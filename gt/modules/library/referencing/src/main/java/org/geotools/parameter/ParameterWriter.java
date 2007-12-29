@@ -221,7 +221,7 @@ public class ParameterWriter extends FilterWriter {
          * Format the table header (i.e. column names).
          */
         final Vocabulary resources = Vocabulary.getResources(locale);
-        final TableWriter table = new TableWriter(out, " \u2502 ");
+        final TableWriter table = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
         table.write(resources.getString(VocabularyKeys.NAME));
@@ -237,7 +237,7 @@ public class ParameterWriter extends FilterWriter {
         table.nextColumn();
         table.write("Units");  // TODO localize
         table.nextLine();
-        table.nextLine('\u2550');
+        table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
         /*
          * Format each element in the parameter group. If values were supplied, we will
          * iterate through the values instead of the descriptor. We do it that way because
@@ -489,7 +489,7 @@ trim:   for (int column=hide.length; --column>=1;) {
          */
         int column = 0;
         synchronized (lock) {
-            final TableWriter table = new TableWriter(out, " \u2502 ");
+            final TableWriter table = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
             table.setMultiLinesCells(true);
             table.writeHorizontalSeparator();
             /*

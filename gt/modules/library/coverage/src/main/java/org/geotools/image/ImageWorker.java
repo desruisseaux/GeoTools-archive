@@ -1695,7 +1695,7 @@ public class ImageWorker {
 		LookupTableJAI table = new LookupTableJAI(tableData);
 		// do the lookup operation
 		PlanarImage luImage = LookupDescriptor.create(image, table,
-				getRenderingHints()).getRendering();
+				getRenderingHints());
 
 		// //
 		//
@@ -1739,8 +1739,7 @@ public class ImageWorker {
 
 		}
 
-		image = BandMergeDescriptor.create(image, luImage, getRenderingHints())
-				.getRendering();
+		image = BandMergeDescriptor.create(image, luImage, getRenderingHints());
 		invalidateStatistics();
 		return this;
 

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2004, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
@@ -32,16 +31,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
-import org.geotools.referencing.Console;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -71,7 +67,7 @@ public class Preprocessor extends Format {
      * The WKT parser, usually a {@link Parser} object.
      */
     protected final Format parser;
-    
+
     /**
      * The set of objects defined by calls to {@link #addDefinition}.
      */
@@ -97,7 +93,7 @@ public class Preprocessor extends Format {
      * of successful parsing.
      */
     transient int offset = 0;
-    
+
     /**
      * Creates a new preprocessor that delegates the work to the specified parser.
      *
@@ -159,6 +155,7 @@ public class Preprocessor extends Format {
      * @return The parsed object.
      * @throws ParseException if the text can't be parsed.
      */
+    @Override
     public Object parseObject(final String wkt) throws ParseException {
         try {
             return parseObject(wkt, Object.class);
@@ -384,7 +381,7 @@ public class Preprocessor extends Format {
     public void printDefinitions(final Writer out) throws IOException {
         final Locale locale = null;
         final Vocabulary resources = Vocabulary.getResources(locale);
-        final TableWriter table = new TableWriter(out, " \u2502 ");
+        final TableWriter table = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
         table.write(resources.getString(VocabularyKeys.NAME));

@@ -297,7 +297,7 @@ public final class CRS {
      * @param  authority The authority name (for example {@code "EPSG"}).
      * @return The set of supported codes. May be empty, but never null.
      */
-    public static Set/*<String>*/ getSupportedCodes(final String authority) {
+    public static Set<String> getSupportedCodes(final String authority) {
         return DefaultAuthorityFactory.getSupportedCodes(authority);
     }
 
@@ -311,7 +311,7 @@ public final class CRS {
      *
      * @since 2.3.1
      */
-    public static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
+    public static Set<String> getSupportedAuthorities(final boolean returnAliases) {
         return DefaultAuthorityFactory.getSupportedAuthorities(returnAliases);
     }
 

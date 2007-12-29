@@ -47,6 +47,7 @@ import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -59,7 +60,6 @@ import org.geotools.factory.Hints;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
 import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.NumberRange;
@@ -69,6 +69,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -240,6 +241,22 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private void checkSource(Object input, final Hints hints)
 			throws UnsupportedEncodingException, DataSourceException,
 			IOException, FileNotFoundException {
+		
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		
+		
+		
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(
 					"No source set to read this coverage.");
@@ -248,8 +265,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			throw ex;
 		}
 		this.source = input;
-		if (hints != null)
-			this.hints.add(hints);
 		closeMe = true;
 		// //
 		//
@@ -402,29 +417,34 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
+		String overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
-			Parameter param;
-			String name;
 			for (int i = 0; i < length; i++) {
-				param = (Parameter) params[i];
-				name = param.getDescriptor().getName().getCode();
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
 				if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
 						.getName().toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
+					continue;
+				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
 				}
 			}
 		}
-		return createCoverage(readEnvelope, requestedDim);
+		return createCoverage(readEnvelope, requestedDim, overviewPolicy);
 	}
 
 	/**
 	 * This method creates the GridCoverage2D from the underlying file.
 	 * 
 	 * @param requestedDim
+	 * @param overviewPolicy 
 	 * @param readEnvelope
 	 * 
 	 * 
@@ -433,7 +453,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim) throws IOException {
+			Rectangle requestedDim, String overviewPolicy) throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
@@ -455,7 +475,8 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, requestedDim);
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);

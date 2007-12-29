@@ -469,7 +469,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             if (remarks == null) {
                 remarks = growable;
             } else if (!growable.isSubsetOf(remarks)) {
-                org.geotools.util.logging.Logging.getLogger("org.geotools.referencing").
+                org.geotools.util.logging.Logging.getLogger(AbstractIdentifiedObject.class).
                         log(Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
@@ -485,7 +485,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     if (current == null) {
                         subProperties.put(prefix, growable);
                     } else if (!growable.isSubsetOf(current)) {
-                        org.geotools.util.logging.Logging.getLogger("org.geotools.referencing")
+                        org.geotools.util.logging.Logging.getLogger(AbstractIdentifiedObject.class)
                                 .log(Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
                     }
                 }

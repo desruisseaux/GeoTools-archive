@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,16 +17,13 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.util.Arrays;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Geotools dependencies
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.XMatrix;
@@ -71,7 +68,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class DimensionFilter {
     /**
-     * The input dimensions to keep.
+     * The input dimensions to keep, in strictly increasing order.
      * This sequence can contains any integers in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>
      * exclusive.
@@ -79,7 +76,7 @@ public class DimensionFilter {
     private int[] sourceDimensions;
 
     /**
-     * The output dimensions to keep.
+     * The output dimensions to keep, in strictly increasing order.
      * This sequence can contains any integers in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>
      * exclusive.
@@ -166,13 +163,13 @@ public class DimensionFilter {
     /**
      * Returns the input dimensions. This information is available only if at least one
      * setter method has been explicitly invoked for source dimensions.
-     * 
+     *
      * @return The input dimension as a sequence of strictly increasing values.
      * @throws IllegalStateException if input dimensions have not been set.
      */
     public int[] getSourceDimensions() throws IllegalStateException {
         if (sourceDimensions != null) {
-            return (int[]) sourceDimensions.clone();
+            return sourceDimensions.clone();
         }
         throw new IllegalStateException();
     }
@@ -240,7 +237,7 @@ public class DimensionFilter {
      */
     public int[] getTargetDimensions() throws IllegalStateException {
         if (targetDimensions != null) {
-            return (int[]) targetDimensions.clone();
+            return targetDimensions.clone();
         }
         throw new IllegalStateException();
     }
@@ -451,7 +448,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
                 }
                 rows[nRows++] = row;
             }
-            rows = (double[][]) XArray.resize(rows, nRows);
+            rows = XArray.resize(rows, nRows);
             if (hasLastRow) {
                 return factory.createAffineTransform(new GeneralMatrix(rows));
             }
@@ -587,7 +584,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
     }
 
     /**
-     * Add the specified {@code dimension} to the specified sequence. Values are added
+     * Adds the specified {@code dimension} to the specified sequence. Values are added
      * in increasing order. Duplicated values are not added.
      *
      * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.
@@ -612,7 +609,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
     }
 
     /**
-     * Add the specified {@code dimensions} to the specified sequence. Values are added
+     * Adds the specified {@code dimensions} to the specified sequence. Values are added
      * in increasing order. Duplicated values are not added.
      *
      * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.
@@ -623,7 +620,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
         if (dimensions.length != 0) {
             ensureValidSeries(dimensions);
             if (sequence == null) {
-                sequence = (int[]) dimensions.clone();
+                sequence = dimensions.clone();
             } else {
                 // Note: the following loop is unefficient, but should suffise since this
                 //       case should not occurs often and arrays should be small anyway.
@@ -636,7 +633,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
     }
 
     /**
-     * Add the specified range to the specified sequence. Values are added
+     * Adds the specified range to the specified sequence. Values are added
      * in increasing order. Duplicated values are not added.
      *
      * @param sequence The {@link #sourceDimensions} or {@link #targetDimensions} sequence to update.

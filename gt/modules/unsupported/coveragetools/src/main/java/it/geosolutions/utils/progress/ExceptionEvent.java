@@ -4,12 +4,16 @@ package it.geosolutions.utils.progress;
  * Event launched when an exception occurrs. Percentage and message may be missing, in this case
  * they will be -1 and the exception message (localized if available, standard otherwise)
  * 
- * @author aaime
+ * @author aaime, TOPP.
  * 
  */
 public class ExceptionEvent extends ProcessingEvent {
 
-    private Exception exception;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2272452028229922551L;
+	private Exception exception;
 
     public ExceptionEvent(Object source, String message, double percentage, Exception exception) {
         super(source, message, percentage);

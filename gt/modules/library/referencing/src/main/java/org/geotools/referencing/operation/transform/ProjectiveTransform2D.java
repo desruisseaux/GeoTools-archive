@@ -28,9 +28,14 @@ import org.opengis.referencing.operation.Matrix;
  */
 final class ProjectiveTransform2D extends ProjectiveTransform implements MathTransform2D {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -3101392684596817045L;
+
+    /**
      * Creates projective transform from a matrix.
      */
-    public ProjectiveTransform2D(Matrix matrix) {
+    public ProjectiveTransform2D(final Matrix matrix) {
         super(matrix);
     }
 }

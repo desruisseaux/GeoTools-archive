@@ -19,17 +19,25 @@ package org.geotools.image.io.mosaic;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.net.URL;
+import java.net.URI;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+
+import org.geotools.io.TableWriter;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -343,14 +351,38 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns the input to be given to the image reader.
+     * Returns the input to be given to the image reader for reading this tile.
      */
     public Object getInput() {
         return input;
     }
 
     /**
-     * Returns the image index to be given to the image reader.
+     * Returns a short string representation of the {@linkplain #input}.
+     * This is only informative and the string content may change.
+     */
+    public String getInputString() {
+        final Object input = getInput();
+        if (input instanceof File) {
+            return ((File) input).getName();
+        }
+        if (input instanceof URI) {
+            return ((URI) input).getPath();
+        }
+        if (input instanceof URL) {
+            return ((URL) input).getPath();
+        }
+        if (input instanceof CharSequence) {
+            return input.toString();
+        }
+        if (input != null) {
+            return input.getClass().getSimpleName();
+        }
+        return Vocabulary.format(VocabularyKeys.UNKNOW);
+    }
+
+    /**
+     * Returns the image index to be given to the image reader for reading this tile.
      */
     public int getImageIndex() {
         return imageIndex;
@@ -358,7 +390,8 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * Returns the pixel size relative to the finest level in an image pyramid.
-     * This method never returns {@code null}.
+     * This method never returns {@code null}, and the width & height shall
+     * never be smaller than 1.
      */
     public Dimension getPixelSize() {
         return new Dimension(dx, dy);
@@ -407,6 +440,14 @@ public class Tile implements Comparable<Tile> {
     final void translate(final int dx, final int dy) {
         x += dx;
         y += dy;
+    }
+
+    /**
+     * Returns {@code true} if this tile can be used for reading an image with the given
+     * subsampling.
+     */
+    final boolean canSubsample(final int xSubsampling, final int ySubsampling) {
+        return (xSubsampling % dx) == 0 && (ySubsampling % dy) == 0;
     }
 
     /**
@@ -487,21 +528,43 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
+     * Returns the name of the given method, for {@link #toString} purpose only.
+     * May returns {@code null} if the name is unknown.
+     */
+    static String toString(final ImageReader reader) {
+        String name = null;
+        if (reader != null) {
+            final ImageReaderSpi spi = reader.getOriginatingProvider();
+            if (spi != null) {
+                final String[] formats = spi.getFormatNames();
+                if (formats != null) {
+                    int length = 0;
+                    for (int i=0; i<formats.length; i++) {
+                        final String candidate = formats[i];
+                        if (candidate != null) {
+                            final int lg = candidate.length();
+                            if (lg > length) {
+                                length = lg;
+                                name = candidate;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return name;
+    }
+
+    /**
      * Returns a string representation of this tile. The returned string is mostly for
      * debugging purpose and could change in any future version.
      */
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this)).append('[');
-        final ImageReader reader = getReader();
+        final String reader = toString(getReader());
         if (reader != null) {
-            final ImageReaderSpi spi = reader.getOriginatingProvider();
-            if (spi != null) {
-                final String[] formats = spi.getFormatNames();
-                if (formats != null && formats.length != 0) {
-                    buffer.append("reader=\"").append(formats[0]).append("\", ");
-                }
-            }
+            buffer.append("reader=\"").append(reader).append("\", ");
         }
         buffer.append("input=\"").append(Utilities.deepToString(getInput())).append("\", ");
         if (!isGetRegionCheap()) {
@@ -521,5 +584,42 @@ public class Tile implements Comparable<Tile> {
             buffer.append(e);
         }
         return buffer.append(']').toString();
+    }
+
+    /**
+     * Returns a string representation of a collection of tiles. The tiles are formatted in a
+     * table in iteration order. Tip: consider sorting the tiles before to invoke this method.
+     *
+     * @see java.util.Collections#sort(List)
+     */
+    public static String toString(final Collection<Tile> tiles) {
+        final TableWriter table = new TableWriter(null);
+        table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
+        table.write("Reader\tInput\tx\ty\twidth\theight\n");
+        table.nextLine(TableWriter.SINGLE_HORIZONTAL_LINE);
+        table.setMultiLinesCells(true);
+        for (final Tile tile : tiles) {
+            table.setAlignment(TableWriter.ALIGN_LEFT);
+            final String reader = toString(tile.getReader());
+            if (reader != null) {
+                table.write(reader);
+            }
+            table.nextColumn();
+            table.write(Utilities.deepToString(tile.getInput()));
+            table.nextColumn();
+            table.setAlignment(TableWriter.ALIGN_RIGHT);
+            table.write(String.valueOf(tile.x));
+            table.nextColumn();
+            table.write(String.valueOf(tile.y));
+            if (tile.isGetRegionCheap()) {
+                table.nextColumn();
+                table.write(String.valueOf(tile.width));
+                table.nextColumn();
+                table.write(String.valueOf(tile.height));
+            }
+            table.nextLine();
+        }
+        table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
+        return table.toString();
     }
 }

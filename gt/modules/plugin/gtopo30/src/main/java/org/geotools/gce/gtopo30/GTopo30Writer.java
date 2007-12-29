@@ -52,6 +52,7 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -221,12 +222,15 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		// managing hints
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (super.hints == null)
-		{
-			this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-		}
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
 		if (hints != null) {
-
+			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
 	}

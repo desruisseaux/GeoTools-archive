@@ -16,7 +16,6 @@
  */
 package org.geotools.resources.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -70,6 +69,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the minimum value, which is negative infinity.
      */
+    @Override
     public double getMinX() {
         return java.lang.Double.NEGATIVE_INFINITY;
     }
@@ -77,6 +77,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the minimum value, which is negative infinity.
      */
+    @Override
     public double getMinY() {
         return java.lang.Double.NEGATIVE_INFINITY;
     }
@@ -84,6 +85,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the maximum value, which is positive infinity.
      */
+    @Override
     public double getMaxX() {
         return java.lang.Double.POSITIVE_INFINITY;
     }
@@ -91,6 +93,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the maximum value, which is positive infinity.
      */
+    @Override
     public double getMaxY() {
         return java.lang.Double.POSITIVE_INFINITY;
     }
@@ -112,6 +115,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the center, which is NaN since we can't compute a center from infinite bounds.
      */
+    @Override
     public double getCenterX() {
         return java.lang.Double.NaN;
     }
@@ -119,6 +123,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the center, which is NaN since we can't compute a center from infinite bounds.
      */
+    @Override
     public double getCenterY() {
         return java.lang.Double.NaN;
     }
@@ -126,18 +131,21 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Do nothing, since we can't extends an infinite rectangle.
      */
+    @Override
     public void add(Rectangle2D rect) {
     }
 
     /**
      * Do nothing, since we can't extends an infinite rectangle.
      */
+    @Override
     public void add(Point2D point) {
     }
 
     /**
      * Do nothing, since we can't extends an infinite rectangle.
      */
+    @Override
     public void add(double x, double y) {
     }
 
@@ -151,6 +159,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns 0, since the specified point can't be outside this rectangle.
      */
+    @Override
     public int outcode(Point2D point) {
         return 0;
     }
@@ -158,6 +167,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean contains(Point2D point) {
         return true;
     }
@@ -165,6 +175,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean contains(Rectangle2D rect) {
         return true;
     }
@@ -172,6 +183,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean contains(double x, double y) {
         return true;
     }
@@ -179,6 +191,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean contains(double x, double y, double w, double h) {
         return true;
     }
@@ -186,6 +199,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean intersects(Rectangle2D rect) {
         return true;
     }
@@ -193,6 +207,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean intersects(double x, double y, double w, double h) {
         return true;
     }
@@ -200,6 +215,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean intersectsLine(double x, double y, double u, double v) {
         return true;
     }
@@ -207,6 +223,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns {@code true} since this rectangle contains all points.
      */
+    @Override
     public boolean intersectsLine(Line2D line) {
         return true;
     }
@@ -222,6 +239,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
      * Returns {@code this}.
      * No need to returns a clone, since this rectangle is immutable.
      */
+    @Override
     public Rectangle2D getFrame() {
         return this;
     }
@@ -230,6 +248,7 @@ final class InfiniteRectangle2D extends Rectangle2D implements Serializable {
      * Returns {@code this}.
      * No need to returns a clone, since this rectangle is immutable.
      */
+    @Override
     public Rectangle2D getBounds2D() {
         return this;
     }

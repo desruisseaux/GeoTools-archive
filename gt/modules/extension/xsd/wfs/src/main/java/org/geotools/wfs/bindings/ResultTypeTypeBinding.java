@@ -15,21 +15,22 @@
  */
 package org.geotools.wfs.bindings;
 
+import net.opengis.wfs.ResultTypeType;
 import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
 
-
 /**
  * Binding object for the type http://www.opengis.net/wfs:ResultTypeType.
- *
+ * 
  * <p>
- *        <pre>
+ * 
+ * <pre>
  *         <code>
- *  &lt;xsd:simpleType name="ResultTypeType"&gt;
- *      &lt;xsd:restriction base="xsd:string"&gt;
- *          &lt;xsd:enumeration value="results"&gt;
+ *  &lt;xsd:simpleType name=&quot;ResultTypeType&quot;&gt;
+ *      &lt;xsd:restriction base=&quot;xsd:string&quot;&gt;
+ *          &lt;xsd:enumeration value=&quot;results&quot;&gt;
  *              &lt;xsd:annotation&gt;
  *                  &lt;xsd:documentation&gt;
  *                    Indicates that a complete response should be generated
@@ -38,11 +39,11 @@ import org.geotools.xml.*;
  *                 &lt;/xsd:documentation&gt;
  *              &lt;/xsd:annotation&gt;
  *          &lt;/xsd:enumeration&gt;
- *          &lt;xsd:enumeration value="hits"&gt;
+ *          &lt;xsd:enumeration value=&quot;hits&quot;&gt;
  *              &lt;xsd:annotation&gt;
  *                  &lt;xsd:documentation&gt;
  *                    Indicates that an empty response should be generated with
- *                    the "numberOfFeatures" attribute set (i.e. no feature
+ *                    the &quot;numberOfFeatures&quot; attribute set (i.e. no feature
  *                    instances should be returned).  In this manner a client may
  *                    determine the number of feature instances that a GetFeature
  *                    request will return without having to actually get the
@@ -52,11 +53,11 @@ import org.geotools.xml.*;
  *          &lt;/xsd:enumeration&gt;
  *      &lt;/xsd:restriction&gt;
  *  &lt;/xsd:simpleType&gt;
- *
- *          </code>
+ * </code>
  *         </pre>
+ * 
  * </p>
- *
+ * 
  * @generated
  */
 public class ResultTypeTypeBinding extends AbstractSimpleBinding {
@@ -71,24 +72,23 @@ public class ResultTypeTypeBinding extends AbstractSimpleBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return ResultTypeType.class;
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
-    public Object parse(InstanceComponent instance, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, value);
+    public Object parse(InstanceComponent instance, Object value) throws Exception {
+        assert value instanceof String;
+        String literal = (String) value;
+        ResultTypeType resultTypeType = ResultTypeType.get(literal);
+        return resultTypeType;
     }
 }

@@ -16,21 +16,16 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.image.RenderedImage;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-// JAI dependencies
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
-// OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -51,6 +46,11 @@ import org.opengis.referencing.operation.TransformException;
  * @since 2.2
  */
 public final class Interpolator2D extends GridCoverage2D {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 9028980295030908004L;
+
     /**
      * The greatest value smaller than 1 representable as a {@code float} number.
      * This value can be obtained with {@code org.geotools.resources.XMath.previous(1f)}.
@@ -84,30 +84,30 @@ public final class Interpolator2D extends GridCoverage2D {
      * Image bounds. Bounds have been reduced by {@link Interpolation}'s padding.
      */
     private final int xmin, ymin, xmax, ymax;
-    
+
     /**
      * Interpolation padding.
      */
     private final int top, left;
-    
+
     /**
      * The interpolation bounds. Interpolation will use pixel inside this rectangle.
      * This rectangle is passed as an argument to {@link RectIterFactory}.
      */
     private final Rectangle bounds;
-    
+
     /**
      * Arrays to use for passing arguments to interpolation.
      * This array will be constructed only when first needed.
      */
     private transient double[][] doubles;
-    
+
     /**
      * Arrays to use for passing arguments to interpolation.
      * This array will be constructed only when first needed.
      */
     private transient float[][] floats;
-    
+
     /**
      * Arrays to use for passing arguments to interpolation.
      * This array will be constructed only when first needed.
@@ -130,7 +130,7 @@ public final class Interpolator2D extends GridCoverage2D {
         }
         return create(coverage, DEFAULTS);
     }
-    
+
     /**
      * Constructs a new interpolator for a single interpolation.
      *
@@ -221,23 +221,23 @@ public final class Interpolator2D extends GridCoverage2D {
         } catch (NoninvertibleTransformException exception) {
             throw new IllegalArgumentException(exception);
         }
-        
+
         final int left   = interpolation.getLeftPadding();
         final int right  = interpolation.getRightPadding();
         final int top    = interpolation.getTopPadding();
         final int bottom = interpolation.getBottomPadding();
-        
+
         this.top  = top;
         this.left = left;
-        
+
         final int x = image.getMinX();
         final int y = image.getMinY();
-        
+
         this.xmin = x + left;
         this.ymin = y + top;
         this.xmax = x + image.getWidth()  - right;
         this.ymax = y + image.getHeight() - bottom;
-        
+
         bounds = new Rectangle(0, 0, interpolation.getWidth(), interpolation.getHeight());
     }
 
@@ -259,6 +259,7 @@ public final class Interpolator2D extends GridCoverage2D {
      *         geophysics values, or {@code false} to get the packed version.
      * @return The newly created grid coverage.
      */
+    @Override
     protected GridCoverage2D createGeophysics(final boolean geo) {
         return create(getSource().geophysics(geo), getInterpolations());
     }
@@ -268,7 +269,7 @@ public final class Interpolator2D extends GridCoverage2D {
      * this grid coverage. Other elements (if any) are fallbacks.
      */
     public Interpolation[] getInterpolations() {
-        final List interp = new ArrayList();
+        final List<Interpolation> interp = new ArrayList<Interpolation>(4);
         Interpolator2D scan = this;
         do {
             interp.add(interpolation);
@@ -279,12 +280,13 @@ public final class Interpolator2D extends GridCoverage2D {
             scan = scan.fallback;
         }
         while (scan != null);
-        return (Interpolation[]) interp.toArray(new Interpolation[interp.size()]);
+        return interp.toArray(new Interpolation[interp.size()]);
     }
 
     /**
      * Returns the primary interpolation used by this {@code Interpolator2D}.
      */
+    @Override
     public Interpolation getInterpolation() {
         return interpolation;
     }
@@ -299,6 +301,7 @@ public final class Interpolator2D extends GridCoverage2D {
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public int[] evaluate(final Point2D coord, int[] dest) throws CannotEvaluateException {
         if (fallback != null) {
             dest = super.evaluate(coord, dest);
@@ -329,6 +332,7 @@ public final class Interpolator2D extends GridCoverage2D {
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public float[] evaluate(final Point2D coord, float[] dest) throws CannotEvaluateException {
         if (fallback != null) {
             dest = super.evaluate(coord, dest);
@@ -359,6 +363,7 @@ public final class Interpolator2D extends GridCoverage2D {
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public double[] evaluate(final Point2D coord, double[] dest) throws CannotEvaluateException {
         if (fallback != null) {
             dest = super.evaluate(coord, dest);
@@ -525,7 +530,7 @@ public final class Interpolator2D extends GridCoverage2D {
         }
         return dest;
     }
-    
+
     /**
      * Interpolate at the specified position. If {@code fallback!=null},
      * then {@code dest} <strong>must</strong> have been initialized with

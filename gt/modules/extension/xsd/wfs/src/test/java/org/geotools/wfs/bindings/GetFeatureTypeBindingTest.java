@@ -16,9 +16,16 @@
 package org.geotools.wfs.bindings;
 
 import java.math.BigInteger;
+import java.net.URL;
+import java.util.List;
 
 import net.opengis.wfs.GetFeatureType;
+import net.opengis.wfs.GetGmlObjectType;
+import net.opengis.wfs.QueryType;
+import net.opengis.wfs.ResultTypeType;
 
+import org.eclipse.emf.common.util.EList;
+import org.geotools.test.TestData;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
@@ -54,8 +61,24 @@ public class GetFeatureTypeBindingTest extends WFSTestSupport {
     }
 
     public void testParse() throws Exception {
-        // throw new UnsupportedOperationException("Not yet implemented");
-        // temporarilly force pass to not break the build
-        assertTrue(true);
+        final URL resource = TestData.getResource(this, "GetFeatureTypeBindingTest.xml");
+        buildDocument(resource);
+
+        Object parsed = parse(WFS.GetFeature);
+        assertTrue(parsed instanceof GetFeatureType);
+        GetFeatureType req = (GetFeatureType) parsed;
+        assertEquals("WFS", req.getService());
+        assertEquals("1.1.0", req.getVersion());
+        assertEquals("fooHandle", req.getHandle());
+        assertEquals("fooFormat", req.getOutputFormat());
+        assertEquals(ResultTypeType.HITS_LITERAL, req.getResultType());
+        assertEquals(1000, req.getMaxFeatures().intValue());
+        assertEquals("*", req.getTraverseXlinkDepth());
+        assertEquals(2, req.getTraverseXlinkExpiry().intValue());
+
+        List queries = req.getQuery();
+        assertEquals(2, queries.size());
+        assertTrue(queries.get(0) instanceof QueryType);
+        assertTrue(queries.get(1) instanceof QueryType);
     }
 }

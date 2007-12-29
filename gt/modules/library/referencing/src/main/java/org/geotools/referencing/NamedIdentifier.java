@@ -345,7 +345,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
             if (remarks == null) {
                 remarks = growable;
             } else {
-                org.geotools.util.logging.Logging.getLogger("org.geotools.referencing").log(
+                org.geotools.util.logging.Logging.getLogger(NamedIdentifier.class).log(
                                  Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }

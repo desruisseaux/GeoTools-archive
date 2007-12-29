@@ -40,6 +40,12 @@ import org.geotools.resources.i18n.Errors;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Having <cite>band dimension</cite> in this class is a problem because it make
+ *             difficult to implement {@link NetcdfImageReader#getNumBands} in a reliable way.
+ *             The information contained in this class need to move in some interface or in
+ *             a {@code FileImageReaderND} superclass (common to NetCDF and HDF readers). The
+ *             {@link AxisType} enumeration needs to be replaced by something neutral from GeoAPI.
  */
 public class NetcdfReadParam extends GeographicImageReadParam {
     /**
@@ -81,9 +87,20 @@ public class NetcdfReadParam extends GeographicImageReadParam {
     }
 
     /**
+     * Returns {@code true} if there is some possibility that {@link #getBandDimension}
+     * returns a positive value.
+     */
+    final boolean isBandDimensionSet() {
+        return (bandDimensionTypes != null) && !bandDimensionTypes.isEmpty() &&
+                NetcdfReadParam.class.equals(getClass());
+        // The last check is because the user could have overriden getBandDimension.
+    }
+
+    /**
      * Returns the dimension to assign to bands for the specified variable. The default
      * implementation returns the last dimension corresponding to one of the types specified
-     * to {@link #setBandDimensionTypes}.
+     * to {@link #setBandDimensionTypes}. Users can override this method if the bands should
+     * be assigned from a dimension computed differently.
      * <p>
      * <b>Example:</b> For a NetCDF variable having dimensions in the
      * (<var>t</var>,<var>z</var>,<var>y</var>,<var>x</var>) order (as in CF convention), if the
@@ -94,17 +111,17 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      * @param variable The variable for which we want to determine the dimension to assign to bands.
      * @return The dimension assigned to bands, or {@code -1} if none.
      */
-    public int getBandDimension(final VariableEnhanced variable) {
+    protected int getBandDimension(final VariableEnhanced variable) {
         if (bandDimensionTypes != null) {
-            final List sys = variable.getCoordinateSystems();
+            final List<CoordinateSystem> sys = variable.getCoordinateSystems();
             if (sys != null) {
                 final int count = sys.size();
                 for (int i=0; i<count; i++) {
-                    final CoordinateSystem cs = (CoordinateSystem) sys.get(i);
-                    final List axes = cs.getCoordinateAxes();
+                    final CoordinateSystem cs = sys.get(i);
+                    final List<CoordinateAxis> axes = cs.getCoordinateAxes();
                     if (axes != null) {
                         for (int j=axes.size(); --j>=0;) { // Must be reverse order; see javadoc
-                            final CoordinateAxis axis = (CoordinateAxis) axes.get(j);
+                            final CoordinateAxis axis = axes.get(j);
                             if (axis != null && bandDimensionTypes.contains(axis.getAxisType())) {
                                 return j;
                             }
@@ -139,10 +156,8 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      * the {@linkplain AxisType#Height height} and {@linkplain AxisType#Pressure pressure} types.
      *
      * @param type The types of dimension to assign to bands.
-     *
-     * @todo Use vararg when we will be allowed to compile for J2SE 1.5.
      */
-    public void setBandDimensionTypes(final AxisType[] types) {
+    public void setBandDimensionTypes(final AxisType... types) {
         if (types != null && types.length != 0) {
             if (bandDimensionTypes == null) {
                 bandDimensionTypes = new HashSet<AxisType>();

@@ -224,10 +224,44 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
 
     /**
      * Creates the datasource for the data store.
+     * <p>
+     * This method creates a {@link BasicDataSource} instance and populates it
+     * as follows:
+     * <ul>
+     *  <li>poolPreparedStatements -> false
+     *  <li>driverClassName -> {@link #getDriverClassName()}
+     *  <li>url -> 'jdbc:&lt;{@link #getDatabaseID()}>://&lt;{@link #HOST}>/&lt;{@link #DATABASE}>'
+     *  <li>username -> &lt;{@link #USER}>
+     *  <li>password -> &lt;{@link #PASSWD}>
+     * </ul>
+     * If different behaviour is needed, this method should be extended or 
+     * overridden.
+     * </p>
      */
     protected DataSource createDataSource( Map params ) throws IOException {
         BasicDataSource dataSource = new BasicDataSource();
-       
+        
+        //some defualt data source behaviour
+        dataSource.setPoolPreparedStatements(false);
+        
+        //driver
+        dataSource.setDriverClassName(getDriverClassName());
+        
+        //jdbc url
+        String host = (String) HOST.lookUp( params );
+        String db = (String) DATABASE.lookUp( params );
+        dataSource.setUrl( "jdbc:" + getDatabaseID() + "://" + host + "/" + db );
+        
+        //username
+        String user = (String) USER.lookUp(params);
+        dataSource.setUsername( user );
+        
+        //password
+        String passwd = (String) PASSWD.lookUp(params);
+        if ( passwd != null ) {
+            dataSource.setPassword(passwd);
+        }
+        
         return dataSource;
     }
 

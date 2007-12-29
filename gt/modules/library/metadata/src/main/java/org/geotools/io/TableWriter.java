@@ -85,6 +85,34 @@ public class TableWriter extends FilterWriter {
     public static final int ALIGN_CENTER = StyleConstants.ALIGN_CENTER;
 
     /**
+     * A column separator for {@linkplain #TableWriter(Writer,String) constructor}.
+     *
+     * @since 2.5
+     */
+    public static final String SINGLE_VERTICAL_LINE = " \u2502 ";
+
+    /**
+     * A column separator for {@linkplain #TableWriter(Writer,String) constructor}.
+     *
+     * @since 2.5
+     */
+    public static final String DOUBLE_VERTICAL_LINE = " \u2551 ";
+
+    /**
+     * A line separator for {@plain #nextLine(char)}.
+     *
+     * @since 2.5
+     */
+    public static final char SINGLE_HORIZONTAL_LINE = '\u2500';
+
+    /**
+     * A line separator for {@plain #nextLine(char)}.
+     *
+     * @since 2.5
+     */
+    public static final char DOUBLE_HORIZONTAL_LINE = '\u2550';
+
+    /**
      * Drawing-box characters. The last two characters
      * are horizontal and vertical line respectively.
      */
@@ -234,6 +262,9 @@ public class TableWriter extends FilterWriter {
      *        only way to get the table's content.
      * @param separator String to write between columns. Drawing box characters are treated
      *        specially. For example {@code " \\u2502 "} can be used for a single-line box.
+     *
+     * @see #SINGLE_VERTICAL_LINE
+     * @see #DOUBLE_VERTICAL_LINE
      */
     public TableWriter(final Writer out, final String separator) {
         super(out!=null ? out : new StringWriter());
@@ -404,8 +435,10 @@ public class TableWriter extends FilterWriter {
 
     /**
      * Returns the number of rows in this table. This count is reset to 0 by {@link #flush}.
+     *
+     * @since 2.5
      */
-    private int getRowCount() {
+    public int getRowCount() {
         int count = row;
         if (column != 0) {
             count++;
@@ -415,8 +448,10 @@ public class TableWriter extends FilterWriter {
 
     /**
      * Returns the number of columns in this table.
+     *
+     * @since 2.5
      */
-    private int getColumnCount() {
+    public int getColumnCount() {
         return width.length;
     }
 
@@ -604,7 +639,7 @@ public class TableWriter extends FilterWriter {
             if (column!=0 || buffer.length()!=0) {
                 nextLine();
             }
-            nextLine('\u2500');
+            nextLine(SINGLE_HORIZONTAL_LINE);
         }
     }
 
@@ -663,6 +698,9 @@ public class TableWriter extends FilterWriter {
      *
      * @param fill Character filling the rest of the line (default to whitespace).
      *             This caracter may be use as a row separator.
+     *
+     * @see #SINGLE_HORIZONTAL_LINE
+     * @see #DOUBLE_HORIZONTAL_LINE
      */
     public void nextLine(final char fill) {
         synchronized (lock) {

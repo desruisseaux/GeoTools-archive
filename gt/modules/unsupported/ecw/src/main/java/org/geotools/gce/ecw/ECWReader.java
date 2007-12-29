@@ -47,6 +47,7 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -57,16 +58,17 @@ import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -130,13 +132,20 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		coverageName = "ECW";
 		try {
+
 			// //
 			//
-			// Hints
+			// managing hints
 			//
 			// //
-			if (hints != null)
+			if (this.hints == null)
+				this.hints = new Hints();
+			if (hints != null) {
+				// prevent the use from reordering axes
 				this.hints.add(hints);
+			}
+			this.coverageFactory = FactoryFinder
+					.getGridCoverageFactory(this.hints);
 
 			// //
 			//
@@ -168,6 +177,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 					: "ECW_coverage";
 			// release the stream if we can.
 			finalStreamPreparation();
+			reader.dispose();
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -520,12 +530,15 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
+		String overviewPolicy=null;
+		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
+		int iUseJAI = 0;
 		if (params != null) {
 
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				Parameter param = (Parameter) params[i];
-				String name = param.getDescriptor().getName().getCode();
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
 				if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
 						.getName().toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
@@ -534,26 +547,40 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
+					continue;
 				}
 
+				if (name.equalsIgnoreCase(AbstractGridFormat.USE_JAI_IMAGEREAD
+						.getName().toString())) {
+					iUseJAI = param.booleanValue() ? 1 : -1;
+					continue;
+				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName()
+						.toString())) {
+					overviewPolicy = param.stringValue();
+					continue;
+				}
 			}
 		}
-		return createCoverage(readEnvelope, requestedDim);
+		return createCoverage(readEnvelope, requestedDim, iUseJAI,
+				overviewPolicy);
 	}
 
 	/**
 	 * This method creates the GridCoverage2D from the underlying file.
 	 * 
 	 * @param requestedDim
+	 * @param iUseJAI
+	 * @param overviewPolicy
 	 * @param readEnvelope
 	 * 
 	 * 
 	 * @return a GridCoverage
 	 * 
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim) throws IOException {
+			Rectangle requestedDim, int iUseJAI, String overviewPolicy) throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
@@ -575,7 +602,8 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, requestedDim);
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -608,11 +636,10 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 					// order to interact with the original envelope
 					//
 					// //
-					final MathTransform transform = operationFactory
-							.createOperation(
-									requestedEnvelope
-											.getCoordinateReferenceSystem(),
-									crs).getMathTransform();
+					final MathTransform transform = CRS.findMathTransform(
+							CRSUtilities.getCRS2D(requestedEnvelope
+									.getCoordinateReferenceSystem()),
+							CRSUtilities.getCRS2D(crs), true);
 					if (!transform.isIdentity()) {
 						requestedEnvelope = CRS.transform(transform,
 								requestedEnvelope);
@@ -647,7 +674,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 
 			// //
 			//
-			// Crop the sourced region
+			// Crop the source region
 			//
 			// //
 			try {
@@ -695,25 +722,38 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 		// image and metadata
 		//
 		// //
-		final ParameterBlock pbjImageRead = new ParameterBlock();
-		pbjImageRead.add(input);
-		pbjImageRead.add(imageChoice);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(null);
-		pbjImageRead.add(null);
-		pbjImageRead.add(readP);
-		pbjImageRead.add(readerSPI.createReaderInstance());
-		ecwCoverage = JAI.create("ImageRead", pbjImageRead, hints);
-
+		boolean useJAI = iUseJAI!=0?(iUseJAI>0):true;
+		if (iUseJAI==0&&this.hints != null) {
+			Object o = this.hints.get(Hints.USE_JAI_IMAGEREAD);
+			if (o != null)
+				useJAI = ((Boolean) o).booleanValue();
+		}
+		if (useJAI) {
+			final ParameterBlock pbjImageRead = new ParameterBlock();
+			pbjImageRead.add(input);
+			pbjImageRead.add(imageChoice);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(null);
+			pbjImageRead.add(null);
+			pbjImageRead.add(readP);
+			pbjImageRead.add(readerSPI.createReaderInstance());
+			ecwCoverage = JAI.create("ImageRead", pbjImageRead, hints);
+		}
+		else
+		{
+			final ImageReader reader = readerSPI.createReaderInstance();
+			reader.setInput(input,true,true);
+			reader.read(imageChoice,readP);
+			ecwCoverage=PlanarImage.wrapRenderedImage(reader.read(imageChoice));
+		}
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Creating the coverage
 		//
 		// /////////////////////////////////////////////////////////////////////
 		try {
-
 			if (intersectionEnvelope != null) {
 				// I need to calculate a new transformation (raster2Model)
 				// between the cropped image and the required

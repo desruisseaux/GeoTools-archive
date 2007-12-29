@@ -37,6 +37,7 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.Interpolation;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -82,7 +83,8 @@ import org.opengis.geometry.Envelope;
 public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		GridCoverageWriter {
 	/** Logger. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("org.geotools.gce.arcgrid");
 
 	/** Imageio {@link AsciiGridsImageWriter} we will use to write out. */
 	private AsciiGridsImageWriter mWriter = new AsciiGridsImageWriter(
@@ -186,15 +188,16 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		else
 			throw new DataSourceException(
 					"The provided destination cannot be used!");
+
 		// //
 		//
 		// managing hints
 		//
 		// //
+		if (this.hints == null)
+			this.hints = new Hints();
 		if (hints != null) {
-			if (this.hints == null) {
-				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-			}
+			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
 	}
@@ -564,8 +567,8 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final AffineTransform gridToWorldTransform = new AffineTransform(
-				(AffineTransform) ((GridGeometry2D) coverage
-						.getGridGeometry()).getGridToCRS2D());
+				(AffineTransform) ((GridGeometry2D) coverage.getGridGeometry())
+						.getGridToCRS2D());
 		XAffineTransform.round(gridToWorldTransform, EPS);
 		final int swapXY = XAffineTransform.getSwapXY(gridToWorldTransform);
 		final double rotation = XAffineTransform
@@ -589,21 +592,22 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		final int flip = XAffineTransform.getFlip(gridToWorldTransform);
 		final CoordinateReferenceSystem crs2D = ((GridCoverage2D) coverage)
 				.getCoordinateReferenceSystem2D();
-		//flip==-1 means there is a flip.
-		if(flip>0)
+		// flip==-1 means there is a flip.
+		if (flip > 0)
 			throw new IOException(
 					"Impossible to encode this coverage as an ascii grid since its"
 							+ "coordinate reference system has strange axes orientation");
-		//let's check that its the Y axis that's flipped
-		if(!AxisDirection.NORTH.equals(crs2D.getCoordinateSystem().getAxis(1).getDirection()))
+		// let's check that its the Y axis that's flipped
+		if (!AxisDirection.NORTH.equals(crs2D.getCoordinateSystem().getAxis(1)
+				.getDirection()))
 			throw new IOException(
 					"Impossible to encode this coverage as an ascii grid since its"
 							+ "coordinate reference system has strange axes orientation");
-		if(!AxisDirection.EAST.equals(crs2D.getCoordinateSystem().getAxis(0).getDirection()))
+		if (!AxisDirection.EAST.equals(crs2D.getCoordinateSystem().getAxis(0)
+				.getDirection()))
 			throw new IOException(
 					"Impossible to encode this coverage as an ascii grid since its"
 							+ "coordinate reference system has strange axes orientation");
-			
 
 	}
 

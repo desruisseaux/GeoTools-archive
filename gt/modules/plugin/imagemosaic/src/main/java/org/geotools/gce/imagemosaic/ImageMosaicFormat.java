@@ -45,6 +45,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
 
 /**
  * {@link AbstractGridFormat} sublass for controlling {@link ImageMosaicReader} creation. As the
@@ -90,20 +91,24 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
             .getLogger("org.geotools.gce.imagemosaic");
 
     /** Control the type of the final mosaic. */
-    public static final DefaultParameterDescriptor FADING = new DefaultParameterDescriptor(
-            "Fading", Boolean.class, null, Boolean.FALSE);
+    public static final ParameterDescriptor<Boolean> FADING = new DefaultParameterDescriptor<Boolean>(
+            "Fading", Boolean.class, new Boolean[]{Boolean.TRUE,Boolean.FALSE}, Boolean.FALSE);
 
     /** Control the transparency of the input coverages. */
-    public static final DefaultParameterDescriptor INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+    public static final ParameterDescriptor<Color> INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor<Color>(
             "InputTransparentColor", Color.class, null, null);
 
     /** Control the transparency of the output coverage. */
-    public static final DefaultParameterDescriptor OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+    public static final ParameterDescriptor<Color> OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor<Color>(
             "OutputTransparentColor", Color.class, null, null);
 
     /** Control the thresholding on the input coverage */
-    public static final DefaultParameterDescriptor INPUT_IMAGE_THRESHOLD_VALUE = new DefaultParameterDescriptor(
+    public static final ParameterDescriptor<Double> INPUT_IMAGE_THRESHOLD_VALUE = new DefaultParameterDescriptor<Double>(
             "InputImageThresholdValue", Double.class, null, new Double(Double.NaN));
+    
+    /** Control the thresholding on the input coverage */
+    public static final ParameterDescriptor<Integer> MAX_ALLOWED_TILES = new DefaultParameterDescriptor<Integer>(
+            "MaxAllowedTiles", Integer.class, null, new Integer(Integer.MAX_VALUE));
 
     /**
      * Creates an instance and sets the metadata.
@@ -116,8 +121,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
      * Sets the metadata information.
      */
     private void setInfo() {
-        HashMap info = new HashMap();
-
+        final HashMap<String,String> info = new HashMap<String,String> ();
         info.put("name", "ImageMosaic");
         info.put("description", "Image mosaicking plugin");
         info.put("vendor", "Geotools");

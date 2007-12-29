@@ -460,7 +460,11 @@ public abstract class XAffineTransform extends AffineTransform {
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleX0.png">.
      */
     public static double getScaleX0(final AffineTransform tr) {
-        return Math.hypot(tr.getScaleX(), tr.getShearX());
+        final double scale = tr.getScaleX();
+        final double shear = tr.getShearX();
+        if (shear == 0) return Math.abs(scale);  // Optimization for a very common case.
+        if (scale == 0) return Math.abs(shear);  // Not as common as above, but still common enough.
+        return Math.hypot(scale, shear);
     }
 
     /**
@@ -469,7 +473,11 @@ public abstract class XAffineTransform extends AffineTransform {
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleY0.png">.
      */
     public static double getScaleY0(final AffineTransform tr) {
-        return Math.hypot(tr.getScaleY(), tr.getShearY());
+        final double scale = tr.getScaleY();
+        final double shear = tr.getShearY();
+        if (shear == 0) return Math.abs(scale);  // Optimization for a very common case.
+        if (scale == 0) return Math.abs(shear);  // Not as common as above, but still common enough.
+        return Math.hypot(scale, shear);
     }
 
     /**

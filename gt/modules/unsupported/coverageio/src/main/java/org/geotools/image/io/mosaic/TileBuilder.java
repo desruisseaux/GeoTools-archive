@@ -54,7 +54,7 @@ public class TileBuilder {
     /**
      * Small number for floating point comparaisons.
      */
-    private static final double EPS = 1E-6;
+    private static final double EPS = 1E-10;
 
     /**
      * The origin of the final bounding box (the one including every tiles).
@@ -317,19 +317,38 @@ public class TileBuilder {
             /*
              * Picks an affine transform to be used as the reference one. We need the finest one.
              * If more than one have the finest resolution, the exact choice does not matter much.
+             * But we will save a little bit of CPU if we pickup the one that will lead to a (0,0)
+             * translation at the end of this method.
              */
             AffineTransform reference = null;
+            double xMin  = Double.POSITIVE_INFINITY;
+            double yMin  = Double.POSITIVE_INFINITY;
             double scale = Double.POSITIVE_INFINITY;
             for (final AffineTransform tr : levels.keySet()) {
-                double s = 0;
-                for (int i=0; i<4; i++) {
-                    final double c = coefficient(tr, i);
-                    s += c*c;
+                final double s = XAffineTransform.getScale(tr);
+                if (s == scale) {
+                    double y = tr.getTranslateY();
+                    if (tr.getScaleY() < 0 || tr.getShearY() < 0) {
+                        y = -y;
+                    }
+                    if (y == yMin) {
+                        double x = tr.getTranslateX();
+                        if (tr.getScaleX() < 0 || tr.getShearX() < 0) {
+                            x = -x;
+                        }
+                        if (!(x < xMin)) {  // Use '!' for catching NaN.
+                            continue;
+                        }
+                        xMin = x;
+                    } else if (!(y < yMin)) {  // Use '!' for catching NaN.
+                        continue;
+                    }
+                    yMin = y;
+                } else if (!(s < scale)) {  // Use '!' for catching NaN.
+                    continue;
                 }
-                if (s < scale) {
-                    scale = s;
-                    reference = tr;
-                }
+                scale = s;
+                reference = tr;
             }
             if (Double.isInfinite(scale)) {
                 continue;
@@ -420,59 +439,21 @@ public class TileBuilder {
      * Sorts affine transform by increasing X scales in absolute value.
      * For {@link #computePyramidLevels} internal working only.
      */
-    private static final Comparator<AffineTransform> X_COMPARATOR = new ScaleComparator(0);
+    private static final Comparator<AffineTransform> X_COMPARATOR = new Comparator<AffineTransform>() {
+        public int compare(final AffineTransform tr1, final AffineTransform tr2) {
+            return Double.compare(XAffineTransform.getScaleX0(tr1), XAffineTransform.getScaleX0(tr2));
+        }
+    };
 
     /**
      * Sorts affine transform by increasing Y scales in absolute value.
      * For {@link #computePyramidLevels} internal working only.
      */
-    private static final Comparator<AffineTransform> Y_COMPARATOR = new ScaleComparator(2);
-
-    /**
-     * Implementation of {@link #X_COMPARATOR} and {@link #Y_COMPARATOR}.
-     */
-    private static final class ScaleComparator implements Comparator<AffineTransform> {
-        /**
-         * 0 for comparing the X scale, or 2 for the Y scale.
-         */
-        private final int term;
-
-        /**
-         * Creates a comparator for the given term (0 for X scale, 2 for Y scale).
-         */
-        ScaleComparator(final int term) {
-            this.term = term;
-        }
-
-        /**
-         * Compares the X <strong>or</strong> Y scale of the given transforms.
-         */
+    private static final Comparator<AffineTransform> Y_COMPARATOR = new Comparator<AffineTransform>() {
         public int compare(final AffineTransform tr1, final AffineTransform tr2) {
-            return Double.compare(vector(tr1), vector(tr2));
+            return Double.compare(XAffineTransform.getScaleY0(tr1), XAffineTransform.getScaleY0(tr2));
         }
-
-        /**
-         * Computes the square of the norm of scale and shear coefficients.
-         */
-        private double vector(final AffineTransform tr) {
-            double value;
-            return (value = coefficient(tr, term  )) * value +
-                   (value = coefficient(tr, term+1)) * value;
-        }
-    }
-
-    /**
-     * Returns an affine transform coefficient from a numerical identifier.
-     */
-    private static double coefficient(final AffineTransform tr, final int term) {
-        switch (term) {
-            case 0: return tr.getScaleX();
-            case 1: return tr.getShearX();
-            case 2: return tr.getScaleY();
-            case 3: return tr.getShearY();
-            default: throw new AssertionError(term);
-        }
-    }
+    };
 
     /**
      * From a set of arbitrary affine transforms, computes pyramid levels that can be given to
@@ -506,7 +487,7 @@ public class TileBuilder {
             if (result == null) {
                 result = new IdentityHashMap<AffineTransform,Dimension>();
             }
-            if (length >= (length = computePyramidLevels(transforms, length, result, 0))) {
+            if (length <= (length = computePyramidLevels(transforms, length, result, false))) {
                 throw new AssertionError(length); // Should always be decreasing.
             }
             if (!result.isEmpty()) {
@@ -522,28 +503,26 @@ public class TileBuilder {
          * pyramid level for some AffineTransform, they will be removed from the map. If
          * a map became empty because of that, the whole map will be removed.
          */
-        if (results != null) {
-            final Iterator<Map<AffineTransform,Dimension>> iterator = results.iterator();
-            while (iterator.hasNext()) {
-                result = iterator.next();
-                length = result.size();
-                transforms = result.keySet().toArray(transforms);
-                Arrays.sort(transforms, 0, length, Y_COMPARATOR);
-                length = computePyramidLevels(transforms, length, result, 2);
-                while (--length >= 0) {
-                    if (result.remove(transforms[length]) == null) {
-                        throw new AssertionError(length);
-                    }
-                }
-                if (result.size() <= 1) {
-                    iterator.remove();
+        if (results == null) {
+            return Collections.emptyList();
+        }
+        final Iterator<Map<AffineTransform,Dimension>> iterator = results.iterator();
+        while (iterator.hasNext()) {
+            result = iterator.next();
+            length = result.size();
+            transforms = result.keySet().toArray(transforms);
+            Arrays.sort(transforms, 0, length, Y_COMPARATOR);
+            length = computePyramidLevels(transforms, length, result, true);
+            while (--length >= 0) {
+                if (result.remove(transforms[length]) == null) {
+                    throw new AssertionError(length);
                 }
             }
-            if (!results.isEmpty()) {
-                return results;
+            if (result.size() <= 1) {
+                iterator.remove();
             }
         }
-        return Collections.emptyList();
+        return results;
     }
 
     /**
@@ -554,11 +533,11 @@ public class TileBuilder {
      *                   sorted along the dimension specififed by {@code term}.
      * @param  length    The number of valid entries in the {@code gridToCRS} array.
      * @param  result    An initially empty map in which to store the results.
-     * @param  term      0 for analyzing the X axis, or 2 for the Y axis.
+     * @param  isY       {@code false} for analyzing the X axis, or {@code true} for the Y axis.
      * @return The number of entries remaining in {@code gridToCRS}.
      */
     private static int computePyramidLevels(final AffineTransform[] gridToCRS, final int length,
-            final Map<AffineTransform,Dimension> result, final int term)
+            final Map<AffineTransform,Dimension> result, final boolean isY)
     {
         int processing = 0;  // Index of the AffineTransform under process.
         int remaining  = 0;  // Count of AffineTransforms that this method did not processed.
@@ -570,12 +549,17 @@ public class TileBuilder {
                 return remaining;
             }
             base  = gridToCRS[processing++];
-            scale = coefficient(base, term);
-            shear = coefficient(base, term+1);
+            if (isY) {
+                scale = base.getScaleY();
+                shear = base.getShearY();
+            } else {
+                scale = base.getScaleX();
+                shear = base.getShearX();
+            }
             scaleIsNull = Math.abs(scale) < EPS;
             shearIsNull = Math.abs(shear) < EPS;
         } while (scaleIsNull && shearIsNull && redo(result.remove(base)));
-        if (term != 0) {
+        if (isY) {
             // If we get a NullPointerException here, it would be a bug in the algorithm.
             result.get(base).height = 1;
         }
@@ -586,8 +570,14 @@ public class TileBuilder {
          */
         while (processing < length) {
             final AffineTransform candidate = gridToCRS[processing++];
-            final double scale2 = coefficient(candidate, term);
-            final double shear2 = coefficient(candidate, term+1);
+            final double scale2, shear2;
+            if (isY) {
+                scale2 = candidate.getScaleY();
+                shear2 = candidate.getShearY();
+            } else {
+                scale2 = candidate.getScaleX();
+                shear2 = candidate.getShearX();
+            }
             final int level;
             if (scaleIsNull) {
                 if (!(Math.abs(scale2) < EPS)) {
@@ -611,26 +601,18 @@ public class TileBuilder {
             }
             /*
              * Stores the pyramid level either as the width or as the height, depending on the
-             * 'term' value. The map is assumed initially empty for the X values, and containing
+             * 'isY' value. The map is assumed initially empty for the X values, and containing
              * every required entries for the Y values.
              */
-            switch (term) {
-                default: {
-                    throw new AssertionError(term);
+            if (isY) {
+                // If we get a NullPointerException here, it would be a bug in the algorithm.
+                result.get(candidate).height = level;
+            } else {
+                if (result.isEmpty()) {
+                    result.put(base, new Dimension(1,0));
                 }
-                case 0: {
-                    if (result.isEmpty()) {
-                        result.put(base, new Dimension(1,0));
-                    }
-                    if (result.put(candidate, new Dimension(level,0)) != null) {
-                        throw new AssertionError(candidate); // Should never happen.
-                    }
-                    break;
-                }
-                case 2: {
-                    // If we get a NullPointerException here, it would be a bug in the algorithm.
-                    result.get(candidate).height = level;
-                    break;
+                if (result.put(candidate, new Dimension(level,0)) != null) {
+                    throw new AssertionError(candidate); // Should never happen.
                 }
             }
         }
@@ -683,5 +665,15 @@ public class TileBuilder {
      */
     private static boolean redo(final Dimension size) {
         return true;
+    }
+
+    /**
+     * Returns a string representation of the tiles contained in this object.
+     */
+    @Override
+    public String toString() {
+        final List<Tile> tiles = new ArrayList<Tile>(this.tiles.values());
+        Collections.sort(tiles);
+        return Tile.toString(tiles);
     }
 }

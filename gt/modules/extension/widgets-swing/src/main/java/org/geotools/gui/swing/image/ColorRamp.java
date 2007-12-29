@@ -78,6 +78,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class ColorRamp extends JComponent {
     /**
      * Margin (in pixel) on each sides: top, left, right and bottom of the color ramp.
@@ -285,6 +286,7 @@ public class ColorRamp extends JComponent {
      * @see #getColors()
      * @see #getGraduation()
      */
+    @SuppressWarnings("fallthrough")
     public boolean setColors(SampleDimension band) {
         Color[] colors = EMPTY;
         Graduation graduation = null;
@@ -676,7 +678,7 @@ public class ColorRamp extends JComponent {
                 graduation = new LogarithmicNumberGraduation(units);
             }
         } else {
-            org.geotools.util.logging.Logging.getLogger("org.geotools.gui.swing").
+            org.geotools.util.logging.Logging.getLogger(ColorRamp.class).
                     log(Logging.format(Level.WARNING, LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1,
                         Classes.getShortClassName(tr)));
             graduation = new NumberGraduation(units);

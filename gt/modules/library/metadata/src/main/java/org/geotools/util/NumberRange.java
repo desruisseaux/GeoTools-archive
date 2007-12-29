@@ -331,6 +331,22 @@ public class NumberRange extends Range {
     }
 
     /**
+     * Casts the given range to an instance of this class.
+     * To be overriden by {@link MeasurementRange} only.
+     */
+    NumberRange cast(final Range range) {
+        return new NumberRange(range);
+    }
+
+    /**
+     * Returns an initially empty array of the given length.
+     * To be overriden by {@link MeasurementRange} only.
+     */
+    NumberRange[] newArray(final int length) {
+        return new NumberRange[length];
+    }
+
+    /**
      * Returns {@code true} if the specified value is within this range.
      */
     @Override
@@ -396,7 +412,7 @@ public class NumberRange extends Range {
     public NumberRange union(final Range range) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        return wrap(castTo(type).unionImpl(convertAndCast(range, type)));
+        return cast(castTo(type).unionImpl(convertAndCast(range, type)));
     }
 
     /**
@@ -445,9 +461,9 @@ public class NumberRange extends Range {
         final Range[] result = castTo(type).subtractImpl(convertAndCast(range, type));
         final NumberRange[] casted;
         if (result != null) {
-            casted = new NumberRange[result.length];
+            casted = newArray(result.length);
             for (int i=0; i<result.length; i++) {
-                casted[i] = wrap(result[i]);
+                casted[i] = cast(result[i]);
             }
         } else {
             casted = null;

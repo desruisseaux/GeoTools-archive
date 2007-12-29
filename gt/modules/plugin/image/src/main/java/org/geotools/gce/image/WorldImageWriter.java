@@ -118,22 +118,17 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 				throw new RuntimeException(
 						"WorldImageWriter::write:It is not possible writing to an URL!");
 			}
-		} /*
-			 * else if (!(destination instanceof ImageOutputStream) &&
-			 * !(destination instanceof File)) throw new RuntimeException(
-			 * "WorldImageWriter::write:It is not possible writing to an URL!");
-			 */
+		} 
 
 		// //
 		//
 		// managing hints
 		//
 		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
 		if (hints != null) {
-			if (this.hints == null) {
-				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-				this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
-			}
+			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
 	}

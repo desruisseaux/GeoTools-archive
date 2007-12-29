@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.stream.ImageOutputStream;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -48,7 +49,7 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	protected Object destination;
 
 	/** Hints to be used for the writing process. */
-	protected Hints hints = new Hints();
+	protected Hints hints = GeoTools.getDefaultHints();
 
 	/** The destination {@link ImageOutputStream}. */
 	protected ImageOutputStream outStream = null;
@@ -84,7 +85,7 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	 *
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
 	 */
-	public final Object getDestination() {
+	public Object getDestination() {
 		return destination;
 	}
 

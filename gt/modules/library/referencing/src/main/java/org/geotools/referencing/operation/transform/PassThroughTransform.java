@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,10 +17,8 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -28,7 +26,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -57,31 +54,31 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -1673997634240223449L;
-    
+
     /**
      * Index of the first affected ordinate.
      */
     protected final int firstAffectedOrdinate;
-    
+
     /**
      * Number of unaffected ordinates after the affected ones.
      * Always 0 when used through the strict OpenGIS API.
      */
     protected final int numTrailingOrdinates;
-    
+
     /**
      * The sub transform.
      *
      * @see #getSubTransform
      */
     protected final MathTransform subTransform;
-    
+
     /**
      * The inverse transform. This field will be computed only when needed.
      * But it is serialized in order to avoid rounding error.
      */
     private PassThroughTransform inverse;
-    
+
     /**
      * Create a pass through transform.
      *
@@ -196,31 +193,33 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         }
         return index;
     }
-    
+
     /**
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
         return firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates;
     }
-    
+
     /**
      * Gets the dimension of output points.
      */
     public int getTargetDimensions() {
         return firstAffectedOrdinate + subTransform.getTargetDimensions() + numTrailingOrdinates;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      */
+    @Override
     public boolean isIdentity() {
         return subTransform.isIdentity();
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
         throws TransformException
@@ -245,7 +244,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
             dstOff += dstStep;
         }
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -273,10 +272,11 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
             dstOff += dstStep;
         }
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      */
+    @Override
     public Matrix derivative(final DirectPosition point) throws TransformException {
         final int nSkipped = firstAffectedOrdinate + numTrailingOrdinates;
         final int transDim = subTransform.getSourceDimensions();
@@ -331,7 +331,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         //                      [                  ]
         subMatrix.copySubMatrix(0, 0, numRow, numCol,
                                 firstAffectedOrdinate, firstAffectedOrdinate, matrix);
-        
+
         //  Set LR part to 1:   [ 1  0  0  0  0  0 ]
         //                      [ 0  1  0  0  0  0 ]
         //                      [ 0  0  ?  ?  ?  0 ]
@@ -355,10 +355,11 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         }
         return matrix;
     }
-    
+
     /**
      * Creates the inverse transform of this object.
      */
+    @Override
     public MathTransform inverse() throws NoninvertibleTransformException {
         // No need to synchronize. Not a big deal if two objects are created.
         if (inverse == null) {
@@ -369,12 +370,13 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         }
         return inverse;
     }
-    
+
     /**
      * Returns a hash value for this transform.
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID + firstAffectedOrdinate + 37*numTrailingOrdinates;
         if (subTransform != null) {
@@ -382,10 +384,11 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         }
         return code;
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -398,7 +401,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         }
         return false;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -411,6 +414,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      *       We should returns a more complex WKT when {@code numTrailingOrdinates != 0},
      *       using an affine transform to change the coordinates order.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatter.append(firstAffectedOrdinate);
         if (numTrailingOrdinates != 0) {

@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
-import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.NumberFormat;
@@ -284,8 +283,7 @@ public class ParameterEditor extends JPanel {
                          * level is slightly higher than in 'RegisteredOperationBrowser'
                          * since we have tried the global operation description as well.
                          */
-                        Logging.getLogger("org.geotools.gui.swing").log(Level.FINE,
-                                         exception.getLocalizedMessage(), exception);
+                        Logging.recoverableException(ParameterEditor.class, "setDescription", exception);
                     }
                 }
             }

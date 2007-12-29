@@ -20,8 +20,6 @@ package org.geotools.gui.headless;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import java.io.PrintWriter;
 import java.io.CharArrayWriter;
@@ -40,7 +38,6 @@ import javax.mail.internet.AddressException;
 import org.geotools.util.ProgressListener;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.opengis.util.InternationalString;
@@ -197,12 +194,7 @@ public class ProgressMailer implements ProgressListener {
             message.setText(messageText);
             Transport.send(message);
         } catch (MessagingException exception) {
-            final LogRecord warning = new LogRecord(Level.WARNING,
-                    "CATCH " + Classes.getShortClassName(exception));
-            warning.setSourceClassName(ProgressMailer.class.getName());
-            warning.setSourceMethodName(method);
-            warning.setThrown(exception);
-            Logging.getLogger("org.geotools.gui.progress").log(warning);
+            Logging.unexpectedException(ProgressMailer.class, method, exception);
         }
     }
 

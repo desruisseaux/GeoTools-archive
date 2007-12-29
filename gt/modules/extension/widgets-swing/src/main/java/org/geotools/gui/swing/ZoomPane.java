@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing;
 
-// Events and action
 import java.util.EventListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -40,7 +39,6 @@ import java.beans.PropertyChangeListener;
 import org.geotools.gui.swing.event.ZoomChangeEvent;
 import org.geotools.gui.swing.event.ZoomChangeListener;
 
-// Geometry
 import java.awt.Shape;
 import java.awt.Point;
 import java.awt.Insets;
@@ -55,7 +53,6 @@ import java.awt.geom.NoninvertibleTransformException;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.geometry.XDimension2D;
 
-// Graphics
 import java.awt.Paint;
 import java.awt.Color;
 import java.awt.Stroke;
@@ -64,14 +61,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 
-// User interface (AWT)
 import java.awt.Toolkit;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import static java.awt.GridBagConstraints.*;
 
-// User interface (Swing)
 import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -84,13 +80,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.BoundedRangeModel;
 import javax.swing.plaf.ComponentUI;
 
-// Logging
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import org.geotools.util.logging.Logging;
 
-// Miscellaneous
 import java.util.Arrays;
 import java.io.Serializable;
 import org.geotools.resources.i18n.Errors;
@@ -197,7 +191,13 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public abstract class ZoomPane extends JComponent implements DeformableViewer {
+    /**
+     * The logger for zoom events.
+     */
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.gui.swing");
+
     /**
      * Small number for floating point comparaisons.
      */
@@ -352,11 +352,6 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     };
 
     /**
-     * The logger for zoom events.
-     */
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.gui.swing");
-
-    /**
      * List of default keystrokes used to perform zooms. The elements of this table go in pairs.
      * The even indexes indicate the keystroke whilst the odd indexes indicate the modifier
      * (CTRL or SHIFT for example). To obtain the {@link KeyStroke} object for a numbered action
@@ -431,6 +426,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
         /**
          * Returns a default minimum size.
          */
+        @Override
         public Dimension getMinimumSize(final JComponent c) {
             return new Dimension(MINIMUM_SIZE, MINIMUM_SIZE);
         }
@@ -439,6 +435,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * Returns the maximum size. We use the preferred
          * size as a default maximum size.
          */
+        @Override
         public Dimension getMaximumSize(final JComponent c) {
             return getPreferredSize(c);
         }
@@ -447,6 +444,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * Returns the default preferred size. User can override this
          * preferred size by invoking {@link JComponent#setPreferredSize}.
          */
+        @Override
         public Dimension getPreferredSize(final JComponent c) {
             return ((ZoomPane) c).getDefaultSize();
         }
@@ -457,6 +455,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * glass is painted just after the normal component, we don't want to
          * clear the background before painting it.
          */
+        @Override
         public void update(final Graphics g, final JComponent c) {
             switch (((ZoomPane) c).flag) {
                 case IS_PAINTING_MAGNIFIER: paint(g, c); break; // Avoid background clearing
@@ -468,6 +467,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * Paint the component. This method basically delegates the
          * work to {@link ZoomPane#paintComponent(Graphics2D)}.
          */
+        @Override
         public void paint(final Graphics g, final JComponent c) {
             final ZoomPane pane = (ZoomPane)   c;
             final Graphics2D gr = (Graphics2D) g;
@@ -492,6 +492,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * very well be an ellipse or any other kind of geometric shape. This
          * method asks {@link ZoomPane#getMouseSelectionShape} for the shape.
          */
+        @Override
         protected Shape getModel(final MouseEvent event) {
             final Point2D point = new Point2D.Double(event.getX(), event.getY());
             if (getZoomableBounds().contains(point)) try {
@@ -528,8 +529,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class Listeners extends MouseAdapter implements MouseWheelListener,
-                                                                  ComponentListener, Serializable
+    private final class Listeners extends MouseAdapter
+            implements MouseWheelListener, ComponentListener, Serializable
     {
         public void mouseWheelMoved (final MouseWheelEvent event) {ZoomPane.this.mouseWheelMoved (event);}
         public void mousePressed    (final MouseEvent      event) {ZoomPane.this.mayShowPopupMenu(event);}
@@ -1295,6 +1296,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * Adds an object to the list of objects interested in being notified about mouse events.
      */
+    @Override
     public void addMouseListener(final MouseListener listener) {
         super.removeMouseListener(mouseSelectionTracker);
         super.addMouseListener   (listener);
@@ -1523,10 +1525,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                     centerX = bounds.x + (bounds.width - size) / 2;
                     centerY = bounds.y + (bounds.height - size) / 2;
                 }
-                magnifier = new MouseReshapeTracker(new Ellipse2D.Float(centerX, centerY, size, size))
-                {
-                    protected void stateWillChange(final boolean isAdjusting) {repaintMagnifier();}
-                    protected void stateChanged   (final boolean isAdjusting) {repaintMagnifier();}
+                magnifier = new MouseReshapeTracker(new Ellipse2D.Float(centerX, centerY, size, size)) {
+                    @Override protected void stateWillChange(final boolean isAdjusting) {repaintMagnifier();}
+                    @Override protected void stateChanged   (final boolean isAdjusting) {repaintMagnifier();}
                 };
                 magnifier.setClip(bounds);
                 magnifier.setAdjustable(SwingConstants.NORTH, true);
@@ -1840,13 +1841,13 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             if (scrollbarX != null) {
                 c.gridx = 0; c.weightx = 1;
                 c.gridy = 1; c.weighty = 0;
-                c.fill = c.HORIZONTAL;
+                c.fill = HORIZONTAL;
                 add(scrollbarX, c);
             }
             if (scrollbarY != null) {
                 c.gridx = 1; c.weightx = 0;
                 c.gridy = 0; c.weighty = 1;
-                c.fill = c.VERTICAL;
+                c.fill = VERTICAL;
                 add(scrollbarY, c);
             }
             if (scrollbarX != null && scrollbarY != null) {
@@ -1854,10 +1855,10 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                 corner.setOpaque(true);
                 c.gridx = 1; c.weightx = 0;
                 c.gridy = 1; c.weighty = 0;
-                c.fill = c.BOTH;
+                c.fill = BOTH;
                 add(corner, c);
             }
-            c.fill = c.BOTH;
+            c.fill = BOTH;
             c.gridx = 0; c.weightx = 1;
             c.gridy = 0; c.weighty = 1;
             add(ZoomPane.this, c);
@@ -1875,6 +1876,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * Invoked when this {@code ScrollPane} is added in a {@link Container}.
          * This method registers all required listeners.
          */
+        @Override
         public void addNotify() {
             super.addNotify();
             tieModels(getModel(scrollbarX), getModel(scrollbarY));
@@ -1885,6 +1887,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * Invoked when this {@code ScrollPane} is removed from a {@link Container}.
          * This method unregisters all listeners.
          */
+        @Override
         public void removeNotify() {
             ZoomPane.this.removePropertyChangeListener("zoom.insets", this);
             untieModels(getModel(scrollbarX), getModel(scrollbarY));
@@ -2101,6 +2104,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * This {@code scrollRectToVisible} method allows us to define the sub-region of {@code bounds}
      * which must appear in the {@code ZoomPane} window.
      */
+    @Override
     public void scrollRectToVisible(final Rectangle rect) {
         Rectangle2D area = getArea();
         if (isValid(area)) {
@@ -2140,6 +2144,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * method of the parent class in order to take into account a case where the magnifying glass
      * is displayed.
      */
+    @Override
     public void repaint(final long tm, final int x, final int y,
                         final int width, final int height) {
         super.repaint(tm, x, y, width, height);
@@ -2208,6 +2213,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Paints this component. This method is declared final in order to avoid unintentional
      * overriding. Override {@link #paintComponent(Graphics2D)} instead.
      */
+    @Override
     protected final void paintComponent(final Graphics graphics) {
         flag = IS_PAINTING;
         super.paintComponent(graphics);
@@ -2229,6 +2235,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Prints this component. This method is declared final in order to avoid unintentional
      * overriding. Override {@link #printComponent(Graphics2D)} instead.
      */
+    @Override
     protected final void printComponent(final Graphics graphics) {
         flag = IS_PRINTING;
         super.paintComponent(graphics);
@@ -2263,6 +2270,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * but accepts a null argument. This method can be redefined if it is necessary to perform zooms
      * on a part of the graphic rather than the whole thing.
      */
+    @Override
     public Insets getInsets(final Insets insets) {
         return super.getInsets((insets != null) ? insets : new Insets(0, 0, 0, 0));
     }
@@ -2271,6 +2279,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Returns the Insets of this component.  This method is declared final in order to avoid
      * confusion. If you want to return other Insets you must redefine {@link #getInsets(Insets)}.
      */
+    @Override
     public final Insets getInsets() {
         return getInsets(null);
     }
@@ -2279,6 +2288,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * Informs {@code ZoomPane} that the GUI has changed.
      * The user doesn't have to call this method directly.
      */
+    @Override
     public void updateUI() {
         navigationPopupMenu = null;
         super.updateUI();

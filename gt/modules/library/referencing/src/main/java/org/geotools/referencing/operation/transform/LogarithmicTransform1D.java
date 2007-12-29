@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -17,11 +17,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.Serializable;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -31,7 +29,6 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
@@ -63,7 +60,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * @see LinearTransform1D
  */
 public class LogarithmicTransform1D extends AbstractMathTransform
-                                 implements MathTransform1D, Serializable
+        implements MathTransform1D, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -129,10 +126,11 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         }
         return new LogarithmicTransform1D(base, offset);
     }
-    
+
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
@@ -142,44 +140,46 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      *
      * @return A copy of the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
             new ParameterValue[] {
             new FloatParameter(Provider.BASE,   base),
             new FloatParameter(Provider.OFFSET, offset)});
     }
-    
+
     /**
      * Gets the dimension of input points, which is 1.
      */
     public int getSourceDimensions() {
         return 1;
     }
-    
+
     /**
      * Gets the dimension of output points, which is 1.
      */
     public int getTargetDimensions() {
         return 1;
     }
-    
+
     /**
      * Creates the inverse transform of this object.
      */
+    @Override
     public MathTransform inverse() {
         if (inverse == null) {
             inverse = new ExponentialTransform1D(this);
         }
         return inverse;
     }
-    
+
     /**
      * Gets the derivative of this function at a value.
      */
     public double derivative(final double value) {
         return 1 / (lnBase * value);
     }
-    
+
     /**
      * Transforms the specified value.
      */
@@ -190,6 +190,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
@@ -237,6 +238,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * @return The combined math transform, or {@code null} if no optimized combined
      *         transform is available.
      */
+    @Override
     MathTransform concatenate(final MathTransform other, final boolean applyOtherFirst) {
         if (other instanceof LinearTransform) {
             final LinearTransform1D linear = (LinearTransform1D) other;
@@ -255,22 +257,24 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         }
         return super.concatenate(other, applyOtherFirst);
     }
-    
+
     /**
      * Returns a hash value for this transform.
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         long code;
         code = serialVersionUID + Double.doubleToLongBits(base);
         code =          code*37 + Double.doubleToLongBits(offset);
         return (int)(code >>> 32) ^ (int)code;
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -283,7 +287,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         }
         return false;
     }
-    
+
     /**
      * The provider for the {@link LogarithmicTransform1D}.
      *
@@ -330,7 +334,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Conversion> getOperationType() {
             return Conversion.class;
         }
 

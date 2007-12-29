@@ -42,6 +42,7 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverage.grid.io.UnknownFormat;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -62,10 +63,12 @@ public class ImageMosaicReaderTest extends TestCase {
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
 
-		suite.addTest(new ImageMosaicReaderTest("testDefaultParameterValue"));
-		suite.addTest(new ImageMosaicReaderTest("testInputAlpha"));
-		suite.addTest(new ImageMosaicReaderTest("testInputImageROI"));
-		suite.addTest(new ImageMosaicReaderTest("testCrop"));
+//		suite.addTest(new ImageMosaicReaderTest("testDefaultParameterValue"));
+//		suite.addTest(new ImageMosaicReaderTest("testInputAlpha"));
+//		suite.addTest(new ImageMosaicReaderTest("testInputImageROI"));
+//		suite.addTest(new ImageMosaicReaderTest("testCrop"));
+		suite.addTest(new ImageMosaicReaderTest("testErrors"));
+		
 
 		return suite;
 	}
@@ -345,6 +348,43 @@ public class ImageMosaicReaderTest extends TestCase {
 		 imageMosaicSimpleParamsTest(indexAlphaURL, Double.NaN, null, null,
 		 "testDefaultParameterValue", false);
 	}
+	
+
+	public void testErrors() {
+		//error for location attribute
+		try{
+			((AbstractGridFormat) GridFormatFinder
+			.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE,"aaaa"));
+			assertTrue(false);
+		}catch (Throwable e) {
+			
+		}
+		
+		try{
+			((AbstractGridFormat) GridFormatFinder
+					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MOSAIC_LOCATION_ATTRIBUTE,"location"));
+			assertTrue(true);
+		}catch (Throwable e) {
+			assertTrue(false);
+		}
+		
+		//error for num tiles
+		try{
+			((AbstractGridFormat) GridFormatFinder
+					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,new Integer(2))).read(null);
+			assertTrue(false);
+		}catch (Throwable e) {
+			assertTrue(true);
+		}
+		
+		try{
+			((AbstractGridFormat) GridFormatFinder
+					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,new Integer(1000))).read(null);
+			assertTrue(true);
+		}catch (Exception e) {
+			assertTrue(false);
+		}
+	}
 
 	/**
 	 * Tests the {@link ImageMosaicReader}
@@ -467,12 +507,17 @@ public class ImageMosaicReaderTest extends TestCase {
 	 */
 	private ImageMosaicReader getReader(URL testURL,
 			final AbstractGridFormat format) {
+		return getReader(testURL, format, null);
+		
+	}
+
+	private ImageMosaicReader getReader(URL testURL,
+			final AbstractGridFormat format,Hints hints) {
 		final ImageMosaicReader reader = (ImageMosaicReader) format
-				.getReader(testURL);
+				.getReader(testURL,hints);
 		assertNotNull(reader);
 		return reader;
 	}
-
 	/**
 	 * Tries to get an {@link AbstractGridFormat} for the provided URL.
 	 * 

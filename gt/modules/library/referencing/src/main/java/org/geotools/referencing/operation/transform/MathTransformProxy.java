@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2005, Institut de Recherche pour le Développement
  *
@@ -20,10 +20,8 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -31,7 +29,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -60,7 +57,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
      * The math transform on which to delegate the work.
      */
     public final MathTransform transform;
-    
+
     /**
      * Creates a new proxy which delegates its work to the specified math transform.
      */
@@ -81,7 +78,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     public int getTargetDimensions() {
         return transform.getSourceDimensions();
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
@@ -90,7 +87,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     {
         return transform.transform(ptSrc, ptDst);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -100,7 +97,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     {
         transform.transform(srcPts, srcOff, dstPts, dstOff, numPts);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -142,6 +139,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     /**
      * Returns a string representation for this transform.
      */
+    @Override
     public String toString() {
         return transform.toString();
     }
@@ -149,6 +147,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     /**
      * Compares the specified object with this inverse math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final MathTransformProxy that = (MathTransformProxy) object;
@@ -160,6 +159,7 @@ public class MathTransformProxy implements MathTransform, Serializable {
     /**
      * Returns a hash code value for this math transform.
      */
+    @Override
     public int hashCode() {
         return transform.hashCode() ^ (int)serialVersionUID;
     }

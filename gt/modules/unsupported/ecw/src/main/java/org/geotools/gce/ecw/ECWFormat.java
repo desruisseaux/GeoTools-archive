@@ -20,6 +20,7 @@ package org.geotools.gce.ecw;
 import it.geosolutions.imageio.plugins.ecw.ECWImageReaderSpi;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,23 +66,22 @@ public final class ECWFormat extends AbstractGridFormat implements Format {
 	 * Sets the metadata information.
 	 */
 	private void setInfo() {
-		HashMap info = new HashMap();
-
+		final HashMap<String, String> info = new HashMap<String, String>();
 		info.put("name", "ECW");
 		info.put("description", "ECW Coverage Format");
 		info.put("vendor", "Geotools");
 		info.put("docURL", "");// TODO: set something
 		info.put("version", "1.0");
-		mInfo = info;
+		mInfo = Collections.unmodifiableMap(info);
 
 		// writing parameters
 		writeParameters = null;
 
 		// reading parameters
 		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(
-						mInfo,
-						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
+				new DefaultParameterDescriptorGroup(mInfo,
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D,
+								USE_JAI_IMAGEREAD }));
 	}
 
 	/**
@@ -132,11 +132,11 @@ public final class ECWFormat extends AbstractGridFormat implements Format {
 		try {
 			return new ECWReader(source, hints);
 		} catch (MismatchedDimensionException e) {
-			final RuntimeException re= new RuntimeException();
+			final RuntimeException re = new RuntimeException();
 			re.initCause(e);
 			throw re;
 		} catch (DataSourceException e) {
-			final RuntimeException re= new RuntimeException();
+			final RuntimeException re = new RuntimeException();
 			re.initCause(e);
 			throw re;
 		}
