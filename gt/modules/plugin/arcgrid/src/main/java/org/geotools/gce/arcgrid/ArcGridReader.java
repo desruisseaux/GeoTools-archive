@@ -251,7 +251,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		if (this.hints == null)
 			this.hints= new Hints();	
 		if (hints != null) {
-			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
 		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);

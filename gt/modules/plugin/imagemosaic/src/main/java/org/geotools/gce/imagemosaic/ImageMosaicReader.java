@@ -221,8 +221,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// //
 		if (this.hints == null)
 			this.hints= new Hints();	
-		if (hints != null) {
-			// prevent the use from reordering axes
+		if (uHints != null) {
 			this.hints.add(uHints);
 		}
 		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
