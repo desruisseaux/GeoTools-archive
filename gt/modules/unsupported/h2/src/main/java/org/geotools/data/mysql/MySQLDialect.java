@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.SQLDialect;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -111,13 +110,12 @@ public class MySQLDialect extends SQLDialect {
         
     }
     
-    public void encodeColumnType(String sqlTypeName, AttributeDescriptor att,
-            StringBuffer sql) {
+    public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
         if ( "VARCHAR".equalsIgnoreCase(sqlTypeName) ) {
             sql.append( "VARCHAR(255)" );
         }
         else {
-            super.encodeColumnType(sqlTypeName, att, sql);
+            super.encodeColumnType(sqlTypeName, sql);
         }
     }
     

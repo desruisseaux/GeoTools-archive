@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
 
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -281,10 +280,9 @@ public abstract class SQLDialect {
      * </ul>
      * </p>
      * @param sqlTypeName
-     * @param att
      * @param sql
      */
-    public void encodeColumnType( String sqlTypeName, AttributeDescriptor att, StringBuffer sql ) {
+    public void encodeColumnType( String sqlTypeName, StringBuffer sql ) {
        sql.append( sqlTypeName ); 
     }
     
