@@ -87,43 +87,13 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
         throws Exception {
         Association association = (Association) object;
 
-        if (association.getValue() == null) {
-            //non resolveed, return the xlink:href
-            if (XLINK.HREF.equals(name)) {
-                String id = (String) association.getUserData().get("gml:id");
+        //non resolveed, return the xlink:href
+        if (XLINK.HREF.equals(name)) {
+            String id = (String) association.getUserData().get("gml:id");
 
-                return "#" + id;
-            }
+            return "#" + id;
         }
-
-        return null;
-    }
-
-    public List getProperties(Object object) throws Exception {
-        Association association = (Association) object;
-
-        if (association.getValue() != null) {
-            //associated value was resolved, return it
-            Object associated = association.getValue();
-
-            //check for feature
-            if (associated instanceof SimpleFeature) {
-                SimpleFeature feature = (SimpleFeature) associated;
-                Name typeName = feature.getType().getName();
-                QName name = new QName(typeName.getNamespaceURI(), typeName.getLocalPart());
-
-                List properties = new ArrayList();
-
-                //return a comment which is hte xlink href
-                properties.add(new Object[] { Encoder.COMMENT, "#" + feature.getID() });
-
-                //first return the feature 
-                properties.add(new Object[] { name, feature });
-
-                return properties;
-            }
-        }
-
+    
         return null;
     }
 }
