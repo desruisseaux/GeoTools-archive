@@ -20,9 +20,9 @@ import org.geotools.jdbc.SQLDialect;
  */
 public class H2DataStoreFactory extends JDBCDataStoreFactory {
 
-    /** parameter for how to handle foreign keys */
-    public static final Param FOREIGN_KEYS = 
-        new Param( "Foreign Keys", Boolean.class, "Foreign Keys", false, Boolean.FALSE );
+    /** parameter for how to handle associations */
+    public static final Param ASSOCIATIONS = 
+        new Param( "Associations", Boolean.class, "Associations", false, Boolean.FALSE );
 
     /**
      * base location to store h2 database files
@@ -49,7 +49,7 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
         parameters.remove( PASSWD.key );
         
         //add additional parameters
-        parameters.put( FOREIGN_KEYS.key, FOREIGN_KEYS );
+        parameters.put( ASSOCIATIONS.key, ASSOCIATIONS );
     }
     
     public String getDisplayName() {
@@ -96,9 +96,9 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
         throws IOException {
     
         //check the foreign keys parameter
-        Boolean foreignKeys = (Boolean) FOREIGN_KEYS.lookUp(params);
+        Boolean foreignKeys = (Boolean) ASSOCIATIONS.lookUp(params);
         if ( foreignKeys != null ) {
-            dataStore.setForeignKeyAware(foreignKeys.booleanValue());
+            dataStore.setAssociations(foreignKeys.booleanValue());
         }
         return dataStore;
     }
