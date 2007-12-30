@@ -60,6 +60,24 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
     }
 
     /**
+     * Determines if the locator can resolve the schema location for a particular 
+     * namespace uri and schema location.
+     * 
+     * @return true if it can handle, otherwise false.
+     */
+    public boolean canHandle( XSDSchema schema, String uri, String location ) {
+        if ( xsd.getNamespaceURI().equals(uri) ) {
+            //strip off the filename and do a resource lookup
+            String fileName = new File(location).getName();
+            URL xsdLocation = xsd.getClass().getResource(fileName);
+
+            return xsdLocation != null;
+        }
+        
+        return false;
+    }
+    
+    /**
      * Resolves <param>location<param> to a physical location.
      * <p>
      * Resolution is performed by stripping the filename off of <param>location</param>
@@ -77,14 +95,9 @@ public class SchemaLocationResolver implements XSDSchemaLocationResolver {
         }
 
         //namespace match?
-        if (xsd.getNamespaceURI().equals(uri)) {
-            //strip off the filename and do a resource lookup
+        if (canHandle(schema, uri, location)) {
             String fileName = new File(location).getName();
-            URL xsdLocation = xsd.getClass().getResource(fileName);
-
-            if (xsdLocation != null) {
-                return xsdLocation.toString();
-            }
+            return xsd.getClass().getResource(fileName).toString();
         }
 
         return null;

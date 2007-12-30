@@ -67,6 +67,17 @@ public final class SchemaLocator implements XSDSchemaLocator {
     }
 
     /**
+     * Determines if the locator can locate a schema for the specified namespace
+     * and location.
+     * 
+     * @return true if it can handle, otherwise false.
+     */
+    public boolean canHandle( XSDSchema schema, String namespaceURI,
+            String rawSchemaLocationURI, String resolvedSchemaLocationURI) {
+        return xsd.getNamespaceURI().equals(namespaceURI); 
+    }
+    
+    /**
      * Creates the schema, returning <code>null</code> if the schema could not be created.
      * </p>
      *  <code>namespaceURI</code> should not be <code>null</code>. All other parameters are ignored.
@@ -75,7 +86,7 @@ public final class SchemaLocator implements XSDSchemaLocator {
      */
     public XSDSchema locateSchema(XSDSchema schema, String namespaceURI,
         String rawSchemaLocationURI, String resolvedSchemaLocationURI) {
-        if (xsd.getNamespaceURI().equals(namespaceURI)) {
+        if (canHandle(schema,namespaceURI,rawSchemaLocationURI,resolvedSchemaLocationURI)) {
             try {
                 return xsd.getSchema();
             } catch (IOException e) {
