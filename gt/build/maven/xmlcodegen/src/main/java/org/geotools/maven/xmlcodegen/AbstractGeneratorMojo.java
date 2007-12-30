@@ -67,8 +67,7 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	/**
 	 * Directory to output generated files to. Default is ${project.build.sourceDirectory}
 	 * <p>
-	 * {@link Deprecated}, use one of {@link #sourceOutputDirectory}, {@link #testOutputDirectory}
-	 * or {@link #resourceOutputDirectory}.
+	 * {@link Deprecated}, use one of {@link #sourceOutputDirectory} or {@link #testOutputDirectory}
 	 * </p>
 	 * @parameter expression="${project.build.sourceDirectory}"
 	 */
@@ -179,29 +178,30 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 		List artifacts = new ArrayList();
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml2", project.getVersion(), "compile", "jar"
+				"org.geotools", "gt2-xml-gml2", "2.5-SNAPSHOT", "compile", "jar"
+
+            )
+		);
+		artifacts.add( 
+			artifactFactory.createArtifact( 
+				"org.geotools", "gt2-xml-gml3", "2.5-SNAPSHOT", "compile", "jar"
 			) 
 		);
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-gml3", project.getVersion(), "compile", "jar"
+				"org.geotools", "gt2-xml-filter", "2.5-SNAPSHOT", "compile", "jar"
 			) 
 		);
 		artifacts.add( 
 			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-filter", project.getVersion(), "compile", "jar"
-			) 
-		);
-		artifacts.add( 
-			artifactFactory.createArtifact( 
-				"org.geotools", "gt2-xml-sld", project.getVersion(), "compile", "jar"
+				"org.geotools", "gt2-xml-sld","2.5-SNAPSHOT", "compile", "jar"
 			) 
 		);
 	
 		Set urls = new HashSet();
 		for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
 			Artifact artifact = (Artifact) a.next();
-			
+			getLog().debug("Attempting to dynamically resolve: " + artifact);
 			try {
 			    Set resolvedArtifacts = project.createArtifacts( artifactFactory, null, null);
 			    //artifactResolver.resolve( artifact, remoteRepositories, localRepository );
@@ -215,13 +215,19 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 				
 			} 
 			catch( Exception e ) {
-				getLog().warn( "Unable to resolve " + artifact.getId() );
+				getLog().warn( "Unable to resolve " + artifact.getId(), e );
 			}
 		}
 		
 		ClassLoader ext = 
 			new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ), getClass().getClassLoader() );
-	
+		StringBuffer sb = new StringBuffer();
+		sb.append( "Using following classpath for XSD lookup: ");
+		for ( Iterator u = urls.iterator(); u.hasNext(); ) {
+		    sb.append( u.next().toString() );
+		}
+		getLog().debug(sb.toString());
+		
 		//use extended classloader to load up configuration classes to load schema files
 		// with
 		final List xsds = new ArrayList();
