@@ -18,7 +18,9 @@ package org.geotools.gml3.bindings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.Map;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.Identifier;
@@ -47,7 +49,7 @@ public class GML3EncodingUtils {
         return dps;
     }
 
-    static URI crs(CoordinateReferenceSystem crs) {
+    static URI toURI(CoordinateReferenceSystem crs) {
         if (crs == null) {
             return null;
         }
@@ -63,5 +65,28 @@ public class GML3EncodingUtils {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @deprecated use {@link #toURI(CoordinateReferenceSystem)}.
+     */
+    static URI crs(CoordinateReferenceSystem crs) {
+        return toURI(crs);
+    }
+
+    static CoordinateReferenceSystem getCRS(Geometry g) {
+        return GML2EncodingUtils.getCRS(g);
+    }
+
+    static String getID(Geometry g) {
+        return GML2EncodingUtils.getID(g);
+    }
+    
+    static String getName(Geometry g) {
+        return GML2EncodingUtils.getName(g);
+    }
+    
+    static String getDescription(Geometry g) {
+        return GML2EncodingUtils.getDescription(g);
     }
 }
