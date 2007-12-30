@@ -63,9 +63,10 @@ public class GeometryCoordinateSequenceTransformer {
      */
     public Geometry transform(Geometry g) throws TransformException {
         GeometryFactory factory = g.getFactory();
-
+        Geometry transformed = null;
+        
         if (g instanceof Point) {
-            return transformPoint((Point) g, factory);
+            transformed = transformPoint((Point) g, factory);
         } else if (g instanceof MultiPoint) {
             MultiPoint mp = (MultiPoint) g;
             Point[] points = new Point[mp.getNumGeometries()];
@@ -74,9 +75,9 @@ public class GeometryCoordinateSequenceTransformer {
                 points[i] = transformPoint((Point) mp.getGeometryN(i), factory);
             }
 
-            return factory.createMultiPoint(points);
+            transformed = factory.createMultiPoint(points);
         } else if (g instanceof LineString) {
-            return transformLineString((LineString) g, factory);
+            transformed = transformLineString((LineString) g, factory);
         } else if (g instanceof MultiLineString) {
             MultiLineString mls = (MultiLineString) g;
             LineString[] lines = new LineString[mls.getNumGeometries()];
@@ -85,9 +86,9 @@ public class GeometryCoordinateSequenceTransformer {
                 lines[i] = transformLineString((LineString) mls.getGeometryN(i), factory);
             }
 
-            return factory.createMultiLineString(lines);
+            transformed = factory.createMultiLineString(lines);
         } else if (g instanceof Polygon) {
-            return transformPolygon((Polygon) g, factory);
+            transformed = transformPolygon((Polygon) g, factory);
         } else if (g instanceof MultiPolygon) {
             MultiPolygon mp = (MultiPolygon) g;
             Polygon[] polygons = new Polygon[mp.getNumGeometries()];
@@ -96,7 +97,7 @@ public class GeometryCoordinateSequenceTransformer {
                 polygons[i] = transformPolygon((Polygon) mp.getGeometryN(i), factory);
             }
 
-            return factory.createMultiPolygon(polygons);
+            transformed = factory.createMultiPolygon(polygons);
         } else if (g instanceof GeometryCollection) {
             GeometryCollection gc = (GeometryCollection) g;
             Geometry[] geoms = new Geometry[gc.getNumGeometries()];
@@ -105,10 +106,16 @@ public class GeometryCoordinateSequenceTransformer {
                 geoms[i] = transform(gc.getGeometryN(i));
             }
 
-            return factory.createGeometryCollection(geoms);
+            transformed = factory.createGeometryCollection(geoms);
         } else {
             throw new IllegalArgumentException("Unsupported geometry type " + g.getClass());
         }
+        
+        //copy over user data
+        //TODO: check for crs user data, and set it to be the new crs
+        transformed.setUserData( g.getUserData() );
+        return transformed;
+       
     }
 
     /**
@@ -118,12 +125,16 @@ public class GeometryCoordinateSequenceTransformer {
     public LineString transformLineString(LineString ls, GeometryFactory gf)
         throws TransformException {
         CoordinateSequence cs = projectCoordinateSequence(ls.getCoordinateSequence());
-
+        LineString transformed = null;
+        
         if (ls instanceof LinearRing) {
-            return gf.createLinearRing(cs);
+            transformed = gf.createLinearRing(cs);
         } else {
-            return gf.createLineString(cs);
+            transformed = gf.createLineString(cs);
         }
+        
+        transformed.setUserData( ls.getUserData() );
+        return transformed;
     }
 
     /**
@@ -134,8 +145,9 @@ public class GeometryCoordinateSequenceTransformer {
     public Point transformPoint(Point point, GeometryFactory gf)
         throws TransformException {
         CoordinateSequence cs = projectCoordinateSequence(point.getCoordinateSequence());
-
-        return gf.createPoint(cs);
+        Point transformed = gf.createPoint(cs);;
+        transformed.setUserData( point.getUserData() );
+        return transformed; 
     }
 
     /**
@@ -161,6 +173,8 @@ public class GeometryCoordinateSequenceTransformer {
             interiors[i] = (LinearRing) transformLineString(polygon.getInteriorRingN(i), gf);
         }
 
-        return gf.createPolygon(exterior, interiors);
+        Polygon transformed = gf.createPolygon(exterior, interiors);
+        transformed.setUserData( polygon.getUserData() );
+        return transformed;
     }
 }
