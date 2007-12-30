@@ -53,10 +53,12 @@ public abstract class JDBCTestSupport extends TestCase {
 
     static {
         //turn up logging
+        /*
         ConsoleHandler handler = new ConsoleHandler();
         handler.setLevel(Level.FINE);
         org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel(Level.FINE);
         org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler(handler);
+        */
     }
 
     protected JDBCTestSetup setup;
