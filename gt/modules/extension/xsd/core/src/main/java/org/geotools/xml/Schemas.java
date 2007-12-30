@@ -51,6 +51,10 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.Parameter;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.PicoVisitor;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -59,6 +63,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -68,6 +73,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.geotools.resources.Utilities;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xml.impl.TypeWalker;
@@ -184,7 +193,7 @@ public class Schemas {
      */
     public static final XSDSchema parse(String location)
         throws IOException {
-        return parse(location, (List) null, (List) null);
+        return parse(location, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
     }
 
     /**
@@ -203,8 +212,8 @@ public class Schemas {
      */
     public static final XSDSchema parse(String location, XSDSchemaLocator[] locators,
         XSDSchemaLocationResolver[] resolvers) throws IOException {
-        return parse(location, (locators != null) ? Arrays.asList(locators) : (List) null,
-            (resolvers != null) ? Arrays.asList(resolvers) : (List) null);
+        return parse(location, (locators != null) ? Arrays.asList(locators) : Collections.EMPTY_LIST,
+            (resolvers != null) ? Arrays.asList(resolvers) : Collections.EMPTY_LIST);
     }
 
     public static final XSDSchema parse(String location, List locators, List resolvers)
@@ -239,6 +248,200 @@ public class Schemas {
         return xsdMainResource.getSchema();
     }
 
+    public static final List validateImportsIncludes(String location) throws IOException {
+        return validateImportsIncludes(location,Collections.EMPTY_LIST,Collections.EMPTY_LIST);
+    }
+    
+    public static final List validateImportsIncludes(String location, XSDSchemaLocator[] locators,
+            XSDSchemaLocationResolver[] resolvers ) throws IOException {
+        return validateImportsIncludes(location, (locators != null) ? Arrays.asList(locators) : Collections.EMPTY_LIST,
+                (resolvers != null) ? Arrays.asList(resolvers) : Collections.EMPTY_LIST);
+    }
+    
+    public static final List validateImportsIncludes(String location, List locators, List resolvers) throws IOException {
+        
+        //create a parser
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setValidating(false);
+        
+        SAXParser parser = null;
+        try {
+            parser = factory.newSAXParser();    
+        } 
+        catch( Exception e ) {
+            throw (IOException) new IOException("could not create parser").initCause( e );
+        }
+        
+        SchemaImportIncludeValidator validator = new SchemaImportIncludeValidator( locators, resolvers );
+        
+        //queue of files to parse
+        LinkedList q = new LinkedList();
+        q.add( location );
+        
+        while( !q.isEmpty() ) {
+            location = (String) q.removeFirst();
+            validator.setBaseLocation( location );
+        
+            try {
+                parser.parse( location, validator );
+            } 
+            catch (SAXException e) {
+                throw (IOException) new IOException( "parse error").initCause( e );
+            }
+            
+            //check for errors
+            if ( !validator.errors.isEmpty() ) {
+                return validator.errors;
+            }
+            
+            if ( !validator.next.isEmpty() ) {
+                q.addAll( validator.next );
+            }
+        }
+        
+        return Collections.EMPTY_LIST;
+    }
+    
+    static final class SchemaImportIncludeValidator extends DefaultHandler {
+   
+        /** base location */
+        String baseLocation;
+        /** locators for resolving to schemas directely */
+        List locators;
+        /** locators for resolving to absolute schema locations */
+        List resolvers;
+        /** tracking seen namespaces and schema locations */
+        Set seen;
+        /** list of errors encountered */
+        List errors;
+        /** next set of locations to process */
+        List next;
+        
+        SchemaImportIncludeValidator( List locators, List resolvers ) {
+            this.locators = locators;
+            this.resolvers = resolvers;
+            seen = new HashSet();
+            errors = new ArrayList();
+            next = new ArrayList();
+        }
+        
+        public void setBaseLocation(String baseLocation) {
+            this.baseLocation = baseLocation;
+        }
+        
+        public void startDocument() throws SAXException {
+            next.clear();
+        }
+        
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            //process import
+            if ( "import".equals( localName ) ) {
+                //get the namespace + location
+                String namespace = attributes.getValue( "namespace" );
+                String schemaLocation = attributes.getValue( "schemaLocation" );
+                
+                //do not validate if we have already seen this import
+                if ( seen.contains( namespace) ) {
+                    return;
+                }
+                seen.add( namespace );
+                
+                if ( schemaLocation != null ) {
+                    //look for a locator or resolver that can handle it
+                    for ( Iterator l = locators.iterator(); l.hasNext(); ) {
+                        XSDSchemaLocator locator = (XSDSchemaLocator) l.next();
+                        
+                        //check for schema locator which canHandle
+                        if ( locator instanceof SchemaLocator ) {
+                            if ( ((SchemaLocator)locator).canHandle(null, namespace, schemaLocation, null)) {
+                                //cool, return here and do not recurse
+                                return;
+                            }
+                        }
+                    }
+                    
+                    //resolve
+                    String resolvedSchemaLocation = resolve( namespace, schemaLocation );
+                    if ( resolvedSchemaLocation != null ) {
+                        recurse( resolvedSchemaLocation );
+                    }
+                    else {
+                        errors.add( "Could not resolve import: " + namespace + "," + schemaLocation);
+                    }
+                }
+                else {
+                    errors.add( "No schemaLocation attribute for namespace import: " + namespace );
+                }
+            }
+            else if ( "include".equals( localName ) ) {
+                //process include
+                String location = attributes.getValue( "location" );
+                String resolvedLocation = resolve( null, location );
+                
+                if ( resolvedLocation != null ) {
+                    recurse( resolvedLocation );
+                }
+                else {
+                    errors.add( "Could not resolve include: " + location);
+                }
+            }
+        }
+        
+        String resolve( String namespace, String location ) {
+            //look for a location resolver capable of handling it
+            for ( Iterator r = resolvers.iterator(); r.hasNext(); ) {
+                XSDSchemaLocationResolver resolver = (XSDSchemaLocationResolver) r.next();
+                if ( resolver instanceof SchemaLocationResolver ) {
+                    if ( ((SchemaLocationResolver) resolver ).canHandle(null, namespace,location)) {
+                        //can handle, actually resolve and recurse
+                        String resolvedSchemaLocation = 
+                            resolver.resolveSchemaLocation(null, namespace, location );
+                        if ( resolvedSchemaLocation != null ) {
+                            return resolvedSchemaLocation;
+                        }
+                        else {
+                            //should not happen, but just continue
+                        }
+                    }
+                }
+            }
+            
+            //attempt tp resolve manuualy
+            File file = new File( location );
+            if ( file.exists() ) {
+                return file.getAbsolutePath();
+            }
+            else {
+                //try relative to base location
+                if ( !file.isAbsolute() ) {
+                    File dir = new File( baseLocation ).getParentFile();
+                    if ( dir != null ) {
+                        file = new File( dir, location );
+                        if ( file.exists() ) {
+                            return file.getAbsolutePath();
+                        }
+                    }    
+                }
+            }
+            
+            return null;
+        }
+        
+        void recurse( String location ) {
+            //do not recurse if we have already processed this one
+            if ( seen.contains( location ) ) {
+                return;
+            }
+            
+            //mark it as seen
+            seen.add( location );
+           
+            //add to queue for processing of in next round
+            next.add( location );
+        }
+    }
+    
     /**
      * Returns a list of all child element declarations of the specified
      * element, no order is guaranteed.
