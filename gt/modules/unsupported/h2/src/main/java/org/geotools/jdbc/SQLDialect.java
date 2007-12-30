@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.jdbc;
 
 import java.io.IOException;
@@ -12,12 +27,11 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
-
-import org.opengis.feature.type.GeometryDescriptor;
-
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.feature.type.GeometryDescriptor;
+
 
 /**
  * The driver used by JDBCDataStore to directly communicate with the database.
@@ -27,9 +41,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * </p>
  * <p>
  *  <h3>Type Mapping</h3>
- * One of the jobs of a dialect is to map sql types to java types and vice 
- * versa. This abstract implementation provides default mappings for "primitive" 
- * java types. The following mappings are provided. A '*' denotes that the 
+ * One of the jobs of a dialect is to map sql types to java types and vice
+ * versa. This abstract implementation provides default mappings for "primitive"
+ * java types. The following mappings are provided. A '*' denotes that the
  * mapping is the default java to sql mapping as well.
  * <ul>
  *   <li>VARCHAR -> String *
@@ -43,14 +57,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *   <li>BIGINT -> Long *
  *   <li>REAL -> Float *
  *   <li>DOUBLE -> Double *
- *   <li>FLOAT -> Double 
+ *   <li>FLOAT -> Double
  *   <li>NUMERIC -> BigDecimal *
- *   <li>DECIMAL -> BigDecimal 
+ *   <li>DECIMAL -> BigDecimal
  *   <li>DATE -> java.sql.Date *
  *   <li>TIME -> java.sql.Time *
  *   <li>TIMESTAMP -> java.sql.Timestmap *
  * </ul>
- * Subclasses should <b>extend</b> (not override) the following methods to 
+ * Subclasses should <b>extend</b> (not override) the following methods to
  * configure the mappings:
  * <ul>
  *   <li>{@link #registerSqlTypeToClassMappings(Map)}
@@ -59,21 +73,20 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * </ul>
  * </p>
  * <p>
- * 
+ *
  * </p>
  * <p>
- * This class is intended to be stateless, therefore subclasses should not 
- * maintain any internal state. If for some reason a subclass must keep some 
- * state around (not recommended), it must ensure that the state is accessed in 
+ * This class is intended to be stateless, therefore subclasses should not
+ * maintain any internal state. If for some reason a subclass must keep some
+ * state around (not recommended), it must ensure that the state is accessed in
  * a thread safe manner.
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
 public abstract class SQLDialect {
-
     /**
-     * Determines if the specified table should be included in those published 
+     * Determines if the specified table should be included in those published
      * by the datastore.
      * <p>
      * This method returns <code>true</code> if the table should be published as
@@ -87,58 +100,60 @@ public abstract class SQLDialect {
      * </p>
      * @param tableName The name of the table.
      * @param cx Database connection.
-     * 
+     *
      */
-    public boolean includeTable( String tableName, Connection cx ) throws SQLException {
+    public boolean includeTable(String tableName, Connection cx)
+        throws SQLException {
         return true;
     }
-    
+
     /**
-     * Registers the sql type name to java type mappings that the dialect uses when 
+     * Registers the sql type name to java type mappings that the dialect uses when
      * reading and writing objects to and from the database.
      * <p>
      * Subclasses should extend (not override) this method to provide additional
-     * mappings, or to override mappings provided by this implementation. This 
+     * mappings, or to override mappings provided by this implementation. This
      * implementation provides the following mappings:
      * </p>
      */
-    public void registerSqlTypeNameToClassMappings( Map<String,Class<?>> mappings ) {
+    public void registerSqlTypeNameToClassMappings(Map<String, Class<?>> mappings) {
         //TODO: do the normal types
     }
-    
+
     /**
      * Determines the class mapping for a particular column of a table.
      * <p>
-     * Implementing this method is optional. It is used to allow database to 
+     * Implementing this method is optional. It is used to allow database to
      * perform custom type mappings based on various column metadata. It is called
      * before the mappings registered in {@link #registerSqlTypeToClassMappings(Map)}
      * and {@link #registerSqlTypeNameToClassMappings(Map) are used to determine
-     * the mapping. Subclasses should implement as needed, this default implementation 
+     * the mapping. Subclasses should implement as needed, this default implementation
      * returns <code>null</code>.
      * </p>
      * <p>
-     * The <tt>columnMetaData</tt> argument is provided from 
+     * The <tt>columnMetaData</tt> argument is provided from
      * {@link DatabaseMetaData#getColumns(String, String, String, String)}.
      * </p>
      * @param columnMetaData The column metadata
-     * 
+     *
      * @return The class mapped to the to column, or <code>null</code>.
      */
-    public Class<?> getMapping( ResultSet columnMetaData ) throws SQLException {
+    public Class<?> getMapping(ResultSet columnMetaData)
+        throws SQLException {
         return null;
     }
-    
+
     /**
-     * Registers the sql type to java type mappings that the dialect uses when 
+     * Registers the sql type to java type mappings that the dialect uses when
      * reading and writing objects to and from the database.
      * <p>
      * Subclasses should extend (not override) this method to provide additional
-     * mappings, or to override mappings provided by this implementation. This 
+     * mappings, or to override mappings provided by this implementation. This
      * implementation provides the following mappings:
      * </p>
-     * 
+     *
      */
-    public void registerSqlTypeToClassMappings( Map<Integer,Class<?>> mappings ) {
+    public void registerSqlTypeToClassMappings(Map<Integer, Class<?>> mappings) {
         mappings.put(new Integer(Types.VARCHAR), String.class);
         mappings.put(new Integer(Types.CHAR), String.class);
         mappings.put(new Integer(Types.LONGVARCHAR), String.class);
@@ -165,17 +180,17 @@ public abstract class SQLDialect {
 
         //subclasses should extend to provide additional
     }
-    
+
     /**
-     * Registers the java type to sql type mappings that the datastore uses when 
+     * Registers the java type to sql type mappings that the datastore uses when
      * reading and writing objects to and from the database.
      * * <p>
      * Subclasses should extend (not override) this method to provide additional
-     * mappings, or to override mappings provided by this implementation. This 
+     * mappings, or to override mappings provided by this implementation. This
      * implementation provides the following mappings:
      * </p>
      */
-    public void registerClassToSqlMappings( Map<Class<?>,Integer> mappings ) {
+    public void registerClassToSqlMappings(Map<Class<?>, Integer> mappings) {
         mappings.put(String.class, new Integer(Types.VARCHAR));
 
         mappings.put(Boolean.class, new Integer(Types.BOOLEAN));
@@ -193,25 +208,25 @@ public abstract class SQLDialect {
         mappings.put(Date.class, new Integer(Types.DATE));
         mappings.put(Time.class, new Integer(Types.TIME));
         mappings.put(Timestamp.class, new Integer(Types.TIMESTAMP));
-        
+
         //subclasses should extend and provide additional
     }
-    
+
     /**
      * Returns the java class mapping for a particular column.
      * <p>
-     * This method is used as a "last resort" when the mappings specified by the 
-     * dialect in the {@link #registerSqlTypeToClassMappings(Map)}" method fail 
+     * This method is used as a "last resort" when the mappings specified by the
+     * dialect in the {@link #registerSqlTypeToClassMappings(Map)}" method fail
      * to yield a java type.
      * </p>
-     * <p> 
-     * The most common case is for databases which store all geometric values under 
-     * a single type, and use some secondary means to store the specific type 
+     * <p>
+     * The most common case is for databases which store all geometric values under
+     * a single type, and use some secondary means to store the specific type
      * (like a metadata table).
      * </p>
      *  * <p>
      * This method is given a direct connection to the database. The connection
-     * must not be closed. However any statements or result sets instantiated 
+     * must not be closed. However any statements or result sets instantiated
      * from the connection must be closed.
      * </p>
      * <p>
@@ -223,21 +238,21 @@ public abstract class SQLDialect {
      * @param columnName The column name.
      * @param type The data type from {@link Types}, reported by database metadata.
      * @param cx The database connection.
-     * 
+     *
      * @return The mapped type of the column, or <code>null</code> if it can not
      * be inferred.
      */
-//    public final Class getMapping( String schemaName, String tableName, String columnName, Integer type, Connection cx )
-//        throws SQLException {
-//        return null;
-//    }
-    
-    
+
+    //    public final Class getMapping( String schemaName, String tableName, String columnName, Integer type, Connection cx )
+    //        throws SQLException {
+    //        return null;
+    //    }
+
     /**
      * Returns the string used to escape names.
      * <p>
      * This value is used to escape any name in a query. This includes columns,
-     * tables, schemas, indexes, etc... If no escape is necessary this method 
+     * tables, schemas, indexes, etc... If no escape is necessary this method
      * should return the empty string, and never return <code>null</code>.
      * </p>
      * <p>
@@ -248,26 +263,26 @@ public abstract class SQLDialect {
     public String getNameEscape() {
         return "\"";
     }
-    
+
     /**
      * Quick accessor for {@link #getNameEscape()}.
      */
     protected final String ne() {
         return getNameEscape();
     }
-    
+
     /**
      * Encodes the name of a column in an SQL statement.
      * <p>
-     * This method wraps <tt>raw</tt> in the character provided by 
+     * This method wraps <tt>raw</tt> in the character provided by
      * {@link #getNameEscape()}. Subclasses usually dont override this method
      * and instead override {@link #getNameEscape()}.
      * </p>
      */
-    public void encodeColumnName( String raw, StringBuffer sql ) {
+    public void encodeColumnName(String raw, StringBuffer sql) {
         sql.append(ne()).append(raw).append(ne());
     }
-    
+
     /**
      * Encodes the type of a column in an SQL CREATE TABLE statement.
      * <p>
@@ -275,73 +290,73 @@ public abstract class SQLDialect {
      * as is. Subclasses may override this method. Such cases might include:
      * <ul>
      *   <li>A type definition requires some parameter, ex: size of a varchar
-     *   <li>The provided attribute (<tt>att</tt>) contains some additional 
-     *   restrictions that can be encoded in the type, ex: field length 
+     *   <li>The provided attribute (<tt>att</tt>) contains some additional
+     *   restrictions that can be encoded in the type, ex: field length
      * </ul>
      * </p>
      * @param sqlTypeName
      * @param sql
      */
-    public void encodeColumnType( String sqlTypeName, StringBuffer sql ) {
-       sql.append( sqlTypeName ); 
+    public void encodeColumnType(String sqlTypeName, StringBuffer sql) {
+        sql.append(sqlTypeName);
     }
-    
+
     /**
      * Encodes the alias of a column in an sql query.
      * <p>
-     * This default implementation uses the syntax: <pre>as "alias"</pre>. 
+     * This default implementation uses the syntax: <pre>as "alias"</pre>.
      * Subclasses should override to provide a different syntax.
      * </p>
      */
-    public void encodeColumnAlias( String raw, StringBuffer sql ) {
-        sql.append( " as ");
-        encodeColumnName( raw, sql );
+    public void encodeColumnAlias(String raw, StringBuffer sql) {
+        sql.append(" as ");
+        encodeColumnName(raw, sql);
     }
-    
+
     /**
      * Encodes the name of a table in an SQL statement.
      * <p>
-     * This method wraps <tt>raw</tt> in the character provided by 
+     * This method wraps <tt>raw</tt> in the character provided by
      * {@link #getNameEscape()}. Subclasses usually dont override this method
      * and instead override {@link #getNameEscape()}.
      * </p>
      */
-    public void encodeTableName( String raw, StringBuffer sql ) {
+    public void encodeTableName(String raw, StringBuffer sql) {
         sql.append(ne()).append(raw).append(ne());
     }
-    
+
     /**
      * Encodes the name of a schema in an SQL statement.
      * <p>
-     * This method wraps <tt>raw</tt> in the character provided by 
+     * This method wraps <tt>raw</tt> in the character provided by
      * {@link #getNameEscape()}. Subclasses usually dont override this method
      * and instead override {@link #getNameEscape()}.
      * </p>
      */
-    public void encodeSchemaName( String raw, StringBuffer sql ) {
+    public void encodeSchemaName(String raw, StringBuffer sql) {
         sql.append(ne()).append(raw).append(ne());
     }
-    
+
     /**
      * Returns the name of a geometric type based on its integer constant.
      * <p>
      * The constant, <tt>type</tt>, is registered in {@link #registerSqlTypeNameToClassMappings(Map)}.
      * </p>
      * <p>
-     * This default implementation returns <code>null</code>, subclasses should 
+     * This default implementation returns <code>null</code>, subclasses should
      * override.
      * </p>
      */
-    public String getGeometryTypeName( Integer type ) {
+    public String getGeometryTypeName(Integer type) {
         return null;
     }
-    
+
     /**
-     * Returns the spatial reference system identifier (srid) for a particular 
+     * Returns the spatial reference system identifier (srid) for a particular
      * geometry column.
      * <p>
      * This method is given a direct connection to the database. The connection
-     * must not be closed. However any statements or result sets instantiated 
+     * must not be closed. However any statements or result sets instantiated
      * from the connection must be closed.
      * </p>
      * <p>
@@ -353,27 +368,25 @@ public abstract class SQLDialect {
      * @param columnName The column name, never <code>null</code>
      * @param cx The database connection.
      */
-    public Integer getGeometrySRID( String schemaName, String tableName, String columnName, Connection cx )
-        throws SQLException {
-       
+    public Integer getGeometrySRID(String schemaName, String tableName, String columnName,
+        Connection cx) throws SQLException {
         return null;
     }
-    
-    
+
     /**
      * Encodes the spatial extent function of a geometry column in a SELECT statement.
      * <p>
-     * This method must also be sure to properly encode the name of the column 
+     * This method must also be sure to properly encode the name of the column
      * with the {@link #encodeColumnName(String, StringBuffer)} function.
      * </p>
      */
-    public abstract void encodeGeometryEnvelope( String geometryColumn, StringBuffer sql );
-    
+    public abstract void encodeGeometryEnvelope(String geometryColumn, StringBuffer sql);
+
     /**
      * Decodes the result of a spatial extent function in a SELECT statement.
      * <p>
      * This method is given direct access to a result set. The <tt>column</tt>
-     * parameter is the index into the result set which contains the spatial 
+     * parameter is the index into the result set which contains the spatial
      * extent value. The query for this value is build with the {@link #encodeGeometryEnvelope(String, StringBuffer)}
      * method.
      * </p>
@@ -385,18 +398,18 @@ public abstract class SQLDialect {
      * @param column Index into the result set which points at the spatial extent
      * value.
      */
-    public abstract Envelope decodeGeometryEnvelope( ResultSet rs, int column ) throws SQLException, IOException;
-    
-   
+    public abstract Envelope decodeGeometryEnvelope(ResultSet rs, int column)
+        throws SQLException, IOException;
+
     /**
      * Encodes the name of a geometry column in a SELECT statement.
      * <p>
-     * This method should wrap the column name in any functions that are used to 
+     * This method should wrap the column name in any functions that are used to
      * retrieve its value. For instance, often it is necessary to use the function
      * <code>asText</code>, or <code>asWKB</code> when fetching a geometry.
      * </p>
      * <p>
-     * This method must also be sure to properly encode the name of the column 
+     * This method must also be sure to properly encode the name of the column
      * with the {@link #encodeColumnName(String, StringBuffer)} function.
      * </p>
      * <p>
@@ -411,22 +424,22 @@ public abstract class SQLDialect {
      * </pre>
      * </p>
      * <p>
-     * This default implementation simply uses the column name without any 
+     * This default implementation simply uses the column name without any
      * wrapping function, subclasses must override.
      * </p>
      */
-    public void encodeGeometryColumn( GeometryDescriptor gatt, StringBuffer sql ) {
-        encodeColumnName( gatt.getLocalName(), sql );
+    public void encodeGeometryColumn(GeometryDescriptor gatt, StringBuffer sql) {
+        encodeColumnName(gatt.getLocalName(), sql);
     }
-    
+
     /**
      * Encodes a geometry value in an sql statement.
      * <p>
-     * An implementations should serialize <tt>value</tt> into some exchange 
-     * format which will then be transported to the underlying database. For 
-     * example, consider an implementation which converts a geometry into its 
+     * An implementations should serialize <tt>value</tt> into some exchange
+     * format which will then be transported to the underlying database. For
+     * example, consider an implementation which converts a geometry into its
      * well known text representation:
-     * <pre> 
+     * <pre>
      *   <code>
      *   sql.append( "GeomFromText('" );
      *   sql.append( new WKTWriter().write( value ) );
@@ -439,17 +452,18 @@ public abstract class SQLDialect {
      *  of the geometry, or 0 if not known.
      * </p>
      */
-    public abstract void encodeGeometryValue( Geometry value, int srid, StringBuffer sql ) throws IOException;
-    
+    public abstract void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
+        throws IOException;
+
     /**
      * Decodes a geometry value from the result of a query.
      * <p>
      * This method is given direct access to a result set. The <tt>column</tt>
-     * parameter is the index into the result set which contains the geometric 
+     * parameter is the index into the result set which contains the geometric
      * value.
      * </p>
      * <p>
-     * An implementation should deserialize the value provided by the result 
+     * An implementation should deserialize the value provided by the result
      * set into {@link Geometry} object. For example, consider an implementation
      * which deserializes from well known text:
      * <code>
@@ -464,17 +478,17 @@ public abstract class SQLDialect {
      * Note that implementations must handle <code>null</code> values.
      * </p>
      * <p>
-     * The <tt>factory</tt> parameter should be used to instantiate any geometry 
+     * The <tt>factory</tt> parameter should be used to instantiate any geometry
      * objects.
      * </p>
      */
-    public abstract Geometry decodeGeometryValue( GeometryDescriptor descriptor, ResultSet rs, String column, GeometryFactory factory ) 
-        throws IOException, SQLException;
-    
+    public abstract Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
+        String column, GeometryFactory factory) throws IOException, SQLException;
+
     /**
      * Encodes the primary key definition in a CREATE TABLE statement.
      * <p>
-     * Implementations should propery encode the column name, column type and 
+     * Implementations should propery encode the column name, column type and
      * any keywords that specify the column as a primary key. Example:
      * <pre>
      *   <code>
@@ -483,28 +497,27 @@ public abstract class SQLDialect {
      *   </code>
      * </pre>
      * </p>
-     * 
+     *
      */
-    public abstract void encodePrimaryKey( String column, StringBuffer sql );
-    
+    public abstract void encodePrimaryKey(String column, StringBuffer sql);
+
     /**
      * Encodes anything post a CREATE TABLE statement.
      * <p>
      * This is appended to a CREATE TABLE statement after the column definitions.
-     * This default implementation does nothing, subclasses should override as 
+     * This default implementation does nothing, subclasses should override as
      * need be.
      * </p>
      */
-    public void encodePostCreateTable( String tableName , StringBuffer sql ) {
-        
+    public void encodePostCreateTable(String tableName, StringBuffer sql) {
     }
- 
-    /**     
-     * Callback to execute any additional sql statements post a create table 
+
+    /**
+     * Callback to execute any additional sql statements post a create table
      * statement.
      * <p>
      * This method should be implemented by subclasses that need to do some post
-     * processing on the database after a table has been created. Examples might 
+     * processing on the database after a table has been created. Examples might
      * include:
      * <ul>
      *   <li>Creating a sequence for a primary key
@@ -513,25 +526,24 @@ public abstract class SQLDialect {
      * </ul>
      * </p>
      * <p>
-     * A common case is creating an auto incrementing sequence for the primary 
-     * key of a table. It should be noted that all tables created through the 
+     * A common case is creating an auto incrementing sequence for the primary
+     * key of a table. It should be noted that all tables created through the
      * datastore use the column "fid" as the primary key.
      * </p>
      * <p>
-     * A direct connection to the database is provided (<tt>cx</tt>). This 
-     * connection must not be closed, however any statements or result sets 
+     * A direct connection to the database is provided (<tt>cx</tt>). This
+     * connection must not be closed, however any statements or result sets
      * instantiated from the connection must be closed.
      * </p>
      * @param schemaName The name of the schema, may be <code>null</code>.
      * @param tableName The name of the table.
      * @param cx Database connection.
-     * 
+     *
      */
-    public void postCreateTable( String schemaName, String tableName, Connection cx )
+    public void postCreateTable(String schemaName, String tableName, Connection cx)
         throws SQLException {
-        
     }
- 
+
     /**
      * Encodes a value in an sql statement.
      * <p>
@@ -539,33 +551,32 @@ public abstract class SQLDialect {
      * types. This default implementation does the following:
      * <ol>
      *   <li>The <tt>value</tt> is encoded via its {@link #toString()} representation.
-     *   <li>If <tt>type</tt> is a character type (extends {@link CharSequence}), 
-     *   it is wrapped in single quotes ('). 
+     *   <li>If <tt>type</tt> is a character type (extends {@link CharSequence}),
+     *   it is wrapped in single quotes (').
      * </ol>
      * </p>
-     * 
+     *
      */
-    public void encodeValue( Object value, Class type, StringBuffer sql ) {
-        if ( CharSequence.class.isAssignableFrom( type ) ) {
+    public void encodeValue(Object value, Class type, StringBuffer sql) {
+        if (CharSequence.class.isAssignableFrom(type)) {
             sql.append("'").append(value).append("'");
-        }
-        else {
+        } else {
             sql.append(value);
         }
     }
-    
+
     /**
      * Obtains the next value of the primary key of a column.
      * <p>
-     * Implementations should determine the next value of the primary key from 
-     * from a sequence defined in teh database, or some other metadata. In the 
-     * worst case a <code>select max(columnName)+1 ...</code> can be used. In 
+     * Implementations should determine the next value of the primary key from
+     * from a sequence defined in teh database, or some other metadata. In the
+     * worst case a <code>select max(columnName)+1 ...</code> can be used. In
      * the event where the next value of the primary key cannot be determined
      * this method should return <code>null</code>.
      * </p>
      * <p>
      * This method is given a direct connection to the database, but this connection
-     * should never be closed. However any statements or result sets instantiated 
+     * should never be closed. However any statements or result sets instantiated
      * from the connection must be closed.
      * </p>
      * <p>
@@ -575,9 +586,9 @@ public abstract class SQLDialect {
      * @param tableName The name of the table.
      * @param columnName The primary key column.
      * @param cx The database connection.
-     * 
+     *
      * @return The next value of the primary key, or <code>null</code>.
      */
-    public abstract Object getNextPrimaryKeyValue( String schemaName, String tableName, String columnName, Connection cx ) 
-        throws SQLException;
+    public abstract Object getNextPrimaryKeyValue(String schemaName, String tableName,
+        String columnName, Connection cx) throws SQLException;
 }

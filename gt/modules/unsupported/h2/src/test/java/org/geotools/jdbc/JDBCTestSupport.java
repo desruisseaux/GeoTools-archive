@@ -1,32 +1,44 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.jdbc;
 
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 import java.sql.Connection;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.sql.DataSource;
-
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-
-import org.geotools.feature.FeatureFactoryImpl;
-import org.geotools.feature.type.FeatureTypeFactoryImpl;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactoryImpl;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterFactoryImpl;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Test support class for jdbc test cases.
  * <p>
- * This test class fires up a live instance of an h2 database to provide a 
+ * This test class fires up a live instance of an h2 database to provide a
  * live database to work with.
  * </p>
  *
@@ -34,69 +46,62 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  */
 public abstract class JDBCTestSupport extends TestCase {
-	
     /**
      * flag to track if connection available or not.
      */
     static boolean dataSourceAvailable = true;
-    
-    /**
-     * data source
-     */
+
     static {
         //turn up logging
         ConsoleHandler handler = new ConsoleHandler();
-    	handler.setLevel(Level.FINE);
-    	org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel( Level.FINE );
-    	org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler( handler );
+        handler.setLevel(Level.FINE);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel(Level.FINE);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler(handler);
     }
-	
+
     protected JDBCTestSetup setup;
     protected JDBCDataStore dataStore;
-    
+
     /**
-     * Override to check if a database connection can be obtained, if not 
+     * Override to check if a database connection can be obtained, if not
      * tests are ignored.
      */
     public void run(TestResult result) {
-        
-        if ( dataSourceAvailable ) {
+        if (dataSourceAvailable) {
             //attempt to grab
             try {
                 JDBCTestSetup setup = createTestSetup();
                 DataSource dataSource = setup.createDataSource();
                 Connection cx = dataSource.getConnection();
                 cx.close();
-            }
-            catch ( Throwable t ) {
+            } catch (Throwable t) {
                 dataSourceAvailable = false;
+
                 return;
             }
-            
-            super.run( result );
-        }
-        else {
+
+            super.run(result);
+        } else {
             return;
         }
-        
-        
     }
-    
+
     protected void setUp() throws Exception {
         super.setUp();
-        
+
         //create the test harness
-        if ( setup == null ) {
-            setup = createTestSetup(); 
+        if (setup == null) {
+            setup = createTestSetup();
         }
+
         setup.setUp();
-        
+
         //initialize the database
         setup.initializeDatabase();
-        
+
         //initialize the data
         setup.setUpData();
-        
+
         FilterCapabilities filterCapabilities = new FilterCapabilities();
         filterCapabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         filterCapabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
@@ -110,26 +115,26 @@ public abstract class JDBCTestSupport extends TestCase {
         //create the dataStore
         //TODO: replace this with call to datastore factory
         dataStore = new JDBCDataStore();
-        dataStore.setSQLDialect( setup.createSQLDialect() );
+        dataStore.setSQLDialect(setup.createSQLDialect());
         dataStore.setNamespaceURI("http://www.geotools.org/test");
-        dataStore.setDataSource( setup.getDataSource() );
+        dataStore.setDataSource(setup.getDataSource());
         dataStore.setDatabaseSchema("geotools");
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
         dataStore.setFeatureFactory(new FeatureFactoryImpl());
-        dataStore.setFeatureTypeFactory( new FeatureTypeFactoryImpl());
+        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
         dataStore.setFilterCapabilities(filterCapabilities);
-        
+
         setup.setUpDataStore(dataStore);
     }
-    
+
     protected abstract JDBCTestSetup createTestSetup();
-   
+
     protected void tearDown() throws Exception {
-    	super.tearDown();
-    	
-    	setup.tearDown();
-    	
-    	dataStore.dispose();
+        super.tearDown();
+
+        setup.tearDown();
+
+        dataStore.dispose();
     }
 }

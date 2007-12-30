@@ -1,4 +1,3 @@
-
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
@@ -17,16 +16,15 @@
 package org.geotools.jdbc;
 
 import java.sql.Connection;
-
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentState;
 
 
 /**
- * State for jdbc datastore providing additional cached values such as primary 
+ * State for jdbc datastore providing additional cached values such as primary
  * key and database connection.
- * 
+ *
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  */
@@ -35,47 +33,53 @@ public final class JDBCState extends ContentState {
      * cached database connection
      */
     private Connection connection;
+
     /**
      * cached primary key
      */
     private PrimaryKey primaryKey;
-    
+
     /**
      * Creates the state from an existing one.
      */
-    public JDBCState( JDBCState state ){
-    	super( state );
-    	
-    	//copy the primary key
-    	primaryKey = state.getPrimaryKey();
-    	
-    	//do not copy the connection
-    	//connection = state.getConnection();
+    public JDBCState(JDBCState state) {
+        super(state);
+
+        //copy the primary key
+        primaryKey = state.getPrimaryKey();
+
+        //do not copy the connection
+        //connection = state.getConnection();
     }
+
     /**
      * Creates a new state object.
      */
-    public JDBCState( ContentEntry entry){
-    	super( entry );
-	}
+    public JDBCState(ContentEntry entry) {
+        super(entry);
+    }
+
     /**
      * The cached database connection.
      */
-    public Connection getConnection(){
-    	return connection;    	
+    public Connection getConnection() {
+        return connection;
     }
+
     /**
      * Sets the cached database connection.
      */
-    public void setConnection( Connection connection ){
-    	this.connection = connection;
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
+
     /**
      * The cached primary key.
      */
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
+
     /**
      * Sets the cached primary key.
      * @param primaryKey
@@ -83,30 +87,29 @@ public final class JDBCState extends ContentState {
     public void setPrimaryKey(PrimaryKey primaryKey) {
         this.primaryKey = primaryKey;
     }
-    
+
     /**
      * Flushes all cached state.
      */
     public void flush() {
-    	connection = null;
-    	primaryKey = null;
-    	super.flush();
+        connection = null;
+        primaryKey = null;
+        super.flush();
     }
-    
+
     /**
      * Copies the state.
      */
     public ContentState copy() {
-        return new JDBCState( this );
+        return new JDBCState(this);
     }
-    
+
     /**
-     * Closes the database connection with a call to 
+     * Closes the database connection with a call to
      * {@link JDBCDataStore#closeSafe(Connection)}.
      */
     public void close() {
-        JDBCDataStore.closeSafe( connection );
+        JDBCDataStore.closeSafe(connection);
         super.close();
     }
 }
-
