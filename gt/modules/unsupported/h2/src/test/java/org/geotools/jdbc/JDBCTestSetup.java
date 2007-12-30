@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -26,6 +27,9 @@ import javax.sql.DataSource;
  */
 public abstract class JDBCTestSetup {
 
+    static final Logger LOGGER = 
+        org.geotools.util.logging.Logging.getLogger( "org.geotools.data.jdbc" );
+    
     DataSource dataSource = null;
     
     public DataSource getDataSource() {
@@ -82,7 +86,7 @@ public abstract class JDBCTestSetup {
                 String line = null;
 
                 while ((line = reader.readLine()) != null) {
-                    System.out.println( line );
+                    LOGGER.fine( line );
                     st.execute(line);
                 }
 

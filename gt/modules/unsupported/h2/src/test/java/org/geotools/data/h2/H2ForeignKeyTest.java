@@ -12,11 +12,31 @@ public class H2ForeignKeyTest extends JDBCForeignKeyTest {
                 super.setUpData();
                 
                 try {
+                    run ( "DROP TABLE \"geotools\".\"feature_relationships\"; COMMIT;" );
+                }
+                catch( Exception e ) {};
+                
+                String sql = "CREATE TABLE \"geotools\".\"feature_relationships\" (" + 
+                    "\"table\" varchar, \"col\" varchar, \"rtable\" varchar, \"rcol\" varchar" + 
+                ")";
+                run( sql );
+                
+                try {
+                    run ( "DROP TABLE \"geotools\".\"feature_associations\"; COMMIT;" );
+                }
+                catch( Exception e ) {}
+                
+                sql = "CREATE TABLE \"geotools\".\"feature_associations\" (" +
+                    "\"fid\" varchar, \"rtable\" varchar, \"rcol\" varchar, \"rfid\" varchar" + 
+                ");";
+                run( sql );
+                
+                try {
                     run ( "DROP TABLE \"geotools\".\"fk\"; COMMIT;" );
                 }
                 catch( Exception e ) {}
                 
-                String sql = "CREATE TABLE \"geotools\".\"fk\" (" + 
+                sql = "CREATE TABLE \"geotools\".\"fk\" (" + 
                   "\"id\" int AUTO_INCREMENT(1) PRIMARY KEY, " + 
                   "\"geometry\" BLOB, \"intProperty\" int, " + 
                   "\"ft1\" int REFERENCES \"ft1\"" +   
@@ -26,6 +46,16 @@ public class H2ForeignKeyTest extends JDBCForeignKeyTest {
                 sql = "INSERT INTO \"geotools\".\"fk\" VALUES (" + 
                   "0,GeomFromText('POINT(0 0)',4326), 0, 0);";
                 run( sql );
+                
+                sql = "INSERT INTO \"geotools\".\"feature_relationships\" VALUES (" + 
+                    "'fk', 'ft1', 'ft1', 'id'" + 
+                ");";
+                run( sql );
+                
+                sql = "INSERT INTO \"geotools\".\"feature_associations\" VALUES (" + 
+                    "'fk.0', 'ft1', 'id', 'ft1.0' " +  
+                ");";
+                run ( sql );
             }
             
             public void tearDown() throws Exception {

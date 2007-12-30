@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 
 import org.geotools.data.ContentFeatureCollection;
@@ -117,9 +118,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         Connection cx = getDataStore().getConnection( getState() );
         
         //get metadata about columns from database
-        try {
-            
-            
+        try {            
             DatabaseMetaData metaData = cx.getMetaData();
 
             /*
@@ -183,57 +182,31 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         continue;
                     }
     
-                    //check for foreign key
-                    if ( getDataStore().isForeignKeyAware() ) {
-                        //foreign key aware, any columns that are foreign keys
-                        // should be made associations
-                        //TODO: for now we assume the foreign key is always a 
-                        //single column
+                    //check for association
+                    if ( getDataStore().isAssociations() ) {
+                        getDataStore().ensureAssociationTablesExist( cx );
                         
-                       /*  <LI><B>PKTABLE_CAT</B> String => primary key table catalog 
-                        *      being imported (may be <code>null</code>)
-                        *  <LI><B>PKTABLE_SCHEM</B> String => primary key table schema
-                        *      being imported (may be <code>null</code>)
-                        *  <LI><B>PKTABLE_NAME</B> String => primary key table name
-                        *      being imported
-                        *  <LI><B>PKCOLUMN_NAME</B> String => primary key column name
-                        *      being imported
-                        *  <LI><B>FKTABLE_CAT</B> String => foreign key table catalog (may be <code>null</code>)
-                        *  <LI><B>FKTABLE_SCHEM</B> String => foreign key table schema (may be <code>null</code>)
-                        *  <LI><B>FKTABLE_NAME</B> String => foreign key table name
-                        *  <LI><B>FKCOLUMN_NAME</B> String => foreign key column name
-                        *  <LI><B>KEY_SEQ</B> short => sequence number within a foreign key
-                        *  <LI><B>UPDATE_RULE</B> short => What happens to a
-                        *       foreign key when the primary key is updated:
-                        *  <LI><B>DELETE_RULE</B> short => What happens to 
-                        *      the foreign key when primary is deleted.
-                        *  <LI><B>FK_NAME</B> String => foreign key name (may be <code>null</code>)
-                        *  <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
-                        *  <LI><B>DEFERRABILITY</B> short => can the evaluation of foreign key 
-                        *      constraints be deferred until commit
-                        */
-                        ResultSet foreignKeys = 
-                            metaData.getImportedKeys(null, databaseSchema, tableName);
-                        
+                        //check for an association
+                        String sql = getDataStore().selectRelationshipSQL( tableName, name );
+
+                        Statement st = cx.createStatement();
                         try {
-                            while( foreignKeys.next() ) {
-                                String keyName = foreignKeys.getString( "FKCOLUMN_NAME" );
-                                if ( name.equals( keyName ) ) {
-                                    String associatedTypeName = 
-                                        foreignKeys.getString("PKTABLE_NAME");
-                                    
-                                    //found, create a special mapping 
-                                    tb.userData( "jdbc.associatedTypeName", associatedTypeName )
-                                        .add( name, Association.class );
-                                    continue;
-                                }
-                            }    
+                            ResultSet relationships = st.executeQuery( sql );
+                            try {
+                               if ( relationships.next() ) {
+                                   //found, create a special mapping 
+                                   tb.add( name, Association.class );
+                                   continue;
+                               }
+                            }
+                            finally {
+                                JDBCDataStore.closeSafe( relationships );    
+                            }
                         }
                         finally {
-                            JDBCDataStore.closeSafe( foreignKeys );
+                            JDBCDataStore.closeSafe( st );
                         }
                     }
-                    
                     
                     //figure out the type mapping
                     

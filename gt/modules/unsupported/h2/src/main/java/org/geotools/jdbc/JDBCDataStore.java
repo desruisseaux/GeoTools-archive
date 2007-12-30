@@ -117,15 +117,41 @@ public final class JDBCDataStore extends ContentDataStore {
     protected FilterCapabilities filterCapabilities;
     
     /**
-     * flag controlling if the datastore is foreign-key aware
+     * flag controlling if the datastore is supporting feature and geometry 
+     * relationships with associations
      */
-    protected boolean foreignKeyAware = false;
+    protected boolean associations = false;
     
     /**
-     * flag controlling if the datastore stores geometries using foreign keys 
-     * to a seperate geometry table.
+     * name of table to use to store geometries when {@link #associations} 
+     * is set.
      */
-    protected boolean foreignKeyGeometries = false;
+    protected static final String GEOMETRY_TABLE = "geometry";
+    
+    /**
+     * name of table to use to store multi geometries made up of non-multi 
+     * geometries when {@link #associations} is set.
+     */
+    protected static final String MULTI_GEOMETRY_TABLE = "multi_geometry";
+    
+    /**
+     * name of table to use to store geometry associations when {@link #associations}
+     * is set.
+     */
+    protected static final String GEOMETRY_ASSOCIATION_TABLE = "geometry_associations";
+    
+    /**
+     * name of table to use to store feature relationships (information about 
+     * associations) when {@link #associations} is set. 
+     */
+    protected static final String FEATURE_RELATIONSHIP_TABLE = "feature_relationships";
+    
+    /**
+     * name of table to use to store feature associations when {@link #associations}
+     * is set.
+     */
+    protected static final String FEATURE_ASSOCIATION_TABLE = "feature_associations";
+    
     /**
      * The dialect the datastore uses to generate sql statements in order to 
      * communicate with the underlying database.
@@ -211,33 +237,28 @@ public final class JDBCDataStore extends ContentDataStore {
     public void setFilterCapabilities(FilterCapabilities filterCapabilities) {
         this.filterCapabilities = filterCapabilities;
     }
-
+    
     /**
-     * Flag determining if the datastore should process foreign keys or not.
-     * 
-     * @return <code>true</code> if the datastore is processing foreign keys, 
-     * otherwise <code>false</code>.
+     * Flag controlling if the datastore is supporting feature and geometry 
+     * relationships with associations
      */
-    public boolean isForeignKeyAware() {
-        return foreignKeyAware;
+    public boolean isAssociations() {
+        return associations;
     }
     
     /**
-     * Sets Flag determining if the datastore should process foreign keys or not.
-     * 
-     * @param foreignKeyAware <code>true</code> if the datastore should process 
-     * foreign keys, otherwise <code>false</code>.
+     * Sets the flag controlling if the datastore is supporting feature and geometry 
+     * relationships with associations
      */
-    public void setForeignKeyAware(boolean foreignKeyAware) {
-        this.foreignKeyAware = foreignKeyAware;
+    public void setAssociations(boolean foreignKeyGeometries) {
+        this.associations = foreignKeyGeometries;
     }
-    
     
     /**
      * The sql type to java type mappings that the datastore uses when reading
      * and writing objects to and from the database.
      * <p>
-     * These mappings are derived from {@link SQLDialect#registerSqlToClassMappings(Map)}
+     * These mappings are derived from {@link SQLDialect#registerSqlTypeToClassMappings(java.util.Map)}
      * </p>
      * @return The mappings, never <code>null</code>.
      */
@@ -864,15 +885,502 @@ public final class JDBCDataStore extends ContentDataStore {
      */
     protected String createTableSQL( SimpleFeatureType featureType, Connection cx ) 
         throws Exception {
-        StringBuffer sql = new StringBuffer();
         
-        //figure out what the sql types are corresponding to the feature type
-        // attributes
-        int[] sqlTypes = new int[featureType.getAttributeCount()];
-        String[] sqlTypeNames = new String[sqlTypes.length];
+        //figure out the names of the columns
+        String[] columnNames = new String[ featureType.getAttributeCount() ];
+        String[] sqlTypeNames = null;
+        Class[] classes = new Class[ featureType.getAttributeCount() ];
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
             AttributeDescriptor attributeType = featureType.getAttribute(i);
-            Class clazz = attributeType.getType().getBinding();
+            
+            //column name
+            columnNames[i] = attributeType.getLocalName();
+            
+            //column type 
+            classes[i] = attributeType.getType().getBinding();
+        }
+        sqlTypeNames = getSQLTypeNames(classes, cx);
+        
+        return createTableSQL( featureType.getTypeName(), columnNames, sqlTypeNames, "fid" );
+    }
+    
+    /**
+     * Helper method for creating geometry association table if it does not
+     * exist.
+     */
+    protected void ensureAssociationTablesExist( Connection cx ) throws IOException, SQLException {
+        
+        // look for feature relationship table
+        ResultSet tables = 
+            cx.getMetaData().getTables(null, databaseSchema, FEATURE_RELATIONSHIP_TABLE, null);
+        try {
+            if (!tables.next()) {
+                // does not exist, create it
+                String sql = createRelationshipTableSQL(cx);
+                LOGGER.fine(sql);
+
+                Statement st = cx.createStatement();
+                try {
+                    st.execute(sql);
+                } finally {
+                    JDBCDataStore.closeSafe(st);
+                }
+            }
+        } finally {
+            JDBCDataStore.closeSafe(tables);
+        }
+        
+        // look for feature association table
+        tables = 
+            cx.getMetaData().getTables(null, databaseSchema, FEATURE_ASSOCIATION_TABLE, null);
+        try {
+            if (!tables.next()) {
+                // does not exist, create it
+                String sql = createAssociationTableSQL(cx);
+                LOGGER.fine(sql);
+
+                Statement st = cx.createStatement();
+                try {
+                    st.execute(sql);
+                } finally {
+                    JDBCDataStore.closeSafe(st);
+                }
+            }
+        } finally {
+            JDBCDataStore.closeSafe(tables);
+        }
+        
+        // look up for geometry table
+        tables = cx.getMetaData().getTables(null, databaseSchema, GEOMETRY_TABLE, null);
+        try {
+            if (!tables.next()) {
+                // does not exist, create it
+                String sql = createGeometryTableSQL(cx);
+                LOGGER.fine(sql);
+
+                Statement st = cx.createStatement();
+                try {
+                    st.execute(sql);
+                } finally {
+                    JDBCDataStore.closeSafe(st);
+                }
+            }
+        } finally {
+            JDBCDataStore.closeSafe(tables);
+        }
+
+        // look up for multi geometry table
+        tables = 
+            cx.getMetaData().getTables(null, databaseSchema, MULTI_GEOMETRY_TABLE, null);
+        try {
+            if (!tables.next()) {
+                // does not exist, create it
+                String sql = createMultiGeometryTableSQL(cx);
+                LOGGER.fine(sql);
+
+                Statement st = cx.createStatement();
+                try {
+                    st.execute(sql);
+                } finally {
+                    JDBCDataStore.closeSafe(st);
+                }
+            }
+        } finally {
+            JDBCDataStore.closeSafe(tables);
+        }
+
+        // look up for metadata for geometry association table
+        tables = cx.getMetaData().getTables(null,databaseSchema, GEOMETRY_ASSOCIATION_TABLE, null);
+        try {
+            if (!tables.next()) {
+                // does not exist, create it
+                String sql = createGeometryAssociationTableSQL(cx);
+                LOGGER.fine(sql);
+
+                Statement st = cx.createStatement();
+                try {
+                    st.execute(sql);
+                } finally {
+                    JDBCDataStore.closeSafe(st);
+                }
+            }
+        } finally {
+            JDBCDataStore.closeSafe(tables);
+        }
+    }
+
+    
+    /**
+     * Creates the sql for the relationship table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     */
+    protected String createRelationshipTableSQL( Connection cx ) throws SQLException {
+        String[] sqlTypeNames = getSQLTypeNames( 
+          new Class[] { String.class, String.class }, cx      
+        );
+        String[] columnNames = new String[] { "table", "col" };
+        return createTableSQL( FEATURE_RELATIONSHIP_TABLE, columnNames, sqlTypeNames, null );
+    }
+    
+    /**
+     * Creates the sql for the association table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     */
+    protected String createAssociationTableSQL( Connection cx ) throws SQLException {
+        String[] sqlTypeNames = getSQLTypeNames( 
+          new Class[] { String.class, String.class, String.class, String.class }, 
+          cx      
+        );
+        String[] columnNames = new String[] { "fid", "rtable", "rcol", "rfid" };
+        return createTableSQL( FEATURE_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null );
+    }
+    
+    /**
+     * Creates the sql for the geometry table.
+     * 
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     */
+    protected String createGeometryTableSQL( Connection cx ) throws SQLException {
+        String[] sqlTypeNames = getSQLTypeNames(
+            new Class[]{ String.class, String.class, String.class, String.class, Geometry.class }, 
+            cx
+        );
+        String[] columnNames = new String[]{ "id", "name", "description", "type", "geometry" };
+                
+        return createTableSQL( GEOMETRY_TABLE, columnNames, sqlTypeNames, null );
+    }
+    
+    /**
+     * Creates the sql for the multi_geometry table.
+     *  <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     */
+    protected String createMultiGeometryTableSQL( Connection cx ) throws SQLException {
+        String[] sqlTypeNames = 
+            getSQLTypeNames( new Class[]{ String.class, String.class}, cx );
+        String[] columnNames = new String[]{ "id", "mgid" };
+                
+        return createTableSQL( MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null );
+    }
+    
+    /**
+     * Creates the sql for the relationship table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param table The table of the association
+     * @param column The column of the association
+     */
+    protected String selectRelationshipSQL( String table, String column ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT " );
+        dialect.encodeColumnName( "table", sql ); sql.append( ",");
+        dialect.encodeColumnName( "col", sql );
+        
+        sql.append( " FROM ");
+        if ( databaseSchema != null ) {
+            dialect.encodeSchemaName( databaseSchema, sql );
+            sql.append( "." );
+        }
+        
+        dialect.encodeTableName( FEATURE_RELATIONSHIP_TABLE, sql );
+        
+        if ( table != null ) {
+            sql.append( " WHERE " );
+            
+            dialect.encodeColumnName( "table", sql );
+            sql.append( " = " );
+            dialect.encodeValue( table, String.class, sql );
+        }
+        
+        if ( column != null ) {
+            if ( table == null ) {
+                sql.append( " WHERE " );    
+            }
+            else {
+                sql.append( " AND ");
+            }
+            
+            dialect.encodeColumnName( "col", sql );
+            sql.append( " = " );
+            dialect.encodeValue( column, String.class, sql );
+        }
+        
+        return sql.toString();
+    }
+    
+    /**
+     * Creates the sql for the association table. 
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param fid The feature id of the association
+     */
+    protected String selectAssociationSQL( String fid ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT " );
+        dialect.encodeColumnName( "fid", sql ); sql.append( ",");
+        dialect.encodeColumnName( "rtable", sql ); sql.append( ",");
+        dialect.encodeColumnName( "rcol", sql ); sql.append( ", ");
+        dialect.encodeColumnName( "rfid", sql ); 
+        
+        sql.append( " FROM ");
+        
+        if( databaseSchema != null ) {
+            dialect.encodeSchemaName(databaseSchema, sql);
+            sql.append( "." );
+        }
+        dialect.encodeTableName( FEATURE_ASSOCIATION_TABLE, sql );
+       
+        if ( fid != null ) {
+            sql.append( " WHERE ");
+            
+            dialect.encodeColumnName( "fid", sql );
+            sql.append( " = " );
+            dialect.encodeValue( fid, String.class, sql );
+        }
+        
+        return sql.toString();
+    }
+    
+    /**
+     * Creates the sql for a select from the geometry table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param gid The geometry id to select for, may be <code>null</code>
+     * 
+     */
+    protected String selectGeometrySQL( String gid ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT " );
+        dialect.encodeColumnName( "id", sql ); sql.append( ",");
+        dialect.encodeColumnName( "name", sql ); sql.append( ",");
+        dialect.encodeColumnName( "description", sql ); sql.append( ",");
+        dialect.encodeColumnName( "type", sql ); sql.append( ",");
+        dialect.encodeColumnName( "geometry", sql );
+        sql.append( " FROM ");
+        dialect.encodeTableName( GEOMETRY_TABLE, sql );
+        
+        if ( gid != null ) {
+            sql.append( " WHERE " );
+            
+            dialect.encodeColumnName( "id", sql );
+            sql.append( " = " );
+            dialect.encodeValue( gid, String.class, sql );
+        }
+        
+        return sql.toString();
+    }
+    
+    /**
+     * Creates the sql for a select from the multi geometry table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     * @param gid The geometry id to select for, may be <code>null</code>.
+     */
+    protected String selectMultiGeometrySQL( String gid ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT " );
+        dialect.encodeColumnName( "id", sql ); sql.append( ",");
+        dialect.encodeColumnName( "mgid", sql );
+        
+        sql.append( " FROM ");
+        dialect.encodeTableName( MULTI_GEOMETRY_TABLE, sql );
+        
+        if ( gid != null ) {
+            sql.append( " WHERE " );
+            
+            dialect.encodeColumnName( "id", sql );
+            sql.append( " = " );
+            dialect.encodeValue( gid, String.class, sql );
+        }
+        
+        return sql.toString();
+    }
+    
+    /**
+     * Creates the sql for the geometry association table.
+     * <p>
+     * This method is only called when {@link JDBCDataStore#isAssociations()}
+     * is true.
+     * </p>
+     */
+    protected String createGeometryAssociationTableSQL( Connection cx ) throws SQLException {
+        String[] sqlTypeNames = getSQLTypeNames(
+            new Class[]{ String.class, String.class, String.class, Boolean.class}, cx
+        );
+        String[] columnNames = new String[]{ "fid", "gname", "gid", "ref" };
+                
+        return createTableSQL( GEOMETRY_ASSOCIATION_TABLE, columnNames, sqlTypeNames, null );
+    }
+    
+    /**
+     * Creates the sql for a select from the geometry association table.
+     * <p>
+     * </p>
+     * @param fid The fid to select for, may be <code>null</code>
+     * @param gid The geometry id to select for, may be <code>null</code>
+     * @param gname The geometry name to select for, may be <code>null</code>
+     */
+    protected String selectGeometryAssociationSQL( String fid, String gid ,String gname ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT " );
+        dialect.encodeColumnName( "fid", sql ); sql.append( ",");
+        dialect.encodeColumnName( "gid", sql ); sql.append( ",");
+        dialect.encodeColumnName( "gname", sql ); sql.append( ",");
+        dialect.encodeColumnName( "ref", sql ); 
+        
+        sql.append( " FROM ");
+        dialect.encodeTableName( GEOMETRY_ASSOCIATION_TABLE, sql );
+        
+        if ( fid != null ) {
+            sql.append( " WHERE " );
+            dialect.encodeColumnName( "fid", sql );
+            sql.append( " = " );
+            dialect.encodeValue( fid, String.class, sql );    
+        }
+        
+        if ( gid != null ) {
+            if ( fid == null ) {
+                sql.append( " WHERE " );
+            }
+            else {
+                sql.append( " AND " );
+            }
+            
+            dialect.encodeColumnName( "gid", sql );
+            sql.append( " = " );
+            dialect.encodeValue( gid, String.class, sql );
+        }
+        
+        if ( gname != null ) {
+            if ( fid == null && gid == null ) {
+                sql.append( " WHERE " );
+            }
+            else {
+                sql.append( " AND " );    
+            }
+            
+            dialect.encodeColumnName( "gname", sql );
+            sql.append( " = " );
+            dialect.encodeValue( gname, String.class, sql );    
+        }
+        
+        return sql.toString();
+    }
+//    /**
+//     * Creates the sql for the multi geometry table.
+//     <p>
+//     * This method is only called when {@link JDBCDataStore#isForeignKeyGeometries()}
+//     * is true.
+//     * </p>
+//     */
+//    protected String createMultiGeometryTableSQL( Connection cx ) throws SQLException {
+//        String[] sqlTypeNames = getSQLTypeNames(
+//            new Class[]{ String.class, String.class, }, cx
+//        );
+//        String[] columnNames = new String[]{ "gid", "rgid" };
+//        
+//        return createTableSQL( MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null );
+//    }
+//    
+//    /**
+//     * Creates the sql for a select from the multi geometry table.
+//     * <p>
+//     * 
+//     * </p>
+//     * @param gid The id of the multi geometry, not <code>null</code>.
+//     */
+//    protected String selectMultiGeometrySQL( String gid ) {
+//        StringBuffer sql = new StringBuffer();
+//        
+//        sql.append( "SELECT " );
+//        dialect.encodeColumnName( "gid", sql ); sql.append( ",");
+//        dialect.encodeColumnName( "rgid", sql ); 
+//        
+//        sql.append( " FROM ");
+//        dialect.encodeTableName( MULTI_GEOMETRY_TABLE, sql );
+//        
+//        sql.append( " WHERE " );
+//        dialect.encodeColumnName( "gid", sql );
+//        sql.append( " = " );
+//        dialect.encodeValue( gid, String.class, sql );
+//        
+//        return sql.toString();    
+//    }
+    
+    /**
+     * Helper method for building a 'CREATE TABLE' sql statement.
+     */
+    private String createTableSQL( String tableName, String[] columnNames, String[] sqlTypeNames, String pkeyColumn ) {
+        //build the create table sql
+        StringBuffer sql = new StringBuffer();
+        sql.append("CREATE TABLE ");
+        
+        encodeTableName( tableName, sql );
+        sql.append(" ( ");
+
+        //primary key column
+        if ( pkeyColumn != null ) {
+            dialect.encodePrimaryKey( pkeyColumn, sql );
+            sql.append( ", ");
+        }
+                
+        //normal attributes
+        for (int i = 0; i < columnNames.length; i++) {
+            //the column name
+            dialect.encodeColumnName(columnNames[i], sql);
+            sql.append(" ");
+
+            //sql type name
+            dialect.encodeColumnType(sqlTypeNames[i],sql);
+            //sql.append(sqlTypeNames[i]);
+
+            if (i < (sqlTypeNames.length - 1)) {
+                sql.append(", ");
+            }
+        }
+
+        sql.append(" ) ");
+        
+        //encode anything post create table
+        dialect.encodePostCreateTable( tableName, sql );
+        
+        return sql.toString();
+    }
+    
+    /**
+     * Helper method for determining what the sql type names are for a set of 
+     * classes.
+     * <p>
+     * This method uses a combination of dialect mappings and database metadata
+     * to determine which sql types map to the specified classes.
+     * </p>
+     */
+    private String[] getSQLTypeNames( Class[] classes, Connection cx ) throws SQLException {
+      //figure out what the sql types are corresponding to the feature type
+        // attributes
+        int[] sqlTypes = new int[classes.length];
+        String[] sqlTypeNames = new String[sqlTypes.length];
+        for (int i = 0; i < classes.length; i++) {
+            Class clazz = classes[i];
             Integer sqlType = getMapping(clazz);
             if ( sqlType == null ) {
                 LOGGER.warning("No sql type mapping for: " + clazz );
@@ -882,7 +1390,8 @@ public final class JDBCDataStore extends ContentDataStore {
             sqlTypes[i] = sqlType;
             
             //if this a geometric type, get the name from teh dialect
-            if ( attributeType instanceof GeometryDescriptor ) {
+            //if ( attributeType instanceof GeometryDescriptor ) {
+            if ( Geometry.class.isAssignableFrom( clazz ) ) {
                 String sqlTypeName = dialect.getGeometryTypeName( sqlType );
                 if ( sqlTypeName != null ) {
                     sqlTypeNames[i] = sqlTypeName;
@@ -951,40 +1460,7 @@ public final class JDBCDataStore extends ContentDataStore {
             closeSafe( types );
         }
         
-
-        //build the create table sql
-        sql.append("CREATE TABLE ");
-        
-        encodeTableName( featureType.getTypeName(), sql );
-        sql.append(" ( ");
-
-        //fid column
-        dialect.encodePrimaryKey( "fid", sql );
-        sql.append( ", ");
-        
-        //normal attributes
-        for (int i = 0; i < sqlTypeNames.length; i++) {
-            AttributeDescriptor att = featureType.getAttribute(i);
-
-            //the column name
-            dialect.encodeColumnName(att.getLocalName(), sql);
-            sql.append(" ");
-
-            //sql type name
-            dialect.encodeColumnType(sqlTypeNames[i],att,sql);
-            //sql.append(sqlTypeNames[i]);
-
-            if (i < (sqlTypeNames.length - 1)) {
-                sql.append(", ");
-            }
-        }
-
-        sql.append(" ) ");
-        
-        //encode anything post create table
-        dialect.encodePostCreateTable( featureType.getTypeName(), sql );
-        
-        return sql.toString();
+        return sqlTypeNames;
     }
     
     /**

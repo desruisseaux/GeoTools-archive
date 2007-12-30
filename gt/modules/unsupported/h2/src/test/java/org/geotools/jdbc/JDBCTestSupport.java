@@ -35,18 +35,23 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public abstract class JDBCTestSupport extends TestCase {
 	
-	/**
-	 * data source
-	 */
-	static {
-	    //turn up logging
-		ConsoleHandler handler = new ConsoleHandler();
-		handler.setLevel(Level.FINE);
-		org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel( Level.FINE );
-		org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler( handler );
-	}
+    /**
+     * flag to track if connection available or not.
+     */
+    static boolean dataSourceAvailable = true;
+    
+    /**
+     * data source
+     */
+    static {
+        //turn up logging
+        ConsoleHandler handler = new ConsoleHandler();
+    	handler.setLevel(Level.FINE);
+    	org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").setLevel( Level.FINE );
+    	org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc").addHandler( handler );
+    }
 	
-	protected JDBCTestSetup setup;
+    protected JDBCTestSetup setup;
     protected JDBCDataStore dataStore;
     
     /**
@@ -54,17 +59,27 @@ public abstract class JDBCTestSupport extends TestCase {
      * tests are ignored.
      */
     public void run(TestResult result) {
-        try {
-            JDBCTestSetup setup = createTestSetup();
-            DataSource dataSource = setup.createDataSource();
-            Connection cx = dataSource.getConnection();
-            cx.close();
+        
+        if ( dataSourceAvailable ) {
+            //attempt to grab
+            try {
+                JDBCTestSetup setup = createTestSetup();
+                DataSource dataSource = setup.createDataSource();
+                Connection cx = dataSource.getConnection();
+                cx.close();
+            }
+            catch ( Throwable t ) {
+                dataSourceAvailable = false;
+                return;
+            }
+            
+            super.run( result );
         }
-        catch ( Throwable t ) {
+        else {
             return;
         }
         
-        super.run( result );
+        
     }
     
     protected void setUp() throws Exception {

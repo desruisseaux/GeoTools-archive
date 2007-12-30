@@ -15,7 +15,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
     protected void setUp() throws Exception {
         super.setUp();
         
-        dataStore.setForeignKeyAware(true);
+        dataStore.setAssociations(true);
     }
     
     public void testGetSchema() throws Exception {
@@ -42,7 +42,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         
         SimpleFeature feature = reader.next();
         Association association = (Association) feature.getAttribute( "ft1" );
-        assertEquals( "0", association.getUserData().get( "gml:id") );
+        assertEquals( "ft1.0", association.getUserData().get( "gml:id") );
         
         SimpleFeature associated = (SimpleFeature) association.getValue();
         assertNotNull( associated );
@@ -50,7 +50,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         assertEquals( "zero", associated.getAttribute("stringProperty"));
         
         Property attribute = feature.getProperty("ft1");
-        assertEquals( "0", attribute.getUserData().get( "gml:id") );
+        assertEquals( "ft1.0", attribute.getUserData().get( "gml:id") );
     }
     
     public void testGetFeaturesWithZeroDepth() throws Exception {
@@ -69,6 +69,6 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         assertNull( association.getValue() );
         
         Property attribute = feature.getProperty("ft1");
-        assertEquals( "0", attribute.getUserData().get( "gml:id") );
+        assertEquals( "ft1.0", attribute.getUserData().get( "gml:id") );
     }
 }
