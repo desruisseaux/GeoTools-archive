@@ -16,6 +16,7 @@ import java.util.List;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.PointGrid;
+import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 
 
 /**
@@ -100,7 +101,7 @@ public class PointGridImpl implements PointGrid {
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
     public DirectPosition get(int row, int column, DirectPosition dest) throws IndexOutOfBoundsException {
-        DirectPosition target = (DirectPosition) getInternal( row, column ).clone();
+        DirectPosition target = new DirectPositionImpl(getInternal( row, column ));
         
         if (dest == null || !dest.getCoordinateReferenceSystem().equals(target.getCoordinateReferenceSystem())){ 
             return target;
@@ -139,7 +140,7 @@ public class PointGridImpl implements PointGrid {
      */
     public void set(int row, int column, DirectPosition position) throws IndexOutOfBoundsException,
                                                                          UnsupportedOperationException {
-        DirectPosition target = (DirectPosition) getInternal( row, column).clone();
+        DirectPosition target = new DirectPositionImpl(getInternal(row, column));
         
         if (position.getCoordinateReferenceSystem().equals(target.getCoordinateReferenceSystem())) {
             for (int i = 0; i < position.getDimension(); i++) {

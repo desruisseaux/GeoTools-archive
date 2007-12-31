@@ -59,8 +59,8 @@ public class EnvelopeImpl implements Envelope {
     public EnvelopeImpl(
             final DirectPosition lowerCorner, 
             final DirectPosition upperCorner) {
-        this.lowerCorner = (DirectPosition) lowerCorner.clone();
-        this.upperCorner = (DirectPosition) upperCorner.clone();
+        this.lowerCorner = new DirectPositionImpl(lowerCorner);
+        this.upperCorner = new DirectPositionImpl(upperCorner);
     }
 
     //*************************************************************************
@@ -112,7 +112,7 @@ public class EnvelopeImpl implements Envelope {
      * @see org.opengis.geometry.coordinate.Envelope#getUpperCorner()
      */
     public final DirectPosition getUpperCorner() {
-        return (DirectPosition) upperCorner.clone();
+        return new DirectPositionImpl(upperCorner);
     }
 
     /**
@@ -120,7 +120,7 @@ public class EnvelopeImpl implements Envelope {
      * @see org.opengis.geometry.coordinate.Envelope#getLowerCorner()
      */
     public final DirectPosition getLowerCorner() {
-        return (DirectPosition) lowerCorner.clone();
+        return new DirectPositionImpl(lowerCorner);
     }
     
     /**

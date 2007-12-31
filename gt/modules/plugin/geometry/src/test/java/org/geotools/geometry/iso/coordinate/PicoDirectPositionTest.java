@@ -8,6 +8,7 @@ import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.elem2D.Geo2DFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.util.Cloneable;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.coordinate.GeometryFactory;
@@ -79,7 +80,7 @@ public class PicoDirectPositionTest extends TestCase {
 		assertTrue(coords1[2] == dp1.getOrdinate(2));
 		
 		// Cloning a DP
-		DirectPosition dp2 = (DirectPosition) dp1.clone();
+		DirectPosition dp2 = (DirectPosition) ((Cloneable) dp1).clone();
 		
 		// setOrdinate(dim, value)
 		dp1.setOrdinate(0, 10.5);

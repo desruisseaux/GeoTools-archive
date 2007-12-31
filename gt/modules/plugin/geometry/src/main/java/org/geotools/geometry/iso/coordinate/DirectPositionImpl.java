@@ -23,6 +23,7 @@ import java.util.Arrays;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.geotools.referencing.CRS;
+import org.opengis.util.Cloneable;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.coordinate.Position;
@@ -32,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jackson Roehrig & Sanjay Jena
  * 
  */
-public class DirectPositionImpl implements DirectPosition, Serializable {
+public class DirectPositionImpl implements DirectPosition, Cloneable, Serializable {
     private static final long serialVersionUID = 2327211794986364062L;
 
     /**

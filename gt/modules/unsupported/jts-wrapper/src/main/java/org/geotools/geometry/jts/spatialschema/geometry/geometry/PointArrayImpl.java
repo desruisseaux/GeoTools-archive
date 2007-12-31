@@ -134,7 +134,7 @@ public class PointArrayImpl extends NotifyingArrayList<Position> implements Poin
      *          to this array, or should we left the decision to the implementor?
      */
     public Position get(int column) throws IndexOutOfBoundsException {
-        return (DirectPosition) ((DirectPosition)super.get(column)).clone();
+        return new DirectPositionImpl((DirectPosition)super.get(column));
     }
 
     /**
@@ -198,7 +198,7 @@ public class PointArrayImpl extends NotifyingArrayList<Position> implements Poin
         int n = size();
         DirectPosition [] result = new DirectPosition[n];
         for (int i=0; i<n; i++) {
-            result[i] = (DirectPosition) ((DirectPosition)get(i)).clone();
+            result[i] = new DirectPositionImpl((DirectPosition)get(i));
         }
         return result;
     }

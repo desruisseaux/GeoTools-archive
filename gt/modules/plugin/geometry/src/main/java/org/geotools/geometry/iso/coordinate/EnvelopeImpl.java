@@ -54,8 +54,8 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @param env
 	 */
 	public EnvelopeImpl(Envelope env) {
-        pMin = (DirectPosition) env.getLowerCorner().clone();
-		pMax = (DirectPosition) env.getUpperCorner().clone();
+        pMin = new DirectPositionImpl(env.getLowerCorner());
+		pMax = new DirectPositionImpl(env.getUpperCorner());
 	}
 
 	/**
@@ -78,8 +78,8 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @param p0
 	 */
 	public EnvelopeImpl(DirectPosition position) {
-		this.pMin = (DirectPosition) position.clone();
-		this.pMax = (DirectPosition) position.clone();
+		this.pMin = new DirectPositionImpl(position);
+		this.pMax = new DirectPositionImpl(position);
 	}
 
 	/*
@@ -198,8 +198,8 @@ public class EnvelopeImpl implements Envelope, Serializable {
 	 * @param env
 	 */
 	public void setValues(EnvelopeImpl env) {
-		this.pMin = (DirectPosition) env.getLowerCorner().clone();
-		this.pMax = (DirectPosition) env.getUpperCorner().clone();
+		this.pMin = new DirectPositionImpl(env.getLowerCorner());
+		this.pMax = new DirectPositionImpl(env.getUpperCorner());
 	}
 
 	/**

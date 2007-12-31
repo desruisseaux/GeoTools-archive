@@ -27,6 +27,7 @@ import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveInterpolation;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 
 /**
  * The {@code LineStringImpl} class implements the {@link LineString}
@@ -145,7 +146,7 @@ public class LineStringImpl extends GenericCurveImpl
         List list = pa.positions();
         int n = controlPoints.length();
         for (int i=n-1; i>=0; i--) {
-            list.add(((DirectPosition)controlPoints.positions().get(i)).clone());
+            list.add(new DirectPositionImpl(controlPoints.positions().get(i).getPosition()));
         }
         return result;
     }

@@ -773,19 +773,17 @@ public final class Hints extends RenderingHints {
     /**
      * The maximum number of associations traversed in a datastore query.
      * <p>
-     * This maps directly to the traversalXlinkDepth parameter in a wfs query.
-     * </p>
+     * This maps directly to the {@code traversalXlinkDepth} parameter in a WFS query.
      */
-    public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key( Integer.class );
+    public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key(Integer.class);
 
     /**
      * The name of a property to traverse in a datastore query.
      * <p>
-     * This maps directly to a xlinkPropertyName in a wfs query.
-     * </p>
+     * This maps directly to a {@code xlinkPropertyName} in a WFS query.
      */
-    public static final Hints.Key ASSOCIATION_PROPERTY = new Key( PropertyName.class ); 
-        
+    public static final Hints.Key ASSOCIATION_PROPERTY = new Key(PropertyName.class);
+
     /**
      * Constructs an initially empty set of hints.
      *

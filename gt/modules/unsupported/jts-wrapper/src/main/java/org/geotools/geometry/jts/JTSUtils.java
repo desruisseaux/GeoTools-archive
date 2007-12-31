@@ -31,6 +31,7 @@ import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SurfaceBoundary;
+import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 
 //**This comment is left from the polexis implementation**
 // This class depends on only two non-GO1 objects.  FactoryManager is used to
@@ -425,8 +426,8 @@ public final class JTSUtils {
         // rather than geo coordinate; only way to be sure is to check Units
         DirectPosition topCorner = envelope.getUpperCorner();
         DirectPosition botCorner = envelope.getLowerCorner();
-        DirectPosition topLeft = (DirectPosition) topCorner.clone();
-        DirectPosition botRight = (DirectPosition) botCorner.clone();
+        DirectPosition topLeft = new DirectPositionImpl(topCorner);
+        DirectPosition botRight = new DirectPositionImpl(botCorner);
         
         //Again, making assumption we can ignore this LatLonAlt stuff - colin
         
