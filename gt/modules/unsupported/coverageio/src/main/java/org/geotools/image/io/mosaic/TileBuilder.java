@@ -32,6 +32,7 @@ import javax.imageio.ImageReader;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -381,16 +382,20 @@ public class TileBuilder {
                 final int      imageIndex = tile.getImageIndex();
                 final Dimension pixelSize = entry.getValue();
                 /*
-                 * Computes the transformed bounds if it is cheap, or only the origin point
-                 * otherwise. We expand 'boundsForAll' accordingly.
+                 * Computes the transformed bounds. If we fail to obtain it, there is probably
+                 * something wrong with the tile (typically a wrong filename) but this is not
+                 * fatal to this method. In such case, we will transform only the origin instead
+                 * of the full box, which sometime imply a lost of accuracy but not always. Note
+                 * that the user is likely to obtains the same exception if the MosaicImageReader
+                 * attempts to read the same tile (but as long as it doesn't, it may work).
                  */
-                final Rectangle bounds;
-                if (tile.isGetRegionCheap()) {
-                    try {
-                        bounds = tile.getRegion();
-                    } catch (IOException e) {
-                        throw new IllegalStateException(e);
-                    }
+                Rectangle bounds = null;
+                try {
+                    bounds = tile.getRegion();
+                } catch (IOException exception) {
+                    Logging.unexpectedException(TileBuilder.class, "tiles", exception);
+                }
+                if (bounds != null) {
                     XAffineTransform.transform(tr, bounds, envelope);
                     bounds.x      = (int) Math.round(envelope.x);
                     bounds.y      = (int) Math.round(envelope.y);

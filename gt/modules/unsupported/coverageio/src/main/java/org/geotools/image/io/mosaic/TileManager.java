@@ -24,24 +24,20 @@ import java.util.*;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.geotools.resources.Classes;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
- * A collection of {@link Tile} objects. This base class do not assumes that the tiles are arranged
- * in any particular order (especially grids). But subclasses can make such assumption for better
- * performances.
- * <p>
- * <strong>This class do not clone any value given as parameter, or any returned value.</strong>
- * Do not modify them. This class is not public for this reason.
+ * A collection of {@link Tile} objects at one image index. This base class do not assumes that
+ * the tiles are arranged in any particular order (especially grids). But subclasses can make such
+ * assumption for better performances.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-class TileManager {
+public class TileManager implements Comparator<Tile> {
     /**
      * The tiles sorted by ({@linkplain Tile#getReader reader}, {@linkplain Tile#getInput input})
      * first, then by {@linkplain Tile#getImageIndex image index}. If an iteration must be performed
@@ -56,25 +52,29 @@ class TileManager {
     private final Collection<Tile> allTiles;
 
     /**
-     * The tiles in the region of interest. Elements can be {@code null} if not yet computed.
+     * The tiles in the region of interest, or {@code null} if not yet computed.
      */
-    private final Collection<Tile>[] tilesOfInterest;
+    private Collection<Tile> tilesOfInterest;
 
     /**
-     * The region of interest. Elements can be {@code null} if we should returns all tiles.
+     * The subsampling used at the time {@link #tilesOfInterest} has been computed.
      */
-    private final Rectangle[] regionsOfInterest;
+    private int xSubsampling, ySubsampling;
 
     /**
-     * The region enclosing all tiles for each image index. The length of this array is the
-     * number of images. The elements in the array will be computed only when first needed.
+     * The region of interest.
      */
-    private final Rectangle[] regions;
+    private final Rectangle regionOfInterest;
+
+    /**
+     * The region enclosing all tiles. Will be computed only when first needed.
+     */
+    private Rectangle region;
 
     /**
      * The tile dimensions. Will be computed only when first needed.
      */
-    private final Dimension[] tileSizes;
+    private Dimension tileSize;
 
     /**
      * The input given (maybe indirectly) to each image readers. Many tiles can share the same
@@ -126,22 +126,14 @@ class TileManager {
         /*
          * Overwrites the tiles array with the same tiles, but ordered with same input firsts.
          */
-        int numTiles  = 0;
-        int numImages = 0;
+        int numTiles = 0;
 fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             assert !sameInputs.isEmpty();
-            final int imageIndex = sameInputs.get(sameInputs.size() - 1).getImageIndex();
-            if (imageIndex >= numImages) {
-                numImages = imageIndex + 1;
-            }
             for (final Tile tile : sameInputs) {
-                synchronized (tile) {
-                    if (tile.manager != null) {
-                        // Found a tile already in use by an other TileManager.
-                        // Stop the loop now; we will thrown an exception later.
-                        break fill;
-                    }
-                    tile.manager = this;
+                if (!tile.setOwner(this, numTiles)) {
+                    // Found a tile already in use by an other TileManager.
+                    // Stop the loop now; we will thrown an exception later.
+                    break fill;
                 }
                 tilesArray[numTiles++] = tile;
             }
@@ -153,26 +145,31 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
          */
         if (numTiles != tilesArray.length) {
             while (--numTiles >= 0) {
-                tilesArray[numTiles].manager = null;
+                tilesArray[numTiles].setOwner(null, 0);
             }
             throw new IllegalArgumentException("Tile already in use"); // TODO: localize
         }
         this.tiles = tilesArray;
         allTiles = UnmodifiableArrayList.wrap(tilesArray);
-        /*
-         * Now initializes the various caches.
-         */
-        @SuppressWarnings("unchecked") // Generic array creation.
-        final Collection<Tile>[] tilesOfInterest = new Collection[numImages];
-        this.tilesOfInterest   = tilesOfInterest;
-        this.regionsOfInterest = new Rectangle [numImages];
-        this.regions           = new Rectangle [numImages];
-        this.tileSizes         = new Dimension [numImages];
+        regionOfInterest = new Rectangle();
+    }
+
+    /**
+     * Compares two tiles for order. The tiles must be members of the collection returned by
+     * {@link #getTiles}. This comparator groups together the tiles that use the same reader
+     * and input. Reading tiles in sorted order should be more efficient than a random order.
+     *
+     * @throws IllegalArgumentException If one of the tiles is not a member of the collection
+     *         returned by {@link #getTiles}.
+     * @see Tile#compareTo
+     */
+    public int compare(final Tile tile1, final Tile tile2) throws IllegalArgumentException {
+        return tile2.getRank(this) - tile1.getRank(this);
     }
 
     /**
      * Returns the raw input (<strong>not</strong> wrapped in an image input stream) for the
-     * given reader.
+     * given reader. This method is invoked by {@link Tile#getPreparedReader} only.
      */
     final Object getRawInput(final ImageReader reader) {
         return readerInputs.get(reader);
@@ -182,6 +179,8 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      * Sets the raw input (<strong>not</strong> wrapped in an image input stream) for the
      * given reader. The input can be set to {@code null}, but we don't allow entry removal
      * on intend since the keys need to be returned by {@link #getReaders}.
+     * <p>
+     * This method is invoked by {@link Tile#getPreparedReader} only.
      */
     final void setRawInput(final ImageReader reader, final Object input) {
         readerInputs.put(reader, input);
@@ -219,32 +218,39 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
-     * Returns the number of images.
-     */
-    public int getNumImages() {
-        return regions.length;
-    }
-
-    /**
-     * Returns the region enclosing all tiles for the given image index.
+     * Computes the region and tile size for all tiles.
      *
-     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
-     * @return The region.
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getReader reader} and this operation failed.
      */
-    public Rectangle getRegion(final int imageIndex) throws IOException {
-        Rectangle region = regions[imageIndex];
-        if (region == null) {
-            for (final Tile tile : getTiles(imageIndex)) {
-                final Rectangle expand = tile.getRegion();
-                if (region == null) {
-                    region = expand;
-                } else {
-                    region.add(expand);
-                }
+    private void initialize() throws IOException {
+        for (final Tile tile : getTiles()) {
+            final Rectangle expand = tile.getRegion();
+            if (region == null) {
+                region = expand;
+            } else {
+                region.add(expand);
             }
-            regions[imageIndex] = region;
+            if (tileSize == null) {
+                tileSize = expand.getSize();
+            } else {
+                if (expand.width  > tileSize.width)  tileSize.width  = expand.width;
+                if (expand.height > tileSize.height) tileSize.height = expand.height;
+            }
+        }
+    }
+
+    /**
+     * Returns the region enclosing all tiles.
+     *
+     * @return The region. <strong>Do not modify</strong> since it may be a direct reference to
+     *         internal structures.
+     * @throws IOException if it was necessary to fetch an image dimension from its
+     *         {@linkplain Tile#getReader reader} and this operation failed.
+     */
+    public Rectangle getRegion() throws IOException {
+        if (region == null) {
+            initialize();
         }
         return region;
     }
@@ -257,95 +263,93 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
-     * Returns every tiles at the given image index.
+     * Returns every tiles that intersect the given region.
      *
-     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @param  region The region of interest (shall not be {@code null}).
+     * @param  xSubsampling The number of source columns to advance for each pixel.
+     * @param  ySubsampling The number of source rows to advance for each pixel.
      * @return The tiles that intercept the given region.
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getReader reader} and this operation failed.
      */
-    public final Collection<Tile> getTiles(final int imageIndex) throws IOException {
-        return getTiles(imageIndex, null, 1, 1);
+    public Collection<Tile> getTiles(final Rectangle region, final int xSubsampling, final int ySubsampling)
+            throws IOException
+    {
+        if (tilesOfInterest == null || !regionOfInterest.equals(region)) {
+            tilesOfInterest = null; // Safety in case of failure.
+            regionOfInterest.setBounds(region);
+            tilesOfInterest = getTileOfInterest(xSubsampling, ySubsampling);
+        }
+        return tilesOfInterest;
     }
 
     /**
-     * Returns every tiles that intersect the given region.
-     *
-     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
-     * @param  region The region of interest, or {@code null} for iterating over all tiles.
-     * @return The tiles that intercept the given region.
-     * @throws IOException if it was necessary to fetch an image dimension from its
-     *         {@linkplain Tile#getReader reader} and this operation failed.
+     * Returns every tiles that intersect the {@linkplain #regionOfInterest region of interest},
+     * which must be set before this methos is invoked. At the difference of {@link #getTiles},
+     * this method does not use any cache - the search is performed inconditionnaly.
      */
-    public Collection<Tile> getTiles(final int imageIndex, final Rectangle region,
-                                     final int xSubsampling, final int ySubsampling)
+    private Collection<Tile> getTileOfInterest(final int xSubsampling, final int ySubsampling)
             throws IOException
     {
-        Collection<Tile> interest = tilesOfInterest[imageIndex];
-        if (interest == null || !Utilities.equals(regionsOfInterest[imageIndex], region)) {
-            interest = new ArrayList<Tile>();
-            /*
-             * TODO: we should use an RTree here except for the tiles where isGetRegionCheap()
-             *       returns 'false'. The loop below would still be used for the laters, but
-             *       the tiles for which 'isGetRegionCheap()' become 'true' would move to the
-             *       RTree.
-             */
-            for (final Tile tile : tiles) {
-                if (tile.getImageIndex() == imageIndex) {
-                    if (region == null || tile.intersects(region)) {
-                        if (tile.canSubsample(xSubsampling, ySubsampling)) {
-                            interest.add(tile);
+        final Map<Rectangle,Tile> interest = new LinkedHashMap<Rectangle,Tile>();
+        for (final Tile tile : tiles) {
+            if (tile.canSubsample(xSubsampling, ySubsampling)) {
+                // TODO: This check should be replaced by iteration over the values returned
+                //       by a RTree. We could consider org.geotools.index.RTree, but we need
+                //       to clean that code first (API that should not be public, should be
+                //       a java.util.Collection, avoid dependencies to JTS, search(Envelope)
+                //       should returns a Collection backed by lazy iterator, etc.) and we
+                //       may need to add a 'RTree subtree(Envelope)' method.
+                Rectangle region = tile.getRegion();
+                if (regionOfInterest.intersects(region)) {
+                    region = region.intersection(regionOfInterest);
+                    final Tile old = interest.put(region, tile);
+                    if (old != null) {
+                        /*
+                         * Found a tile with the same bounding box than the new tile. It is
+                         * probably a tile at a different resolution. Retains the one which
+                         * minimize the disk reading, and discard the other one. This check
+                         * is not generic since we search for an exact match, but this case
+                         * is common enough. Handling it with a HashMap will help to reduce
+                         * the amount of tiles to handle in a more costly way later.
+                         */
+                        if (old .countWastedPixels(region, xSubsampling, ySubsampling) <
+                            tile.countWastedPixels(region, xSubsampling, ySubsampling))
+                        {
+                            interest.put(region, old); // Keep the old tile, discart the new one.
                         }
                     }
                 }
             }
-            /*
-             * TODO: We could put more logic here by removing overlapping tiles, if any.
-             */
-            interest = Collections.unmodifiableCollection(interest);
-            tilesOfInterest[imageIndex] = interest;
-            regionsOfInterest[imageIndex] = region;
         }
-        return interest;
+        /*
+         * TODO: We could put more logic here by removing overlapping tiles, if any.
+         * TODO: sort the result.
+         */
+        return Collections.unmodifiableCollection(interest.values());
     }
 
     /**
-     * Returns {@code true} if there is more than one tile for the given image index.
+     * Returns {@code true} if there is more than one tile.
      */
-    public boolean isImageTiled(final int imageIndex) {
-        boolean found = false;
+    public boolean isImageTiled() {
         // Don't invoke 'getTiles' because we want to avoid the call to Tile.getRegion().
-        for (final Tile tile : tiles) {
-            if (tile.getImageIndex() == imageIndex) {
-                if (found) {
-                    return true;
-                }
-                found = true;
-            }
-        }
-        return false;
+        return tiles.length >= 2;
     }
 
     /**
      * Returns the tiles dimension.
      *
+     * @return The tiles dimension. <strong>Do not modify</strong> since it may be a direct
+     *         reference to internal structures.
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getReader reader} and this operation failed.
      */
-    public Dimension getTileSize(final int imageIndex) throws IOException {
-        Dimension size = tileSizes[imageIndex];
-        if (size == null) {
-            int width  = 0;
-            int height = 0;
-            for (final Tile tile : getTiles(imageIndex)) {
-                final Rectangle region = tile.getRegion();
-                if (region.width  > width)  width  = region.width;
-                if (region.height > height) height = region.height;
-            }
-            size = new Dimension(width, height);
-            tileSizes[imageIndex] = size;
+    public Dimension getTileSize() throws IOException {
+        if (tileSize == null) {
+            initialize();
         }
-        return size;
+        return tileSize;
     }
 
     /**

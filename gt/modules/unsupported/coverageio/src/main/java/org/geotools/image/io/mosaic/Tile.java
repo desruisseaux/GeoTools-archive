@@ -80,8 +80,18 @@ public class Tile implements Comparable<Tile> {
     /**
      * The tile manager that own this tile. Will be set by {@link TileManager} constructor
      * only, and should not be modified after that point.
+     *
+     * @see #setOwner
      */
-    TileManager manager;
+    private TileManager manager;
+
+    /**
+     * The rank of this tile in a sorted tile array. Will be set by {@link TileManager} constructor
+     * only, and should not be modified after that point.
+     *
+     * @see #setOwner
+     */
+    private int rank;
 
     /**
      * The image reader to use. The same reader is typically given to every {@code Tile} objects
@@ -100,7 +110,7 @@ public class Tile implements Comparable<Tile> {
     private final Object input;
 
     /**
-     * The image index of the tile to be read. This is often 0.
+     * The image index to be given to the image reader for reading this tile.
      */
     private final int imageIndex;
 
@@ -135,7 +145,7 @@ public class Tile implements Comparable<Tile> {
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
-     *          The image index of the tile to be read. This is often 0.
+     *          The image index to be given to the image reader for reading this tile.
      * @param origin
      *          The upper-left corner in the destination image.
      * @param pixelSize
@@ -177,7 +187,7 @@ public class Tile implements Comparable<Tile> {
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
-     *          The image index of the tile to be read. This is often 0.
+     *          The image index to be given to the image reader for reading this tile.
      * @param region
      *          The region in the destination image. The {@linkplain Rectangle#width width} and
      *          {@linkplain Rectangle#height height} should match the image size.
@@ -210,6 +220,35 @@ public class Tile implements Comparable<Tile> {
         } else {
             dx = dy = 1;
         }
+    }
+
+    /**
+     * Assigns this tile to a {@link TileManager} and returns {@code true} on success,
+     * or {@code false} if this tile was already assigned to an other manager. Can also
+     * be invoked with a {@code null} argument for cancelling a previous setting.
+     *
+     * @param owner The tile manager which is storing a reference to this tile.
+     * @param rank  The rank given by the tile manager to this tile in its internal array.
+     */
+    final synchronized boolean setOwner(final TileManager owner, final int rank) {
+        if (owner != null && manager != null) {
+            return false;
+        }
+        manager = owner;
+        this.rank = rank;
+        return true;
+    }
+
+    /**
+     * Returns the rank of this file provided that it is owned by the given manager, or throw
+     * an exception otherwise. This method is invoked by {@link TileManager#compare} only.
+     */
+    final int getRank(final TileManager owner) throws IllegalArgumentException {
+        if (owner != manager) {
+            // The argument name in the public TileManager.compare(...) method are "tile1","tile2".
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "tile"));
+        }
+        return rank;
     }
 
     /**
@@ -426,14 +465,6 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns {@code true} if calls to {@link #getRegion}, {@link #intersects} and related
-     * methods will be cheap. For internal usage by {@link TileManager#getTiles} only.
-     */
-    final boolean isGetRegionCheap() {
-        return width != 0 || height != 0;
-    }
-
-    /**
      * Translates this tile. For internal usage by {@link TileBuilder} only. This method
      * shound not be invoked anymore after a {@code Tile} instance has been made public.
      */
@@ -444,25 +475,51 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * Returns {@code true} if this tile can be used for reading an image with the given
-     * subsampling.
+     * subsampling. This method always returns {@code true} if the given subsampling are
+     * zero. In principle, subsampling can't be zero. But {@link TileManager} uses that
+     * value for iterating over all tiles.
      */
     final boolean canSubsample(final int xSubsampling, final int ySubsampling) {
         return (xSubsampling % dx) == 0 && (ySubsampling % dy) == 0;
     }
 
     /**
-     * Returns {@code true} if this tile {@linkplain #getRegion region} intersects the given
-     * rectangle.
+     * Returns the amount of pixels in this tile that would be useless if reading the given region
+     * at the given subsampling. This method is invoked by {@link TileManager} when two or more
+     * tile overlaps, in order to choose the tiles that would minimize the amount of pixels to
+     * read. The default implementation computes the amount of tile pixels skipped because of
+     * subsampling, added to the amount of pixels outside the region, including the pixels below
+     * the bottom. The later is conservative since many file formats will stop reading as soon as
+     * they reach the region bottom. Subclasses can override this method in order to alter this
+     * calculation if they are sure that pixels below the region have no disk seed cost.
      *
+     * @param  region The region to read.
+     * @param  sourceXSubsampling The number of columns to advance between pixels.
+     *         Must be strictly positive (not zero).
+     * @param  sourceYSubsampling The number of rows to advance between pixels.
+     *         Must be strictly positive (not zero).
+     * @return The amount of pixels which would be unused if the reading was performed on this
+     *         tile. Smaller number is better.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getReader reader} and this operation failed.
      */
-    public boolean intersects(final Rectangle region) throws IOException {
-        if (region.x + region.width <= x || region.y + region.height <= y) {
-            // Cheap test before to invoke 'getRegion()', which may be costly.
-            return false;
+    protected int countWastedPixels(Rectangle region, int xSubsampling, int ySubsampling)
+            throws IOException
+    {
+        if (!canSubsample(xSubsampling, ySubsampling)) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                    "subsampling", "(" + xSubsampling + ',' + ySubsampling + ')'));
         }
-        return getRegion().intersects(region);
+        final Rectangle current = getRegion();
+        region = current.intersection(region);
+        region.width  /= dx; current.width  /= dx; xSubsampling /= dx;
+        region.height /= dy; current.height /= dy; ySubsampling /= dy;
+        int count;
+        count  = region.width  - (region.width  / xSubsampling);
+        count += region.height - (region.height / ySubsampling);
+        count += (current.height - region.height) * current.width;
+        count += (current.width  - region.width)  * region.height; // Really 'region', not 'current'
+        return count;
     }
 
     /**
@@ -472,6 +529,8 @@ public class Tile implements Comparable<Tile> {
      * <p>
      * This ordering allows efficient access for tiles that use the same
      * {@linkplain #getReader image reader} and {@linkplain #getInput input}.
+     *
+     * @see TileManager#compare
      */
     public final int compareTo(final Tile other) {
         int c = imageIndex - other.imageIndex;
@@ -556,8 +615,9 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns a string representation of this tile. The returned string is mostly for
-     * debugging purpose and could change in any future version.
+     * Returns a string representation of this tile. The default implementation uses only the
+     * public getter methods, so if a subclass override them the effect should be visible in
+     * the returned string.
      */
     @Override
     public String toString() {
@@ -567,7 +627,7 @@ public class Tile implements Comparable<Tile> {
             buffer.append("reader=\"").append(reader).append("\", ");
         }
         buffer.append("input=\"").append(Utilities.deepToString(getInput())).append("\", ");
-        if (!isGetRegionCheap()) {
+        if (width == 0 && height == 0) {
             final Point origin = getOrigin();
             buffer.append(  "x=").append(origin.x)
                   .append(", y=").append(origin.y);
@@ -611,7 +671,7 @@ public class Tile implements Comparable<Tile> {
             table.write(String.valueOf(tile.x));
             table.nextColumn();
             table.write(String.valueOf(tile.y));
-            if (tile.isGetRegionCheap()) {
+            if (tile.width != 0 || tile.height != 0) {
                 table.nextColumn();
                 table.write(String.valueOf(tile.width));
                 table.nextColumn();
