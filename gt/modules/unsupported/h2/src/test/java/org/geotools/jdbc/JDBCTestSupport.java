@@ -18,6 +18,8 @@ package org.geotools.jdbc;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,10 +49,11 @@ import org.geotools.filter.FilterFactoryImpl;
  */
 public abstract class JDBCTestSupport extends TestCase {
     /**
-     * flag to track if connection available or not.
+     * map of test setup class to boolean which tracks which 
+     * setups can obtain a connection and which cannot
      */
-    static boolean dataSourceAvailable = true;
-
+    static Map dataSourceAvailable = new HashMap();
+    
     static {
         //turn up logging
         /*
@@ -69,22 +72,23 @@ public abstract class JDBCTestSupport extends TestCase {
      * tests are ignored.
      */
     public void run(TestResult result) {
-        if (dataSourceAvailable) {
-            //attempt to grab
+        JDBCTestSetup setup = createTestSetup();
+        
+        //check if the data source is available for this setup
+        Boolean available = 
+            (Boolean) dataSourceAvailable.get( setup.getClass() );
+        if ( available == null || available.booleanValue() ) {
+            //test the connection
             try {
-                JDBCTestSetup setup = createTestSetup();
                 DataSource dataSource = setup.createDataSource();
                 Connection cx = dataSource.getConnection();
                 cx.close();
             } catch (Throwable t) {
-                dataSourceAvailable = false;
-
+                dataSourceAvailable.put( setup.getClass(), Boolean.FALSE );
                 return;
             }
-
+            
             super.run(result);
-        } else {
-            return;
         }
     }
 
