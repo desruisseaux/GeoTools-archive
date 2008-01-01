@@ -66,13 +66,13 @@ public class ContextActiveItem extends JCheckBoxMenuItem implements TreePopupIte
 
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer == null) ;
+            return (selection[0].getLayer() == null && selection[0].getSubObject() == null) ;
         }
         return false;
     }
 
     public Component getComponent(SelectionData[] selection) {
-        context = selection[0].context;
+        context = selection[0].getContext();
         this.setSelected( context.equals(xtree.getActiveContext()));
         
         return this;

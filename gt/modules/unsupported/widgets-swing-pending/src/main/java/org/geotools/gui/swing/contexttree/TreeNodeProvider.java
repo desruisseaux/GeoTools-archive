@@ -13,27 +13,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.contexttree;
 
-
+import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
 import java.awt.Font;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.JDBC1DataStore;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
-
-
 
 /**
  * Provider for ContextTree to render TreeColumn
@@ -41,20 +37,19 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  * @author johann sorel
  */
 public final class TreeNodeProvider extends ComponentProvider<JLabel> {
-        
+
     private static final ImageIcon ICON_LAYER_VISIBLE = IconBundle.getResource().getIcon("16_maplayer_visible");
-    private static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");    
+    private static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");
     private static final ImageIcon ICON_LAYER_FILE_VECTOR_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fv");
     private static final ImageIcon ICON_LAYER_FILE_VECTOR_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fv");
     private static final ImageIcon ICON_LAYER_FILE_RASTER_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fr");
     private static final ImageIcon ICON_LAYER_FILE_RASTER_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fr");
     private static final ImageIcon ICON_LAYER_DB_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_db");
-    private static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");    
+    private static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");
     private static final ImageIcon ICON_CONTEXT_ACTIVE = IconBundle.getResource().getIcon("16_mapcontext_enable");
     private static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
-
     private final JContextTree tree;
-    
+
     
     /**
      * Provider for ContextTree to render TreeColumn
@@ -65,7 +60,7 @@ public final class TreeNodeProvider extends ComponentProvider<JLabel> {
         this.tree = tree;
         rendererComponent = new JLabel();
     }
-    
+
     /**
      * {@inheritDoc}
      * @param arg0 
@@ -73,55 +68,71 @@ public final class TreeNodeProvider extends ComponentProvider<JLabel> {
     @Override
     protected void configureState(CellContext arg0) {
     }
-    
+
     /** 
      * {@inheritDoc}
      * @return 
      */
     @Override
-    protected JLabel createRendererComponent() {        
+    protected JLabel createRendererComponent() {
         return new JLabel();
     }
-    
+
     /**
      * {@inheritDoc}
      * @param arg0 
      */
     @Override
     protected void format(CellContext arg0) {
-        ContextTreeNode node  = (ContextTreeNode) arg0.getValue();
-        if(node.getUserObject() instanceof MapContext) {
-            if(node.getUserObject().equals(tree.getActiveContext())) {
-                rendererComponent.setIcon( ICON_CONTEXT_ACTIVE );
-                rendererComponent.setFont(new Font("Tahoma",Font.BOLD,10));
-            } else{
-                rendererComponent.setIcon( ICON_CONTEXT_DESACTIVE );
-                rendererComponent.setFont(new Font("Tahoma",Font.PLAIN,10));
-            }
-            rendererComponent.setText( ((MapContext)node.getUserObject()).getTitle() );
-        } else if(node.getUserObject() instanceof MapLayer){
-            MapLayer layer = (MapLayer)node.getUserObject();
-            
-            rendererComponent.setFont(new Font("Arial",Font.PLAIN,9));
-            
-            //choose icon from datastoretype
-            DataStore ds = layer.getFeatureSource().getDataStore();
-            
-            if ( layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")){
-                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE );
-            }else if(AbstractFileDataStore.class.isAssignableFrom( ds.getClass() )){
-                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE );
-            }else if(JDBC1DataStore.class.isAssignableFrom( ds.getClass() )){
-                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE  );
-            }else{
-                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE );
-            }
-            
-            rendererComponent.setText( layer.getTitle() );
-        } else {
-            rendererComponent.setText(arg0.getValue().toString());
-        }
         
+        if (arg0.getValue() instanceof ContextTreeNode) {
+            ContextTreeNode node = (ContextTreeNode) arg0.getValue();
+            
+            Icon ico = node.getIcon();
+            Object value = node.getValue();
+            
+            rendererComponent.setIcon( (ico == null)? arg0.getIcon(): ico);           
+            rendererComponent.setText( (value == null)? "" : value.toString() );
+                    
+            
+//            if (node.getUserObject() instanceof MapContext) {
+//                if (node.getUserObject().equals(tree.getActiveContext())) {
+//                    rendererComponent.setIcon(ICON_CONTEXT_ACTIVE);
+//                    rendererComponent.setFont(new Font("Tahoma", Font.BOLD, 10));
+//                } else {
+//                    rendererComponent.setIcon(ICON_CONTEXT_DESACTIVE);
+//                    rendererComponent.setFont(new Font("Tahoma", Font.PLAIN, 10));
+//                }
+//                rendererComponent.setText(((MapContext) node.getUserObject()).getTitle());
+//            } else if (node.getUserObject() instanceof MapLayer) {
+//                MapLayer layer = (MapLayer) node.getUserObject();
+//
+//                rendererComponent.setFont(new Font("Arial", Font.PLAIN, 9));
+//
+//                //choose icon from datastoretype
+//                DataStore ds = layer.getFeatureSource().getDataStore();
+//
+//                if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+//                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE);
+//                } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
+//                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE);
+//                } else if (JDBC1DataStore.class.isAssignableFrom(ds.getClass())) {
+//                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE);
+//                } else {
+//                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE);
+//                }
+//
+//                rendererComponent.setText(layer.getTitle());
+//            } else {
+//                rendererComponent.setText(arg0.getValue().toString());
+//            }
+
+        }
+        //should never happen
+        else{
+            rendererComponent.setIcon(arg0.getIcon());
+            rendererComponent.setText(arg0.getValue().toString());
+            rendererComponent.setFont(new Font("Tahoma", Font.BOLD, 8));
+        }
     }
-    
 }

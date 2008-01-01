@@ -159,10 +159,16 @@
                 <Property name="text" type="java.lang.String" value="Context Tree"/>
               </Properties>
               <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem7">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Columns-----"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkVisible">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Visible Column"/>
+                    <Property name="text" type="java.lang.String" value="Visible"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkVisibleActionPerformed"/>
@@ -171,7 +177,7 @@
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkOpacity">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Opacity Column"/>
+                    <Property name="text" type="java.lang.String" value="Opacity"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkOpacityActionPerformed"/>
@@ -180,7 +186,7 @@
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkStyle">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Style Column"/>
+                    <Property name="text" type="java.lang.String" value="Style"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkStyleActionPerformed"/>
@@ -189,11 +195,45 @@
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkSelection">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Selection Column"/>
+                    <Property name="text" type="java.lang.String" value="Selection"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkSelectionActionPerformed"/>
                   </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JSeparator" name="jSeparator2">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem9">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="SubNode Groups-----"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkSubSource">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="Source"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkSubSourceActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="guiChkSubStyle">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="Style"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiChkSubStyleActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JSeparator" name="jSeparator4">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem8">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Popup Items-----"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
                 </MenuItem>
               </SubComponents>
             </Menu>

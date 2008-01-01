@@ -21,6 +21,7 @@ import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
+import org.geotools.styling.Symbolizer;
 
 
 /**
@@ -59,7 +60,7 @@ public final class OpacityTreeTableColumn extends TreeTableColumn {
 
     public Object getValue(Object target) {
 
-        if (target instanceof MapLayer) {
+        if (target instanceof MapLayer || target instanceof Symbolizer) {
             return target;
         } else {
             return "n/a";
@@ -69,7 +70,7 @@ public final class OpacityTreeTableColumn extends TreeTableColumn {
    
     public boolean isCellEditable(Object target) {
 
-        if (target instanceof MapLayer) {
+        if (target instanceof MapLayer || target instanceof Symbolizer) {
             return isEditable();
         } else {
             return false;

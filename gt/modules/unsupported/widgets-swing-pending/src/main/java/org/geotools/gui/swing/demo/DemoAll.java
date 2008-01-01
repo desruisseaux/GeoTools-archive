@@ -49,6 +49,8 @@ import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
+import org.geotools.gui.swing.contexttree.node.SourceGroup;
+import org.geotools.gui.swing.contexttree.node.StyleGroup;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDataChooser;
@@ -86,6 +88,9 @@ public class DemoAll extends javax.swing.JFrame {
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
     
+    private final SourceGroup subsource = new SourceGroup();
+    private final StyleGroup substyle = new StyleGroup();
+    
     private final JToolTree tooltree = new JToolTree();
     
     private final ImageDecoration overBackImage= new ImageDecoration();
@@ -111,7 +116,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane.add(map);
                 
         tree.addContext(context);
-
+        
         gui_map2dcontrol.setMap(map);
         gui_map2dinfo.setMap(map);
         gui_map2dedit.setMap(map);
@@ -222,6 +227,9 @@ public class DemoAll extends javax.swing.JFrame {
         tree.addColumn(colStyle);
         tree.addColumn(colSelection);
         
+        tree.addSubNodeGroup(subsource);
+        tree.addSubNodeGroup(substyle);
+                
         tree.revalidate();
     }
     
@@ -266,10 +274,17 @@ public class DemoAll extends javax.swing.JFrame {
         chk_server = new javax.swing.JCheckBoxMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
         guiChkVisible = new javax.swing.JCheckBoxMenuItem();
         guiChkOpacity = new javax.swing.JCheckBoxMenuItem();
         guiChkStyle = new javax.swing.JCheckBoxMenuItem();
         guiChkSelection = new javax.swing.JCheckBoxMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
+        jMenuItem9 = new javax.swing.JMenuItem();
+        guiChkSubSource = new javax.swing.JCheckBoxMenuItem();
+        guiChkSubStyle = new javax.swing.JCheckBoxMenuItem();
+        jSeparator4 = new javax.swing.JSeparator();
+        jMenuItem8 = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItem5 = new javax.swing.JMenuItem();
         jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
@@ -457,8 +472,12 @@ public class DemoAll extends javax.swing.JFrame {
 
         jMenu5.setText("Context Tree");
 
+        jMenuItem7.setText("Columns-----");
+        jMenuItem7.setEnabled(false);
+        jMenu5.add(jMenuItem7);
+
         guiChkVisible.setSelected(true);
-        guiChkVisible.setText("Visible Column");
+        guiChkVisible.setText("Visible");
         guiChkVisible.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiChkVisibleActionPerformed(evt);
@@ -467,7 +486,7 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu5.add(guiChkVisible);
 
         guiChkOpacity.setSelected(true);
-        guiChkOpacity.setText("Opacity Column");
+        guiChkOpacity.setText("Opacity");
         guiChkOpacity.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiChkOpacityActionPerformed(evt);
@@ -476,7 +495,7 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu5.add(guiChkOpacity);
 
         guiChkStyle.setSelected(true);
-        guiChkStyle.setText("Style Column");
+        guiChkStyle.setText("Style");
         guiChkStyle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiChkStyleActionPerformed(evt);
@@ -485,13 +504,41 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu5.add(guiChkStyle);
 
         guiChkSelection.setSelected(true);
-        guiChkSelection.setText("Selection Column");
+        guiChkSelection.setText("Selection");
         guiChkSelection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiChkSelectionActionPerformed(evt);
             }
         });
         jMenu5.add(guiChkSelection);
+        jMenu5.add(jSeparator2);
+
+        jMenuItem9.setText("SubNode Groups-----");
+        jMenuItem9.setEnabled(false);
+        jMenu5.add(jMenuItem9);
+
+        guiChkSubSource.setSelected(true);
+        guiChkSubSource.setText("Source");
+        guiChkSubSource.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkSubSourceActionPerformed(evt);
+            }
+        });
+        jMenu5.add(guiChkSubSource);
+
+        guiChkSubStyle.setSelected(true);
+        guiChkSubStyle.setText("Style");
+        guiChkSubStyle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkSubStyleActionPerformed(evt);
+            }
+        });
+        jMenu5.add(guiChkSubStyle);
+        jMenu5.add(jSeparator4);
+
+        jMenuItem8.setText("Popup Items-----");
+        jMenuItem8.setEnabled(false);
+        jMenu5.add(jMenuItem8);
 
         jMenu4.add(jMenu5);
 
@@ -750,6 +797,22 @@ public class DemoAll extends javax.swing.JFrame {
         }
 }//GEN-LAST:event_gui_ChkminimaplayerActionPerformed
 
+    private void guiChkSubStyleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkSubStyleActionPerformed
+        if(guiChkSubStyle.isSelected()){
+            tree.addSubNodeGroup(substyle);
+        }else{
+            tree.removeSubNodeGroup(substyle);
+        }
+    }//GEN-LAST:event_guiChkSubStyleActionPerformed
+
+    private void guiChkSubSourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkSubSourceActionPerformed
+        if(guiChkSubSource.isSelected()){
+            tree.addSubNodeGroup(subsource);
+        }else{
+            tree.removeSubNodeGroup(subsource);
+        }
+}//GEN-LAST:event_guiChkSubSourceActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -780,6 +843,8 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkOpacity;
     private javax.swing.JCheckBoxMenuItem guiChkSelection;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
+    private javax.swing.JCheckBoxMenuItem guiChkSubSource;
+    private javax.swing.JCheckBoxMenuItem guiChkSubStyle;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
     private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
@@ -803,13 +868,18 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;

@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.contexttree;
 
+import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
 import java.awt.Component;
 import java.awt.Point;
 import javax.swing.JPopupMenu;
@@ -49,8 +50,7 @@ final class TreePopup extends JPopupMenu {
         if (view) {
             removeAll();
 
-            SelectionData[] selection = 
-               {};
+            SelectionData[] selection = {};
 
             if (treetable != null) {
 
@@ -67,30 +67,32 @@ final class TreePopup extends JPopupMenu {
                     treetable.getTreeSelectionModel().clearSelection();
                 }
 
-                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
-
-                if (paths != null) {
-
-                    selection = new SelectionData[paths.length];
-
-                    for (int i = 0; i < paths.length; i++) {
-
-                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
-                        Object last = lastnode.getUserObject();
-
-                        if (last instanceof MapLayer) {
-                            MapLayer layer = (MapLayer) last;
-                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-                            SelectionData data = new SelectionData(context, layer);
-                            selection[i] = data;
-                        } else {
-                            MapContext context = (MapContext) last;
-                            SelectionData data = new SelectionData(context, null);
-                            selection[i] = data;
-                        }
-
-                    }
-                }
+                selection = manager.getTree().getSelection();
+                
+//                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
+//
+//                if (paths != null) {
+//
+//                    selection = new SelectionData[paths.length];
+//
+//                    for (int i = 0; i < paths.length; i++) {
+//
+//                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
+//                        Object last = lastnode.getUserObject();
+//
+//                        if (last instanceof MapLayer) {
+//                            MapLayer layer = (MapLayer) last;
+//                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
+//                            SelectionData data = new SelectionData(context, layer);
+//                            selection[i] = data;
+//                        } else if (last instanceof MapContext) {
+//                            MapContext context = (MapContext) last;
+//                            SelectionData data = new SelectionData(context, null);
+//                            selection[i] = data;
+//                        }
+//
+//                    }
+//                }
 
             }
 

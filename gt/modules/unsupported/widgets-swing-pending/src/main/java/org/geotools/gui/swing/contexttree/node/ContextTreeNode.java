@@ -14,10 +14,10 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree;
+package org.geotools.gui.swing.contexttree.node;
 
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
+import javax.swing.Icon;
+import org.geotools.gui.swing.contexttree.*;
 import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
@@ -26,15 +26,23 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  * 
  * @author johann sorel
  */
-final class ContextTreeNode extends AbstractMutableTreeTableNode{
+public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
     
-    private final ContextTreeModel model;
+    protected final ContextTreeModel model;
+    
+        
+    public abstract Object getValue();
+    public abstract void setValue(Object obj);
+    
+    public abstract Icon getIcon();
+        
+    public abstract boolean isEditable();
     
     /**
      * Creates a new instance of ContextTreeNode
      * @param model model of the tree
      */
-    ContextTreeNode(ContextTreeModel model) {
+    public ContextTreeNode(ContextTreeModel model) {
         super();
         this.model = model;
     }
@@ -44,7 +52,7 @@ final class ContextTreeNode extends AbstractMutableTreeTableNode{
      * @param anotherNode the node to compare with
      * @return true is anotherNode is an ancestor of node
      */
-    public boolean isNodeAncestor(ContextTreeNode anotherNode) {
+    public final boolean isNodeAncestor(ContextTreeNode anotherNode) {
         
         if (anotherNode == null) {
             return false;
@@ -67,20 +75,21 @@ final class ContextTreeNode extends AbstractMutableTreeTableNode{
      * @param column number of the column
      * @return object at column
      */
-    public Object getValueAt(int column) {
+    public final Object getValueAt(int column) {
         
         Object res;
         
         if(column == ContextTreeModel.TREE){
-            if(getUserObject() instanceof MapContext)
-                res = ((MapContext)getUserObject()).getTitle();
-            else if(getUserObject() instanceof MapLayer)
-                res = ((MapLayer)getUserObject()).getTitle();
-            else
-                res = "n/a";
+            res = getValue();
+//            if(getUserObject() instanceof MapContext)
+//                res = ((MapContext)getUserObject()).getTitle();
+//            else if(getUserObject() instanceof MapLayer)
+//                res = ((MapLayer)getUserObject()).getTitle();
+//            else
+//                res = "n/a";
         }else{
-            if(column <= model.getColumnModels().size()){
-                res = model.getColumnModels().get(column-1).getValue(getUserObject());
+            if(column <= model.getColumnModelCount()){
+                res = model.getColumnModel(column-1).getValue(getUserObject());
             } else{
                 res = "n/a";
             }
@@ -95,17 +104,18 @@ final class ContextTreeNode extends AbstractMutableTreeTableNode{
      * @param column column number
      */
     @Override
-    public void setValueAt(Object aValue, int column){
+    public final void setValueAt(Object aValue, int column){
         
         if(column == ContextTreeModel.TREE){
-            if(getUserObject() instanceof MapContext)
-                ((MapContext)getUserObject()).setTitle((String)aValue);
-            else if(getUserObject() instanceof MapLayer)
-                ((MapLayer)getUserObject()).setTitle((String)aValue);
-            
+            setValue(aValue);
+//            if(getUserObject() instanceof MapContext)
+//                ((MapContext)getUserObject()).setTitle((String)aValue);
+//            else if(getUserObject() instanceof MapLayer)
+//                ((MapLayer)getUserObject()).setTitle((String)aValue);
+//            
         }else{
-            if(column <= model.getColumnModels().size())
-                model.getColumnModels().get(column-1).setValue(getUserObject(),aValue);
+            if(column <= model.getColumnModelCount())
+                model.getColumnModel(column-1).setValue(getUserObject(),aValue);
             
         }
         
@@ -115,9 +125,24 @@ final class ContextTreeNode extends AbstractMutableTreeTableNode{
      * get the number of columns
      * @return the number of columns
      */
-    public int getColumnCount() {
+    public final int getColumnCount() {
         return model.getColumnCount();
     }
+
+    /**
+     * 
+     * @param arg0
+     * @return
+     */
+    @Override
+    public final boolean isEditable(int arg0) {
+        if(arg0 == 0){
+            return isEditable();
+        }else{
+            return super.isEditable(arg0);
+        }
+    }
+    
     
         
 }

@@ -106,7 +106,7 @@ public class PasteItem implements TreePopupItem {
     }
 
     public boolean isValid(SelectionData[] selection) {
-        return true;
+        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
     }
 
     public Component getComponent(SelectionData[] selection) {

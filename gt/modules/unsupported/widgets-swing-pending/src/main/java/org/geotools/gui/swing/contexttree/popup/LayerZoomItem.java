@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.map.Map;
@@ -75,13 +74,13 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
    
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer != null) ;
+            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
         }
         return false;
     }
 
     public Component getComponent(SelectionData[] selection) {
-        layer = selection[0].layer;
+        layer = selection[0].getLayer();
         this.setEnabled((map != null));
 
         return this;

@@ -15,7 +15,7 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import java.awt.Color;
+import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -34,18 +34,14 @@ import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.renderer.DefaultContextTreeHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
+import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-
-
-
 
 /**
  *
@@ -58,56 +54,52 @@ final class TreeTable extends JXTreeTable {
      */
     private final Action COPY_ACTION = new AbstractAction() {
 
-                public void actionPerformed(ActionEvent e) {
-                    copySelectionInBuffer();
-                }
-                };
+        public void actionPerformed(ActionEvent e) {
+            copySelectionInBuffer();
+        }
+    };
     /**
      * Default cut action used for Key Input
      */
     private final Action CUT_ACTION = new AbstractAction() {
 
-                public void actionPerformed(ActionEvent e) {
-                    cutSelectionInBuffer();
-                }
-                };
+        public void actionPerformed(ActionEvent e) {
+            cutSelectionInBuffer();
+        }
+    };
     /**
      * Default paste action used for Key Input
      */
     private final Action PASTE_ACTION = new AbstractAction() {
 
-                public void actionPerformed(ActionEvent e) {
-                    pasteBuffer();
-                }
-                };
+        public void actionPerformed(ActionEvent e) {
+            pasteBuffer();
+        }
+    };
     /**
      * Default delete action used for Key Input
      */
     private final Action DELETE_ACTION = new AbstractAction() {
 
-                public void actionPerformed(ActionEvent e) {
-                    deleteSelection();
-                }
-                };
+        public void actionPerformed(ActionEvent e) {
+            deleteSelection();
+        }
+    };
     /**
      * Default duplicate action used for Key Input
      */
     private final Action DUPLICATE_ACTION = new AbstractAction() {
 
-                public void actionPerformed(ActionEvent e) {
-                    duplicateSelection();
-                }
-                };
-                
+        public void actionPerformed(ActionEvent e) {
+            duplicateSelection();
+        }
+    };
     /**
      * the buffer containing the cutted/copied datas
      */
     private final List<SelectionData> buffer = new ArrayList<SelectionData>();
-    
     private final JContextTreePopup popupManager;
-    
     private final TreeSelectionManager selectionManager;
-    
     /**
      * String added to layer name use when paste/duplicate
      */
@@ -122,25 +114,53 @@ final class TreeTable extends JXTreeTable {
 
         selectionManager = new TreeSelectionManager(frame);
         popupManager = new JContextTreePopup(this, frame);
-        
-        setComponentPopupMenu( popupManager.getPopupMenu() );
+
+        setComponentPopupMenu(popupManager.getPopupMenu());
         setColumnControlVisible(true);
-        
+
         setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(frame)));
         getTableHeader().setDefaultRenderer(new DefaultContextTreeHeaderRenderer());
 
-        setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
+//        setHighlighters(new Highlighter() {
+//
+//            public Color col = Color.GRAY;
+//
+//            public Component highlight(Component arg0, ComponentAdapter arg1) {
+//                
+//                if (!arg1.isSelected()) {
+//                    if (arg1.getValue() instanceof MapLayer) {
+//                        col = Color.GRAY;
+//                    } else {
+//                        col = Color.WHITE;
+//                    }
+//                    arg0.setBackground(col);
+//                }
+//
+//                return arg0;
+//            }
+//
+//            public void addChangeListener(ChangeListener arg0) {
+//            }
+//
+//            public void removeChangeListener(ChangeListener arg0) {
+//            }
+//
+//            public ChangeListener[] getChangeListeners() {
+//                return new ChangeListener[]{};
+//            }
+//        });
+        //setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
 
         initCellEditAcceleration();
         initDragAndDrop();
         initKeySupport();
-        
-        String name = TextBundle.getResource().getString("col_tree");                
-        getColumnModel().getColumn(0).setHeaderValue( new HeaderInfo(name," ",null) );
-        
-        
-        getTreeSelectionModel().addTreeSelectionListener( selectionManager );
-        
+
+        String name = TextBundle.getResource().getString("col_tree");
+        getColumnModel().getColumn(0).setHeaderValue(new HeaderInfo(name, " ", null));
+
+
+        getTreeSelectionModel().addTreeSelectionListener(selectionManager);
+
     }
 
     /**
@@ -150,38 +170,38 @@ final class TreeTable extends JXTreeTable {
         //listener to set cell in edit mode on mouse over
         this.addMouseMotionListener(new MouseMotionListener() {
 
-                    public void mouseDragged(MouseEvent e) {
-                    }
+            public void mouseDragged(MouseEvent e) {
+            }
 
-                    public void mouseMoved(MouseEvent e) {
-                        Point p = e.getPoint();
-                        if (p != null) {
-                            int row = rowAtPoint(p);
-                            int col = columnAtPoint(p);
+            public void mouseMoved(MouseEvent e) {
+                Point p = e.getPoint();
+                if (p != null) {
+                    int row = rowAtPoint(p);
+                    int col = columnAtPoint(p);
 
-                            if (row != editingRow || col != editingColumn) {
+                    if (row != editingRow || col != editingColumn) {
 
-                                if (isEditing()) {
-                                    TableCellEditor editor = cellEditor;
-                                    if (!editor.stopCellEditing()) {
-                                        editor.cancelCellEditing();
-                                    }
-                                }
+                        if (isEditing()) {
+                            TableCellEditor editor = cellEditor;
+                            if (!editor.stopCellEditing()) {
+                                editor.cancelCellEditing();
+                            }
+                        }
 
-                                if (!isEditing() && col >= 0 && row >= 0) {
+                        if (!isEditing() && col >= 0 && row >= 0) {
 
-                                    //we handle differently ContextTreeColumn
-                                    if (getColumnExt(col) instanceof TreeTableColumn) {
-                                        TreeTableColumn column = (TreeTableColumn) getColumnExt(col);
-                                        if (isCellEditable(row, col) && column.isEditableOnMouseOver()) {
-                                            editCellAt(row, col);
-                                        }
-                                    }
+                            //we handle differently ContextTreeColumn
+                            if (getColumnExt(col) instanceof TreeTableColumn) {
+                                TreeTableColumn column = (TreeTableColumn) getColumnExt(col);
+                                if (isCellEditable(row, col) && column.isEditableOnMouseOver()) {
+                                    editCellAt(row, col);
                                 }
                             }
                         }
                     }
-                });
+                }
+            }
+        });
     }
 
     private void initDragAndDrop() {
@@ -221,51 +241,98 @@ final class TreeTable extends JXTreeTable {
 
     }
 
+    private MapContext findContext(TreePath tp) {
+        ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+        Object obj = lastnode.getUserObject();
+        if (obj instanceof MapContext) {
+            return (MapContext) obj;
+        } else if (lastnode.getParent().equals(getTreeTableModel().getRoot())) {
+            return null;
+        } else {
+            return findContext(new TreePath(lastnode.getParent()));
+        }
+    }
+
+    private MapLayer findLayer(TreePath tp) {
+        ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+        Object obj = lastnode.getUserObject();
+        if (obj instanceof MapLayer) {
+            return (MapLayer) obj;
+        } else if (lastnode.getParent().equals(getTreeTableModel().getRoot())) {
+            return null;
+        } else {
+            return findLayer(new TreePath(lastnode.getParent()));
+        }
+    }
+
+    private Object findSubObject(TreePath tp) {
+        ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+        Object obj = lastnode.getUserObject();
+        if (!(obj instanceof MapLayer) && !(obj instanceof MapContext)) {
+            return obj;
+        } else {
+            return null;
+        }
+    }
+
     public TreeSelectionManager getSelectionManager() {
         return selectionManager;
     }
-    
+
     JContextTreePopup getPopupMenu() {
         return popupManager;
     }
-        
-    SelectionData[] getSelection() {
+
+    List<SelectionData> getSelectionList() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
-        SelectionData[] datas = null;
-        
+        List<SelectionData> temp = new ArrayList<SelectionData>();
+
         if (hasSelection(selections)) {
-            List<SelectionData> temp = new ArrayList<SelectionData>();
-        
-            temp.clear();
 
-            if (onlyMapLayers(selections)) {
-
-                for (TreePath tp : selections) {
-                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-                    MapLayer layer = (MapLayer) lastnode.getUserObject();
-                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-                    SelectionData data = new SelectionData(context, layer);
-                    temp.add(data);
-                }
-
-                
-            } else if (onlyMapContexts(selections)) {
-
-                for (TreePath tp : selections) {
-                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-                    MapContext context = (MapContext) lastnode.getUserObject();
-                    SelectionData data = new SelectionData(context, null);
-                    temp.add(data);
-                }
-
+            for (TreePath tp : selections) {
+                MapContext context = findContext(tp);
+                MapLayer layer = findLayer(tp);
+                Object obj = findSubObject(tp);
+                SelectionData data = new SelectionData(context, layer, obj);
+                temp.add(data);
             }
-            datas = new SelectionData[temp.size()];
-            temp.toArray(datas);
+
+//            if (onlyMapLayers(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+//                    MapLayer layer = (MapLayer) lastnode.getUserObject();
+//                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
+//                    SelectionData data = new SelectionData(context, layer);
+//                    temp.add(data);
+//                }
+//
+//
+//            } else if (onlyMapContexts(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+//                    MapContext context = (MapContext) lastnode.getUserObject();
+//                    SelectionData data = new SelectionData(context, null);
+//                    temp.add(data);
+//                }
+//
+//            }
         }
+
+        return temp;
+    }
+
+    SelectionData[] getSelectionArray() {
+        SelectionData[] datas = null;
+
+        List<SelectionData> temp = getSelectionList();
+        datas = new SelectionData[temp.size()];
+        temp.toArray(datas);
 
         return datas;
     }
-    
+
     /**
      * get the tree model. dont play with the model, too much things are linked    
      * @return the tree model
@@ -293,7 +360,6 @@ final class TreeTable extends JXTreeTable {
     ////////////////////////////////////////////////////////////////////////////////
 // CUT/COPY/PASTE/DUPLICATE/DELETE  ////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
     private boolean hasSelection(TreePath[] selections) {
 
         if (selections != null) {
@@ -303,47 +369,55 @@ final class TreeTable extends JXTreeTable {
         }
         return false;
     }
-
+        
     private boolean onlyMapContexts(List<SelectionData> lst) {
-
         for (SelectionData data : lst) {
-
-            if (data.layer != null) {
+            if (data.getLayer() != null || data.getSubObject() != null) {
                 return false;
             }
         }
-
         return true;
     }
 
     private boolean onlyMapContexts(TreePath[] paths) {
-
         for (TreePath path : paths) {
-
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapContext)) {
                 return false;
             }
         }
         return true;
     }
-
-    private boolean onlyMapLayers(List<SelectionData> lst) {
-
-        for (SelectionData data : lst) {
-
-            if (data.layer == null) {
+    
+    public boolean onlyMapContexts(SelectionData[] datas){        
+        for (SelectionData data : datas) {
+            if (data.getLayer() != null || data.getSubObject() != null) {
                 return false;
             }
         }
+        return true;        
+    }
 
+    private boolean onlyMapLayers(List<SelectionData> lst) {
+        for (SelectionData data : lst) {
+            if (data.getLayer() == null || data.getSubObject() != null) {
+                return false;
+            }
+        }
         return true;
     }
 
     private boolean onlyMapLayers(TreePath[] paths) {
-
         for (TreePath path : paths) {
-
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapLayer)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean onlyMapLayers(SelectionData[] datas){
+         for (SelectionData data : datas) {
+            if (data.getLayer() == null || data.getSubObject() != null) {
                 return false;
             }
         }
@@ -486,7 +560,7 @@ final class TreeTable extends JXTreeTable {
      * @return true if delete can succeed
      */
     boolean canDeleteSelection() {
-        return hasSelection();
+        return canDuplicateSelection();
     }
 
     /**
@@ -548,29 +622,38 @@ final class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
-            if (onlyMapLayers(selections)) {
+            List<SelectionData> datas = getSelectionList();
 
-                for (TreePath tp : selections) {
-                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-                    MapLayer layer = (MapLayer) lastnode.getUserObject();
-                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-                    SelectionData data = new SelectionData(context, layer);
+            if (onlyMapLayers(datas) || onlyMapContexts(datas)) {
+                for (SelectionData data : datas) {
                     buffer.add(data);
                 }
-
-                return true;
-                
-            } else if (onlyMapContexts(selections)) {
-
-                for (TreePath tp : selections) {
-                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-                    MapContext context = (MapContext) lastnode.getUserObject();
-                    SelectionData data = new SelectionData(context, null);
-                    buffer.add(data);
-                }
-
                 return true;
             }
+
+//            if (onlyMapLayers(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+//                    MapLayer layer = (MapLayer) lastnode.getUserObject();
+//                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
+//                    SelectionData data = new SelectionData(context, layer);
+//                    buffer.add(data);
+//                }
+//
+//                return true;
+//
+//            } else if (onlyMapContexts(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+//                    MapContext context = (MapContext) lastnode.getUserObject();
+//                    SelectionData data = new SelectionData(context, null);
+//                    buffer.add(data);
+//                }
+//
+//                return true;
+//            }
 
 
         }
@@ -578,7 +661,7 @@ final class TreeTable extends JXTreeTable {
         return false;
 
     }
-    
+
     /**
      * copy what is actually selected in the tree buffer and cut it from the tree.
      * 
@@ -590,29 +673,44 @@ final class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
+            List<SelectionData> datas = getSelectionList();
 
-            if (onlyMapLayers(selections)) {
-
-                for (TreePath tp : selections) {
-                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
-                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
-
-                    SelectionData data = new SelectionData(parent, layer);
+            if (onlyMapLayers(datas)) {
+                for (SelectionData data : datas) {
                     buffer.add(data);
-                    parent.removeLayer(layer);
+                    data.getContext().removeLayer(data.getLayer());
                 }
                 return true;
-            } else if (onlyMapContexts(selections)) {
-
-                for (TreePath tp : selections) {
-                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
-
-                    SelectionData data = new SelectionData(context, null);
+            }else if(onlyMapContexts(datas)){
+                for (SelectionData data : datas) {
                     buffer.add(data);
-                    removeMapContext(context);
+                    removeMapContext(data.getContext());
                 }
                 return true;
             }
+
+//            if (onlyMapLayers(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+//                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
+//
+//                    SelectionData data = new SelectionData(parent, layer);
+//                    buffer.add(data);
+//                    parent.removeLayer(layer);
+//                }
+//                return true;
+//            } else if (onlyMapContexts(selections)) {
+//
+//                for (TreePath tp : selections) {
+//                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+//
+//                    SelectionData data = new SelectionData(context, null);
+//                    buffer.add(data);
+//                    removeMapContext(context);
+//                }
+//                return true;
+//            }
 
         }
         return false;
@@ -638,12 +736,12 @@ final class TreeTable extends JXTreeTable {
                     if (selections.length == 1) {
 
                         if (((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject() instanceof MapLayer) {
-                            
+
                             MapLayer insertlayer = (MapLayer) ((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject();
                             MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) selections[0].getLastPathComponent()).getParent()).getUserObject();
 
                             for (SelectionData data : buffer) {
-                                MapLayer layer = data.layer;
+                                MapLayer layer = data.getLayer();
 
                                 if (parent.indexOf(layer) == -1) {
                                     parent.addLayer(layer);
@@ -662,7 +760,7 @@ final class TreeTable extends JXTreeTable {
 
 
                             for (SelectionData data : buffer) {
-                                MapLayer layer = data.layer;
+                                MapLayer layer = data.getLayer();
 
                                 if (context.indexOf(layer) == -1) {
                                     context.addLayer(layer);
@@ -681,7 +779,7 @@ final class TreeTable extends JXTreeTable {
             } else if (onlyMapContexts(buffer)) {
 
                 for (SelectionData data : buffer) {
-                    MapContext context = data.context;
+                    MapContext context = data.getContext();
 
                     if (getMapContextIndex(context) == -1) {
                         addMapContext(context);
@@ -708,14 +806,13 @@ final class TreeTable extends JXTreeTable {
         return buffer.toArray(new SelectionData[buffer.size()]);
     }
 
-    
-    void clearBuffer(){
+    void clearBuffer() {
         buffer.clear();
     }
-    ////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
     /**
      * add a new column in the model and update the treetable
      * @param model the new column model
@@ -746,14 +843,14 @@ final class TreeTable extends JXTreeTable {
         revalidate();
     }
 
-    int getColumnModelIndex(TreeTableColumn model){
-        return getTreeTableModel().getgetColumnModelIndex(model);
+    int getColumnModelIndex(TreeTableColumn model) {
+        return getTreeTableModel().getColumnModelIndex(model);
     }
-    
+
     public int getColumnModelCount() {
         return getTreeTableModel().getColumnModelCount();
     }
-        
+
     /**
      * get the list of column
      * @return list of column models
@@ -762,10 +859,37 @@ final class TreeTable extends JXTreeTable {
         return (TreeTableColumn[]) getTreeTableModel().getColumnModels().toArray();
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// SUBNODES MANAGEMENT /////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+    void addSubNodeGroup(SubNodeGroup group) {
+        getTreeTableModel().addSubNodeGroup(group);
+        revalidate();
+    }
+
+    void removeSubNodeGroup(SubNodeGroup group) {
+        getTreeTableModel().removeSubNodeGroup(group);
+    }
+
+    void removeSubNodeGroup(int index) {
+        getTreeTableModel().removeSubNodeGroup(index);
+    }
+
+    int getSubNodeGroupCount() {
+        return getTreeTableModel().getSubNodeGroupCount();
+    }
+
+    int getSubNodeGroupIndex(SubNodeGroup group) {
+        return getTreeTableModel().getSubNodeGroupIndex(group);
+    }
+
+    SubNodeGroup[] getSubNodeGroups() {
+        return getTreeTableModel().getSubNodeGroups();
+    }
+
+////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
     /**
      * get the active context
      * @return return the active MapContext, if none return null
@@ -843,13 +967,12 @@ final class TreeTable extends JXTreeTable {
         ContextTreeNode moveNode = (ContextTreeNode) getTreeTableModel().getMapContextNode(context);
         ContextTreeNode father = (ContextTreeNode) moveNode.getParent();
         getTreeTableModel().moveMapContext(moveNode, father, newplace);
-        
+
     }
 
 ////////////////////////////////////////////////////////////////////////////////
 // LISTENERS MANAGEMENT ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
     /**
      * add treeListener to Model
      * @param ker the new listener
@@ -873,7 +996,5 @@ final class TreeTable extends JXTreeTable {
     TreeContextListener[] getTreeContextListeners() {
         return getTreeTableModel().getTreeContextListeners();
     }
-
-    
 }
 

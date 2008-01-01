@@ -42,6 +42,7 @@ import org.opengis.filter.expression.Expression;
 public final class OpacityComponent extends RenderAndEditComponent {
 
     private MapLayer layer = null;
+    private Symbolizer symb = null;
     private JSlider slide = new JSlider(0, 100);
 
     /**
@@ -55,12 +56,10 @@ public final class OpacityComponent extends RenderAndEditComponent {
 
         slide.addChangeListener(new ChangeListener() {
 
-                    public void stateChanged(ChangeEvent e) {
-                        if (layer != null) {
-                            applyOpacity(layer, slide.getValue()/100d);
-                        }
-                    }
-                });
+            public void stateChanged(ChangeEvent e) {
+                applyOpacity(slide.getValue() / 100d);
+            }
+        });
     }
 
     public void parse(Object value) {
@@ -68,6 +67,7 @@ public final class OpacityComponent extends RenderAndEditComponent {
         boolean correct = false;
 
         layer = null;
+        symb = null;
         if (value instanceof MapLayer) {
 
             valeur = format((MapLayer) value);
@@ -81,10 +81,31 @@ public final class OpacityComponent extends RenderAndEditComponent {
             correct = true;
             valeur *= 100;
             slide.setValue(Double.valueOf(valeur).intValue());
-            
+
             this.layer = (MapLayer) value;
+        } else if (value instanceof Symbolizer) {
+            
+            if (value instanceof PolygonSymbolizer) {
+                PolygonSymbolizer sym = (PolygonSymbolizer) value;
+                valeur = Filters.asDouble(sym.getFill().getOpacity());
+            } else if (value instanceof PointSymbolizer) {
+                PointSymbolizer sym = (PointSymbolizer) value;
+                valeur = Filters.asDouble(sym.getGraphic().getOpacity());
+            } else if (value instanceof LineSymbolizer) {
+                LineSymbolizer sym = (LineSymbolizer) value;
+                valeur = Filters.asDouble(sym.getStroke().getOpacity());
+            } else if (value instanceof RasterSymbolizer) {
+                RasterSymbolizer sym = (RasterSymbolizer) value;
+                valeur = Filters.asDouble(sym.getOpacity());
+            }
+            
+            correct = true;
+            valeur *= 100;
+            slide.setValue(Double.valueOf(valeur).intValue());
+            
+            this.symb = (Symbolizer) value;
         }
-        
+
 
 
         removeAll();
@@ -99,8 +120,6 @@ public final class OpacityComponent extends RenderAndEditComponent {
     }
 
     private Double format(MapLayer layer) {
-
-        
 
         FeatureTypeStyle[] sty = layer.getStyle().getFeatureTypeStyles();
         double valeur = 1d;
@@ -117,20 +136,14 @@ public final class OpacityComponent extends RenderAndEditComponent {
                     if (symbolizers[j] instanceof PolygonSymbolizer) {
                         PolygonSymbolizer sym = (PolygonSymbolizer) symbolizers[j];
                         valeur = Filters.asDouble(sym.getFill().getOpacity());
-                    }
-
-                    if (symbolizers[j] instanceof PointSymbolizer) {
+                    } else if (symbolizers[j] instanceof PointSymbolizer) {
                         PointSymbolizer sym = (PointSymbolizer) symbolizers[j];
                         //valeur = SLD.pointOpacity(sym);
                         valeur = Filters.asDouble(sym.getGraphic().getOpacity());
-                    }
-
-                    if (symbolizers[j] instanceof LineSymbolizer) {
+                    } else if (symbolizers[j] instanceof LineSymbolizer) {
                         LineSymbolizer sym = (LineSymbolizer) symbolizers[j];
                         valeur = Filters.asDouble(sym.getStroke().getOpacity());
-                    }
-
-                    if (symbolizers[j] instanceof RasterSymbolizer) {
+                    } else if (symbolizers[j] instanceof RasterSymbolizer) {
                         RasterSymbolizer sym = (RasterSymbolizer) symbolizers[j];
                         valeur = Filters.asDouble(sym.getOpacity());
                     }
@@ -143,8 +156,7 @@ public final class OpacityComponent extends RenderAndEditComponent {
 
     }
 
-
-    private void applyOpacity(MapLayer layer, Double d) {
+    private void applyOpacity(Double d) {
         StyleBuilder sb = new StyleBuilder();
         Expression opa = sb.literalExpression(d);
 
@@ -160,34 +172,40 @@ public final class OpacityComponent extends RenderAndEditComponent {
                 if (r.getFilter() == null) {
                     Symbolizer[] symbolizers = r.getSymbolizers();
                     for (int j = 0; j < symbolizers.length; j++) {
-
-                        if (symbolizers[j] instanceof PolygonSymbolizer) {
-                            PolygonSymbolizer sym = (PolygonSymbolizer) symbolizers[j];
-                            sym.getFill().setOpacity(opa);
-                            sym.getStroke().setOpacity(opa);
-                        } else if (symbolizers[j] instanceof PointSymbolizer) {
-                            PointSymbolizer sym = (PointSymbolizer) symbolizers[j];
-                            sym.getGraphic().setOpacity(opa);
-
-                            Mark[] marks = sym.getGraphic().getMarks();
-
-                            for (int k = 0; k < marks.length; k++) {
-                                marks[k].getFill().setOpacity(opa);
-                                marks[k].getStroke().setOpacity(opa);
-                            }
-
-                        } else if (symbolizers[j] instanceof LineSymbolizer) {
-                            LineSymbolizer sym = (LineSymbolizer) symbolizers[j];
-                            sym.getStroke().setOpacity(opa);
-                        } else if (symbolizers[j] instanceof RasterSymbolizer) {
-                            RasterSymbolizer sym = (RasterSymbolizer) symbolizers[j];
-                            sym.setOpacity(opa);
-                        }
+                        applyOpacity(symbolizers[j], opa);
                     }
                 }
             }
 
             layer.setStyle(layer.getStyle());
+        } else if (symb != null) {
+            applyOpacity(symb, opa);
+        }
+
+    }
+
+    private void applyOpacity(Symbolizer symbol, Expression opa) {
+        if (symbol instanceof PolygonSymbolizer) {
+            PolygonSymbolizer sym = (PolygonSymbolizer) symbol;
+            sym.getFill().setOpacity(opa);
+            sym.getStroke().setOpacity(opa);
+        } else if (symbol instanceof PointSymbolizer) {
+            PointSymbolizer sym = (PointSymbolizer) symbol;
+            sym.getGraphic().setOpacity(opa);
+
+            Mark[] marks = sym.getGraphic().getMarks();
+
+            for (int k = 0; k < marks.length; k++) {
+                marks[k].getFill().setOpacity(opa);
+                marks[k].getStroke().setOpacity(opa);
+            }
+
+        } else if (symbol instanceof LineSymbolizer) {
+            LineSymbolizer sym = (LineSymbolizer) symbol;
+            sym.getStroke().setOpacity(opa);
+        } else if (symbol instanceof RasterSymbolizer) {
+            RasterSymbolizer sym = (RasterSymbolizer) symbol;
+            sym.setOpacity(opa);
         }
     }
 }

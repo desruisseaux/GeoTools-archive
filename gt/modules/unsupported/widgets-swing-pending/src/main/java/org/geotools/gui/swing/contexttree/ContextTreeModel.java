@@ -16,7 +16,12 @@
 
 package org.geotools.gui.swing.contexttree;
 
+import javax.swing.ImageIcon;
+import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.event.EventListenerList;
@@ -24,7 +29,11 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
+import org.geotools.gui.swing.contexttree.node.LayerContextTreeNode;
+import org.geotools.gui.swing.contexttree.node.MapContextTreeNode;
+import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
@@ -32,6 +41,7 @@ import org.geotools.map.event.MapLayerListListener;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 
 /**
  * ContextTreeModel for JContextTree
@@ -42,11 +52,14 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     /**
      * number of the tree column
      */
-    static final int TREE = 0;
+    public static final int TREE = 0;
+    private static final SubNodeGroup[] EMPTY_SUBNODEGROUP_ARRAY = new SubNodeGroup[] {};
     
     private final EventListenerList listeners = new EventListenerList();    
     private final JContextTree frame;
     private final ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
+    private final ArrayList<SubNodeGroup> subgroups = new ArrayList<SubNodeGroup>();
+    private final Map<SubNodeGroup,List<ContextTreeNode>> subnodes = new HashMap<SubNodeGroup,List<ContextTreeNode>>();
     private final Vector columnNames = new Vector(); 
     
     private MapContext activeContext;
@@ -61,15 +74,35 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     ContextTreeModel(JContextTree frame) {
         super();
         this.frame = frame;
-        ContextTreeNode node = new ContextTreeNode(this);
+                
+        ContextTreeNode node = new ContextTreeNode(this) {
+
+            @Override
+            public ImageIcon getIcon() {
+                return IconBundle.EMPTY_ICON;
+            }
+
+            @Override
+            public boolean isEditable() {
+                return false;
+            }
+
+            @Override
+            public Object getValue() {
+                return "Root";
+            }
+
+            @Override
+            public void setValue(Object obj) {
+            }
+        };
         setRoot(node);
 
         columnNames.add(TextBundle.getResource().getString("col_tree"));
 
         setColumnIdentifiers(columnNames);
     }
-
-    
+        
 
     /**
      * set if the treecolumn (maplayer and mapcontext titles) can be edited
@@ -131,7 +164,8 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     public boolean isCellEditable(Object node, int column) {
 
         if (column == TREE) {
-            return treeedit;
+            ContextTreeNode n = (ContextTreeNode) node;
+            return (treeedit && n.isEditable(column));
         } else {
             if (column <= columns.size()) {
                 return columns.get(column - 1).isCellEditable(((ContextTreeNode) node).getUserObject());
@@ -162,7 +196,6 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     }
 
     
-
         
 ////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
@@ -197,15 +230,18 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         
     }
     
-    int getColumnModelCount() {
+    public int getColumnModelCount() {
         return columns.size();
     }
 
-    int getgetColumnModelIndex(TreeTableColumn model) {
-        return columns.indexOf(model);
+    public TreeTableColumn getColumnModel(int index){
+        return columns.get(index);
     }
     
-    
+    public int getColumnModelIndex(TreeTableColumn model) {
+        return columns.indexOf(model);
+    }
+        
     /**
      * get the list of column
      * @return list of column models
@@ -214,6 +250,94 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         return columns;
     }
 
+////////////////////////////////////////////////////////////////////////////////
+// SUBNODES MANAGEMENT /////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+    
+    void addSubNodeGroup(SubNodeGroup group) {
+        if(group!=null && !subgroups.contains(group)){
+            subgroups.add(group);           
+            subnodes.put(group, new ArrayList<ContextTreeNode>());
+            visitNode(getRoot(),group);       
+        }        
+    }
+    
+    void removeSubNodeGroup(SubNodeGroup group) {
+        if(group!=null && subgroups.contains(group)){
+            
+            List<ContextTreeNode> nodes = subnodes.get(group);            
+            for(ContextTreeNode n : nodes){
+                removeNodeFromParent(n);
+            }
+            
+            subnodes.remove(group);            
+            subgroups.remove(group);           
+        }        
+    }
+            
+    void removeSubNodeGroup(int index){
+       SubNodeGroup grp = subgroups.get(index);
+       removeSubNodeGroup(grp);
+    }
+    
+    int getSubNodeGroupCount(){
+       return subgroups.size();
+    }
+    
+    int getSubNodeGroupIndex(SubNodeGroup group){
+        return subgroups.indexOf(group);
+    }
+    
+    SubNodeGroup[] getSubNodeGroups() {
+        return subgroups.toArray(EMPTY_SUBNODEGROUP_ARRAY);
+    }
+        
+    private void visitNode(TreeTableNode node, SubNodeGroup group){
+                
+        for(int i=0, max=node.getChildCount(); i<max;i++){
+            visitNode(node.getChildAt(i),group);
+        }
+        
+        if(node instanceof ContextTreeNode ){
+            ContextTreeNode tn = (ContextTreeNode) node;
+            Object obj = tn.getUserObject();
+            if(group.isValid(obj)){
+                ContextTreeNode[] nodes = group.createNodes(this,obj);
+                for(ContextTreeNode n : nodes){
+                    subnodes.get(group).add(n);
+                    insertNodeInto(n, tn, tn.getChildCount());
+                }
+                
+            }
+        }
+        
+    }
+    
+    private void cleanNode(TreeTableNode node){
+        
+        for(SubNodeGroup sub : subgroups){
+            cleanNode(node, sub);
+        }
+        
+    }
+    
+    private void cleanNode(TreeTableNode node, SubNodeGroup group){
+        
+        for(int i=0, max=node.getChildCount(); i<max;i++){
+            cleanNode(node.getChildAt(i),group);
+        }
+        
+        if(node instanceof ContextTreeNode ){
+            ContextTreeNode tn = (ContextTreeNode) node;            
+            List<ContextTreeNode> lst = subnodes.get(group);
+            
+            if(lst.contains(tn)){
+                lst.remove(tn);
+                removeNodeFromParent(tn);
+            }
+            
+        }
+    }
     
 ////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
@@ -223,7 +347,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
      * get the active context
      * @return return the active MapContext, if none return null
      */
-    MapContext getActiveContext() {
+    public MapContext getActiveContext() {
         return activeContext;
     }
 
@@ -262,19 +386,23 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         if (getMapContextIndex(context) < 0) {
             context.addMapLayerListListener(this);
 
-            ContextTreeNode node = new ContextTreeNode(this);
-            node.setUserObject(context);
+            ContextTreeNode node = new MapContextTreeNode(this,context);
 
             insertNodeInto(node, (ContextTreeNode) getRoot(), getRoot().getChildCount());
 
             for (int i = context.getLayerCount() - 1; i >= 0; i--) {
-                ContextTreeNode layer = new ContextTreeNode(this);
-                layer.setUserObject(context.getLayer(i));
+                ContextTreeNode layer = new LayerContextTreeNode(this,context.getLayer(i));
                 insertNodeInto(layer, node, node.getChildCount());
             }
 
             fireContextAdded(context, getMapContextIndex(context));
             setActiveContext(context);
+            
+            //subnodes
+            for(SubNodeGroup grp : subgroups){
+                visitNode(node, grp);
+            }
+            
         }
     }
 
@@ -288,6 +416,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
             ContextTreeNode jm = (ContextTreeNode) getRoot().getChildAt(i);
 
             if (jm.getUserObject().equals(context)) {
+                cleanNode(jm);
                 removeNodeFromParent(jm);
 
                 if (jm.getUserObject().equals(activeContext)) {
@@ -560,19 +689,15 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
      */
     public void layerAdded(MapLayerListEvent mle) {
         MapContext context = (MapContext) mle.getSource();
-
+  
         int i = 0;
         boolean find = false;
         while (i < getRoot().getChildCount() && !find) {
 
             if (((ContextTreeNode) getRoot().getChildAt(i)).getUserObject().equals(context)) {
 
-
-                ContextTreeNode layer = new ContextTreeNode(this);
-                layer.setUserObject(mle.getLayer());
-
+                ContextTreeNode layer = new LayerContextTreeNode(this,mle.getLayer());
                 ContextTreeNode father = (ContextTreeNode) getRoot().getChildAt(i);
-
 
                 int index = mle.getToIndex();
 
@@ -584,6 +709,12 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
                     index = 0;
                 }
                 insertNodeInto(layer, father, index);
+                
+                //subnodes
+                for(SubNodeGroup grp : subgroups){
+                    visitNode(layer, grp);
+                }
+                
             }
             i++;
         }
@@ -608,6 +739,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
                     ContextTreeNode node = (ContextTreeNode) father.getChildAt(t);
 
                     if (mle.getLayer().equals(node.getUserObject())) {
+                        cleanNode(node);                        
                         removeNodeFromParent(node);
                     }
                 }
