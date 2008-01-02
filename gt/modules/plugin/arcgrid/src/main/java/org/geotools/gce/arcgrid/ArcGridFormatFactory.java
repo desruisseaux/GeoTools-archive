@@ -51,7 +51,7 @@ public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 			Class.forName("javax.media.jai.JAI");
 			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
 			Class
-					.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata");
+					.forName("it.geosolutions.imageio.plugins.arcgrid.AsciiGridsImageMetadata");
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("ArcGridFormatFactory is availaible.");
 		} catch (ClassNotFoundException cnf) {

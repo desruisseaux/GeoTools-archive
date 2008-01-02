@@ -16,6 +16,8 @@
  */
 package org.geotools.gce.arcgrid;
 
+import it.geosolutions.imageio.plugins.arcgrid.spi.AsciiGridsImageReaderSpi;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -25,7 +27,6 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
-import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -47,10 +48,15 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 */
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
-	/** Indicates whether the arcgrid data is in GRASS format */
+	/** Indicates whether the arcgrid data must be written in GRASS format */
 	public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor(
-			"GRASS", "Indicates whether the arcgrid data is in GRASS format",
+			"GRASS", "Indicates whether the arcgrid data has to be written in GRASS format",
 			Boolean.FALSE, true);
+	
+	/** Indicates whether we ask the plugin to resample the coverage to have dx==dy */
+	public static final DefaultParameterDescriptor FORCE_CELLSIZE = new DefaultParameterDescriptor(
+			"FORCE_CELLSIZE", "Indicates whether the input coverage has to be resampled to have dx==dyt",
+			Boolean.FALSE, false);
 	
 
 	/** Caching the {@link AsciiGridsImageReaderSpi} factory. */
@@ -82,7 +88,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 		writeParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(mInfo,
 						new GeneralParameterDescriptor[] { GRASS,
-								GEOTOOLS_WRITE_PARAMS }));
+								GEOTOOLS_WRITE_PARAMS,FORCE_CELLSIZE }));
 
 		// reading parameters
 		readParameters = new ParameterGroup(
@@ -109,7 +115,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 		} catch (DataSourceException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -123,7 +129,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 		} catch (DataSourceException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -151,7 +157,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 		} catch (DataSourceException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
