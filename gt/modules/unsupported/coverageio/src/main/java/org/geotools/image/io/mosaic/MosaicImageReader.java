@@ -23,14 +23,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*; // Lot of imports used in this class.
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -40,6 +35,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
 
 import org.geotools.image.io.metadata.MetadataMerge;
 import org.geotools.io.TableWriter;
@@ -51,7 +47,8 @@ import org.geotools.util.logging.Logging;
 
 
 /**
- * An image reader built from a mosaic of other image readers.
+ * An image reader built from a mosaic of other image readers. The mosaic is specified as a
+ * collection of {@link Tile} objects, organized in a {@link TileManager}.
  *
  * @since 2.5
  * @source $URL$
@@ -73,18 +70,26 @@ public class MosaicImageReader extends ImageReader {
     };
 
     /**
-     * The logging level for tiling information during reads.
+     * An unmodifiable view of {@link #readers} keys.
      */
-    private Level level = Level.FINE;
+    private final Set<ImageReaderSpi> providers;
 
     /**
-     * The tile manager.
+     * The image reader created for each provider. Keys must be the union of
+     * {@link TileManager#getImageReaderSpis} at every image index and must be computed right at
+     * {@link #setInput} invocation time. Values may be {@code null} and assigned only later.
      */
-    private TileManager tiles;
+    private final Map<ImageReaderSpi,ImageReader> readers;
 
     /**
-     * The reader currently under process of reading, or {@code null} if none.
-     * Used by {@link #abort} only.
+     * The input given to each image reader. Values are {@linkplain Tile#getInput tile input}
+     * before they have been wrapped in an {@linkplain ImageInputStream image input stream}.
+     */
+    private final Map<ImageReader,Object> readerInputs;
+
+    /**
+     * The reader currently under process of reading, or {@code null} if none. Used by
+     * {@link #abort} only. Changes must be performed inside a {@code synchronized(this)} block.
      */
     private transient ImageReader reading;
 
@@ -93,60 +98,9 @@ public class MosaicImageReader extends ImageReader {
      */
     public MosaicImageReader(final ImageReaderSpi spi) {
         super(spi != null ? spi : Spi.DEFAULT);
-    }
-
-    /**
-     * Sets the input source. This method expects an array or a {@linkplain Collection collection}
-     * of {@link Tile} objects.
-     */
-    @Override
-    public void setInput(Object input, final boolean seekForwardOnly, final boolean ignoreMetadata) {
-        /*
-         * Closes previous streams, if any. This is not a big deal if this operation fails,
-         * since we will not use anymore the old streams anyway. However it is worth to log.
-         */
-        try {
-            close();
-        } catch (IOException exception) {
-            Logging.recoverableException(MosaicImageReader.class, "setInput", exception);
-        }
-        /*
-         * Gets the new collection of tiles. We set the superclass input to the collection returned
-         * by the TileManager, not the TileManager itself, in order to be consistent with the input
-         * given by the user to this method. We do not store directly the given input neither in
-         * order to protect it from changes.
-         */
-        this.tiles = null;
-        this.input = null; // Clears first in case of failure.
-        if (input != null) {
-            if (input instanceof Tile[]) {
-                tiles = new TileManager((Tile[]) input);
-            } else if (input instanceof Collection) {
-                @SuppressWarnings("unchecked") // TileManager constructor will checks indirectly.
-                final Collection<Tile> c = (Collection<Tile>) input;
-                tiles = new TileManager(c);
-            } else {
-                throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Classes.getClass(input), Tile[].class));
-            }
-            input = tiles.getTiles();
-        }
-        super.setInput(input, seekForwardOnly, ignoreMetadata);
-        /*
-         * Copies the configuration to every readers in the tile collection.
-         */
-        if (locale != null) {
-            for (final ImageReader reader : tiles.getReaders()) {
-                try {
-                    reader.setLocale(locale);
-                } catch (IllegalArgumentException e) {
-                    // Invalid locale. Ignore this exception since it will not prevent the image
-                    // reader to work mostly as expected (warning messages may be in a different
-                    // locale, which is not a big deal).
-                    Logging.recoverableException(MosaicImageReader.class, "setInput", e);
-                }
-            }
-        }
+        readers = new HashMap<ImageReaderSpi,ImageReader>();
+        readerInputs = new IdentityHashMap<ImageReader,Object>();
+        providers = Collections.unmodifiableSet(readers.keySet());
     }
 
     /**
@@ -154,54 +108,265 @@ public class MosaicImageReader extends ImageReader {
      *
      * @param imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
      * @return The tile manager for image at the given index.
-     *
-     * @todo Current implementation has only one tile manager because we allow only one image,
-     *       but we could allow for more in a future version.
      */
     private TileManager getTileManager(final int imageIndex) throws IOException {
-        if (tiles == null) {
-            throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
+        if (input instanceof TileManager[]) {
+            final TileManager[] tiles = (TileManager[]) input;
+            if (imageIndex < 0 || imageIndex >= tiles.length) {
+                throw new IndexOutOfBoundsException(Errors.format(
+                        ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, imageIndex));
+            }
+            return tiles[imageIndex];
         }
-        final int numImages = getNumImages(false);
-        if (imageIndex < 0 || (numImages >= 0 && imageIndex >= numImages)) {
-            throw new IndexOutOfBoundsException(Errors.format(
-                    ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, imageIndex));
+        throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
+    }
+
+    /**
+     * Returns the input, which is a an array of {@linkplain TileManager tile managers}.
+     * The array length is the {@linkplain #getNumImages number of images}. The element
+     * at index <var>i</var> is the tile manager to use when reading at image index <var>i</var>.
+     */
+    @Override
+    public TileManager[] getInput() {
+        final TileManager[] managers = (TileManager[]) super.getInput();
+        return (managers != null) ? managers.clone() : null;
+    }
+
+    /**
+     * Sets the input source, which is expected to be an array of
+     * {@linkplain TileManager tile managers}. If the given input is a singleton, an array or a
+     * {@linkplain Collection collection} of {@link Tile} objects, then it will be wrapped in an
+     * array of {@link TileManager}s.
+     *
+     * @param input The input.
+     * @param seekForwardOnly if {@code true}, images and metadata may only be read in ascending
+     *        order from this input source.
+     * @param ignoreMetadata if {@code true}, metadata may be ignored during reads.
+     */
+    @Override
+    public void setInput(Object input, final boolean seekForwardOnly, final boolean ignoreMetadata) {
+        final TileManager[] managers;
+        if (input == null) {
+            managers = null;
+        } else if (input instanceof TileManager[]) {
+            managers = ((TileManager[]) input).clone();
+        } else if (input instanceof TileManager) {
+            managers = new TileManager[] {(TileManager) input};
+        } else if (input instanceof Tile[]) {
+            managers = new TileManager[] {new TileManager((Tile[]) input)};
+        } else if (input instanceof Collection) {
+            @SuppressWarnings("unchecked") // TileManager constructor will checks indirectly.
+            final Collection<Tile> c = (Collection<Tile>) input;
+            managers = new TileManager[] {new TileManager(c)};
+        } else {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, input.getClass(), TileManager.class));
         }
-        return tiles;
+        /*
+         * Before to assign the value, make sure that there is no null value.
+         */
+        final int numImages = (managers != null) ? managers.length : 0;
+        for (int i=0; i<numImages; i++) {
+            if (managers[i] == null) {
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.NULL_ARGUMENT_$1, "input[" + i + ']'));
+            }
+        }
+        super.setInput(input=managers, seekForwardOnly, ignoreMetadata);
+        availableLocales = null; // Will be computed by getAvailableLocales() when first needed.
+        /*
+         * For every tile readers, closes the stream and disposes the ones that are not needed
+         * anymore for the new input. The image readers that may still useful will be recycled.
+         * We keep their streams open since it is possible that the new input uses the same ones
+         * (the old streams will be closed later if appears to not be used).
+         */
+        final Set<ImageReaderSpi> providers;
+        switch (numImages) {
+            case 0: {
+                providers = Collections.emptySet();
+                break;
+            }
+            case 1: {
+                providers = managers[0].getImageReaderSpis();
+                break;
+            }
+            default: {
+                providers = new HashSet<ImageReaderSpi>(managers[0].getImageReaderSpis());
+                for (int i=1; i<numImages; i++) {
+                    providers.addAll(managers[i].getImageReaderSpis());
+                }
+                break;
+            }
+        }
+        final Iterator<Map.Entry<ImageReaderSpi,ImageReader>> it = readers.entrySet().iterator();
+        while (it.hasNext()) {
+            final Map.Entry<ImageReaderSpi,ImageReader> entry = it.next();
+            if (!providers.contains(entry.getKey())) {
+                final ImageReader reader = entry.getValue();
+                if (reader != null) {
+                    /*
+                     * Closes previous streams, if any. It is not a big deal if this operation
+                     * fails, since we will not use anymore the old streams anyway. However it
+                     * is worth to log.
+                     */
+                    final Object rawInput = readerInputs.remove(reader);
+                    final Object tileInput = reader.getInput();
+                    if (rawInput != tileInput) try {
+                        close(tileInput);
+                    } catch (IOException exception) {
+                        Logging.recoverableException(MosaicImageReader.class, "setInput", exception);
+                    }
+                    reader.dispose();
+                }
+                it.remove();
+            }
+        }
+        for (final ImageReaderSpi provider : providers) {
+            if (!readers.containsKey(provider)) {
+                readers.put(provider, null);
+            }
+        }
+        assert providers.equals(this.providers);
+        assert readers.values().containsAll(readerInputs.keySet());
+    }
+
+    /**
+     * Returns the <cite>Service Provider Interfaces</cite> (SPI) of every
+     * {@linkplain ImageReader image readers} to be used for reading tiles.
+     * This method returns an empty set if no input has been set.
+     *
+     * @see TileManager#getImageReaderSpis
+     */
+    public Set<ImageReaderSpi> getTileReaderSpis() {
+        return providers;
+    }
+
+    /**
+     * Creates a new {@link ImageReader} from the specified provider. This method do not
+     * check the cache and do not store the result in the cache. It should be invoked by
+     * {@link #getTileReader} and {@link #getTileReaders} methods only.
+     * <p>
+     * It is technically possible to return the same {@link ImageReader} instance from
+     * different {@link ImageReaderSpi}. It would broke the usual {@code ImageReaderSpi}
+     * contract for no obvious reason, but technically this class should work correctly
+     * even in such case.
+     *
+     * @param  provider The provider. Must be a member of {@link #getTileReaderSpis}.
+     * @return The image reader for the given provider.
+     * @throws IOException if the image reader can not be created.
+     */
+    private ImageReader createReaderInstance(final ImageReaderSpi provider) throws IOException {
+        final ImageReader reader = provider.createReaderInstance();
+        if (locale != null) {
+            try {
+                reader.setLocale(locale);
+            } catch (IllegalArgumentException e) {
+                // Invalid locale. Ignore this exception since it will not prevent the image
+                // reader to work mostly as expected (warning messages may be in a different
+                // locale, which is not a big deal).
+                Logging.recoverableException(MosaicImageReader.class, "getTileReader", e);
+            }
+        }
+        return reader;
+    }
+
+    /**
+     * Returns the image reader for the given provider.
+     *
+     * @param  provider The provider. Must be a member of {@link #getTileReaderSpis}.
+     * @return The image reader for the given provider.
+     * @throws IOException if the image reader can not be created.
+     */
+    final ImageReader getTileReader(final ImageReaderSpi provider) throws IOException {
+        assert readers.containsKey(provider); // Key should exists even if the value is null.
+        ImageReader reader = readers.get(provider);
+        if (reader == null) {
+            reader = createReaderInstance(provider);
+            readers.put(provider, reader);
+        }
+        return reader;
+    }
+
+    /**
+     * Returns every readers used for reading tiles. New readers may be created on the fly
+     * by this method.  However failure to create them will be logged rather than trown as
+     * an exception. In such case the information obtained by the caller may be incomplete
+     * and the exception may be thrown later when {@link #getTileReader} will be invoked.
+     */
+    private Set<ImageReader> getTileReaders() {
+        for (final Map.Entry<ImageReaderSpi,ImageReader> entry : readers.entrySet()) {
+            ImageReader reader = entry.getValue();
+            if (reader == null) {
+                final ImageReaderSpi provider = entry.getKey();
+                try {
+                    reader = createReaderInstance(provider);
+                } catch (IOException exception) {
+                    Logging.unexpectedException(MosaicImageReader.class, "getTileReaders", exception);
+                    continue;
+                }
+                entry.setValue(reader);
+            }
+            if (!readerInputs.containsKey(reader)) {
+                readerInputs.put(reader, null);
+            }
+        }
+        assert readers.values().containsAll(readerInputs.keySet());
+        return readerInputs.keySet();
+    }
+
+    /**
+     * Returns a reader sample, or {@code null}. This method tries to returns an instance of the
+     * most specific reader class. If no suitable instance is found, then it returns {@code null}.
+     * <p>
+     * This method is typically invoked for fetching an instance of {@code ImageReadParam}. We
+     * look for the most specific class because it may contains additional parameters that are
+     * ignored by super-classes. If we fail to find a suitable instance, then the caller shall
+     * fallback on the {@link ImageReader} default implementation.
+     */
+    private ImageReader getTileReader() {
+        final Set<ImageReader> readers = getTileReaders();
+        Class<?> type = Classes.specializedClass(readers);
+        while (type!=null && ImageReader.class.isAssignableFrom(type)) {
+            for (final ImageReader candidate : readers) {
+                if (type.equals(candidate.getClass())) {
+                    return candidate;
+                }
+            }
+            type = type.getSuperclass();
+        }
+        return null;
     }
 
     /**
      * Returns an array of locales that may be used to localize warning listeners. The default
      * implementations returns the union of the locales supported by this reader and every
-     * {@linkplain Tile#getReader tile readers}.
+     * {@linkplain Tile#getImageReader tile readers}.
      *
      * @return An array of supported locales, or {@code null}.
      */
     @Override
     public Locale[] getAvailableLocales() {
-        if (tiles == null) {
-            return super.getAvailableLocales();
-        }
-        final Set<Locale> locales = new LinkedHashSet<Locale>();
-        if (availableLocales != null) {
-            for (final Locale locale : availableLocales) {
-                locales.add(locale);
-            }
-        }
-        for (final ImageReader reader : tiles.getReaders()) {
-            final Locale[] additional = reader.getAvailableLocales();
-            if (additional != null) {
-                for (final Locale locale : additional) {
-                    locales.add(locale);
+        if (availableLocales == null) {
+            final Set<Locale> locales = new LinkedHashSet<Locale>();
+            for (final ImageReader reader : getTileReaders()) {
+                final Locale[] additional = reader.getAvailableLocales();
+                if (additional != null) {
+                    for (final Locale locale : additional) {
+                        locales.add(locale);
+                    }
                 }
             }
+            if (locales.isEmpty()) {
+                return null;
+            }
+            availableLocales = locales.toArray(new Locale[locales.size()]);
         }
-        return locales.toArray(new Locale[locales.size()]);
+        return availableLocales.clone();
     }
 
     /**
      * Sets the current locale of this image reader and every
-     * {@linkplain Tile#getReader tile readers}.
+     * {@linkplain Tile#getImageReader tile readers}.
      *
      * @param locale the desired locale, or {@code null}.
      * @throws IllegalArgumentException if {@code locale} is non-null but is not
@@ -210,15 +375,13 @@ public class MosaicImageReader extends ImageReader {
     @Override
     public void setLocale(final Locale locale) throws IllegalArgumentException {
         super.setLocale(locale); // May thrown an exception.
-        if (tiles != null) {
-            for (final ImageReader reader : tiles.getReaders()) {
-                try {
-                    reader.setLocale(locale);
-                } catch (IllegalArgumentException e) {
-                    // Locale not supported by the reader. It may occurs
-                    // if not all readers support the same set of locales.
-                    Logging.recoverableException(MosaicImageReader.class, "setLocale", e);
-                }
+        for (final ImageReader reader : readers.values()) {
+            try {
+                reader.setLocale(locale);
+            } catch (IllegalArgumentException e) {
+                // Locale not supported by the reader. It may occurs
+                // if not all readers support the same set of locales.
+                Logging.recoverableException(MosaicImageReader.class, "setLocale", e);
             }
         }
     }
@@ -229,7 +392,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getNumImages(final boolean allowSearch) throws IOException {
-        return 1;
+        return (input instanceof TileManager[]) ? ((TileManager[]) input).length : 0;
     }
 
     /**
@@ -297,18 +460,16 @@ public class MosaicImageReader extends ImageReader {
      * This method always returns {@code true} if there is no tiles.
      */
     private boolean useDefaultImplementation(final String methodName, final Class<?>[] parameterTypes) {
-        if (tiles != null) {
-            for (final ImageReader reader : tiles.getReaders()) {
-                Class<?> type = reader.getClass();
-                try {
-                    type = type.getMethod(methodName, parameterTypes).getDeclaringClass();
-                } catch (NoSuchMethodException e) {
-                    Logging.unexpectedException(MosaicImageReader.class, "useDefaultImplementation", e);
-                    return false; // Conservative value.
-                }
-                if (!type.equals(ImageReader.class)) {
-                    return false;
-                }
+        for (final ImageReader reader : getTileReaders()) {
+            Class<?> type = reader.getClass();
+            try {
+                type = type.getMethod(methodName, parameterTypes).getDeclaringClass();
+            } catch (NoSuchMethodException e) {
+                Logging.unexpectedException(MosaicImageReader.class, "useDefaultImplementation", e);
+                return false; // Conservative value.
+            }
+            if (!type.equals(ImageReader.class)) {
+                return false;
             }
         }
         return true;
@@ -332,7 +493,7 @@ public class MosaicImageReader extends ImageReader {
             if (!(input instanceof File)) {
                 return false;
             }
-            final ImageReader reader = tile.getPreparedReader(true, true);
+            final ImageReader reader = tile.getImageReader(this, true, true);
             if (!reader.isRandomAccessEasy(tile.getImageIndex())) {
                 return false;
             }
@@ -352,7 +513,7 @@ public class MosaicImageReader extends ImageReader {
         if (!useDefaultImplementation("getAspectRatio", INTEGER_ARGUMENTS)) {
             float ratio = Float.NaN;
             for (final Tile tile : getTileManager(imageIndex).getTiles()) {
-                final ImageReader reader = tile.getPreparedReader(true, true);
+                final ImageReader reader = tile.getImageReader(this, true, true);
                 final float candidate = reader.getAspectRatio(tile.getImageIndex());
                 if (candidate == ratio || Float.isNaN(candidate)) {
                     // Same ratio or unspecified ratio.
@@ -440,7 +601,7 @@ public class MosaicImageReader extends ImageReader {
         int pass = 0;
         final Map<ImageTypeSpecifier,Integer> types = new LinkedHashMap<ImageTypeSpecifier,Integer>();
         for (final Tile tile : tiles) {
-            final ImageReader reader = tile.getPreparedReader(true, true);
+            final ImageReader reader = tile.getImageReader(this, true, true);
             final int imageIndex = tile.getImageIndex();
             if (rawTypes != null) {
                 rawTypes.add(reader.getRawImageType(imageIndex));
@@ -482,7 +643,7 @@ public class MosaicImageReader extends ImageReader {
 
     /**
      * Returns default parameters appropriate for this format. The default implementation tries
-     * to delegate to an {@linkplain Tile#getReader tile image reader} which is an instance of
+     * to delegate to an {@linkplain Tile#getImageReader tile image reader} which is an instance of
      * the most specialized class. We look for the most specialized subclass because it may
      * declares additional parameters that are ignored by super-classes. If we fail to find
      * a suitable instance, then the default parameters are returned.
@@ -490,7 +651,7 @@ public class MosaicImageReader extends ImageReader {
     @Override
     public ImageReadParam getDefaultReadParam() {
         if (!useDefaultImplementation("getDefaultReadParam", null)) {
-            final ImageReader reader = tiles.getReader();
+            final ImageReader reader = getTileReader();
             if (reader != null) {
                 return reader.getDefaultReadParam();
             }
@@ -507,22 +668,16 @@ public class MosaicImageReader extends ImageReader {
      */
     public IIOMetadata getStreamMetadata() throws IOException {
         IIOMetadata metadata = null;
-        if (tiles != null) {
-            ImageReader previousReader = null;
-            Object      previousInput  = null;
-            /*
-             * The tiles are supposed to be ordered with tiles using same reader and input first.
-             * So checking if the (reader,input) pair is different from the previous iteration is
-             * suffisient for avoiding querying the same stream twice.
-             */
-            for (final Tile tile : tiles.getTiles()) {
-                final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
-                final Object input = reader.getInput();
-                if (reader != previousReader || input != previousInput) {
-                    final IIOMetadata candidate = reader.getStreamMetadata();
-                    metadata = MetadataMerge.merge(candidate, metadata);
-                    previousReader = reader;
-                    previousInput  = input;
+        if (input instanceof TileManager[]) {
+            final Set<ReaderInputPair> done = new HashSet<ReaderInputPair>();
+            for (final TileManager manager : (TileManager[]) input) {
+                for (final Tile tile : manager.getTiles()) {
+                    final ImageReader reader = tile.getImageReader(this, true, ignoreMetadata);
+                    final Object input = reader.getInput();
+                    if (done.add(new ReaderInputPair(reader, input))) {
+                        final IIOMetadata candidate = reader.getStreamMetadata();
+                        metadata = MetadataMerge.merge(candidate, metadata);
+                    }
                 }
             }
         }
@@ -541,18 +696,16 @@ public class MosaicImageReader extends ImageReader {
             throws IOException
     {
         IIOMetadata metadata = null;
-        if (tiles != null) {
-            ImageReader previousReader = null;
-            Object      previousInput  = null;
-            // Same assumption and optimization than getStreamMetadata().
-            for (final Tile tile : tiles.getTiles()) {
-                final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
-                final Object input = reader.getInput();
-                if (reader != previousReader || input != previousInput) {
-                    final IIOMetadata candidate = reader.getStreamMetadata(formatName, nodeNames);
-                    metadata = MetadataMerge.merge(candidate, metadata);
-                    previousReader = reader;
-                    previousInput  = input;
+        if (input instanceof TileManager[]) {
+            final Set<ReaderInputPair> done = new HashSet<ReaderInputPair>();
+            for (final TileManager manager : (TileManager[]) input) {
+                for (final Tile tile : manager.getTiles()) {
+                    final ImageReader reader = tile.getImageReader(this, true, ignoreMetadata);
+                    final Object input = reader.getInput();
+                    if (done.add(new ReaderInputPair(reader, input))) {
+                        final IIOMetadata candidate = reader.getStreamMetadata(formatName, nodeNames);
+                        metadata = MetadataMerge.merge(candidate, metadata);
+                    }
                 }
             }
         }
@@ -573,7 +726,7 @@ public class MosaicImageReader extends ImageReader {
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         IIOMetadata metadata = null;
         for (final Tile tile : getTileManager(imageIndex).getTiles()) {
-            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final ImageReader reader = tile.getImageReader(this, true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(tile.getImageIndex());
             metadata = MetadataMerge.merge(candidate, metadata);
         }
@@ -593,7 +746,7 @@ public class MosaicImageReader extends ImageReader {
     {
         IIOMetadata metadata = null;
         for (final Tile tile : getTileManager(imageIndex).getTiles()) {
-            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final ImageReader reader = tile.getImageReader(this, true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(tile.getImageIndex(), formatName, nodeNames);
             metadata = MetadataMerge.merge(candidate, metadata);
         }
@@ -671,6 +824,8 @@ public class MosaicImageReader extends ImageReader {
          */
         final Logger logger = Logging.getLogger(MosaicImageReader.class);
         final TableWriter table;
+        final Level level = (originatingProvider instanceof Spi) ?
+                ((Spi) originatingProvider).getLogLevel() : Level.FINE;
         if (logger.isLoggable(level)) {
             table = new TableWriter(null, TableWriter.SINGLE_VERTICAL_LINE);
             table.writeHorizontalSeparator();
@@ -733,6 +888,10 @@ public class MosaicImageReader extends ImageReader {
             final Dimension pixelSize = tile.getPixelSize();
             assert xSubsampling % pixelSize.width  == 0 : pixelSize;
             assert ySubsampling % pixelSize.height == 0 : pixelSize;
+            regionToRead.x      /= pixelSize.width;
+            regionToRead.y      /= pixelSize.height;
+            regionToRead.width  /= pixelSize.width;
+            regionToRead.height /= pixelSize.height;
             param.setController(null);
             if (image != null) {
                 param.setDestinationType(null);
@@ -745,14 +904,14 @@ public class MosaicImageReader extends ImageReader {
             param.setSourceRegion(regionToRead);
             param.setSourceSubsampling(xSubsampling / pixelSize.width,
                                        ySubsampling / pixelSize.height, 0, 0);
-            final ImageReader reader = tile.getPreparedReader(true, true);
+            final ImageReader reader = tile.getImageReader(this, true, true);
             /*
              * Adds a row in the table to be logged (if logable) and process to the reading.
              */
             if (table != null) {
-                table.write(Tile.toString(reader));
+                table.write(Tile.toString(reader.getOriginatingProvider()));
                 table.nextColumn();
-                table.write(tile.getInputString());
+                table.write(tile.getInputName());
                 format(table, regionToRead.width,  regionToRead.height);
                 format(table, regionToRead.x,      regionToRead.y);
                 format(table, destinationOffset.x, destinationOffset.y);
@@ -849,24 +1008,6 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
-     * Returns the logging level for tile information during reads.
-     */
-    public Level getLogLevel() {
-        return level;
-    }
-
-    /**
-     * Sets the logging level for tile information during reads. The default
-     * value is {@link Level#FINE}. A {@code null} value restore the default.
-     */
-    public void setLogLevel(Level level) {
-        if (level == null) {
-            level = Level.FINE;
-        }
-        this.level = level;
-    }
-
-    /**
      * Formats a (x,y) value pair. A call to {@link TableWriter#nextColumn} is performed first.
      */
     private static void format(final TableWriter table, final int x, final int y) {
@@ -890,30 +1031,70 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
+     * Returns the raw input (<strong>not</strong> wrapped in an image input stream) for the
+     * given reader. This method is invoked by {@link Tile#getImageReader} only.
+     */
+    final Object getRawInput(final ImageReader reader) {
+        return readerInputs.get(reader);
+    }
+
+    /**
+     * Sets the raw input (<strong>not</strong> wrapped in an image input stream) for the
+     * given reader. The input can be set to {@code null}. This method is invoked by
+     * {@link Tile#getImageReader} only.
+     */
+    final void setRawInput(final ImageReader reader, final Object input) {
+        readerInputs.put(reader, input);
+    }
+
+    /**
      * Closes any image input streams thay may be held by tiles.
      * The streams will be opened again when they will be first needed.
      *
      * @throws IOException if error occured while closing a stream.
      */
     public void close() throws IOException {
-        if (tiles != null) {
-            tiles.close(false);
+        for (final Map.Entry<ImageReader,Object> entry : readerInputs.entrySet()) {
+            final ImageReader reader = entry.getKey();
+            final Object    rawInput = entry.getValue();
+            final Object       input = reader.getInput();
+            entry .setValue(null);
+            reader.setInput(null);
+            if (input != rawInput) {
+                close(input);
+            }
+        }
+    }
+
+    /**
+     * Closes the specified stream, if it is closeable.
+     */
+    private static void close(final Object input) throws IOException {
+        if (input instanceof ImageInputStream) {
+            ((ImageInputStream) input).close();
+        } else if (input instanceof Closeable) {
+            ((Closeable) input).close();
         }
     }
 
     /**
      * Allows any resources held by this reader to be released. The default implementation
      * closes any image input streams thay may be held by tiles, then disposes every
-     * {@linkplain Tile#getReader tile image readers}.
+     * {@linkplain Tile#getImageReader tile image readers}.
      */
     @Override
     public void dispose() {
-        if (tiles != null) try {
-            tiles.close(true);
+        input = null;
+        try {
+            close();
         } catch (IOException e) {
             Logging.recoverableException(MosaicImageReader.class, "dispose", e);
         }
-        tiles = null;
+        readerInputs.clear();
+        for (final ImageReader reader : readers.values()) {
+            reader.dispose();
+        }
+        readers.clear();
         super.dispose();
     }
 
@@ -937,6 +1118,8 @@ public class MosaicImageReader extends ImageReader {
          * The input types.
          */
         private static final Class<?>[] INPUT_TYPES = new Class[] {
+            TileManager[].class,
+            TileManager.class,
             Tile[].class,
             Collection.class
         };
@@ -945,6 +1128,11 @@ public class MosaicImageReader extends ImageReader {
          * The default instance.
          */
         public static final Spi DEFAULT = new Spi();
+
+        /**
+         * The logging level for tiling information during reads.
+         */
+        private Level level = Level.FINE;
 
         /**
          * Creates a default provider.
@@ -991,6 +1179,24 @@ public class MosaicImageReader extends ImageReader {
         @Override
         public String getDescription(final Locale locale) {
             return "Mosaic Image Reader";
+        }
+
+        /**
+         * Returns the logging level for tile information during reads.
+         */
+        public Level getLogLevel() {
+            return level;
+        }
+
+        /**
+         * Sets the logging level for tile information during reads. The default
+         * value is {@link Level#FINE}. A {@code null} value restore the default.
+         */
+        public void setLogLevel(Level level) {
+            if (level == null) {
+                level = Level.FINE;
+            }
+            this.level = level;
         }
     }
 }

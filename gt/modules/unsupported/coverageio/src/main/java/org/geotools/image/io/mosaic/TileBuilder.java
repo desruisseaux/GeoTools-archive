@@ -28,7 +28,7 @@ import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -74,14 +74,14 @@ public class TileBuilder {
      *
      * @see #getImageReader(Object)
      */
-    private Map<String,ImageReader> readersBySuffix;
+    private Map<String,ImageReaderSpi> readersBySuffix;
 
     /**
-     * The image reader for the next tiles to be added.
+     * The image reader provider for the next tiles to be added.
      *
-     * @see #setImageReader
+     * @see #setImageReaderSpi
      */
-    private ImageReader reader;
+    private ImageReaderSpi provider;
 
     /**
      * Creates an initially empty tile collection with the origin set to (0,0).
@@ -128,15 +128,15 @@ public class TileBuilder {
     /**
      * Sets the image reader for next tiles to be {@linkplain #add added}.
      */
-    public void setImageReader(final ImageReader reader) {
-        this.reader = reader;
+    public void setImageReaderSpi(final ImageReaderSpi provider) {
+        this.provider = provider;
     }
 
     /**
      * Returns the image reader for next tiles to be {@linkplain #add added}.
      */
-    public ImageReader getImageReader() {
-        return reader;
+    public ImageReaderSpi getImageReaderSpi() {
+        return provider;
     }
 
     /**
@@ -160,8 +160,8 @@ public class TileBuilder {
      * @return A suitable image reader.
      * @throws IllegalStateException if no suitable image reader has been found.
      */
-    protected ImageReader getImageReader(final Object input) throws IllegalStateException {
-        ImageReader reader = getImageReader();
+    protected ImageReaderSpi getImageReaderSpi(final Object input) throws IllegalStateException {
+        ImageReaderSpi reader = getImageReaderSpi();
         if (reader != null) {
             return reader;
         }
@@ -187,37 +187,23 @@ public class TileBuilder {
                         return reader;
                     }
                 }
-                final Iterator<ImageReader> it = ImageIO.getImageReadersBySuffix(extension);
+                final Iterator<ImageReaderSpi> it = null; // TODO
                 while (it.hasNext()) {
                     reader = it.next();
-                    if (filter(reader)) {
-                        if (readersBySuffix == null) {
-                            readersBySuffix = new HashMap<String,ImageReader>();
-                        }
-                        readersBySuffix.put(extension, reader);
-                        return reader;
+                    if (readersBySuffix == null) {
+                        readersBySuffix = new HashMap<String,ImageReaderSpi>();
                     }
+                    readersBySuffix.put(extension, reader);
+                    return reader;
                 }
             }
         }
-        final Iterator<ImageReader> it = ImageIO.getImageReaders(input);
+        final Iterator<ImageReaderSpi> it = null; // TODO
         while (it.hasNext()) {
             reader = it.next();
-            if (filter(reader)) {
-                return reader;
-            }
+            return reader;
         }
         throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_READER));
-    }
-
-    /**
-     * Returns {@code true} if {@link #getImageReader(Object)} should accepts the given reader.
-     * The default implementation returns {@code true} in all cases.
-     *
-     * @todo This method is not yet public because I'm not sure about its API.
-     */
-    private boolean filter(final ImageReader reader) {
-        return true;
     }
 
     /**
@@ -284,7 +270,7 @@ public class TileBuilder {
     public void add(Object input, int imageIndex, Point origin, AffineTransform gridToCRS) {
         Tile.ensureNonNull("gridToCRS", gridToCRS);
         gridToCRS = new AffineTransform(gridToCRS);
-        tiles.put(gridToCRS, new Tile(getImageReader(input), input, imageIndex, origin, null));
+        tiles.put(gridToCRS, new Tile(getImageReaderSpi(input), input, imageIndex, origin, null));
     }
 
     /**
@@ -299,7 +285,7 @@ public class TileBuilder {
     public void add(Object input, int imageIndex, Rectangle region, AffineTransform gridToCRS) {
         Tile.ensureNonNull("gridToCRS", gridToCRS);
         gridToCRS = new AffineTransform(gridToCRS);
-        tiles.put(gridToCRS, new Tile(getImageReader(input), input, imageIndex, region, null));
+        tiles.put(gridToCRS, new Tile(getImageReaderSpi(input), input, imageIndex, region, null));
     }
 
     /**
@@ -377,7 +363,7 @@ public class TileBuilder {
                 final AffineTransform tr = entry.getKey();
                 Tile tile = tiles.remove(tr); // Should never be null.
                 tr.preConcatenate(toGrid);
-                final ImageReader  reader = tile.getReader();
+                final ImageReaderSpi spi  = tile.getImageReaderSpi();
                 final Object       input  = tile.getInput();
                 final int      imageIndex = tile.getImageIndex();
                 final Dimension pixelSize = entry.getValue();
@@ -401,7 +387,7 @@ public class TileBuilder {
                     bounds.y      = (int) Math.round(envelope.y);
                     bounds.width  = (int) Math.round(envelope.width);
                     bounds.height = (int) Math.round(envelope.height);
-                    tile = new Tile(reader, input, imageIndex, bounds, pixelSize);
+                    tile = new Tile(spi, input, imageIndex, bounds, pixelSize);
                     if (groupBounds == null) {
                         groupBounds = bounds;
                     } else {
@@ -410,7 +396,7 @@ public class TileBuilder {
                 } else {
                     final Point origin = tile.getOrigin();
                     tr.transform(origin, origin);
-                    tile = new Tile(reader, input, imageIndex, origin, pixelSize);
+                    tile = new Tile(spi, input, imageIndex, origin, pixelSize);
                     if (groupBounds == null) {
                         groupBounds = new Rectangle(origin.x, origin.y, 0, 0);
                     } else {

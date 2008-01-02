@@ -16,33 +16,30 @@
  */
 package org.geotools.image.io.mosaic;
 
+import java.util.*;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import org.geotools.resources.Classes;
+import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
- * A collection of {@link Tile} objects at one image index. This base class do not assumes that
- * the tiles are arranged in any particular order (especially grids). But subclasses can make such
- * assumption for better performances.
+ * A collection of {@link Tile} objects to be given to {@link MosaicImageReader}. This base
+ * class does not assume that the tiles are arranged in any particular order (especially grids).
+ * But subclasses can make such assumption for better performances.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TileManager implements Comparator<Tile> {
+public class TileManager {
     /**
-     * The tiles sorted by ({@linkplain Tile#getReader reader}, {@linkplain Tile#getInput input})
-     * first, then by {@linkplain Tile#getImageIndex image index}. If an iteration must be performed
-     * over every tiles, doing the iteration in this array order should be more efficient than other
-     * order.
+     * The tiles sorted by {@linkplain Tile#getInput input}) first, then by
+     * {@linkplain Tile#getImageIndex image index}. If an iteration must be
+     * performed over every tiles, doing the iteration in this array order
+     * should be more efficient than other order.
      */
     private final Tile[] tiles;
 
@@ -77,20 +74,9 @@ public class TileManager implements Comparator<Tile> {
     private Dimension tileSize;
 
     /**
-     * The input given (maybe indirectly) to each image readers. Many tiles can share the same
-     * reader, but that reader can have have only one {@linkplain ImageReader#setInput input set}.
-     * It may be the {@linkplain Tile#getInput tile input}, but not necessary since the later may
-     * have been wrapped in an {@linkplain ImageInputStream image input stream} before to be given
-     * to the image reader. The values in this map are the {@linkplain Tile#getInput tile inputs}
-     * <strong>before</strong> they have been wrapped in an image input stream.
+     * All image providers used as an unmodifiable set.
      */
-    private final Map<ImageReader,Object> readerInputs;
-
-    /**
-     * An unmodifiable view of the set of image readers. Will typically contains only
-     * one reader, but could contains more.
-     */
-    private final Set<ImageReader> readers;
+    private final Set<ImageReaderSpi> providers;
 
     /**
      * Creates a manager for the given tiles.
@@ -109,20 +95,22 @@ public class TileManager implements Comparator<Tile> {
          * Puts together the tiles that use the same input. For those that use
          * different input, we will order by image index first, then (y,x) order.
          */
+        final Set<ImageReaderSpi> providers;
         final Map<ReaderInputPair,List<Tile>> tilesByInput;
         tilesByInput = new LinkedHashMap<ReaderInputPair, List<Tile>>();
-        readerInputs = new IdentityHashMap<ImageReader, Object>();
-        readers      = Collections.unmodifiableSet(readerInputs.keySet());
+        providers    = new LinkedHashSet<ImageReaderSpi>(4);
         for (final Tile tile : tilesArray) {
-            final ReaderInputPair key = new ReaderInputPair(tile);
-            readerInputs.put(key.reader, null);
+            final ImageReaderSpi  spi = tile.getImageReaderSpi();
+            final ReaderInputPair key = new ReaderInputPair(spi, tile.getInput());
             List<Tile> sameInputs = tilesByInput.get(key);
             if (sameInputs == null) {
                 sameInputs = new ArrayList<Tile>(4);
                 tilesByInput.put(key, sameInputs);
+                providers.add(spi);
             }
             sameInputs.add(tile);
         }
+        this.providers = Collections.unmodifiableSet(providers);
         /*
          * Overwrites the tiles array with the same tiles, but ordered with same input firsts.
          */
@@ -130,24 +118,8 @@ public class TileManager implements Comparator<Tile> {
 fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             assert !sameInputs.isEmpty();
             for (final Tile tile : sameInputs) {
-                if (!tile.setOwner(this, numTiles)) {
-                    // Found a tile already in use by an other TileManager.
-                    // Stop the loop now; we will thrown an exception later.
-                    break fill;
-                }
                 tilesArray[numTiles++] = tile;
             }
-        }
-        /*
-         * If we stopped the loop before we assigned every tiles, this is because the above
-         * loop has found a tile already in use by an other TileManager. Release every
-         * previous tiles already assigned before to throw the exception.
-         */
-        if (numTiles != tilesArray.length) {
-            while (--numTiles >= 0) {
-                tilesArray[numTiles].setOwner(null, 0);
-            }
-            throw new IllegalArgumentException("Tile already in use"); // TODO: localize
         }
         this.tiles = tilesArray;
         allTiles = UnmodifiableArrayList.wrap(tilesArray);
@@ -155,73 +127,10 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
-     * Compares two tiles for order. The tiles must be members of the collection returned by
-     * {@link #getTiles}. This comparator groups together the tiles that use the same reader
-     * and input. Reading tiles in sorted order should be more efficient than a random order.
-     *
-     * @throws IllegalArgumentException If one of the tiles is not a member of the collection
-     *         returned by {@link #getTiles}.
-     * @see Tile#compareTo
-     */
-    public int compare(final Tile tile1, final Tile tile2) throws IllegalArgumentException {
-        return tile2.getRank(this) - tile1.getRank(this);
-    }
-
-    /**
-     * Returns the raw input (<strong>not</strong> wrapped in an image input stream) for the
-     * given reader. This method is invoked by {@link Tile#getPreparedReader} only.
-     */
-    final Object getRawInput(final ImageReader reader) {
-        return readerInputs.get(reader);
-    }
-
-    /**
-     * Sets the raw input (<strong>not</strong> wrapped in an image input stream) for the
-     * given reader. The input can be set to {@code null}, but we don't allow entry removal
-     * on intend since the keys need to be returned by {@link #getReaders}.
-     * <p>
-     * This method is invoked by {@link Tile#getPreparedReader} only.
-     */
-    final void setRawInput(final ImageReader reader, final Object input) {
-        readerInputs.put(reader, input);
-    }
-
-    /**
-     * Returns the set of image readers. Will typically contains only one reader,
-     * but could contains more.
-     */
-    public Set<ImageReader> getReaders() {
-        return readers;
-    }
-
-    /**
-     * Returns a reader sample, or {@code null}. This method tries to returns an instance of the
-     * most specific reader class. If no suitable instance is found, then it returns {@code null}.
-     * <p>
-     * This method is typically invoked for fetching an instance of {@code ImageReadParam}. We
-     * look for the most specific class because it may contains additional parameters that are
-     * ignored by super-classes. If we fail to find a suitable instance, then the caller shall
-     * fallback on the {@link ImageReader} default implementation.
-     */
-    final ImageReader getReader() {
-        final Set<ImageReader> readers = getReaders();
-        Class<?> type = Classes.specializedClass(readers);
-        while (type!=null && ImageReader.class.isAssignableFrom(type)) {
-            for (final ImageReader candidate : readers) {
-                if (type.equals(candidate.getClass())) {
-                    return candidate;
-                }
-            }
-            type = type.getSuperclass();
-        }
-        return null;
-    }
-
-    /**
      * Computes the region and tile size for all tiles.
      *
      * @throws IOException if it was necessary to fetch an image dimension from its
-     *         {@linkplain Tile#getReader reader} and this operation failed.
+     *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
     private void initialize() throws IOException {
         for (final Tile tile : getTiles()) {
@@ -241,12 +150,22 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
+     * Returns all image reader providers used by the tiles. The set will typically contains
+     * only one element, but more are allowed.
+     *
+     * @see MosaicImageReader#getTileReaderSpis
+     */
+    public Set<ImageReaderSpi> getImageReaderSpis() {
+        return providers;
+    }
+
+    /**
      * Returns the region enclosing all tiles.
      *
      * @return The region. <strong>Do not modify</strong> since it may be a direct reference to
      *         internal structures.
      * @throws IOException if it was necessary to fetch an image dimension from its
-     *         {@linkplain Tile#getReader reader} and this operation failed.
+     *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
     public Rectangle getRegion() throws IOException {
         if (region == null) {
@@ -270,15 +189,19 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      * @param  ySubsampling The number of source rows to advance for each pixel.
      * @return The tiles that intercept the given region.
      * @throws IOException if it was necessary to fetch an image dimension from its
-     *         {@linkplain Tile#getReader reader} and this operation failed.
+     *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
     public Collection<Tile> getTiles(final Rectangle region, final int xSubsampling, final int ySubsampling)
             throws IOException
     {
-        if (tilesOfInterest == null || !regionOfInterest.equals(region)) {
-            tilesOfInterest = null; // Safety in case of failure.
-            regionOfInterest.setBounds(region);
-            tilesOfInterest = getTileOfInterest(xSubsampling, ySubsampling);
+        if (tilesOfInterest == null || !regionOfInterest.equals(region) ||
+            this.xSubsampling != xSubsampling || this.ySubsampling != ySubsampling)
+        {
+            this.tilesOfInterest = null; // Safety in case of failure.
+            this.regionOfInterest.setBounds(region);
+            this.xSubsampling    = xSubsampling;
+            this.ySubsampling    = ySubsampling;
+            this.tilesOfInterest = getTileOfInterest();
         }
         return tilesOfInterest;
     }
@@ -288,9 +211,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      * which must be set before this methos is invoked. At the difference of {@link #getTiles},
      * this method does not use any cache - the search is performed inconditionnaly.
      */
-    private Collection<Tile> getTileOfInterest(final int xSubsampling, final int ySubsampling)
-            throws IOException
-    {
+    private Collection<Tile> getTileOfInterest() throws IOException {
         final Map<Rectangle,Tile> interest = new LinkedHashMap<Rectangle,Tile>();
         for (final Tile tile : tiles) {
             if (tile.canSubsample(xSubsampling, ySubsampling)) {
@@ -343,49 +264,13 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      * @return The tiles dimension. <strong>Do not modify</strong> since it may be a direct
      *         reference to internal structures.
      * @throws IOException if it was necessary to fetch an image dimension from its
-     *         {@linkplain Tile#getReader reader} and this operation failed.
+     *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
     public Dimension getTileSize() throws IOException {
         if (tileSize == null) {
             initialize();
         }
         return tileSize;
-    }
-
-    /**
-     * Closes the specified stream, if it is closeable.
-     */
-    private static void close(final Object input) throws IOException {
-        if (input instanceof ImageInputStream) {
-            ((ImageInputStream) input).close();
-        } else if (input instanceof Closeable) {
-            ((Closeable) input).close();
-        }
-    }
-
-    /**
-     * Closes every streams. If {@code dispose} is {@code true}, also
-     * {@linkplain ImageReader#dispose disposes} every image readers.
-     */
-    public void close(final boolean dispose) throws IOException {
-        for (final Map.Entry<ImageReader,Object> entry : readerInputs.entrySet()) {
-            final ImageReader reader = entry.getKey();
-            final Object    rawInput = entry.getValue();
-            final Object       input = reader.getInput();
-            entry .setValue(null);
-            reader.setInput(null);
-            if (!dispose) {
-                if (input != rawInput) {
-                    close(input);
-                }
-            } else {
-                close(input);
-                if (rawInput != input) {
-                    close(rawInput);
-                }
-                reader.dispose();
-            }
-        }
     }
 
     /**
