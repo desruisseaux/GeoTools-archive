@@ -223,7 +223,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                             g = geometryFactory.createPoint(new CoordinateArraySequence(
                                                         new Coordinate[] {  }));
                                             //g = new NullGeometry();
-                                            setGmlProperties(g, gid, null, null);
+                                            dataStore.setGmlProperties(g, gid, null, null);
                                         } else {
                                             // read the geometry
                                             sql = dataStore.selectGeometrySQL(gid);
@@ -263,33 +263,47 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 
                                                             while (mg.next()) {
                                                                 String mgid = mg.getString("mgid");
-                                                                sql = dataStore.selectGeometrySQL(mgid);
-                                                                dataStore.LOGGER.fine(sql);
-
-                                                                Statement select2 = st.getConnection()
-                                                                                      .createStatement();
-                                                                ResultSet mgg = select2.executeQuery(sql);
-
-                                                                try {
-                                                                    mgg.next();
-
-                                                                    String mname = mgg.getString(
-                                                                            "name");
-                                                                    String mdesc = mgg.getString(
-                                                                            "description");
-
-                                                                    Geometry member = dataStore.getSQLDialect()
-                                                                                               .decodeGeometryValue(gatt,
-                                                                            mgg, "geometry",
-                                                                            geometryFactory);
-
-                                                                    setGmlProperties(member, mgid,
-                                                                        mname, mdesc);
-                                                                    members.add(member);
-                                                                } finally {
-                                                                    JDBCDataStore.closeSafe(mgg);
-                                                                    JDBCDataStore.closeSafe(select2);
+                                                                boolean mref = mg.getBoolean("ref");
+                                                                
+                                                                Geometry member = null;
+                                                                if ( !mref || resolve ) {
+                                                                    sql = dataStore.selectGeometrySQL(mgid);
+                                                                    dataStore.LOGGER.fine(sql);
+    
+                                                                    Statement select2 = st.getConnection()
+                                                                                          .createStatement();
+                                                                    ResultSet mgg = select2.executeQuery(sql);
+    
+                                                                    try {
+                                                                        mgg.next();
+    
+                                                                        String mname = mgg.getString(
+                                                                                "name");
+                                                                        String mdesc = mgg.getString(
+                                                                                "description");
+    
+                                                                        member = dataStore.getSQLDialect()
+                                                                                                   .decodeGeometryValue(gatt,
+                                                                                mgg, "geometry",
+                                                                                geometryFactory);
+    
+                                                                        dataStore.setGmlProperties(member, mgid,
+                                                                            mname, mdesc);
+                                                                        
+                                                                    } finally {
+                                                                        JDBCDataStore.closeSafe(mgg);
+                                                                        JDBCDataStore.closeSafe(select2);
+                                                                    }
                                                                 }
+                                                                else {
+                                                                    //create a stub
+                                                                    // use a stub
+                                                                    member = geometryFactory.createPoint(new CoordinateArraySequence(
+                                                                                new Coordinate[] {  }));
+                                                                    dataStore.setGmlProperties(member, mgid, null, null);
+                                                                }
+                                                                
+                                                                members.add(member);
                                                             }
 
                                                             if ("MULTIPOINT".equals(gtype)) {
@@ -319,7 +333,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                                     }
                                                 }
 
-                                                setGmlProperties(g, gid, name, desc);
+                                                dataStore.setGmlProperties(g, gid, name, desc);
                                             } catch (IOException e) {
                                                 throw new RuntimeException(e);
                                             } finally {
@@ -369,7 +383,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                 }
 
                                 // set the referenced id + typeName as user data
-                                builder.userData("gml:id", rfid);
+                                builder.userData("gml:id", rtable + "." + rfid);
                                 builder.userData("gml:featureTypeName", rtable);
 
                                 FeatureTypeFactory tf = dataStore.getFeatureTypeFactory();
@@ -393,7 +407,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                 FeatureFactory f = dataStore.getFeatureFactory();
                                 Association association = f.createAssociation(null,
                                         associationDescriptor);
-                                association.getUserData().put("gml:id", rfid);
+                                association.getUserData().put("gml:id", rtable + "." + rfid);
 
                                 if (resolve) {
                                     // use the value as an the identifier in a query against
@@ -477,120 +491,11 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
         }
     }
 
-    /**
-     * Helper method for setting the gml:id of ageometry as user data.
-     */
-    private void setGmlProperties(Geometry g, String gid, String name, String description) {
-        // set up the user data
-        Map userData = null;
-
-        if (g.getUserData() != null) {
-            if (g.getUserData() instanceof Map) {
-                userData = (Map) g.getUserData();
-            } else {
-                userData = new HashMap();
-                userData.put(g.getUserData().getClass(), g.getUserData());
-            }
-        } else {
-            userData = new HashMap();
-        }
-
-        if (gid != null) {
-            userData.put("gml:id", gid);
-        }
-
-        if (name != null) {
-            userData.put("gml:name", name);
-        }
-
-        if (description != null) {
-            userData.put("gml:description", description);
-        }
-
-        g.setUserData(userData);
-    }
-
     public void remove() {
         try {
             rs.deleteRow();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    void checkForMultiGEometry() {
-        // if ( depth.intValue() > 0 ) {
-        // try {
-        // //check case where this is a multi geometry
-        // // which is composed of associations
-        //                
-        // if ( gtype.startsWith( "MULTI" )
-        // && gas.getObject("geometry") == null ) {
-        //                
-        // //look for the associated mapping
-        // sql = dataStore.selectMultiGeometrySQL(gid);
-        // dataStore.LOGGER.fine( sql );
-        // ResultSet mg = select.executeQuery( sql );
-        // try {
-        // List geometries = new ArrayList();
-        // while( mg.next() ) {
-        // //get the referenced geometry id
-        // String rgid = mg.getString( "rgid" );
-        //                            
-        // sql = dataStore.selectGeometryAssociationSQL(null, rgid, null);
-        // dataStore.LOGGER.fine( sql );
-        //                            
-        // ResultSet rgas = st.executeQuery( sql );
-        // try {
-        // //read the geometry
-        // rgas.next();
-        //                                
-        // Geometry geometry =
-        // dataStore.getSQLDialect().decodeGeometryValue(gatt, rgas, "geometry",
-        // geometryFactory);
-        // setGmlID(geometry, rgid);
-        // geometries.add( geometry );
-        // }
-        // finally {
-        // JDBCDataStore.closeSafe( rgas );
-        // }
-        // }
-        //                        
-        // if ( "MULTIPOINT".equals( gtype ) ) {
-        // Point[] points = (Point[]) geometries.toArray( new Point[
-        // geometries.size() ] );
-        // g = geometryFactory.createMultiPoint(points);
-        // }
-        // else if ( "MULTILINESTRING".equals( gtype ) ) {
-        // LineString[] lines = (LineString[]) geometries.toArray( new
-        // LineString[ geometries.size() ] );
-        // g = geometryFactory.createMultiLineString(lines);
-        // }
-        // else if ( "MULTIPOLYGON".equals( gtype ) ) {
-        // Polygon[] polygons = (Polygon[]) geometries.toArray( new Polygon[
-        // geometries.size() ] );
-        // g = geometryFactory.createMultiPolygon(polygons);
-        // }
-        // else {
-        // Geometry[] geoms = (Geometry[]) geometries.toArray( new Geometry[
-        // geometries.size() ]);
-        // g = geometryFactory.createGeometryCollection( geoms );
-        // }
-        // }
-        // finally {
-        // JDBCDataStore.closeSafe( mg );
-        // }
-        // }
-        // else {
-        // //read the geometry normal
-        // g = dataStore.getSQLDialect()
-        // .decodeGeometryValue(gatt, gas, "geometry", geometryFactory);
-        // }
-        //                 
-        // }
-        // catch (IOException e) {
-        // throw new RuntimeException( e );
-        // }
-        // }
     }
 }

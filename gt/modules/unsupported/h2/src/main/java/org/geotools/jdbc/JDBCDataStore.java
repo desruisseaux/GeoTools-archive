@@ -39,11 +39,16 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.GmlObjectStore;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.Transaction.State;
 import org.geotools.data.jdbc.FilterToSQL;
@@ -53,6 +58,9 @@ import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.data.store.ContentState;
+import org.geotools.factory.Hints;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.Name;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -92,7 +100,9 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public final class JDBCDataStore extends ContentDataStore {
+public final class JDBCDataStore extends ContentDataStore
+    implements GmlObjectStore {
+    
     /**
      * logging instance
      */
@@ -425,6 +435,90 @@ public final class JDBCDataStore extends ContentDataStore {
         entries.put(entry.getName(), entry);
     }
 
+    /**
+     * 
+     */
+    public Object getGmlObject(GmlObjectId id, Hints hints) throws IOException {
+        //geometry?
+        if ( isAssociations() ) {
+        
+            Connection cx = createConnection();
+            try {
+                String sql = selectGeometrySQL(id.getID());
+                LOGGER.fine( sql );
+                
+                try {
+                    Statement st = cx.createStatement();
+                    try {
+                        ResultSet rs = st.executeQuery( sql );
+                        try {
+                            if ( rs.next() ) {
+                                //read the geometry
+                                Geometry g = getSQLDialect().decodeGeometryValue(
+                                    null, rs, "geometry", getGeometryFactory());
+                                
+                                //read the metadata
+                                String name = rs.getString( "name" );
+                                String desc = rs.getString( "description" );
+                                setGmlProperties(g, id.getID(),name,desc);
+                                
+                                return g;
+                            }
+                        }
+                        finally {
+                            JDBCDataStore.closeSafe( rs );
+                        }
+                    }
+                    finally {
+                        JDBCDataStore.closeSafe( st );
+                    }
+                }
+                catch( SQLException e ) {
+                    throw (IOException) new IOException().initCause( e );
+                }
+            }
+            finally {
+                JDBCDataStore.closeSafe( cx );
+            }
+        }
+        
+        //regular feature, first feature out the feature type
+        int i = id.getID().indexOf('.');
+        if ( i == -1 ) {
+            LOGGER.info( "Unable to determine feature type for GmlObjectId:" + id );
+            return null; 
+        }
+        
+        //figure out the type name from the id
+        String featureTypeName = id.getID().substring( 0, i );
+        SimpleFeatureType featureType = getSchema( featureTypeName );
+        if ( featureType == null ) {
+            throw new IllegalArgumentException( "No such feature type: " + featureTypeName );
+        }
+        
+        //load the feature
+        Id filter = getFilterFactory().id(Collections.singleton(id));
+        DefaultQuery query = new DefaultQuery( featureTypeName );
+        query.setFilter( filter );
+        query.setHints( hints );
+        
+        FeatureCollection features = 
+            getFeatureSource( featureTypeName ).getFeatures( query );  
+        if ( !features.isEmpty() ) {
+            FeatureIterator fi = features.features();
+            try {
+                if ( fi.hasNext() ) {
+                    return fi.next();
+                }
+            }
+            finally {
+                features.close( fi );
+            }
+        }
+        
+        return null;
+    }
+    
     /**
      * Creates a new instance of {@link JDBCFeatureStore}.
      *
@@ -1094,8 +1188,8 @@ public final class JDBCDataStore extends ContentDataStore {
      */
     protected String createMultiGeometryTableSQL(Connection cx)
         throws SQLException {
-        String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class }, cx);
-        String[] columnNames = new String[] { "id", "mgid" };
+        String[] sqlTypeNames = getSQLTypeNames(new Class[] { String.class, String.class, Boolean.class }, cx);
+        String[] columnNames = new String[] { "id", "mgid", "ref" };
 
         return createTableSQL(MULTI_GEOMETRY_TABLE, columnNames, sqlTypeNames, null);
     }
@@ -1117,13 +1211,7 @@ public final class JDBCDataStore extends ContentDataStore {
         dialect.encodeColumnName("col", sql);
 
         sql.append(" FROM ");
-
-        if (databaseSchema != null) {
-            dialect.encodeSchemaName(databaseSchema, sql);
-            sql.append(".");
-        }
-
-        dialect.encodeTableName(FEATURE_RELATIONSHIP_TABLE, sql);
+        encodeTableName(FEATURE_RELATIONSHIP_TABLE, sql);
 
         if (table != null) {
             sql.append(" WHERE ");
@@ -1168,14 +1256,8 @@ public final class JDBCDataStore extends ContentDataStore {
         dialect.encodeColumnName("rfid", sql);
 
         sql.append(" FROM ");
-
-        if (databaseSchema != null) {
-            dialect.encodeSchemaName(databaseSchema, sql);
-            sql.append(".");
-        }
-
-        dialect.encodeTableName(FEATURE_ASSOCIATION_TABLE, sql);
-
+        encodeTableName(FEATURE_ASSOCIATION_TABLE, sql);
+        
         if (fid != null) {
             sql.append(" WHERE ");
 
@@ -1209,8 +1291,8 @@ public final class JDBCDataStore extends ContentDataStore {
         sql.append(",");
         dialect.encodeColumnName("geometry", sql);
         sql.append(" FROM ");
-        dialect.encodeTableName(GEOMETRY_TABLE, sql);
-
+        encodeTableName( GEOMETRY_TABLE, sql );
+        
         if (gid != null) {
             sql.append(" WHERE ");
 
@@ -1236,9 +1318,11 @@ public final class JDBCDataStore extends ContentDataStore {
         dialect.encodeColumnName("id", sql);
         sql.append(",");
         dialect.encodeColumnName("mgid", sql);
+        sql.append(",");
+        dialect.encodeColumnName("ref", sql);
 
         sql.append(" FROM ");
-        dialect.encodeTableName(MULTI_GEOMETRY_TABLE, sql);
+        encodeTableName(MULTI_GEOMETRY_TABLE, sql);
 
         if (gid != null) {
             sql.append(" WHERE ");
@@ -1288,7 +1372,7 @@ public final class JDBCDataStore extends ContentDataStore {
         dialect.encodeColumnName("ref", sql);
 
         sql.append(" FROM ");
-        dialect.encodeTableName(GEOMETRY_ASSOCIATION_TABLE, sql);
+        encodeTableName(GEOMETRY_ASSOCIATION_TABLE, sql);
 
         if (fid != null) {
             sql.append(" WHERE ");
@@ -1895,6 +1979,39 @@ public final class JDBCDataStore extends ContentDataStore {
         dialect.encodeSchemaName(tableName, sql);
     }
 
+    /**
+     * Helper method for setting the gml:id of a geometry as user data.
+     */
+    protected void setGmlProperties(Geometry g, String gid, String name, String description) {
+        // set up the user data
+        Map userData = null;
+
+        if (g.getUserData() != null) {
+            if (g.getUserData() instanceof Map) {
+                userData = (Map) g.getUserData();
+            } else {
+                userData = new HashMap();
+                userData.put(g.getUserData().getClass(), g.getUserData());
+            }
+        } else {
+            userData = new HashMap();
+        }
+
+        if (gid != null) {
+            userData.put("gml:id", gid);
+        }
+
+        if (name != null) {
+            userData.put("gml:name", name);
+        }
+
+        if (description != null) {
+            userData.put("gml:description", description);
+        }
+
+        g.setUserData(userData);
+    }
+    
     /**
      * Utility method for closing a result set.
      * <p>
