@@ -126,8 +126,11 @@ public final class SMIL20 extends XSD {
     }
 
     protected SchemaLocator createSchemaLocator() {
+        //we explicity return null here because of a circular dependnecy with 
+        //gml3 schema... returning null breaks the circle when the schemas are 
+        //being built
         return null;
     }
-
+    
     /* Attributes */
 }
