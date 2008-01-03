@@ -26,63 +26,64 @@ public class H2GeometryAssociationTest extends JDBCGeometryAssociationTestSuppor
                     super.setUpData();
 
                     try {
-                        run("DROP TABLE \"geometry\"; COMMIT;");
+                        run("DROP TABLE \"geotools\".\"geometry\"; COMMIT;");
                     } catch (Exception e) {
                     }
 
-                    String sql = "CREATE TABLE \"geometry\" ("
+                    String sql = "CREATE TABLE \"geotools\".\"geometry\" ("
                         + "\"id\" VARCHAR, \"name\" VARCHAR, \"description\" VARCHAR,  "
                         + "\"type\" VARCHAR, \"geometry\" BLOB" + ")";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry\" VALUES ("
                         + "'0','name-0','description-0', 'POINT', GeomFromText('POINT(0 0)',4326) "
                         + ");";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry\" VALUES ("
                         + "'1','name-1','description-1', 'POINT', GeomFromText('POINT(1 1)',4326) "
                         + ");";
                     run(sql);
 
                     try {
-                        run("DROP TABLE \"multi_geometry\"; COMMIT;");
+                        run("DROP TABLE \"geotools\".\"multi_geometry\"; COMMIT;");
                     } catch (Exception e) {
                     }
 
-                    sql = "CREATE TABLE \"multi_geometry\" (" + "\"id\" VARCHAR, \"mgid\" VARCHAR"
-                        + ")";
+                    sql = "CREATE TABLE \"geotools\".\"multi_geometry\" (" + 
+                        "\"id\" VARCHAR, \"mgid\" VARCHAR, \"ref\" boolean" + 
+                         ")";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry\" VALUES ("
                         + "'2','name-2','description-2','MULTIPOINT', NULL" + ");";
                     run(sql);
 
-                    sql = "INSERT INTO \"multi_geometry\" VALUES ('2', '0');";
+                    sql = "INSERT INTO \"geotools\".\"multi_geometry\" VALUES ('2', '0', false);";
                     run(sql);
 
-                    sql = "INSERT INTO \"multi_geometry\" VALUES ('2', '1');";
+                    sql = "INSERT INTO \"geotools\".\"multi_geometry\" VALUES ('2', '1', false);";
                     run(sql);
 
                     try {
-                        run("DROP TABLE \"geometry_associations\"; COMMIT;");
+                        run("DROP TABLE \"geotools\".\"geometry_associations\"; COMMIT;");
                     } catch (Exception e) {
                     }
 
-                    sql = "CREATE TABLE \"geometry_associations\" ("
+                    sql = "CREATE TABLE \"geotools\".\"geometry_associations\" ("
                         + "\"fid\" VARCHAR, \"gid\" VARCHAR, \"gname\" VARCHAR, "
                         + "\"ref\" BOOLEAN" + ")";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry_associations\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry_associations\" VALUES ("
                         + "'ga.0', '0', 'geometry', false" + ");";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry_associations\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry_associations\" VALUES ("
                         + "'ga.1', '1', 'geometry', true" + ");";
                     run(sql);
 
-                    sql = "INSERT INTO \"geometry_associations\" VALUES ("
+                    sql = "INSERT INTO \"geotools\".\"geometry_associations\" VALUES ("
                         + "'ga.2', '2', 'geometry', false" + ");";
                     run(sql);
 

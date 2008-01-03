@@ -67,7 +67,7 @@ public class H2ForeignKeyTest extends JDBCForeignKeyTest {
                     run(sql);
 
                     sql = "INSERT INTO \"geotools\".\"feature_associations\" VALUES ("
-                        + "'fk.0', 'ft1', 'id', 'ft1.0' " + ");";
+                        + "'fk.0', 'ft1', 'id', '0' " + ");";
                     run(sql);
                 }
 
