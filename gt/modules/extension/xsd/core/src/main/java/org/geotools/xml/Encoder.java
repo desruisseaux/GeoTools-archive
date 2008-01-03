@@ -357,10 +357,9 @@ public class Encoder {
      * @param out The output stream.
      *
      * @throws IOException
-     * @throws SAXException
      */
     public void encode(Object object, QName name, OutputStream out)
-        throws IOException, SAXException {
+        throws IOException {
         //create the document seriaizer
         XMLSerializer xmls = null;
 
@@ -371,7 +370,12 @@ public class Encoder {
         }
 
         xmls.setNamespaces(namespaceAware);
-        encode(object, name, xmls);
+        try {
+            encode(object, name, xmls);
+        } 
+        catch (SAXException e) {
+            throw (IOException) new IOException().initCause(e); 
+        }
     }
 
     public void encode(Object object, QName name, ContentHandler handler)
