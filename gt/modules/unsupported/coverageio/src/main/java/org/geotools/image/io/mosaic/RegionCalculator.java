@@ -23,18 +23,12 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.net.URL;
-import java.net.URI;
-import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -43,15 +37,15 @@ import org.geotools.resources.i18n.ErrorKeys;
  * tiles, {@linkplain Tile#Tile(ImageReader,Object,int,Rectangle,Dimension) tile constructor} can be
  * invoked directly. But in some cases the destination region is not known directly. Instead we have
  * a set of {@linkplain java.awt.image.BufferedImage buffered images} with a (0,0) origin for each
- * of them, and different <cite>grid to CRS</cite> affine transforms. This {@code TileBuilder} class
- * infer the destination regions automatically from the set of affine transforms.
+ * of them, and different <cite>grid to CRS</cite> affine transforms. This {@code RegionCalculator}
+ * class infers the destination regions automatically from the set of affine transforms.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TileBuilder {
+final class RegionCalculator {
     /**
      * Small number for floating point comparaisons.
      */
@@ -70,23 +64,9 @@ public class TileBuilder {
     private final Map<AffineTransform,Tile> tiles;
 
     /**
-     * Readers by suffix allocated up to date.
-     *
-     * @see #getImageReader(Object)
-     */
-    private Map<String,ImageReaderSpi> readersBySuffix;
-
-    /**
-     * The image reader provider for the next tiles to be added.
-     *
-     * @see #setImageReaderSpi
-     */
-    private ImageReaderSpi provider;
-
-    /**
      * Creates an initially empty tile collection with the origin set to (0,0).
      */
-    public TileBuilder() {
+    public RegionCalculator() {
         this(null);
     }
 
@@ -95,7 +75,7 @@ public class TileBuilder {
      *
      * @param origin The origin, or {@code null} for (0,0).
      */
-    public TileBuilder(final Point origin) {
+    public RegionCalculator(final Point origin) {
         if (origin != null) {
             xOrigin = origin.x;
             yOrigin = origin.y;
@@ -109,116 +89,6 @@ public class TileBuilder {
     }
 
     /**
-     * Removes any entry from this tile collection.
-     */
-    public void clear() {
-        tiles.clear();
-        if (readersBySuffix != null) {
-            readersBySuffix.clear();
-        }
-    }
-
-    /**
-     * Returns {@code true} if there is no tile in this collection.
-     */
-    public boolean isEmpty() {
-        return tiles.isEmpty();
-    }
-
-    /**
-     * Sets the image reader for next tiles to be {@linkplain #add added}.
-     */
-    public void setImageReaderSpi(final ImageReaderSpi provider) {
-        this.provider = provider;
-    }
-
-    /**
-     * Returns the image reader for next tiles to be {@linkplain #add added}.
-     */
-    public ImageReaderSpi getImageReaderSpi() {
-        return provider;
-    }
-
-    /**
-     * Returns an image reader for the given input. This method is invoked by {@code add} methods
-     * for creating new tiles. The default implementation performs the following steps:
-     * <p>
-     * <ul>
-     *   <li>If {@link #getImageReader()} returns a non-null value, then this value is returned
-     *       directly.</li>
-     *   <li>Otherwise if the input is a {@linkplain String string}, {@linkplain File file},
-     *       {@linkplain URL} or {@linkplain URI}, then this method tries to infer a reader
-     *        from the file suffix using {@link ImageIO#getImageReadersBySuffix}.</li>
-     *   <li>Otherwise this methode tries to infer a reader from the input using
-     *       {@link ImageIO#getImageReaders}.</li>
-     * </ul>
-     * <p>
-     * Note that this method <strong>does not</strong> attempt to convert the given object into
-     * an image input stream, because {@link MosaicImageReader} is not well suited for them.
-     *
-     * @param  input The input.
-     * @return A suitable image reader.
-     * @throws IllegalStateException if no suitable image reader has been found.
-     */
-    protected ImageReaderSpi getImageReaderSpi(final Object input) throws IllegalStateException {
-        ImageReaderSpi reader = getImageReaderSpi();
-        if (reader != null) {
-            return reader;
-        }
-        final String name;
-        if (input instanceof File) {
-            name = ((File) input).getName();
-        } else if (input instanceof URL) {
-            name = ((URL) input).getPath();
-        } else if (input instanceof URI) {
-            name = ((URI) input).getPath();
-        } else if (input instanceof String) {
-            name = (String) input;
-        } else {
-            name = null;
-        }
-        if (name != null) {
-            final int split = name.lastIndexOf('.');
-            if (split >= 0) {
-                final String extension = name.substring(split + 1);
-                if (readersBySuffix != null) {
-                    reader = readersBySuffix.get(extension);
-                    if (reader != null) {
-                        return reader;
-                    }
-                }
-                final Iterator<ImageReaderSpi> it = null; // TODO
-                while (it.hasNext()) {
-                    reader = it.next();
-                    if (readersBySuffix == null) {
-                        readersBySuffix = new HashMap<String,ImageReaderSpi>();
-                    }
-                    readersBySuffix.put(extension, reader);
-                    return reader;
-                }
-            }
-        }
-        final Iterator<ImageReaderSpi> it = null; // TODO
-        while (it.hasNext()) {
-            reader = it.next();
-            return reader;
-        }
-        throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_READER));
-    }
-
-    /**
-     * Creates a default transform for the given pixel size. This method <strong>must</strong>
-     * returns a new instance on each invocation (no caching allowed).
-     */
-    private static AffineTransform asTransform(final Dimension pixelSize) {
-        if (pixelSize == null) {
-            return new AffineTransform();
-        } else {
-            return AffineTransform.getScaleInstance(pixelSize.width, pixelSize.height);
-        }
-    }
-
-    /**
      * Returns the origin of the tile collections to be created. The origin is usually (0,0)
      * which match the {@linkplain java.awt.image.BufferedImage buffered image} origin, but
      * it doesn't have to.
@@ -228,64 +98,24 @@ public class TileBuilder {
     }
 
     /**
-     * Adds a tile for the given input and origin point. The tile width and
-     * height will be computed when first needed.
+     * Adds a tile to the collection of tiles to process.
      *
-     * @param input      The input to be given to the image reader.
-     * @param imageIndex The image index of the tile to be read. This is often 0.
-     * @param origin     The upper-left corner in the destination image.
-     * @param pixelSize  Pixel size relative to the finest resolution in an image pyramid,
-     *                   or {@code null} if none.
-     *
-     * @todo Not yet public because we need to review the semantic regarding affine transform.
+     * @param  tile The tile to add.
+     * @return {@code true} if the tile has been successfully added, or {@code false}
+     *         if the tile doesn't need to be processed by this class.
      */
-    private void add(Object input, int imageIndex, Point origin, Dimension pixelSize) {
-        add(input, imageIndex, origin, asTransform(pixelSize));
-    }
-
-    /**
-     * Adds a tile for the given input and bounds.
-     *
-     * @param input      The input to be given to the image reader.
-     * @param imageIndex The image index of the tile to be read. This is often 0.
-     * @param region     The region in the destination image. The {@linkplain Rectangle#width width}
-     *                   and {@linkplain Rectangle#height height} should match the image size.
-     * @param pixelSize  Pixel size relative to the finest resolution in an image pyramid,
-     *                   or {@code null} if none.
-     *
-     * @todo Not yet public because we need to review the semantic regarding affine transform.
-     */
-    private void add(Object input, int imageIndex, Rectangle region, Dimension pixelSize) {
-        add(input, imageIndex, region, asTransform(pixelSize));
-    }
-
-    /**
-     * Adds a tile for the given input, origin and affine transform.
-     *
-     * @param input      The input to be given to the image reader.
-     * @param imageIndex The image index of the tile to be read. This is often 0.
-     * @param origin     The upper-left corner in the destination image.
-     * @param gridToCRS  A <cite>grid to coordinate reference system</cite> transform.
-     */
-    public void add(Object input, int imageIndex, Point origin, AffineTransform gridToCRS) {
-        Tile.ensureNonNull("gridToCRS", gridToCRS);
-        gridToCRS = new AffineTransform(gridToCRS);
-        tiles.put(gridToCRS, new Tile(getImageReaderSpi(input), input, imageIndex, origin, null));
-    }
-
-    /**
-     * Adds a tile for the given input, size and affine transform.
-     *
-     * @param input      The input to be given to the image reader.
-     * @param imageIndex The image index of the tile to be read. This is often 0.
-     * @param region     The region in the destination image. The {@linkplain Rectangle#width width}
-     *                   and {@linkplain Rectangle#height height} should match the image size.
-     * @param gridToCRS  A <cite>grid to coordinate reference system</cite> transform.
-     */
-    public void add(Object input, int imageIndex, Rectangle region, AffineTransform gridToCRS) {
-        Tile.ensureNonNull("gridToCRS", gridToCRS);
-        gridToCRS = new AffineTransform(gridToCRS);
-        tiles.put(gridToCRS, new Tile(getImageReaderSpi(input), input, imageIndex, region, null));
+    public boolean add(final Tile tile) {
+        final AffineTransform gridToCRS;
+        synchronized (tile) {
+            gridToCRS = tile.getPendingGridToCRS(true);
+        }
+        if (gridToCRS == null) {
+            return false;
+        }
+        if (tiles.put(gridToCRS, tile) != null) {
+            throw new AssertionError(); // Should never happen.
+        }
+        return true;
     }
 
     /**
@@ -363,10 +193,6 @@ public class TileBuilder {
                 final AffineTransform tr = entry.getKey();
                 Tile tile = tiles.remove(tr); // Should never be null.
                 tr.preConcatenate(toGrid);
-                final ImageReaderSpi spi  = tile.getImageReaderSpi();
-                final Object       input  = tile.getInput();
-                final int      imageIndex = tile.getImageIndex();
-                final Dimension pixelSize = entry.getValue();
                 /*
                  * Computes the transformed bounds. If we fail to obtain it, there is probably
                  * something wrong with the tile (typically a wrong filename) but this is not
@@ -375,33 +201,32 @@ public class TileBuilder {
                  * that the user is likely to obtains the same exception if the MosaicImageReader
                  * attempts to read the same tile (but as long as it doesn't, it may work).
                  */
-                Rectangle bounds = null;
-                try {
-                    bounds = tile.getRegion();
-                } catch (IOException exception) {
-                    Logging.unexpectedException(TileBuilder.class, "tiles", exception);
+                Rectangle bounds;
+                synchronized (tile) {
+                    tile.setPixelSize(entry.getValue());
+                    try {
+                        bounds = tile.getRegion();
+                    } catch (IOException exception) {
+                        bounds = null;
+                        Logging.unexpectedException(RegionCalculator.class, "tiles", exception);
+                    }
+                    if (bounds != null) {
+                        XAffineTransform.transform(tr, bounds, envelope);
+                        bounds.x      = (int) Math.round(envelope.x);
+                        bounds.y      = (int) Math.round(envelope.y);
+                        bounds.width  = (int) Math.round(envelope.width);
+                        bounds.height = (int) Math.round(envelope.height);
+                    } else {
+                        final Point origin = tile.getOrigin();
+                        tr.transform(origin, origin);
+                        bounds = new Rectangle(origin.x, origin.y, 0, 0);
+                    }
+                    tile.setRegion(bounds);
                 }
-                if (bounds != null) {
-                    XAffineTransform.transform(tr, bounds, envelope);
-                    bounds.x      = (int) Math.round(envelope.x);
-                    bounds.y      = (int) Math.round(envelope.y);
-                    bounds.width  = (int) Math.round(envelope.width);
-                    bounds.height = (int) Math.round(envelope.height);
-                    tile = new Tile(spi, input, imageIndex, bounds, pixelSize);
-                    if (groupBounds == null) {
-                        groupBounds = bounds;
-                    } else {
-                        groupBounds.add(bounds);
-                    }
+                if (groupBounds == null) {
+                    groupBounds = bounds;
                 } else {
-                    final Point origin = tile.getOrigin();
-                    tr.transform(origin, origin);
-                    tile = new Tile(spi, input, imageIndex, origin, pixelSize);
-                    if (groupBounds == null) {
-                        groupBounds = new Rectangle(origin.x, origin.y, 0, 0);
-                    } else {
-                        groupBounds.add(origin);
-                    }
+                    groupBounds.add(bounds);
                 }
                 tilesArray[index++] = tile;
             }
@@ -412,17 +237,18 @@ public class TileBuilder {
             if (groupBounds != null) {
                 final int dx = xOrigin - groupBounds.x;
                 final int dy = yOrigin - groupBounds.y;
-                if (dx != 0 || dy != 0) {
+                if (dx != 0 && dy != 0) {
                     reference.translate(-dx, -dy);
                     groupBounds.translate(dx, dy);
-                    for (final Tile tile : tilesArray) {
-                        tile.translate(dx, dy);
-                    }
                 }
-                results.put(new ImageGeometry(groupBounds, reference), tilesArray);
+                final ImageGeometry geometry = new ImageGeometry(groupBounds, reference);
+                reference = geometry.getGridToCRS(); // Fetchs the immutable instance.
+                for (final Tile tile : tilesArray) {
+                    tile.translate(dx, dy, reference);
+                }
+                results.put(geometry, tilesArray);
             }
         }
-        clear();
         return results;
     }
 

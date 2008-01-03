@@ -153,11 +153,11 @@ public class MosaicImageReader extends ImageReader {
         } else if (input instanceof TileManager) {
             managers = new TileManager[] {(TileManager) input};
         } else if (input instanceof Tile[]) {
-            managers = new TileManager[] {new TileManager((Tile[]) input)};
+            managers = TileManagerFactory.DEFAULT.create((Tile[]) input);
         } else if (input instanceof Collection) {
-            @SuppressWarnings("unchecked") // TileManager constructor will checks indirectly.
+            @SuppressWarnings("unchecked") // TileManagerFactory will checks indirectly.
             final Collection<Tile> c = (Collection<Tile>) input;
-            managers = new TileManager[] {new TileManager(c)};
+            managers = TileManagerFactory.DEFAULT.create(c);
         } else {
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.ILLEGAL_CLASS_$2, input.getClass(), TileManager.class));

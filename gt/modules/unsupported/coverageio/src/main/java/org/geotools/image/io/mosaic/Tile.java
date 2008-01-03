@@ -19,6 +19,7 @@ package org.geotools.image.io.mosaic;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -95,9 +96,13 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * The pixel size relative to the finest pyramid level. If this tile is the
-     * finest level, then the value shall be 1. Should never be 0 or negative.
+     * finest level, then the value shall be 1. Should never be 0 or negative,
+     * except if its value has not yet been computed.
+     * <p>
+     * This field should be considered as final. It is not final only because
+     * {@link RegionCalculator} may computes its value automatically.
      */
-    private final int dx, dy;
+    private int dx, dy;
 
     /**
      * The upper-left corner in the destination image. Should be considered as final, since
@@ -110,6 +115,16 @@ public class Tile implements Comparable<Tile> {
      * The size of the image to be read, or 0 if not yet computed.
      */
     private int width, height;
+
+    /**
+     * The "grid to real world" transform, used by {@link RegionCalculator} in order to compute
+     * the {@linkplain #getRegion region} for this tile. This field is set to {@code null} once
+     * {@link RegionCalculator} work is in progress, and set to a new value on completion.
+     * <p>
+     * <b>Note:</b> {@link RegionCalculator} really needs a new instance for each tile.
+     * No caching allowed.
+     */
+    private AffineTransform gridToCRS;
 
     /**
      * Creates a tile for the given provider, input and origin. This constructor can be used when
@@ -200,9 +215,59 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Ensures that the pixel size is strictly positive.
+     * Creates a tile for the given provider, input and "<cite>grid to real world</cite>" transform.
+     * This constructor can be used when the {@linkplain #getOrigin origin} of the image to be read
+     * by the supplied reader is unknown. The origin and the pixel size will be computed
+     * automatically when this tile will be given to a {@link TileManager}.
+     * <p>
+     * When using this constructor, the {@link #getOrigin}, {@link #getRegion} and
+     * {@link #getPixelSize} methods will throw an {@link IllegalStateException} until this tile
+     * has been given to a {@link TileManager}, which will compute those values automatically.
+     *
+     * @param provider
+     *          The image reader provider to use. The same provider is typically given to every
+     *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
+     *          this is not mandatory.
+     * @param input
+     *          The input to be given to the image reader.
+     * @param imageIndex
+     *          The image index to be given to the image reader for reading this tile.
+     * @param imageSize
+     *          The image size (not to be confused with the pixel size), or {@code null} if
+     *          unknown.
+     * @param gridToCRS
+     *          The "<cite>grid to real world</cite>" transform.
      */
-    private void ensureValidPixelSize() {
+    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
+                final Dimension imageSize, final AffineTransform gridToCRS)
+    {
+        ensureNonNull("provider",  provider);
+        ensureNonNull("input",     input);
+        ensureNonNull("gridToCRS", gridToCRS);
+        checkImageIndex(imageIndex);
+        this.provider   = provider;
+        this.input      = input;
+        this.imageIndex = imageIndex;
+        this.width      = imageSize.width;
+        this.height     = imageSize.height;
+        this.gridToCRS  = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
+    }
+
+    /**
+     * Ensures that the given argument is non-null.
+     */
+    private static void ensureNonNull(final String argument, final Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, argument));
+        }
+    }
+
+    /**
+     * Ensures that the pixel size is strictly positive. This method is invoked for checking
+     * user-supplied arguments, as opposed to {@link #checkGeometryValidity} which checks if
+     * the size has been computed. Both methods differ in exception type for that reason.
+     */
+    private void ensureValidPixelSize() throws IllegalArgumentException {
         int n;
         if ((n=dx) < 1 || (n=dy) < 1) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1, n));
@@ -210,11 +275,23 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Ensures that the given argument is non-null.
+     * Checks if the origin, region, and pixel size can be returned. Throw an exception if this
+     * tile has been {@linkplain #Tile(ImageReaderSpi, Object, int, Dimension, AffineTransform)
+     * created without origin} and not yet processed by {@link TileManagerFactory}.
+     * <p>
+     * <b>Note:</b> It is not strictly necessary to synchronize this method since update to a
+     * {@code int} field is atomic according Java language specification, the {@link #dx} and
+     * {@link #dy} fields do not change anymore as soon as they have a non-zero value (this is
+     * checked by setPixelSize(Dimension) implementation) and this method succed only if both
+     * fields are set. Most callers are already synchronized anyway, except {@link TileManager}
+     * constructor which invoke this method only has a sanity check. It is okay to conservatively
+     * get the exception in situations where a synchronized block would not have thrown it.
+     *
+     * @todo Localize the exception message.
      */
-    static void ensureNonNull(final String argument, final Object value) {
-        if (value == null) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, argument));
+    final void checkGeometryValidity() throws IllegalStateException {
+        if (dx == 0 || dy == 0) {
+            throw new IllegalStateException("Tile must be processed by TileManagerFactory.");
         }
     }
 
@@ -405,40 +482,113 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
+     * If the user-supplied transform is waiting for a processing by {@link RegionCalculator},
+     * returns it. Otherwise returns {@code null}. This method is for internal usage by
+     * {@link RegionCalculator} only.
+     * <p>
+     * See {@link #checkGeometryValidity} for a note about synchronization. When {@code clear}
+     * is {@code false} (i.e. this method is invoked just in order to get a hint), it is okay
+     * to conservatively return a non-null value in situations where a synchronized block would
+     * have returned {@code null}.
+     *
+     * @param clear If {@code true}, clears the {@link #gridToCRS} field before to return. This
+     *              is a way to tell that processing is in progress, and also a safety against
+     *              transform usage while it may become invalid.
+     * @return The transform, or {@code null} if none. This method does not clone the returned
+     *         value - {@link RegionCalculator} will reference and modify directly that transform.
+     */
+    final AffineTransform getPendingGridToCRS(final boolean clear) {
+        assert !clear || Thread.holdsLock(this); // Lock required only if 'clear' is true.
+        if (dx != 0 || dy != 0) {
+            // No transform waiting to be processed.
+            return null;
+        }
+        final AffineTransform gridToCRS = this.gridToCRS;
+        if (clear) {
+            this.gridToCRS = null;
+        }
+        return gridToCRS;
+    }
+
+    /**
+     * Returns the "<cite>grid to real world</cite>" transform, or {@code null} if unknown.
+     * This transform is derived from the value given to the constructor, but may not be
+     * identical since it may have been {@linkplain AffineTransform#translate translated}
+     * in order to get a uniform grid geometry for every tiles in a {@link TileManager}.
+     *
+     * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
+     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         processed by {@link TileManagerFactory}.
+     *
+     * @see TileManager#getGridGeometry
+     */
+    public synchronized AffineTransform getGridToCRS() throws IllegalStateException {
+        checkGeometryValidity();
+        return gridToCRS; // No need to clone since TileManagerFactory assigned an immutable instance.
+    }
+
+    /**
      * Returns the pixel size relative to the finest level in an image pyramid.
      * This method never returns {@code null}, and the width & height shall
      * never be smaller than 1.
      *
+     * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
+     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         processed by {@link TileManagerFactory}.
+     *
      * @see javax.imageio.ImageReadParam#setSourceSubsampling
      */
-    public Dimension getPixelSize() {
+    public synchronized Dimension getPixelSize() throws IllegalStateException {
+        checkGeometryValidity();
         return new Dimension(dx, dy);
+    }
+
+    /**
+     * Invoked by {@link RegionCalculator} only. No other caller allowed.
+     */
+    final void setPixelSize(final Dimension pixelSize) throws IllegalStateException {
+        assert Thread.holdsLock(this);
+        if (dx != 0 || dy != 0) {
+            throw new IllegalStateException(); // Should never happen.
+        }
+        dx = pixelSize.width;
+        dy = pixelSize.height;
+        ensureValidPixelSize();
     }
 
     /**
      * Returns the upper-left corner in the destination image.
      *
+     * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
+     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         processed by {@link TileManagerFactory}.
+     *
      * @see javax.imageio.ImageReadParam#setDestinationOffset
      */
-    public Point getOrigin() {
+    public synchronized Point getOrigin() throws IllegalStateException {
+        checkGeometryValidity();
         return new Point(x,y);
     }
 
     /**
-     * Returns the upper-left corner in the destination image, with the image size.
-     * If this tile has been created with the {@linkplain #Tile(ImageReader, Object,
-     * Rectangle constructor expecting a rectangle), a copy of the specified rectangle
-     * is returned. Otherwise the image {@linkplain ImageReader#getWidth width} and
-     * {@linkplain ImageReader#getHeight height} are read from the image reader and
-     * cached for future usage.
+     * Returns the upper-left corner in the destination image, with the image size. If this tile
+     * has been created with the {@linkplain #Tile(ImageReader,Object,int,Rectangle,Dimension)
+     * constructor expecting a rectangle}, a copy of the specified rectangle is returned.
+     * Otherwise the image {@linkplain ImageReader#getWidth width} and
+     * {@linkplain ImageReader#getHeight height} are read from the image reader and cached for
+     * future usage.
      *
      * @return The region in the destination image.
+     * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
+     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         processed by {@link TileManagerFactory}.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getImageReader reader} and this operation failed.
      *
      * @see javax.imageio.ImageReadParam#setSourceRegion
      */
-    public synchronized Rectangle getRegion() throws IOException {
+    public synchronized Rectangle getRegion() throws IllegalStateException, IOException {
+        checkGeometryValidity();
         if (width == 0 && height == 0) {
             final ImageReader reader = getImageReader(null, true, true);
             width  = reader.getWidth (imageIndex);
@@ -449,12 +599,32 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Translates this tile. For internal usage by {@link TileBuilder} only. This method
-     * shound not be invoked anymore after a {@code Tile} instance has been made public.
+     * Invoked by {@link RegionCalculator} only. No other caller allowed.
+     * <p>
+     * Note that invoking this method usually invalidate {@link #gridToCRS}. Calls to this method
+     * should be closely followed by calls to {@link #translate} for fixing the "gridToCRS" value.
      */
-    final void translate(final int dx, final int dy) {
+    final void setRegion(final Rectangle region) {
+        assert Thread.holdsLock(this);
+        x      = region.x;
+        y      = region.y;
+        width  = region.width;
+        height = region.height;
+    }
+
+    /**
+     * Translates this tile. For internal usage by {@link RegionCalculator} only.
+     * This method is invoked slightly after {@link #setRegion} for final adjustment.
+     *
+     * @param dx The translation to apply on <var>x</var> values (often 0).
+     * @param dy The translation to apply on <var>y</var> values (often 0).
+     * @param gridToCRS The new "<cite>grid to real world</cite>" transform to use after this
+     *        translation. Should be an immutable instance because it will not be cloned.
+     */
+    final synchronized void translate(final int dx, final int dy, final AffineTransform gridToCRS) {
         x += dx;
         y += dy;
+        this.gridToCRS = gridToCRS;
     }
 
     /**

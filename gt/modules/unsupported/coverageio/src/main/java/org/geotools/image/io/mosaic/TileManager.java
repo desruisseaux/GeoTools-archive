@@ -16,11 +16,20 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform; // For javadoc
 import java.io.IOException;
 import javax.imageio.spi.ImageReaderSpi;
+import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.UnmodifiableArrayList;
 
 
@@ -74,23 +83,27 @@ public class TileManager {
     private Dimension tileSize;
 
     /**
+     * The grid geometry, including the "<cite>grid to real world</cite>" transform. This is
+     * provided by {@link TileManagerFactory} when this information is available, but is not
+     * used by this class.
+     */
+    ImageGeometry geometry;
+
+    /**
      * All image providers used as an unmodifiable set.
      */
     private final Set<ImageReaderSpi> providers;
 
     /**
-     * Creates a manager for the given tiles.
+     * Creates a manager for the given tiles. This constructor is protected for subclassing,
+     * but should not invoked directly. {@code TileManager} instances should be created by
+     * {@link TileManagerFactory}.
+     *
+     * @param tiles The tiles. This array is not cloned and elements in this array may be
+     *        reordered by this constructor. The public methods in {@link TileManagerFactory}
+     *        are reponsible for cloning the user-provided arrays if needed.
      */
-    public TileManager(final Tile[] tiles) {
-        this(Arrays.asList(tiles));
-    }
-
-    /**
-     * Creates a manager for the given tiles.
-     */
-    public TileManager(final Collection<Tile> tiles) {
-        final Tile[] tilesArray = tiles.toArray(new Tile[tiles.size()]);
-        Arrays.sort(tilesArray);
+    protected TileManager(final Tile[] tiles) {
         /*
          * Puts together the tiles that use the same input. For those that use
          * different input, we will order by image index first, then (y,x) order.
@@ -99,7 +112,8 @@ public class TileManager {
         final Map<ReaderInputPair,List<Tile>> tilesByInput;
         tilesByInput = new LinkedHashMap<ReaderInputPair, List<Tile>>();
         providers    = new LinkedHashSet<ImageReaderSpi>(4);
-        for (final Tile tile : tilesArray) {
+        for (final Tile tile : tiles) {
+            tile.checkGeometryValidity();
             final ImageReaderSpi  spi = tile.getImageReaderSpi();
             final ReaderInputPair key = new ReaderInputPair(spi, tile.getInput());
             List<Tile> sameInputs = tilesByInput.get(key);
@@ -117,12 +131,13 @@ public class TileManager {
         int numTiles = 0;
 fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             assert !sameInputs.isEmpty();
+            Collections.sort(sameInputs);
             for (final Tile tile : sameInputs) {
-                tilesArray[numTiles++] = tile;
+                tiles[numTiles++] = tile;
             }
         }
-        this.tiles = tilesArray;
-        allTiles = UnmodifiableArrayList.wrap(tilesArray);
+        this.tiles = tiles;
+        allTiles = UnmodifiableArrayList.wrap(tiles);
         regionOfInterest = new Rectangle();
     }
 
@@ -271,6 +286,20 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             initialize();
         }
         return tileSize;
+    }
+
+    /**
+     * Returns the grid geometry, including the "<cite>grid to real world</cite>" transform.
+     * This information is typically available only when {@linkplain AffineTransform affine
+     * transform} were explicitly given to {@linkplain Tile#Tile(ImageReaderSpi,Object,int,
+     * Dimension,AffineTransform) tile constructor}.
+     *
+     * @return The grid geometry, or {@code null} if this information is not available.
+     *
+     * @see Tile#getGridToCRS
+     */
+    public ImageGeometry getGridGeometry() {
+        return geometry;
     }
 
     /**
