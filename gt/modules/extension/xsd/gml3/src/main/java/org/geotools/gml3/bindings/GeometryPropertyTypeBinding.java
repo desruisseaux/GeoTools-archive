@@ -20,7 +20,10 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+
 import org.geotools.gml3.GML;
+import org.geotools.xlink.XLINK;
 import org.geotools.xml.*;
 
 
@@ -89,27 +92,10 @@ public class GeometryPropertyTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        if (GML._Geometry.equals(name)) {
-            //if the geometry is null, return null
-            Geometry geometry = (Geometry) object;
-            if ( geometry.isEmpty() ) {
-                return null;
-            }
-            return object;
-        }
-
-        return null;
+        return GML3EncodingUtils.getProperty((Geometry) object, name );
     }
     
     public List getProperties(Object object) throws Exception {
-        Geometry geometry = (Geometry) object;
-        String id = GML3EncodingUtils.getID( geometry );
-        if ( id != null ) {
-            //add a comment 
-            // return a comment which is hte xlink href
-            return Collections.singletonList(new Object[] { Encoder.COMMENT, "#" +id });
-        }
-        
-        return null;
+        return GML3EncodingUtils.getProperties((Geometry) object);
     }
 }

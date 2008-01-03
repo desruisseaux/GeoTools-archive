@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.gml3.GML;
@@ -79,11 +81,10 @@ public class PolygonPropertyTypeBinding extends AbstractComplexBinding {
     }
 
     public Object getProperty(Object object, QName name) {
-        if (GML.Polygon.equals(name)) {
-            //return the polygon, which is the object passed in
-            return object;
-        }
-
-        return null;
+        return GML3EncodingUtils.getProperty((Polygon) object, name );
+    }
+    
+    public List getProperties(Object object) throws Exception {
+        return GML3EncodingUtils.getProperties((Polygon)object);
     }
 }

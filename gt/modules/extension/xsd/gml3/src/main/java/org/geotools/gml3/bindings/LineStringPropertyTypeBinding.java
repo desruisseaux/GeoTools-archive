@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,11 +90,10 @@ public class LineStringPropertyTypeBinding extends AbstractComplexBinding {
     }
 
     public Object getProperty(Object object, QName name) {
-        if (GML.LineString.equals(name)) {
-            //return the line string, which is the object passed in
-            return object;
-        }
-
-        return null;
+        return GML3EncodingUtils.getProperty( (LineString) object, name );
+    }
+    
+    public List getProperties(Object object) throws Exception {
+        return GML3EncodingUtils.getProperties( (LineString) object );
     }
 }
