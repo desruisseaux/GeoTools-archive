@@ -21,6 +21,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.logging.Level;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.feature.Association;
@@ -28,12 +29,17 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.ContentFeatureCollection;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.GmlObjectStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 
 
@@ -48,6 +54,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public final class JDBCFeatureStore extends ContentFeatureStore {
+    
     /**
      * primary key of the table
      */
