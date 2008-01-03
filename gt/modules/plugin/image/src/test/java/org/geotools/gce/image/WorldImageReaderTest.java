@@ -131,9 +131,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         // HINTS
         //
         ///////////////////////////////////////////////////////////////////////
-        Hints hints = new Hints();
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
-        WorldImageReader wiReader = new WorldImageReader(file, hints);
+        WorldImageReader wiReader = new WorldImageReader(file);
 
         // more than native resolution (250 pixel representation for 125 pixels image)
         assertEquals(0, getChosenOverview(250,wiReader));
@@ -197,7 +195,9 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         // HINTS
         //
         ///////////////////////////////////////////////////////////////////////
-        WorldImageReader wiReader = new WorldImageReader(file);
+        Hints hints = new Hints();
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+        WorldImageReader wiReader = new WorldImageReader(file,hints);
         
         // between 16 and 9, any value should report the match of 16
         assertEquals(4, getChosenOverview(16,wiReader));
@@ -214,7 +214,6 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         //
         ///////////////////////////////////////////////////////////////////////
         //parameter ovverrides hints
-        Hints hints = new Hints();
         hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
         wiReader = new WorldImageReader(file, hints);
 		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,7 +100,7 @@ public abstract class AbstractGridCoverage2DReader implements
 			Color.WHITE };
 
 	/**
-	 * This contains the  number of overviews.
+	 * This contains the  number of overviews.aaa
 	 */
 	protected int numOverviews = 0;
 	
@@ -199,59 +198,51 @@ public abstract class AbstractGridCoverage2DReader implements
 		
 		// //
 		//
-		// Init overview policy
-		//
-		// //
-		// when policy is explictly provided it overrides the policy provided
-		// using hints.
-		if(overviewPolicy==null||overviewPolicy.length()==0)
-		{
-			// check if a policy was provided using hints (check even the
-			// deprecated one)
-			if (this.hints != null)
-				if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
-					overviewPolicy = (String) this.hints
-							.get(Hints.OVERVIEW_POLICY);
-				else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
-					overviewPolicy = ((Boolean) this.hints
-							.get(Hints.IGNORE_COVERAGE_OVERVIEW))
-							.booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
-							: hints.VALUE_OVERVIEW_POLICY_QUALITY;
-			
-			//use default if not provided. Default is nearest
-			if(overviewPolicy==null||overviewPolicy.length()==0)
-				overviewPolicy=Hints.VALUE_OVERVIEW_POLICY_NEAREST;
-		}
-		
-		
-		
-		// default values for subsampling
-		readP.setSourceSubsampling(1, 1, 0, 0);
-		// //
-		//
 		// Default image index 0
 		//
 		// //
 		Integer imageChoice = new Integer(0);
-		if (overviewPolicy.equalsIgnoreCase(Hints.VALUE_OVERVIEW_POLICY_IGNORE))
-			return imageChoice;
-
+		
 		// we are able to handle overviews properly only if the transformation
 		// is  an affine transform with pure scale and translation, no rotational
 		// components
 		if (raster2Model != null && !isScaleTranslate(raster2Model))
 			return imageChoice;
-
-
+		
+		// //
+		//
+		// Init overview policy
+		//
+		// //
+		// when policy is explictly provided it overrides the policy provided
+		// using hints.
+		if(overviewPolicy==null||overviewPolicy.length()<=0)
+		overviewPolicy = extractOverviewPolicy();
+		
+		
+		// //
+		//
+		// default values for subsampling
+		//
+		// //
+		readP.setSourceSubsampling(1, 1, 0, 0);
 
 		// //
 		//
-		// Am I going to decimate or to use overviews? If this geotiff has only
-		// one page we use decimation, otherwise we use the best page avalabile.
+		// requested to ignore overviews
+		//
+		// //
+		if (overviewPolicy.equalsIgnoreCase(Hints.VALUE_OVERVIEW_POLICY_IGNORE))
+			return imageChoice;
+
+		// //
+		//
+		// Am I going to decimate or to use overviews? If this file has only
+		// one page we use decimation, otherwise we use the best page available.
 		// Future versions should use both.
 		//
 		// //
-		final boolean decimate = (numOverviews <= 0) ? true : false;
+		final boolean useOverviews = (numOverviews >0) ? true : false;
 
 		// //
 		//
@@ -269,15 +260,44 @@ public abstract class AbstractGridCoverage2DReader implements
 		// overviews or decimation
 		//
 		// //
-		if (!decimate) {
-			return getOverviewImage(overviewPolicy, requestedRes);
-		} else {
-    		// /////////////////////////////////////////////////////////////////////
-    		// DECIMATION ON READING
-    		// /////////////////////////////////////////////////////////////////////
-    		decimationOnReadingControl(imageChoice, readP, requestedRes);
-    		return imageChoice;
-		}
+		if (useOverviews) 
+			imageChoice= getOverviewImage(overviewPolicy, requestedRes);
+		
+		// /////////////////////////////////////////////////////////////////////
+		// DECIMATION ON READING
+		// /////////////////////////////////////////////////////////////////////
+		decimationOnReadingControl(imageChoice, readP, requestedRes);
+		return imageChoice;
+
+	}
+
+	/**
+	 * This method is responsible for checking the overview policy as defined by
+	 * the provided {@link Hints}.
+	 * 
+	 * @return the overview policy which can be one of
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_IGNORE},
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST},
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_SPEED}, {@link Hints#VALUE_OVERVIEW_POLICY_QUALITY}.
+	 *         Default is {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST}.
+	 */
+	private String extractOverviewPolicy() {
+		String overviewPolicy=null;
+		// check if a policy was provided using hints (check even the
+		// deprecated one)
+		if (this.hints != null)
+			if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
+				overviewPolicy = (String) this.hints.get(Hints.OVERVIEW_POLICY);
+			else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
+				overviewPolicy = ((Boolean) this.hints
+						.get(Hints.IGNORE_COVERAGE_OVERVIEW)).booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
+						: hints.VALUE_OVERVIEW_POLICY_QUALITY;
+
+		// use default if not provided. Default is nearest
+		if (overviewPolicy == null || overviewPolicy.length() == 0)
+			overviewPolicy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
+		assert overviewPolicy!=null&&overviewPolicy.length()>0;
+		return overviewPolicy;
 	}
 	
 	/**
@@ -327,12 +347,8 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	private Integer getOverviewImage(String policy, double[] requestedRes) {
 	    // setup policy
-        if(policy == null) {
-            policy = (String) hints.get(Hints.OVERVIEW_POLICY);
-            if(policy == null)
-            	//defaul policy
-                policy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
-        }
+        if(policy == null||policy.length()<=0)
+        	policy=extractOverviewPolicy();
         
         // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
         // keeping a reference to the original image choice
