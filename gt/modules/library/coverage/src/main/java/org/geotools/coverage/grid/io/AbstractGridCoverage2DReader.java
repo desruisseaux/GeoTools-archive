@@ -101,10 +101,9 @@ public abstract class AbstractGridCoverage2DReader implements
 			Color.WHITE };
 
 	/**
-	 * This contains the maximum number of grid coverages in the file/stream.
-	 * Until multi-image files are supported, this is going to be 0 or 1.
+	 * This contains the  number of overviews.
 	 */
-	protected volatile int numOverviews = 0;
+	protected int numOverviews = 0;
 	
 	/** 2DGridToWorld math transform. */
 	protected MathTransform raster2Model = null;
@@ -219,9 +218,9 @@ public abstract class AbstractGridCoverage2DReader implements
 							.booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
 							: hints.VALUE_OVERVIEW_POLICY_QUALITY;
 			
-			//use default if not provided
+			//use default if not provided. Default is nearest
 			if(overviewPolicy==null||overviewPolicy.length()==0)
-				overviewPolicy=Hints.VALUE_OVERVIEW_POLICY_QUALITY;
+				overviewPolicy=Hints.VALUE_OVERVIEW_POLICY_NEAREST;
 		}
 		
 		
