@@ -218,7 +218,7 @@ public class Tile implements Comparable<Tile> {
      * Creates a tile for the given provider, input and "<cite>grid to real world</cite>" transform.
      * This constructor can be used when the {@linkplain #getOrigin origin} of the image to be read
      * by the supplied reader is unknown. The origin and the pixel size will be computed
-     * automatically when this tile will be given to a {@link TileManager}.
+     * automatically when this tile will be given to a {@link TileManagerFactory}.
      * <p>
      * When using this constructor, the {@link #getOrigin}, {@link #getRegion} and
      * {@link #getPixelSize} methods will throw an {@link IllegalStateException} until this tile
@@ -232,14 +232,15 @@ public class Tile implements Comparable<Tile> {
      *          The input to be given to the image reader.
      * @param imageIndex
      *          The image index to be given to the image reader for reading this tile.
-     * @param imageSize
-     *          The image size (not to be confused with the pixel size), or {@code null} if
-     *          unknown.
+     * @param region
+     *          The tile region, or {@code null} if unknown. The (<var>x</var>,<var>y</var>)
+     *          location of this region is typically (0,0). The definitive will be computed
+     *          when this tile will be given to a {@link TileManagerFactory}.
      * @param gridToCRS
      *          The "<cite>grid to real world</cite>" transform.
      */
     public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
-                final Dimension imageSize, final AffineTransform gridToCRS)
+                final Rectangle region, final AffineTransform gridToCRS)
     {
         ensureNonNull("provider",  provider);
         ensureNonNull("input",     input);
@@ -248,9 +249,37 @@ public class Tile implements Comparable<Tile> {
         this.provider   = provider;
         this.input      = input;
         this.imageIndex = imageIndex;
-        this.width      = imageSize.width;
-        this.height     = imageSize.height;
+        if (region != null) {
+            if (region.isEmpty()) {
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, region));
+            }
+            this.x      = region.x;
+            this.y      = region.y;
+            this.width  = region.width;
+            this.height = region.height;
+        }
         this.gridToCRS  = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
+    }
+
+    /**
+     * Creates a tile for the given region with default pixel size. This is a constructor is
+     * provided for avoiding compile-tile ambiguity between null <cite>pixel size</cite> and
+     * null <cite>affine transform</cite> (the former is legal, the later is not).
+     *
+     * @param provider
+     *          The image reader provider to use. The same provider is typically given to every
+     *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
+     *          this is not mandatory.
+     * @param input
+     *          The input to be given to the image reader.
+     * @param imageIndex
+     *          The image index to be given to the image reader for reading this tile.
+     * @param region
+     *          The region in the destination image. The {@linkplain Rectangle#width width} and
+     *          {@linkplain Rectangle#height height} should match the image size.
+     */
+    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex, final Rectangle region) {
+        this(provider, input, imageIndex, region, (Dimension) null);
     }
 
     /**
