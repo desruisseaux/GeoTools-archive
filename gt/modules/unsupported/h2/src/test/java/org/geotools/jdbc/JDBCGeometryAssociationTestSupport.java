@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.identity.GmlObjectId;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
@@ -136,5 +137,19 @@ public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport
         p = (Point) mp.getGeometryN(1);
         assertEquals(new Coordinate(1, 1), p.getCoordinate());
         assertEquals("1", ((Map) p.getUserData()).get("gml:id"));
+    }
+    
+    public void testGetGmlObjectGeometry() throws Exception {
+        GmlObjectId id = dataStore.getFilterFactory().gmlObjectId("0");
+        Object o = dataStore.getGmlObject( id, null);
+        
+        assertNotNull( o );
+        assertTrue( o instanceof Point );
+        assertEquals( new Coordinate( 0 , 0 ), ((Point)o).getCoordinate() );
+        
+        id = dataStore.getFilterFactory().gmlObjectId( "ft1.0" );
+        o = dataStore.getGmlObject( id, null);
+        assertNotNull( o );
+        assertTrue( o instanceof SimpleFeature );
     }
 }
