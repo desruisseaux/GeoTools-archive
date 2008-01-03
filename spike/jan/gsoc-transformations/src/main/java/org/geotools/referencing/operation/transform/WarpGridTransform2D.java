@@ -166,16 +166,16 @@ public class WarpGridTransform2D extends WarpTransform2D {
         return worldToGrid;
     }
 
-    public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts)
+    public void transform(final double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts)
        {
         // TODO Auto-generated method stub
         //transformToGrid(srcPts, srcOff, srcPts, srcOff, numPts, false);
         try {
-			double[] helperPts = srcPts.clone();
+			double[] helperPts = new double[srcPts.length];
 
 			
 			    if (worldToGrid != null) {
-			        worldToGrid.transform(helperPts, srcOff, helperPts, srcOff, numPts);
+			        worldToGrid.transform(srcPts, srcOff, helperPts, srcOff, numPts);
 			    }
       
 

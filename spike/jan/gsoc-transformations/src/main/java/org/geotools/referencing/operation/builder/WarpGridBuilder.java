@@ -25,16 +25,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.media.jai.RasterFactory;
 import javax.vecmath.MismatchedSizeException;
-import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.geometry.MismatchedReferenceSystemException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.parameter.ParameterGroup;
@@ -45,6 +39,15 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -76,7 +79,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     /**
      * List of Mapped Positions in ggrid coordinates
      */
-    List /*<MappedPosition>*/ localpositions = new ArrayList();
+    List <MappedPosition> localpositions = new ArrayList<MappedPosition>();
 
     //List /*<MappedPosition>*/ worldpositions ;
 
@@ -100,6 +103,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
     /** Raster of interpolated values*/
     private WritableRaster yRaster;
+    
 
     /**
      * Constructs Builder
@@ -112,22 +116,22 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @throws MismatchedReferenceSystemException
      * @throws NoSuchIdentifierException
      */
-    public WarpGridBuilder(List vectors, double dx, double dy, Envelope envelope,
-        MathTransform realToGrid)
+    public WarpGridBuilder(List<MappedPosition> vectors, double dx, double dy, Envelope envelope,
+        MathTransform worldToGrid)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException, TransformException, NoSuchIdentifierException {
-        this.worldToGrid = realToGrid;
+        this.worldToGrid = worldToGrid;
 
-        this.globalValues = new GridParamValues(envelope, realToGrid, dx, dy);
+        this.globalValues = new GridParamValues(envelope, worldToGrid, dx, dy);
 
         super.setMappedPositions(vectors);
 
         // super.setMappedPositions(transformMPToGrid(vectors, realToGrid));
-        localpositions = transformMPToGrid(vectors, realToGrid);
+        localpositions = transformMPToGrid(vectors, worldToGrid);
         this.envelope = envelope;
     }
 
-    public List getGridMappedPositions() throws MismatchedDimensionException, TransformException {
+    public List<MappedPosition> getGridMappedPositions() throws MismatchedDimensionException, TransformException {
         if (localpositions == null) {
             localpositions = transformMPToGrid(getMappedPositions(), worldToGrid);
         }
@@ -142,10 +146,10 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @return Map
      * @throws TransformException
      */
-    protected HashMap buildPositionsMap(int dim) throws TransformException {
-        HashMap poitnsToDeltas = new HashMap();
+    protected HashMap<DirectPosition, Double> buildPositionsMap(int dim) throws TransformException {
+        HashMap<DirectPosition, Double> poitnsToDeltas = new HashMap<DirectPosition, Double>();
 
-        for (Iterator i = this.getGridMappedPositions().iterator(); i.hasNext();) {
+        for (Iterator<MappedPosition> i = this.getGridMappedPositions().iterator(); i.hasNext();) {
             MappedPosition mp = ((MappedPosition) i.next());
             poitnsToDeltas.put(mp.getSource(),
                 mp.getSource().getCoordinates()[dim] - mp.getTarget().getCoordinates()[dim]);
@@ -158,11 +162,11 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * Transforms MappedPostions to grid system
      *
      */
-    private List/*<MappedPosition>*/ transformMPToGrid(List MappedPositions, MathTransform trans)
+    private List<MappedPosition> transformMPToGrid(List<MappedPosition> MappedPositions, MathTransform trans)
         throws MismatchedDimensionException, TransformException {
-        List/*<MappedPosition>*/ gridmp = new ArrayList();
+        List<MappedPosition> gridmp = new ArrayList<MappedPosition>();
 
-        for (Iterator i = MappedPositions.iterator(); i.hasNext();) {
+        for (Iterator<MappedPosition> i = MappedPositions.iterator(); i.hasNext();) {
             MappedPosition mp = (MappedPosition) i.next();
 
             DirectPosition2D gridSource = new DirectPosition2D();
@@ -303,7 +307,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                    dxgrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
+                    dxgrid[WarpParams.parameter("yNumCells").intValue()-i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
                         - (j * xStep) -xStart;
                 }
             }
@@ -313,7 +317,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Return array of Shifts. This method is useful to create Coverage2D object.
+     * Returns array of Shifts. This method is useful to create Coverage2D object.
      * @return array of Shifts
      */
     public float[][] getDyGrid() throws FactoryException {
@@ -334,7 +338,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
-                    dygrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)
+                    dygrid[WarpParams.parameter("yNumCells").intValue()-i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)
                         + 1)] - (i * yStep) - yStart;
                 }
             }

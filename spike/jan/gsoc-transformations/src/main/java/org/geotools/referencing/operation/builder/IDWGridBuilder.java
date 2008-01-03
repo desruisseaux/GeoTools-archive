@@ -66,7 +66,7 @@ public class IDWGridBuilder extends WarpGridBuilder {
 
     protected float[] computeWarpGrid(ParameterValueGroup WarpParams)
         throws TransformException {
-        IDWInterpolation dxInterpolation = new IDWInterpolation(buildPositionsMap(0));
+        IDWInterpolation dxInterpolation = new IDWInterpolation(buildPositionsMap(0));        
         IDWInterpolation dyInterpolation = new IDWInterpolation(buildPositionsMap(1));
 
         return interpolateWarpGrid(WarpParams, dxInterpolation, dyInterpolation);
