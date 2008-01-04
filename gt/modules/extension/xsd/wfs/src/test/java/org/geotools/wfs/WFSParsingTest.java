@@ -72,6 +72,7 @@ public class WFSParsingTest extends TestCase {
                 .getResourceAsStream("geoserver-GetCapabilities.xml"));
 
         assertNotNull(caps);
+        assertEquals("1.1.0", caps.getVersion());
 
         assertServiceIdentification(caps);
         assertOperationsMetadata(caps);
