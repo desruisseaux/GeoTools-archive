@@ -56,7 +56,7 @@ public class TileManagerFactory extends AbstractFactory {
      * returned if this factory has been unable to put every tiles in a single mosaic
      * (for example if the ratio between {@linkplain AffineTransform affine transform} given to
      * {@linkplain Tile#Tile(ImageReaderSpi,Object,int,Dimension,AffineTransform) tile constructor}
-     * would lead to fractional {@linkplain Tile#getPixelSize pixel size}).
+     * would lead to fractional {@linkplain Tile#getSubsampling subsampling}).
      */
     public TileManager[] create(final Tile[] tiles) {
         // The default called invokes Collection.toArray(), which will copy the array.
@@ -69,7 +69,7 @@ public class TileManagerFactory extends AbstractFactory {
      * returned if this factory has been unable to put every tiles in a single mosaic
      * (for example if the ratio between {@linkplain AffineTransform affine transform} given to
      * {@linkplain Tile#Tile(ImageReaderSpi,Object,int,Dimension,AffineTransform) tile constructor}
-     * would lead to fractional {@linkplain Tile#getPixelSize pixel size}).
+     * would lead to fractional {@linkplain Tile#getSubsampling subsampling}).
      */
     public TileManager[] create(Collection<Tile> tiles) {
         int count = 0;

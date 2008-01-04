@@ -236,24 +236,28 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
                 //       a java.util.Collection, avoid dependencies to JTS, search(Envelope)
                 //       should returns a Collection backed by lazy iterator, etc.) and we
                 //       may need to add a 'RTree subtree(Envelope)' method.
-                Rectangle region = tile.getRegion();
+                final Rectangle region = tile.getAbsoluteRegion();
                 if (regionOfInterest.intersects(region)) {
-                    region = region.intersection(regionOfInterest);
-                    final Tile old = interest.put(region, tile);
-                    if (old != null) {
-                        /*
-                         * Found a tile with the same bounding box than the new tile. It is
-                         * probably a tile at a different resolution. Retains the one which
-                         * minimize the disk reading, and discard the other one. This check
-                         * is not generic since we search for an exact match, but this case
-                         * is common enough. Handling it with a HashMap will help to reduce
-                         * the amount of tiles to handle in a more costly way later.
-                         */
-                        if (old .countWastedPixels(region, xSubsampling, ySubsampling) <
-                            tile.countWastedPixels(region, xSubsampling, ySubsampling))
-                        {
-                            interest.put(region, old); // Keep the old tile, discart the new one.
-                        }
+                    final Rectangle toRead = region.intersection(regionOfInterest);
+                    final Tile old = interest.put(toRead, tile);
+                    if (old == null) {
+                        continue;
+                    }
+                    /*
+                     * Found a tile with the same bounding box than the new tile. It is
+                     * probably a tile at a different resolution. Retains the one which
+                     * minimize the disk reading, and discard the other one. This check
+                     * is not generic since we search for an exact match, but this case
+                     * is common enough. Handling it with a HashMap will help to reduce
+                     * the amount of tiles to handle in a more costly way later.
+                     */
+                    final int n1, n2;
+                    region.setBounds(toRead);
+                    n1 = old.countUnwantedPixelsFromAbsolute(region, xSubsampling, ySubsampling);
+                    region.setBounds(toRead);
+                    n2 = tile.countUnwantedPixelsFromAbsolute(region, xSubsampling, ySubsampling);
+                    if (n1 <= n2) {
+                        interest.put(toRead, old); // Keep the old tile, discart the new one.
                     }
                 }
             }

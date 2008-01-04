@@ -44,30 +44,63 @@ import org.geotools.resources.i18n.Errors;
  * A tile to be read by {@link MosaicImageReader}. Each tile must contains the following:
  * <p>
  * <ul>
- *   <li>An {@link ImageReaderSpi} instance. The same provider is typically used for every tiles,
- *       but this is not mandatory. An {@link ImageReader image reader} will be instantiated and
- *       the {@linkplain #getInput input} will be assigned to it before a tile is read.</li>
+ *   <li><p><b>An {@link ImageReaderSpi} instance</b>. The same provider is typically used for every
+ *   tiles, but this is not mandatory. An {@linkplain ImageReader image reader} will be instantiated
+ *   and the {@linkplain #getInput input} will be assigned to it before a tile is read.</p></li>
  *
- *   <li>An input, typically a {@linkplain File file}, {@linkplain URL} or {@linkplain URI}.
- *       The input is typically different for every tile to be read, but this is not mandatory.
- *       For example different tiles could be stored at different {@linkplain #getImageIndex
- *       image index} in the same file.</li>
+ *   <li><p><b>An input</b>, typically a {@linkplain File file}, {@linkplain URL}, {@linkplain URI}
+ *   or {@linkplain String}. The input is typically different for every tile to be read, but this
+ *   is not mandatory. For example different tiles could be stored at different
+ *   {@linkplain #getImageIndex image index} in the same file.</p></li>
  *
- *   <li>An image index to be given to {@link ImageReader#read(int)} for reading the tile.</li>
+ *   <li><p><b>An image index</b> to be given to {@link ImageReader#read(int)} for reading the
+ *   tile. This index is often 0.</p></li>
  *
- *   <li>The upper-left corner in the destination image as a {@linkplain Point point}, or the
- *       upper-left corner together with the image size as a {@linkplain Rectangle rectangle}.</li>
+ *   <li><p><b>The upper-left corner</b> in the destination image as a {@linkplain Point point},
+ *   or the upper-left corner together with the image size as a {@linkplain Rectangle rectangle}.
+ *   If the upper-left corner has been given as a {@linkplain Point point}, then the
+ *   {@linkplain ImageReader#getWidth width} and {@linkplain ImageReader#getHeight height} will
+ *   be obtained from the image reader when first needed, which may have a slight performance cost.
+ *   If the upper-left corner has been given as a {@linkplain Rectangle rectangle} instead, then
+ *   this performance cost is avoided but the user is responsible for the accuracy of the
+ *   information provided.
+ *
+ *     <blockquote><font size=2>
+ *     <b>NOTE:</b> The upper-left corner is the {@linkplain #getLocation location} of this tile
+ *     in the {@linkplain javax.imageio.ImageReadParam#setDestination destination image} when no
+ *     {@linkplain javax.imageio.ImageReadParam#setDestinationOffset destination offset} are
+ *     specified. If the user specified a destination offset, then the tile location will be
+ *     translated accordingly for the image being read.
+ *     </font></blockquote></p></li>
+ *
+ *   <li><p><b>The subsampling relative to the tile having the best resolution.</b> This is not
+ *   the subsampling to apply when reading this tile, but rather the subsampling that we would
+ *   need to apply on the tile having the finest resolution in order to produce an image equivalent
+ *   to this tile. The subsampling is (1,1) for the tile having the finest resolution, (2,3) for an
+ *   overview having half the width and third of the height for the same geographic extent,
+ *   <cite>etc.</cite> (note that overviews are not required to have the same geographic extent -
+ *   the above is just an example).</p>
+ *
+ *     <blockquote><font size=2>
+ *     <b>NOTE 1:</b> The semantic assumes that overviews are produced by subsampling, not by
+ *     interpolation or pixel averaging. The later are not prohibed, but doing so introduce
+ *     some subsampling-dependant variations in images produced by {@link MosaicImageReader},
+ *     which would not be what we would expect from a strictly compliant {@link ImageReader}.
+ *     <br><br>
+ *     <b>NOTE 2:</b> Tile {@linkplain #getLocation location} and {@linkplain #getRegion region}
+ *     coordinates should be specified in the overview pixel units - they should <em>not</em> be
+ *     pre-multiplied by subsampling. This multiplication will be performed automatically by
+ *     {@link TileManager} when comparing regions from tiles at different subsampling levels.
+ *     </font></blockquote></p></li>
  * </ul>
  * <p>
- * If the upper-left corner has been given as a {@linkplain Point point}, then the
- * {@linkplain ImageReader#getWidth width} and {@linkplain ImageReader#getHeight height}
- * will be obtained from the image reader when first needed, which may have a slight performance
- * cost. If the upper-left corner has been given as a {@linkplain Rectangle rectangle} instead,
- * then this performance cost is avoided but the user is responsible for the accuracy of the
- * information provided.
- * <p>
  * The tiles are not required to be arranged on a regular grid, but performances may be
- * better if they are.
+ * better if they are. {@link TileManagerFactory} is responsible for analysing the layout
+ * of a collection of tiles and instantiate {@link TileManager} subclasses optimized for
+ * the layout geometry.
+ * <p>
+ * {@link Tile} can be considered as immutable after construction. However some properties
+ * may be available only after this tile has been given to a {@link TileManagerFactory}.
  *
  * @since 2.5
  * @source $URL$
@@ -95,14 +128,14 @@ public class Tile implements Comparable<Tile> {
     private final int imageIndex;
 
     /**
-     * The pixel size relative to the finest pyramid level. If this tile is the
-     * finest level, then the value shall be 1. Should never be 0 or negative,
+     * The subsampling relative to the tile having the finest resolution. If this tile is the
+     * one with finest resolution, then the value shall be 1. Should never be 0 or negative,
      * except if its value has not yet been computed.
      * <p>
      * This field should be considered as final. It is not final only because
      * {@link RegionCalculator} may computes its value automatically.
      */
-    private int dx, dy;
+    private int xSubsampling, ySubsampling;
 
     /**
      * The upper-left corner in the destination image. Should be considered as final, since
@@ -127,7 +160,7 @@ public class Tile implements Comparable<Tile> {
     private AffineTransform gridToCRS;
 
     /**
-     * Creates a tile for the given provider, input and origin. This constructor can be used when
+     * Creates a tile for the given provider, input and location. This constructor can be used when
      * the size of the image to be read by the supplied reader is unknown. This size will be
      * fetched automatically the first time {@link #getRegion} is invoked.
      *
@@ -139,31 +172,32 @@ public class Tile implements Comparable<Tile> {
      *          The input to be given to the image reader.
      * @param imageIndex
      *          The image index to be given to the image reader for reading this tile.
-     * @param origin
+     * @param location
      *          The upper-left corner in the destination image.
-     * @param pixelSize
-     *          Pixel size relative to the finest resolution in an image pyramid,
-     *          or {@code null} if none. If non-null, width and height should be
-     *          strictly positive.
+     * @param subsampling
+     *          The subsampling relative to the tile having the finest resolution, or {@code null}
+     *          if none. If non-null, width and height should be strictly positive. This argument
+     *          if of {@linkplain Dimension dimension} kind because it can also be understood as
+     *          relative "pixel size".
      */
     public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
-                final Point origin, final Dimension pixelSize)
+                final Point location, final Dimension subsampling)
     {
         ensureNonNull("provider", provider);
         ensureNonNull("input",    input);
-        ensureNonNull("origin",   origin);
+        ensureNonNull("location", location);
         checkImageIndex(imageIndex);
         this.provider   = provider;
         this.input      = input;
         this.imageIndex = imageIndex;
-        this.x          = origin.x;
-        this.y          = origin.y;
-        if (pixelSize != null) {
-            dx = pixelSize.width;
-            dy = pixelSize.height;
-            ensureValidPixelSize();
+        this.x          = location.x;
+        this.y          = location.y;
+        if (subsampling != null) {
+            xSubsampling = subsampling.width;
+            ySubsampling = subsampling.height;
+            ensureValidSubsampling();
         } else {
-            dx = dy = 1;
+            xSubsampling = ySubsampling = 1;
         }
     }
 
@@ -183,13 +217,14 @@ public class Tile implements Comparable<Tile> {
      * @param region
      *          The region in the destination image. The {@linkplain Rectangle#width width} and
      *          {@linkplain Rectangle#height height} should match the image size.
-     * @param pixelSize
-     *          Pixel size relative to the finest resolution in an image pyramid,
-     *          or {@code null} if none. If non-null, width and height should be
-     *          strictly positive.
+     * @param subsampling
+     *          The subsampling relative to the tile having the finest resolution, or {@code null}
+     *          if none. If non-null, width and height should be strictly positive. This argument
+     *          if of {@linkplain Dimension dimension} kind because it can also be understood as
+     *          relative "pixel size".
      */
     public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
-                final Rectangle region, final Dimension pixelSize)
+                final Rectangle region, final Dimension subsampling)
     {
         ensureNonNull("provider", provider);
         ensureNonNull("input",    input);
@@ -205,23 +240,23 @@ public class Tile implements Comparable<Tile> {
         this.y          = region.y;
         this.width      = region.width;
         this.height     = region.height;
-        if (pixelSize != null) {
-            dx = pixelSize.width;
-            dy = pixelSize.height;
-            ensureValidPixelSize();
+        if (subsampling != null) {
+            xSubsampling = subsampling.width;
+            ySubsampling = subsampling.height;
+            ensureValidSubsampling();
         } else {
-            dx = dy = 1;
+            xSubsampling = ySubsampling = 1;
         }
     }
 
     /**
      * Creates a tile for the given provider, input and "<cite>grid to real world</cite>" transform.
-     * This constructor can be used when the {@linkplain #getOrigin origin} of the image to be read
-     * by the supplied reader is unknown. The origin and the pixel size will be computed
-     * automatically when this tile will be given to a {@link TileManagerFactory}.
+     * This constructor can be used when the {@linkplain #getLocation location} of the image to be
+     * read by the supplied reader is unknown. The definitive location and the subsampling will be
+     * computed automatically when this tile will be given to a {@link TileManagerFactory}.
      * <p>
-     * When using this constructor, the {@link #getOrigin}, {@link #getRegion} and
-     * {@link #getPixelSize} methods will throw an {@link IllegalStateException} until this tile
+     * When using this constructor, the {@link #getLocation}, {@link #getRegion} and
+     * {@link #getSubsampling} methods will throw an {@link IllegalStateException} until this tile
      * has been given to a {@link TileManager}, which will compute those values automatically.
      *
      * @param provider
@@ -234,8 +269,8 @@ public class Tile implements Comparable<Tile> {
      *          The image index to be given to the image reader for reading this tile.
      * @param region
      *          The tile region, or {@code null} if unknown. The (<var>x</var>,<var>y</var>)
-     *          location of this region is typically (0,0). The definitive will be computed
-     *          when this tile will be given to a {@link TileManagerFactory}.
+     *          location of this region is typically (0,0). The definitive location will be
+     *          computed when this tile will be given to a {@link TileManagerFactory}.
      * @param gridToCRS
      *          The "<cite>grid to real world</cite>" transform.
      */
@@ -250,20 +285,19 @@ public class Tile implements Comparable<Tile> {
         this.input      = input;
         this.imageIndex = imageIndex;
         if (region != null) {
-            if (region.isEmpty()) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, region));
+            this.x = region.x;
+            this.y = region.y;
+            if (!region.isEmpty()) {
+                this.width  = region.width;
+                this.height = region.height;
             }
-            this.x      = region.x;
-            this.y      = region.y;
-            this.width  = region.width;
-            this.height = region.height;
         }
         this.gridToCRS  = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
     }
 
     /**
-     * Creates a tile for the given region with default pixel size. This is a constructor is
-     * provided for avoiding compile-tile ambiguity between null <cite>pixel size</cite> and
+     * Creates a tile for the given region with default subsampling. This is a constructor is
+     * provided for avoiding compile-tile ambiguity between null <cite>subsampling</cite> and
      * null <cite>affine transform</cite> (the former is legal, the later is not).
      *
      * @param provider
@@ -292,26 +326,26 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Ensures that the pixel size is strictly positive. This method is invoked for checking
+     * Ensures that the subsampling is strictly positive. This method is invoked for checking
      * user-supplied arguments, as opposed to {@link #checkGeometryValidity} which checks if
-     * the size has been computed. Both methods differ in exception type for that reason.
+     * the subsampling has been computed. Both methods differ in exception type for that reason.
      */
-    private void ensureValidPixelSize() throws IllegalArgumentException {
+    private void ensureValidSubsampling() throws IllegalArgumentException {
         int n;
-        if ((n=dx) < 1 || (n=dy) < 1) {
+        if ((n=xSubsampling) < 1 || (n=ySubsampling) < 1) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1, n));
         }
     }
 
     /**
-     * Checks if the origin, region, and pixel size can be returned. Throw an exception if this
+     * Checks if the location, region, and subsampling can be returned. Throw an exception if this
      * tile has been {@linkplain #Tile(ImageReaderSpi, Object, int, Dimension, AffineTransform)
-     * created without origin} and not yet processed by {@link TileManagerFactory}.
+     * created without location} and not yet processed by {@link TileManagerFactory}.
      * <p>
      * <b>Note:</b> It is not strictly necessary to synchronize this method since update to a
-     * {@code int} field is atomic according Java language specification, the {@link #dx} and
-     * {@link #dy} fields do not change anymore as soon as they have a non-zero value (this is
-     * checked by setPixelSize(Dimension) implementation) and this method succed only if both
+     * {@code int} field is atomic according Java language specification, the {@link #xSubsampling} and
+     * {@link #ySubsampling} fields do not change anymore as soon as they have a non-zero value (this is
+     * checked by setSubsampling(Dimension) implementation) and this method succed only if both
      * fields are set. Most callers are already synchronized anyway, except {@link TileManager}
      * constructor which invoke this method only has a sanity check. It is okay to conservatively
      * get the exception in situations where a synchronized block would not have thrown it.
@@ -319,7 +353,7 @@ public class Tile implements Comparable<Tile> {
      * @todo Localize the exception message.
      */
     final void checkGeometryValidity() throws IllegalStateException {
-        if (dx == 0 || dy == 0) {
+        if (xSubsampling == 0 || ySubsampling == 0) {
             throw new IllegalStateException("Tile must be processed by TileManagerFactory.");
         }
     }
@@ -528,7 +562,7 @@ public class Tile implements Comparable<Tile> {
      */
     final AffineTransform getPendingGridToCRS(final boolean clear) {
         assert !clear || Thread.holdsLock(this); // Lock required only if 'clear' is true.
-        if (dx != 0 || dy != 0) {
+        if (xSubsampling != 0 || ySubsampling != 0) {
             // No transform waiting to be processed.
             return null;
         }
@@ -546,7 +580,7 @@ public class Tile implements Comparable<Tile> {
      * in order to get a uniform grid geometry for every tiles in a {@link TileManager}.
      *
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
-     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
      *
      * @see TileManager#getGridGeometry
@@ -557,44 +591,49 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns the pixel size relative to the finest level in an image pyramid.
-     * This method never returns {@code null}, and the width & height shall
-     * never be smaller than 1.
+     * Returns the subsampling relative to the tile having the finest resolution. This method never
+     * returns {@code null}, and the width & height shall never be smaller than 1. The return type
+     * is of {@linkplain Dimension dimension} kind because the value can also be interpreted as
+     * relative "pixel size".
      *
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
-     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
      *
      * @see javax.imageio.ImageReadParam#setSourceSubsampling
      */
-    public synchronized Dimension getPixelSize() throws IllegalStateException {
+    public synchronized Dimension getSubsampling() throws IllegalStateException {
         checkGeometryValidity();
-        return new Dimension(dx, dy);
+        return new Dimension(xSubsampling, ySubsampling);
     }
 
     /**
      * Invoked by {@link RegionCalculator} only. No other caller allowed.
      */
-    final void setPixelSize(final Dimension pixelSize) throws IllegalStateException {
+    final void setSubsampling(final Dimension subsampling) throws IllegalStateException {
         assert Thread.holdsLock(this);
-        if (dx != 0 || dy != 0) {
+        if (xSubsampling != 0 || ySubsampling != 0) {
             throw new IllegalStateException(); // Should never happen.
         }
-        dx = pixelSize.width;
-        dy = pixelSize.height;
-        ensureValidPixelSize();
+        xSubsampling = subsampling.width;
+        ySubsampling = subsampling.height;
+        ensureValidSubsampling();
     }
 
     /**
-     * Returns the upper-left corner in the destination image.
+     * Returns the upper-left corner in the
+     * {@linkplain javax.imageio.ImageReadParam#setDestination destination image}. This is the
+     * location when no {@linkplain javax.imageio.ImageReadParam#setDestinationOffset destination
+     * offset} are specified. If the user specified a destination offset, then the tile location
+     * will be translated accordingly for the image being read.
      *
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
-     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
      *
      * @see javax.imageio.ImageReadParam#setDestinationOffset
      */
-    public synchronized Point getOrigin() throws IllegalStateException {
+    public synchronized Point getLocation() throws IllegalStateException {
         checkGeometryValidity();
         return new Point(x,y);
     }
@@ -609,7 +648,7 @@ public class Tile implements Comparable<Tile> {
      *
      * @return The region in the destination image.
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
-     *         Object, int, Dimension, AffineTransform) created without origin} and not yet
+     *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getImageReader reader} and this operation failed.
@@ -625,6 +664,21 @@ public class Tile implements Comparable<Tile> {
             reader.dispose();
         }
         return new Rectangle(x, y, width, height);
+    }
+
+    /**
+     * Returns the {@linkplain #getRegion region} multiplied by the subsampling.
+     * This is this tile coordinates in the units of the tile having the finest
+     * resolution, as opposed to the default public methods which are always in
+     * units relative to this tile.
+     */
+    final Rectangle getAbsoluteRegion() throws IOException {
+        final Rectangle region = getRegion();
+        region.x      *= xSubsampling;
+        region.y      *= ySubsampling;
+        region.width  *= xSubsampling;
+        region.height *= ySubsampling;
+        return region;
     }
 
     /**
@@ -645,8 +699,8 @@ public class Tile implements Comparable<Tile> {
      * Translates this tile. For internal usage by {@link RegionCalculator} only.
      * This method is invoked slightly after {@link #setRegion} for final adjustment.
      *
-     * @param dx The translation to apply on <var>x</var> values (often 0).
-     * @param dy The translation to apply on <var>y</var> values (often 0).
+     * @param xSubsampling The translation to apply on <var>x</var> values (often 0).
+     * @param ySubsampling The translation to apply on <var>y</var> values (often 0).
      * @param gridToCRS The new "<cite>grid to real world</cite>" transform to use after this
      *        translation. Should be an immutable instance because it will not be cloned.
      */
@@ -662,46 +716,67 @@ public class Tile implements Comparable<Tile> {
      * zero. In principle, subsampling can't be zero. But {@link TileManager} uses that
      * value for iterating over all tiles.
      */
-    final boolean canSubsample(final int xSubsampling, final int ySubsampling) {
-        return (xSubsampling % dx) == 0 && (ySubsampling % dy) == 0;
+    final boolean canSubsample(final int sourceXSubsampling, final int sourceYSubsampling) {
+        return (sourceXSubsampling % xSubsampling) == 0 && (sourceYSubsampling % ySubsampling) == 0;
+    }
+
+    /**
+     * Converts the given region and subsampling from "absolute" units (i.e. pre-multiplied by
+     * {@link #xSubsampling} and {@link #ySubsampling}) to units relative to this tile, and
+     * delegates to the user-overrideable {@link #countUnwantedPixels}.
+     *
+     * @param region The region to read, in the same units than {@link #getAbsoluteRegion}.
+     *        <strong>This rectangle will be modified without clone</strong>. This is okay
+     *        for our private usage, but would not be acceptable in a public API.
+     */
+    final int countUnwantedPixelsFromAbsolute(final Rectangle region,
+            final int sourceXSubsampling, final int sourceYSubsampling)
+            throws IOException
+    {
+        assert canSubsample(sourceXSubsampling, sourceYSubsampling);
+        region.x      /= xSubsampling;
+        region.y      /= ySubsampling;
+        region.width  /= xSubsampling;
+        region.height /= ySubsampling;
+        return countUnwantedPixels(region, sourceXSubsampling / xSubsampling,
+                                           sourceYSubsampling / ySubsampling);
     }
 
     /**
      * Returns the amount of pixels in this tile that would be useless if reading the given region
      * at the given subsampling. This method is invoked by {@link TileManager} when two or more
      * tile overlaps, in order to choose the tiles that would minimize the amount of pixels to
-     * read. The default implementation computes the amount of tile pixels skipped because of
-     * subsampling, added to the amount of pixels outside the region, including the pixels below
-     * the bottom. The later is conservative since many file formats will stop reading as soon as
-     * they reach the region bottom. Subclasses can override this method in order to alter this
-     * calculation if they are sure that pixels below the region have no disk seed cost.
+     * read. The default implementation computes the sum of:
+     * <ul>
+     *   <li>the amount of tile pixels skipped because of the given subsampling</li>
+     *   <li>the amount of pixels in this {@linkplain #getRegion tile region} that are outside
+     *       the given region, including the pixels below the bottom.</li>
+     * </ul>
+     * The later is conservative since many file formats will stop reading as soon as they reach
+     * the region bottom. Subclasses can override this method in order to alter this calculation
+     * if they are sure that pixels below the region have no disk seed cost.
      *
-     * @param  region The region to read.
-     * @param  sourceXSubsampling The number of columns to advance between pixels.
-     *         Must be strictly positive (not zero).
-     * @param  sourceYSubsampling The number of rows to advance between pixels.
-     *         Must be strictly positive (not zero).
+     * @param  region The region to read, in the same units than {@link #getRegion}.
+     * @param  sourceXSubsampling The number of columns to advance between pixels
+     *         in the given region. Must be strictly positive (not zero).
+     * @param  sourceYSubsampling The number of rows to advance between pixels
+     *         in the given region. Must be strictly positive (not zero).
      * @return The amount of pixels which would be unused if the reading was performed on this
      *         tile. Smaller number is better.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getImageReader reader} and this operation failed.
      */
-    protected int countWastedPixels(Rectangle region, int xSubsampling, int ySubsampling)
+    protected int countUnwantedPixels(Rectangle region,
+            final int sourceXSubsampling, final int sourceYSubsampling)
             throws IOException
     {
-        if (!canSubsample(xSubsampling, ySubsampling)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                    "subsampling", "(" + xSubsampling + ',' + ySubsampling + ')'));
-        }
-        final Rectangle current = getRegion();
-        region = current.intersection(region);
-        region.width  /= dx; current.width  /= dx; xSubsampling /= dx;
-        region.height /= dy; current.height /= dy; ySubsampling /= dy;
+        final Rectangle tile = getRegion();
+        region = tile.intersection(region);
         int count;
-        count  = region.width  - (region.width  / xSubsampling);
-        count += region.height - (region.height / ySubsampling);
-        count += (current.height - region.height) * current.width;
-        count += (current.width  - region.width)  * region.height; // Really 'region', not 'current'
+        count  = region.width  - (region.width  / sourceXSubsampling);
+        count += region.height - (region.height / sourceYSubsampling);
+        count += (tile.height - region.height) * tile.width;
+        count += (tile.width  - region.width)  * region.height; // Really 'region', not 'tile'
         return count;
     }
 
@@ -774,16 +849,18 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Compares two tiles for order. Tiles are sorted by {@linkplain #getInput input} first,
-     * then increasing {@linkplain #getImageIndex image index}, then increasing <var>y</var>
-     * coordinate, then increasing <var>x</var> coordinate.
-     * <p>
+     * Compares two tiles for optimal order in sequential reads. Default implementation sorts by
+     * {@linkplain #getInput input} first, then increasing {@linkplain #getImageIndex image index}.
      * This ordering allows efficient access for tiles that use the same
-     * {@linkplain #getImageReader image reader} and {@linkplain #getInput input}.
+     * {@linkplain #getImageReader image reader}.
      * <p>
-     * This method is consistent with {@link #equals} in the most common case where, for every
-     * tiles to be compared (typically every tiles given to a {@link TileManager} instance),
-     * inputs are of the same kind (preferrably {@link File}, {@link URL}, {@link URI} or
+     * For tiles having the same input and index, additional criterions are used like increasing
+     * subsampling, increasing <var>y</var> then increasing <var>x</var> coordinates. But the
+     * actual set of additional criterions may change.
+     * <p>
+     * This method is consistent with {@link #equals} in the most common case where every
+     * tiles to be compared (typically every tiles given to a {@link TileManager} instance)
+     * have inputs of the same kind (preferrably {@link File}, {@link URL}, {@link URI} or
      * {@link String}), and there is no duplicated ({@linkplain #getInput input},
      * {@linkplain #getImageIndex image index}) pair.
      */
@@ -792,15 +869,19 @@ public class Tile implements Comparable<Tile> {
         if (c == 0) {
             c = imageIndex - other.imageIndex;
             if (c == 0) {
-                c = y - other.y;
+                /*
+                 * From this point it doesn't matter much for disk access. But we continue to
+                 * define criterions for consistency with 'equals(Object)' method. We compare
+                 * subsampling first because it may be undefined while it is needed for (x,y)
+                 * ordering. Undefined subsampling will be ordered first (this is arbitrary).
+                 */
+                c = ySubsampling - other.ySubsampling;
                 if (c == 0) {
-                    c = x - other.x;
+                    c = xSubsampling - other.xSubsampling;
                     if (c == 0) {
-                        // From this point, it doesn't matter much for disk access.
-                        // But we continue to define criterions for consistency with 'equals'.
-                        c = dy - other.dy;
+                        c = (y * ySubsampling) - (other.y - other.ySubsampling);
                         if (c == 0) {
-                            c = dx - other.dx;
+                            c = (x * xSubsampling) - (other.x * other.xSubsampling);
                         }
                     }
                 }
@@ -813,7 +894,7 @@ public class Tile implements Comparable<Tile> {
      * Compares this tile with the specified one for equality. Two tiles are considered equal
      * if they have the same {@linkplain #getImageReaderSpi provider}, {@linkplain #getInput
      * input}, {@linkplain #getImageIndex image index}, {@linkplain #getRegion region} and
-     * {@linkplain #getPixelSize pixel size}.
+     * {@linkplain #getSubsampling subsampling}.
      */
     @Override
     public boolean equals(final Object object) {
@@ -822,9 +903,10 @@ public class Tile implements Comparable<Tile> {
         }
         if (object != null && object.getClass().equals(getClass())) {
             final Tile that = (Tile) object;
-            if (this.x  == that.x  && this.y  == that.y   &&
-                this.dx == that.dx && this.dy == that.dy  &&
-                this.imageIndex == that.imageIndex        &&
+            if (this.x == that.x  &&  this.y == that.y    &&
+                this.xSubsampling == that.xSubsampling    &&
+                this.ySubsampling == that.ySubsampling    &&
+                this.imageIndex   == that.imageIndex      &&
                 Utilities.equals(provider, that.provider) &&
                 Utilities.deepEquals(input, that.input))
             {
@@ -890,9 +972,9 @@ public class Tile implements Comparable<Tile> {
               .append("\", input=\"").append(getInputName())
               .append("\", index=").append(getImageIndex());
         if (width == 0 && height == 0) {
-            final Point origin = getOrigin();
-            buffer.append(", x=").append(origin.x)
-                  .append(", y=").append(origin.y);
+            final Point location = getLocation();
+            buffer.append(", x=").append(location.x)
+                  .append(", y=").append(location.y);
         } else try {
             final Rectangle region = getRegion();
             buffer.append(", x=")     .append(region.x)

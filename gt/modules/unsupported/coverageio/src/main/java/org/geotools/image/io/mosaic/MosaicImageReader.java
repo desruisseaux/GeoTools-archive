@@ -885,7 +885,7 @@ public class MosaicImageReader extends ImageReader {
              * the pixel size should be a dividor of subsampling; this condition must have been
              * checked by the tile manager when it selected the tiles to be returned.
              */
-            final Dimension pixelSize = tile.getPixelSize();
+            final Dimension pixelSize = tile.getSubsampling();
             assert xSubsampling % pixelSize.width  == 0 : pixelSize;
             assert ySubsampling % pixelSize.height == 0 : pixelSize;
             regionToRead.x      /= pixelSize.width;

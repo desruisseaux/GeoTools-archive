@@ -24,7 +24,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.IOException;
-import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -36,7 +35,7 @@ import org.geotools.util.logging.Logging;
  * When the {@linkplain Rectangle rectangle} that describe the destination region is known for every
  * tiles, {@linkplain Tile#Tile(ImageReader,Object,int,Rectangle,Dimension) tile constructor} can be
  * invoked directly. But in some cases the destination region is not known directly. Instead we have
- * a set of {@linkplain java.awt.image.BufferedImage buffered images} with a (0,0) origin for each
+ * a set of {@linkplain java.awt.image.BufferedImage buffered images} with a (0,0) location for each
  * of them, and different <cite>grid to CRS</cite> affine transforms. This {@code RegionCalculator}
  * class infers the destination regions automatically from the set of affine transforms.
  *
@@ -52,10 +51,10 @@ final class RegionCalculator {
     private static final double EPS = 1E-10;
 
     /**
-     * The origin of the final bounding box (the one including every tiles).
-     * Tiles will be translated as needed in order to fit this origin.
+     * The location of the final bounding box (the one including every tiles).
+     * Tiles will be translated as needed in order to fit this location.
      */
-    private final int xOrigin, yOrigin;
+    private final int xLocation, yLocation;
 
     /**
      * Tiles for which we should compute the bounding box only when we have them all.
@@ -64,23 +63,23 @@ final class RegionCalculator {
     private final Map<AffineTransform,Tile> tiles;
 
     /**
-     * Creates an initially empty tile collection with the origin set to (0,0).
+     * Creates an initially empty tile collection with the location set to (0,0).
      */
     public RegionCalculator() {
         this(null);
     }
 
     /**
-     * Creates an initially empty tile collection with the given origin.
+     * Creates an initially empty tile collection with the given location.
      *
-     * @param origin The origin, or {@code null} for (0,0).
+     * @param location The location, or {@code null} for (0,0).
      */
-    public RegionCalculator(final Point origin) {
-        if (origin != null) {
-            xOrigin = origin.x;
-            yOrigin = origin.y;
+    public RegionCalculator(final Point location) {
+        if (location != null) {
+            xLocation = location.x;
+            yLocation = location.y;
         } else {
-            xOrigin = yOrigin = 0;
+            xLocation = yLocation = 0;
         }
         // We really need an IdentityHashMap, not an ordinary HashMap, because we will
         // put many AffineTransforms that are equal in the sense of Object.equals  but
@@ -89,12 +88,12 @@ final class RegionCalculator {
     }
 
     /**
-     * Returns the origin of the tile collections to be created. The origin is usually (0,0)
-     * which match the {@linkplain java.awt.image.BufferedImage buffered image} origin, but
+     * Returns the location of the tile collections to be created. The location is usually (0,0)
+     * which match the {@linkplain java.awt.image.BufferedImage buffered image} location, but
      * it doesn't have to.
      */
-    public Point getOrigin() {
-        return new Point(xOrigin, yOrigin);
+    public Point getLocation() {
+        return new Point(xLocation, yLocation);
     }
 
     /**
@@ -196,14 +195,14 @@ final class RegionCalculator {
                 /*
                  * Computes the transformed bounds. If we fail to obtain it, there is probably
                  * something wrong with the tile (typically a wrong filename) but this is not
-                 * fatal to this method. In such case, we will transform only the origin instead
+                 * fatal to this method. In such case, we will transform only the location instead
                  * of the full box, which sometime imply a lost of accuracy but not always. Note
                  * that the user is likely to obtains the same exception if the MosaicImageReader
                  * attempts to read the same tile (but as long as it doesn't, it may work).
                  */
                 Rectangle bounds;
                 synchronized (tile) {
-                    tile.setPixelSize(entry.getValue());
+                    tile.setSubsampling(entry.getValue());
                     try {
                         bounds = tile.getRegion();
                     } catch (IOException exception) {
@@ -217,9 +216,9 @@ final class RegionCalculator {
                         bounds.width  = (int) Math.round(envelope.width);
                         bounds.height = (int) Math.round(envelope.height);
                     } else {
-                        final Point origin = tile.getOrigin();
-                        tr.transform(origin, origin);
-                        bounds = new Rectangle(origin.x, origin.y, 0, 0);
+                        final Point location = tile.getLocation();
+                        tr.transform(location, location);
+                        bounds = new Rectangle(location.x, location.y, 0, 0);
                     }
                     tile.setRegion(bounds);
                 }
@@ -232,11 +231,11 @@ final class RegionCalculator {
             }
             /*
              * Translates the tiles in such a way that the upper-left corner has the coordinates
-             * specified by (xOrigin, yOrigin). Adjusts the final affine transform concequently.
+             * specified by (xLocation, yLocation). Adjusts the final affine transform concequently.
              */
             if (groupBounds != null) {
-                final int dx = xOrigin - groupBounds.x;
-                final int dy = yOrigin - groupBounds.y;
+                final int dx = xLocation - groupBounds.x;
+                final int dy = yLocation - groupBounds.y;
                 if (dx != 0 && dy != 0) {
                     reference.translate(-dx, -dy);
                     groupBounds.translate(dx, dy);
@@ -452,8 +451,9 @@ final class RegionCalculator {
      * </ul>
      *
      * @param  ratio The ratio between affine transform coefficients.
-     * @return The pixel size relative to the smallest pixel, or 0 if it can't be computed.
-     *         If the ratio is between 0 and 1, then this method returns a negative number.
+     * @return The pixel size (actually subsampling) relative to the smallest pixel, or 0 if it
+     *         can't be computed. If the ratio is between 0 and 1, then this method returns a
+     *         negative number.
      */
     private static int level(double ratio) {
         if (ratio > 0 && ratio < Double.POSITIVE_INFINITY) {
