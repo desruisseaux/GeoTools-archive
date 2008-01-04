@@ -230,6 +230,16 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
             if (EMFUtils.has(eObject, name.getLocalPart())) {
                 return EMFUtils.get(eObject, name.getLocalPart());
             }
+            else {
+                //special case check for "_" since emf removes these from bean 
+                // property names
+                if ( name.getLocalPart().contains( "_" ) ) {
+                    String stripped = name.getLocalPart().replaceAll( "_", "" );
+                    if (EMFUtils.has(eObject, stripped)) {
+                        return EMFUtils.get(eObject, stripped);
+                    }        
+                }
+            }
         }
 
         return null;
