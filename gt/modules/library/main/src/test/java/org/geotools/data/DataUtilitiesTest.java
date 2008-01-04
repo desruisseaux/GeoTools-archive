@@ -38,6 +38,7 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.referencing.CRS;
+import org.geotools.test.TestData;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -90,7 +91,8 @@ public class DataUtilitiesTest extends DataTestCase {
         handleFile( "C:\\one\\two" );
         handleFile( "C:\\one\\two\\and three" );
         handleFile( "D:\\" );
-        handleFile( "\\\\host\\share\\file" ); 
+        if(TestData.isExtensiveTest())
+            handleFile( "\\\\host\\share\\file" ); 
     }
     public void handleFile( String path ) throws Exception {
         File file = new File( path );
