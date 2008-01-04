@@ -621,7 +621,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					// mosaic.
 					final MathTransform transform = CRS.findMathTransform(
 							requestedOriginalEnvelope
-									.getCoordinateReferenceSystem(), crs);
+									.getCoordinateReferenceSystem(), crs, true);
 					if (!transform.isIdentity()) {
 						requestedOriginalEnvelope = CRS.transform(transform,
 								requestedOriginalEnvelope);
