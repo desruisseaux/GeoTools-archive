@@ -3,6 +3,7 @@ package org.geotools.referencing.factory.epsg;
 import java.sql.Connection;
 import java.util.Set;
 
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -90,6 +91,9 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertEquals("The CRS should still be in the cache.","EPSG:4326", id);
     }
     public void testFindBeijing1954() throws FactoryException {
+        if(!TestData.isExtensiveTest())
+            return;
+        
         /*
          * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would

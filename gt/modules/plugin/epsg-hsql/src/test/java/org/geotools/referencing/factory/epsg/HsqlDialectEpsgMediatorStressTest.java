@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import net.sourceforge.groboutils.junit.v1.MultiThreadedTestRunner;
 import net.sourceforge.groboutils.junit.v1.TestRunnable;
 
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
@@ -59,6 +60,8 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
     }
     
     public void testRunners() throws Throwable {
+        if(!TestData.isExtensiveTest())
+            return;
         
         TestRunnable runners[] = new TestRunnable[RUNNER_COUNT];
         for (int i = 0; i < RUNNER_COUNT; i++) {

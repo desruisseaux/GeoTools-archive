@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -91,6 +92,9 @@ public class HsqlDialectEpsgMediatorTest extends TestCase {
         assertEquals("The CRS should still in the cache.","EPSG:4326", id);
     }
     public void testFindBeijing1954() throws FactoryException {
+        if(!TestData.isExtensiveTest())
+            return;
+        
         /*
          * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would

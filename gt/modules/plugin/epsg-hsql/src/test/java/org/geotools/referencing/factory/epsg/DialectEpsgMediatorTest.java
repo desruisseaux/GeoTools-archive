@@ -3,6 +3,7 @@ package org.geotools.referencing.factory.epsg;
 import java.sql.Connection;
 import java.util.Set;
 
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -60,6 +61,9 @@ public class DialectEpsgMediatorTest extends TestCase {
     }
 
     public void testFindWSG84() throws FactoryException {
+        if(!TestData.isExtensiveTest())
+            return;
+        
         String wkt;
         wkt = "GEOGCS[\"WGS 84\",\n"                                    +
               "  DATUM[\"World Geodetic System 1984\",\n"               +
@@ -89,6 +93,9 @@ public class DialectEpsgMediatorTest extends TestCase {
         assertNotNull("The CRS should still in the cache.",finder.findIdentifier(crs));
     }
     public void testFindBeijing1954() throws FactoryException {
+        if(!TestData.isExtensiveTest())
+            return;
+        
         /*
          * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
