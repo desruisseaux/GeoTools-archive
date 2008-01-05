@@ -78,6 +78,9 @@ public class ReprojectFeatureIterator implements Iterator {
         this.reader = reader;
         this.schema = schema;
         transformer.setMathTransform((MathTransform2D)transform);
+        
+        //set hte target coordinate system
+        transformer.setCoordinateReferenceSystem(schema.getCRS());
     }    
 
     /**

@@ -30,6 +30,7 @@ public class ReprojectFeatureResultsTest extends
 		.createOperation(crs,target).getMathTransform();
 		transformer = new GeometryCoordinateSequenceTransformer();
 		transformer.setMathTransform( tx );
+                transformer.setCoordinateReferenceSystem( target );
 	}
 	
 	public void testNormal() throws Exception {
@@ -44,8 +45,11 @@ public class ReprojectFeatureResultsTest extends
 			Point p1 = (Point) normal.getAttribute( "defaultGeom" );
 			Point p2 = (Point) reprojected.getAttribute( "defaultGeom" );
 			if(p1 != null) {
-			    p1 = (Point) transformer.transform( p1 );
-    			assertTrue( p1.equals( p2 ) );
+                            assertEquals( crs, p1.getUserData() );
+                            assertEquals( target, p2.getUserData() );
+			    
+                            p1 = (Point) transformer.transform( p1 );
+    			    assertTrue( p1.equals( p2 ) );
 			} else {
 			    assertNull(p2);
 			}

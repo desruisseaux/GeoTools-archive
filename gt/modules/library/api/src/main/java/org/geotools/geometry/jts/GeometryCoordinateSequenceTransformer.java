@@ -26,6 +26,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -39,7 +41,8 @@ import org.opengis.referencing.operation.TransformException;
 public class GeometryCoordinateSequenceTransformer {
     private MathTransform transform;
     private CoordinateSequenceTransformer csTransformer;
-
+    private CoordinateReferenceSystem crs;
+    
     public GeometryCoordinateSequenceTransformer() {
         csTransformer = new DefaultCoordinateSequenceTransformer();
     }
@@ -56,6 +59,19 @@ public class GeometryCoordinateSequenceTransformer {
         this.transform = transform;
     }
 
+    
+    /**
+     * Sets the target coordinate reference system.
+     * <p>
+     * This value is used to set the coordinate reference system of geometries
+     * after they have been transformed.
+     * </p>
+     * @param crs The target coordinate reference system.
+     */
+    public void setCoordinateReferenceSystem(CoordinateReferenceSystem crs) {
+        this.crs = crs;
+    }
+    
     /**
      * Applies the transform to the provided geometry, given
      * @param g
@@ -111,11 +127,18 @@ public class GeometryCoordinateSequenceTransformer {
             throw new IllegalArgumentException("Unsupported geometry type " + g.getClass());
         }
         
-        //copy over user data
-        //TODO: check for crs user data, and set it to be the new crs
-        transformed.setUserData( g.getUserData() );
+        //copy over user data, do a special check for coordinate reference 
+        // systme
+        transformed.setUserData(g.getUserData());
+
+        if ((g.getUserData() == null) || g.getUserData() instanceof CoordinateReferenceSystem) {
+            //set the new one to be the target crs
+            if (crs != null) {
+                transformed.setUserData(crs);
+            }
+        }
+        
         return transformed;
-       
     }
 
     /**
