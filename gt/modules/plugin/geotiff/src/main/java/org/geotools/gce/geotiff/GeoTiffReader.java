@@ -311,7 +311,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			double res[];
 			for (int i = 0; i < numOverviews; i++) {
 				res = getResolution(originalEnvelope, new Rectangle(0, 0,
-						reader.getWidth(i), reader.getHeight(i)), crs);
+						reader.getWidth(i+1), reader.getHeight(i+1)), crs);
 				overViewResolutions[i][0] = res[0];
 				overViewResolutions[i][1] = res[1];
 			}
