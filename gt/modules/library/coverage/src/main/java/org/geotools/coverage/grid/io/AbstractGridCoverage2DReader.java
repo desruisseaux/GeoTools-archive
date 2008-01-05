@@ -353,8 +353,9 @@ public abstract class AbstractGridCoverage2DReader implements
         // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
         // keeping a reference to the original image choice
         final List<Resolution> resolutions = new ArrayList<Resolution>();
+        resolutions.add(new Resolution(highestRes[0], highestRes[1], 0));
         for (int i = 0; i < overViewResolutions.length; i++) {
-            resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i));
+            resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i+1));
         }
         Collections.sort(resolutions);
 
