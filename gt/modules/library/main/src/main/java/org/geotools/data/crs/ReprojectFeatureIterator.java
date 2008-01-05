@@ -128,8 +128,9 @@ public class ReprojectFeatureIterator implements Iterator {
         //grab the next feature
         SimpleFeature next = reader.next();
         
-        //copy it since we are going to modify it
-        next = SimpleFeatureBuilder.copy( next );
+        //copy  it since we are going to modify it
+        //retype since the resuling must have a different schemas
+        next = SimpleFeatureBuilder.retype( next, schema );
         
         try {
             for (Iterator p = next.getProperties().iterator(); p.hasNext(); ) {
