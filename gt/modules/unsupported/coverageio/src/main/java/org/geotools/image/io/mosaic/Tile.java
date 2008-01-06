@@ -832,7 +832,7 @@ public class Tile implements Comparable<Tile> {
             return ((Comparable) input1).compareTo(input2);
         }
         if (input2 instanceof Comparable && input2.getClass().isInstance(input1)) {
-            return ((Comparable) input2).compareTo(input1);
+            return -((Comparable) input2).compareTo(input1);
         }
         int c = input1.getClass().getName().compareTo(input2.getClass().getName());
         if (c != 0) {

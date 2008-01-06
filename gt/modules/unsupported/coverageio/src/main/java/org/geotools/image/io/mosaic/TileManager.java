@@ -19,7 +19,9 @@ package org.geotools.image.io.mosaic;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.UnmodifiableArrayList;
+import org.geotools.util.Comparators;
 
 
 /**
@@ -128,8 +131,12 @@ public class TileManager {
         /*
          * Overwrites the tiles array with the same tiles, but ordered with same input firsts.
          */
+        @SuppressWarnings("unchecked")
+        final List<Tile>[] asArray = tilesByInput.values().toArray(new List[tilesByInput.size()]);
+        final Comparator<List<Tile>> comparator = Comparators.forLists();
+        Arrays.sort(asArray, comparator);
         int numTiles = 0;
-fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
+fill:   for (final List<Tile> sameInputs : asArray) {
             assert !sameInputs.isEmpty();
             Collections.sort(sameInputs);
             for (final Tile tile : sameInputs) {
@@ -304,6 +311,26 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      */
     public ImageGeometry getGridGeometry() {
         return geometry;
+    }
+
+    /**
+     * Returns a hash code value for this tile manager.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(tiles) ^ 83;
+    }
+
+    /**
+     * Compares this tile manager with the specified object for equality.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object != null && object.getClass().equals(getClass())) {
+            final TileManager that = (TileManager) object;
+            return Arrays.equals(this.tiles, that.tiles);
+        }
+        return false;
     }
 
     /**
