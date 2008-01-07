@@ -20,6 +20,7 @@ import java.awt.Component;
 import java.awt.Point;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
 import org.geotools.map.MapContext;
@@ -125,7 +126,9 @@ final class TreePopup extends JPopupMenu {
     public Component add(Component menuItem) {
 
         if (getComponentCount() > 0) {
-            if (!(getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem && menuItem instanceof TitledSeparatorItem)) {
+            if( getComponent(getComponentCount() - 1) instanceof SeparatorItem && menuItem instanceof SeparatorItem){
+                return menuItem;
+            } else if (!(getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem && menuItem instanceof TitledSeparatorItem)) {
                 return super.add(menuItem);
             } else {
                 remove(getComponentCount() - 1);

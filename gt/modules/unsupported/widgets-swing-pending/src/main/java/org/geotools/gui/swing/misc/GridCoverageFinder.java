@@ -36,14 +36,14 @@ import org.opengis.coverage.grid.GridCoverage;
  */
 public class GridCoverageFinder {
 
-    private static String GEOTIFF = ".tif";
-    private static String BMP = ".bmp";
-    private static String JPG = ".jpg";
-    private static String JPEG = ".jpeg";
-    private static String PNG = ".png";
+    private static final String GEOTIFF = ".tif";
+    private static final String BMP = ".bmp";
+    private static final String JPG = ".jpg";
+    private static final String JPEG = ".jpeg";
+    private static final String PNG = ".png";
 
     /**
-     * return a gridcoverage for GeoTiff file. Use a Map containing "url"
+     * return a gridcoverage for Raster file. Use a Map containing key "url"
      * @param params 
      * @return GridCoverage
      */

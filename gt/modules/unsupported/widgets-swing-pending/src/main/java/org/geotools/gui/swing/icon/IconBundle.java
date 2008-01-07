@@ -36,6 +36,8 @@ public class IconBundle {
 
     private IconBundle() {
         bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/icon/defaultset") );
+        bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/icon/crystalset") );
+        bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/icon/jsorelset") );
     }
 
     private URL getURL(String adress, Class base) {

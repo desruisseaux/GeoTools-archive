@@ -265,7 +265,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                     }
                 }
 
-                //featureType.
                 SimpleFeature sf = SimpleFeatureBuilder.build(featureType, values, null);
                 collection.add(sf);
 

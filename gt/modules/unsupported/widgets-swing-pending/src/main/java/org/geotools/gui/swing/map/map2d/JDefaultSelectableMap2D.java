@@ -215,16 +215,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
         }
 
-//        SLDTransformer st = new SLDTransformer();
-//
-//            try {
-//                String xml = st.transform(selectionStyle);            
-//                JOptionPane.showInputDialog("haha",xml);
-//            } catch (TransformerException ex) {
-//                ex.printStackTrace();
-//            }
-
-
         updateOverLayer();
     }
 

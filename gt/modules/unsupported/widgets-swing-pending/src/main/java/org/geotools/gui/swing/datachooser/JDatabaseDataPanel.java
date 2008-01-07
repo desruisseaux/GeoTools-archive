@@ -27,10 +27,12 @@ import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.oracle.OracleDataStoreFactory;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.datachooser.model.DBModel;
 import org.geotools.gui.swing.datachooser.model.KeyModel;
 import org.geotools.gui.swing.i18n.TextBundle;
@@ -91,7 +93,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                     }
                 });
 
-
+                
     }
 
     public Map getProperties() {
@@ -107,7 +109,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                 jcb_dbtype.setSelectedIndex(0);
                 
                 PostgisDataStoreFactory pdsf = new PostgisDataStoreFactory();
-
+                
                 KeyModel model = new KeyModel(tab_key);
                 model.setParam(pdsf.getParametersInfo());
                 model.parse(map);

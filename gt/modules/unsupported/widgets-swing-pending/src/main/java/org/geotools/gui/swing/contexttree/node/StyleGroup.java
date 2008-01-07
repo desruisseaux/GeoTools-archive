@@ -33,7 +33,9 @@ import org.geotools.styling.Symbolizer;
 public class StyleGroup implements SubNodeGroup {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final ImageIcon ICON_STYLE = IconBundle.getResource().getIcon("16_style");
+    private static final Icon ICON_STYLE = IconBundle.getResource().getIcon("16_style");
+    private static final Icon ICON_FTS = IconBundle.getResource().getIcon("16_style_fts");
+    private static final Icon ICON_RULE = IconBundle.getResource().getIcon("16_style_rule");
     
     public boolean isValid(Object target) {
         return (target instanceof MapLayer);
@@ -81,7 +83,7 @@ public class StyleGroup implements SubNodeGroup {
        
         @Override
         public Icon getIcon() {
-            return null;
+            return ICON_STYLE;
         }
 
         @Override
@@ -103,6 +105,8 @@ public class StyleGroup implements SubNodeGroup {
     
     private class FeatureTypeStyleNode extends ContextTreeNode{
         
+        
+        
         FeatureTypeStyleNode(ContextTreeModel model,FeatureTypeStyle target){
             super(model);
             setUserObject(target);
@@ -111,7 +115,7 @@ public class StyleGroup implements SubNodeGroup {
        
         @Override
         public Icon getIcon() {
-            return null;
+            return ICON_FTS;
         }
 
         @Override
@@ -141,7 +145,7 @@ public class StyleGroup implements SubNodeGroup {
        
         @Override
         public Icon getIcon() {
-            return null;
+            return ICON_RULE;
         }
 
         @Override

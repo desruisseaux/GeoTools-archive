@@ -51,6 +51,8 @@ import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.contexttree.node.SourceGroup;
 import org.geotools.gui.swing.contexttree.node.StyleGroup;
+import org.geotools.gui.swing.contexttree.popup.RuleMaxScaleItem;
+import org.geotools.gui.swing.contexttree.popup.RuleMinScaleItem;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDataChooser;
@@ -218,6 +220,10 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new SeparatorItem() );        
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
+        
+        popup.addItem(new RuleMinScaleItem());
+        popup.addItem(new RuleMaxScaleItem());
+        
                 
         popup.setMap(map);        
         colSelection.setMap(map);
