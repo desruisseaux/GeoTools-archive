@@ -49,7 +49,10 @@ import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
@@ -59,6 +62,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -795,6 +799,42 @@ public abstract class AbstractGridCoverage2DReader implements
 	 */
 	public final GeneralEnvelope getOriginalEnvelope() {
 		return originalEnvelope;
+	}
+	
+	/**
+	 * Retrieves the original grid to world transformation for this
+	 * {@link AbstractGridCoverage2DReader}.
+	 * 
+	 * @param pixInCell specifies the datum of the transformation we want.
+	 * @return the original grid to world transformation for this
+	 *         {@link AbstractGridCoverage2DReader}.
+	 */
+	public final MathTransform getOriginalGridToWorld(final PixelInCell pixInCell) {
+	    synchronized (this) {
+	        if(raster2Model==null){
+	            final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(this.originalGridRange,this.originalEnvelope);
+	            geMapper.setGridType(PixelInCell.CELL_CENTER);
+	            raster2Model=geMapper.createTransform();
+	        }
+	    }
+
+	    //we do not have to change the pixel datum
+	    if( pixInCell==PixelInCell.CELL_CENTER)
+	        return raster2Model;
+
+	    //we do have to change the pixel datum
+	    if(raster2Model instanceof AffineTransform){
+	        final AffineTransform tr= new AffineTransform((AffineTransform) raster2Model);
+	        tr.concatenate(AffineTransform.getTranslateInstance(-0.5,-0.5));
+	        return ProjectiveTransform.create(tr);
+	    }
+	    if(raster2Model instanceof IdentityTransform){
+	        final AffineTransform tr= new AffineTransform(1,0,0,1,0,0);
+	        tr.concatenate(AffineTransform.getTranslateInstance(-0.5,-0.5));
+	        return ProjectiveTransform.create(tr);
+	    }
+	    throw new IllegalStateException("This reader's grid to world transform is invalud!");
+
 	}
 
 	/**
