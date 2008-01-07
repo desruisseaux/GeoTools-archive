@@ -189,9 +189,7 @@ public class Encoder {
 
         index = new SchemaIndexImpl(new XSDSchema[] { schema });
 
-        bindingLoader = new BindingLoader();
-        bindingLoader.setContainer(configuration.setupBindings(bindingLoader.getContainer()));
-
+        bindingLoader = new BindingLoader(configuration.setupBindings());
         bindingWalker = new BindingWalker(bindingLoader);
 
         //create the context

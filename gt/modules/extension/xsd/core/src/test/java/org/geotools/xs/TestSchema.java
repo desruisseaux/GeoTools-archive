@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.namespace.QName;
 import org.geotools.xml.Binding;
@@ -37,6 +38,7 @@ import org.geotools.xml.Schemas;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.ElementImpl;
+import org.geotools.xml.impl.PicoMap;
 
 
 public abstract class TestSchema extends TestCase {
@@ -55,8 +57,11 @@ public abstract class TestSchema extends TestCase {
         }
 
         xsd = schema.getSchemaForSchema();
-        factory = new BindingLoader();
-        new XSConfiguration().registerBindings(factory.getContainer());
+        
+        Map bindings = new HashMap();
+        
+        new XSConfiguration().registerBindings(new PicoMap(bindings));
+        factory = new BindingLoader(bindings);        
     }
 
     protected XSDSimpleTypeDefinition typeDef;
