@@ -132,16 +132,6 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /** Standard java logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
-    /** Map of expression types to sql representation */
-    private static Map expressions = new HashMap();
-
-    static {
-        expressions.put(Add.class, "+");
-        expressions.put(Divide.class, "/");
-        expressions.put(Multiply.class, "*");
-        expressions.put(Subtract.class, "-");
-    }
-
     /** Character used to escape database schema, table and column names */
     private String sqlNameEscape = "";
 
@@ -875,33 +865,32 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     }
     
     public Object visit(Add expression, Object extraData) {
-        return visit((BinaryExpression)expression, extraData);
+        return visit((BinaryExpression)expression, "+", extraData);
     }
     public Object visit(Divide expression, Object extraData) {
-        return visit((BinaryExpression)expression, extraData);
+        return visit((BinaryExpression)expression, "%", extraData);
     }
     public Object visit(Multiply expression, Object extraData) {
-        return visit((BinaryExpression)expression, extraData);
+        return visit((BinaryExpression)expression, "*", extraData);
     }
     public Object visit(Subtract expression, Object extraData) {
-        return visit((BinaryExpression)expression, extraData);
+        return visit((BinaryExpression)expression, "-", extraData);
     }
 
     /**
      * Writes the SQL for the Math Expression.
      *
      * @param expression the Math phrase to be written.
+     * @param operator The operator of the expression.
      *
      * @throws RuntimeException for io problems
      */
-    protected Object visit(BinaryExpression expression, Object extraData) throws RuntimeException {
+    protected Object visit(BinaryExpression expression, String operator, Object extraData) throws RuntimeException {
         LOGGER.finer("exporting Expression Math");
-
-        String type = (String) expressions.get(expression.getClass());
 
         try {
             expression.getExpression1().accept(this, extraData);
-            out.write(" " + type + " ");
+            out.write(" " + operator + " ");
             expression.getExpression2().accept(this, extraData);
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing expression", ioe);
