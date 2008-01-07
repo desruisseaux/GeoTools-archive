@@ -683,16 +683,20 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * Invoked by {@link RegionCalculator} only. No other caller allowed.
+     * {@link #setSubsampling} must be invoked prior this method.
      * <p>
      * Note that invoking this method usually invalidate {@link #gridToCRS}. Calls to this method
      * should be closely followed by calls to {@link #translate} for fixing the "gridToCRS" value.
+     *
+     * @throws ArithmeticException if {@link #setSubsampling} has not be invoked.
      */
-    final void setRegion(final Rectangle region) {
+    final void setAbsoluteRegion(final Rectangle region) throws ArithmeticException {
         assert Thread.holdsLock(this);
-        x      = region.x;
-        y      = region.y;
-        width  = region.width;
-        height = region.height;
+        assert (region.width % xSubsampling) == 0 && (region.height % ySubsampling) == 0 : region;
+        x      = region.x      / xSubsampling;
+        y      = region.y      / ySubsampling;
+        width  = region.width  / xSubsampling;
+        height = region.height / ySubsampling;
     }
 
     /**
@@ -971,21 +975,30 @@ public class Tile implements Comparable<Tile> {
         buffer.append("format=\"").append(getFormatName())
               .append("\", input=\"").append(getInputName())
               .append("\", index=").append(getImageIndex());
-        if (width == 0 && height == 0) {
-            final Point location = getLocation();
-            buffer.append(", x=").append(location.x)
-                  .append(", y=").append(location.y);
-        } else try {
-            final Rectangle region = getRegion();
-            buffer.append(", x=")     .append(region.x)
-                  .append(", y=")     .append(region.y)
-                  .append(", width=") .append(region.width)
-                  .append(", height=").append(region.height);
-        } catch (IOException e) {
-            // Should not happen since we checked that 'getRegion' should be easy.
-            // If it happen anyway, put the exception message at the place where
-            // coordinates were supposed to appear, so we can debug.
-            buffer.append(e);
+        if (xSubsampling != 0 || ySubsampling != 0) {
+            buffer.append(", location=(");
+            if (width == 0 && height == 0) {
+                final Point location = getLocation();
+                buffer.append(location.x).append(',').append(location.y);
+            } else try {
+                final Rectangle region = getRegion();
+                buffer.append(region.x).append(',').append(region.y)
+                      .append("), size=(").append(region.width).append(',').append(region.height);
+            } catch (IOException e) {
+                // Should not happen since we checked that 'getRegion' should be easy.
+                // If it happen anyway, put the exception message at the place where
+                // coordinates were supposed to appear, so we can debug.
+                buffer.append(e);
+            }
+            final Dimension subsampling = getSubsampling();
+            buffer.append("), subsampling=(").append(subsampling.width)
+                  .append(',').append(subsampling.height).append(')');
+        } else {
+            // Location and subsampling not yet computed, so don't display it. We can not
+            // invoke 'getRegion()' neither since it would throw an IllegalStateException.
+            if (width != 0 || height != 0) {
+                buffer.append(", size=(").append(width).append(',').append(height).append(')');
+            }
         }
         return buffer.append(']').toString();
     }
@@ -1000,7 +1013,7 @@ public class Tile implements Comparable<Tile> {
     public static String toString(final Collection<Tile> tiles) {
         final TableWriter table = new TableWriter(null);
         table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
-        table.write("Format\tInput\tindex\tx\ty\twidth\theight\n");
+        table.write("Format\tInput\tindex\tx\ty\twidth\theight\tdx\tdy\n");
         table.nextLine(TableWriter.SINGLE_HORIZONTAL_LINE);
         table.setMultiLinesCells(true);
         for (final Tile tile : tiles) {
@@ -1023,6 +1036,15 @@ public class Tile implements Comparable<Tile> {
                 table.write(String.valueOf(tile.width));
                 table.nextColumn();
                 table.write(String.valueOf(tile.height));
+            } else {
+                table.nextColumn();
+                table.nextColumn();
+            }
+            if (tile.xSubsampling != 0 || tile.ySubsampling != 0) {
+                table.nextColumn();
+                table.write(String.valueOf(tile.xSubsampling));
+                table.nextColumn();
+                table.write(String.valueOf(tile.ySubsampling));
             }
             table.nextLine();
         }

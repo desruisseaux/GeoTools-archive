@@ -156,7 +156,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      */
     private void initialize() throws IOException {
         for (final Tile tile : getTiles()) {
-            final Rectangle expand = tile.getRegion();
+            final Rectangle expand = tile.getAbsoluteRegion();
             if (region == null) {
                 region = expand;
             } else {

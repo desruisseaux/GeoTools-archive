@@ -843,7 +843,7 @@ public class MosaicImageReader extends ImageReader {
             if (abortRequested()) {
                 break;
             }
-            final Rectangle tileRegion = tile.getRegion();
+            final Rectangle tileRegion = tile.getAbsoluteRegion();
             final Rectangle regionToRead = tileRegion.intersection(sourceRegion);
             /*
              * Computes the location of the region to read relative to the source region requested

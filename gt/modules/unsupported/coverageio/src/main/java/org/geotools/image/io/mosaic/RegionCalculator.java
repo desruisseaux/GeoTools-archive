@@ -142,32 +142,20 @@ final class RegionCalculator {
             double scale = Double.POSITIVE_INFINITY;
             for (final AffineTransform tr : levels.keySet()) {
                 final double s = XAffineTransform.getScale(tr);
-                if (s == scale) {
-                    double y = tr.getTranslateY();
-                    if (tr.getScaleY() < 0 || tr.getShearY() < 0) {
-                        y = -y;
-                    }
-                    if (y == yMin) {
-                        double x = tr.getTranslateX();
-                        if (tr.getScaleX() < 0 || tr.getShearX() < 0) {
-                            x = -x;
-                        }
-                        if (!(x < xMin)) {  // Use '!' for catching NaN.
-                            continue;
-                        }
-                        xMin = x;
-                    } else if (!(y < yMin)) {  // Use '!' for catching NaN.
-                        continue;
-                    }
+                double y = tr.getTranslateY(); if (tr.getScaleY() < 0 || tr.getShearY() < 0) y = -y;
+                double x = tr.getTranslateX(); if (tr.getScaleX() < 0 || tr.getShearX() < 0) x = -x;
+                if (s != scale) {
+                    if (!(s < scale)) continue;  // '!' is for catching NaN.
+                    scale = s;
                     yMin = y;
-                } else if (!(s < scale)) {  // Use '!' for catching NaN.
-                    continue;
+                } else if (y != yMin) {
+                    if (!(y < yMin)) continue;
+                    yMin = y;
+                } else if (x != xMin) {
+                    if (!(x < xMin)) continue;
                 }
-                scale = s;
+                xMin = x;
                 reference = tr;
-            }
-            if (Double.isInfinite(scale)) {
-                continue;
             }
             /*
              * Transforms the image bounding box from its own space to the reference space. If
@@ -177,6 +165,9 @@ final class RegionCalculator {
              * round (we do not clip as in the default Rectangle implementation) because we
              * really expect integer results.
              */
+            if (reference == null) {
+                continue;
+            }
             reference = new AffineTransform(reference); // Protects from upcomming changes.
             final AffineTransform toGrid;
             try {
@@ -220,7 +211,7 @@ final class RegionCalculator {
                         tr.transform(location, location);
                         bounds = new Rectangle(location.x, location.y, 0, 0);
                     }
-                    tile.setRegion(bounds);
+                    tile.setAbsoluteRegion(bounds);
                 }
                 if (groupBounds == null) {
                     groupBounds = bounds;
@@ -236,7 +227,7 @@ final class RegionCalculator {
             if (groupBounds != null) {
                 final int dx = xLocation - groupBounds.x;
                 final int dy = yLocation - groupBounds.y;
-                if (dx != 0 && dy != 0) {
+                if (dx != 0 || dy != 0) {
                     reference.translate(-dx, -dy);
                     groupBounds.translate(dx, dy);
                 }
@@ -279,7 +270,10 @@ final class RegionCalculator {
      * AffineTransform#getScaleY scale Y} coefficients in absolute value. This transform is
      * given a dimension of (1,1) and stored in an {@linkplain IdentityHashMap identity hash
      * map}. Other transforms are stored in the same map with their dimension relative to the
-     * first one, or discarted if the scale ratio is not an integer.
+     * first one, or discarted if the scale ratio is not an integer. In the later case, the
+     * transforms that were discarted from the first pass will be put in a new map to be added
+     * as the second element in the returned list. A new pass is run, discarted transforms from
+     * the second pass are put in the third element of the list, <cite>etc</cite>.
      *
      * @param  gridToCRS The <cite>grid to CRS</cite> affine transforms computed from the
      *         image to use in a pyramid. Those transforms will not be modified.
@@ -294,7 +288,8 @@ final class RegionCalculator {
         List<Map<AffineTransform,Dimension>> results = null;
         /*
          * First, computes the pyramid levels along the X axis. Hash map will be created
-         * when needed. Transforms that we were unable to classify will be discarted.
+         * when needed. Transforms that we were unable to classify will be discarted from
+         * the first run and put in a subsequent run.
          */
         AffineTransform[] transforms = gridToCRS.toArray(new AffineTransform[gridToCRS.size()]);
         Arrays.sort(transforms, X_COMPARATOR);
