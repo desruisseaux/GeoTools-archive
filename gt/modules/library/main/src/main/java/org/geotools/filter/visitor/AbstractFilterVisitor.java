@@ -268,7 +268,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor,
      * does nothing
      */
     public Object visit(BBOX filter, Object data) {
-    	return filter;
+        return visit((BinarySpatialOperator)filter, data);
     }
     
     /**
