@@ -216,11 +216,13 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
         try{
-            HttpURLConnection hc = getConnection(host,auth,false);
+            // try and complete the url first
+            HttpURLConnection hc = getConnection(createGetCapabilitiesRequest(host),auth,false);            
             InputStream is = getInputStream(hc);
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }catch(Throwable e){
-            HttpURLConnection hc = getConnection(createGetCapabilitiesRequest(host),auth,false);
+            // try the url as given second
+            HttpURLConnection hc = getConnection(host,auth,false);
             InputStream is = getInputStream(hc);
             t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }
