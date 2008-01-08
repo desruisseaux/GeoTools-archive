@@ -77,13 +77,15 @@ public class MosaicImageReader extends ImageReader {
     /**
      * The image reader created for each provider. Keys must be the union of
      * {@link TileManager#getImageReaderSpis} at every image index and must be computed right at
-     * {@link #setInput} invocation time. Values may be {@code null} and assigned only later.
+     * {@link #setInput} invocation time.
      */
     private final Map<ImageReaderSpi,ImageReader> readers;
 
     /**
      * The input given to each image reader. Values are {@linkplain Tile#getInput tile input}
      * before they have been wrapped in an {@linkplain ImageInputStream image input stream}.
+     *
+     * @see MosaicImageReadParam#readers
      */
     private final Map<ImageReader,Object> readerInputs;
 
@@ -283,6 +285,7 @@ public class MosaicImageReader extends ImageReader {
         if (reader == null) {
             reader = createReaderInstance(provider);
             readers.put(provider, reader);
+            assert provider.equals(reader.getOriginatingProvider());
         }
         return reader;
     }
@@ -293,7 +296,7 @@ public class MosaicImageReader extends ImageReader {
      * an exception. In such case the information obtained by the caller may be incomplete
      * and the exception may be thrown later when {@link #getTileReader} will be invoked.
      */
-    private Set<ImageReader> getTileReaders() {
+    final Set<ImageReader> getTileReaders() {
         for (final Map.Entry<ImageReaderSpi,ImageReader> entry : readers.entrySet()) {
             ImageReader reader = entry.getValue();
             if (reader == null) {
@@ -335,6 +338,30 @@ public class MosaicImageReader extends ImageReader {
             type = type.getSuperclass();
         }
         return null;
+    }
+
+    /**
+     * From the given set of tiles, select one tile to use as a prototype.
+     * This method tries to select the tile which use the most specific reader.
+     */
+    private Tile getSpecificTile(final Collection<Tile> tiles) {
+        final Set<ImageReader> readers = getTileReaders();
+        Class<?> type = Classes.specializedClass(readers);
+        while (type!=null && ImageReader.class.isAssignableFrom(type)) {
+            for (final ImageReader reader : readers) {
+                if (type.equals(reader.getClass())) {
+                    for (final Tile tile : tiles) {
+                        // We don't use ImageReaderSpi.isOwnReader(ImageReader)
+                        // because we need consistency with the 'readers' HashMap.
+                        if (tile.getImageReaderSpi().equals(reader.getOriginatingProvider())) {
+                            return tile;
+                        }
+                    }
+                }
+            }
+            type = type.getSuperclass();
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -533,12 +560,63 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
-     * Returns an image type which most closely represents the "raw" internal format of the
-     * image. The default implementation invokes {@code getRawImageType} for every tile readers,
-     * ommits the types that are not declared in <code>{@linkplain ImageReader#getImageTypes
-     * getImageTypes}(imageIndex)</code> for every tile readers, and returns the most common
-     * remainding value. If none is found, then some {@linkplain ImageReader#getRawImageType
-     * default specifier} is returned.
+     * Returns the policy for {@link #getImageTypes computing image types}. This is also
+     * the policy used by {@linkplain #read read} method when none has been explicitly
+     * {@linkplain MosaicImageReadParam#setImageTypePolicy set in read parameters}.
+     * <p>
+     * The default implementation makes the following choice based on the number of
+     * {@linkplain #getTileReaderSpis reader providers}:
+     * <ul>
+     *   <li>{@link ImageTypePolicy#SUPPORTED_BY_ALL SUPPORTED_BY_ALL} if two or more</li>
+     *   <li>{@link ImageTypePolicy#SUPPORTED_BY_ONE SUPPORTED_BY_ONE} if exactly one</li>
+     *   <li>{@link ImageTypePolicy#ALWAYS_ARGB ALWAYS_ARGB} if none.</li>
+     * </ul>
+     * <p>
+     * Note that {@link ImageTypePolicy#SUPPORTED_BY_ONE SUPPORTED_BY_ONE} is <strong>not</strong>
+     * a really safe choice even if there is only one provider, because the image type can also
+     * depends on {@linkplain Tile#getInput tile input}. However the safest choice in all cases
+     * ({@link ImageTypePolicy#SUPPORTED_BY_ALL SUPPORTED_BY_ALL}) is costly and often not
+     * necessary. The current implementation is a compromize between safety and performance.
+     * <p>
+     * If Java assertions are enabled, this reader will verify that {@code SUPPORTED_BY_ONE}
+     * produces the same result than {@code SUPPORTED_BY_ALL}.
+     * <p>
+     * Subclasses can override this method if they want a different policy.
+     */
+    public ImageTypePolicy getDefaultImageTypePolicy() {
+        switch (providers.size()) {
+            default: return ImageTypePolicy.SUPPORTED_BY_ALL;
+            case 1:  return ImageTypePolicy.SUPPORTED_BY_ONE;
+            case 0:  return ImageTypePolicy.ALWAYS_ARGB;
+        }
+    }
+
+    /**
+     * Returns type image type specifier for policy of pre-defined types.
+     * More types may be added in future GeoTools versions.
+     */
+    private static ImageTypeSpecifier getPredefinedImageType(final ImageTypePolicy policy) {
+        final int type;
+        switch (policy) {
+            case ALWAYS_ARGB: type = BufferedImage.TYPE_INT_ARGB; break;
+            default: throw new IllegalArgumentException(policy.toString());
+        }
+        return ImageTypeSpecifier.createFromBufferedImageType(type);
+    }
+
+    /**
+     * Returns an image type which most closely represents the "raw" internal format of the image.
+     * The default implementation depends on the {@linkplain #getDefaultImageTypePolicy default
+     * image type policy}:
+     * <ul>
+     *   <li>For {@link ImageTypePolicy#SUPPORTED_BY_ONE SUPPORTED_BY_ONE}, this method delegates
+     *       directly to the reader of an arbitrary tile (typically the first one).</li>
+     *   <li>For {@link ImageTypePolicy#SUPPORTED_BY_ALL SUPPORTED_BY_ALL}, this method invokes
+     *       {@code getRawImageType} for every tile readers, ommits the types that are not declared
+     *       in <code>{@linkplain ImageReader#getImageTypes getImageTypes}(imageIndex)</code> for
+     *       every tile readers, and returns the most common remainding value. If none is found,
+     *       then some {@linkplain ImageReader#getRawImageType default specifier} is returned.</li>
+     * </ul>
      *
      * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
      * @return A raw image type specifier.
@@ -546,8 +624,24 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
-        final ImageTypeSpecifier type = getRawImageType(getTileManager(imageIndex).getTiles());
-        return (type != null) ? type : super.getRawImageType(imageIndex);
+        final ImageTypePolicy policy = getDefaultImageTypePolicy();
+        switch (policy) {
+            default: {
+                return getPredefinedImageType(policy);
+            }
+            case SUPPORTED_BY_ONE: {
+                final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
+                final ImageTypeSpecifier type = getSpecificTile(tiles)
+                        .getImageReader(this, true, true).getRawImageType(imageIndex);
+                assert type.equals(getRawImageType(tiles));
+                return type;
+            }
+            case SUPPORTED_BY_ALL: {
+                final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
+                final ImageTypeSpecifier type = getRawImageType(tiles);
+                return (type != null) ? type : super.getRawImageType(imageIndex);
+            }
+        }
     }
 
     /**
@@ -627,36 +721,48 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
-     * Returns possible image types to which the given image may be decoded. Default implementation
-     * invokes <code>{@linkplain ImageReader#getImageTypes getImageTypes}(imageIndex)</code> on
-     * every tile readers and returns the intersection of all sets (i.e. only the types that are
-     * supported by every readers).
+     * Returns possible image types to which the given image may be decoded. The default
+     * implementation depends on the {@linkplain #getDefaultImageTypePolicy default image
+     * type policy}:
+     * <ul>
+     *   <li>For {@link ImageTypePolicy#SUPPORTED_BY_ONE SUPPORTED_BY_ONE}, this method delegates
+     *       directly to the reader of an arbitrary tile (typically the first one).</li>
+     *   <li>For {@link ImageTypePolicy#SUPPORTED_BY_ALL SUPPORTED_BY_ALL}, this method invokes
+     *       <code>{@linkplain ImageReader#getImageTypes getImageTypes}(imageIndex)</code> on
+     *       every tile readers and returns the intersection of all sets (i.e. only the types
+     *       that are supported by every readers).</li>
+     * </ul>
      *
      * @param  imageIndex  The image index, from 0 inclusive to {@link #getNumImages} exclusive.
      * @return The image type specifiers that are common to all tiles.
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
-        final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
-        return getImageTypes(tiles, null).iterator();
+        final ImageTypePolicy policy = getDefaultImageTypePolicy();
+        switch (policy) {
+            default: {
+                return Collections.singleton(getPredefinedImageType(policy)).iterator();
+            }
+            case SUPPORTED_BY_ONE: {
+                final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
+                final Iterator<ImageTypeSpecifier> types = getSpecificTile(tiles)
+                        .getImageReader(this, true, true).getImageTypes(imageIndex);
+                // We would like to put an assertion here, but iterator is unconvenient.
+                return types;
+            }
+            case SUPPORTED_BY_ALL: {
+                final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
+                return getImageTypes(tiles, null).iterator();
+            }
+        }
     }
 
     /**
-     * Returns default parameters appropriate for this format. The default implementation tries
-     * to delegate to an {@linkplain Tile#getImageReader tile image reader} which is an instance of
-     * the most specialized class. We look for the most specialized subclass because it may
-     * declares additional parameters that are ignored by super-classes. If we fail to find
-     * a suitable instance, then the default parameters are returned.
+     * Returns default parameters appropriate for this format.
      */
     @Override
-    public ImageReadParam getDefaultReadParam() {
-        if (!useDefaultImplementation("getDefaultReadParam", null)) {
-            final ImageReader reader = getTileReader();
-            if (reader != null) {
-                return reader.getDefaultReadParam();
-            }
-        }
-        return super.getDefaultReadParam();
+    public MosaicImageReadParam getDefaultReadParam() {
+        return new MosaicImageReadParam(this);
     }
 
     /**
@@ -758,6 +864,7 @@ public class MosaicImageReader extends ImageReader {
      *
      * @param  imageIndex The index of the image to be retrieved.
      * @param  param The parameters used to control the reading process, or {@code null}.
+     *         An instance of {@link MosaicImageReadParam} is expected but not required.
      * @return The desired portion of the image.
      * @throws IOException if an error occurs during reading.
      */
@@ -808,7 +915,28 @@ public class MosaicImageReader extends ImageReader {
                     imageType = param.getDestinationType();
                 }
                 if (imageType == null) {
-                    imageType = getRawImageType(tiles);
+                    ImageTypePolicy policy = null;
+                    if (param instanceof MosaicImageReadParam) {
+                        policy = ((MosaicImageReadParam) param).getImageTypePolicy();
+                    }
+                    if (policy == null) {
+                        policy = getDefaultImageTypePolicy();
+                    }
+                    switch (policy) {
+                        default: {
+                            imageType = getPredefinedImageType(policy);
+                            break;
+                        }
+                        case SUPPORTED_BY_ONE: {
+                            imageType = getSpecificTile(tiles).getImageReader(this, true, true)
+                                    .getRawImageType(imageIndex);
+                            break;
+                        }
+                        case SUPPORTED_BY_ALL: {
+                            imageType = getRawImageType(tiles);
+                            break;
+                        }
+                    }
                     if (imageType == null) {
                         throw new IIOException(Errors.format(ErrorKeys.DESTINATION_NOT_SET));
                     }
