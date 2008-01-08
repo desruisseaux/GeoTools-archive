@@ -248,6 +248,12 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         binding = Object.class;
                     }
 
+                    //nullability
+                    if ( "NO".equalsIgnoreCase( columns.getString( "IS_NULLABLE" ) ) ) {
+                        tb.nillable(false);
+                        tb.minOccurs(1);
+                    }
+                    
                     //determine if this attribute is a geometry or not
                     if (Geometry.class.isAssignableFrom(binding)) {
                         //add the attribute as a geometry, try to figure out 
