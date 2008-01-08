@@ -25,17 +25,18 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.geotools.gui.swing.misc.filtre.mnt.FiltreVDem;
 import org.geotools.gui.swing.misc.filtre.txt.FiltreCSV;
+import org.geotools.gui.swing.toolbox.AbstractTreeTool;
 
 /**
  *
  * @author  Johann
  */
-public class MNTVisualDem extends javax.swing.JPanel {
+public class VDem2CSVTool extends AbstractTreeTool {
     
     private PLMNTVisualDem plvdem = new PLMNTVisualDem();
     
     /** Creates new form MNTVisualDem */
-    public MNTVisualDem() {
+    public VDem2CSVTool() {
         initComponents();
     }
     

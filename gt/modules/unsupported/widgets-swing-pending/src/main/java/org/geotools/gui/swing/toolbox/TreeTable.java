@@ -17,100 +17,128 @@ package org.geotools.gui.swing.toolbox;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JDialog;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.toolbox.tools.shapecreation.ToolShapeCreation;
-import org.geotools.gui.swing.toolbox.tools.svg2mif.ToolSVG2MIF;
-import org.geotools.gui.swing.toolbox.tools.vdem2csv.ToolVdem2csv;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableNode;
-
-
 
 /**
  *
  * @author johann sorel
  */
-final class TreeTable extends JXTreeTable implements MouseListener{
+final class TreeTable extends JXTreeTable implements MouseListener {
 
+    protected final TreeToolDescriptor[] EMPTY_TREETOOLDESCRIPTOR_ARRAY = {};
+    protected final EventListenerList LISTENERS = new EventListenerList();
     private final ToolPackTreeNode root;
-
+    private final Map<TreeToolDescriptor, ToolTreeNode> tools = new HashMap<TreeToolDescriptor, ToolTreeNode>();
+    private DefaultTreeTableModel model;
+    
+    
     /**
-     * Tree widget to manage MapContexts and MapLayers
-     * 
+     * Tree widget to manage tools
      */
     TreeTable(JToolTree frame) {
         super(new DefaultTreeTableModel(new ToolPackTreeNode("Root")));
-        
+        model = (DefaultTreeTableModel) getTreeTableModel();
+
         getSelectionModel().setSelectionMode(getSelectionModel().SINGLE_SELECTION);
-                        
+
         setTreeCellRenderer(new DefaultTreeRenderer(new ToolTreeNodeProvider(frame)));
-                
-        String name = TextBundle.getResource().getString("col_tree");     
+
+        String name = TextBundle.getResource().getString("col_tree");
         name = "Tools";
-        getColumnModel().getColumn(0).setHeaderValue( name );
-        
+        getColumnModel().getColumn(0).setHeaderValue(name);
+
         root = (ToolPackTreeNode) getTreeTableModel().getRoot();
-        
-        addTool(new ToolSVG2MIF());
-        addTool(new ToolVdem2csv());
-        addTool(new ToolShapeCreation());
-                
+
         expandAll();
-        
+
         addMouseListener(this);
     }
 
-    
-    void addTool(Tool tool){
+    void addTool(TreeToolDescriptor tool) {
         
-        ToolTreeNode node = new ToolTreeNode(tool.getTitle());
-        node.setUserObject(tool);
-        
-        String[] path = tool.getPath();
-        
-        ToolPackTreeNode origine = root;
-        for(String str : path){
-            boolean found = false;
-            for(int i=0, max=origine.getChildCount(); (i<max && !found) ; i++){
-                TreeTableNode n = origine.getChildAt(i);
-                
-                if(n instanceof ToolPackTreeNode){
-                    if(  ((ToolPackTreeNode)n).getTitle().equals(str)){
-                        origine = (ToolPackTreeNode)n;
-                        found = true;
+        if (!tools.containsKey(tool)) {
+
+            ToolTreeNode node = new ToolTreeNode(tool.getTitle());
+            node.setUserObject(tool);
+
+            tools.put(tool, node);
+
+            String[] path = tool.getPath();
+
+            ToolPackTreeNode origine = root;
+            for (String str : path) {
+                boolean found = false;
+                for (int i = 0,  max = origine.getChildCount(); (i < max && !found); i++) {
+                    TreeTableNode n = origine.getChildAt(i);
+
+                    if (n instanceof ToolPackTreeNode) {
+                        if (((ToolPackTreeNode) n).getTitle().equals(str)) {
+                            origine = (ToolPackTreeNode) n;
+                            found = true;
+                        }
                     }
                 }
+
+                if (!found) {
+                    ToolPackTreeNode n = new ToolPackTreeNode(str);
+                    model.insertNodeInto(n,origine,origine.getChildCount());
+                    //origine.add(n);
+                    origine = n;                    
+                }
             }
-            
-            if(!found){
-                ToolPackTreeNode n = new ToolPackTreeNode(str);
-                origine.add(n);
-                origine = n;
-            }
+            model.insertNodeInto(node,origine, origine.getChildCount());
+            //origine.add(node);
+            expandPath(new TreePath(root));
         }
         
-        origine.add(node);
         
+
     }
+
+    void removeTool(TreeToolDescriptor tool) {
+
+        if (tools.containsKey(tool)) {
+            ToolTreeNode node = tools.get(tool);            
+            MutableTreeTableNode origine = (MutableTreeTableNode) node.getParent();
+            model.removeNodeFromParent(node);
+            //origine.remove(node);
+            
+            while (origine != root && origine.getChildCount() == 0) {
+                MutableTreeTableNode parent = (MutableTreeTableNode) origine.getParent();
+                model.removeNodeFromParent(origine);
+                //parent.remove(origine);
+                origine = parent;
+            }
+            
+            revalidate();
+
+            tools.remove(tool);
+        }
+    }
+    
+    TreeToolDescriptor[] getTreeToolDescriptors() {
+        return tools.keySet().toArray(EMPTY_TREETOOLDESCRIPTOR_ARRAY);
+    }
+
+    
 
     public void mouseClicked(MouseEvent e) {
         int nb = e.getClickCount();
-        if(nb == 2){
+        if (nb == 2) {
             TreePath path = getTreeSelectionModel().getSelectionPath();
             Object node = path.getLastPathComponent();
-            if(node instanceof ToolTreeNode){
-                JDialog dialog = new JDialog();
-                Tool tool = (Tool) ((ToolTreeNode)node).getUserObject();
-                dialog.setTitle(tool.getTitle());
-                dialog.setContentPane(tool.getComponent());
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setModal(true);
-                dialog.setVisible(true);                
+            if (node instanceof ToolTreeNode) {                
+                TreeToolDescriptor tool = (TreeToolDescriptor) ((ToolTreeNode) node).getUserObject();
+                fireActivation(tool);
             }
         }
     }
@@ -126,9 +154,26 @@ final class TreeTable extends JXTreeTable implements MouseListener{
 
     public void mouseExited(MouseEvent e) {
     }
-    
-
 
     
+    private void fireActivation(TreeToolDescriptor tool){
+        ToolTreeListener[] listeners = getToolTreeListeners();
+        
+        for(ToolTreeListener listener : listeners){
+            listener.treeToolActivated(tool);
+        }
+    }
+        
+    void addToolTreeListener(ToolTreeListener listener) {
+        LISTENERS.add(ToolTreeListener.class, listener);
+    }
+
+    void removeToolTreeListener(ToolTreeListener listener) {
+        LISTENERS.remove(ToolTreeListener.class, listener);
+    }
+
+    ToolTreeListener[] getToolTreeListeners() {
+        return LISTENERS.getListeners(ToolTreeListener.class);
+    }
 }
 

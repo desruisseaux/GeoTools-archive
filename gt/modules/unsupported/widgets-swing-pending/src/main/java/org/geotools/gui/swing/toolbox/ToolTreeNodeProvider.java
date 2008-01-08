@@ -64,7 +64,7 @@ public final class ToolTreeNodeProvider extends ComponentProvider<JLabel> {
         Object node = arg0.getValue();
         if(node instanceof ToolTreeNode){
             ToolTreeNode nod  = (ToolTreeNode) node;
-            Tool tool = (Tool)nod.getUserObject();            
+            TreeToolDescriptor tool = (TreeToolDescriptor)nod.getUserObject();            
             rendererComponent.setFont(new Font("Arial",Font.PLAIN,9));            
             rendererComponent.setIcon(ICON_TOOL);                        
             rendererComponent.setText( tool.getTitle() );

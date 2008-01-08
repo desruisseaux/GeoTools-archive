@@ -14,28 +14,37 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tools.vdem2csv;
+package org.geotools.gui.swing.toolbox;
 
 import javax.swing.JComponent;
-import org.geotools.gui.swing.toolbox.Tool;
 
 /**
- *
- * @author johann Sorel
+ * @author johann sorel
  */
-public class ToolVdem2csv implements Tool{
+public interface TreeTool {
 
+    public final TreeToolListener[] EMPTY_TREETOOLLISTENER_ARRAY = {};
     
-    public String getTitle(){
-        return "VDem > CSV";
-    }
+    
+    public JComponent getComponent();
+    
+    
+    /**
+     * add TreeToolListener
+     * @param listener
+     */
+    public void addTreeToolListener(TreeToolListener listener);
 
-    public JComponent getComponent() {
-        return new MNTVisualDem();
-    }
+    /**
+     * remove TreeToolListener
+     * @param listener to remove
+     */
+    public void removeTreeToolListener(TreeToolListener listener);
 
-    public String[] getPath() {
-        return new String[]{"File utilities","Convert tools"};
-    }
-
+    /**
+     * get TreeToolListener list
+     * @return the listener's table
+     */
+    public TreeToolListener[] getTreeToolListeners();
+    
 }

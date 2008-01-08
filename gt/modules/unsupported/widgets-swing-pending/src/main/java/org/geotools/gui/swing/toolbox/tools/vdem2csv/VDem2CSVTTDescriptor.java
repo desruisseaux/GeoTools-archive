@@ -14,13 +14,35 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tools.vdem2csv;
+
+import java.util.Map;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.TreeTool;
+import org.geotools.gui.swing.toolbox.TreeToolDescriptor;
 
 /**
  *
  * @author johann Sorel
  */
-public class ToolConstants {
+public class VDem2CSVTTDescriptor implements TreeToolDescriptor{
 
     
+    public String getTitle(){
+        return "VDem > CSV";
+    }
+
+
+    public String[] getPath() {
+        return new String[]{"File utilities","Convert tools"};
+    }
+
+    public TreeTool createTool(Map parameters) {        
+        return new VDem2CSVTool();
+    }
+
+    public Parameter[] getParametersInfo() {
+        return EMPTY_PARAMETER_ARRAY;
+    }
+
 }

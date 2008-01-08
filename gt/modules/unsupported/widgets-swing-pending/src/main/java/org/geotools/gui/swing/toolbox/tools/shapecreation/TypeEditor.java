@@ -35,11 +35,11 @@ public class TypeEditor implements TableCellEditor{
     private JComboBox box = new JComboBox();
     
     TypeEditor(){        
-        box.addItem(ToolShapeCreation.TYPE.INTEGER);
-        box.addItem(ToolShapeCreation.TYPE.LONG);
-        box.addItem(ToolShapeCreation.TYPE.DOUBLE);
-        box.addItem(ToolShapeCreation.TYPE.STRING);
-        box.addItem(ToolShapeCreation.TYPE.DATE);
+        box.addItem(ShapeCreationTTDescriptor.TYPE.INTEGER);
+        box.addItem(ShapeCreationTTDescriptor.TYPE.LONG);
+        box.addItem(ShapeCreationTTDescriptor.TYPE.DOUBLE);
+        box.addItem(ShapeCreationTTDescriptor.TYPE.STRING);
+        box.addItem(ShapeCreationTTDescriptor.TYPE.DATE);
     }
     
     

@@ -14,28 +14,16 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tools.svg2mif;
 
-import javax.swing.JComponent;
-import org.geotools.gui.swing.toolbox.Tool;
+package org.geotools.gui.swing.toolbox;
+
+import java.util.EventListener;
 
 /**
- *
- * @author Laurent Jegou
+ * @author johann sorel
  */
-public class ToolSVG2MIF implements Tool{
+public interface TreeToolListener extends EventListener{
 
-        
-    public String getTitle(){
-        return "SVG > MIF";
-    }
-
-    public JComponent getComponent() {
-        return new svg2mifPanel();
-    }
-
-    public String[] getPath() {
-        return new String[]{"File utilities","Convert tools"};
-    }
-
+    public void objectCreated(Object obj);
+    
 }

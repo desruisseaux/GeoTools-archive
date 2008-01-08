@@ -14,35 +14,34 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tools.shapecreation;
+package org.geotools.gui.swing.toolbox.tools.svg2mif;
 
-import javax.swing.JComponent;
-import org.geotools.gui.swing.toolbox.Tool;
+import java.util.Map;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.TreeTool;
+import org.geotools.gui.swing.toolbox.TreeToolDescriptor;
 
 /**
  *
- * @author johann sorel
+ * @author Laurent Jegou
  */
-public class ToolShapeCreation implements Tool{
+public class SVG2MIFTTDescriptor implements TreeToolDescriptor{
 
-    public static enum TYPE{
-        INTEGER,
-        LONG,
-        DOUBLE,
-        STRING,
-        DATE
-    }
-    
-    public String getTitle() {
-        return "Shapefile creation";
+        
+    public String getTitle(){
+        return "SVG > MIF";
     }
 
     public String[] getPath() {
-        return new String[]{"File utilities","Creation"};
+        return new String[]{"File utilities","Convert tools"};
     }
 
-    public JComponent getComponent() {
-        return new ShapeCreationPanel();
+    public TreeTool createTool(Map parameters) {
+        return new SVG2MIFTool();
+    }
+
+    public Parameter[] getParametersInfo() {
+        return EMPTY_PARAMETER_ARRAY;
     }
 
 }

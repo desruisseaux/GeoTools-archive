@@ -20,8 +20,10 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -69,6 +71,11 @@ import org.geotools.gui.swing.map.map2d.overLayer.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.toolbox.JToolTree;
+import org.geotools.gui.swing.toolbox.ToolTreeListener;
+import org.geotools.gui.swing.toolbox.TreeToolDescriptor;
+import org.geotools.gui.swing.toolbox.tools.shapecreation.ShapeCreationTTDescriptor;
+import org.geotools.gui.swing.toolbox.tools.svg2mif.SVG2MIFTTDescriptor;
+import org.geotools.gui.swing.toolbox.tools.vdem2csv.VDem2CSVTTDescriptor;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -99,6 +106,10 @@ public class DemoAll extends javax.swing.JFrame {
     private final ColorDecoration overBackColor= new ColorDecoration();
     private final NavigationDecoration overNavigation = new NavigationDecoration();
     private final MiniMapDecoration overMiniMap = new MiniMapDecoration();
+    
+    private final TreeToolDescriptor shapeTool = new ShapeCreationTTDescriptor();
+    private final TreeToolDescriptor vdem2csvTool = new VDem2CSVTTDescriptor();
+    private final TreeToolDescriptor svg2mifTool = new SVG2MIFTTDescriptor();
     
     private int nb = 1;
 
@@ -151,6 +162,23 @@ public class DemoAll extends javax.swing.JFrame {
         pantoolbox.add(BorderLayout.CENTER,tooltree);
         
                 
+        tooltree.addTool(shapeTool);
+        tooltree.addTool(svg2mifTool);
+        tooltree.addTool(vdem2csvTool);
+        
+        tooltree.addToolTreeListener(new ToolTreeListener() {
+
+            public void treeToolActivated(TreeToolDescriptor tool) {
+                JDialog dialog = new JDialog();
+                dialog.setTitle(tool.getTitle());
+                dialog.setContentPane(tool.createTool(new HashMap()).getComponent());
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setModal(true);
+                dialog.setVisible(true);
+            }
+        });
+        
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -291,6 +319,10 @@ public class DemoAll extends javax.swing.JFrame {
         guiChkSubStyle = new javax.swing.JCheckBoxMenuItem();
         jSeparator4 = new javax.swing.JSeparator();
         jMenuItem8 = new javax.swing.JMenuItem();
+        jMenu7 = new javax.swing.JMenu();
+        guiChkShapeCreateTool = new javax.swing.JCheckBoxMenuItem();
+        guiChkVdem2CSV = new javax.swing.JCheckBoxMenuItem();
+        guiChkSVG2MIF = new javax.swing.JCheckBoxMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItem5 = new javax.swing.JMenuItem();
         jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
@@ -547,6 +579,37 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu5.add(jMenuItem8);
 
         jMenu4.add(jMenu5);
+
+        jMenu7.setText("Tool Tree");
+
+        guiChkShapeCreateTool.setSelected(true);
+        guiChkShapeCreateTool.setText("Shapefile creation");
+        guiChkShapeCreateTool.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkShapeCreateToolActionPerformed(evt);
+            }
+        });
+        jMenu7.add(guiChkShapeCreateTool);
+
+        guiChkVdem2CSV.setSelected(true);
+        guiChkVdem2CSV.setText("VDem > CSV");
+        guiChkVdem2CSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkVdem2CSVActionPerformed(evt);
+            }
+        });
+        jMenu7.add(guiChkVdem2CSV);
+
+        guiChkSVG2MIF.setSelected(true);
+        guiChkSVG2MIF.setText("SVG > MIF");
+        guiChkSVG2MIF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkSVG2MIFActionPerformed(evt);
+            }
+        });
+        jMenu7.add(guiChkSVG2MIF);
+
+        jMenu4.add(jMenu7);
 
         jMenu6.setText("Map2D");
 
@@ -819,6 +882,30 @@ public class DemoAll extends javax.swing.JFrame {
         }
 }//GEN-LAST:event_guiChkSubSourceActionPerformed
 
+    private void guiChkSVG2MIFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkSVG2MIFActionPerformed
+        if(guiChkSVG2MIF.isSelected()){
+            tooltree.addTool(svg2mifTool);
+        }else{
+            tooltree.removeTool(svg2mifTool);
+        }        
+    }//GEN-LAST:event_guiChkSVG2MIFActionPerformed
+
+    private void guiChkVdem2CSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkVdem2CSVActionPerformed
+        if(guiChkVdem2CSV.isSelected()){
+            tooltree.addTool(vdem2csvTool);
+        }else{
+            tooltree.removeTool(vdem2csvTool);
+        }  
+    }//GEN-LAST:event_guiChkVdem2CSVActionPerformed
+
+    private void guiChkShapeCreateToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkShapeCreateToolActionPerformed
+        if(guiChkShapeCreateTool.isSelected()){
+            tooltree.addTool(shapeTool);
+        }else{
+            tooltree.removeTool(shapeTool);
+        }  
+    }//GEN-LAST:event_guiChkShapeCreateToolActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -847,10 +934,13 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JDialog dia_about;
     private javax.swing.ButtonGroup group_jdatachooser;
     private javax.swing.JCheckBoxMenuItem guiChkOpacity;
+    private javax.swing.JCheckBoxMenuItem guiChkSVG2MIF;
     private javax.swing.JCheckBoxMenuItem guiChkSelection;
+    private javax.swing.JCheckBoxMenuItem guiChkShapeCreateTool;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
     private javax.swing.JCheckBoxMenuItem guiChkSubSource;
     private javax.swing.JCheckBoxMenuItem guiChkSubStyle;
+    private javax.swing.JCheckBoxMenuItem guiChkVdem2CSV;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
     private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
@@ -867,6 +957,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;

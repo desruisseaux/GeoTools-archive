@@ -16,33 +16,39 @@
 
 package org.geotools.gui.swing.toolbox;
 
-import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
+import java.util.Map;
 
 /**
- * 
  * @author johann sorel
  */
-final class ToolTreeNode extends AbstractMutableTreeTableNode{
-    
-    private String name ="";
+public interface TreeToolDescriptor {
+
+    /**
+     * empty Parameter array
+     */
+    public final Parameter[] EMPTY_PARAMETER_ARRAY = {};
     
     /**
-     * Creates a new instance of ContextTreeNode
-     * @param model model of the tree
+     * @return name of the tool
      */
-    ToolTreeNode(String name) {
-        super();
-        this.name = name;
-    }    
+    public String getTitle();
     
+    /**
+     * @return String Path ex: {utilities,convert}
+     */
+    public String[] getPath();
     
-    public Object getValueAt(int arg0) {
-        return name;
-    }
-
-    public int getColumnCount() {
-        return 1;
-    }
+    /**
+     * @param parameters 
+     * @return the panel of the tool
+     */
+    public TreeTool createTool(Map parameters);
                 
-        
+    /**
+     * get an array of parameter describing parameters for the createComponent method
+     * @return array of Parameter
+     */
+    public Parameter[] getParametersInfo();
+    
+    
 }

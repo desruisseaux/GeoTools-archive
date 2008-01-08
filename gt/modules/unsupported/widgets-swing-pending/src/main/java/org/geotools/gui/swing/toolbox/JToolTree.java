@@ -42,8 +42,40 @@ public class JToolTree extends JComponent{
         add(BorderLayout.CENTER,pane);        
     }
     
-    public void addTool(Tool tool){
+    public void addTool(TreeToolDescriptor tool){
         treetable.addTool(tool);
+    }
+    
+    public void removeTool(TreeToolDescriptor tool){
+        treetable.removeTool(tool);
+    }
+    
+    public TreeToolDescriptor[] getTreeToolDescriptors(){
+        return treetable.getTreeToolDescriptors();
+    }
+    
+    /**
+     * add ToolTreeListener
+     * @param listener
+     */
+    public void addToolTreeListener(ToolTreeListener listener) {
+        treetable.addToolTreeListener(listener);
+    }
+
+    /**
+     * remove ToolTreeListener
+     * @param listener to remove
+     */
+    public void removeToolTreeListener(ToolTreeListener listener) {
+        treetable.removeToolTreeListener(listener);
+    }
+
+    /**
+     * get ToolTreeListener list
+     * @return the listener's table
+     */
+    public ToolTreeListener[] getToolTreeListeners() {
+        return treetable.getToolTreeListeners();
     }
     
     

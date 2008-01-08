@@ -17,7 +17,6 @@ package org.geotools.gui.swing.toolbox.tools.shapecreation;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
@@ -30,6 +29,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.crschooser.JCRSChooser;
+import org.geotools.gui.swing.toolbox.AbstractTreeTool;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author johann sorel
  */
-public class ShapeCreationPanel extends javax.swing.JPanel {
+public class ShapeCreationTool extends AbstractTreeTool {
 
     private ShapeAttModel model = new ShapeAttModel();
     private String geotype = "Point";
@@ -48,7 +48,7 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
     /** 
      * Creates new form shapeCreationPanel 
      */
-    public ShapeCreationPanel() {
+    public ShapeCreationTool() {
         initComponents();
         gui_tab.getSelectionModel().setSelectionMode(gui_tab.getSelectionModel().SINGLE_SELECTION);
         gui_tab.getColumn(1).setCellEditor(new TypeEditor());

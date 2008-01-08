@@ -14,32 +14,16 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.geotools.gui.swing.toolbox;
 
-import javax.swing.JComponent;
+import java.util.EventListener;
 
 /**
  * @author johann sorel
  */
-public interface Tool {
+public interface ToolTreeListener extends EventListener{
 
-    /**
-     * 
-     * @return name of the tool
-     */
-    public String getTitle();
-    
-    /**
-     * 
-     * @return String Path ex: {utilities;convert}
-     */
-    public String[] getPath();
-    
-    /**
-     * 
-     * @return the panel of the tool
-     */
-    public JComponent getComponent();
-    
+    public void treeToolActivated(TreeToolDescriptor tool);
     
 }
