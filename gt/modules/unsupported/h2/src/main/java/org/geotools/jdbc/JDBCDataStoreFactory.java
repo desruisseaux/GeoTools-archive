@@ -27,6 +27,10 @@ import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
 import org.geotools.feature.FeatureFactoryImpl;
@@ -291,6 +295,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
      * set of capabilities which includes:
      * <ul>
      *   <li>simple comparisons
+     *   <li>simple arithmetic
      *   <li>identifiers
      *   <li>null comparison
      *   <li>like comparison
@@ -302,6 +307,14 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         FilterCapabilities filterCapabilities = new FilterCapabilities();
         filterCapabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         filterCapabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        
+        //simple arithmetic
+        filterCapabilities.addType(Add.class);
+        filterCapabilities.addType(Subtract.class);
+        filterCapabilities.addType(Multiply.class);
+        filterCapabilities.addType(Divide.class);
+        
+        //simple comparisons
         filterCapabilities.addType(PropertyIsNull.class);
         filterCapabilities.addType(PropertyIsBetween.class);
         filterCapabilities.addType(Id.class);
