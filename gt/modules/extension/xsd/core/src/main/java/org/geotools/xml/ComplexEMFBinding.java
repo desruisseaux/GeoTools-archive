@@ -32,8 +32,8 @@ public class ComplexEMFBinding extends AbstractComplexEMFBinding
      * Creates the binding.
      * 
      * @param factory The factory for the emf model.
-     * @param target The qualified name of the type in the emf model that this
-     * binding works against. 
+         * @param target The qualified name of the type in the emf model that this
+         * binding works against. 
      */
     public ComplexEMFBinding( EFactory factory, QName target ) {
         super( factory );
