@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 import javax.swing.event.EventListenerList;
@@ -32,7 +33,6 @@ import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.node.LayerContextTreeNode;
 import org.geotools.gui.swing.contexttree.node.MapContextTreeNode;
 import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -49,6 +49,9 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  */
 public final class ContextTreeModel extends DefaultTreeTableModel implements MapLayerListListener {
 
+    private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/contexttree/Bundle");
+    
+    
     /**
      * number of the tree column
      */
@@ -98,7 +101,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         };
         setRoot(node);
 
-        columnNames.add(TextBundle.getResource().getString("col_tree"));
+        columnNames.add(BUNDLE.getString("col_tree"));
 
         setColumnIdentifiers(columnNames);
     }

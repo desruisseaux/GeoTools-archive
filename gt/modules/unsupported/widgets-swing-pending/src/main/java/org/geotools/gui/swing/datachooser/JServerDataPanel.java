@@ -20,9 +20,9 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 
@@ -31,6 +31,9 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  */
 public class JServerDataPanel extends javax.swing.JPanel implements DataPanel{
+    
+    private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
+    
     
     /** Creates new form DefaultShapeTypeChooser */
     public JServerDataPanel() {
@@ -76,7 +79,7 @@ public class JServerDataPanel extends javax.swing.JPanel implements DataPanel{
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("server");
+        return BUNDLE.getString("server");
     }
 
     public Component getChooserComponent() {

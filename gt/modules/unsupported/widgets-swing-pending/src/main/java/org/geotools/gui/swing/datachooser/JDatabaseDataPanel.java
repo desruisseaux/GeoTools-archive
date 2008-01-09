@@ -23,19 +23,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.oracle.OracleDataStoreFactory;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.datachooser.model.DBModel;
 import org.geotools.gui.swing.datachooser.model.KeyModel;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapLayer;
@@ -48,6 +46,8 @@ import org.geotools.styling.Style;
  */
 public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel {
 
+    private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
+    
     private DataStore store;
     private EventListenerList listeners = new EventListenerList();
 
@@ -170,9 +170,10 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
         jScrollPane2 = new javax.swing.JScrollPane();
         tab_key = new javax.swing.JTable();
 
-        lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle"); // NOI18N
+        lbl_dbtype.setText(bundle.getString("dbtype")); // NOI18N
 
-        but_refresh.setText(TextBundle.getResource().getString("refresh"));
+        but_refresh.setText(bundle.getString("connect")); // NOI18N
         but_refresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionRefresh(evt);
@@ -192,7 +193,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
         jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis", "oracle" }));
 
         but_add.setIcon(IconBundle.getResource().getIcon("16_data_add"));
-        but_add.setText(TextBundle.getResource().getString("add"));
+        but_add.setText(bundle.getString("add")); // NOI18N
         but_add.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         but_add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -229,7 +230,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(92, 92, 92)
                         .add(but_add)))
@@ -307,7 +308,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("database");
+        return BUNDLE.getString("database");
     }
 
     public Component getChooserComponent() {

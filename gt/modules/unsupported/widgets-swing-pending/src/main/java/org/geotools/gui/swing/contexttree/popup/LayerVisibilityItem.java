@@ -27,7 +27,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.contexttree.column.OpacityComponent;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
 
@@ -58,7 +57,7 @@ public class LayerVisibilityItem extends JPanel implements TreePopupItem{
         opa.setPreferredSize(new Dimension(30,20));
         
         jck.setOpaque(false);
-        jck.setText( TextBundle.getResource().getString("visible"));
+        jck.setText( BUNDLE.getString("visible"));
         jck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 layer.setVisible(jck.isSelected());

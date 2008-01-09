@@ -18,7 +18,6 @@ package org.geotools.gui.swing.contexttree.column;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellEditor;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Symbolizer;
@@ -41,7 +40,7 @@ public final class OpacityTreeTableColumn extends TreeTableColumn {
         setCellRenderer(new DefaultCellRenderer( new OpacityComponent()));
         setCellEditor(new DefaultCellEditor( new OpacityComponent()));
 
-        String name = TextBundle.getResource().getString("col_opacity");                
+        String name = BUNDLE.getString("col_opacity");                
         setHeaderValue( new HeaderInfo(name,null,IconBundle.getResource().getIcon("16_opacity") ));
         
         setEditable(true);

@@ -24,7 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
 /**
@@ -43,7 +42,7 @@ public class CutItem implements TreePopupItem{
     public CutItem(final JContextTree tree){
         this.tree = tree;
         
-        cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
+        cutitem = new JMenuItem(BUNDLE.getString("cut"));
         cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
         cutitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         

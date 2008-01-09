@@ -24,7 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
 /**
@@ -43,7 +42,7 @@ public class CopyItem implements TreePopupItem{
     public CopyItem(final JContextTree tree){
         this.tree = tree;
         
-        copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));
+        copyitem = new JMenuItem(BUNDLE.getString("copy"));
         copyitem.setIcon( IconBundle.getResource().getIcon("16_copy") );
         copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
         

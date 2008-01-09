@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerGeneralPanel;
@@ -45,7 +44,7 @@ public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
      * Creates a new instance of DefaultContextPropertyPop 
      */
     public LayerPropertyItem() {
-        super(TextBundle.getResource().getString("properties"));
+        super(BUNDLE.getString("properties"));
         init();
     }
 

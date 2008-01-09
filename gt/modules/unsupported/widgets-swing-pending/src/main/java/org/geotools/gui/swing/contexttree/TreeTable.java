@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -35,7 +36,6 @@ import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.renderer.DefaultContextTreeHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -49,6 +49,9 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  */
 final class TreeTable extends JXTreeTable {
 
+    private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/contexttree/Bundle");
+    
+    
     /**
      * Default copy action used for Key Input
      */
@@ -103,7 +106,7 @@ final class TreeTable extends JXTreeTable {
     /**
      * String added to layer name use when paste/duplicate
      */
-    private String PREFIX = "-" + TextBundle.getResource().getString("a_copy") + "- ";
+    private String PREFIX = "-" + BUNDLE.getString("a_copy") + "- ";
 
     /**
      * Tree widget to manage MapContexts and MapLayers
@@ -155,7 +158,7 @@ final class TreeTable extends JXTreeTable {
         initDragAndDrop();
         initKeySupport();
 
-        String name = TextBundle.getResource().getString("col_tree");
+        String name = BUNDLE.getString("col_tree");
         getColumnModel().getColumn(0).setHeaderValue(new HeaderInfo(name, " ", null));
 
 

@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapLayer;
@@ -39,7 +38,7 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
      * @param map 
      */
     public LayerZoomItem(Map map) {
-        this.setText(TextBundle.getResource().getString("zoom_to_layer"));
+        this.setText(BUNDLE.getString("zoom_to_layer"));
         setMap(map);
         init();
     }
