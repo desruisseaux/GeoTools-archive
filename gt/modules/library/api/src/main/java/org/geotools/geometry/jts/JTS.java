@@ -69,7 +69,7 @@ import org.geotools.resources.i18n.Errors;
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions.
  */
 public final class JTS {
     /**
@@ -538,13 +538,12 @@ public final class JTS {
         }
 
         // Ensure the CRS is 2D and retrieve the new envelope
-        final CoordinateReferenceSystem crs2D;
+        final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(crs);
+		if(crs2D==null)
+			throw new MismatchedDimensionException(
+					Errors.format(
+		                    ErrorKeys.CANT_SEPARATE_CRS_$1,crs));
 
-        try {
-            crs2D = CRSUtilities.getCRS2D(crs);
-        } catch (TransformException exception) {
-            throw new MismatchedDimensionException(exception.getLocalizedMessage());
-        }
 
         return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(), envelope.getWidth(),
             envelope.getHeight());

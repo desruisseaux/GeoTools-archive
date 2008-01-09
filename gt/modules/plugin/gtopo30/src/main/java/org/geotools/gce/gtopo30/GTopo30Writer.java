@@ -469,109 +469,106 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		// final GeneralEnvelope envelope = (GeneralEnvelope) gc.getEnvelope();
 		final double noData = -9999.0;
 
-		try {
 			// checking the directions of the axes.
 			// we need to understand how the axes of this gridcoverage are
 			// specified
-			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
-					.getCoordinateReferenceSystem());
-/*
- * Note from Martin: I suggest to replace all the above lines by the commented code below.
- * The change need to be tested in order to make sure that I didn't made a mistake in the
- * mathematic. Note that 'lonFirst' totally vanish.
- */
+	/*
+	 * Note from Martin: I suggest to replace all the above lines by the commented code below.
+	 * The change need to be tested in order to make sure that I didn't made a mistake in the
+	 * mathematic. Note that 'lonFirst' totally vanish.
+	 */
 			final AffineTransform gridToWorld = (AffineTransform) gc
-					.getGridGeometry().getGridToCoordinateSystem();
+					.getGridGeometry().getGridToCRS2D();
 			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
-
+	
 			final double geospatialDx = Math.abs((lonFirst) ? gridToWorld
 					.getScaleX() : gridToWorld.getShearY());
 			final double geospatialDy = Math.abs((lonFirst) ? gridToWorld
 					.getScaleY() : gridToWorld.getShearX());
-
+	
 			// getting corner coordinates of the left upper corner
 			final double xUpperLeft = lonFirst ? gridToWorld.getTranslateX()
 					: gridToWorld.getTranslateY();
 			final double yUpperLeft = lonFirst ? gridToWorld.getTranslateY()
 					: gridToWorld.getTranslateX();
-/*
-			final AffineTransform worldToGrid = (AffineTransform) gc
-					.getGridGeometry().getGridToCoordinateSystem().inverse();
-
-			final double geospatialDx = 1 / XAffineTransform.getScaleX0(worldToGrid);
-			final double geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
-
-			// getting corner coordinates of the left upper corner
-			final double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
-			final double yUpperLeft = -worldToGrid.getTranslateY() * geospatialDy;
-*/
-
+	/*
+				final AffineTransform worldToGrid = (AffineTransform) gc
+						.getGridGeometry().getGridToCoordinateSystem().inverse();
+	
+				final double geospatialDx = 1 / XAffineTransform.getScaleX0(worldToGrid);
+				final double geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
+	
+				// getting corner coordinates of the left upper corner
+				final double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
+				final double yUpperLeft = -worldToGrid.getTranslateY() * geospatialDy;
+	*/
+	
 			// calculating the physical resolution over x and y.
 			final int geometryWidth = gc.getGridGeometry().getGridRange()
 					.getLength(0);
 			final int geometryHeight = gc.getGridGeometry().getGridRange()
 					.getLength(1);
-
+	
 			if (dest instanceof File) {
-
+	
 				final PrintWriter out = new PrintWriter(
 						new BufferedOutputStream(new FileOutputStream(new File(
 								(File) dest, new StringBuffer(name).append(
 										".HDR").toString()))));
-
+	
 				// output header and assign header fields
 				out.print("BYTEORDER");
 				out.print(" ");
 				out.println("M");
-
+	
 				out.print("LAYOUT");
 				out.print(" ");
 				out.println("BIL");
-
+	
 				out.print("NROWS");
 				out.print(" ");
 				out.println(geometryHeight);
-
+	
 				out.print("NCOLS");
 				out.print(" ");
 				out.println(geometryWidth);
-
+	
 				out.print("NBANDS");
 				out.print(" ");
 				out.println("1");
-
+	
 				out.print("NBITS");
 				out.print(" ");
 				out.println("16");
-
+	
 				out.print("BANDROWBYTES");
 				out.print(" ");
 				out.println(geometryWidth * 2);
-
+	
 				out.print("TOTALROWBYTES");
 				out.print(" ");
 				out.println(geometryWidth * 2);
-
+	
 				out.print("BANDGAPBYTES");
 				out.print(" ");
 				out.println(0);
-
+	
 				out.print("NODATA");
 				out.print(" ");
 				out.println((int) noData);
-
+	
 				out.print("ULXMAP");
 				out.print(" ");
 				out.println(xUpperLeft);
-
+	
 				out.print("ULYMAP");
 				out.print(" ");
 				out.println(yUpperLeft);
-
+	
 				out.print("XDIM");
 				out.print(" ");
 				out.println(geospatialDx);
-
+	
 				out.print("YDIM");
 				out.print(" ");
 				out.println(geospatialDy);
@@ -582,90 +579,84 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				final ZipEntry e = new ZipEntry(gc.getName().toString()
 						+ ".HDR");
 				outZ.putNextEntry(e);
-
+	
 				// writing world file
 				outZ.write("BYTEORDER".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write("M".getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("LAYoutZ".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write("BIL".getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("NROWS".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Integer.toString(geometryHeight).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("NCOLS".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Integer.toString(geometryWidth).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("NBANDS".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write("1".getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("NBITS".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write("16".getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("BANDROWBYTES".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Integer.toString(geometryWidth * 2).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("TOTALROWBYTES".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Integer.toString(geometryWidth * 2).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("BANDGAPBYTES".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write("0".getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("NODATA".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Integer.toString((int) noData).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("ULXMAP".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Double.toString(xUpperLeft + (geospatialDx / 2))
 						.getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("ULYMAP".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Double.toString(yUpperLeft - (geospatialDy / 2))
 						.getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("XDIM".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Double.toString(geospatialDx).getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.write("YDIM".getBytes());
 				outZ.write(" ".getBytes());
 				outZ.write(Double.toString(geospatialDy).toString().getBytes());
 				outZ.write("\n".getBytes());
-
+	
 				outZ.closeEntry();
-
+	
 				((ZipOutputStream) dest).closeEntry();
 			}
-		} catch (TransformException e) {
-			final IOException ioe = new IOException(
-					"Unable to write world file");
-			ioe.initCause(e);
-			throw ioe;
-		}
 	}
 
 	/**
@@ -987,78 +978,69 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		 * values.
 		 */
 
-		try {
-			// /////////////////////////////////////////////////////////////////////
-			//
-			// trying to understand the direction of the first axis in order to
-			// understand how to associate the value to the crs.
-			//
-			// /////////////////////////////////////////////////////////////////////
-			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
-					.getCoordinateReferenceSystem());
-			final AffineTransform gridToWorld = (AffineTransform) gc
-					.getGridGeometry().getGridToCoordinateSystem();
-			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// trying to understand the direction of the first axis in order to
+		// understand how to associate the value to the crs.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final AffineTransform gridToWorld = (AffineTransform) gc
+				.getGridGeometry().getGridToCRS2D();
+		boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 
-			// /////////////////////////////////////////////////////////////////////
-			//
-			// associate value to crs
-			//
-			// /////////////////////////////////////////////////////////////////////
-			final double xPixelSize = (lonFirst) ? gridToWorld.getScaleX()
-					: gridToWorld.getShearY();
-			final double rotation1 = (lonFirst) ? gridToWorld.getShearX()
-					: gridToWorld.getScaleY();
-			final double rotation2 = (lonFirst) ? gridToWorld.getShearY()
-					: gridToWorld.getScaleX();
-			final double yPixelSize = (lonFirst) ? gridToWorld.getScaleY()
-					: gridToWorld.getShearX();
-			final double xLoc = lonFirst ? gridToWorld.getTranslateX()
-					: gridToWorld.getTranslateY();
-			final double yLoc = lonFirst ? gridToWorld.getTranslateY()
-					: gridToWorld.getTranslateX();
-			if (dest instanceof File) {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// associate value to crs
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final double xPixelSize = (lonFirst) ? gridToWorld.getScaleX()
+				: gridToWorld.getShearY();
+		final double rotation1 = (lonFirst) ? gridToWorld.getShearX()
+				: gridToWorld.getScaleY();
+		final double rotation2 = (lonFirst) ? gridToWorld.getShearY()
+				: gridToWorld.getScaleX();
+		final double yPixelSize = (lonFirst) ? gridToWorld.getScaleY()
+				: gridToWorld.getShearX();
+		final double xLoc = lonFirst ? gridToWorld.getTranslateX()
+				: gridToWorld.getTranslateY();
+		final double yLoc = lonFirst ? gridToWorld.getTranslateY()
+				: gridToWorld.getTranslateX();
+		if (dest instanceof File) {
 
-				dest = new File((File) dest, new StringBuffer(name).append(
-						".DMW").toString());
-				// writing world file
-				final PrintWriter out = new PrintWriter(new FileOutputStream(
-						(File) dest));
-				out.println(xPixelSize);
-				out.println(rotation1);
-				out.println(rotation2);
-				out.println(yPixelSize);
-				out.println(xLoc);
-				out.println(yLoc);
-				out.close();
-			} else {
-				final ZipOutputStream outZ = (ZipOutputStream) dest;
-				final ZipEntry e = new ZipEntry(gc.getName().toString()
-						+ ".DMW");
-				outZ.putNextEntry(e);
+			dest = new File((File) dest, new StringBuffer(name).append(
+					".DMW").toString());
+			// writing world file
+			final PrintWriter out = new PrintWriter(new FileOutputStream(
+					(File) dest));
+			out.println(xPixelSize);
+			out.println(rotation1);
+			out.println(rotation2);
+			out.println(yPixelSize);
+			out.println(xLoc);
+			out.println(yLoc);
+			out.close();
+		} else {
+			final ZipOutputStream outZ = (ZipOutputStream) dest;
+			final ZipEntry e = new ZipEntry(gc.getName().toString()
+					+ ".DMW");
+			outZ.putNextEntry(e);
 
-				// writing world file
-				outZ.write(Double.toString(xPixelSize).getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(rotation1).toString().getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(rotation2).toString().getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(xPixelSize).toString().getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(yPixelSize).toString().getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(xLoc).toString().getBytes());
-				outZ.write("\n".getBytes());
-				outZ.write(Double.toString(yLoc).toString().getBytes());
-				outZ.write("\n".getBytes());
-				((ZipOutputStream) dest).closeEntry();
-			}
-		} catch (TransformException e) {
-			final IOException ioe = new IOException(
-					"Unable to write world file");
-			ioe.initCause(e);
-			throw ioe;
+			// writing world file
+			outZ.write(Double.toString(xPixelSize).getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(rotation1).toString().getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(rotation2).toString().getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(xPixelSize).toString().getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(yPixelSize).toString().getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(xLoc).toString().getBytes());
+			outZ.write("\n".getBytes());
+			outZ.write(Double.toString(yLoc).toString().getBytes());
+			outZ.write("\n".getBytes());
+			((ZipOutputStream) dest).closeEntry();
 		}
 	}
 

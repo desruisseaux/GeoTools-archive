@@ -449,7 +449,11 @@ public final class CRS {
         if (envelope != null) {
             final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
             if (sourceCRS != null) try {
-                crs = CRSUtilities.getCRS2D(crs);
+                crs = CRS.getHorizontalCRS(crs);
+        		if(crs==null)
+        			throw new TransformException(
+        					Errors.format(
+        		                    ErrorKeys.CANT_SEPARATE_CRS_$1,crs));
                 if (!equalsIgnoreMetadata(sourceCRS, crs)) {
                     final GeneralEnvelope e;
                     e = transform(findMathTransform(sourceCRS, crs, true), envelope);

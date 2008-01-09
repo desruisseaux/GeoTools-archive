@@ -82,7 +82,6 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
- * @version 0.2
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
@@ -741,17 +740,16 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param crs
 	 * @throws DataSourceException
 	 */
-	protected final double[] getResolution(GeneralEnvelope envelope,
+	protected final static double[] getResolution(GeneralEnvelope envelope,
 			Rectangle2D dim, CoordinateReferenceSystem crs)
 			throws DataSourceException {
 		double[] requestedRes = null;
 		try {
-			if (dim != null && envelope != null) {
+			if (dim != null && envelope != null&&crs!=null) {
 				// do we need to transform the originalEnvelope?
-				final CoordinateReferenceSystem crs2D = CRSUtilities
-						.getCRS2D(envelope.getCoordinateReferenceSystem());
-
-				if (crs != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
+				final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(
+						envelope.getCoordinateReferenceSystem());
+				if (crs2D != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
 					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
 					if (!tr.isIdentity())
 						envelope = CRS.transform(tr, envelope);
@@ -762,9 +760,9 @@ public abstract class AbstractGridCoverage2DReader implements
 			}
 			return requestedRes;
 		} catch (TransformException e) {
-			throw new DataSourceException("Unable to get the resolution", e);
+			throw new DataSourceException("Unable to get resolution", e);
 		} catch (FactoryException e) {
-			throw new DataSourceException("Unable to get the resolution", e);
+			throw new DataSourceException("Unable to get resolution", e);
 		}
 	}
 

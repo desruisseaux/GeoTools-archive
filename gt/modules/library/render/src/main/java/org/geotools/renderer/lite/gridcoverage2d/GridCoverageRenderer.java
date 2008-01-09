@@ -57,6 +57,8 @@ import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.SLD;
@@ -223,7 +225,11 @@ public final class GridCoverageRenderer {
 		//
 		// ///////////////////////////////////////////////////////////////////
 		this.destinationSize = screenSize;
-		this.destinationCRS = CRSUtilities.getCRS2D(destinationCRS);
+		this.destinationCRS = CRS.getHorizontalCRS(destinationCRS);
+		if(this.destinationCRS==null)
+			throw new TransformException(
+					Errors.format(
+		                    ErrorKeys.CANT_SEPARATE_CRS_$1,destinationCRS));
 		gridToEnvelopeMapper = new GridToEnvelopeMapper();
 		gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
 		gridToEnvelopeMapper

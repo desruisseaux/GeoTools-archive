@@ -355,18 +355,24 @@ public final class CRSUtilities {
         Exception exception;
         final StringBuffer buffer = new StringBuffer();
         try {
-            crs = getCRS2D(crs);
-            if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
-                final CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null)
-                        .createOperation(crs, DefaultGeographicCRS.WGS84);
-                bounds = CRS.transform(op, bounds, null);
-            }
-            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
-            fmt.format(new  Latitude(bounds.getMinY()), buffer, null).append('-');
-            fmt.format(new  Latitude(bounds.getMaxY()), buffer, null).append(' ');
-            fmt.format(new Longitude(bounds.getMinX()), buffer, null).append('-');
-            fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
-            return buffer.toString();
+            final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(crs);
+			if(crs2D==null)
+				exception=new UnsupportedOperationException(
+						Errors.format(
+			                    ErrorKeys.CANT_SEPARATE_CRS_$1,crs));
+			else{
+	            if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs2D)) {
+	                final CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null)
+	                        .createOperation(crs2D, DefaultGeographicCRS.WGS84);
+	                bounds = CRS.transform(op, bounds, null);
+	            }
+	            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
+	            fmt.format(new  Latitude(bounds.getMinY()), buffer, null).append('-');
+	            fmt.format(new  Latitude(bounds.getMaxY()), buffer, null).append(' ');
+	            fmt.format(new Longitude(bounds.getMinX()), buffer, null).append('-');
+	            fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
+	            return buffer.toString();
+			}
         } catch (TransformException e) {
             exception = e;
         } catch (FactoryException e) {

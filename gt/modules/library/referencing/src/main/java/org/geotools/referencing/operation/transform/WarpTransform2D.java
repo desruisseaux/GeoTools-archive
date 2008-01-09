@@ -216,22 +216,22 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          * according the scale values, but the 'preScale' and 'postScale' are interchanged.
          * When JAI bug will be fixed, delete all the following block until the next comment.
          */
-        final double scaleX = preScaleX / postScaleX;
-        final double scaleY = preScaleY / postScaleY;
-        if (scaleX!=1 || scaleY!=1) {
-            final int n = numCoords*2;
-            if (cloneCoords) {
-                float[] o;
-                o=srcCoords; srcCoords=new float[n]; System.arraycopy(o, srcOffset, srcCoords, 0, n); srcOffset=0;
-                o=dstCoords; dstCoords=new float[n]; System.arraycopy(o, dstOffset, dstCoords, 0, n); dstOffset=0;
-            }
-            for (int i=0; i<n;) {
-                srcCoords[srcOffset + i  ] /= scaleX;
-                dstCoords[dstOffset + i++] *= scaleX;
-                srcCoords[srcOffset + i  ] /= scaleY;
-                dstCoords[dstOffset + i++] *= scaleY;
-            }
-        }
+//        final double scaleX = preScaleX / postScaleX;
+//        final double scaleY = preScaleY / postScaleY;
+//        if (scaleX!=1 || scaleY!=1) {
+//            final int n = numCoords*2;
+//            if (cloneCoords) {
+//                float[] o;
+//                o=srcCoords; srcCoords=new float[n]; System.arraycopy(o, srcOffset, srcCoords, 0, n); srcOffset=0;
+//                o=dstCoords; dstCoords=new float[n]; System.arraycopy(o, dstOffset, dstCoords, 0, n); dstOffset=0;
+//            }
+//            for (int i=0; i<n;) {
+//                srcCoords[srcOffset + i  ] /= scaleX;
+//                dstCoords[dstOffset + i++] *= scaleX;
+//                srcCoords[srcOffset + i  ] /= scaleY;
+//                dstCoords[dstOffset + i++] *= scaleY;
+//            }
+//        }
         /*
          * Note: Warp semantic (transforms coordinates from destination to source) is the
          *       opposite of MathTransform semantic (transforms coordinates from source to

@@ -45,7 +45,10 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.NumberRange;
 
 
@@ -93,6 +96,41 @@ public final class CoverageUtilities {
             }
         }
         return CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
+    }
+    
+    /**
+     * Returns a two-dimensional horizontal CRS for the given coverage. This method performs a
+     * <cite>best effort</cite>; the returned CRS is not garanteed to succed.
+     *
+     * @param  coverage The coverage for which to obtains a two-dimensional horizontal CRS.
+     * @return The two-dimensional horizontal CRS.
+     * @throws TransformException if the CRS can't be reduced to two dimensions.
+     */
+    public static CoordinateReferenceSystem getHorizontalCRS(final Coverage coverage)
+            throws TransformException
+    {
+    	CoordinateReferenceSystem returnedCRS=null;
+        if (coverage instanceof GridCoverage2D) {
+        	returnedCRS= ((GridCoverage2D) coverage).getCoordinateReferenceSystem2D();
+        }
+        if (coverage instanceof GridCoverage) {
+            final GridGeometry2D geometry =
+                    GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
+            if (geometry.isDefined(GridGeometry2D.CRS)) {
+            	returnedCRS= geometry.getCoordinateReferenceSystem2D();
+            } else try {
+            	returnedCRS= geometry.reduce(coverage.getCoordinateReferenceSystem());
+            } catch (FactoryException exception) {
+                // Ignore; we will fallback on the code below.
+            }
+        }
+        if(returnedCRS==null)
+        	returnedCRS= CRS.getHorizontalCRS(coverage.getCoordinateReferenceSystem());
+        if(returnedCRS==null)
+                throw new TransformException(Errors.format(
+                          ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                          returnedCRS));
+        return returnedCRS;
     }
 
     /**

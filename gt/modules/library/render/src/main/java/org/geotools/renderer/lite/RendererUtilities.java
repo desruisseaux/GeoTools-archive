@@ -32,6 +32,8 @@ import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
@@ -213,13 +215,11 @@ public final class RendererUtilities {
 		// Make sure the CRS is 2d
 		//
 		// //
-		final CoordinateReferenceSystem crs2d;
-		try {
-			crs2d = CRSUtilities.getCRS2D(crs);
-		} catch (TransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
-		}
+		final CoordinateReferenceSystem crs2d= CRS.getHorizontalCRS(crs);
+        if(crs2d==null)
+            throw new UnsupportedOperationException(Errors.format(
+                      ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                      crs));			
 
 		// //
 		//
@@ -298,8 +298,11 @@ public final class RendererUtilities {
 		// simboss: TODO TO BE REMOVED
 		// we need to take into account axes swapping. We can do that by
 		// preconcatenating an axes swapping to the transform we perform below
-		final CoordinateReferenceSystem tempCRS = CRSUtilities
-				.getCRS2D(coordinateReferenceSystem);
+		final CoordinateReferenceSystem tempCRS = CRS.getHorizontalCRS(coordinateReferenceSystem);
+        if(tempCRS==null)
+            throw new TransformException(Errors.format(
+                      ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                      coordinateReferenceSystem));
 		// final CoordinateSystem tempCS = tempCRS.getCoordinateSystem();
 		// final MathTransform preTransform;
 		// if (tempCS.getAxis(0).getDirection().absolute().equals(
@@ -515,8 +518,11 @@ public final class RendererUtilities {
 			// get CRS2D for this referenced envelope, check that its 2d
 			//
 			// //
-			final CoordinateReferenceSystem tempCRS = CRSUtilities
-					.getCRS2D(envelope.getCoordinateReferenceSystem());
+			final CoordinateReferenceSystem tempCRS = CRS.getHorizontalCRS(envelope.getCoordinateReferenceSystem());
+	        if(tempCRS==null)
+	            throw new TransformException(Errors.format(
+	                      ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+	                      envelope.getCoordinateReferenceSystem()));
 			// make sure the crs is 2d
 			envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
 			MathTransform toWGS84 = StreamingRenderer.getMathTransform(tempCRS,
@@ -625,6 +631,7 @@ public final class RendererUtilities {
 		// remember, this is the denominator, not the actual scale;
 	}
 
+	
 	/**
 	 * This worldToScreenTransform method makes the assumption that the crs is
 	 * in Lon,Lat or Lat,Lon. If the provided envelope does not carry along a
@@ -639,41 +646,42 @@ public final class RendererUtilities {
 	 * @param paintArea
 	 *            The area to paint as a rectangle
 	 * @param destinationCrs
+	 * @throws TransformException 
 	 * @todo add georeferenced envelope check when merge with trunk will
 	 *         be performed
+	 * 
 	 */
 	public static AffineTransform worldToScreenTransform(Envelope mapExtent,
-			Rectangle paintArea, CoordinateReferenceSystem destinationCrs) {
-		try {
+			Rectangle paintArea, CoordinateReferenceSystem destinationCrs) throws TransformException {
 
 			// is the crs also lon,lat?
-			final boolean lonFirst = CRSUtilities.getCRS2D(destinationCrs)
-					.getCoordinateSystem().getAxis(0).getDirection().absolute()
-					.equals(AxisDirection.EAST);
-			final GeneralEnvelope newEnvelope = lonFirst ? new GeneralEnvelope(
-					new double[] { mapExtent.getMinX(), mapExtent.getMinY() },
-					new double[] { mapExtent.getMaxX(), mapExtent.getMaxY() })
-					: new GeneralEnvelope(new double[] { mapExtent.getMinY(),
-							mapExtent.getMinX() }, new double[] {
-							mapExtent.getMaxY(), mapExtent.getMaxX() });
-			newEnvelope.setCoordinateReferenceSystem(destinationCrs);
+		final CoordinateReferenceSystem crs2D= CRS.getHorizontalCRS(destinationCrs);
+		if(crs2D==null)
+			throw new TransformException(Errors.format(
+                    ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                    destinationCrs));
+		final boolean lonFirst = crs2D
+				.getCoordinateSystem().getAxis(0).getDirection().absolute()
+				.equals(AxisDirection.EAST);
+		final GeneralEnvelope newEnvelope = lonFirst ? new GeneralEnvelope(
+				new double[] { mapExtent.getMinX(), mapExtent.getMinY() },
+				new double[] { mapExtent.getMaxX(), mapExtent.getMaxY() })
+				: new GeneralEnvelope(new double[] { mapExtent.getMinY(),
+						mapExtent.getMinX() }, new double[] {
+						mapExtent.getMaxY(), mapExtent.getMaxX() });
+		newEnvelope.setCoordinateReferenceSystem(destinationCrs);
 
-			//			
-			// with this method I can build a world to grid transform
-			// without adding half of a pixel translations. The cost
-            // is a hashtable lookup. The benefit is reusing the last
-            // transform (instead of creating a new one) if the grid
-            // and envelope are the same one than during last invocation.
-            final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
-            m.setGridRange(new GeneralGridRange(paintArea));
-            m.setEnvelope(newEnvelope);
-            return (AffineTransform) (m.createTransform().inverse());
+		//			
+		// with this method I can build a world to grid transform
+		// without adding half of a pixel translations. The cost
+        // is a hashtable lookup. The benefit is reusing the last
+        // transform (instead of creating a new one) if the grid
+        // and envelope are the same one than during last invocation.
+        final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
+        m.setGridRange(new GeneralGridRange(paintArea));
+        m.setEnvelope(newEnvelope);
+        return (AffineTransform) (m.createTransform().inverse());
 
-		} catch (IndexOutOfBoundsException e) {
-			return null;
-		} catch (TransformException e) {
-			return null;
-		}
 
 	}
 }
