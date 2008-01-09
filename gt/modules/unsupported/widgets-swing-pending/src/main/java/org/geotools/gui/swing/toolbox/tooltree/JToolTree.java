@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tooltree;
 
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tooltree;
 
 
 import org.geotools.gui.swing.contexttree.*;

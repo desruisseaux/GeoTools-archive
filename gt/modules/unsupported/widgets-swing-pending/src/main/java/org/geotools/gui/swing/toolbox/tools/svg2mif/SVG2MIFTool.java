@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreMifMid;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreSVG;
-import org.geotools.gui.swing.toolbox.AbstractTreeTool;
+import org.geotools.gui.swing.toolbox.AbstractWidgetTool;
 import org.geotools.gui.swing.toolbox.tools.svg2mif.element.DCircle;
 import org.geotools.gui.swing.toolbox.tools.svg2mif.element.DLine;
 import org.geotools.gui.swing.toolbox.tools.svg2mif.element.DPoint;
@@ -31,7 +31,7 @@ import org.geotools.gui.swing.toolbox.tools.svg2mif.element.xml.Parser;
  *
  * @author  johann sorel
  */
-public class SVG2MIFTool extends AbstractTreeTool {
+public class SVG2MIFTool extends AbstractWidgetTool {
 
     private String fichierSVG;
     private String fichierMIF;

@@ -17,9 +17,9 @@
 package org.geotools.gui.swing.toolbox.tools.shapecreation;
 
 import java.util.Map;
-import org.geotools.gui.swing.toolbox.Parameter;
-import org.geotools.gui.swing.toolbox.TreeTool;
-import org.geotools.gui.swing.toolbox.TreeToolDescriptor;
+import org.geotools.gui.swing.toolbox.tooltree.Parameter;
+import org.geotools.gui.swing.toolbox.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
 
 /**
  *
@@ -43,7 +43,7 @@ public class ShapeCreationTTDescriptor implements TreeToolDescriptor{
         return new String[]{"File utilities","Creation"};
     }
 
-    public TreeTool createTool(Map parameters) {
+    public WidgetTool createTool(Map parameters) {
         return new ShapeCreationTool();
     }
 

@@ -16,36 +16,36 @@
 
 package org.geotools.gui.swing.toolbox;
 
-import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
+import org.geotools.gui.swing.toolbox.tooltree.*;
+import javax.swing.JComponent;
 
 /**
- * 
  * @author johann sorel
  */
-final class ToolPackTreeNode extends AbstractMutableTreeTableNode{
+public interface WidgetTool extends Tool{
+
+    public final WidgetToolListener[] EMPTY_TREETOOLLISTENER_ARRAY = {};
     
-    private String name ="";
+    
+    public JComponent getComponent();
+    
     
     /**
-     * Creates a new instance of ContextTreeNode
-     * @param model model of the tree
+     * add WidgetToolListener
+     * @param listener
      */
-    ToolPackTreeNode(String name) {
-        super();
-        this.name = name;
-    }
-    
-    public String getTitle(){
-        return name;
-    }
-    
-    public Object getValueAt(int arg0) {
-        return name;
-    }
+    public void addWidgetToolListener(WidgetToolListener listener);
 
-    public int getColumnCount() {
-        return 1;
-    }
-                
-        
+    /**
+     * remove WidgetToolListener
+     * @param listener to remove
+     */
+    public void removeWidgetToolListener(WidgetToolListener listener);
+
+    /**
+     * get WidgetToolListener list
+     * @return the listener's table
+     */
+    public WidgetToolListener[] getWidgetToolListeners();
+    
 }

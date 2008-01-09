@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.toolbox;
 
+import org.geotools.gui.swing.toolbox.tooltree.*;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
@@ -23,7 +24,7 @@ import javax.swing.event.EventListenerList;
 /**
  * @author johann sorel
  */
-public abstract class AbstractTreeTool extends JPanel implements TreeTool{
+public abstract class AbstractWidgetTool extends JPanel implements WidgetTool{
 
     protected final EventListenerList LISTENERS = new EventListenerList();
 
@@ -32,9 +33,9 @@ public abstract class AbstractTreeTool extends JPanel implements TreeTool{
     }
     
     protected void fireObjectCreation(Object obj){
-        TreeToolListener[] listeners = getTreeToolListeners();
+        WidgetToolListener[] listeners = getWidgetToolListeners();
         
-        for(TreeToolListener listener : listeners){
+        for(WidgetToolListener listener : listeners){
             listener.objectCreated(obj);
         }
     }
@@ -43,24 +44,24 @@ public abstract class AbstractTreeTool extends JPanel implements TreeTool{
      * add TreeToolListener
      * @param listener
      */
-    public void addTreeToolListener(TreeToolListener listener) {
-        LISTENERS.add(TreeToolListener.class,listener);
+    public void addWidgetToolListener(WidgetToolListener listener) {
+        LISTENERS.add(WidgetToolListener.class,listener);
     }
 
     /**
      * remove TreeToolListener
      * @param listener to remove
      */
-    public void removeTreeToolListener(TreeToolListener listener) {
-        LISTENERS.remove(TreeToolListener.class,listener);
+    public void removeWidgetToolListener(WidgetToolListener listener) {
+        LISTENERS.remove(WidgetToolListener.class,listener);
     }
 
     /**
      * get TreeToolListener list
      * @return the listener's table
      */
-    public TreeToolListener[] getTreeToolListeners() {
-        return LISTENERS.getListeners(TreeToolListener.class);
+    public WidgetToolListener[] getWidgetToolListeners() {
+        return LISTENERS.getListeners(WidgetToolListener.class);
     }
     
 }

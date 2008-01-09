@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tooltree;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -39,8 +39,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
     private final ToolPackTreeNode root;
     private final Map<TreeToolDescriptor, ToolTreeNode> tools = new HashMap<TreeToolDescriptor, ToolTreeNode>();
     private DefaultTreeTableModel model;
-    
-    
+
     /**
      * Tree widget to manage tools
      */
@@ -64,7 +63,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
     }
 
     void addTool(TreeToolDescriptor tool) {
-        
+
         if (!tools.containsKey(tool)) {
 
             ToolTreeNode node = new ToolTreeNode(tool.getTitle());
@@ -75,13 +74,13 @@ final class TreeTable extends JXTreeTable implements MouseListener {
             String[] path = tool.getPath();
 
             ToolPackTreeNode origine = root;
-            for (String str : path) {
+            for (String nodeName : path) {
                 boolean found = false;
                 for (int i = 0,  max = origine.getChildCount(); (i < max && !found); i++) {
                     TreeTableNode n = origine.getChildAt(i);
 
                     if (n instanceof ToolPackTreeNode) {
-                        if (((ToolPackTreeNode) n).getTitle().equals(str)) {
+                        if (((ToolPackTreeNode) n).getTitle().equals(nodeName)) {
                             origine = (ToolPackTreeNode) n;
                             found = true;
                         }
@@ -89,54 +88,81 @@ final class TreeTable extends JXTreeTable implements MouseListener {
                 }
 
                 if (!found) {
-                    ToolPackTreeNode n = new ToolPackTreeNode(str);
-                    model.insertNodeInto(n,origine,origine.getChildCount());
+                    ToolPackTreeNode n = new ToolPackTreeNode(nodeName);
+
+                    //finding the right index, compare alpabeticly
+                    int insertIndex = origine.getChildCount();
+                    if (origine.getChildCount() != 0) {
+                        for (int i = 0,  max = origine.getChildCount(); i < max; i++) {
+                            TreeTableNode test = origine.getChildAt(i);
+                            String name = test.getValueAt(0).toString();
+                            if (name.compareTo(nodeName) >= 0) {
+                                insertIndex = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    model.insertNodeInto(n, origine, insertIndex);
                     //origine.add(n);
-                    origine = n;                    
+                    origine = n;
                 }
             }
-            model.insertNodeInto(node,origine, origine.getChildCount());
+
+
+            //finding the right index, compare alpabeticly
+            String nodeName = node.getValueAt(0).toString();
+            int insertIndex = origine.getChildCount();
+            if (origine.getChildCount() != 0) {
+                for (int i = 0,  max = origine.getChildCount(); i < max; i++) {
+                    TreeTableNode test = origine.getChildAt(i);
+                    String name = test.getValueAt(0).toString();
+                    if (name.compareTo(nodeName) >= 0) {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+            }
+            model.insertNodeInto(node, origine, insertIndex);
             //origine.add(node);
             expandPath(new TreePath(root));
         }
-        
-        
+
+
 
     }
 
     void removeTool(TreeToolDescriptor tool) {
 
         if (tools.containsKey(tool)) {
-            ToolTreeNode node = tools.get(tool);            
+            ToolTreeNode node = tools.get(tool);
             MutableTreeTableNode origine = (MutableTreeTableNode) node.getParent();
             model.removeNodeFromParent(node);
             //origine.remove(node);
-            
+
             while (origine != root && origine.getChildCount() == 0) {
                 MutableTreeTableNode parent = (MutableTreeTableNode) origine.getParent();
                 model.removeNodeFromParent(origine);
                 //parent.remove(origine);
                 origine = parent;
             }
-            
+
             revalidate();
 
             tools.remove(tool);
         }
     }
-    
+
     TreeToolDescriptor[] getTreeToolDescriptors() {
         return tools.keySet().toArray(EMPTY_TREETOOLDESCRIPTOR_ARRAY);
     }
-
-    
 
     public void mouseClicked(MouseEvent e) {
         int nb = e.getClickCount();
         if (nb == 2) {
             TreePath path = getTreeSelectionModel().getSelectionPath();
             Object node = path.getLastPathComponent();
-            if (node instanceof ToolTreeNode) {                
+            if (node instanceof ToolTreeNode) {
                 TreeToolDescriptor tool = (TreeToolDescriptor) ((ToolTreeNode) node).getUserObject();
                 fireActivation(tool);
             }
@@ -155,15 +181,14 @@ final class TreeTable extends JXTreeTable implements MouseListener {
     public void mouseExited(MouseEvent e) {
     }
 
-    
-    private void fireActivation(TreeToolDescriptor tool){
+    private void fireActivation(TreeToolDescriptor tool) {
         ToolTreeListener[] listeners = getToolTreeListeners();
-        
-        for(ToolTreeListener listener : listeners){
+
+        for (ToolTreeListener listener : listeners) {
             listener.treeToolActivated(tool);
         }
     }
-        
+
     void addToolTreeListener(ToolTreeListener listener) {
         LISTENERS.add(ToolTreeListener.class, listener);
     }

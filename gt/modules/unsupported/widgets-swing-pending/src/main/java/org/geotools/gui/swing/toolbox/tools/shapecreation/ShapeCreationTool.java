@@ -29,16 +29,17 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.crschooser.JCRSChooser;
-import org.geotools.gui.swing.toolbox.AbstractTreeTool;
+import org.geotools.gui.swing.toolbox.AbstractWidgetTool;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 
 /**
  *
  * @author johann sorel
  */
-public class ShapeCreationTool extends AbstractTreeTool {
+public class ShapeCreationTool extends AbstractWidgetTool {
 
     private ShapeAttModel model = new ShapeAttModel();
     private String geotype = "Point";

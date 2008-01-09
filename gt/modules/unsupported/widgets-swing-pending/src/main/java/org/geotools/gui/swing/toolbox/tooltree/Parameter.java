@@ -14,41 +14,33 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tooltree;
 
-import java.util.Map;
 
 /**
+ *
  * @author johann sorel
  */
-public interface TreeToolDescriptor {
+public class Parameter {
 
-    /**
-     * empty Parameter array
-     */
-    public final Parameter[] EMPTY_PARAMETER_ARRAY = {};
     
-    /**
-     * @return name of the tool
-     */
-    public String getTitle();
+    public final String description;
     
-    /**
-     * @return String Path ex: {utilities,convert}
-     */
-    public String[] getPath();
+    public final String key;
     
-    /**
-     * @param parameters 
-     * @return the panel of the tool
-     */
-    public TreeTool createTool(Map parameters);
-                
-    /**
-     * get an array of parameter describing parameters for the createComponent method
-     * @return array of Parameter
-     */
-    public Parameter[] getParametersInfo();
+    public final boolean required;
+        
+    public final Object sample;
+    
+    public final Class type ;
+        
+    public Parameter(String description, String key, boolean required, Object sample, Class type){
+        this.description = description;
+        this.key = key;
+        this.required = required;
+        this.sample = sample;
+        this.type = type;               
+    }
     
     
 }

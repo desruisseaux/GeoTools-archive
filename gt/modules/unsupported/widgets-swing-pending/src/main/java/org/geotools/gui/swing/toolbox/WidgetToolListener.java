@@ -14,35 +14,16 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.geotools.gui.swing.toolbox;
 
-import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
+import java.util.EventListener;
 
 /**
- * 
  * @author johann sorel
  */
-final class ToolTreeNode extends AbstractMutableTreeTableNode{
-    
-    private String name ="";
-    
-    /**
-     * Creates a new instance of ContextTreeNode
-     * @param model model of the tree
-     */
-    ToolTreeNode(String name) {
-        super();
-        this.name = name;
-    }    
-    
-    
-    public Object getValueAt(int arg0) {
-        return name;
-    }
+public interface WidgetToolListener extends EventListener{
 
-    public int getColumnCount() {
-        return 1;
-    }
-                
-        
+    public void objectCreated(Object obj);
+    
 }

@@ -14,33 +14,35 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.tooltree;
 
+import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 
 /**
- *
+ * 
  * @author johann sorel
  */
-public class Parameter {
-
+final class ToolTreeNode extends AbstractMutableTreeTableNode{
     
-    public final String description;
+    private String name ="";
     
-    public final String key;
+    /**
+     * Creates a new instance of ContextTreeNode
+     * @param model model of the tree
+     */
+    ToolTreeNode(String name) {
+        super();
+        this.name = name;
+    }    
     
-    public final boolean required;
-        
-    public final Object sample;
     
-    public final Class type ;
-        
-    public Parameter(String description, String key, boolean required, Object sample, Class type){
-        this.description = description;
-        this.key = key;
-        this.required = required;
-        this.sample = sample;
-        this.type = type;               
+    public Object getValueAt(int arg0) {
+        return name;
     }
-    
-    
+
+    public int getColumnCount() {
+        return 1;
+    }
+                
+        
 }

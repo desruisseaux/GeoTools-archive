@@ -17,9 +17,9 @@
 package org.geotools.gui.swing.toolbox.tools.svg2mif;
 
 import java.util.Map;
-import org.geotools.gui.swing.toolbox.Parameter;
-import org.geotools.gui.swing.toolbox.TreeTool;
-import org.geotools.gui.swing.toolbox.TreeToolDescriptor;
+import org.geotools.gui.swing.toolbox.tooltree.Parameter;
+import org.geotools.gui.swing.toolbox.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
 
 /**
  *
@@ -36,7 +36,7 @@ public class SVG2MIFTTDescriptor implements TreeToolDescriptor{
         return new String[]{"File utilities","Convert tools"};
     }
 
-    public TreeTool createTool(Map parameters) {
+    public WidgetTool createTool(Map parameters) {
         return new SVG2MIFTool();
     }
 

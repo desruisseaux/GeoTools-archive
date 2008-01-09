@@ -14,16 +14,13 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.geotools.gui.swing.toolbox;
 
-import java.util.EventListener;
+import org.geotools.gui.swing.toolbox.tooltree.*;
 
 /**
  * @author johann sorel
  */
-public interface ToolTreeListener extends EventListener{
+public interface Tool {
 
-    public void treeToolActivated(TreeToolDescriptor tool);
-    
 }
