@@ -621,6 +621,50 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
+     * Returns the highest subsampling that this tile can handle, not greater than the given
+     * subsampling. Special cases:
+     * <p>
+     * <ul>
+     *   <li>If the given subsampling is {@code null}, then this method returns {@code null}.</li>
+     *   <li>Otherwise if the given subsampling is {@code (0,0)}, then this method returns the
+     *       same {@code subsampling} reference unchanged. Callers can test using the identity
+     *       ({@code ==}) operator.</li>
+     *   <li>Otherwise if this tile can handle exactly the given subsampling, then this method
+     *       returns the same {@code subsampling} reference unchanged. Callers can test using
+     *       the identity ({@code ==}) operator.</li>
+     *   <li>Otherwise if there is no subsampling that this tile could handle,
+     *       then this method returns {@code null}.</li>
+     *   <li>Otherwise this method returns a new {@link Dimension} set to the greatest subsampling
+     *       that this tile can handle, not greater than the given subsampling.</li>
+     * </ul>
+     *
+     * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
+     *         Object, int, Dimension, AffineTransform) created without location} and not yet
+     *         processed by {@link TileManagerFactory}.
+     */
+    public Dimension getSubsamplingFloor(final Dimension subsampling) throws IllegalStateException {
+        if (subsampling != null) {
+            final int dx, dy;
+            try {
+                dx = subsampling.width  % xSubsampling;
+                dy = subsampling.height % ySubsampling;
+            } catch (ArithmeticException e) {
+                throw new IllegalStateException("Tile must be processed by TileManagerFactory.", e);
+            }
+            if (dx != 0 || dy != 0) {
+                final int sourceXSubsampling = subsampling.width  - dx;
+                final int sourceYSubsampling = subsampling.height - dy;
+                if (sourceXSubsampling != 0 && sourceYSubsampling != 0) {
+                    return new Dimension(sourceXSubsampling, sourceYSubsampling);
+                } else {
+                    return null;
+                }
+            }
+        }
+        return subsampling;
+    }
+
+    /**
      * Returns the upper-left corner in the
      * {@linkplain javax.imageio.ImageReadParam#setDestination destination image}. This is the
      * location when no {@linkplain javax.imageio.ImageReadParam#setDestinationOffset destination
@@ -715,35 +759,30 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns {@code true} if this tile can be used for reading an image with the given
-     * subsampling. This method always returns {@code true} if the given subsampling are
-     * zero. In principle, subsampling can't be zero. But {@link TileManager} uses that
-     * value for iterating over all tiles.
-     */
-    final boolean canSubsample(final int sourceXSubsampling, final int sourceYSubsampling) {
-        return (sourceXSubsampling % xSubsampling) == 0 && (sourceYSubsampling % ySubsampling) == 0;
-    }
-
-    /**
      * Converts the given region and subsampling from "absolute" units (i.e. pre-multiplied by
      * {@link #xSubsampling} and {@link #ySubsampling}) to units relative to this tile, and
      * delegates to the user-overrideable {@link #countUnwantedPixels}.
      *
-     * @param region The region to read, in the same units than {@link #getAbsoluteRegion}.
+     * @param toRead The region to read, in the same units than {@link #getAbsoluteRegion}.
      *        <strong>This rectangle will be modified without clone</strong>. This is okay
      *        for our private usage, but would not be acceptable in a public API.
+     * @param subsampling The number of columns and rows to advance between pixels in the given
+     *        region. <strong>This dimension will be modified without clone</strong>. This is
+     *        okay for our private usage, but would not be acceptable in a public API.
      */
-    final int countUnwantedPixelsFromAbsolute(final Rectangle region,
-            final int sourceXSubsampling, final int sourceYSubsampling)
+    final int countUnwantedPixelsFromAbsolute(final Rectangle toRead, final Dimension subsampling)
             throws IOException
     {
-        assert canSubsample(sourceXSubsampling, sourceYSubsampling);
-        region.x      /= xSubsampling;
-        region.y      /= ySubsampling;
-        region.width  /= xSubsampling;
-        region.height /= ySubsampling;
-        return countUnwantedPixels(region, sourceXSubsampling / xSubsampling,
-                                           sourceYSubsampling / ySubsampling);
+        assert Utilities.equals(getSubsamplingFloor(subsampling), subsampling) : subsampling;
+        assert (subsampling.width  % xSubsampling) == 0 &&
+               (subsampling.height % ySubsampling) == 0 : subsampling;
+        toRead.x           /= xSubsampling;
+        toRead.y           /= ySubsampling;
+        toRead.width       /= xSubsampling;
+        toRead.height      /= ySubsampling;
+        subsampling.width  /= xSubsampling;
+        subsampling.height /= ySubsampling;
+        return countUnwantedPixels(toRead, subsampling);
     }
 
     /**
@@ -760,27 +799,24 @@ public class Tile implements Comparable<Tile> {
      * the region bottom. Subclasses can override this method in order to alter this calculation
      * if they are sure that pixels below the region have no disk seed cost.
      *
-     * @param  region The region to read, in the same units than {@link #getRegion}.
-     * @param  sourceXSubsampling The number of columns to advance between pixels
-     *         in the given region. Must be strictly positive (not zero).
-     * @param  sourceYSubsampling The number of rows to advance between pixels
+     * @param  toRead The region to read, in the same units than {@link #getRegion}.
+     * @param  subsampling The number of columns and rows to advance between pixels
      *         in the given region. Must be strictly positive (not zero).
      * @return The amount of pixels which would be unused if the reading was performed on this
      *         tile. Smaller number is better.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getImageReader reader} and this operation failed.
      */
-    protected int countUnwantedPixels(Rectangle region,
-            final int sourceXSubsampling, final int sourceYSubsampling)
+    protected int countUnwantedPixels(Rectangle toRead, final Dimension subsampling)
             throws IOException
     {
-        final Rectangle tile = getRegion();
-        region = tile.intersection(region);
+        final Rectangle region = getRegion();
+        toRead = region.intersection(toRead);
         int count;
-        count  = region.width  - (region.width  / sourceXSubsampling);
-        count += region.height - (region.height / sourceYSubsampling);
-        count += (tile.height - region.height) * tile.width;
-        count += (tile.width  - region.width)  * region.height; // Really 'region', not 'tile'
+        count  = toRead.width  - (toRead.width  / subsampling.width);
+        count += toRead.height - (toRead.height / subsampling.height);
+        count += (region.height - toRead.height) * region.width;
+        count += (region.width  - toRead.width)  * toRead.height; // Really 'toRead', not 'region'
         return count;
     }
 

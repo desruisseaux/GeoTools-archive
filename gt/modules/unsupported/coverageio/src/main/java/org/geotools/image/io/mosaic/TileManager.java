@@ -16,16 +16,7 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*; // We use really a lot of those imports.
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform; // For javadoc
@@ -33,6 +24,7 @@ import java.io.IOException;
 import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.UnmodifiableArrayList;
+import org.geotools.resources.Utilities;
 import org.geotools.util.Comparators;
 
 
@@ -66,6 +58,12 @@ public class TileManager {
     private Collection<Tile> tilesOfInterest;
 
     /**
+     * The {@linkplain #tiles} in a tree for faster access.
+     * Will be created only when first needed.
+     */
+    private transient RTree tree;
+
+    /**
      * The subsampling used at the time {@link #tilesOfInterest} has been computed.
      */
     private int xSubsampling, ySubsampling;
@@ -86,9 +84,9 @@ public class TileManager {
     private Dimension tileSize;
 
     /**
-     * The grid geometry, including the "<cite>grid to real world</cite>" transform. This is
-     * provided by {@link TileManagerFactory} when this information is available, but is not
-     * used by this class.
+     * The grid geometry, including the "<cite>grid to real world</cite>" transform.  This is
+     * provided by {@link TileManagerFactory} when this information is available and returned
+     * by {@link #getGridGeometry}, but is not used by this class.
      */
     ImageGeometry geometry;
 
@@ -189,7 +187,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
-    public Rectangle getRegion() throws IOException {
+    public synchronized Rectangle getRegion() throws IOException {
         if (region == null) {
             initialize();
         }
@@ -213,67 +211,150 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
-    public Collection<Tile> getTiles(final Rectangle region, final int xSubsampling, final int ySubsampling)
-            throws IOException
+    public synchronized Collection<Tile> getTiles(final Rectangle region,
+            final int xSubsampling, final int ySubsampling) throws IOException
     {
         if (tilesOfInterest == null || !regionOfInterest.equals(region) ||
             this.xSubsampling != xSubsampling || this.ySubsampling != ySubsampling)
         {
             this.tilesOfInterest = null; // Safety in case of failure.
-            this.regionOfInterest.setBounds(region);
             this.xSubsampling    = xSubsampling;
             this.ySubsampling    = ySubsampling;
-            this.tilesOfInterest = getTileOfInterest();
+            this.regionOfInterest.setBounds(region);
+            searchTiles(false);
         }
         return tilesOfInterest;
     }
 
     /**
      * Returns every tiles that intersect the {@linkplain #regionOfInterest region of interest},
-     * which must be set before this methos is invoked. At the difference of {@link #getTiles},
+     * which must be set before this method is invoked. At the difference of {@link #getTiles},
      * this method does not use any cache - the search is performed inconditionnaly.
+     * <p>
+     * On input, the following field must be set:
+     * <ul>
+     *   <li>{@link #regionOfInterest}</li>
+     *   <li>{@link #xSubsampling}</li>
+     *   <li>{@link #ySubsampling}</li>
+     * </ul>
+     * <p>
+     * On output, the following field will be set:
+     * <ul>
+     *   <li>{@link #tilesOfInterest}</li>
+     *   <li>{@link #xSubsampling} if {@code allowSubsamplingChange} is {@code true}</li>
+     *   <li>{@link #ySubsampling} if {@code allowSubsamplingChange} is {@code true}</li>
+     * </ul>
+     *
+     * @return The estimated {@linkplain Tile#countUnwantedPixels amount of unwanted pixels}.
      */
-    private Collection<Tile> getTileOfInterest() throws IOException {
-        final Map<Rectangle,Tile> interest = new LinkedHashMap<Rectangle,Tile>();
-        for (final Tile tile : tiles) {
-            if (tile.canSubsample(xSubsampling, ySubsampling)) {
-                // TODO: This check should be replaced by iteration over the values returned
-                //       by a RTree. We could consider org.geotools.index.RTree, but we need
-                //       to clean that code first (API that should not be public, should be
-                //       a java.util.Collection, avoid dependencies to JTS, search(Envelope)
-                //       should returns a Collection backed by lazy iterator, etc.) and we
-                //       may need to add a 'RTree subtree(Envelope)' method.
-                final Rectangle region = tile.getAbsoluteRegion();
-                if (regionOfInterest.intersects(region)) {
-                    final Rectangle toRead = region.intersection(regionOfInterest);
-                    final Tile old = interest.put(toRead, tile);
-                    if (old == null) {
-                        continue;
-                    }
+    private long searchTiles(final boolean allowSubsamplingChange) throws IOException {
+        long lowestCost = Long.MAX_VALUE;
+        if (tree == null) {
+            tree = new RTree(tiles);
+        }
+        // The list of tiles to consider must be a copy, because it will be emptied.
+        final Collection<Tile> tiles = tree.intersect(region);
+        Map<Rectangle,Tile> candidates=null, bestCandidates=null;
+        /*
+         * If 'allowSubsamplingChange' is false, the 'do' block below will be executed exactly once.
+         * Otherwise, 'subsamplingDone' and 'subsamplingToTry' will be created when first needed and
+         * the loop will be executed as long as there is new subsamplings to try. We will retain the
+         * one having the lowest cost.
+         */
+        Set  <Dimension> subsamplingDone  = null;
+        Queue<Dimension> subsamplingToTry = Utilities.emptyQueue();
+        Dimension  subsampling = new Dimension(xSubsampling, ySubsampling);
+        final Dimension buffer = new Dimension();
+        do {
+            long cost = 0;
+            if (candidates == bestCandidates) {
+                 // Works on a new map in order to protect 'bestCandidates' from changes.
+                candidates = new LinkedHashMap<Rectangle,Tile>();
+            }
+            for (final Iterator<Tile> it=tiles.iterator(); it.hasNext();) {
+                final Tile tile = it.next();
+                final Dimension floor = tile.getSubsamplingFloor(subsampling);
+                if (floor == null) {
                     /*
-                     * Found a tile with the same bounding box than the new tile. It is
-                     * probably a tile at a different resolution. Retains the one which
-                     * minimize the disk reading, and discard the other one. This check
-                     * is not generic since we search for an exact match, but this case
-                     * is common enough. Handling it with a HashMap will help to reduce
-                     * the amount of tiles to handle in a more costly way later.
+                     * A tile is unable to read its image at the given subsampling or any smaller
+                     * subsampling. There is no reason to keep it for further examination in this
+                     * method. Remove it for faster execution in subsequent run of the outer loop.
                      */
-                    final int n1, n2;
-                    region.setBounds(toRead);
-                    n1 = old.countUnwantedPixelsFromAbsolute(region, xSubsampling, ySubsampling);
-                    region.setBounds(toRead);
-                    n2 = tile.countUnwantedPixelsFromAbsolute(region, xSubsampling, ySubsampling);
-                    if (n1 <= n2) {
-                        interest.put(toRead, old); // Keep the old tile, discart the new one.
+                    it.remove();
+                    continue;
+                }
+                if (floor != subsampling) {
+                    /*
+                     * A tile is unable to read its image at the given subsampling, but would
+                     * be capable if the subsampling was smaller. If we are allowed to change
+                     * the setting, add this item to the queue of subsampling to try later.
+                     */
+                    if (allowSubsamplingChange) {
+                        if (subsamplingDone == null) {
+                            subsamplingDone  = new HashSet<Dimension>();
+                            subsamplingToTry = new LinkedList<Dimension>();
+                        }
+                        if (subsamplingDone.add(floor)) {
+                            subsamplingToTry.add(floor);
+                        }
                     }
+                    continue;
+                }
+                /*
+                 * The tile is capable to read its image at the given subsampling. Computes the
+                 * cost that reading this tile would have.
+                 */
+                final Rectangle region = tile.getAbsoluteRegion();
+                final Rectangle toRead = region.intersection(regionOfInterest);
+                final Tile previousTile = candidates.put(toRead, tile);
+                region.setBounds(toRead); // From this point, we will use 'region' as a buffer.
+                buffer.setSize(subsampling);
+                int delta = tile.countUnwantedPixelsFromAbsolute(region, buffer);
+                cost += delta;
+                if (previousTile == null) {
+                    continue;
+                }
+                /*
+                 * Found a tile with the same bounding box than the new tile. It is
+                 * probably a tile at a different resolution. Retains the one which
+                 * minimize the disk reading, and discard the other one. This check
+                 * is not generic since we search for an exact match, but this case
+                 * is common enough. Handling it with a HashMap will help to reduce
+                 * the amount of tiles to handle in a more costly way later.
+                 */
+                region.setBounds(toRead);
+                buffer.setSize(subsampling);
+                delta -= previousTile.countUnwantedPixelsFromAbsolute(region, buffer);
+                if (delta >= 0) {
+                    // Previous tile had a cost equals or lower.
+                    // Keep the old tile, discart the new one.
+                    cost -= delta;
+                    candidates.put(toRead, previousTile);
                 }
             }
-        }
+            /*
+             * TODO: We could put more logic here by removing overlapping tiles, if any.
+             */
+            /*
+             * We now have the final set of tiles for current subsampling. Checks if the cost
+             * of this set is lower than previous sets, and keep as "best candidates" if it is.
+             * If there is other subsamplings to try, we redo the process again in case we find
+             * cheaper set of tiles.
+             */
+            if (cost < lowestCost) {
+                lowestCost = cost;
+                bestCandidates = candidates;
+                xSubsampling = subsampling.width;
+                ySubsampling = subsampling.height;
+            } else {
+                candidates.clear(); // Reuses the existing HashMap.
+            }
+        } while ((subsampling = subsamplingToTry.poll()) != null);
         /*
-         * TODO: We could put more logic here by removing overlapping tiles, if any.
          * TODO: sort the result.
          */
-        return Collections.unmodifiableCollection(interest.values());
+        tilesOfInterest = Collections.unmodifiableCollection(bestCandidates.values());
+        return lowestCost;
     }
 
     /**
