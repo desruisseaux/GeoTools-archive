@@ -23,7 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 /**
- *
+ * 
  * @author Johann Sorel
  */
 public class JToolTree extends JComponent{

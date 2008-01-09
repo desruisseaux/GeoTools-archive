@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.toolbox.tools.shapecreation;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.tooltree.Parameter;
 import org.geotools.gui.swing.toolbox.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
 import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
 
 /**
@@ -27,20 +29,18 @@ import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
  */
 public class ShapeCreationTTDescriptor implements TreeToolDescriptor{
 
-    public static enum TYPE{
-        INTEGER,
-        LONG,
-        DOUBLE,
-        STRING,
-        DATE
-    }
+   
+    private final String[] path = ToolTreePaths.getInstance().FILE_CREATE.getPath();
+    
+    private String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/shapecreation/Bundle").getString("shapefile_creation");
+       
     
     public String getTitle() {
-        return "Shapefile creation";
+        return title;
     }
 
     public String[] getPath() {
-        return new String[]{"File utilities","Creation"};
+        return path;
     }
 
     public WidgetTool createTool(Map parameters) {

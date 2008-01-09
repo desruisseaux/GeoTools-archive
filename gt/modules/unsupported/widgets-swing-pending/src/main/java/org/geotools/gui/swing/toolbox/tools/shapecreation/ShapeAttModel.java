@@ -19,7 +19,7 @@ package org.geotools.gui.swing.toolbox.tools.shapecreation;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import org.geotools.gui.swing.toolbox.tools.shapecreation.ShapeCreationTTDescriptor.TYPE;
+import org.geotools.gui.swing.toolbox.tools.shapecreation.Data.TYPE;
 
 
 /**
@@ -53,7 +53,7 @@ class ShapeAttModel extends AbstractTableModel{
         if(columnIndex == 0){
             return String.class;
         }else{
-            return ShapeCreationTTDescriptor.TYPE.class;
+            return Data.TYPE.class;
         }
     }
 
@@ -128,7 +128,4 @@ class ShapeAttModel extends AbstractTableModel{
     
 }
 
-class Data{        
-        public String name = "name";
-        public ShapeCreationTTDescriptor.TYPE type = ShapeCreationTTDescriptor.TYPE.STRING;
-    }
+

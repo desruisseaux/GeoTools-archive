@@ -24,6 +24,7 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.TableCellEditor;
+import org.geotools.gui.swing.toolbox.tools.shapecreation.Data.TYPE;
 
 /**
  *
@@ -35,11 +36,11 @@ public class TypeEditor implements TableCellEditor{
     private JComboBox box = new JComboBox();
     
     TypeEditor(){        
-        box.addItem(ShapeCreationTTDescriptor.TYPE.INTEGER);
-        box.addItem(ShapeCreationTTDescriptor.TYPE.LONG);
-        box.addItem(ShapeCreationTTDescriptor.TYPE.DOUBLE);
-        box.addItem(ShapeCreationTTDescriptor.TYPE.STRING);
-        box.addItem(ShapeCreationTTDescriptor.TYPE.DATE);
+        box.addItem(TYPE.INTEGER);
+        box.addItem(TYPE.LONG);
+        box.addItem(TYPE.DOUBLE);
+        box.addItem(TYPE.STRING);
+        box.addItem(TYPE.DATE);
     }
     
     

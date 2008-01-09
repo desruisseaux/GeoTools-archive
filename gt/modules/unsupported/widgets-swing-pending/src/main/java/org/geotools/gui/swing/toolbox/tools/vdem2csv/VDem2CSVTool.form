@@ -20,12 +20,12 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel1" alignment="1" max="32767" attributes="0"/>
-                  <Component id="jLabel3" alignment="1" pref="307" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="jpb_attente" pref="226" max="32767" attributes="0"/>
+                      <Component id="jpb_attente" pref="228" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jbu_convertir" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="jXTitledSeparator1" alignment="0" pref="305" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -35,7 +35,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+              <Component id="jXTitledSeparator1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -51,22 +51,12 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel3">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Georgia" size="18" style="3"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="VDEM to CSV" noResource="true"/>
-        <Property name="horizontalTextPosition" type="int" value="2"/>
-        <Property name="iconTextGap" type="int" value="40"/>
-      </Properties>
-    </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Fichier">
-              <Font PropertyName="font" name="Dialog" size="11" style="1"/>
+            <TitledBorder title="File">
+              <ResourceString PropertyName="titleX" bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="file" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -80,17 +70,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jtf_entree" pref="220" max="32767" attributes="0"/>
+                          <Component id="jtf_entree" pref="218" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="but_chercher_entree" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jtf_sortie" pref="220" max="32767" attributes="0"/>
+                          <Component id="jtf_sortie" pref="218" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="but_chercher_sortie" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jLabel2" pref="172" max="32767" attributes="0"/>
+                          <Component id="jLabel2" pref="170" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="99" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -122,7 +112,9 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Fichier en entr&#xe9;e : "/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="input_file" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jtf_entree">
@@ -146,7 +138,9 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Fichier en sortie :" noResource="true"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="output_file" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jtf_sortie">
@@ -172,7 +166,9 @@
     </Container>
     <Component class="javax.swing.JButton" name="jbu_convertir">
       <Properties>
-        <Property name="text" type="java.lang.String" value="convertir" noResource="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="convert" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbu_convertirActionPerformed"/>
@@ -182,8 +178,8 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Param&#xe8;tres">
-              <Font PropertyName="font" name="Dialog" size="11" style="1"/>
+            <TitledBorder title="Settings">
+              <ResourceString PropertyName="titleX" bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="config" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -198,12 +194,12 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jtf_refx" pref="146" max="32767" attributes="0"/>
+                          <Component id="jtf_refx" pref="217" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jtf_refy" pref="146" max="32767" attributes="0"/>
+                          <Component id="jtf_refy" pref="217" max="32767" attributes="0"/>
                       </Group>
                       <Component id="chk_cover" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -225,7 +221,7 @@
                   </Group>
                   <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                   <Component id="chk_cover" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="20" max="32767" attributes="0"/>
+                  <EmptySpace pref="13" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -233,12 +229,16 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="G&#xe9;or&#xe9;f&#xe9;rencement en X :"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="georef_x" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
           <Properties>
-            <Property name="text" type="java.lang.String" value="G&#xe9;or&#xe9;f&#xe9;rencement en Y :"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="georef_y" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jtf_refx">
@@ -253,7 +253,9 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="chk_cover">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Garder recouvrement" noResource="true"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="keep_border_overlap" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                 <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -267,6 +269,13 @@
       </SubComponents>
     </Container>
     <Component class="javax.swing.JProgressBar" name="jpb_attente">
+    </Component>
+    <Component class="org.jdesktop.swingx.JXTitledSeparator" name="jXTitledSeparator1">
+      <Properties>
+        <Property name="title" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle.properties" key="title" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

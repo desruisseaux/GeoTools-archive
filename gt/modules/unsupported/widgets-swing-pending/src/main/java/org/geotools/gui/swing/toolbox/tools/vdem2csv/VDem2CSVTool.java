@@ -104,7 +104,6 @@ public class VDem2CSVTool extends AbstractWidgetTool {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel3 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jtf_entree = new javax.swing.JTextField();
@@ -120,15 +119,12 @@ public class VDem2CSVTool extends AbstractWidgetTool {
         jtf_refy = new javax.swing.JTextField();
         chk_cover = new javax.swing.JCheckBox();
         jpb_attente = new javax.swing.JProgressBar();
+        jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
 
-        jLabel3.setFont(new java.awt.Font("Georgia", 3, 18));
-        jLabel3.setText("VDEM to CSV"); // NOI18N
-        jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        jLabel3.setIconTextGap(40);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle"); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("file"))); // NOI18N
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Fichier", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 11)));
-
-        jLabel1.setText("Fichier en entrée : ");
+        jLabel1.setText(bundle.getString("input_file")); // NOI18N
 
         jtf_entree.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -149,7 +145,7 @@ public class VDem2CSVTool extends AbstractWidgetTool {
             }
         });
 
-        jLabel2.setText("Fichier en sortie :"); // NOI18N
+        jLabel2.setText(bundle.getString("output_file")); // NOI18N
 
         jtf_sortie.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -179,15 +175,15 @@ public class VDem2CSVTool extends AbstractWidgetTool {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel1)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(jtf_entree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                        .add(jtf_entree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(but_chercher_entree, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(jtf_sortie, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                        .add(jtf_sortie, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(but_chercher_sortie, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
+                        .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
                         .add(99, 99, 99)))
                 .addContainerGap())
         );
@@ -208,24 +204,24 @@ public class VDem2CSVTool extends AbstractWidgetTool {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jbu_convertir.setText("convertir"); // NOI18N
+        jbu_convertir.setText(bundle.getString("convert")); // NOI18N
         jbu_convertir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbu_convertirActionPerformed(evt);
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Paramètres", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 11)));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("config"))); // NOI18N
 
-        jLabel4.setText("Géoréférencement en X :");
+        jLabel4.setText(bundle.getString("georef_x")); // NOI18N
 
-        jLabel5.setText("Géoréférencement en Y :");
+        jLabel5.setText(bundle.getString("georef_y")); // NOI18N
 
         jtf_refx.setText("0");
 
         jtf_refy.setText("0");
 
-        chk_cover.setText("Garder recouvrement"); // NOI18N
+        chk_cover.setText(bundle.getString("keep_border_overlap")); // NOI18N
         chk_cover.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         chk_cover.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
@@ -239,11 +235,11 @@ public class VDem2CSVTool extends AbstractWidgetTool {
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jtf_refx, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE))
+                        .add(jtf_refx, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jtf_refy, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE))
+                        .add(jtf_refy, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))
                     .add(chk_cover))
                 .addContainerGap())
         );
@@ -259,8 +255,10 @@ public class VDem2CSVTool extends AbstractWidgetTool {
                     .add(jtf_refy, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(19, 19, 19)
                 .add(chk_cover)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
+
+        jXTitledSeparator1.setTitle(bundle.getString("title")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -271,18 +269,18 @@ public class VDem2CSVTool extends AbstractWidgetTool {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
-                        .add(jpb_attente, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                        .add(jpb_attente, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jbu_convertir)))
+                        .add(jbu_convertir))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel3)
+                .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -363,11 +361,11 @@ public class VDem2CSVTool extends AbstractWidgetTool {
     private javax.swing.JCheckBox chk_cover;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
     private javax.swing.JButton jbu_convertir;
     private javax.swing.JProgressBar jpb_attente;
     private javax.swing.JTextField jtf_entree;

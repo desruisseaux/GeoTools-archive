@@ -41,6 +41,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class ShapeCreationTool extends AbstractWidgetTool {
 
+    
+    
     private ShapeAttModel model = new ShapeAttModel();
     private String geotype = "Point";
     private CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
@@ -148,8 +150,8 @@ public class ShapeCreationTool extends AbstractWidgetTool {
         jLabel2 = new javax.swing.JLabel();
         gui_jtf_crs = new javax.swing.JTextField();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/i18n/tool/shapecreation"); // NOI18N
-        jLabel1.setText(bundle.getString("File")); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/shapecreation/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("file")); // NOI18N
 
         jXTitledSeparator1.setTitle(bundle.getString("shapefile_creation")); // NOI18N
 

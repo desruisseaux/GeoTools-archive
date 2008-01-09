@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.toolbox.tools.svg2mif;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.tooltree.Parameter;
 import org.geotools.gui.swing.toolbox.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
 import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
 
 /**
@@ -27,13 +29,15 @@ import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
  */
 public class SVG2MIFTTDescriptor implements TreeToolDescriptor{
 
-        
+    private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();    
+    String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/svg2mif/Bundle").getString("title");
+    
     public String getTitle(){
         return "SVG > MIF";
     }
 
     public String[] getPath() {
-        return new String[]{"File utilities","Convert tools"};
+        return path;
     }
 
     public WidgetTool createTool(Map parameters) {

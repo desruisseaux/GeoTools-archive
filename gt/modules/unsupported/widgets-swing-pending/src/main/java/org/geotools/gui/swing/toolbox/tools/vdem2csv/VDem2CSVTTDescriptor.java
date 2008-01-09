@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.toolbox.tools.vdem2csv;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.tooltree.Parameter;
 import org.geotools.gui.swing.toolbox.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
 import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
 
 /**
@@ -27,6 +29,9 @@ import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
  */
 public class VDem2CSVTTDescriptor implements TreeToolDescriptor{
 
+    private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();
+    String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle").getString("title");
+    
     
     public String getTitle(){
         return "VDem > CSV";
@@ -34,7 +39,7 @@ public class VDem2CSVTTDescriptor implements TreeToolDescriptor{
 
 
     public String[] getPath() {
-        return new String[]{"File utilities","Convert tools"};
+        return path;
     }
 
     public WidgetTool createTool(Map parameters) {        

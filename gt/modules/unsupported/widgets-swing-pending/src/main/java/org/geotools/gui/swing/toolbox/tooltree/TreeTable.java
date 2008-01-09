@@ -19,9 +19,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreePath;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
@@ -34,6 +34,9 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  */
 final class TreeTable extends JXTreeTable implements MouseListener {
 
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tooltree/Bundle");
+    
+    
     protected final TreeToolDescriptor[] EMPTY_TREETOOLDESCRIPTOR_ARRAY = {};
     protected final EventListenerList LISTENERS = new EventListenerList();
     private final ToolPackTreeNode root;
@@ -51,8 +54,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
 
         setTreeCellRenderer(new DefaultTreeRenderer(new ToolTreeNodeProvider(frame)));
 
-        String name = TextBundle.getResource().getString("col_tree");
-        name = "Tools";
+        String name = BUNDLE.getString("tools");
         getColumnModel().getColumn(0).setHeaderValue(name);
 
         root = (ToolPackTreeNode) getTreeTableModel().getRoot();
