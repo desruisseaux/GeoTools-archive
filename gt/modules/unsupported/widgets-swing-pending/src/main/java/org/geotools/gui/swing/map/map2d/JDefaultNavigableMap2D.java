@@ -23,9 +23,9 @@ import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
+import org.geotools.gui.swing.map.map2d.decoration.ZoomPanDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
-import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanDecoration;
 
 /**
  * Default implementation of NavigableMap2D

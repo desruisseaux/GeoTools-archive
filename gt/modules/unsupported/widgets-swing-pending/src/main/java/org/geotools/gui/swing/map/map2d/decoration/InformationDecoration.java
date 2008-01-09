@@ -34,14 +34,13 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  */
 public class InformationDecoration extends JComponent implements MapDecoration{
 
-    private static ResourceBundle I18N = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/decoration/InformationDecoration");
     
     private final BufferedImage buffer;
     private boolean drawing = false;
     
     public InformationDecoration(){
         ImageIcon anim = IconBundle.getResource().getIcon("JS_GT");
-        String msg = I18N.getString("drawing_wait");
+        String msg = BUNDLE.getString("drawing_wait");
         
         
         Font currentFont = new Font("Arial",Font.BOLD|Font.ITALIC,13);
