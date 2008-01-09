@@ -16,9 +16,16 @@
  */
 package org.geotools.resources;
 
+import java.util.Set;
+import java.util.Queue;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Collections;
+import java.util.AbstractQueue;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.io.Serializable;
+import java.io.ObjectStreamException;
 import org.geotools.util.logging.Logging;
 
 
@@ -37,6 +44,62 @@ public final class Utilities {
      * contains a string of length 5. Strings are constructed only when first needed.
      */
     private static final String[] spacesFactory = new String[20];
+
+    /**
+     * The singleton instance to be returned by {@link #emptyQueue}.
+     */
+    private static Queue EMPTY_QUEUE = new EmptyQueue<Object>();
+
+    /**
+     * The class for the {@link #EMPTY_QUEUE} instance. Defined as a named class rather than
+     * anonymous in order to avoid serialization issue.
+     */
+    private static final class EmptyQueue<E> extends AbstractQueue<E> implements Serializable {
+        /** For cross-version compatibility. **/
+        private static final long serialVersionUID = -6147951199761870325L;
+
+        /** No effect on an queue which is already empty. */
+        @Override
+        public void clear() {
+        }
+
+        /** Returns {@code true} is all case. */
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        /** Returns the size, which is always 0. */
+        public int size() {
+            return 0;
+        }
+
+        /** Returns an empty iterator. */
+        public Iterator<E> iterator() {
+            final Set<E> empty = Collections.emptySet();
+            return empty.iterator();
+        }
+
+        /** Always returns {@code false} since this queue doesn't accept any element. */
+        public boolean offer(E e) {
+            return false;
+        }
+
+        /** Always returns {@code null} since this queue is always empty. */
+        public E poll() {
+            return null;
+        }
+
+        /** Always returns {@code null} since this queue is always empty. */
+        public E peek() {
+            return null;
+        }
+
+        /** Returns the singleton instance of deserialization. */
+        protected Object readResolve() throws ObjectStreamException {
+            return EMPTY_QUEUE;
+        }
+    }
 
     /**
      * Forbid object creation.
@@ -223,6 +286,17 @@ public final class Utilities {
             return Arrays.toString((boolean[]) object);
         }
         return String.valueOf(object);
+    }
+
+    /**
+     * Returns a {@linkplain Queue queue} which is always empty and accepts no element.
+     *
+     * @see Collections#emptyList
+     * @see Collections#emptySet
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Queue<E> emptyQueue() {
+        return EMPTY_QUEUE;
     }
 
     /**

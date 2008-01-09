@@ -97,6 +97,12 @@ public class ReferencingFactoryFinder {
     private static Set<String> authorityNames;
 
     /**
+     * A special instance meaning "no hints", not even the
+     * {@linkplain GeoTools#getDefaultHints GeoTools default hints}.
+     */
+    private static final Hints NULL_HINTS = new Hints();
+
+    /**
      * Do not allows any instantiation of this class.
      */
     ReferencingFactoryFinder() {
@@ -138,7 +144,7 @@ public class ReferencingFactoryFinder {
          */
         if (authorityNames == null) {
             authorityNames = new LinkedHashSet<String>();
-            final Hints hints = null;
+            final Hints hints = NULL_HINTS;
 loop:       for (int i=0; ; i++) {
                 final Set<? extends AuthorityFactory> factories;
                 switch (i) {
@@ -173,7 +179,9 @@ loop:       for (int i=0; ; i++) {
     private static synchronized <T extends Factory>
             Set<T> getFactories(final Class<T> type, Hints hints)
     {
-        hints = GeoTools.addDefaultHints(hints);
+        if (hints != NULL_HINTS) {
+            hints = GeoTools.addDefaultHints(hints);
+        }
         return new LazySet<T>(getServiceRegistry().getServiceProviders(type, null, hints));
     }
 

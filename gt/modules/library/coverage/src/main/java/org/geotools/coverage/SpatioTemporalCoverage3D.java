@@ -251,10 +251,9 @@ control:    for (int p=0; p<=1; p++) {
                     envelope.getMaximum(xDimension),
                     envelope.getMaximum(yDimension));
             final CoordinateReferenceSystem sourceCRS = CRS.getHorizontalCRS(crs);
-			if(sourceCRS==null)
-				throw new TransformException(
-						Errors.format(
-			                    ErrorKeys.CANT_SEPARATE_CRS_$1,crs));
+            if (sourceCRS == null) {
+                throw new TransformException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1, crs.getName()));
+            }
             final CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
             if (!CRS.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
@@ -553,16 +552,14 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @see #getRenderableImage(Date)
      * @see RenderableImage#createDefaultRendering()
-     *
-     * @todo Find some way to avoid the cast in the {@code return} statement.
      */
     public GridCoverage2D getGridCoverage2D(final Date time) throws CannotEvaluateException {
         final InternationalString      name = getName();
         final CoordinateReferenceSystem crs = CRS.getHorizontalCRS(this.crs);
-		if(crs==null)
-			throw new CannotEvaluateException(
-					Errors.format(
-		                    ErrorKeys.CANT_SEPARATE_CRS_$1,this.crs));
+        if (crs == null) {
+            throw new CannotEvaluateException(
+                    Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1, this.crs.getName()));
+        }
         final RenderedImage           image = getRenderableImage(time).createDefaultRendering();
         final GridSampleDimension[]   bands = new GridSampleDimension[getNumSampleDimensions()];
         for (int i=0; i<getNumSampleDimensions(); i++){

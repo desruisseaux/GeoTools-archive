@@ -43,7 +43,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
     final static int MAX_TIME = 2 * 60 * 1000;
     final static boolean SHOW_OUTPUT = false;
     final static int MAX_WORKERS = 2;
-    
+
     HsqlDialectEpsgMediator mediator;
     DataSource datasource;
     static String[] codes;
@@ -58,14 +58,14 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
         mediator = new HsqlDialectEpsgMediator(80, hints, datasource);
         codes = getCodes();
     }
-    
+
     public void testRunners() throws Throwable {
-        if(!TestData.isExtensiveTest())
+        if (!TestData.isExtensiveTest()) {
             return;
-        
+        }
         TestRunnable runners[] = new TestRunnable[RUNNER_COUNT];
         for (int i = 0; i < RUNNER_COUNT; i++) {
-            ClientThread thread = new ClientThread(i, mediator); 
+            ClientThread thread = new ClientThread(i, mediator);
             thread.iterations = ITERATIONS;
             runners[i] = thread;
         }
@@ -73,7 +73,7 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
         long timeStart = System.currentTimeMillis();
         mttr.runTestRunnables(MAX_TIME);
         long timeElapsed = System.currentTimeMillis() - timeStart;
-        
+
         //count exceptions and metrics
         int exceptions = 0;
         int totalTime = 0;
@@ -133,10 +133,10 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
             fail(exceptions + " exception(s) occurred");
         }
     }
-    
+
     /**
      * Returns a selection of CRS codes for UTM and NAD zones.
-     * 
+     *
      * @return array of EPSG codes
      * @throws FactoryException
      */
@@ -322,25 +322,25 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
                 "32189", "32190", "32191", "32192", "32193", "32194", "32195",
                 "32196", "32197", "32198" };
     }
-    
+
     public static class ClientThread extends TestRunnable {
 
         String values;
         int id = -1; //thread identifier
         public int exceptions = 0;
-        
+
         //test metrics
         public long minTime = Long.MAX_VALUE;
         public long maxTime = -1;
         public long totalTime = 0;
         public int totalRuns = 0;
-        
+
         /** number of iterations to perform */
         public int iterations = 10;
 
         Random rand = new Random();
         HsqlDialectEpsgMediator mediator; //victim
-        
+
         public ClientThread(int id, HsqlDialectEpsgMediator mediator) {
             this.id = id;
             this.mediator = mediator;
@@ -352,16 +352,16 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
             }
             return codes[rand.nextInt(codes.length)];
         }
-        
+
         private CoordinateReferenceSystem acquireCRS(String code) throws FactoryException {
             return mediator.createCoordinateReferenceSystem(code);
         }
-        
+
         public void runTest() throws Throwable {
             for (int i = 0; i < iterations; i++) {
                 //record start time
                 long timeStart = System.currentTimeMillis();
-                
+
                 //select first CRS
                 String code1 = "4326";
                 CoordinateReferenceSystem crs1 = acquireCRS(code1);
@@ -397,7 +397,5 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
                 maxTime = Math.max(maxTime, timeElapsed);
             }
         }
-
     }
-
 }

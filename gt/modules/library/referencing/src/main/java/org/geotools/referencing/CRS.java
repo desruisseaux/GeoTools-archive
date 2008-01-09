@@ -450,10 +450,10 @@ public final class CRS {
             final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
             if (sourceCRS != null) try {
                 crs = CRS.getHorizontalCRS(crs);
-        		if(crs==null)
-        			throw new TransformException(
-        					Errors.format(
-        		                    ErrorKeys.CANT_SEPARATE_CRS_$1,crs));
+                if (crs == null) {
+                    throw new TransformException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1,
+                            crs.getName()));
+                }
                 if (!equalsIgnoreMetadata(sourceCRS, crs)) {
                     final GeneralEnvelope e;
                     e = transform(findMathTransform(sourceCRS, crs, true), envelope);

@@ -1012,8 +1012,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
         @Override
         public int hashCode() {
             int code = 0;
-            if (source!=null) code  = source.hashCode();
-            if (target!=null) code += target.hashCode() * 37;
+            if (source != null) code  = source.hashCode();
+            if (target != null) code += target.hashCode() * 37;
             return code;
         }
 

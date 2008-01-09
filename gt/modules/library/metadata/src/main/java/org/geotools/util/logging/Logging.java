@@ -102,7 +102,7 @@ public final class Logging {
      * {@code true} if every {@link Logging} instances use the same {@link LoggerFactory}.
      * This is an optimization for a very common case.
      */
-    private static boolean sameLoggerFactory;
+    private static boolean sameLoggerFactory = true;
 
     /**
      * Creates an instance for the root logger. This constructor should not be used
@@ -157,8 +157,9 @@ public final class Logging {
     public static Logger getLogger(final String name) {
         synchronized (EMPTY) {
             final Logging logging = sameLoggerFactory ? ALL : getLogging(name, false);
-            if (logging != null) {
+            if (logging != null) { // Paranoiac check ('getLogging' should not returns null).
                 final LoggerFactory factory = logging.factory;
+                assert getLogging(name, false).factory == factory : name;
                 if (factory != null) {
                     final Logger logger = factory.getLogger(name);
                     if (logger != null) {
@@ -368,6 +369,14 @@ public final class Logging {
                 // Set the source format only if the user didn't specified
                 // an explicit one in the jre/lib/logging.properties file.
                 f.setSourceFormat("class:short");
+            }
+            if (level != null) {
+                // If a level was specified, changes to a finer level if needed
+                // (e.g. from FINE to FINER, but not the opposite).
+                final Level current = logger.getLevel();
+                if (current == null || current.intValue() > level.intValue()) {
+                    logger.setLevel(level);
+                }
             }
         }
     }
