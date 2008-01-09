@@ -26,7 +26,6 @@ import javax.swing.event.ListSelectionListener;
 import org.geotools.data.DefaultQuery;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.FilterToCQL;
 import org.geotools.gui.swing.misc.FilterToCQLException;
@@ -87,7 +86,7 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
             txt_error.setText(" ");
             return flt;
         } catch (CQLException e) {
-            txt_error.setText(TextBundle.getResource().getString("cql_error"));
+            txt_error.setText(BUNDLE.getString("cql_error"));
             return null;
         }
     }
@@ -163,11 +162,12 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
         lst_basic.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(lst_basic);
 
-        jLabel2.setText(TextBundle.getResource().getString("cql_basic"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/filterproperty/Bundle"); // NOI18N
+        jLabel2.setText(bundle.getString("cql_basic")); // NOI18N
 
-        jLabel1.setText(TextBundle.getResource().getString("cql_gis"));
+        jLabel1.setText(bundle.getString("cql_advance")); // NOI18N
 
-        jLabel4.setText(TextBundle.getResource().getString("cql_field"));
+        jLabel4.setText(bundle.getString("cql_field")); // NOI18N
 
         txt_error.setText(" ");
 
@@ -253,7 +253,7 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("cqlfilter");
+        return BUNDLE.getString("cqlfilter");
     }
 
     public ImageIcon getIcon() {

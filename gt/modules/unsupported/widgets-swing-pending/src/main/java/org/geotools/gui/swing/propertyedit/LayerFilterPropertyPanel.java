@@ -19,7 +19,6 @@ package org.geotools.gui.swing.propertyedit;
 
 import javax.swing.ImageIcon;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.filterproperty.JCQLPropertyPanel;
 
@@ -62,7 +61,7 @@ public class LayerFilterPropertyPanel extends MultiPropertyPanel {
 
 
     public String getTitle() {
-        return TextBundle.getResource().getString("filter");
+        return BUNDLE.getString("filter");
     }
 
     public ImageIcon getIcon() {

@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.style.JLineSymbolizerPanel;
 import org.geotools.gui.swing.style.JPointSymbolizerPanel;
@@ -89,7 +88,7 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("simple");
+        return BUNDLE.getString("simple");
     }
 
     public void setTarget(Object layer) {
@@ -122,7 +121,7 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else {        
                     detail = null;
-                    add(BorderLayout.CENTER,new JLabel("<b>" + TextBundle.getResource().getString("unknown_simplestyle") + "</b>"));
+                    add(BorderLayout.CENTER,new JLabel("<b>" + BUNDLE.getString("unknown_simplestyle") + "</b>"));
                 }
             }
         }

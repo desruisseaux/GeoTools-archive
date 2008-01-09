@@ -8,7 +8,6 @@ package org.geotools.gui.swing.propertyedit.styleproperty;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
@@ -33,7 +32,7 @@ public class JScaleStylePanel extends javax.swing.JPanel implements PropertyPane
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("scalestyle");
+        return BUNDLE.getString("scalestyle");
     }
 
     
