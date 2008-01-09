@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
+import javax.imageio.IIOParamController;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
@@ -285,7 +286,6 @@ public class MosaicImageReader extends ImageReader {
         if (reader == null) {
             reader = createReaderInstance(provider);
             readers.put(provider, reader);
-            assert provider.equals(reader.getOriginatingProvider());
         }
         return reader;
     }
@@ -345,21 +345,34 @@ public class MosaicImageReader extends ImageReader {
      * This method tries to select the tile which use the most specific reader.
      */
     private Tile getSpecificTile(final Collection<Tile> tiles) {
+        Tile fallback = null;
         final Set<ImageReader> readers = getTileReaders();
         Class<?> type = Classes.specializedClass(readers);
         while (type!=null && ImageReader.class.isAssignableFrom(type)) {
             for (final ImageReader reader : readers) {
                 if (type.equals(reader.getClass())) {
+                    final ImageReaderSpi provider = reader.getOriginatingProvider(); // May be null
                     for (final Tile tile : tiles) {
-                        // We don't use ImageReaderSpi.isOwnReader(ImageReader)
-                        // because we need consistency with the 'readers' HashMap.
-                        if (tile.getImageReaderSpi().equals(reader.getOriginatingProvider())) {
+                        /*
+                         * We give precedence to ImageReaderSpi.equals(ImageReaderSpi) over
+                         * ImageReaderSpi.isOwnReader(ImageReader) because we need consistency
+                         * with the 'readers' HashMap. However the later will be used as a
+                         * fallback if no exact match has been found.
+                         */
+                        final ImageReaderSpi candidate = tile.getImageReaderSpi(); // Never null
+                        if (candidate.equals(provider)) {
                             return tile;
+                        }
+                        if (fallback == null && candidate.isOwnReader(reader)) {
+                            fallback = tile;
                         }
                     }
                 }
             }
             type = type.getSuperclass();
+        }
+        if (fallback != null) {
+            return fallback;
         }
         throw new NoSuchElementException();
     }
@@ -624,24 +637,30 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
+        ImageTypeSpecifier type;
         final ImageTypePolicy policy = getDefaultImageTypePolicy();
         switch (policy) {
             default: {
-                return getPredefinedImageType(policy);
+                type = getPredefinedImageType(policy);
+                break;
             }
             case SUPPORTED_BY_ONE: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
-                final ImageTypeSpecifier type = getSpecificTile(tiles)
-                        .getImageReader(this, true, true).getRawImageType(imageIndex);
-                assert type.equals(getRawImageType(tiles));
-                return type;
+                final Tile tile = getSpecificTile(tiles);
+                type = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
+                assert type.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
+                break;
             }
             case SUPPORTED_BY_ALL: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
-                final ImageTypeSpecifier type = getRawImageType(tiles);
-                return (type != null) ? type : super.getRawImageType(imageIndex);
+                type = getRawImageType(tiles);
+                if (type == null) {
+                    type = super.getRawImageType(imageIndex);
+                }
+                break;
             }
         }
+        return type;
     }
 
     /**
@@ -738,23 +757,49 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
+        Iterator<ImageTypeSpecifier> types;
         final ImageTypePolicy policy = getDefaultImageTypePolicy();
         switch (policy) {
             default: {
-                return Collections.singleton(getPredefinedImageType(policy)).iterator();
+                types = Collections.singleton(getPredefinedImageType(policy)).iterator();
+                break;
             }
             case SUPPORTED_BY_ONE: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
-                final Iterator<ImageTypeSpecifier> types = getSpecificTile(tiles)
-                        .getImageReader(this, true, true).getImageTypes(imageIndex);
-                // We would like to put an assertion here, but iterator is unconvenient.
-                return types;
+                final Tile tile = getSpecificTile(tiles);
+                types = tile.getImageReader(this, true, true).getImageTypes(imageIndex);
+                assert (types = containsAll(getImageTypes(tiles, null), types)) != null : incompatibleImageType(tile);
+                break;
             }
             case SUPPORTED_BY_ALL: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
-                return getImageTypes(tiles, null).iterator();
+                types = getImageTypes(tiles, null).iterator();
+                break;
             }
         }
+        return types;
+    }
+
+    /**
+     * Helper method for assertions only.
+     */
+    private static Iterator<ImageTypeSpecifier> containsAll(
+            final Collection<ImageTypeSpecifier> expected, final Iterator<ImageTypeSpecifier> types)
+    {
+        final List<ImageTypeSpecifier> asList = new ArrayList<ImageTypeSpecifier>(expected.size());
+        while (types.hasNext()) {
+            asList.add(types.next());
+        }
+        return expected.containsAll(asList) ? asList.iterator() : null;
+    }
+
+    /**
+     * Helper method for assertions only.
+     */
+    private static String incompatibleImageType(final Tile tile) {
+        return "Image type computed by " + ImageTypePolicy.SUPPORTED_BY_ONE +
+                " policy using " +  tile + " is incompatible with type computed by " +
+                ImageTypePolicy.SUPPORTED_BY_ALL + " policy.";
     }
 
     /**
@@ -868,7 +913,7 @@ public class MosaicImageReader extends ImageReader {
      * @return The desired portion of the image.
      * @throws IOException if an error occurs during reading.
      */
-    public BufferedImage read(final int imageIndex, ImageReadParam param) throws IOException {
+    public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
         final int xSubsampling, ySubsampling;
         if (param != null) {
@@ -928,8 +973,9 @@ public class MosaicImageReader extends ImageReader {
                             break;
                         }
                         case SUPPORTED_BY_ONE: {
-                            imageType = getSpecificTile(tiles).getImageReader(this, true, true)
-                                    .getRawImageType(imageIndex);
+                            final Tile tile = getSpecificTile(tiles);
+                            imageType = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
+                            assert imageType.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
                             break;
                         }
                         case SUPPORTED_BY_ALL: {
@@ -947,8 +993,26 @@ public class MosaicImageReader extends ImageReader {
             }
         }
         /*
-         * Now read every tiles... If logging are enabled, we will format the tiles that we read in
-         * a table and logs the table as one log record once the reading is completed or failed.
+         * Gets a MosaicImageReadParam instance to be used for caching Tile parameters. There is
+         * no need to invokes 'getDefaultReadParam()' since we are interrested only in the cache
+         * that MosaicImageReadParam provide.
+         */
+        MosaicController controller = null;
+        final MosaicImageReadParam mosaicParam;
+        if (param instanceof MosaicImageReadParam) {
+            mosaicParam = (MosaicImageReadParam) param;
+            if (mosaicParam.hasController()) {
+                final IIOParamController candidate = mosaicParam.getController();
+                if (candidate instanceof MosaicController) {
+                    controller = (MosaicController) candidate;
+                }
+            }
+        } else {
+            mosaicParam = new MosaicImageReadParam();
+        }
+        /*
+         * If logging are enabled, we will format the tiles that we read in a table and
+         * logs the table as one log record once the reading is completed or failed.
          */
         final Logger logger = Logging.getLogger(MosaicImageReader.class);
         final TableWriter table;
@@ -962,9 +1026,9 @@ public class MosaicImageReader extends ImageReader {
         } else {
             table = null;
         }
-        if (param == null) {
-            param = getDefaultReadParam();
-        }
+        /*
+         * Now read every tiles...
+         */
         final Point destinationOffset = (destRegion != null) ? destRegion.getLocation() : null;
         Exception failure = null;
         for (final Tile tile : tiles) {
@@ -1020,19 +1084,22 @@ public class MosaicImageReader extends ImageReader {
             regionToRead.y      /= pixelSize.height;
             regionToRead.width  /= pixelSize.width;
             regionToRead.height /= pixelSize.height;
-            param.setController(null);
+            final ImageReader reader = tile.getImageReader(this, true, true);
+            final ImageReadParam tileParam = mosaicParam.getCachedTileParameters(reader);
             if (image != null) {
-                param.setDestinationType(null);
-                param.setDestination(image); // Must be after setDestinationType.
-                param.setDestinationOffset(destinationOffset);
-                if (param.canSetSourceRenderSize()) {
-                    param.setSourceRenderSize(null); // TODO.
+                tileParam.setDestinationType(null);
+                tileParam.setDestination(image); // Must be after setDestinationType.
+                tileParam.setDestinationOffset(destinationOffset);
+                if (tileParam.canSetSourceRenderSize()) {
+                    tileParam.setSourceRenderSize(null); // TODO.
                 }
             }
-            param.setSourceRegion(regionToRead);
-            param.setSourceSubsampling(xSubsampling / pixelSize.width,
-                                       ySubsampling / pixelSize.height, 0, 0);
-            final ImageReader reader = tile.getImageReader(this, true, true);
+            tileParam.setSourceRegion(regionToRead);
+            tileParam.setSourceSubsampling(xSubsampling / pixelSize.width,
+                                           ySubsampling / pixelSize.height, 0, 0);
+            if (controller != null) {
+                controller.configure(tile, tileParam);
+            }
             /*
              * Adds a row in the table to be logged (if logable) and process to the reading.
              */
@@ -1043,7 +1110,7 @@ public class MosaicImageReader extends ImageReader {
                 format(table, regionToRead.width,  regionToRead.height);
                 format(table, regionToRead.x,      regionToRead.y);
                 format(table, destinationOffset.x, destinationOffset.y);
-                format(table, param.getSourceXSubsampling(), param.getSourceYSubsampling());
+                format(table, tileParam.getSourceXSubsampling(), tileParam.getSourceYSubsampling());
                 table.nextLine();
             }
             final BufferedImage output;
@@ -1051,7 +1118,7 @@ public class MosaicImageReader extends ImageReader {
                 reading = reader;
             }
             try {
-                output = reader.read(tile.getImageIndex(), param);
+                output = reader.read(tile.getImageIndex(), tileParam);
             } catch (IOException exception) {
                 failure = exception;
                 break;

@@ -38,13 +38,13 @@ import javax.imageio.ImageWriteParam;
  *       {@link MosaicImageReadParam} or {@link MosaicImageWriteParam}) are setup
  *       by {@link #activate}.</li>
  *   <li>The parameters for the tiles (typically as {@link ImageReadParam} or
- *       {@link ImageWriteParam} of arbitrary class) are setup by {@link #activateTile}.</li>
+ *       {@link ImageWriteParam} of arbitrary class) are setup by {@link #activateForTile}.</li>
  * </ul>
  * <p>
  * The {@code activate} methods are executed only when explicitly invoked, typically through a
  * call to {@link IIOParam#activateController}. They are <strong>not</strong> invoked automatically
  * by {@linkplain MosaicImageReader mosaic image reader} or {@linkplain MosaicImageWriter writer}.
- * This is different than {@link #configureTile}, which is always invoked automatically by the
+ * This is different than {@link #configure}, which is always invoked automatically by the
  * above.
  * <p>
  * Users can create a subclass of {@code MosaicController} and pass it to
@@ -100,7 +100,7 @@ public class MosaicController implements IIOParamController {
                     p = params.getTileParameters(entry.getKey());
                     entry.setValue(p);
                 }
-                if (!activateTile(p)) {
+                if (!activateForTile(p)) {
                     return false;
                 }
             }
@@ -126,7 +126,7 @@ public class MosaicController implements IIOParamController {
      * @return {@code true} if the parameters are ready for use, or
      *         {@code false} if the user canceled the operation.
      */
-    protected boolean activateTile(final IIOParam parameters) {
+    protected boolean activateForTile(final IIOParam parameters) {
         if (parameters.hasController()) {
             return parameters.activateController();
         } else {
@@ -147,6 +147,6 @@ public class MosaicController implements IIOParamController {
      * @param parameters
      *          The parameter to be given to the image reader or writer.
      */
-    protected void configureTile(Tile tile, IIOParam parameters) {
+    protected void configure(Tile tile, IIOParam parameters) {
     }
 }
