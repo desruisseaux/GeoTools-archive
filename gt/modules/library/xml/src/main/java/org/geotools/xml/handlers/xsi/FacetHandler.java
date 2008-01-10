@@ -104,6 +104,9 @@ public abstract class FacetHandler extends XSIElementHandler {
      */
     public XSIElementHandler getHandler(String namespaceURI, String localName)
         throws SAXException {
+    	if (localName.equalsIgnoreCase("annotation") || localName.equalsIgnoreCase("documentation")) {
+    		return new IgnoreHandler();
+    	}
         throw new SAXNotRecognizedException(
             "Facets are not allowed to have sub-elements");
     }

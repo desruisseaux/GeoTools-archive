@@ -3766,17 +3766,17 @@ public class GMLComplexTypes {
             x = y = z = null;
 
             for (int i = 0; i < value.length; i++) {
-                if (elements[0].getName().equals(value[i].getElement().getType()
+                if (elements[0].getName().equals(value[i].getElement()
                                                              .getName())) {
                     x = (Double) value[i].getValue();
                 }
 
-                if (elements[1].getName().equals(value[i].getElement().getType()
+                if (elements[1].getName().equals(value[i].getElement()
                                                              .getName())) {
                     y = (Double) value[i].getValue();
                 }
 
-                if (elements[2].getName().equals(value[i].getElement().getType()
+                if (elements[2].getName().equals(value[i].getElement()
                                                              .getName())) {
                     z = (Double) value[i].getValue();
                 }
