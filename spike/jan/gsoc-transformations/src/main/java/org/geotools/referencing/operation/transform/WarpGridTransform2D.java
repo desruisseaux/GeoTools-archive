@@ -67,7 +67,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
     /** Warp object */
     private final Warp warp;
 
-    /** warp position (Warp desn't offer getWarpPosition in the same format as needed)*/
+    /** warp position (Warp object desn't offer getWarpPosition in the same format as needed)*/
     private final float[] warpPositions;
     
     
@@ -352,7 +352,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         public static final ParameterDescriptor Y_NUMCELLS = new DefaultParameterDescriptor("yNumCells",
         		Integer.class, null, null);
 
-        /** Descriptor for the warpPositions parameter value. */
+        /** Descriptor for the warpPositions parameter value. This the target coordinates of weach cell (not deltas) */
         public static final ParameterDescriptor WARP_POSITIONS = new DefaultParameterDescriptor("warpPositions",
                 float[].class, null, null);
 
@@ -434,7 +434,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                     new NamedIdentifier(Citations.EPSG, "9613"),
-                    new NamedIdentifier(Citations.GEOTOOLS, "Warp Grid (form file)")
+                    new NamedIdentifier(Citations.GEOTOOLS, "Warp Grid (from file)")
                 }, new ParameterDescriptor[] { X_DIFF_FILE, Y_DIFF_FILE });
 
         /**
