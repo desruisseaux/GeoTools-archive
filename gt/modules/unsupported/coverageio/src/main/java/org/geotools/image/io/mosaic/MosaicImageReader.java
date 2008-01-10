@@ -964,11 +964,13 @@ public class MosaicImageReader extends ImageReader {
          */
         BufferedImage image = null;
         final Rectangle destRegion;
+        final Point destinationOffset;
         if (tiles.size() == 1) {
             destRegion = null;
             if (subsamplingChangeAllowed) {
                 sourceRegion.setBounds(getSourceRegion(param, srcWidth, srcHeight));
             }
+            destinationOffset = (param != null) ? param.getDestinationOffset() : new Point();
         } else {
             if (param != null) {
                 image = param.getDestination();
@@ -1014,10 +1016,12 @@ public class MosaicImageReader extends ImageReader {
                         throw new IIOException(Errors.format(ErrorKeys.DESTINATION_NOT_SET));
                     }
                 }
-                image = imageType.createBufferedImage(destRegion.x + destRegion.width,
-                                                      destRegion.y + destRegion.height);
+                final int width  = destRegion.x + destRegion.width;
+                final int height = destRegion.y + destRegion.height;
+                image = imageType.createBufferedImage(width, height);
                 computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
             }
+            destinationOffset = destRegion.getLocation();
         }
         /*
          * Gets a MosaicImageReadParam instance to be used for caching Tile parameters. There is
@@ -1052,7 +1056,6 @@ public class MosaicImageReader extends ImageReader {
         /*
          * Now read every tiles...
          */
-        final Point destinationOffset = (destRegion != null) ? destRegion.getLocation() : null;
         Exception failure = null;
         for (final Tile tile : tiles) {
             if (abortRequested()) {
@@ -1085,7 +1088,7 @@ public class MosaicImageReader extends ImageReader {
              * Now that the offset is a multiple of subsampling, computes the destination offset.
              * Then translate the region to read from "this image reader" space to "tile" space.
              */
-            if (destinationOffset != null) {
+            if (destRegion != null) {
                 xOffset = (regionToRead.x - sourceRegion.x) / xSubsampling;
                 yOffset = (regionToRead.y - sourceRegion.y) / ySubsampling;
                 destinationOffset.x = destRegion.x + xOffset;
