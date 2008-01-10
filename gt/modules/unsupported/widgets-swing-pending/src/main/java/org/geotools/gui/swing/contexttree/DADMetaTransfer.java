@@ -6,7 +6,7 @@
 package org.geotools.gui.swing.contexttree;
 
 import javax.swing.tree.TreePath;
-import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 
 final class DADMetaTransfer{
     

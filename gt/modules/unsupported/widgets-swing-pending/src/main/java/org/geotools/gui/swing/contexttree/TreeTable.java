@@ -15,7 +15,7 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

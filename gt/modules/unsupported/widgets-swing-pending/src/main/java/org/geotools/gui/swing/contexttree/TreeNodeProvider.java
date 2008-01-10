@@ -15,7 +15,7 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Font;
 
 import javax.swing.Icon;

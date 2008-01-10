@@ -14,19 +14,33 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.node;
-
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.LightContextTreeModel;
+package org.geotools.gui.swing.contexttree;
 
 /**
- *
  * @author johann sorel
  */
-public interface SubNodeGroup {
+public class LightContextTreeModel {
 
-    public boolean isValid(Object target);
+    public final ContextTreeModel completeModel;
     
-    public ContextTreeNode[] createNodes(LightContextTreeModel model,Object target);
+    LightContextTreeModel(ContextTreeModel model){
+        this.completeModel = model;
+        
+    }
+    
+    public void removeNodeFromParent(ContextTreeNode node){
+        completeModel.removeNodeFromParent(node);
+    }
+       
+    public void insetNodeInto(ContextTreeNode child, ContextTreeNode father, int index){
+        completeModel.insertNodeInto(child, father, index);
+    }
+    
+
+    
+        
+    
+    
+    
     
 }

@@ -15,12 +15,14 @@
  */
 package org.geotools.gui.swing.contexttree.node;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeModel;
+import org.geotools.gui.swing.contexttree.LightContextTreeModel;
 import org.geotools.map.MapLayer;
 
 /**
@@ -33,13 +35,12 @@ public class SourceGroup implements SubNodeGroup {
         return (target instanceof MapLayer);
     }
 
-    public ContextTreeNode[] createNodes(final ContextTreeModel model, Object target) {
+    public ContextTreeNode[] createNodes(final LightContextTreeModel model, Object target) {
         final MapLayer layer = (MapLayer) target;
         final DataStore ds = layer.getFeatureSource().getDataStore();
-
+        
         ContextTreeNode node = new ContextTreeNode(model) {
 
-            
             @Override
             public ImageIcon getIcon() {
                 return null;
@@ -57,7 +58,6 @@ public class SourceGroup implements SubNodeGroup {
                 } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
                     
                     if(ds instanceof ShapefileDataStore){
-                        ShapefileDataStore store = (ShapefileDataStore) ds;
                         return "Source : " ;
                     }
                     

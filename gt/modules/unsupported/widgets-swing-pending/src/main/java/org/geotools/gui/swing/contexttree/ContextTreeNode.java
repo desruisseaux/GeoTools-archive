@@ -1,3 +1,5 @@
+
+
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
@@ -14,10 +16,9 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.node;
+package org.geotools.gui.swing.contexttree;
 
 import javax.swing.Icon;
-import org.geotools.gui.swing.contexttree.*;
 import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 
@@ -28,7 +29,7 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  */
 public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
     
-    protected final ContextTreeModel model;
+    protected final LightContextTreeModel lightModel;
     
         
     public abstract Object getValue();
@@ -42,9 +43,9 @@ public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
      * Creates a new instance of ContextTreeNode
      * @param model model of the tree
      */
-    public ContextTreeNode(ContextTreeModel model) {
+    public ContextTreeNode(LightContextTreeModel model) {
         super();
-        this.model = model;
+        this.lightModel = model;
     }
             
     /**
@@ -88,8 +89,8 @@ public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
 //            else
 //                res = "n/a";
         }else{
-            if(column <= model.getColumnModelCount()){
-                res = model.getColumnModel(column-1).getValue(getUserObject());
+            if(column <= lightModel.completeModel.getColumnModelCount()){
+                res = lightModel.completeModel.getColumnModel(column-1).getValue(getUserObject());
             } else{
                 res = "n/a";
             }
@@ -114,8 +115,8 @@ public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
 //                ((MapLayer)getUserObject()).setTitle((String)aValue);
 //            
         }else{
-            if(column <= model.getColumnModelCount())
-                model.getColumnModel(column-1).setValue(getUserObject(),aValue);
+            if(column <= lightModel.completeModel.getColumnModelCount())
+                lightModel.completeModel.getColumnModel(column-1).setValue(getUserObject(),aValue);
             
         }
         
@@ -126,7 +127,7 @@ public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
      * @return the number of columns
      */
     public final int getColumnCount() {
-        return model.getColumnCount();
+        return lightModel.completeModel.getColumnCount();
     }
 
     /**

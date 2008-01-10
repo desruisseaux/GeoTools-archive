@@ -13,10 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.contexttree.node;
+package org.geotools.gui.swing.contexttree;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
-import org.geotools.gui.swing.contexttree.*;
+import org.geotools.gui.swing.contexttree.LightContextTreeModel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 
@@ -33,8 +34,9 @@ public final class MapContextTreeNode extends ContextTreeNode {
     /**
      * 
      * @param model
+     * @param context 
      */
-    public MapContextTreeNode(ContextTreeModel model, MapContext context) {
+    public MapContextTreeNode(LightContextTreeModel model, MapContext context) {
         super(model);
         setUserObject(context);
     }
@@ -42,8 +44,8 @@ public final class MapContextTreeNode extends ContextTreeNode {
     @Override
     public ImageIcon getIcon() {
         MapContext context = (MapContext) getUserObject();
-
-        if (context.equals(model.getActiveContext())) {
+       
+        if (context.equals( lightModel.completeModel.getActiveContext())) {
             return ICON_CONTEXT_ACTIVE;
         } else {
             return ICON_CONTEXT_DESACTIVE;

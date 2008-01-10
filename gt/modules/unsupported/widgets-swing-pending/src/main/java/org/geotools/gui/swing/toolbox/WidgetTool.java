@@ -20,6 +20,8 @@ import org.geotools.gui.swing.toolbox.tooltree.*;
 import javax.swing.JComponent;
 
 /**
+ * A widget Tool is a tool wich has a JComponent to configure it
+ * widget tool are top level tools because they offer an interface for the user
  * @author johann sorel
  */
 public interface WidgetTool extends Tool{
@@ -27,6 +29,10 @@ public interface WidgetTool extends Tool{
     public final WidgetToolListener[] EMPTY_TREETOOLLISTENER_ARRAY = {};
     
     
+    /**
+     * get the configuration component/panel of the tool
+     * @return JComponent
+     */
     public JComponent getComponent();
     
     

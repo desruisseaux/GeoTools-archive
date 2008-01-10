@@ -13,8 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.contexttree.node;
+package org.geotools.gui.swing.contexttree;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
@@ -42,8 +43,9 @@ public final class LayerContextTreeNode extends ContextTreeNode {
     /**
      * 
      * @param model
+     * @param layer 
      */
-    public LayerContextTreeNode(ContextTreeModel model, MapLayer layer) {
+    public LayerContextTreeNode(LightContextTreeModel model, MapLayer layer) {
         super(model);
         setUserObject(layer);
     }

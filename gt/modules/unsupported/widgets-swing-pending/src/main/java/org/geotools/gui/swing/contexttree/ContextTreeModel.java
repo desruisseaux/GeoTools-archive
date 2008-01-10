@@ -16,8 +16,6 @@
 
 package org.geotools.gui.swing.contexttree;
 
-import javax.swing.ImageIcon;
-import org.geotools.gui.swing.contexttree.node.ContextTreeNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,13 +23,12 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
-import org.geotools.gui.swing.contexttree.node.LayerContextTreeNode;
-import org.geotools.gui.swing.contexttree.node.MapContextTreeNode;
 import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
@@ -65,6 +62,8 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     private final Map<SubNodeGroup,List<ContextTreeNode>> subnodes = new HashMap<SubNodeGroup,List<ContextTreeNode>>();
     private final Vector columnNames = new Vector(); 
     
+    private final LightContextTreeModel lightModel;
+    
     private MapContext activeContext;
     private boolean treeedit = true;        
     
@@ -76,9 +75,12 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
      */
     ContextTreeModel(JContextTree frame) {
         super();
+        
+        lightModel = new LightContextTreeModel(this);
+                
         this.frame = frame;
                 
-        ContextTreeNode node = new ContextTreeNode(this) {
+        ContextTreeNode node = new ContextTreeNode(lightModel) {
 
             @Override
             public ImageIcon getIcon() {
@@ -104,6 +106,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         columnNames.add(BUNDLE.getString("col_tree"));
 
         setColumnIdentifiers(columnNames);
+        
     }
         
 
@@ -305,7 +308,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
             ContextTreeNode tn = (ContextTreeNode) node;
             Object obj = tn.getUserObject();
             if(group.isValid(obj)){
-                ContextTreeNode[] nodes = group.createNodes(this,obj);
+                ContextTreeNode[] nodes = group.createNodes(lightModel,obj);
                 for(ContextTreeNode n : nodes){
                     subnodes.get(group).add(n);
                     insertNodeInto(n, tn, tn.getChildCount());
@@ -389,12 +392,12 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         if (getMapContextIndex(context) < 0) {
             context.addMapLayerListListener(this);
 
-            ContextTreeNode node = new MapContextTreeNode(this,context);
+            ContextTreeNode node = new MapContextTreeNode(lightModel,context);
 
             insertNodeInto(node, (ContextTreeNode) getRoot(), getRoot().getChildCount());
 
             for (int i = context.getLayerCount() - 1; i >= 0; i--) {
-                ContextTreeNode layer = new LayerContextTreeNode(this,context.getLayer(i));
+                ContextTreeNode layer = new LayerContextTreeNode(lightModel,context.getLayer(i));
                 insertNodeInto(layer, node, node.getChildCount());
             }
 
@@ -699,7 +702,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
 
             if (((ContextTreeNode) getRoot().getChildAt(i)).getUserObject().equals(context)) {
 
-                ContextTreeNode layer = new LayerContextTreeNode(this,mle.getLayer());
+                ContextTreeNode layer = new LayerContextTreeNode(lightModel,mle.getLayer());
                 ContextTreeNode father = (ContextTreeNode) getRoot().getChildAt(i);
 
                 int index = mle.getToIndex();

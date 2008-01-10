@@ -15,12 +15,15 @@
  */
 package org.geotools.gui.swing.contexttree.node;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.geotools.gui.swing.contexttree.ContextTreeModel;
+import org.geotools.gui.swing.contexttree.LightContextTreeModel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.MapLayer;
+import org.geotools.map.event.MapLayerEvent;
+import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
@@ -36,51 +39,101 @@ public class StyleGroup implements SubNodeGroup {
     private static final Icon ICON_STYLE = IconBundle.getResource().getIcon("16_style");
     private static final Icon ICON_FTS = IconBundle.getResource().getIcon("16_style_fts");
     private static final Icon ICON_RULE = IconBundle.getResource().getIcon("16_style_rule");
-    
+
     public boolean isValid(Object target) {
         return (target instanceof MapLayer);
     }
 
-    public ContextTreeNode[] createNodes(final ContextTreeModel model, Object target) {
+    public ContextTreeNode[] createNodes(final LightContextTreeModel model, Object target) {
         final MapLayer layer = (MapLayer) target;
         Style style = layer.getStyle();
-        
-        ContextTreeNode root = new PackStyleNode(model, "Style",style);
-                
+
+        ContextTreeNode root = new PackStyleNode(model, "Style", layer);
+
         FeatureTypeStyle[] ftss = style.getFeatureTypeStyles();
-        
-        for(FeatureTypeStyle fts : ftss){
-            ContextTreeNode ftsnode = new FeatureTypeStyleNode(model,fts);
+
+        for (FeatureTypeStyle fts : ftss) {
+            ContextTreeNode ftsnode = new FeatureTypeStyleNode(model, fts);
             root.add(ftsnode);
-            
+
             Rule[] rules = fts.getRules();
-            for(Rule rule : rules){
-                ContextTreeNode rulenode = new RuleNode(model,rule);
+            for (Rule rule : rules) {
+                ContextTreeNode rulenode = new RuleNode(model, rule);
                 Symbolizer[] symbs = rule.getSymbolizers();
-                for(Symbolizer symb : symbs){
+                for (Symbolizer symb : symbs) {
                     Icon ico = new ImageIcon(RANDOM_STYLE_FACTORY.createGlyph(symb));
                     SymbolizerNode symbnode = new SymbolizerNode(model, ico, symb);
                     rulenode.add(symbnode);
-                }   
+                }
                 ftsnode.add(rulenode);
-            }                    
+            }
         }
-       
-        
+
+
         return new ContextTreeNode[]{root};
     }
-    
-    private class PackStyleNode extends ContextTreeNode{
-        
+
+    private class PackStyleNode extends ContextTreeNode {
+
+        private LightContextTreeModel model;
         private String name;
-        
-        PackStyleNode(ContextTreeModel model,String name,Style target){
+        private MapLayer layer;
+
+        PackStyleNode(LightContextTreeModel model, String name, MapLayer target) {
             super(model);
+            this.model = model;
             this.name = name;
-            setUserObject(target);
+            this.layer = target;
+            setUserObject(target.getStyle());
+            
+
+            target.addMapLayerListener(new MapLayerListener() {
+
+                public void layerChanged(MapLayerEvent event) {
+                    updateStyleNodes();
+                }
+
+                public void layerShown(MapLayerEvent event) {
+                }
+
+                public void layerHidden(MapLayerEvent event) {
+                }
+            });
         }
-        
-       
+
+        private void updateStyleNodes() {
+            
+            while(!isLeaf()){
+                model.removeNodeFromParent( (ContextTreeNode)getChildAt(0));
+            }
+            
+            Style style = layer.getStyle();
+            setUserObject(style);
+            
+            FeatureTypeStyle[] ftss = style.getFeatureTypeStyles();
+
+            for (FeatureTypeStyle fts : ftss) {
+                ContextTreeNode ftsnode = new FeatureTypeStyleNode(model, fts);
+                model.insetNodeInto(ftsnode, this, getChildCount());
+//                root.add(ftsnode);
+
+                Rule[] rules = fts.getRules();
+                for (Rule rule : rules) {
+                    ContextTreeNode rulenode = new RuleNode(model, rule);
+                    model.insetNodeInto(rulenode, ftsnode, ftsnode.getChildCount());
+                    
+                    Symbolizer[] symbs = rule.getSymbolizers();
+                    for (Symbolizer symb : symbs) {
+                        Icon ico = new ImageIcon(RANDOM_STYLE_FACTORY.createGlyph(symb));
+                        SymbolizerNode symbnode = new SymbolizerNode(model, ico, symb);
+                        model.insetNodeInto(symbnode, rulenode, symbnode.getChildCount());
+//                        rulenode.add(symbnode);
+                    }
+//                    ftsnode.add(rulenode);
+                }
+            }
+        }
+
         @Override
         public Icon getIcon() {
             return ICON_STYLE;
@@ -99,20 +152,15 @@ public class StyleGroup implements SubNodeGroup {
         @Override
         public void setValue(Object obj) {
         }
-        
     }
-    
-    
-    private class FeatureTypeStyleNode extends ContextTreeNode{
-        
-        
-        
-        FeatureTypeStyleNode(ContextTreeModel model,FeatureTypeStyle target){
+
+    private class FeatureTypeStyleNode extends ContextTreeNode {
+
+        FeatureTypeStyleNode(LightContextTreeModel model, FeatureTypeStyle target) {
             super(model);
             setUserObject(target);
         }
-        
-       
+
         @Override
         public Icon getIcon() {
             return ICON_FTS;
@@ -125,24 +173,22 @@ public class StyleGroup implements SubNodeGroup {
 
         @Override
         public Object getValue() {
-            return ((FeatureTypeStyle)userObject).getTitle();
+            return ((FeatureTypeStyle) userObject).getTitle();
         }
 
         @Override
         public void setValue(Object obj) {
-            ((FeatureTypeStyle)userObject).setTitle(obj.toString());
+            ((FeatureTypeStyle) userObject).setTitle(obj.toString());
         }
-        
     }
-    
-    private class RuleNode extends ContextTreeNode{
-        
-        RuleNode(ContextTreeModel model,Rule target){
+
+    private class RuleNode extends ContextTreeNode {
+
+        RuleNode(LightContextTreeModel model, Rule target) {
             super(model);
             setUserObject(target);
         }
-        
-       
+
         @Override
         public Icon getIcon() {
             return ICON_RULE;
@@ -155,26 +201,25 @@ public class StyleGroup implements SubNodeGroup {
 
         @Override
         public Object getValue() {
-            return ((Rule)userObject).getTitle();
+            return ((Rule) userObject).getTitle();
         }
 
         @Override
         public void setValue(Object obj) {
-            ((Rule)userObject).setTitle(obj.toString());
+            ((Rule) userObject).setTitle(obj.toString());
         }
-        
     }
-    
-    private class SymbolizerNode extends ContextTreeNode{
+
+    private class SymbolizerNode extends ContextTreeNode {
 
         private Icon icon;
-        
-        SymbolizerNode(ContextTreeModel model, Icon icon, Object target){
+
+        SymbolizerNode(LightContextTreeModel model, Icon icon, Object target) {
             super(model);
             this.icon = icon;
             setUserObject(target);
         }
-        
+
         @Override
         public Icon getIcon() {
             return icon;
@@ -193,8 +238,5 @@ public class StyleGroup implements SubNodeGroup {
         @Override
         public void setValue(Object obj) {
         }
-        
     }
-    
-    
 }
