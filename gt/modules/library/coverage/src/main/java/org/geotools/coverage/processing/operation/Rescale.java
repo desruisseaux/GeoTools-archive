@@ -16,10 +16,6 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// JAI dependencies (for javadoc)
-import javax.media.jai.operator.RescaleDescriptor;
-
-// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.processing.OperationJAI;
 
@@ -35,7 +31,7 @@ import org.geotools.coverage.processing.OperationJAI;
  * </CODE></BLOCKQUOTE>
  *
  * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"Rescale"</CODE><BR>
- *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain RescaleDescriptor Rescale}"</CODE><BR>
+ *    <STRONG>JAI operator:</STRONG>&nbsp;<CODE>"{@linkplain javax.media.jai.operator.RescaleDescriptor Rescale}"</CODE><BR>
  *    <STRONG>Parameters:</STRONG></P>
  * <table border='3' cellpadding='6' bgcolor='F4F8FF'>
  *   <tr bgcolor='#B9DCFF'>
@@ -74,7 +70,7 @@ import org.geotools.coverage.processing.OperationJAI;
  * @author Martin Desruisseaux
  *
  * @see org.geotools.coverage.processing.Operations#rescale
- * @see RescaleDescriptor
+ * @see javax.media.jai.operator.RescaleDescriptor
  *
  * @todo Should operates on {@code sampleToGeophysics} transform when possible.
  *       See <A HREF="http://jira.codehaus.org/browse/GEOT-610">GEOT-610</A>.
@@ -97,6 +93,7 @@ public class Rescale extends OperationJAI {
      *
      * @todo Not yet implemented.
      */
+    @Override
     protected NumberRange deriveRange(final NumberRange[] ranges, final Parameters parameters) {
         return super.deriveRange(ranges, parameters);
     }

@@ -16,33 +16,27 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.util.Arrays;
 import javax.units.Unit;
 
-// JAI dependencies
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
-// OpenGIS dependencies
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.TypeMap;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.resources.ClassChanger;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.NumberRange;
@@ -77,7 +71,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      * The grid value data type.
      */
     private final SampleDimensionType type;
-    
+
     /**
      * Constructs a sample dimension with a set of categories from an other sample dimension.
      *
@@ -302,7 +296,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
                 max = new double[numBands];
                 Arrays.fill(max, Double.NEGATIVE_INFINITY);
             }
-            int b=0;
+            int b = 0;
             iterator.startBands();
             if (!iterator.finishedBands()) do {
                 iterator.startLines();
@@ -349,13 +343,15 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      *
      * @return a code value indicating grid value data type.
      */
+    @Override
     public SampleDimensionType getSampleDimensionType() {
         return type;
     }
-    
+
     /**
      * Returns the color interpretation of the sample dimension.
      */
+    @Override
     public ColorInterpretation getColorInterpretation() {
         return TypeMap.getColorInterpretation(getColorModel(), band);
     }
@@ -363,47 +359,48 @@ final class Grid2DSampleDimension extends GridSampleDimension {
     /**
      * Returns a color model for this sample dimension.
      */
+    @Override
     public ColorModel getColorModel() {
         return getColorModel(band, numBands);
     }
-    
+
     /**
      * Returns the minimum value occurring in this sample dimension.
      */
     //  public double getMinimumValue()
     //  {return getHistogram().getLowValue(band);}
-    
+
     /**
      * Returns the maximum value occurring in this sample dimension.
      */
     //  public double getMaximumValue()
     //  {return getHistogram().getHighValue(band);}
-    
+
     /**
      * Determine the mode grid value in this sample dimension.
      */
     //  public double getModeValue()
     //  {throw new UnsupportedOperationException("Not implemented");}
-    
+
     /**
      * Determine the median grid value in this sample dimension.
      */
     //  public double getMedianValue()
     //  {throw new UnsupportedOperationException("Not implemented");}
-    
+
     /**
      * Determine the mean grid value in this sample dimension.
      */
     //  public double getMeanValue()
     //  {return getHistogram().getMean()[band];}
-    
+
     /**
      * Determine the standard deviation from the mean
      * of the grid values in a sample dimension.
      */
     //  public double getStandardDeviation()
     //  {return getHistogram().getStandardDeviation()[band];}
-    
+
     /**
      * Gets the histogram for the underlying grid coverage.
      */

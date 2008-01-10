@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,12 +29,11 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.SampleModel;
 import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.SampleDimensionType;
-import org.opengis.util.InternationalString;
+import static org.opengis.coverage.SampleDimensionType.*;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -60,29 +58,26 @@ import org.geotools.util.NumberRange;
 public final class TypeMap {
     /**
      * The mapping of {@link SampleDimensionType} to {@link DataBuffer} types.
-     *
-     * @todo Simplify when we will be allowed to compile with J2SE 1.5
-     *       (using auto-boxing and static imports).
      */
     private static final TypeMap[] MAP = new TypeMap[SampleDimensionType.values().length];
     static {
-        final Map  pool = new HashMap(32);
+        final Map<Number,Number> pool = new HashMap<Number,Number>(32);
         final Float  M1 = -Float .MAX_VALUE;
         final Float  P1 =  Float .MAX_VALUE;
         final Double M2 = -Double.MAX_VALUE;
         final Double P2 =  Double.MAX_VALUE;
         // The constructor will register automatically those objects in the above array.
-        new TypeMap(SampleDimensionType. UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false,        pool);
-        new TypeMap(SampleDimensionType. UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false,        pool);
-        new TypeMap(SampleDimensionType. UNSIGNED_4BITS, DataBuffer.TYPE_BYTE,   (byte) 4, false, false,        pool);
-        new TypeMap(SampleDimensionType. UNSIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, false, false,        pool);
-        new TypeMap(SampleDimensionType.   SIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, true,  false,        pool);
-        new TypeMap(SampleDimensionType.UNSIGNED_16BITS, DataBuffer.TYPE_USHORT, (byte)16, false, false,        pool);
-        new TypeMap(SampleDimensionType.  SIGNED_16BITS, DataBuffer.TYPE_SHORT,  (byte)16, true,  false,        pool);
-        new TypeMap(SampleDimensionType.UNSIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, false, false,        pool);
-        new TypeMap(SampleDimensionType.  SIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, true,  false,        pool);
-        new TypeMap(SampleDimensionType.    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true, M1, P1, pool);
-        new TypeMap(SampleDimensionType.    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true, M2, P2, pool);
+        new TypeMap( UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false,        pool);
+        new TypeMap( UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false,        pool);
+        new TypeMap( UNSIGNED_4BITS, DataBuffer.TYPE_BYTE,   (byte) 4, false, false,        pool);
+        new TypeMap( UNSIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, false, false,        pool);
+        new TypeMap(   SIGNED_8BITS, DataBuffer.TYPE_BYTE,   (byte) 8, true,  false,        pool);
+        new TypeMap(UNSIGNED_16BITS, DataBuffer.TYPE_USHORT, (byte)16, false, false,        pool);
+        new TypeMap(  SIGNED_16BITS, DataBuffer.TYPE_SHORT,  (byte)16, true,  false,        pool);
+        new TypeMap(UNSIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, false, false,        pool);
+        new TypeMap(  SIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, true,  false,        pool);
+        new TypeMap(    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true, M1, P1, pool);
+        new TypeMap(    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true, M2, P2, pool);
     };
 
     /**
@@ -142,7 +137,7 @@ public final class TypeMap {
     private TypeMap(final SampleDimensionType code,
                     final int     type,   final byte    size,
                     final boolean signed, final boolean real,
-                    final Map pool)
+                    final Map<Number,Number> pool)
     {
         this(code, type, size, signed, real, null, null, pool);
     }
@@ -153,7 +148,7 @@ public final class TypeMap {
     private TypeMap(final SampleDimensionType code,
                     final int     type,   final byte    size,
                     final boolean signed, final boolean real,
-                    Number lower, Number upper, final Map pool)
+                    Number lower, Number upper, final Map<Number,Number> pool)
     {
         Number one = null;
         if (lower == null) {
@@ -183,7 +178,7 @@ public final class TypeMap {
             assert upper.longValue() == max;
         }
         assert ((Comparable) lower).compareTo(upper) < 0 : upper;
-        final Class c      = upper.getClass();
+        final Class<? extends Number> c = upper.getClass();
         this.code          = code;
         this.type          = type;
         this.size          = size;
@@ -200,8 +195,8 @@ public final class TypeMap {
     /**
      * Returns a single instance of the specified number.
      */
-    private static Number unique(final Map pool, final Number n) {
-        final Number candidate = (Number) pool.put(n, n);
+    private static Number unique(final Map<Number,Number> pool, final Number n) {
+        final Number candidate = pool.put(n, n);
         if (candidate == null) {
             return n;
         }
@@ -218,10 +213,10 @@ public final class TypeMap {
     public static SampleDimensionType getSampleDimensionType(final Range range) {
         final Class type = range.getElementClass();
         if (Double.class.isAssignableFrom(type)) {
-            return SampleDimensionType.REAL_64BITS;
+            return REAL_64BITS;
         }
         if (Float.class.isAssignableFrom(type)) {
-            return SampleDimensionType.REAL_32BITS;
+            return REAL_32BITS;
         }
         long min = ((Number) range.getMinValue()).longValue();
         long max = ((Number) range.getMaxValue()).longValue();
@@ -248,10 +243,10 @@ public final class TypeMap {
         }
         min = Math.abs(min);
         max = Math.abs(max);
-        if (Math.min(min,max)>=Float.MIN_VALUE && Math.max(min,max)<=Float.MAX_VALUE) {
-            return SampleDimensionType.REAL_32BITS;
+        if (Math.min(min,max) >= Float.MIN_VALUE  &&  Math.max(min,max) <= Float.MAX_VALUE) {
+            return REAL_32BITS;
         }
-        return SampleDimensionType.REAL_64BITS;
+        return REAL_64BITS;
     }
 
     /**
@@ -263,18 +258,18 @@ public final class TypeMap {
      */
     public static SampleDimensionType getSampleDimensionType(final long min, final long max) {
         if (min >= 0) {
-            if (max < (1L <<  1)) return SampleDimensionType.UNSIGNED_1BIT;
-            if (max < (1L <<  2)) return SampleDimensionType.UNSIGNED_2BITS;
-            if (max < (1L <<  4)) return SampleDimensionType.UNSIGNED_4BITS;
-            if (max < (1L <<  8)) return SampleDimensionType.UNSIGNED_8BITS;
-            if (max < (1L << 16)) return SampleDimensionType.UNSIGNED_16BITS;
-            if (max < (1L << 32)) return SampleDimensionType.UNSIGNED_32BITS;
+            if (max < (1L <<  1)) return UNSIGNED_1BIT;
+            if (max < (1L <<  2)) return UNSIGNED_2BITS;
+            if (max < (1L <<  4)) return UNSIGNED_4BITS;
+            if (max < (1L <<  8)) return UNSIGNED_8BITS;
+            if (max < (1L << 16)) return UNSIGNED_16BITS;
+            if (max < (1L << 32)) return UNSIGNED_32BITS;
         } else {
-            if (min>=Byte   .MIN_VALUE && max<=Byte   .MAX_VALUE) return SampleDimensionType.SIGNED_8BITS;
-            if (min>=Short  .MIN_VALUE && max<=Short  .MAX_VALUE) return SampleDimensionType.SIGNED_16BITS;
-            if (min>=Integer.MIN_VALUE && max<=Integer.MAX_VALUE) return SampleDimensionType.SIGNED_32BITS;
+            if (min>=Byte   .MIN_VALUE && max<=Byte   .MAX_VALUE) return SIGNED_8BITS;
+            if (min>=Short  .MIN_VALUE && max<=Short  .MAX_VALUE) return SIGNED_16BITS;
+            if (min>=Integer.MIN_VALUE && max<=Integer.MAX_VALUE) return SIGNED_32BITS;
         }
-        return SampleDimensionType.REAL_32BITS;
+        return REAL_32BITS;
     }
 
     /**
@@ -286,6 +281,7 @@ public final class TypeMap {
      * @return The sample dimension type for the specified sample model and band number.
      * @throws IllegalArgumentException if the band number is not in the valid range.
      */
+    @SuppressWarnings("fallthrough")
     public static SampleDimensionType getSampleDimensionType(final SampleModel model, final int band)
             throws IllegalArgumentException
     {
@@ -294,19 +290,19 @@ public final class TypeMap {
         }
         boolean signed = true;
         switch (model.getDataType()) {
-            case DataBuffer.TYPE_DOUBLE: return SampleDimensionType.REAL_64BITS;
-            case DataBuffer.TYPE_FLOAT:  return SampleDimensionType.REAL_32BITS;
+            case DataBuffer.TYPE_DOUBLE: return REAL_64BITS;
+            case DataBuffer.TYPE_FLOAT:  return REAL_32BITS;
             case DataBuffer.TYPE_USHORT: // Fall through
             case DataBuffer.TYPE_BYTE:   signed=false; // Fall through
             case DataBuffer.TYPE_INT:
             case DataBuffer.TYPE_SHORT: {
                 switch (model.getSampleSize(band)) {
-                    case  1: return SampleDimensionType.UNSIGNED_1BIT;
-                    case  2: return SampleDimensionType.UNSIGNED_2BITS;
-                    case  4: return SampleDimensionType.UNSIGNED_4BITS;
-                    case  8: return signed ? SampleDimensionType.SIGNED_8BITS  : SampleDimensionType.UNSIGNED_8BITS;
-                    case 16: return signed ? SampleDimensionType.SIGNED_16BITS : SampleDimensionType.UNSIGNED_16BITS;
-                    case 32: return signed ? SampleDimensionType.SIGNED_32BITS : SampleDimensionType.UNSIGNED_32BITS;
+                    case  1: return UNSIGNED_1BIT;
+                    case  2: return UNSIGNED_2BITS;
+                    case  4: return UNSIGNED_4BITS;
+                    case  8: return signed ? SIGNED_8BITS  : UNSIGNED_8BITS;
+                    case 16: return signed ? SIGNED_16BITS : UNSIGNED_16BITS;
+                    case 32: return signed ? SIGNED_32BITS : UNSIGNED_32BITS;
                 }
             }
         }

@@ -466,7 +466,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             if (name == null) {
                 name = value.toString();
             }
-            final NumberRange range = new NumberRange((Class) value.getClass(), value, value);
+            final NumberRange range = new NumberRange(value.getClass(), value, value);
             final Color[] colors = ColorUtilities.subarray(palette, intValue, intValue + 1);
             categoryList.add(new Category(name, colors, range, (MathTransform1D) null));
         }
@@ -491,7 +491,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
                 final CharSequence name = categories[lower];
                 Number min = TypeMap.wrapSample(lower,   type, false);
                 Number max = TypeMap.wrapSample(upper-1, type, false);
-                final Class classe;
+                final Class<? extends Number> classe;
                 if (min.equals(max)) {
                     min = max;
                     classe = max.getClass();
@@ -581,7 +581,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             if (maximum - minimum > (minIncluded && maxIncluded ? 0 : 1)) {
                 Number min = TypeMap.wrapSample(minimum, type, false);
                 Number max = TypeMap.wrapSample(maximum, type, false);
-                final Class classe = ClassChanger.getWidestClass(min, max);
+                final Class<? extends Number> classe = ClassChanger.getWidestClass(min, max);
                 min = ClassChanger.cast(min, classe);
                 max = ClassChanger.cast(max, classe);
                 final NumberRange range = new NumberRange(classe, min, minIncluded,
@@ -1440,8 +1440,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         final MathTransform1D sampleToGeophysics = Category.createLinearTransform(scale, offset);
         final Category[] categories = (Category[]) getCategories().toArray();
         final Category[] reference  = categories.clone();
-        final int length = categories.length;
-        for (int i = 0; i < length; i++) {
+        for (int i=0; i<categories.length; i++) {
             if (categories[i].isQuantitative()) {
                 categories[i] = categories[i].rescale(sampleToGeophysics);
             }

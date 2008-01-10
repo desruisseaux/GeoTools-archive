@@ -112,7 +112,7 @@ public class MeasurementRange extends NumberRange {
      * @param isMaxIncluded Defines whether the maximum value is included in the Range.
      * @param units   The units of measurement, or {@code null} if unknown.
      */
-    public <N extends Number> MeasurementRange(final Class<N> type,
+    public <N extends Number> MeasurementRange(final Class<? extends N> type,
                                                final N minimum, final boolean isMinIncluded,
                                                final N maximum, final boolean isMaxIncluded,
                                                final Unit units)

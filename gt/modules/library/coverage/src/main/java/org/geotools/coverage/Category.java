@@ -261,12 +261,11 @@ public class Category implements Serializable {
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      */
-    @SuppressWarnings("unchecked")
     private Category(final CharSequence name,
                      final int[]        ARGB,
                      final Number       sample)
     {
-        this(name, ARGB, new NumberRange((Class) sample.getClass(), sample, sample), null);
+        this(name, ARGB, new NumberRange(sample.getClass(), sample, sample), null);
         assert Double.isNaN(inverse.minimum) : inverse.minimum;
         assert Double.isNaN(inverse.maximum) : inverse.maximum;
     }
@@ -319,9 +318,7 @@ public class Category implements Serializable {
                     final double       scale,
                     final double       offset) throws IllegalArgumentException
     {
-        this(name, colors,
-             new NumberRange(Integer.class, Integer.valueOf(lower), true,
-                    Integer.valueOf(upper), false), scale, offset);
+        this(name, colors, new NumberRange(Integer.class, lower, true, upper, false), scale, offset);
     }
 
     /**
