@@ -329,7 +329,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     
     private void cleanNode(TreeTableNode node, SubNodeGroup group){
         
-        for(int i=0, max=node.getChildCount(); i<max;i++){
+        for(int max=node.getChildCount(), i=max-1; i>=0;i--){
             cleanNode(node.getChildAt(i),group);
         }
         

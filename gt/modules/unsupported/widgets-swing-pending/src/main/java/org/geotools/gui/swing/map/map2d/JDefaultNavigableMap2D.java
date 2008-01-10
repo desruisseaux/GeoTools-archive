@@ -133,7 +133,6 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     //---------------------PRIVATE CLASSES--------------------------------------
     private class MouseListen implements MouseInputListener {
 
-        private Cursor cursor;
         private int startX;
         private int startY;
         private int lastX;
