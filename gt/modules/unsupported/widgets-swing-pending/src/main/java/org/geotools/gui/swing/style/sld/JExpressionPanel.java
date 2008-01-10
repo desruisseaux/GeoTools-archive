@@ -17,7 +17,6 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
@@ -147,7 +146,8 @@ public class JExpressionPanel extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText(TextBundle.getResource().getString("shortexpression"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
+        jButton1.setText(bundle.getString("shortexpression")); // NOI18N
         jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -160,7 +160,7 @@ public class JExpressionPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(txt, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+                .add(txt, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1))
         );

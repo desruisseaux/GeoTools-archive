@@ -103,7 +103,7 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
 
         if (layer != null) {
             if (layer.getFeatureSource() != null) {
-
+                removeAll();
 
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 

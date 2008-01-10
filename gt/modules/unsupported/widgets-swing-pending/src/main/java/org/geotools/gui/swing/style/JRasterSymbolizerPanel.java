@@ -18,7 +18,6 @@ package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.style.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
@@ -104,7 +103,8 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
         jLabel1 = new javax.swing.JLabel();
         exp_opacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
 
-        jLabel1.setText(TextBundle.getResource().getString("opacity"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("opacity")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -115,7 +115,7 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(exp_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 111, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
