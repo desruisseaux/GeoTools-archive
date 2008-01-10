@@ -204,24 +204,32 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     /**
      * Returns every tiles that intersect the given region.
      *
-     * @param  region The region of interest (shall not be {@code null}).
-     * @param  xSubsampling The number of source columns to advance for each pixel.
-     * @param  ySubsampling The number of source rows to advance for each pixel.
+     * @param region
+     *          The region of interest (shall not be {@code null}).
+     * @param subsampling
+     *          On input, the number of source columns and rows to advance for each pixel. On
+     *          output, the effective values to use. Those values may be different only if
+     *          {@code subsamplingChangeAllowed} is {@code true}.
+     * @param subsamplingChangeAllowed
+     *          If {@code true}, this method is allowed to replace {@code subsampling} by the
+     *          highest subsampling that overviews can handle, not greater than the given
+     *          subsampling.
      * @return The tiles that intercept the given region.
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
     public synchronized Collection<Tile> getTiles(final Rectangle region,
-            final int xSubsampling, final int ySubsampling) throws IOException
+            final Dimension subsampling, final boolean subsamplingChangeAllowed) throws IOException
     {
         if (tilesOfInterest == null || !regionOfInterest.equals(region) ||
-            this.xSubsampling != xSubsampling || this.ySubsampling != ySubsampling)
+            xSubsampling != subsampling.width || ySubsampling != subsampling.height)
         {
-            this.tilesOfInterest = null; // Safety in case of failure.
-            this.xSubsampling    = xSubsampling;
-            this.ySubsampling    = ySubsampling;
-            this.regionOfInterest.setBounds(region);
-            searchTiles(false);
+            tilesOfInterest = null; // Safety in case of failure.
+            xSubsampling = subsampling.width;
+            ySubsampling = subsampling.height;
+            regionOfInterest.setBounds(region);
+            searchTiles(subsamplingChangeAllowed);
+            subsampling.setSize(xSubsampling, ySubsampling);
         }
         return tilesOfInterest;
     }
@@ -247,7 +255,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      *
      * @return The estimated {@linkplain Tile#countUnwantedPixels amount of unwanted pixels}.
      */
-    private long searchTiles(final boolean allowSubsamplingChange) throws IOException {
+    private long searchTiles(final boolean subsamplingChangeAllowed) throws IOException {
         long lowestCost = Long.MAX_VALUE;
         if (tree == null) {
             tree = new RTree(tiles);
@@ -256,7 +264,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
         final Collection<Tile> tiles = tree.intersect(region);
         Map<Rectangle,Tile> candidates=null, bestCandidates=null;
         /*
-         * If 'allowSubsamplingChange' is false, the 'do' block below will be executed exactly once.
+         * If 'subsamplingChangeAllowed' is false, the do loop below will be executed exactly once.
          * Otherwise, 'subsamplingDone' and 'subsamplingToTry' will be created when first needed and
          * the loop will be executed as long as there is new subsamplings to try. We will retain the
          * one having the lowest cost.
@@ -289,7 +297,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                      * be capable if the subsampling was smaller. If we are allowed to change
                      * the setting, add this item to the queue of subsampling to try later.
                      */
-                    if (allowSubsamplingChange) {
+                    if (subsamplingChangeAllowed) {
                         if (subsamplingDone == null) {
                             subsamplingDone  = new HashSet<Dimension>();
                             subsamplingToTry = new LinkedList<Dimension>();
@@ -310,8 +318,8 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                 region.setBounds(toRead); // From this point, we will use 'region' as a buffer.
                 buffer.setSize(subsampling);
                 int delta = tile.countUnwantedPixelsFromAbsolute(region, buffer);
-                cost += delta;
                 if (previousTile == null) {
+                    cost += delta;
                     continue;
                 }
                 /*
@@ -328,8 +336,10 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                 if (delta >= 0) {
                     // Previous tile had a cost equals or lower.
                     // Keep the old tile, discart the new one.
-                    cost -= delta;
                     candidates.put(toRead, previousTile);
+                } else {
+                    // We accept the new tile. Adjust the cost (which is now lower).
+                    cost += delta;
                 }
             }
             /*

@@ -18,14 +18,40 @@ package org.geotools.image.io.mosaic;
 
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.Collections;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.IIOParamController;
 
 
 /**
- * The parameters for {@link MosaicImageReader}.
+ * The parameters for {@link MosaicImageReader}. <strong>Users are strongly encouraged to invoke
+ * the following:</strong>
+ *
+ * <blockquote><pre>
+ * parameters.{@linkplain #setSubsamplingChangeAllowed setSubsamplingChangeAllowed}(true);
+ * </pre></blockquote>
+ *
+ * <b>Explanation:</b> the {@linkplain TileManager tile manager} will select the {@linkplain Tile
+ * tile} overviews depending on the {@linkplain #setSourceSubsampling source subsampling defined
+ * in this parameter object}. Suppose that an image size is 1000&times;1000 pixels and this image
+ * has an overview of 500&times;500 pixels. If the image (always 1000&times;1000 pixels from user's
+ * point of view) is requested with a subsampling of (6,6) along (<var>x</var>,<var>y</var>) axis,
+ * then the {@linkplain MosaicImageReader mosaic image reader} will detect that it can read the
+ * 500&times;500 pixels overview with a subsampling of (3,3) instead. But if the requested
+ * subsampling was (7,7), then the reader can not use the overview because it would require a
+ * subsampling of (3.5, 3.5) and fractional subsamplings are not allowed. It will read the full
+ * 1000&times;1000 pixels image instead, thus leading to lower performance even if we would have
+ * expected the opposite from a higher subsampling value.
+ * <p>
+ * To avoid this problem, {@link MosaicImageReader} can adjust automatically the subsampling
+ * parameter to the highest subsampling that overviews can handle, not greater than the specified
+ * subsampling. But this adjustment is <strong>not</strong> allowed by default because it would
+ * violate the usual {@link javax.imageio.ImageReader} contract. It is allowed only if the
+ * {@link #setSubsamplingChangeAllowed} method has been explicitly invoked with value {@code true}.
+ * <p>
+ * If subsampling changes are allowed, then the values defined in this {@code MosaicImageReadParam}
+ * will be modified during the {@linkplain MosaicImageReader#read(int, ImageReadParam) read process}
+ * and can be queried once the reading is finished.
  *
  * @since 2.5
  * @source $URL$
@@ -39,6 +65,15 @@ public class MosaicImageReadParam extends ImageReadParam {
      * @see MosaicImageReader#getDefaultImageTypePolicy
      */
     private ImageTypePolicy imageTypePolicy;
+
+    /**
+     * If {@code true}, the {@linkplain MoisaicImageReader mosaic image reader} will be allowed
+     * to change the {@linkplain #setSourceSubsampling specified subsampling} to some lower but
+     * more efficient subsampling.
+     *
+     * @see #isSubsamplingChangeAllowed
+     */
+    private boolean subsamplingChangeAllowed;
 
     /**
      * The tile readers obtained from the {@link MosaicImageReader} given at construction time,
@@ -79,6 +114,28 @@ public class MosaicImageReadParam extends ImageReadParam {
             }
         }
         controller = defaultController = MosaicController.DEFAULT;
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain MoisaicImageReader mosaic image reader} is allowed
+     * to change the {@linkplain #setSourceSubsampling subsampling} to some more efficient value.
+     * The default value is {@code false}, which means that the reader will use exactly the given
+     * subsampling and may leads to very slow reading. See {@linkplain MosaicImageReadParam class
+     * javadoc}.
+     */
+    public boolean isSubsamplingChangeAllowed() {
+        return subsamplingChangeAllowed;
+    }
+
+    /**
+     * Sets whatever the {@linkplain MoisaicImageReader mosaic image reader} will be allowed to
+     * change the {@linkplain #setSourceSubsampling subsampling} to some more efficient value.
+     * <strong>Users are strongly encouraged to set this value to {@code true}</strong>, which
+     * is not the default because doing so would violate the {@link javax.imageio.ImageReader}
+     * contract. See {@linkplain MosaicImageReadParam class javadoc} for more details.
+     */
+    public void setSubsamplingChangeAllowed(final boolean allowed) {
+        subsamplingChangeAllowed = allowed;
     }
 
     /**

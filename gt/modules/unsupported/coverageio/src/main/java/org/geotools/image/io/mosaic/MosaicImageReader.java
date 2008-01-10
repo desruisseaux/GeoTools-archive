@@ -906,6 +906,9 @@ public class MosaicImageReader extends ImageReader {
 
     /**
      * Reads the image indexed by {@code imageIndex} using a supplied parameters.
+     * <strong>See {@link MosaicImageReadParam} for a performance recommandation</strong>.
+     * If the parameters allow subsampling changes, then the subsampling effectively used
+     * will be written back in the given parameters.
      *
      * @param  imageIndex The index of the image to be retrieved.
      * @param  param The parameters used to control the reading process, or {@code null}.
@@ -915,21 +918,42 @@ public class MosaicImageReader extends ImageReader {
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
-        final int xSubsampling, ySubsampling;
+        final Dimension subsampling = new Dimension(1,1);
+        boolean subsamplingChangeAllowed = false;
+        MosaicImageReadParam mosaicParam = null;
         if (param != null) {
-            xSubsampling = param.getSourceXSubsampling();
-            ySubsampling = param.getSourceYSubsampling();
+            subsampling.width  = param.getSourceXSubsampling();
+            subsampling.height = param.getSourceYSubsampling();
+            if (param instanceof MosaicImageReadParam) {
+                mosaicParam = (MosaicImageReadParam) param;
+                subsamplingChangeAllowed = mosaicParam.isSubsamplingChangeAllowed();
+            }
             // Note: we don't extract subsampling offsets because they will be taken in account
             //       in the 'sourceRegion' to be calculated by ImageReader.computeRegions(...).
-        } else {
-            xSubsampling = 1;
-            ySubsampling = 1;
         }
         final int srcWidth  = getWidth (imageIndex);
         final int srcHeight = getHeight(imageIndex);
         final Rectangle sourceRegion = getSourceRegion(param, srcWidth, srcHeight);
-        final Collection<Tile> tiles = getTileManager(imageIndex).getTiles(sourceRegion,
-                xSubsampling, ySubsampling);
+        final Collection<Tile> tiles = getTileManager(imageIndex)
+                .getTiles(sourceRegion, subsampling, subsamplingChangeAllowed);
+        /*
+         * If the subsampling changed as a result of TileManager.getTiles(...) call,
+         * stores the new subsampling values in the parameters. Note that the source
+         * region will need to be computed again, which will do later.
+         */
+        final int xSubsampling = subsampling.width;
+        final int ySubsampling = subsampling.height;
+        if (subsamplingChangeAllowed) {
+            if (param.getSourceXSubsampling() != xSubsampling ||
+                param.getSourceYSubsampling() != ySubsampling)
+            {
+                final int xOffset = param.getSubsamplingXOffset() % xSubsampling;
+                final int yOffset = param.getSubsamplingYOffset() % ySubsampling;
+                param.setSourceSubsampling(xSubsampling, ySubsampling, xOffset, yOffset);
+            } else {
+                subsamplingChangeAllowed = false;
+            }
+        }
         /*
          * If there is exactly one image to read, we will left the image reference to null. It will
          * be understood later as an indication to delegate directly to the sole image reader as an
@@ -942,6 +966,9 @@ public class MosaicImageReader extends ImageReader {
         final Rectangle destRegion;
         if (tiles.size() == 1) {
             destRegion = null;
+            if (subsamplingChangeAllowed) {
+                sourceRegion.setBounds(getSourceRegion(param, srcWidth, srcHeight));
+            }
         } else {
             if (param != null) {
                 image = param.getDestination();
@@ -998,17 +1025,13 @@ public class MosaicImageReader extends ImageReader {
          * that MosaicImageReadParam provide.
          */
         MosaicController controller = null;
-        final MosaicImageReadParam mosaicParam;
-        if (param instanceof MosaicImageReadParam) {
-            mosaicParam = (MosaicImageReadParam) param;
-            if (mosaicParam.hasController()) {
-                final IIOParamController candidate = mosaicParam.getController();
-                if (candidate instanceof MosaicController) {
-                    controller = (MosaicController) candidate;
-                }
-            }
-        } else {
+        if (mosaicParam == null) {
             mosaicParam = new MosaicImageReadParam();
+        } else if (mosaicParam.hasController()) {
+            final IIOParamController candidate = mosaicParam.getController();
+            if (candidate instanceof MosaicController) {
+                controller = (MosaicController) candidate;
+            }
         }
         /*
          * If logging are enabled, we will format the tiles that we read in a table and
@@ -1021,7 +1044,7 @@ public class MosaicImageReader extends ImageReader {
         if (logger.isLoggable(level)) {
             table = new TableWriter(null, TableWriter.SINGLE_VERTICAL_LINE);
             table.writeHorizontalSeparator();
-            table.write("Reader\tTile\tSize\tSource\tDestination\tSubsampling");
+            table.write("Reader\tTile\tIndex\tSize\tSource\tDestination\tSubsampling");
             table.writeHorizontalSeparator();
         } else {
             table = null;
@@ -1074,32 +1097,32 @@ public class MosaicImageReader extends ImageReader {
             /*
              * Sets the parameters to be given to the tile reader. We don't use any subsampling
              * offset because it has already been calculated in the region to read. Note that
-             * the pixel size should be a dividor of subsampling; this condition must have been
-             * checked by the tile manager when it selected the tiles to be returned.
+             * the tile subsampling should be a dividor of image subsampling; this condition must
+             * have been checked by the tile manager when it selected the tiles to be returned.
              */
-            final Dimension pixelSize = tile.getSubsampling();
-            assert xSubsampling % pixelSize.width  == 0 : pixelSize;
-            assert ySubsampling % pixelSize.height == 0 : pixelSize;
-            regionToRead.x      /= pixelSize.width;
-            regionToRead.y      /= pixelSize.height;
-            regionToRead.width  /= pixelSize.width;
-            regionToRead.height /= pixelSize.height;
+            subsampling.setSize(tile.getSubsampling());
+            assert xSubsampling % subsampling.width  == 0 : subsampling;
+            assert ySubsampling % subsampling.height == 0 : subsampling;
+            regionToRead.x      /= subsampling.width;
+            regionToRead.y      /= subsampling.height;
+            regionToRead.width  /= subsampling.width;
+            regionToRead.height /= subsampling.height;
+            subsampling.width  = xSubsampling / subsampling.width;
+            subsampling.height = ySubsampling / subsampling.height;
             final ImageReader reader = tile.getImageReader(this, true, true);
             final ImageReadParam tileParam = mosaicParam.getCachedTileParameters(reader);
-            if (image != null) {
-                tileParam.setDestinationType(null);
-                tileParam.setDestination(image); // Must be after setDestinationType.
-                tileParam.setDestinationOffset(destinationOffset);
-                if (tileParam.canSetSourceRenderSize()) {
-                    tileParam.setSourceRenderSize(null); // TODO.
-                }
+            tileParam.setDestinationType(null);
+            tileParam.setDestination(image); // Must be after setDestinationType and may be null.
+            tileParam.setDestinationOffset(destinationOffset);
+            if (tileParam.canSetSourceRenderSize()) {
+                tileParam.setSourceRenderSize(null); // TODO.
             }
             tileParam.setSourceRegion(regionToRead);
-            tileParam.setSourceSubsampling(xSubsampling / pixelSize.width,
-                                           ySubsampling / pixelSize.height, 0, 0);
+            tileParam.setSourceSubsampling(subsampling.width, subsampling.height, 0, 0);
             if (controller != null) {
                 controller.configure(tile, tileParam);
             }
+            final int tileIndex = tile.getImageIndex();
             /*
              * Adds a row in the table to be logged (if logable) and process to the reading.
              */
@@ -1107,10 +1130,12 @@ public class MosaicImageReader extends ImageReader {
                 table.write(Tile.toString(reader.getOriginatingProvider()));
                 table.nextColumn();
                 table.write(tile.getInputName());
+                table.nextColumn();
+                table.write(String.valueOf(tileIndex));
                 format(table, regionToRead.width,  regionToRead.height);
                 format(table, regionToRead.x,      regionToRead.y);
                 format(table, destinationOffset.x, destinationOffset.y);
-                format(table, tileParam.getSourceXSubsampling(), tileParam.getSourceYSubsampling());
+                format(table, subsampling.width,   subsampling.height);
                 table.nextLine();
             }
             final BufferedImage output;
@@ -1118,7 +1143,7 @@ public class MosaicImageReader extends ImageReader {
                 reading = reader;
             }
             try {
-                output = reader.read(tile.getImageIndex(), tileParam);
+                output = reader.read(tileIndex, tileParam);
             } catch (IOException exception) {
                 failure = exception;
                 break;
