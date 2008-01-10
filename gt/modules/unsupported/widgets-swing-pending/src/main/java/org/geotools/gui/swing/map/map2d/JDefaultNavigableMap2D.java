@@ -17,10 +17,17 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.Date;
+import javax.swing.ImageIcon;
 import javax.swing.event.MouseInputListener;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.ZoomPanDecoration;
@@ -37,11 +44,12 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
      * Action state of the map widget
      */
     protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
-    
+    protected Cursor CUR_ZOOM_IN;
+    protected Cursor CUR_ZOOM_OUT;
+    protected Cursor CUR_ZOOM_PAN;
     private final MouseInputListener mouseInputListener;
     private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
-    
 
     /**
      * create a default JDefaultNavigableMap2D
@@ -50,8 +58,30 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         super();
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
-        addMouseMotionListener(mouseInputListener);        
+        addMouseMotionListener(mouseInputListener);
         addMapDecoration(zoompanPanel);
+
+        buildCursors();
+    }
+
+    private void buildCursors() {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        ImageIcon ico_zoomIn = IconBundle.getResource().getIcon("16_zoom_in");
+        ImageIcon ico_zoomOut = IconBundle.getResource().getIcon("16_zoom_out");
+        ImageIcon ico_zoomPan = IconBundle.getResource().getIcon("16_zoom_pan");
+
+
+        BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        img.getGraphics().drawImage(ico_zoomIn.getImage(), 0, 0, null);
+        CUR_ZOOM_IN = tk.createCustomCursor(img, new Point(1, 1), "in");
+
+        BufferedImage img2 = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        img2.getGraphics().drawImage(ico_zoomOut.getImage(), 0, 0, null);
+        CUR_ZOOM_OUT = tk.createCustomCursor(img2, new Point(1, 1), "in");
+
+        BufferedImage img3 = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        img3.getGraphics().drawImage(ico_zoomPan.getImage(), 0, 0, null);
+        CUR_ZOOM_PAN = tk.createCustomCursor(img3, new Point(1, 1), "in");
     }
 
     private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {
@@ -64,15 +94,15 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
     }
-    
+
     //-----------------------NAVIGABLEMAP2D-------------------------------------
     public void setActionState(ACTION_STATE state) {
-        
-        if(actionState != state){
+
+        if (actionState != state) {
             fireActionStateChanged(actionState, state);
             actionState = state;
         }
-        
+
     }
 
     public ACTION_STATE getActionState() {
@@ -86,7 +116,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     public double getZoomFactor() {
         return zoomFactor;
     }
-    
+
     public void addNavigableMap2DListener(NavigableMap2DListener listener) {
         MAP2DLISTENERS.add(NavigableMap2DListener.class, listener);
     }
@@ -98,11 +128,12 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     public NavigableMap2DListener[] getNavigableMap2DListeners() {
         return MAP2DLISTENERS.getListeners(NavigableMap2DListener.class);
     }
-    
+
 
     //---------------------PRIVATE CLASSES--------------------------------------
     private class MouseListen implements MouseInputListener {
 
+        private Cursor cursor;
         private int startX;
         private int startY;
         private int lastX;
@@ -121,12 +152,10 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
         private void processDrag(int x1, int y1, int x2, int y2) {
-                        
-            
+
             if (mapArea != null) {
 
                 if ((x1 == x2) && (y1 == y2)) {
-                    this.mouseClicked(new MouseEvent((JDefaultNavigableMap2D) THIS_MAP, 0, new Date().getTime(), 0, x1, y1, y2, false));
                     return;
                 }
 
@@ -202,7 +231,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         double deltaY2 = mapArea.getMaxY() - top;
                         double nDeltaY2 = (deltaY2 * nHeight) / mapHeight;
                         ur = new Coordinate(mapArea.getMaxX() + nDeltaX2, mapArea.getMaxY() + nDeltaY2);
-                        
+
                         setMapArea(fixAspectRatio(getBounds(), new Envelope(ll, ur)));
                         break;
                 }
@@ -211,6 +240,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
         public void mouseClicked(MouseEvent e) {
+            
             if (mapArea != null) {
                 // TODO Auto-generated method stub
                 // System.out.println("before area "+mapArea+"\nw:"+mapArea.getWidth()+"
@@ -254,8 +284,32 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                 Coordinate ll = new Coordinate(mapX - (width2 / zlevel), mapY - (height2 / zlevel));
                 Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY + (height2 / zlevel));
 
-                setMapArea(new Envelope(ll, ur));
-                repaint();
+
+                switch (actionState) {
+                    case PAN:
+                        setMapArea(new Envelope(ll, ur));
+                        repaint();
+                        break;
+                    case ZOOM_IN:
+                        int width3 = getWidth() / 2;
+                        int height3 = getHeight() / 2;
+
+                        int x1 = e.getX() - (width3 / 2);
+                        int y1 = e.getY() - (height3 / 2);
+                        int x2 = x1 + width3;
+                        int y2 = y1 + height3;
+
+                        processDrag(x1, y1, x2, y2);
+                        break;
+                    case ZOOM_OUT:
+                        setMapArea(new Envelope(ll, ur));
+                        repaint();
+                        break;
+                    default:
+                        return;
+                }
+
+
             }
 
         }
@@ -265,6 +319,20 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
             startY = e.getY();
             lastX = 0;
             lastY = 0;
+
+//            if (actionState == MapConstants.ACTION_STATE.ZOOM_IN) {
+//
+//                int width = getWidth() / 2;
+//                int height = getHeight() / 2;
+//
+//                int x1 = e.getX() - (width / 2);
+//                int y1 = e.getY() - (height / 2);
+//                int x2 = x1 + width;
+//                int y2 = y1 + height;
+//
+//                processDrag(x1,y1,x2,y2);
+//                
+//            }
 
         }
 
@@ -277,24 +345,40 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                 case PAN:
                     zoompanPanel.setFill(false);
                     zoompanPanel.setCoord(0, 0, 0, 0, false);
+                    processDrag(startX, startY, endX, endY);
                     break;
                 case ZOOM_IN:
                 case ZOOM_OUT:
                     drawRectangle(false, true);
+                    processDrag(startX, startY, endX, endY);
                     break;
             }
 
 
-            processDrag(startX, startY, endX, endY);
+
             lastX = 0;
             lastY = 0;
 
         }
 
         public void mouseEntered(MouseEvent e) {
+
+            switch (actionState) {
+                case PAN:
+                    setCursor(CUR_ZOOM_PAN);
+                    break;
+                case ZOOM_IN:
+                    setCursor(CUR_ZOOM_IN);
+                    break;
+                case ZOOM_OUT:
+                    setCursor(CUR_ZOOM_OUT);
+                    break;
+            }
         }
 
         public void mouseExited(MouseEvent e) {
+            zoompanPanel.setFill(false);
+            zoompanPanel.setCoord(0, 0, 0, 0, true);
         }
 
         public void mouseDragged(MouseEvent e) {
@@ -330,10 +414,21 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
         public void mouseMoved(MouseEvent e) {
+
+            if (actionState == MapConstants.ACTION_STATE.ZOOM_IN) {
+
+                int width = getWidth() / 2;
+                int height = getHeight() / 2;
+
+                int left = e.getX() - (width / 2);
+                int bottom = e.getY() - (height / 2);
+
+                zoompanPanel.setFill(false);
+                zoompanPanel.setCoord(left, bottom, width, height, true);
+            }
+
         }
     }
-
-    
 }
 
 
