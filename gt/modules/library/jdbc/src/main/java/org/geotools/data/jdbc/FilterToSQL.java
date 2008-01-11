@@ -155,6 +155,12 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         this.out = out;
     }
     
+    /**
+     * Sets the writer the encoder will write to.
+     */
+    public void setWriter(Writer out) {
+        this.out = out;
+    }
     
     /**
      * Performs the encoding, sends the encoded sql to the writer passed in.
@@ -781,6 +787,13 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         Class target = (Class)context;
         
         try {
+            
+            //handle the null case
+            if ( expression.getValue() == null ) {
+                out.write( "NULL" );
+                return context;
+            }
+            
 			Object literal = null;
 			
 			if ( target == Geometry.class && expression.getValue() instanceof Geometry ) {
