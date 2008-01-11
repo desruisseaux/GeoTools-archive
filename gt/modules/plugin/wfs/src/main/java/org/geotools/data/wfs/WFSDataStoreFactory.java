@@ -207,7 +207,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      */
     public static final Param LENIENT = parametersInfo[8];
 
-    protected Map cache = new HashMap();
+    protected Map<Map, DataStore> perParameterSetDataStoreCache = new HashMap();
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
@@ -215,8 +215,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     public DataStore createDataStore(final Map params) throws IOException {
         // TODO check that we can use hashcodes in this manner -- think it's ok,
         // particularily for regular usage
-        if (cache.containsKey(params)) {
-            return (DataStore) cache.get(params);
+        if (perParameterSetDataStoreCache.containsKey(params)) {
+            return (DataStore) perParameterSetDataStoreCache.get(params);
         }
         URL host = null;
 
@@ -284,7 +284,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         try {
             ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient,
                     encoding);
-            cache.put(params, ds);
+            perParameterSetDataStoreCache.put(new HashMap(params), ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
             throw new IOException(e.toString());
