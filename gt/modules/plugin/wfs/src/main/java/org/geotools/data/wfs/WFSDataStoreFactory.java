@@ -23,16 +23,18 @@ import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
+import org.geotools.util.logging.Logging;
+import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
 import org.xml.sax.SAXException;
-
 
 /**
  * <p>
  * DOCUMENT ME!
  * </p>
- *
+ * 
  * @author dzwiers
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
  */
 public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
@@ -40,40 +42,43 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * url
      */
     public static final Param URL = new Param("WFSDataStoreFactory:GET_CAPABILITIES_URL",
-            URL.class,
-            "Represents a URL to the getCapabilities document or a server instance.",
+            URL.class, "Represents a URL to the getCapabilities document or a server instance.",
             true);
-    
+
     /**
      * boolean
      */
-    public static final Param PROTOCOL = new Param("WFSDataStoreFactory:PROTOCOL",
+    public static final Param PROTOCOL = new Param(
+            "WFSDataStoreFactory:PROTOCOL",
             Boolean.class,
             "Sets a preference for the HTTP protocol to use when requesting WFS functionality. Set this value to Boolean.TRUE for POST, Boolean.FALSE for GET or NULL for AUTO",
             false);
-    
 
     // password stuff -- see java.net.Authentication
     // either both or neither
     /**
      * String
      */
-    public static final Param USERNAME = new Param("WFSDataStoreFactory:USERNAME",
+    public static final Param USERNAME = new Param(
+            "WFSDataStoreFactory:USERNAME",
             String.class,
             "This allows the user to specify a username. This param should not be used without the PASSWORD param.",
             false);
+
     /**
      * String
      */
-    public static final Param PASSWORD = new Param("WFSDataStoreFactory:PASSWORD",
+    public static final Param PASSWORD = new Param(
+            "WFSDataStoreFactory:PASSWORD",
             String.class,
             "This allows the user to specify a username. This param should not be used without the USERNAME param.",
             false);
-    
+
     /**
      * String
      */
-    public static final Param ENCODING = new Param("WFSDataStoreFactory:ENCODING",
+    public static final Param ENCODING = new Param(
+            "WFSDataStoreFactory:ENCODING",
             String.class,
             "This allows the user to specify the Encoding of the XML of the XML-Requests sent to the Server.",
             false);
@@ -82,7 +87,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     /**
      * Integer
      */
-    public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",
+    public static final Param TIMEOUT = new Param(
+            "WFSDataStoreFactory:TIMEOUT",
             Integer.class,
             "This allows the user to specify a timeout in milliseconds. This param has a default value of 3000ms.",
             false);
@@ -91,40 +97,42 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     /**
      * Integer
      */
-    public static final Param BUFFER_SIZE = new Param("WFSDataStoreFactory:BUFFER_SIZE",
+    public static final Param BUFFER_SIZE = new Param(
+            "WFSDataStoreFactory:BUFFER_SIZE",
             Integer.class,
             "This allows the user to specify a buffer size in features. This param has a default value of 10 features.",
             false);
+
     // use gzip -- optional
     /**
      * Boolean
      */
-    public static final Param TRY_GZIP = new Param("WFSDataStoreFactory:TRY_GZIP",
+    public static final Param TRY_GZIP = new Param(
+            "WFSDataStoreFactory:TRY_GZIP",
             Boolean.class,
             "Indicates that datastore should use gzip to transfer data if the server supports it.  Default is true",
             false);
+
     // be lenient about parsing data -- optional
     /**
      * Boolean
      */
-    public static final Param LENIENT = new Param("WFSDataStoreFactory:LENIENT",
+    public static final Param LENIENT = new Param(
+            "WFSDataStoreFactory:LENIENT",
             Boolean.class,
             "Indicates that datastore should do its best to create features from the provided data even if it does not accurately match the schema.  Errors will be logged but the parsing will continue if this is true.  Default is false",
             false);
-    
+
     protected Map cache = new HashMap();
-    protected static final Logger logger = logger();
-    
-    private static Logger logger(){
-    	Logger r = org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs");
-    	return r;
-    }
+
+    private static final Logger logger = Logging.getLogger("org.geotools.data.wfs");
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
-        // TODO check that we can use hashcodes in this manner -- think it's ok, particularily for regular usage
+        // TODO check that we can use hashcodes in this manner -- think it's ok,
+        // particularily for regular usage
         if (cache.containsKey(params)) {
             return (DataStore) cache.get(params);
         }
@@ -134,13 +142,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param params DOCUMENT ME!
-     *
+     * 
+     * @param params
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
+     * 
      * @throws IOException
-     *
+     * 
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
     public DataStore createNewDataStore(Map params) throws IOException {
@@ -154,37 +163,37 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         if (params.containsKey(PROTOCOL.key)) {
             protocol = (Boolean) PROTOCOL.lookUp(params);
         }
-        
+
         String user, pass;
         user = pass = null;
 
         int timeout = 3000;
         int buffer = 10;
-        boolean tryGZIP=true;
-        boolean lenient=false;
+        boolean tryGZIP = true;
+        boolean lenient = false;
         String encoding = null;
 
         if (params.containsKey(TIMEOUT.key)) {
             Integer i = (Integer) TIMEOUT.lookUp(params);
-            if(i!=null)
+            if (i != null)
                 timeout = i.intValue();
         }
 
         if (params.containsKey(BUFFER_SIZE.key)) {
             Integer i = (Integer) BUFFER_SIZE.lookUp(params);
-            if(i!=null)
+            if (i != null)
                 buffer = i.intValue();
         }
 
         if (params.containsKey(TRY_GZIP.key)) {
             Boolean b = (Boolean) TRY_GZIP.lookUp(params);
-            if(b!=null)
+            if (b != null)
                 tryGZIP = b.booleanValue();
         }
 
         if (params.containsKey(LENIENT.key)) {
             Boolean b = (Boolean) LENIENT.lookUp(params);
-            if(b!=null)
+            if (b != null)
                 lenient = b.booleanValue();
         }
 
@@ -195,23 +204,21 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         if (params.containsKey(PASSWORD.key)) {
             pass = (String) PASSWORD.lookUp(params);
         }
-        
+
         if (params.containsKey(ENCODING.key)) {
             encoding = (String) ENCODING.lookUp(params);
         }
 
-        if (((user == null) && (pass != null))
-                || ((pass == null) && (user != null))) {
+        if (((user == null) && (pass != null)) || ((pass == null) && (user != null))) {
             throw new IOException(
-                "Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
+                    "Cannot define only one of USERNAME or PASSWORD, muct define both or neither");
         }
 
-        
-        
         DataStore ds = null;
 
         try {
-            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient,encoding);
+            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient,
+                    encoding);
             cache.put(params, ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
@@ -232,10 +239,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] {
-            URL, PROTOCOL, USERNAME,
-            PASSWORD, TIMEOUT, BUFFER_SIZE
-        };
+        return new Param[] { URL, PROTOCOL, USERNAME, PASSWORD, TIMEOUT, BUFFER_SIZE };
     }
 
     /**
@@ -248,7 +252,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         // check url
         if (!params.containsKey(URL.key)) {
-                return false; // cannot have both
+            return false; // cannot have both
         }
 
         // check password / username
@@ -270,7 +274,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 return false;
             }
         }
-        
+
         // check for type
         if (params.containsKey(TIMEOUT.key)) {
             try {

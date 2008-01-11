@@ -1,15 +1,12 @@
 package org.geotools.feature;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.Property;
+import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.FeatureFactory;
 /**
  * A build that can be used as a replacement for SimpleFeatureBuilder in order
  * to avoid validation.

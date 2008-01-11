@@ -15,6 +15,15 @@
  */
 package org.geotools.catalog.wfs;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
+
 import org.geotools.catalog.AbstractService;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.ResolveChangeEvent;
@@ -25,18 +34,11 @@ import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataStore;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.util.ProgressListener;
+import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
 import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.swing.Icon;
 
 
 /**

@@ -15,6 +15,12 @@
  */
 package org.geotools.catalog.wfs;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.geotools.catalog.AbstractGeoResource;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.GeoResource;
@@ -28,17 +34,12 @@ import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.ows.FeatureSetDescription;
-import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.ProgressListener;
+import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.List;
 
 
 /**

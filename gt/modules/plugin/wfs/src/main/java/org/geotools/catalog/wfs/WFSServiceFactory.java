@@ -15,17 +15,18 @@
  */
 package org.geotools.catalog.wfs;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
-import org.geotools.catalog.wfs.WFSService.MyWFSDataStore;
-import org.geotools.data.wfs.WFSDataStoreFactory;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.geotools.catalog.Catalog;
+import org.geotools.catalog.Service;
+import org.geotools.catalog.ServiceFactory;
+import org.geotools.catalog.wfs.WFSService.MyWFSDataStore;
+import org.geotools.data.wfs.WFSDataStoreFactory;
 
 
 /**
