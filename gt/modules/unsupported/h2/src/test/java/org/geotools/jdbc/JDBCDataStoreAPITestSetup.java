@@ -16,6 +16,7 @@
 package org.geotools.jdbc;
 
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
 
@@ -40,8 +41,8 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
         return delegate.createDataSource();
     }
 
-    protected final SQLDialect createSQLDialect() {
-        return delegate.createSQLDialect();
+    protected final SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return delegate.createSQLDialect(dataStore);
     }
 
     protected final void setUpData() throws Exception {

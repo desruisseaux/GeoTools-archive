@@ -15,8 +15,9 @@
  */
 package org.geotools.data.h2;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
@@ -62,7 +63,6 @@ public class H2TestSetup extends JDBCTestSetup {
             + "\"geometry\" BLOB, \"intProperty\" int, "
             + "\"doubleProperty\" double, \"stringProperty\" varchar" + ")";
         run(sql);
-
         sql = "INSERT INTO \"geotools\".\"ft1\" VALUES ("
             + "0,GeomFromText('POINT(0 0)',4326), 0, 0.0,'zero');";
         run(sql);
@@ -86,7 +86,7 @@ public class H2TestSetup extends JDBCTestSetup {
         return dataSource;
     }
 
-    protected SQLDialect createSQLDialect() {
-        return new H2Dialect();
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return new H2Dialect(dataStore);
     }
 }

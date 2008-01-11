@@ -15,8 +15,10 @@
  */
 package org.geotools.data.h2;
 
-import junit.framework.TestCase;
 import java.util.HashMap;
+
+import junit.framework.TestCase;
+
 import org.geotools.jdbc.JDBCDataStoreFactory;
 
 

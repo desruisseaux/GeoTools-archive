@@ -15,12 +15,19 @@
  */
 package org.geotools.jdbc;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javax.sql.DataSource;
-import com.vividsolutions.jts.geom.GeometryFactory;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.data.AbstractDataStoreFactory;
+import org.geotools.data.DataStore;
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
@@ -31,12 +38,8 @@ import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.Subtract;
-import org.geotools.data.AbstractDataStoreFactory;
-import org.geotools.data.DataStore;
-import org.geotools.feature.FeatureFactoryImpl;
-import org.geotools.feature.type.FeatureTypeFactoryImpl;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactoryImpl;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -98,7 +101,7 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
 
         //datasource + dialect
         dataStore.setDataSource(createDataSource(params));
-        dataStore.setSQLDialect(createSQLDialect());
+        dataStore.setSQLDialect(createSQLDialect(dataStore));
 
         //namespace
         String namespace = (String) NAMESPACE.lookUp(params);
@@ -240,8 +243,10 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
     /**
      * Creates the dialect that the datastore uses for communication with the
      * underlying database.
+     * 
+     * @param dataStore The datastore.
      */
-    protected abstract SQLDialect createSQLDialect();
+    protected abstract SQLDialect createSQLDialect(JDBCDataStore dataStore);
 
     /**
      * Creates the datasource for the data store.

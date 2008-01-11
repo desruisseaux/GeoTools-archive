@@ -18,6 +18,7 @@ package org.geotools.jdbc;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 /**
@@ -85,7 +86,7 @@ public abstract class PrimaryKey {
      *
      * @throws Exception
      */
-    public String encode(ResultSet rs) throws Exception {
+    public String encode(ResultSet rs) throws SQLException {
         Object value = rs.getObject(columnName);
 
         //TODO: run column[i].type through converter to string

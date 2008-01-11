@@ -29,28 +29,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.sql.DataSource;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.filter.Filter;
-import org.opengis.filter.Id;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.identity.GmlObjectId;
-import org.opengis.filter.sort.SortBy;
-import org.opengis.filter.sort.SortOrder;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.GmlObjectStore;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.Transaction.State;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
@@ -64,6 +52,20 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.Name;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.GmlObjectId;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -527,16 +529,16 @@ public final class JDBCDataStore extends ContentDataStore
     protected ContentFeatureSource createFeatureSource(ContentEntry entry)
         throws IOException {
         //TODO: read only access
-        return new JDBCFeatureStore(entry);
+        return new JDBCFeatureStore(entry,null);
     }
 
-    /**
-     * Creates a new instance of {@link JDBCTransactionState}.
-     */
-    protected State createTransactionState(ContentFeatureSource featureSource)
-        throws IOException {
-        return new JDBCTransactionState((JDBCFeatureStore) featureSource);
-    }
+//    /**
+//     * Creates a new instance of {@link JDBCTransactionState}.
+//     */
+//    protected State createTransactionState(ContentFeatureSource featureSource)
+//        throws IOException {
+//        return new JDBCTransactionState((JDBCFeatureStore) featureSource);
+//    }
 
     /**
      * Creates an instanceof {@link JDBCState}.
@@ -742,10 +744,14 @@ public final class JDBCDataStore extends ContentDataStore
 
     /**
      * Returns the bounds of the features for a particular feature type / table.
+     * 
+     * @param featureType The feature type / table.
+     //* @param types The columns to include in the bounds calculation, may be <code>null<code>.
+     * @param filter Filter specifying rows to include in bounds calculation.
      */
-    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, Filter filter,
+    protected ReferencedEnvelope getBounds(SimpleFeatureType featureType, /*Set types,*/ Filter filter,
         Connection cx) throws IOException {
-        String sql = selectBoundsSQL(featureType, filter);
+        String sql = selectBoundsSQL(featureType,/* types,*/ filter);
         LOGGER.fine(sql);
 
         try {
@@ -960,7 +966,14 @@ public final class JDBCDataStore extends ContentDataStore
                 }
 
                 state.setConnection(cx);
-            }
+                
+                if ( state.getTransaction() != Transaction.AUTO_COMMIT ) {
+                    //TODO: what abotu when it is auto commmit... i beleive this
+                    // is leaking connection
+                    //add connection state to the transaction
+                    state.getTransaction().putState(state, new JDBCTransactionState( cx ) );    
+                }
+}
         }
 
         return cx;
@@ -1686,8 +1699,12 @@ public final class JDBCDataStore extends ContentDataStore
 
     /**
      * Generates a 'SELECT' sql statement which selects bounds.
+     * 
+     * @param featureType The feature type / table.
+     //* @param types The columns to include in the bounds calculation, may be <code>null<code>.
+     * @param filter Filter specifying rows to include in bounds calculation.
      */
-    protected String selectBoundsSQL(SimpleFeatureType featureType, Filter filter) {
+    protected String selectBoundsSQL(SimpleFeatureType featureType, /*Set types,*/ Filter filter) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT ");
@@ -1695,7 +1712,9 @@ public final class JDBCDataStore extends ContentDataStore
         //walk through all geometry attributes and build the query
         for (Iterator a = featureType.getAttributes().iterator(); a.hasNext();) {
             AttributeDescriptor attribute = (AttributeDescriptor) a.next();
-
+            //if (types != null && !types.contains( attribute.getLocalName() ) ) {
+            //    continue;
+            //}
             if (attribute instanceof GeometryDescriptor) {
                 String geometryColumn = featureType.getDefaultGeometry().getLocalName();
                 dialect.encodeGeometryEnvelope(geometryColumn, sql);
@@ -1808,25 +1827,7 @@ public final class JDBCDataStore extends ContentDataStore
                 if (Geometry.class.isAssignableFrom(binding)) {
                     try {
                         Geometry g = (Geometry) value;
-
-                        int srid = 0;
-
-                        // check for srid
-                        if (g.getSRID() > 0) {
-                            srid = g.getSRID();
-                        }
-
-                        if (srid == 0) {
-                            //check for crs object
-                            CoordinateReferenceSystem crs = (CoordinateReferenceSystem) g
-                                .getUserData();
-
-                            if (crs != null) {
-                                //pull out the epsg code
-                            }
-                        }
-
-                        dialect.encodeGeometryValue((Geometry) value, srid, sql);
+                        encodeGeometryValue( g, sql );
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -1846,6 +1847,32 @@ public final class JDBCDataStore extends ContentDataStore
     }
 
     /**
+     * Helper method for encoding a geometry, pulls out the crs, turns it to 
+     * a code and then delegates to the dialecte.
+     */
+    protected void encodeGeometryValue( Geometry g, StringBuffer sql ) throws IOException {
+
+        int srid = 0;
+
+        // check for srid
+        if (g.getSRID() > 0) {
+            srid = g.getSRID();
+        }
+
+        if (srid == 0) {
+            //check for crs object
+            CoordinateReferenceSystem crs = (CoordinateReferenceSystem) g
+                .getUserData();
+
+            if (crs != null) {
+                //pull out the epsg code
+            }
+        }
+
+        dialect.encodeGeometryValue(g, srid, sql);
+    }
+    
+    /**
      * Generates an 'UPDATE' sql statement.
      */
     protected String updateSQL(SimpleFeatureType featureType, AttributeDescriptor[] attributes,
@@ -1859,7 +1886,18 @@ public final class JDBCDataStore extends ContentDataStore
         for (int i = 0; i < attributes.length; i++) {
             dialect.encodeColumnName(attributes[i].getLocalName(), sql);
             sql.append(" = ");
-            dialect.encodeValue(values[i], attributes[i].getType().getBinding(), sql);
+            
+            if ( Geometry.class.isAssignableFrom( attributes[i].getType().getBinding() ) ) {
+                try {
+                    encodeGeometryValue((Geometry)values[i],sql); 
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else {
+                dialect.encodeValue(values[i], attributes[i].getType().getBinding(), sql);    
+            }
+            
             sql.append(",");
         }
 
@@ -1881,88 +1919,96 @@ public final class JDBCDataStore extends ContentDataStore
 
     /**
      * Creates a new instance of a filter to sql encoder.
+     * <p>
+     * The <tt>featureType</tt> may be null but it is not recommended. Such a 
+     * case where this may neccessary is when a literal needs to be encoded in 
+     * isolation.
+     * </p>
      */
     protected FilterToSQL createFilterToSQL(final SimpleFeatureType featureType) {
-        //set up a fid mapper
-        //TODO: remove this
-        final PrimaryKey key;
-
-        try {
-            key = getPrimaryKey(featureType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        FIDMapper mapper = new FIDMapper() {
-                public String createID(Connection conn, SimpleFeature feature, Statement statement)
-                    throws IOException {
-                    return null;
-                }
-
-                public int getColumnCount() {
-                    return 1;
-                }
-
-                public int getColumnDecimalDigits(int colIndex) {
-                    return 0;
-                }
-
-                public String getColumnName(int colIndex) {
-                    return key.getColumnName();
-                }
-
-                public int getColumnSize(int colIndex) {
-                    return 0;
-                }
-
-                public int getColumnType(int colIndex) {
-                    return 0;
-                }
-
-                public String getID(Object[] attributes) {
-                    return null;
-                }
-
-                public Object[] getPKAttributes(String FID)
-                    throws IOException {
-                    //strip off the feature type name
-                    if (FID.startsWith(featureType.getTypeName() + ".")) {
-                        FID = FID.substring(featureType.getTypeName().length() + 1);
-                    }
-
-                    try {
-                        return new Object[] { key.decode(FID) };
-                    } catch (Exception e) {
-                        throw (IOException) new IOException().initCause(e);
-                    }
-                }
-
-                public boolean hasAutoIncrementColumns() {
-                    return false;
-                }
-
-                public void initSupportStructures() {
-                }
-
-                public boolean isAutoIncrement(int colIndex) {
-                    return false;
-                }
-
-                public boolean isVolatile() {
-                    return false;
-                }
-
-                public boolean returnFIDColumnsAsAttributes() {
-                    return false;
-                }
-            };
-
         FilterToSQL toSQL = new FilterToSQL();
-        toSQL.setFeatureType(featureType);
+        
         toSQL.setSqlNameEscape(dialect.getNameEscape());
-        toSQL.setFIDMapper(mapper);
         toSQL.setCapabilities(filterCapabilities);
+        
+        if ( featureType != null ) {
+            //set up a fid mapper
+            //TODO: remove this
+            final PrimaryKey key;
 
+            try {
+                key = getPrimaryKey(featureType);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            FIDMapper mapper = new FIDMapper() {
+                    public String createID(Connection conn, SimpleFeature feature, Statement statement)
+                        throws IOException {
+                        return null;
+                    }
+
+                    public int getColumnCount() {
+                        return 1;
+                    }
+
+                    public int getColumnDecimalDigits(int colIndex) {
+                        return 0;
+                    }
+
+                    public String getColumnName(int colIndex) {
+                        return key.getColumnName();
+                    }
+
+                    public int getColumnSize(int colIndex) {
+                        return 0;
+                    }
+
+                    public int getColumnType(int colIndex) {
+                        return 0;
+                    }
+
+                    public String getID(Object[] attributes) {
+                        return null;
+                    }
+
+                    public Object[] getPKAttributes(String FID)
+                        throws IOException {
+                        //strip off the feature type name
+                        if (FID.startsWith(featureType.getTypeName() + ".")) {
+                            FID = FID.substring(featureType.getTypeName().length() + 1);
+                        }
+
+                        try {
+                            return new Object[] { key.decode(FID) };
+                        } catch (Exception e) {
+                            throw (IOException) new IOException().initCause(e);
+                        }
+                    }
+
+                    public boolean hasAutoIncrementColumns() {
+                        return false;
+                    }
+
+                    public void initSupportStructures() {
+                    }
+
+                    public boolean isAutoIncrement(int colIndex) {
+                        return false;
+                    }
+
+                    public boolean isVolatile() {
+                        return false;
+                    }
+
+                    public boolean returnFIDColumnsAsAttributes() {
+                        return false;
+                    }
+                };
+            toSQL.setFeatureType(featureType);    
+            toSQL.setFIDMapper(mapper);
+        }
+        
         return toSQL;
     }
 

@@ -15,9 +15,7 @@
  */
 package org.geotools.data.mysql;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 
@@ -29,8 +27,8 @@ import org.geotools.jdbc.SQLDialect;
  *
  */
 public class MySQLDataStoreFactory extends JDBCDataStoreFactory {
-    protected SQLDialect createSQLDialect() {
-        return new MySQLDialect();
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return new MySQLDialect(dataStore);
     }
 
     protected String getDriverClassName() {

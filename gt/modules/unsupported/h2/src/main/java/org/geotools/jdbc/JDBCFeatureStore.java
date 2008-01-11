@@ -21,26 +21,26 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.logging.Level;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.feature.Association;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.Filter;
-import org.opengis.filter.Id;
-import org.opengis.filter.identity.GmlObjectId;
-import org.opengis.filter.sort.SortBy;
-import org.geotools.data.ContentFeatureCollection;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.GmlObjectStore;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.FilteringFeatureReader;
+import org.geotools.data.FilteringFeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Association;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -63,9 +63,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
     /**
      * Creates the new feature store.
      * @param entry The datastore entry.
+     * @param query The defining query.
      */
-    public JDBCFeatureStore(ContentEntry entry) throws IOException {
-        super(entry);
+    public JDBCFeatureStore(ContentEntry entry,Query query) throws IOException {
+        super(entry,query);
 
         //TODO: cache this
         primaryKey = ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
@@ -92,24 +93,24 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         return primaryKey;
     }
 
-    /**
-     * This method operates by delegating to the
-     * {@link JDBCFeatureCollection#update(AttributeDescriptor[], Object[])}
-     * method provided by the feature collection resulting from
-     * {@link #filtered(ContentState, Filter)}.
-     *
-     * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
-     */
-    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
-        throws IOException {
-        if (filter == null) {
-            String msg = "Must specify a filter, must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-
-        JDBCFeatureCollection features = (JDBCFeatureCollection) filtered(getState(), filter);
-        features.update(type, value);
-    }
+//    /**
+//     * This method operates by delegating to the
+//     * {@link JDBCFeatureCollection#update(AttributeDescriptor[], Object[])}
+//     * method provided by the feature collection resulting from
+//     * {@link #filtered(ContentState, Filter)}.
+//     *
+//     * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
+//     */
+//    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
+//        throws IOException {
+//        if (filter == null) {
+//            String msg = "Must specify a filter, must not be null.";
+//            throw new IllegalArgumentException(msg);
+//        }
+//
+//        JDBCFeatureCollection features = (JDBCFeatureCollection) filtered(getState(), filter);
+//        features.update(type, value);
+//    }
 
     /**
      * Builds the feature type from database metadata.
@@ -285,18 +286,191 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         }
     }
 
-    protected JDBCFeatureCollection all(ContentState state) {
-        return new JDBCFeatureCollection(this, getState());
+    /**
+     * Helper method for splitting a filter.
+     */
+    Filter[] splitFilter(Filter original) {
+        Filter[] split = new Filter[2];
+        if ( original != null ) {
+            //create a filter splitter
+            PostPreProcessFilterSplittingVisitor splitter = new PostPreProcessFilterSplittingVisitor(getDataStore()
+                    .getFilterCapabilities(), getSchema(), null);
+            original.accept(splitter, null);
+        
+            split[0] = splitter.getFilterPre();
+            split[1] = splitter.getFilterPost();
+        }
+        
+        return split;
     }
 
-    protected JDBCFeatureCollection filtered(ContentState state, Filter filter) {
-        return new JDBCFeatureCollection(this, getState(), filter);
+    protected int getCountInternal(Query query) throws IOException {
+        JDBCDataStore dataStore = getDataStore();
+
+        //split the filter
+        Filter[] split = splitFilter( query.getFilter() );
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
+        
+        try {
+            if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
+                //calculate manually, dont use datastore optimization
+                JDBCDataStore.LOGGER.fine("Calculating size manually");
+
+                int count = 0;
+
+                //grab a reader
+                FeatureReader reader = getReader( query );
+                try {
+                    while (reader.hasNext()) {
+                        reader.next();
+                        count++;
+                    }
+                } finally {
+                    reader.close();
+                }
+
+                return count;
+            } else {
+                //no post filter, we have a preFilter, or preFilter is null.. 
+                // either way we can use the datastore optimization
+                return dataStore.getCount(getSchema(), preFilter, dataStore.getConnection(getState()));
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+    
+    protected ReferencedEnvelope getBoundsInternal(Query query)
+            throws IOException {
+        JDBCDataStore dataStore = getDataStore();
 
-    protected JDBCFeatureCollection sorted(ContentState state, SortBy[] sort, Filter filter) {
-        JDBCFeatureCollection collection = filtered(state, filter);
-        collection.setSort(sort);
+        //split the filter
+        Filter[] split = splitFilter( query.getFilter() );
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
 
-        return collection;
+        try {
+            if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
+                //calculate manually, dont use datastore optimization
+                JDBCDataStore.LOGGER.fine("Calculating bounds manually");
+
+                ReferencedEnvelope bounds = new ReferencedEnvelope(getSchema().getCRS());
+
+                //grab a reader
+                FeatureReader i = getReader(postFilter);
+                try {
+                    if (i.hasNext()) {
+                        SimpleFeature f = (SimpleFeature) i.next();
+                        bounds.init(f.getBounds());
+
+                        while (i.hasNext()) {
+                            bounds.include(f.getBounds());
+                        }
+                    }
+                } finally {
+                    i.close();
+                }
+
+                return bounds;
+            } 
+            else {
+                //post filter was null... pre can be set or null... either way
+                // use datastore optimization
+                Connection cx = dataStore.getConnection(getState());
+                return dataStore.getBounds(getSchema(), preFilter, cx);
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    protected boolean canFilter() {
+        return true;
+    }
+    
+    protected boolean canSort() {
+        return true;
+    }
+    
+    protected FeatureReader getReaderInternal(Query query) throws IOException {
+        
+        Filter[] split = splitFilter(query.getFilter());
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
+        
+        //build up a statement for the content
+        String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
+        JDBCDataStore.LOGGER.fine(sql);
+
+        //grab connection
+        Connection cx = getDataStore().getConnection(getState());
+        
+        //create the reader
+        FeatureReader reader;
+        try {
+            reader = new JDBCFeatureReader( sql, cx, this, query.getHints() );
+        } catch (SQLException e) {
+            throw (IOException) new IOException("error create reader").initCause( e );
+        }
+
+        //if post filter, wrap it
+        if (postFilter != null && postFilter != Filter.INCLUDE) {
+            reader = new FilteringFeatureReader(reader,postFilter);
+        }
+
+        return reader;
+    }
+    
+    protected FeatureWriter getWriterInternal(Query query, int flags)
+            throws IOException {
+        
+        if ( flags == 0 ) {
+            throw new IllegalArgumentException( "no write flags set" );
+        }
+        
+        //get connection from current state
+        Connection cx = getDataStore().getConnection(getState());
+        
+        Filter postFilter;
+        //check for update only case
+        FeatureWriter writer;
+        try {
+            //check for insert only
+            if ( (flags | WRITER_ADD) == WRITER_ADD ) {
+                //build up a statement for the content, inserting only so we dont want
+                // the query to return any data ==> Filter.EXCLUDE
+                String sql = getDataStore().selectSQL(getSchema(), Filter.EXCLUDE, query.getSortBy());
+                JDBCDataStore.LOGGER.fine(sql);
+
+                return new JDBCInsertFeatureWriter( sql, cx, this, query.getHints() );
+            }
+            
+            //split the filter
+            Filter[] split = splitFilter(query.getFilter());
+            Filter preFilter = split[0];
+            postFilter = split[1];
+            
+            //build up a statement for the content
+            String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
+            JDBCDataStore.LOGGER.fine(sql);
+            
+            if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {
+                writer = new JDBCUpdateFeatureWriter( sql, cx, this, query.getHints() );
+            }
+            else {
+                //update insert case
+                writer = new JDBCUpdateInsertFeatureWriter( sql, cx, this, query.getHints() );
+            }
+        } 
+        catch (SQLException e) {
+            throw (IOException) new IOException( ).initCause(e);
+        }
+        
+        //check for post filter and wrap accordingly
+        if ( postFilter != null && postFilter != Filter.INCLUDE ) {
+            writer = new FilteringFeatureWriter( writer, postFilter );
+        }
+        return writer;
     }
 }

@@ -15,26 +15,27 @@
  */
 package org.geotools.jdbc;
 
-import junit.framework.TestCase;
-import junit.framework.TestResult;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.sql.DataSource;
-import com.vividsolutions.jts.geom.GeometryFactory;
+
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
-import org.geotools.feature.FeatureFactoryImpl;
-import org.geotools.feature.type.FeatureTypeFactoryImpl;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactoryImpl;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -121,7 +122,7 @@ public abstract class JDBCTestSupport extends TestCase {
         //create the dataStore
         //TODO: replace this with call to datastore factory
         dataStore = new JDBCDataStore();
-        dataStore.setSQLDialect(setup.createSQLDialect());
+        dataStore.setSQLDialect(setup.createSQLDialect(dataStore));
         dataStore.setNamespaceURI("http://www.geotools.org/test");
         dataStore.setDataSource(setup.getDataSource());
         dataStore.setDatabaseSchema("geotools");

@@ -22,6 +22,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Map;
+
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.SQLDialect;
+import org.opengis.feature.type.GeometryDescriptor;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -31,12 +36,14 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKTWriter;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.jdbc.SQLDialect;
 
 
 public class H2Dialect extends SQLDialect {
+    
+    public H2Dialect( JDBCDataStore dataStore ) {
+        super( dataStore );
+    }
+    
     public String getNameEscape() {
         return "\"";
     }

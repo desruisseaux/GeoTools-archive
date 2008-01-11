@@ -15,12 +15,13 @@
  */
 package org.geotools.data.h2;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+
 import javax.sql.DataSource;
-import org.geotools.data.DataStore;
+
+import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
@@ -81,8 +82,8 @@ public class H2DataStoreFactory extends JDBCDataStoreFactory {
         return "org.h2.Driver";
     }
 
-    protected SQLDialect createSQLDialect() {
-        return new H2Dialect();
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return new H2Dialect(dataStore);
     }
 
     protected DataSource createDataSource(Map params) throws IOException {

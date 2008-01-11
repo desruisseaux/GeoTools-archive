@@ -15,8 +15,10 @@
  */
 package org.geotools.data.mysql;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
 
@@ -39,8 +41,8 @@ public class MySQLTestSetup extends JDBCTestSetup {
         return dataSource;
     }
 
-    protected SQLDialect createSQLDialect() {
-        return new MySQLDialect();
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return new MySQLDialect(dataStore);
     }
 
     protected void setUpData() throws Exception {

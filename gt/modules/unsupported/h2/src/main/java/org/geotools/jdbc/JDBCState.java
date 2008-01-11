@@ -16,7 +16,7 @@
 package org.geotools.jdbc;
 
 import java.sql.Connection;
-import org.geotools.data.Transaction;
+
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentState;
 

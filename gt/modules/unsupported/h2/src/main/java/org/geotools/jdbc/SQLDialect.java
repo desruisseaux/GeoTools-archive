@@ -16,21 +16,25 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
+
+import org.geotools.data.jdbc.FilterToSQL;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.expression.Literal;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.opengis.feature.type.GeometryDescriptor;
 
 
 /**
@@ -85,6 +89,20 @@ import org.opengis.feature.type.GeometryDescriptor;
  *
  */
 public abstract class SQLDialect {
+    
+    /**
+     * The datastore using the dialect
+     */
+    protected JDBCDataStore dataStore;
+    
+    /**
+     * Creates the dialect.
+     * @param dataStore The dataStore using the dialect.
+     */
+    protected SQLDialect( JDBCDataStore dataStore ) {
+        this.dataStore = dataStore;
+    }
+    
     /**
      * Determines if the specified table should be included in those published
      * by the datastore.
@@ -558,11 +576,22 @@ public abstract class SQLDialect {
      *
      */
     public void encodeValue(Object value, Class type, StringBuffer sql) {
-        if (CharSequence.class.isAssignableFrom(type)) {
-            sql.append("'").append(value).append("'");
-        } else {
-            sql.append(value);
-        }
+        
+        //turn the value into a literal and use FilterToSQL to encode it
+        Literal literal = dataStore.getFilterFactory().literal( value );
+        FilterToSQL filterToSQL = dataStore.createFilterToSQL(null);
+        
+        StringWriter w = new StringWriter();
+        filterToSQL.setWriter(w);
+        
+        filterToSQL.visit(literal,type);
+        
+        sql.append( w.getBuffer().toString() );
+//        if (CharSequence.class.isAssignableFrom(type)) {
+//            sql.append("'").append(value).append("'");
+//        } else {
+//            sql.append(value);
+//        }
     }
 
     /**

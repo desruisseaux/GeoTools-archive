@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.logging.Logger;
+
 import javax.sql.DataSource;
 
 
@@ -110,5 +111,5 @@ public abstract class JDBCTestSetup {
 
     protected abstract DataSource createDataSource();
 
-    protected abstract SQLDialect createSQLDialect();
+    protected abstract SQLDialect createSQLDialect(JDBCDataStore dataStore);
 }

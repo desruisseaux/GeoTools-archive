@@ -16,12 +16,16 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
-import org.opengis.feature.simple.SimpleFeature;
+
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.resources.JDBC;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public abstract class JDBCTransactionTest extends JDBCTestSupport {
@@ -61,7 +65,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         assertEquals(3, fc.size());
     }
 
-    public void testMultipleTransactions() throws IOException {
+    public void testConcurrentTransactions() throws IOException {
         JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
 
         Transaction tx1 = new DefaultTransaction();
@@ -90,5 +94,27 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
 
         FeatureCollection fc = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals(5, fc.size());
+    }
+    
+    public void testSerialTransactions() throws IOException {
+        FeatureStore st = (FeatureStore) dataStore.getFeatureSource( "ft1" );
+        
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(st.getSchema());
+        b.set( "intProperty", new Integer(100));
+        SimpleFeature f1 = b.buildFeature(null);
+        FeatureCollection features = new DefaultFeatureCollection(null,null);
+        features.add( f1 );
+
+        Transaction tx1 = new DefaultTransaction();
+        st.setTransaction(tx1);
+        st.addFeatures( features );
+        tx1.commit();
+        assertEquals(4, dataStore.getFeatureSource("ft1").getCount(Query.ALL));
+        
+        Transaction tx2 = new DefaultTransaction();
+        st.setTransaction(tx2);
+        st.addFeatures( features );
+        tx2.commit();
+        assertEquals(5, dataStore.getFeatureSource("ft1").getCount(Query.ALL));
     }
 }

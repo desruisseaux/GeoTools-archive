@@ -16,6 +16,7 @@
 package org.geotools.jdbc;
 
 import java.sql.Connection;
+
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 
 

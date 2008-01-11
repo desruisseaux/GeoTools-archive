@@ -16,43 +16,49 @@
 package org.geotools.jdbc;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.geotools.data.Transaction;
 import org.geotools.data.Transaction.State;
 
 
 public final class JDBCTransactionState implements State {
     /**
-     * the transaction
+     * the current transaction
      */
     Transaction tx;
-
     /**
-     * the datastore
-     *
+     * The current connection
      */
-    JDBCFeatureStore featureSource;
-
-    public JDBCTransactionState(JDBCFeatureStore featureSource) {
-        this.featureSource = featureSource;
+    Connection cx;
+    
+    public JDBCTransactionState(Connection cx) {
+        this.cx = cx;
     }
 
     public void setTransaction(Transaction tx) {
-        if ((tx == null) && (this.tx != null)) {
-            //            //close the connection
-            //            try {
-            //                synchronized ( featureSource ) {
-            //                    featureSource.setTransaction( this.tx );
-            //                    if ( featureSource.getState().getConnection() != null ) {
-            //                        featureSource.getState().getConnection().close();
-            //                    }
-            //                }
-            //            } 
-            //            catch (SQLException e) {
-            //                throw new RuntimeException( e );
-            //            }
+        if ( tx != null && this.tx != null ) {
+            throw new IllegalStateException( "New transaction set without " +
+                "closing old transaction first.");
         }
-
+            
+        if ( tx == null ) {
+            if ( cx != null ) {
+                try {
+                    cx.close();
+                }
+                catch( SQLException e ) {
+                    //TODO: perhaps we should log this at the finest level
+                }
+            }
+            else {
+                JDBCDataStore.LOGGER.warning("Transaction is attempting to " +
+                    "close an already closed connection");
+            }
+            cx = null;
+        }
+        
         this.tx = tx;
     }
 
@@ -60,28 +66,20 @@ public final class JDBCTransactionState implements State {
     }
 
     public void commit() throws IOException {
-        synchronized (featureSource) {
-            featureSource.setTransaction(tx);
-
-            try {
-                featureSource.getState().getConnection().commit();
-            } catch (SQLException e) {
-                String msg = "Error occured on commit";
-                throw (IOException) new IOException(msg).initCause(e);
-            }
+        try {
+            cx.commit();
+        } catch (SQLException e) {
+            String msg = "Error occured on commit";
+            throw (IOException) new IOException(msg).initCause(e);
         }
     }
 
     public void rollback() throws IOException {
-        synchronized (featureSource) {
-            featureSource.setTransaction(tx);
-
-            try {
-                featureSource.getState().getConnection().rollback();
-            } catch (SQLException e) {
-                String msg = "Error occured on rollback";
-                throw (IOException) new IOException(msg).initCause(e);
-            }
+        try {
+            cx.rollback();
+        } catch (SQLException e) {
+            String msg = "Error occured on rollback";
+            throw (IOException) new IOException(msg).initCause(e);
         }
     }
 }

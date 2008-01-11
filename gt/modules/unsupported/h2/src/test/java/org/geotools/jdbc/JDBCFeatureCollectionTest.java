@@ -17,29 +17,29 @@ package org.geotools.jdbc;
 
 import java.io.IOException;
 import java.util.Iterator;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
+
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
-    JDBCFeatureCollection collection;
+    FeatureCollection collection;
 
     protected void setUp() throws Exception {
         super.setUp();
 
         JDBCFeatureStore source = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
-
-        collection = new JDBCFeatureCollection(source,
-                (JDBCState) source.getEntry().getState(Transaction.AUTO_COMMIT));
+        collection = source.getFeatures(); 
     }
 
     public void testIterator() throws Exception {

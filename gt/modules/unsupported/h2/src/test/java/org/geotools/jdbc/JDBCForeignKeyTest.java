@@ -15,15 +15,15 @@
  */
 package org.geotools.jdbc;
 
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.opengis.feature.Association;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.Transaction;
-import org.geotools.factory.Hints;
 
 
 public abstract class JDBCForeignKeyTest extends JDBCTestSupport {

@@ -16,16 +16,18 @@
 package org.geotools.jdbc;
 
 import java.util.Map;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.identity.GmlObjectId;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.identity.GmlObjectId;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
 
 
 public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport {

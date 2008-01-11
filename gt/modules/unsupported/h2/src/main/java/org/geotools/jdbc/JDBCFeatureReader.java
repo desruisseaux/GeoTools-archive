@@ -1,32 +1,45 @@
-/*
- *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- */
 package org.geotools.jdbc;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
+
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.util.Converters;
+import org.opengis.feature.Association;
+import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AssociationDescriptor;
+import org.opengis.feature.type.AssociationType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureTypeFactory;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.geometry.BoundingBox;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
@@ -35,68 +48,64 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
-import org.opengis.feature.Association;
-import org.opengis.feature.FeatureFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AssociationDescriptor;
-import org.opengis.feature.type.AssociationType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureTypeFactory;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.Id;
-import org.opengis.filter.expression.PropertyName;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.factory.Hints;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.util.Converters;
-
 
 /**
- * Iterator for read only access to a dataset.
- *
- * @author Justin Deoliveira, The Open Planning Project
+ * Reader for jdbc datastore
+ * 
+ * @author Justin Deoliveira, The Open Plannign Project.
  *
  */
-public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
-    /**
-     * flag indicating if the iterator has another feature
-     */
-    Boolean next;
+public class JDBCFeatureReader implements FeatureReader {
 
+    /**
+     * the datastore
+     */
+    protected JDBCDataStore dataStore;
+    /**
+     * schema of features
+     */
+    protected SimpleFeatureType featureType;
     /**
      * geometry factory used to create geometry objects
      */
-    GeometryFactory geometryFactory;
-
+    protected GeometryFactory geometryFactory;
+    /**
+     * hints
+     */
+    protected Hints hints;
+    /**
+     * current transaction
+     */
+    protected Transaction tx;
+    /**
+     * flag indicating if the iterator has another feature
+     */
+    protected Boolean next;
     /**
      * feature builder
      */
-    SimpleFeatureBuilder builder;
-
-    public JDBCFeatureIterator(Statement st, SimpleFeatureType featureType,
-        JDBCFeatureCollection collection) {
-        super(st, featureType, collection);
-
-        try {
-            rs.beforeFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        // set a geometry factory, use the hints on the collection first
-        geometryFactory = (GeometryFactory) collection.getHints().get(Hints.JTS_GEOMETRY_FACTORY);
-
+    protected SimpleFeatureBuilder builder;
+    
+    /**
+     * statement,result set that is being worked from.
+     */
+    protected Statement st;
+    protected ResultSet rs;
+    
+    public JDBCFeatureReader( String sql, Connection cx, JDBCFeatureStore featureStore, Hints hints ) 
+        throws SQLException {
+        //grab feature type of features
+        this.featureType = featureStore.getSchema();
+        this.dataStore = featureStore.getDataStore();
+        this.tx = featureStore.getTransaction();
+        this.hints = hints;
+        
+        //grab a geometry factory... check for a special hint
+        geometryFactory = (GeometryFactory) hints.get(Hints.JTS_GEOMETRY_FACTORY);
         if (geometryFactory == null) {
             // look for a coordinate sequence factory
-            CoordinateSequenceFactory csFactory = (CoordinateSequenceFactory) collection.getHints()
-                                                                                        .get(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
+            CoordinateSequenceFactory csFactory = 
+                (CoordinateSequenceFactory) hints.get(Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
 
             if (csFactory != null) {
                 geometryFactory = new GeometryFactory(csFactory);
@@ -104,14 +113,36 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
         }
 
         if (geometryFactory == null) {
-            // use the datastore provided one
+            // fall back on one privided by datastore
             geometryFactory = dataStore.getGeometryFactory();
         }
 
+        //create a feature builder
         builder = new SimpleFeatureBuilder(featureType);
+        
+        //create the statement
+        st = cx.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        rs = st.executeQuery(sql);
+    }
+    
+    public JDBCFeatureReader( JDBCFeatureReader other ) {
+        this.featureType = other.featureType;
+        this.dataStore = other.dataStore;
+        this.tx = other.tx;
+        this.hints = other.hints;
+        this.geometryFactory = other.geometryFactory;
+        this.builder = other.builder;
+        this.st = other.st;
+        this.rs = other.rs;
+    }
+    
+    public SimpleFeatureType getFeatureType() {
+        return featureType;
     }
 
-    public boolean hasNext() {
+    public boolean hasNext() throws IOException {
+        ensureOpen();
+        
         if (next == null) {
             try {
                 next = Boolean.valueOf(rs.next());
@@ -123,11 +154,23 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
         return next.booleanValue();
     }
 
-    public SimpleFeature next() throws NoSuchElementException {
+    protected void ensureNext() {
         if (next == null) {
             throw new IllegalStateException("Must call hasNext before calling next");
         }
-
+    }
+    
+    protected void ensureOpen() throws IOException {
+        if ( rs == null ) {
+            throw new IOException( "reader already closed" );
+        }
+    }
+    
+    public SimpleFeature next() throws IOException, IllegalArgumentException,
+            NoSuchElementException {
+        ensureOpen();
+        ensureNext();
+        
         // find the primary key
         PrimaryKey pkey;
 
@@ -151,14 +194,14 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 
         // check for the association traversal depth hint, if not > 0 dont
         // resolve the associated feature or geometry
-        Integer depth = (Integer) collection.getHints().get(Hints.ASSOCIATION_TRAVERSAL_DEPTH);
+        Integer depth = (Integer) hints.get(Hints.ASSOCIATION_TRAVERSAL_DEPTH);
 
         if (depth == null) {
             depth = new Integer(0);
         }
 
-        PropertyName associationPropertyName = (PropertyName) collection.getHints()
-                                                                        .get(Hints.ASSOCIATION_PROPERTY);
+        PropertyName associationPropertyName = 
+            (PropertyName) hints.get(Hints.ASSOCIATION_PROPERTY);
 
         // round up attributes
         // List attributes = new ArrayList();
@@ -354,7 +397,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                 }
 
                 // is this an association?
-                if (collection.getDataStore().isAssociations()
+                if (dataStore.isAssociations()
                         && Association.class.equals(type.getType().getBinding()) && (value != null)) {
                     Statement select = st.getConnection().createStatement();
 
@@ -419,7 +462,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                             new Integer(depth.intValue() - 1));
                                     query.setHints(hints);
 
-                                    FilterFactory ff = collection.getDataStore().getFilterFactory();
+                                    FilterFactory ff = dataStore.getFilterFactory();
                                     Id filter = ff.id(Collections.singleton(ff.featureId(
                                                     value.toString())));
                                     query.setFilter(filter);
@@ -428,10 +471,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
                                         // grab a reader and get the feature, there should
                                         // only
                                         // be one
-                                        FeatureReader r = collection.getDataStore()
-                                                                    .getFeatureReader(query,
-                                                collection.getState().getTransaction());
-
+                                        FeatureReader r = dataStore.getFeatureReader(query, tx);
                                         try {
                                             r.hasNext();
 
@@ -491,11 +531,253 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
         }
     }
 
-    public void remove() {
-        try {
-            rs.deleteRow();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public void close() throws IOException {
+        //clean up
+        JDBCDataStore.closeSafe( rs );
+        JDBCDataStore.closeSafe( st );
+        
+        //throw away state
+        rs = null;
+        st = null;
+        dataStore = null;
+        featureType = null;
+        geometryFactory = null;
+        tx = null;
+        hints = null;
+        next = null;
+        builder = null;
+      
+    }
+    
+     /**
+     * Feature wrapper around a result set.
+     */
+    protected class ResultSetFeature implements SimpleFeature {
+        /**
+         * result set
+         */
+        ResultSet rs;
+
+        /**
+         * updated values
+         * */
+        Object[] values;
+
+        /**
+         * fid
+         */
+        String fid;
+
+        /**
+         * dirty flags
+         */
+        boolean[] dirty;
+        /**
+         * name index
+         */
+        HashMap<String, Integer> index;
+        /**
+         * user data
+         */
+        HashMap<Object, Object> userData = new HashMap<Object, Object>();
+
+        ResultSetFeature(ResultSet rs) throws SQLException, IOException {
+            this.rs = rs;
+
+            //get the result set metadata
+            ResultSetMetaData md = rs.getMetaData();
+
+            //get the primary key, ensure its not contained in the values
+            PrimaryKey key = dataStore.getPrimaryKey(featureType);
+            int count = md.getColumnCount();
+
+            for (int i = 0; i < md.getColumnCount(); i++) {
+                if (key.getColumnName().equals(md.getColumnName(i + 1))) {
+                    count--;
+                }
+            }
+
+            //set up values
+            values = new Object[count];
+            dirty = new boolean[values.length];
+
+            //set up name lookup
+            index = new HashMap<String, Integer>();
+
+            int offset = 0;
+
+            for (int i = 0; i < md.getColumnCount(); i++) {
+                if (key.getColumnName().equals(md.getColumnName(i + 1))) {
+                    offset = 1;
+
+                    continue;
+                }
+
+                index.put(md.getColumnName(i + 1), i - offset);
+            }
+        }
+
+        public void init(String fid) {
+            //clear values
+            for (int i = 0; i < values.length; i++) {
+                values[i] = null;
+                dirty[i] = false;
+            }
+
+            this.fid = fid;
+        }
+
+        public void init() throws SQLException, IOException {
+            //get fid
+            PrimaryKey pkey = dataStore.getPrimaryKey(featureType);
+
+            //TODO: factory fid prefixing out
+            init(featureType.getTypeName() + "." + pkey.encode(rs));
+        }
+
+        public SimpleFeatureType getFeatureType() {
+            return featureType;
+        }
+
+        public SimpleFeatureType getType() {
+            return featureType;
+        }
+
+        public String getID() {
+            return fid;
+        }
+
+        public void setID( String fid ) {
+            this.fid = fid;
+        }
+        
+        public Object getAttribute(String name) {
+            return values[index.get(name)];
+        }
+
+        public Object getAttribute(Name name) {
+            return getAttribute(name.getLocalPart());
+        }
+
+        public Object getAttribute(int index) throws IndexOutOfBoundsException {
+            return values[index];
+        }
+
+        public void setAttribute(String name, Object value) {
+            JDBCDataStore.LOGGER.fine("Setting " + name + " to " + value);
+
+            int i = index.get(name);
+            setAttribute(i, value);
+        }
+
+        public void setAttribute(Name name, Object value) {
+            setAttribute(name.getLocalPart(), value);
+        }
+
+        public void setAttribute(int index, Object value)
+            throws IndexOutOfBoundsException {
+            JDBCDataStore.LOGGER.fine("Setting " + index + " to " + value);
+            values[index] = value;
+            dirty[index] = true;
+        }
+
+        public void setAttributes(List<Object> values) {
+            for (int i = 0; i < values.size(); i++) {
+                setAttribute(i, values.get(i));
+            }
+        }
+
+        public int getAttributeCount() {
+            return values.length;
+        }
+
+        public boolean isDirty(int index) {
+            return dirty[index];
+        }
+
+        public boolean isDirrty(String name) {
+            return isDirty(index.get(name));
+        }
+
+        public void close() {
+            rs = null;
+        }
+
+        public List<Object> getAttributes() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object getDefaultGeometry() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setAttributes(Object[] object) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setDefaultGeometry(Object defaultGeometry) {
+            throw new UnsupportedOperationException();
+        }
+
+        public BoundingBox getBounds() {
+            throw new UnsupportedOperationException();
+        }
+
+        public GeometryAttribute getDefaultGeometryProperty() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setDefaultGeometryProperty(GeometryAttribute defaultGeometry) {
+            throw new UnsupportedOperationException();
+        }
+
+        public Collection<Property> getProperties() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Collection<Property> getProperties(Name name) {
+            throw new UnsupportedOperationException();
+        }
+
+        public Collection<Property> getProperties(String name) {
+            throw new UnsupportedOperationException();
+        }
+
+        public Property getProperty(Name name) {
+            throw new UnsupportedOperationException();
+        }
+
+        public Property getProperty(String name) {
+            throw new UnsupportedOperationException();
+        }
+
+        public Collection<?extends Property> getValue() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setValue(Collection<Property> value) {
+            throw new UnsupportedOperationException();
+        }
+
+        public AttributeDescriptor getDescriptor() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Name getName() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Map<Object, Object> getUserData() {
+            return userData;
+        }
+
+        public boolean isNillable() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setValue(Object value) {
+            throw new UnsupportedOperationException();
         }
     }
+
 }

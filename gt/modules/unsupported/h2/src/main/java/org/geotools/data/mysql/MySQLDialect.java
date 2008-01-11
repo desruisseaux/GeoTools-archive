@@ -21,6 +21,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
+
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.SQLDialect;
+import org.opengis.feature.type.GeometryDescriptor;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -32,11 +37,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTWriter;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.jdbc.SQLDialect;
 
 
 public class MySQLDialect extends SQLDialect {
@@ -50,6 +51,11 @@ public class MySQLDialect extends SQLDialect {
     protected Integer MULTILINESTRING = new Integer(2005);
     protected Integer MULTIPOLYGON = new Integer(2006);
     protected Integer GEOMETRY = new Integer(2007);
+
+    
+    public MySQLDialect(JDBCDataStore dataStore) {
+        super(dataStore);
+    }
 
     public String getNameEscape() {
         return "";

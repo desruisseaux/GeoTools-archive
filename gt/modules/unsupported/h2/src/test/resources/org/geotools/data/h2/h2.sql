@@ -6,8 +6,9 @@
 --       contact: dblasby@openplans.org 
 
 CREATE ALIAS GeomFromText for "org.openplans.spatialdbbox.JTS.GeomFromText";
-CREATE ALIAS envelope for "org.openplans.spatialdbbox.JTS.envelope";
-CREATE ALIAS getSRID FOR "org.openplans.spatialdbbox.JTS.getSRID";
+CREATE ALIAS Envelope for "org.openplans.spatialdbbox.JTS.Envelope";
+CREATE ALIAS GetSRID FOR "org.openplans.spatialdbbox.JTS.GetSRID";
+CREATE ALIAS GeometryType for "org.openplans.spatialdbbox.JTS.GeometryType";
 --CREATE ALIAS GeometryFromBytes for "org.openplans.spatialdbbox.JTS.geometryFromBytes";
 --CREATE ALIAS extent FOR "org.openplans.spatialdbbox.JTS.extentB";
 --CREATE ALIAS setSRID FOR "org.openplans.spatialdbbox.JTS.setSRID";
@@ -23,7 +24,7 @@ CREATE ALIAS isClosed FOR "org.openplans.spatialdbbox.StaticGeometry.isClosed";
 --CREATE ALIAS geometryFromText FOR "org.openplans.spatialdbbox.StaticGeometry.geomFromWKT";
 
 CREATE ALIAS isValid FOR "org.openplans.spatialdbbox.StaticGeometry.isValid";
-CREATE ALIAS geometryType FOR "org.openplans.spatialdbbox.StaticGeometry.getGeometryType";
+--CREATE ALIAS geometryType FOR "org.openplans.spatialdbbox.StaticGeometry.getGeometryType";
 CREATE ALIAS sRID FOR "org.openplans.spatialdbbox.StaticGeometry.getSRID";
 CREATE ALIAS numPoints FOR "org.openplans.spatialdbbox.StaticGeometry.getNumPoints";
 CREATE ALIAS isSimple FOR "org.openplans.spatialdbbox.StaticGeometry.isSimple";
