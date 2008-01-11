@@ -34,7 +34,7 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 /**
  * A simple grid geometry holding the grid range as a {@linkplain Rectangle rectangle} and the
  * <cite>grid to CRS</cite> relationship as an {@linkplain AffineTransform affine transform}.
- * This grid geometry do not holds any Coordinate Reference System information. Because of that,
+ * This grid geometry does not hold any Coordinate Reference System information. Because of that,
  * it is not suitable to {@link GridCoverage2D} (the later rather use {@link GridGeometry2D}).
  * But it is sometime used with plain {@linkplain java.awt.image.RenderedImage rendered image}
  * instances.
