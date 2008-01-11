@@ -78,24 +78,26 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
             pkg = pkg.substring(0, pkg.length() - 5);
         }
 
-        String className = getTarget().getLocalPart();
+        String localName = getTarget().getLocalPart();
 
         try {
-            return Class.forName(pkg + "." + className);
+            return Class.forName(pkg + "." + localName);
         } catch (ClassNotFoundException e) {
-            //do an underscore check
-            if (className.startsWith("_")) {
-                className = className.substring(1) + "Type";
-            }
-
-            try {
-                return Class.forName(pkg + "." + className);
-            } catch (ClassNotFoundException e1) {
-                //try appending a Type
+            //
+            //check for anonymous complex type
+            //
+            int i = localName.indexOf('_');
+            if ( i != -1 ) {
+                String className = localName.substring(i+1) + "Type";
+                
+                try {
+                    return Class.forName(pkg + "." + className);
+                } catch (ClassNotFoundException e1) {
+                }
             }
         }
 
-        return null;
+        throw new RuntimeException( "Could not map an EMF model class to:" + localName);
     }
 
     /**
