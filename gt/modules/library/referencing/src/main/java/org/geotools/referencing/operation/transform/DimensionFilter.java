@@ -24,6 +24,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
+import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.XMatrix;
@@ -56,6 +57,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  *
  * @todo This class is specific to Geotools implementation; it is better to avoid it if
  *       you can. It could be generalized a bit if we perform the same operations on
@@ -94,6 +96,15 @@ public class DimensionFilter {
      */
     public DimensionFilter() {
         this(ReferencingFactoryFinder.getMathTransformFactory(null));
+    }
+    
+    /**
+     * Constructs a dimension filter with a {@linkplain ReferencingFactoryFinder#getMathTransformFactory
+     * math transform factory built using the provided hints}.
+     * @param hints to control the creation of the {@link MathTransformFactory}.
+     */
+    public DimensionFilter(Hints hints) {
+        this(ReferencingFactoryFinder.getMathTransformFactory(hints));
     }
 
     /**
