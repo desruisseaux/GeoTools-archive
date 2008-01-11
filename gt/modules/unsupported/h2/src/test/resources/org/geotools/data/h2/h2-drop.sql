@@ -1,0 +1,5 @@
+DROP ALIAS GeomFromText;
+DROP ALIAS Envelope;
+DROP ALIAS GetSRID;
+DROP ALIAS GeometryType;
+COMMIT;
