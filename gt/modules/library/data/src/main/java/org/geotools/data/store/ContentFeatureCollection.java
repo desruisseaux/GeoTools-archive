@@ -1,4 +1,4 @@
-package org.geotools.data;
+package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,19 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.store.ContentDataStore;
-import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.data.store.ContentFeatureStore;
-import org.geotools.data.store.ContentState;
-import org.geotools.data.store.FeatureIteratorIterator;
-import org.geotools.factory.Hints;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.Query;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.SortBy;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
@@ -30,18 +32,20 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
-import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.Filter;
 
-public abstract class AbstractContentFeatureCollection implements ContentFeatureCollection {
-
-    /**
-     * data store the collection originated from
-     */
-    protected ContentDataStore dataStore;
+public class ContentFeatureCollection implements FeatureCollection {
+    
     /**
      * feature store the collection originated from.
      */
     protected ContentFeatureSource featureSource;
+    protected Query query;
+    
+    /**
+     * feature (possibly retyped from feautre source original) type
+     */
+    protected SimpleFeatureType featureType;
     /**
      * state of the feature source 
      */
@@ -53,9 +57,6 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
     /** Set of open resource iterators */
     protected final Set open = new HashSet();
     
-    /** hints */
-    protected Hints hints = new Hints(Collections.EMPTY_MAP);
-    
     /**
      * feature listener which listens to the feautre source and 
      * forwards events to its listeners.
@@ -64,7 +65,7 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         public void changed(FeatureEvent featureEvent) {
             if( listeners.isEmpty() ) return;
 
-            FeatureCollection collection = (FeatureCollection) AbstractContentFeatureCollection.this;
+            FeatureCollection collection = (FeatureCollection) ContentFeatureCollection.this;
             CollectionEvent event = new CollectionEvent( collection, featureEvent );
 
             CollectionListener[] notify = (CollectionListener[]) listeners.toArray( new CollectionListener[ listeners.size() ]);
@@ -81,25 +82,25 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         }           
     };
     
-    protected AbstractContentFeatureCollection( ContentFeatureStore featureSource, ContentState state ) {
+    protected ContentFeatureCollection( ContentFeatureSource featureSource, Query query ) {
         this.featureSource = featureSource;
-        this.dataStore = featureSource.getDataStore();
-        this.state = state;
+        this.query = query;
         
         //add the feautre source listener
         featureSource.addFeatureListener(listener);
+        
+        //retype feature type if necessary
+        if ( query.getPropertyNames() != Query.ALL_NAMES ) {
+            this.featureType = 
+                SimpleFeatureTypeBuilder.retype(featureSource.getSchema(), query.getPropertyNames() );
+        }
+        else {
+            this.featureType = featureSource.getSchema();
+        }
     }
     
     public SimpleFeatureType getSchema() {
-        return featureSource.getSchema();
-    }
-    
-    public void setHints(Hints hints) {
-        this.hints = hints;
-    }
-    
-    public Hints getHints() {
-        return hints;
+        return featureType;
     }
     
     //Visitors
@@ -108,16 +109,23 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
      * @throws IOException 
      */
     public void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        Iterator iterator = null;
-        // if( progress == null ) progress = new NullProgressListener();
+        accepts( (org.opengis.feature.FeatureVisitor) visitor, 
+            (org.opengis.util.ProgressListener) progress );
+    }
+
+    public void accepts(org.opengis.feature.FeatureVisitor visitor,
+            org.opengis.util.ProgressListener progress) throws IOException {
+        if( progress == null ) progress = new NullProgressListener();
+        
+        FeatureReader reader = featureSource.getReader(query);
         try{
             float size = size();
             float position = 0;            
             progress.started();
-            for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext();){
+            while( reader.hasNext() ){
                 if (size > 0) progress.progress( position++/size );
                 try {
-                    SimpleFeature feature = (SimpleFeature) iterator.next();
+                    SimpleFeature feature = reader.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){
@@ -127,12 +135,8 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         }
         finally {
             progress.complete();            
-            close( iterator );
+            reader.close();
         }
-    }
-
-    public void accepts(org.opengis.feature.FeatureVisitor visitor,
-            org.opengis.util.ProgressListener progress) throws IOException {
     }
     
     
@@ -156,57 +160,183 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
     }
     
     // Iterators
-    //public FeatureIterator features(){
+    public static class WrappingFeatureIterator implements FeatureIterator {
+       
+        FeatureReader delegate;
+        
+        public WrappingFeatureIterator( FeatureReader delegate ) {
+            this.delegate = delegate;
+        }
+        
+        public boolean hasNext() {
+            try {
+                return delegate.hasNext();    
+            }
+            catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
+            
+        }
+
+        public SimpleFeature next() throws java.util.NoSuchElementException {
+            try {
+                return delegate.next();    
+            }
+            catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
+        }
+
+        public void close() {
+            try {
+                delegate.close();    
+            }
+            catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
+            
+        }
+    }
+    
     public FeatureIterator features(){
         try {
-            return open( createFeatureIterator() );
-        } 
-        catch (Exception e) {
+            return new WrappingFeatureIterator( featureSource.getReader(query) );    
+        }
+        catch( IOException e ) {
             throw new RuntimeException( e );
         }
     }
-    protected abstract FeatureIterator createFeatureIterator() throws Exception;
     
-    public FeatureIterator writer() {
-        try {
-            return open( createFeatureWriter() );
-        } 
-        catch (Exception e) {
-            throw new RuntimeException( e );
-        }
-    }
-    protected abstract FeatureIterator createFeatureWriter() throws Exception;
-    
-    public FeatureIterator inserter() {
-        try {
-            return open( createFeatureInserter() );
-        } 
-        catch (Exception e) {
-            throw new RuntimeException( e );
-        }
-    }
-    protected abstract FeatureIterator createFeatureInserter() throws Exception;
-    
-    protected FeatureIterator open( FeatureIterator iterator ) {
-        // keep track of the iterator
-        open.add( iterator );
-        return iterator;
-    }
     public void close( FeatureIterator iterator ) {
         iterator.close();
-        open.remove( iterator );
+    }
+    
+    public static class WrappingIterator implements Iterator {
+    
+        FeatureReader delegate;
+        
+        public  WrappingIterator( FeatureReader delegate ) {
+            this.delegate = delegate;
+        }
+        
+        public boolean hasNext() {
+            try {
+                return delegate.hasNext();    
+            }
+            catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
+            
+        }
+
+        public Object next() {
+            try {
+                return delegate.next();    
+            }
+            catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
+        }
+
+    
+       public void remove() {
+           throw new UnsupportedOperationException();
+       }
     }
     
     public Iterator iterator() {
-        FeatureIterator iterator = features();
-        return new FeatureIteratorIterator( iterator );
+        try {
+            return new WrappingIterator( featureSource.getReader(query) );    
+        }
+        catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
     }
     
     public void close(Iterator close) {
-        if ( close instanceof FeatureIteratorIterator ) {
-            FeatureIteratorIterator iterator = (FeatureIteratorIterator) close;
-            close( iterator.getDelegate() );
+        try {
+            ((WrappingIterator)close).delegate.close();    
         }
+        catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
+    }
+    
+    public ReferencedEnvelope getBounds() {
+        try {
+            return featureSource.getBounds(query);    
+        }
+        catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
+    }
+    
+    public int size() {
+        try {
+           return featureSource.getCount(query);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    public boolean add(Object o) {
+        return addAll(Collections.singletonList(o));
+    }
+
+    ContentFeatureStore ensureFeatureStore() {
+        if ( featureSource instanceof ContentFeatureStore ) {
+            return (ContentFeatureStore) featureSource;
+        }
+        
+        throw new UnsupportedOperationException( "read only" );
+    }
+    public boolean addAll(Collection c) {
+        ContentFeatureStore featureStore = ensureFeatureStore();
+        
+        try {
+            Set ids = featureStore.addFeatures(c);
+            return ids.size() == c.size();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void clear() {
+        ContentFeatureStore featureStore = ensureFeatureStore();
+        
+        try { 
+            featureStore.removeFeatures(query.getFilter());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void purge() {
+        //do nothing
+    }
+    
+    public FeatureCollection sort(SortBy order) {
+        return sort( (org.opengis.filter.sort.SortBy) order );
+    }
+    
+    public FeatureCollection sort(org.opengis.filter.sort.SortBy sort) {
+        Query query = new DefaultQuery();
+        ((DefaultQuery)query).setSortBy( new org.opengis.filter.sort.SortBy[]{sort});
+
+        query = DataUtilities.mixQueries( this.query, query, null );
+        return new ContentFeatureCollection( featureSource, query );    
+    }
+    
+    public FeatureCollection subCollection(Filter filter) {
+        Query query = new DefaultQuery();
+        ((DefaultQuery)query).setFilter( filter );
+        
+        query = DataUtilities.mixQueries(this.query, query, null);
+        return new ContentFeatureCollection( featureSource, query );    
     }
     
     //Unsupported
@@ -214,7 +344,7 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         throw new UnsupportedOperationException();
     }
 
-    public boolean containsAll(Collection arg0) {
+    public boolean containsAll(Collection collection) {
         throw new UnsupportedOperationException();
     }
 
@@ -222,11 +352,11 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         throw new UnsupportedOperationException();
     }
 
-    public boolean removeAll(Collection arg0) {
+    public boolean removeAll(Collection collection) {
         throw new UnsupportedOperationException();
     }
 
-    public boolean retainAll(Collection arg0) {
+    public boolean retainAll(Collection collection) {
         throw new UnsupportedOperationException();
     }
 
@@ -234,11 +364,7 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
         throw new UnsupportedOperationException();
     }
 
-    public Object[] toArray(Object[] arg0) {
-        throw new UnsupportedOperationException();
-    }
-
-    public FeatureCollection sort(SortBy order) {
+    public Object[] toArray(Object[] array) {
         throw new UnsupportedOperationException();
     }
 
@@ -358,4 +484,5 @@ public abstract class AbstractContentFeatureCollection implements ContentFeature
     public void setValue(Object value) {
         throw new UnsupportedOperationException();
     }
+    
 }

@@ -16,14 +16,20 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureLock;
+import org.geotools.data.FeatureLockException;
+import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
-import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -63,91 +69,222 @@ import org.opengis.filter.Filter;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public abstract class ContentFeatureStore extends ContentFeatureSource implements FeatureStore {
-    public ContentFeatureStore(ContentEntry entry) {
-        super(entry);
+public abstract class ContentFeatureStore extends ContentFeatureSource implements FeatureStore, FeatureLocking {
+
+    /**
+     * writer flags
+     */
+    protected final int WRITER_ADD = ContentDataStore.WRITER_ADD;
+    protected final int WRITER_UPDATE = ContentDataStore.WRITER_UPDATE;
+    
+    /**
+     * current feature lock
+     */
+    protected FeatureLock lock = FeatureLock.TRANSACTION;
+    
+    /**
+     * Creates the content feature store.
+     * 
+     * @param entry The entry for the feature store.
+     * @param query The defining query.
+     */
+    public ContentFeatureStore(ContentEntry entry,Query query) {
+        super(entry,query);
     }
     
     /**
-     * Adds a feature collection to the feature store.
+     * Returns a writer over features specified by a filter.
+     * 
+     * @param filter The filter
+     */
+    public final FeatureWriter getWriter( Filter filter ) throws IOException {
+        return getWriter( filter, WRITER_ADD | WRITER_UPDATE );
+    }
+    
+    /**
+     * Returns a writer over features specified by a filter.
+     * 
+     * @param filter The filter
+     * @param flags flags specifying writing mode
+     */
+    public final FeatureWriter getWriter( Filter filter, int flags  ) throws IOException {
+        return getWriter( new DefaultQuery( getSchema().getTypeName(), filter ), flags );
+    }
+    
+    /**
+     * Returns a writer over features specified by a query.
+     * 
+     * @param query The query
+     */
+    public final FeatureWriter getWriter( Query query ) throws IOException {
+        return getWriter( query, WRITER_ADD | WRITER_UPDATE );
+    }
+    
+    /**
+     * Returns a writer over features specified by a query.
+     * 
+     * @param query The query
+     * @param flags flags specifying writing mode
+     */
+    public final FeatureWriter getWriter( Query query, int flags ) throws IOException {
+        query = joinQuery( query );
+        
+        //apply wrappers
+        return getWriterInternal( query, flags );
+    }
+    
+    /**
+     * 
+     * Subclass method for returning a native writer from the datastore.
      * <p>
-     * This method delegates to the {@link FeatureCollection#add(Object)}
-     * method of the feature collection created by {@link #all(ContentState)}.
+     * It is important to note that if the native writer intends to handle any 
+     * of the following natively:
+     * <ul>
+     *   <li>reprojection</li>
+     *   <li>filtering</li>
+     *   <li>max feature limiting</li>
+     *   <li>sorting<li>
+     * </ul>
+     * Then it <b>*must*</b> set the corresponding flags to <code>true</code>:
+     * <ul>
+     *   <li>{@link #canReproject()}</li>
+     *   <li>{@link #canFilter()}</li>
+     *   <li>{@link #canLimit()}</li>
+     *   <li>{@link #canSort()}<li>
+     * </ul>
      * </p>
+     * 
+     */
+    protected abstract FeatureWriter getWriterInternal( Query query, int flags ) 
+        throws IOException;
+    
+    /**
+     * Adds a collection of features to the store.
      * <p>
-     * <b>Note:</b>Persistent feature id's are reported back using 
-     * {@link Feature#getUserData()} under the "fid" key. 
+     * This method operates by getting an appending feature writer and writing 
+     * all the features in <tt>collection</tt> to it. Directly after a feature 
+     * is written its id is obtained and added to the returned set.
+     * </p>
+     */
+    public final Set<String> addFeatures(Collection collection)
+        throws IOException {
+        
+        //gather up id's
+        Set<String> ids = new TreeSet<String>();
+        
+        FeatureWriter writer = getWriter( Filter.INCLUDE, WRITER_ADD );
+        try {
+            for ( Iterator f = collection.iterator(); f.hasNext(); ) {
+                SimpleFeature feature = (SimpleFeature) f.next();
+                
+                // grab next feature and populate it
+                // JD: worth a note on how we do this... we take a "pull" approach 
+                // because the raw schema we are inserting into may not match the 
+                // schema of the features we are inserting
+                SimpleFeature toWrite = writer.next();
+                for ( int i = 0; i < toWrite.getAttributeCount(); i++ ) {
+                    String name = toWrite.getType().getAttribute(i).getLocalName();
+                    toWrite.setAttribute( name, feature.getAttribute(name));
+                }
+                
+                //perform the write
+                writer.write();
+                
+                //add the id to the set of inserted
+                ids.add( toWrite.getID() );
+            }
+        } 
+        finally {
+            writer.close();
+        }
+        
+        return ids;
+    }
+    
+    /**
+     * Adds a collection of features to the store.
+     * <p>
+     * This method calls through to {@link #addFeatures(Collection)}.
      * </p>
      */
     public final Set<String> addFeatures(FeatureCollection collection)
         throws IOException {
         
-        //grab all the features
-        FeatureCollection all = all(entry.getState(transaction));
-        
-        //gather up id's
-        Set<String> ids = new TreeSet<String>();
-        
-        for ( Iterator<SimpleFeature> i = collection.iterator(); i.hasNext(); ) {
-            SimpleFeature feature = i.next();
-            if ( all.add( feature ) ) {
-                String fid = (String) feature.getUserData().get( "fid" );
-                if ( fid != null ) {
-                    ids.add( fid );
-                }
-                else {
-                    ids.add( feature.getID() );
-                }
-            }
-            
-        }
-        
-        return ids;
+       return addFeatures( (Collection) collection );
     }
 
     /**
-     * Sets the features of the feature source.
-     * <p>
-     * This method delegates to the {@link FeatureCollection#clear()} and 
-     * {@link FeatureCollection#add(Object)} methods of the feature collection
-     * created by {@link #all(ContentState)}.
-     * </p>
+     * Sets the feature of the source.
      * <p>
      * This method operates by first clearing the contents of the feature 
-     * collection, then adding features produced by <tt>reader</tt>.
+     * store ({@link #removeFeatures(Filter)}), and then obtaining an appending
+     * feature writer and writing all features from <tt>reader</tt> to it.
      * </p>
      */
     public final void setFeatures(FeatureReader reader) throws IOException {
-        FeatureCollection features = all( getState() );
-        features.clear();
+        //remove features
+        removeFeatures( Filter.INCLUDE );
         
-        while( reader.hasNext() ) {
-            features.add( reader.next() );
+        //grab a feature writer for insert
+        FeatureWriter writer = getWriter( Filter.INCLUDE, WRITER_ADD );
+        try {
+            while( reader.hasNext() ) {
+                SimpleFeature feature = reader.next();
+                
+                // grab next feature and populate it
+                // JD: worth a note on how we do this... we take a "pull" approach 
+                // because the raw schema we are inserting into may not match the 
+                // schema of the features we are inserting
+                SimpleFeature toWrite = writer.next();
+                for ( int i = 0; i < toWrite.getAttributeCount(); i++ ) {
+                    String name = toWrite.getType().getAttribute(i).getLocalName();
+                    toWrite.setAttribute( name, feature.getAttribute(name));
+                }
+                
+                //perform the write
+                writer.write();
+            }
+        }
+        finally {
+            writer.close();
         }
     }
     
     /**
-     * Modifies or updates the features of a feature store which match the 
-     * specified filter.
+     * Modifies/updates the features of the store which match the specified filter.
      * <p>
-     * This method delegates to the {@link FeatureCollection#update(AttributeDescriptor[], Object[] value)}
-     * method of the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * This method operates by obtaining an updating feature writer based on the
+     * specified <tt>filter</tt> and writing the updated values to it.
      * </p>
      * <p>
      * The <tt>filter</tt> must not be <code>null</code>, in this case this method
      * will throw an {@link IllegalArgumentException}.
      * </p>
      */
-    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
+    public final void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException {
         if ( filter == null ) {
             String msg = "Must specify a filter, must not be null.";
             throw new IllegalArgumentException( msg );
         }
         
-        //TODO: implement and make final when datastore api is changed.
-        //FeatureCollection features = filtered(getState(), filter);
-        //features.update(type, value);
+        //grab a feature writer
+        FeatureWriter writer = getWriter( filter, WRITER_UPDATE );
+        try {
+            while( writer.hasNext() ) {
+                SimpleFeature toWrite = writer.next();
+                
+                for ( int i = 0; i < type.length; i++ ) {
+                    toWrite.setAttribute( type[i].getName(), value[i] );
+                }
+                
+                writer.write();
+            }
+            
+        }
+        finally {
+            writer.close();
+        }
     }
 
     /**
@@ -160,11 +297,10 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
     }
 
     /**
-     * Removes the features from the feature store which match the specified 
-     * filter.
+     * Removes the features from the store which match the specified filter.
      * <p>
-     * This method delegates to the {@link FeatureCollection#clear()} method of
-     * the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * This method operates by obtaining an updating feature writer based on 
+     * the specified <tt>filter</tt> and removing every feature from it.
      * </p>
      * <p>
      * The <tt>filter</tt> must not be <code>null</code>, in this case this method
@@ -177,6 +313,116 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
             throw new IllegalArgumentException( msg );
         }
         
-        filtered( getState(), filter ).clear();
+        //grab a feature writer
+        FeatureWriter writer = getWriter( filter, WRITER_UPDATE );
+        try {
+            //remove everything
+            while( writer.hasNext() ) {
+                writer.next();
+                writer.remove();
+                writer.write();
+            }
+            
+        }
+        finally {
+            writer.close();
+        }
+    }
+    
+    /**
+     * Sets the feature lock of the feature store.
+     */
+    public final void setFeatureLock(FeatureLock lock) {
+        this.lock = lock;
+    }
+
+    /**
+     * Locks all features.
+     * <p>
+     * This method calls through to {@link #lockFeatures(Filter)}.
+     * </p>
+     */
+    public final int lockFeatures() throws IOException {
+        return lockFeatures(Filter.INCLUDE);
+    }
+    
+    /**
+     * Locks features specified by a query.
+     * <p>
+     * This method calls through to {@link #lockFeatures(Filter)}.
+     * </p>
+     */
+    public final int lockFeatures(Query query) throws IOException {
+        return lockFeatures( query.getFilter() );
+    }
+
+    /**
+     * Locks features specified by a filter.
+     */
+    public final int lockFeatures(Filter filter) throws IOException {
+        String typeName = getSchema().getTypeName(); 
+        
+        FeatureReader reader = getReader(filter);
+        try {
+            int locked = 0;
+            while( reader.hasNext() ) {
+                try {
+                    SimpleFeature feature = reader.next();
+                    getDataStore().getLockingManager()
+                        .lockFeatureID(typeName, feature.getID(), transaction, lock);    
+                    locked++;
+                }
+                catch( FeatureLockException e ) {
+                    //ignore
+                    //TODO: log this
+                }
+            }
+            
+            return locked;
+        }
+        finally {
+            reader.close();
+        }
+    }
+
+    /**
+     * Unlocks all features.
+     * <p>
+     * This method calls through to {@link #unLockFeatures(Filter)}.
+     * </p>
+     * 
+     */
+    public final void unLockFeatures() throws IOException {
+        unLockFeatures(Filter.INCLUDE);
+    }
+    
+    /**
+     * Unlocks features specified by a query.
+     * <p>
+     * This method calls through to {@link #unLockFeatures(Filter)}.
+     * </p>
+     * 
+     */
+    public final void unLockFeatures(Query query) throws IOException {
+        unLockFeatures(query.getFilter());
+    }
+    
+    /**
+     * Unlocks features specified by a filter.
+     */
+    public final void unLockFeatures(Filter filter) throws IOException {
+        String typeName = getSchema().getTypeName(); 
+        
+        FeatureReader reader = getReader(filter);
+        try {
+            while( reader.hasNext() ) {
+                SimpleFeature feature = reader.next();
+                getDataStore().getLockingManager()
+                    .unLockFeatureID(typeName, feature.getID(), transaction, lock);    
+            }
+        }
+        finally {
+            reader.close();
+        }
     }
 }
