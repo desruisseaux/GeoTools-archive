@@ -32,7 +32,13 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
     protected JDBCDataStoreAPITestSetup(JDBCTestSetup delegate) {
         this.delegate = delegate;
     }
-
+    
+    public void setUp() throws Exception {
+        super.setUp();
+        
+        delegate.setUp();
+    }
+    
     protected final void initializeDatabase() throws Exception {
         delegate.initializeDatabase();
     }
