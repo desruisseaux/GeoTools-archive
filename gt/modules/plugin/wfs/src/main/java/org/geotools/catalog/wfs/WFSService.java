@@ -17,7 +17,6 @@ package org.geotools.catalog.wfs;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +31,11 @@ import org.geotools.catalog.ServiceInfo;
 import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
 import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.catalog.defaults.DefaultServiceInfo;
-import org.geotools.data.DataStore;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.util.ProgressListener;
 import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
 import org.geotools.xml.wfs.WFSSchema;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -53,7 +50,7 @@ public class WFSService extends AbstractService {
     private List members = null;
     private ServiceInfo info = null;
     private Throwable msg = null;
-    private MyWFSDataStore ds = null;
+    private WFSDataStore ds = null;
 
     public WFSService(Catalog parent, URI uri, Map params) {
         super(parent);
@@ -152,15 +149,15 @@ public class WFSService extends AbstractService {
         return params;
     }
 
-    MyWFSDataStore getDS() throws IOException {
+    WFSDataStore getDS() throws IOException {
         if (ds == null) {
-            synchronized (MyWFSDataStore.class) {
+            synchronized (WFSDataStore.class) {
                 if (ds == null) {
-                    WFSDataStoreFactory dsf = new MyWFSDataStoreFactory();
+                    WFSDataStoreFactory dsf = new WFSDataStoreFactory();
 
                     if (dsf.canProcess(params)) {
                         try {
-                            ds = (MyWFSDataStore) dsf.createDataStore(params);
+                            ds = (WFSDataStore) dsf.createDataStore(params);
                         } catch (IOException e) {
                             msg = e;
                             throw e;
@@ -207,90 +204,10 @@ public class WFSService extends AbstractService {
         return uri;
     }
 
-    private static class MyWFSDataStoreFactory extends WFSDataStoreFactory {
-        public DataStore createNewDataStore(Map params)
-            throws IOException {
-            URL host = (URL) URL.lookUp(params);
-
-            Boolean protocol = (Boolean) PROTOCOL.lookUp(params);
-
-            String user;
-            String pass;
-            user = pass = null;
-
-            int timeout = 3000;
-            int buffer = 10;
-            boolean tryGZIP=true;
-            
-            if (params.containsKey(TIMEOUT.key)) {
-                Integer i = (Integer) TIMEOUT.lookUp(params);
-
-                if (i != null) {
-                    timeout = i.intValue();
-                }
-            }
-
-            if (params.containsKey(BUFFER_SIZE.key)) {
-                Integer i = (Integer) BUFFER_SIZE.lookUp(params);
-
-                if (i != null) {
-                    buffer = i.intValue();
-                }
-            }
-
-            if (params.containsKey(TRY_GZIP.key)) {
-                Boolean b = (Boolean) TRY_GZIP.lookUp(params);
-                if(b!=null)
-                    tryGZIP = b.booleanValue();
-            }
-
-            if (params.containsKey(USERNAME.key)) {
-                user = (String) USERNAME.lookUp(params);
-            }
-
-            if (params.containsKey(PASSWORD.key)) {
-                pass = (String) PASSWORD.lookUp(params);
-            }
-
-            if (((user == null) && (pass != null))
-                    || ((pass == null) && (user != null))) {
-                throw new IOException("Username / password cannot be null");
-            }
-
-            DataStore ds = null;
-
-            try {
-                ds = new MyWFSDataStore(host, protocol, user, pass, timeout,
-                        buffer, tryGZIP);
-                cache.put(params, ds);
-            } catch (SAXException e) {
-                throw new RuntimeException(e);
-            }
-
-            return ds;
-        }
-    }
-
-    static class MyWFSDataStore extends WFSDataStore {
-        MyWFSDataStore(URL host, Boolean protocol, String username,
-            String password, int timeout, int buffer, boolean tryGZIP)
-            throws SAXException, IOException {
-            super(host, protocol, username, password, timeout, buffer, tryGZIP);
-        }
-
-        public WFSCapabilities getCapabilities() {
-            return capabilities;
-        }
-
-        protected static URL createGetCapabilitiesRequest(URL host) {
-            return WFSDataStore.createGetCapabilitiesRequest(host);
-        }
-    }
-
     private class IServiceWFSInfo extends DefaultServiceInfo {
         private WFSCapabilities caps = null;
 
-        IServiceWFSInfo(MyWFSDataStore resource) {
+        IServiceWFSInfo(WFSDataStore resource) {
             super();
 
             try {

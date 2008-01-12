@@ -25,7 +25,6 @@ import java.util.Map;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.ServiceFactory;
-import org.geotools.catalog.wfs.WFSService.MyWFSDataStore;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 
 
@@ -74,7 +73,7 @@ public class WFSServiceFactory implements ServiceFactory {
             if (id == null) {
                 URL base = (URL) params.get(WFSDataStoreFactory.URL.key);
                 base = (base == null) ? null
-                                      : MyWFSDataStore
+                                      : WFSDataStoreFactory
                         .createGetCapabilitiesRequest(base);
 
                     return new WFSService(parent,

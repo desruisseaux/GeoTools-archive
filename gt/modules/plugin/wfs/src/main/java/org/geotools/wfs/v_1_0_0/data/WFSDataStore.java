@@ -23,10 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -65,7 +62,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
-import org.geotools.xml.DocumentFactory;
+import org.geotools.wfs.io.WFSConnectionFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
@@ -85,98 +82,77 @@ import org.xml.sax.SAXException;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-
 /**
  * <p>
  * DOCUMENT ME!
  * </p>
- *
+ * 
  * @author dzwiers
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_0_0/data/WFSDataStore.java $
  */
 public class WFSDataStore extends AbstractDataStore {
     public static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.1.1.0");
 
     protected WFSCapabilities capabilities = null;
-    
+
     protected static final int AUTO_PROTOCOL = 3;
+
     protected static final int POST_PROTOCOL = 1;
+
     protected static final int GET_PROTOCOL = 2;
-    
+
     protected int protocol = AUTO_PROTOCOL; // visible for transaction
-    protected Authenticator auth = null; // visible for transaction
-    
-    private int bufferSize = 10;
-    private int timeout = 10000;
-    private final boolean tryGZIP;
+
+    private final int bufferSize;
+
+    private final int timeout;
+
     protected WFSStrategy strategy;
-    
-    protected String encoding = "UTF-8";
 
     private boolean lenient;
 
-    /**
-     * Construct <code>WFSDataStore</code>.
-     *
-     * Should NEVER be called!
-     */
-    private WFSDataStore() {
-    	// not called
-    	tryGZIP=true;
-    }
-    
-    public WFSDataStore(URL host, Boolean protocol, String username,
-            String password, int timeout, int buffer, boolean tryGZIP, boolean lenient,String encoding) 
-    	throws SAXException, IOException {
-    	 this( host, protocol, username, password, timeout, buffer, tryGZIP, lenient);
-    	 if (encoding != null){
-         	this.encoding = encoding;
-         }
-	}
-    
-    /**
-     * Construct <code>WFSDataStore</code>.
-     *
-     * @param host - may not yet be a capabilities url
-     * @param protocol - true,false,null (post,get,auto)
-     * @param username - iff password
-     * @param password - iff username
-     * @param timeout - default 3000 (ms)
-     * @param buffer - default 10 (features)
-     * @param tryGZIP - indicates to use GZIP if server supports it.
-     * 
-     * @throws SAXException
-     * @throws IOException
-     */
-    protected WFSDataStore(URL host, Boolean protocol, String username,
-        String password, int timeout, int buffer, boolean tryGZIP )
-    throws SAXException, IOException {
-        this( host, protocol, username, password, timeout, buffer, tryGZIP, false);
-    }
-    /**
-     * Construct <code>WFSDataStore</code>.
-     *
-     * @param host - may not yet be a capabilities url
-     * @param protocol - true,false,null (post,get,auto)
-     * @param username - iff password
-     * @param password - iff username
-     * @param timeout - default 3000 (ms)
-     * @param buffer - default 10 (features)
-     * @param tryGZIP - indicates to use GZIP if server supports it.
-     * @param lenient - if true the parsing will be very forgiving to bad data.  Errors will be logged rather than exceptions.
-     * 
-     * @throws SAXException
-     * @throws IOException
-     */
-    protected WFSDataStore(URL host, Boolean protocol, String username,
-        String password, int timeout, int buffer, boolean tryGZIP, boolean lenient)
-        throws SAXException, IOException {
-        super(true);
+    WFSConnectionFactory connectionFactory;
 
-        this.lenient=lenient;
-        if ((username != null) && (password != null)) {
-            auth = new WFSAuthenticator(username, password);
-        }
+    private String[] typeNames = null;
+
+    private Map<String, SimpleFeatureType> featureTypeCache = new HashMap<String, SimpleFeatureType>();
+
+    private Map fidMap = new HashMap();
+
+    private Map xmlSchemaCache = new HashMap();
+
+    /**
+     * Construct <code>WFSDataStore</code>.
+     * 
+     * @param host -
+     *            may not yet be a capabilities url
+     * @param protocol -
+     *            true,false,null (post,get,auto)
+     * @param username -
+     *            iff password
+     * @param password -
+     *            iff username
+     * @param timeout -
+     *            default 3000 (ms)
+     * @param buffer -
+     *            default 10 (features)
+     * @param tryGZIP -
+     *            indicates to use GZIP if server supports it.
+     * @param lenient -
+     *            if true the parsing will be very forgiving to bad data. Errors
+     *            will be logged rather than exceptions.
+     * 
+     * @throws SAXException
+     * @throws IOException
+     */
+    public WFSDataStore(WFSCapabilities capabilities, Boolean protocol,
+            WFSConnectionFactory connectionFactory, int timeout, int buffer, boolean lenient)
+            throws SAXException, IOException {
+        super(true);
+        this.capabilities = capabilities;
+        this.connectionFactory = connectionFactory;
+        this.lenient = lenient;
 
         if (protocol == null) {
             this.protocol = AUTO_PROTOCOL;
@@ -190,123 +166,25 @@ public class WFSDataStore extends AbstractDataStore {
 
         this.timeout = timeout;
         this.bufferSize = buffer;
-        this.tryGZIP=tryGZIP;
-        findCapabilities(host);
-        determineCorrectStrategy(host);
-    }
-    private void determineCorrectStrategy(URL host) {
-        if( host.toString().indexOf("mapserv")!=-1 )
-            strategy=new MapServerWFSStrategy(this);
-        else
-            strategy=new StrictWFSStrategy(this);
-    }
-    
-    private void findCapabilities(URL host) throws SAXException, IOException {
-
-        // TODO support using POST for getCapabilities
-        
-        Object t = null;
-        Map hints = new HashMap();
-        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
-        try{
-            // try and complete the url first
-            HttpURLConnection hc = getConnection(createGetCapabilitiesRequest(host),auth,false);            
-            InputStream is = getInputStream(hc);
-            t = DocumentFactory.getInstance(is, hints, LOGGER.getLevel());
-        }catch(Throwable e){
-            // try the url as given second
-            HttpURLConnection hc = getConnection(host,auth,false);
-            InputStream is = getInputStream(hc);
-            t = DocumentFactory.getInstance(is, hints, LOGGER.getLevel());
-        }
-        if (t instanceof WFSCapabilities) {
-            capabilities = (WFSCapabilities) t;
-        } else {
-            throw new SAXException(
-            "The specified URL Should have returned a 'WFSCapabilities' object. Returned a "
-            + ((t == null) ? "null value." : (t.getClass().getName() + " instance.")));
-        }
+        determineCorrectStrategy();
     }
 
-    protected HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost ) throws IOException{
-        
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        
-        if(isPost){
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-type", "text/xml, application/xml");
-        }else{
-            connection.setRequestMethod("GET");
-        }
-        connection.setDoInput(true);
-        /*
-         * FIXME this could breaks uDig. Not quite sure what to do otherwise.
-         * Maybe have a mechanism that would allow an authenticator to ask the 
-         * datastore itself for a previously supplied user/pass.
-         */
-        if (auth != null) {
-            synchronized (Authenticator.class) {
-                    Authenticator.setDefault(auth);
-                    connection.connect();
-                    Authenticator.setDefault(null);
-            }
-        }
-        
-        if (this.tryGZIP ){
-    		connection.addRequestProperty("Accept-Encoding", "gzip");	
-        }
-
-        return connection;
-    }
-
-    protected static URL createGetCapabilitiesRequest(URL host) {
+    private void determineCorrectStrategy() {
+        URL host = capabilities.getGetCapabilities().getGet();
         if (host == null) {
-            return null;
+            host = capabilities.getGetCapabilities().getPost();
         }
-
-        String url = host.toString();
-
-        if (host.getQuery() == null) {
-            url += "?SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities";
-        } else {
-            String t = host.getQuery().toUpperCase();
-
-            if (t.indexOf("SERVICE") == -1) {
-                url += "&SERVICE=WFS";
-            }
-
-            if (t.indexOf("VERSION") == -1) {
-                url += "&VERSION=1.0.0";
-            }
-
-            if (t.indexOf("REQUEST") == -1) {
-                url += "&REQUEST=GetCapabilities";
-            }
-        }
-
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            LOGGER.warning(e.toString());
-
-            return host;
-        }
+        if (host.toString().indexOf("mapserv") != -1)
+            strategy = new MapServerWFSStrategy(this);
+        else
+            strategy = new StrictWFSStrategy(this);
     }
-
-    private String[] typeNames = null;
-    
-    private Map<String,SimpleFeatureType> featureTypeCache = new HashMap<String,SimpleFeatureType>();
-
-	private Map fidMap=new HashMap();
-
-    private Map xmlSchemaCache=new HashMap();
 
     /**
      * @see org.geotools.data.AbstractDataStore#getTypeNames()
      */
     public String[] getTypeNames() {
-        if(typeNames == null){
+        if (typeNames == null) {
             List l = capabilities.getFeatureTypes();
             typeNames = new String[l.size()];
 
@@ -322,23 +200,24 @@ public class WFSDataStore extends AbstractDataStore {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param typeName DOCUMENT ME!
-     *
+     * 
+     * @param typeName
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
+     * 
      * @throws IOException
-     *
+     * 
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
     public SimpleFeatureType getSchema(String typeName) throws IOException {
         if (featureTypeCache.containsKey(typeName)) {
             return featureTypeCache.get(typeName);
         }
-        
+
         // TODO sanity check for request with capabilities obj
 
-        SimpleFeatureType t=null;
+        SimpleFeatureType t = null;
         SAXException sax = null;
         IOException io = null;
         if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
@@ -365,25 +244,26 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
 
-        if(t == null && sax!=null)
+        if (t == null && sax != null)
             throw new DataSourceException(sax);
 
-        if(t == null && io!=null)
+        if (t == null && io != null)
             throw io;
-        
-        //set crs?
-        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,typeName);
+
+        // set crs?
+        FeatureSetDescription fsd = WFSCapabilities
+                .getFeatureSetDescription(capabilities, typeName);
         String crsName = null;
         String ftName = null;
-        if(fsd != null){
+        if (fsd != null) {
             crsName = fsd.getSRS();
             ftName = fsd.getName();
-        
+
             CoordinateReferenceSystem crs;
             try {
-                if(crsName!=null){
+                if (crsName != null) {
                     crs = CRS.decode(crsName);
-            	    t = WFSFeatureTypeTransformer.transform(t,crs);
+                    t = WFSFeatureTypeTransformer.transform(t, crs);
                 }
             } catch (FactoryException e) {
                 LOGGER.warning(e.getMessage());
@@ -391,96 +271,58 @@ public class WFSDataStore extends AbstractDataStore {
                 LOGGER.warning(e.getMessage());
             }
         }
-        
-        if(ftName!=null){
+
+        if (ftName != null) {
             SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
-            build.init( t );
-            build.setName( ftName );
-                
+            build.init(t);
+            build.setName(ftName);
+
             t = build.buildFeatureType();
-//            	t = FeatureTypeBuilder.newFeatureType(
-//            	        t.getAttributeTypes(),
-//            	        ftName==null?typeName:ftName,
-//    	                t.getNamespace(),
-//    	                t.isAbstract(),
-//    	                t.getAncestors(),
-//    	                t.getDefaultGeometry());                
+            // t = FeatureTypeBuilder.newFeatureType(
+            // t.getAttributeTypes(),
+            // ftName==null?typeName:ftName,
+            // t.getNamespace(),
+            // t.isAbstract(),
+            // t.getAncestors(),
+            // t.getDefaultGeometry());
         }
-        try{
-            URL url = getDescribeFeatureTypeURLGet(typeName);
-            if( url!=null ) {
+        try {
+            URL url = connectionFactory.getDescribeFeatureTypeURLGet(typeName);
+            if (url != null) {
                 SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
-                build.init( t );
-                build.setNamespaceURI( url.toURI() );
-                t = build.buildFeatureType();                
-			}
-        }catch (URISyntaxException e) {
-            throw (RuntimeException) new RuntimeException( e );
+                build.init(t);
+                build.setNamespaceURI(url.toURI());
+                t = build.buildFeatureType();
+            }
+        } catch (URISyntaxException e) {
+            throw (RuntimeException) new RuntimeException(e);
         }
         if (t != null) {
-            featureTypeCache.put( typeName, t );
+            featureTypeCache.put(typeName, t);
         }
         return t;
     }
 
-    //  protected for testing
-    protected SimpleFeatureType getSchemaGet(String typeName)
-        throws SAXException, IOException {
-        URL getUrl = getDescribeFeatureTypeURLGet(typeName);
-        Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
-        if( getUrl==null )
+    // protected for testing
+    protected SimpleFeatureType getSchemaGet(String typeName) throws SAXException, IOException {
+        HttpURLConnection hc = connectionFactory.createDescribeFeatureTypeConnection(typeName,
+                false);
+        if (hc == null) {
             return null;
-        HttpURLConnection hc = getConnection(getUrl,auth,false);
+        }
 
-        InputStream is = getInputStream(hc);
+        InputStream is = connectionFactory.getInputStream(hc);
         Schema schema;
-        try{
+        try {
             schema = SchemaFactory.getInstance(null, is);
-        }finally{
+        } finally {
             is.close();
         }
         return parseDescribeFeatureTypeResponse(typeName, schema);
     }
 
-    private URL getDescribeFeatureTypeURLGet( String typeName ) throws MalformedURLException {
-        URL getUrl = capabilities.getDescribeFeatureType().getGet();
-        Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
-
-        if (getUrl == null) {
-            return null;
-        }
-
-        String query = getUrl.getQuery();
-        query = query == null?null:query.toUpperCase();
-        String url = getUrl.toString();
-
-        if ((query == null) || "".equals(query)) {
-            if ((url == null) || !url.endsWith("?")) {
-                url += "?";
-            }
-
-            url += "SERVICE=WFS";
-        } else {
-            if (query.indexOf("SERVICE=WFS") == -1) {
-                url += "&SERVICE=WFS";
-            }
-        }
-
-        if ((query == null) || (query.indexOf("VERSION") == -1)) {
-            url += "&VERSION=1.0.0";
-        }
-
-        if ((query == null) || (query.indexOf("REQUEST") == -1)) {
-            url += "&REQUEST=DescribeFeatureType";
-        }
-
-        url += ("&TYPENAME=" + typeName);
-
-        getUrl = new URL(url);
-        return getUrl;
-    }
-
-    static SimpleFeatureType parseDescribeFeatureTypeResponse( String typeName, Schema schema ) throws SAXException {
+    static SimpleFeatureType parseDescribeFeatureTypeResponse(String typeName, Schema schema)
+            throws SAXException {
         Element[] elements = schema.getElements();
 
         if (elements == null) {
@@ -492,9 +334,9 @@ public class WFSDataStore extends AbstractDataStore {
         String ttname = typeName.substring(typeName.indexOf(":") + 1);
 
         for (int i = 0; (i < elements.length) && (element == null); i++) {
-            // HACK -- namspace related -- should be checking ns as opposed to removing prefix
-            if (typeName.equals(elements[i].getName())
-                    || ttname.equals(elements[i].getName())) {
+            // HACK -- namspace related -- should be checking ns as opposed to
+            // removing prefix
+            if (typeName.equals(elements[i].getName()) || ttname.equals(elements[i].getName())) {
                 element = elements[i];
             }
         }
@@ -504,64 +346,60 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         SimpleFeatureType ft = GMLComplexTypes.createFeatureType(element);
-
-
         return ft;
     }
 
     // protected for testing
-    protected SimpleFeatureType getSchemaPost(String typeName)
-        throws IOException, SAXException {
-        URL postUrl = capabilities.getDescribeFeatureType().getPost();
-
-        if (postUrl == null) {
+    protected SimpleFeatureType getSchemaPost(String typeName) throws IOException, SAXException {
+        // getConnection(postUrl, tryGZIP, false, auth);
+        HttpURLConnection hc;
+        hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, true);
+        if (hc == null) {
             return null;
         }
-
-        HttpURLConnection hc = getConnection(postUrl,auth,true);
 
         // write request
         Writer osw = getOutputStream(hc);
         Map hints = new HashMap();
-        hints.put(DocumentWriter.BASE_ELEMENT,
-            WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
+        hints.put(DocumentWriter.BASE_ELEMENT, WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
         List l = capabilities.getFeatureTypes();
         Iterator it = l.iterator();
         URI uri = null;
-        while(it.hasNext() && uri == null){
-            FeatureSetDescription fsd = (FeatureSetDescription)it.next();
-            if(typeName.equals(fsd.getName()))
+        while (it.hasNext() && uri == null) {
+            FeatureSetDescription fsd = (FeatureSetDescription) it.next();
+            if (typeName.equals(fsd.getName()))
                 uri = fsd.getNamespace();
         }
-        if(uri!=null)
-            hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
-        
-        hints.put(DocumentWriter.ENCODING, encoding);
+        if (uri != null)
+            hints.put(DocumentWriter.SCHEMA_ORDER, new String[] { WFSSchema.NAMESPACE.toString(),
+                    uri.toString() });
+
+        hints.put(DocumentWriter.ENCODING, connectionFactory.getEncoding());
         try {
-            DocumentWriter.writeDocument(new String[] { typeName },
-                WFSSchema.getInstance(), osw, hints);
+            DocumentWriter.writeDocument(new String[] { typeName }, WFSSchema.getInstance(), osw,
+                    hints);
         } catch (OperationNotSupportedException e) {
             LOGGER.warning(e.getMessage());
             throw new SAXException(e);
         }
-        
+
         osw.flush();
         osw.close();
-        InputStream is = getInputStream(hc);
+        InputStream is = connectionFactory.getInputStream(hc);
 
         Schema schema;
-        try{
+        try {
             schema = SchemaFactory.getInstance(null, is);
-        }finally{
+        } finally {
             is.close();
         }
 
         return parseDescribeFeatureTypeResponse(typeName, schema);
     }
 
-    //  protected for testing
-    protected FeatureReader getFeatureReaderGet(Query request,
-        Transaction transaction) throws UnsupportedEncodingException, IOException, SAXException{
+    // protected for testing
+    protected FeatureReader getFeatureReaderGet(Query request, Transaction transaction)
+            throws UnsupportedEncodingException, IOException, SAXException {
         URL getUrl = capabilities.getGetFeature().getGet();
 
         if (getUrl == null) {
@@ -569,7 +407,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         String query = getUrl.getQuery();
-        query = query == null?null:query.toUpperCase();
+        query = query == null ? null : query.toUpperCase();
         String url = getUrl.toString();
 
         if ((query == null) || "".equals(query)) {
@@ -598,10 +436,11 @@ public class WFSDataStore extends AbstractDataStore {
             }
 
             if (request.getFilter() != null) {
-                if ( Filters.getFilterType(request.getFilter()) == FilterType.GEOMETRY_BBOX) {
-                    String bb = printBBoxGet(((GeometryFilter) request.getFilter()),request.getTypeName());
-                    if(bb!=null)
-                        url += ("&BBOX=" + URLEncoder.encode(bb, this.encoding));
+                if (Filters.getFilterType(request.getFilter()) == FilterType.GEOMETRY_BBOX) {
+                    String bb = printBBoxGet(((GeometryFilter) request.getFilter()), request
+                            .getTypeName());
+                    if (bb != null)
+                        url += ("&BBOX=" + URLEncoder.encode(bb, connectionFactory.getEncoding()));
                 } else {
                     if (Filters.getFilterType(request.getFilter()) == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
@@ -615,23 +454,25 @@ public class WFSDataStore extends AbstractDataStore {
                         }
                     } else {
                         // rest
-                        if (request.getFilter() != Filter.INCLUDE && request.getFilter() != Filter.EXCLUDE) {
-                            url += "&FILTER=" + URLEncoder.encode(
-                                    printFilter(request.getFilter()), this.encoding);
+                        if (request.getFilter() != Filter.INCLUDE
+                                && request.getFilter() != Filter.EXCLUDE) {
+                            url += "&FILTER="
+                                    + URLEncoder.encode(printFilter(request.getFilter()),
+                                            connectionFactory.getEncoding());
                         }
                     }
                 }
             }
         }
 
-        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), this.encoding));
+        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), connectionFactory
+                .getEncoding()));
 
         Logging.getLogger("org.geotools.data.wfs").fine(url);
-        Logging.getLogger("org.geotools.data.communication").fine("Output: "+url);
+        Logging.getLogger("org.geotools.data.communication").fine("Output: " + url);
         getUrl = new URL(url);
-        HttpURLConnection hc = getConnection(getUrl,auth,false);
-
-        InputStream is = getInputStream(hc);
+        HttpURLConnection hc = connectionFactory.getConnection(getUrl, false);
+        InputStream is = connectionFactory.getInputStream(hc);
         WFSTransactionState ts = null;
 
         if (!(transaction == Transaction.AUTO_COMMIT)) {
@@ -644,73 +485,77 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         SimpleFeatureType schema = getSchema(request.getTypeName());
-        
+
         SimpleFeatureType featureType;
         try {
-            featureType = DataUtilities.createSubType( schema, request.getPropertyNames(), 
-                    request.getCoordinateSystem() );
+            featureType = DataUtilities.createSubType(schema, request.getPropertyNames(), request
+                    .getCoordinateSystem());
         } catch (SchemaException e) {
-            featureType=schema;
+            featureType = schema;
         }
-        schema.getUserData().put("lenient", true );
-        WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,timeout, ts, schema);
+        schema.getUserData().put("lenient", true);
+        WFSFeatureReader ft = WFSFeatureReader
+                .getFeatureReader(is, bufferSize, timeout, ts, schema);
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
             return new ReTypeFeatureReader(ft, featureType, false);
-        }else
+        } else
             return ft;
-        
+
     }
 
-    Writer getOutputStream( HttpURLConnection hc ) throws IOException {
+    Writer getOutputStream(HttpURLConnection hc) throws IOException {
         OutputStream os = hc.getOutputStream();
 
         Writer w = new OutputStreamWriter(os);
         // write request
         Logger logger = Logging.getLogger("org.geotools.data.wfs");
-        if (logger.isLoggable(Level.FINE) ){
+        if (logger.isLoggable(Level.FINE)) {
             w = new LogWriterDecorator(w, logger, Level.FINE);
         }
         // special logger for communication information only.
         logger = Logging.getLogger("org.geotools.data.communication");
-        if (logger.isLoggable(Level.FINE) ){
+        if (logger.isLoggable(Level.FINE)) {
             w = new LogWriterDecorator(w, logger, Level.FINE);
         }
         return w;
     }
 
     /**
-     * If the field useGZIP is true Adds gzip to the connection accept-encoding property and creates a gzip inputstream 
-     * (if server supports it).  Otherwise returns a normal buffered input stream.  
-     * @param hc the connection to use to create the stream
+     * If the field useGZIP is true Adds gzip to the connection accept-encoding
+     * property and creates a gzip inputstream (if server supports it).
+     * Otherwise returns a normal buffered input stream.
+     * 
+     * @param hc
+     *            the connection to use to create the stream
      * @return an input steam from the provided connection
      */
-	InputStream getInputStream(HttpURLConnection hc) throws IOException {
-		InputStream is = hc.getInputStream();
+    static InputStream getInputStream(HttpURLConnection hc, final boolean tryGZIP)
+            throws IOException {
+        InputStream is = hc.getInputStream();
 
-        if( tryGZIP ){
-	        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
-	        		is = new GZIPInputStream(is);
-	        } 
-		}
-        is=new BufferedInputStream(is);
-        if( LOGGER.isLoggable(Level.FINE) ){
-            is=new LogInputStream(is, LOGGER, Level.FINE);
+        if (tryGZIP) {
+            if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
+                is = new GZIPInputStream(is);
+            }
+        }
+        is = new BufferedInputStream(is);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            is = new LogInputStream(is, LOGGER, Level.FINE);
         }
         // special logger for communication information only.
         Logger logger = Logging.getLogger("org.geotools.data.communication");
-        if (logger.isLoggable(Level.FINE) ){
+        if (logger.isLoggable(Level.FINE)) {
             is = new LogInputStream(is, logger, Level.FINE);
         }
         return is;
-	}
+    }
 
     private String printFilter(Filter f) throws IOException, SAXException {
         // ogc filter
         Map hints = new HashMap();
-        hints.put(DocumentWriter.BASE_ELEMENT,
-            FilterSchema.getInstance().getElements()[2]); // Filter
+        hints.put(DocumentWriter.BASE_ELEMENT, FilterSchema.getInstance().getElements()[2]); // Filter
 
         StringWriter w = new StringWriter();
 
@@ -724,81 +569,74 @@ public class WFSDataStore extends AbstractDataStore {
         return w.toString();
     }
 
-    private String printBBoxGet(GeometryFilter gf,String typename) throws IOException {
+    private String printBBoxGet(GeometryFilter gf, String typename) throws IOException {
         Envelope e = null;
 
         if (gf.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-            e = ((Geometry) ((LiteralExpression) gf.getLeftGeometry())
-                .getLiteral()).getEnvelopeInternal();
+            e = ((Geometry) ((LiteralExpression) gf.getLeftGeometry()).getLiteral())
+                    .getEnvelopeInternal();
         } else {
             if (gf.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
                 LiteralExpression literal = (LiteralExpression) gf.getRightGeometry();
                 Geometry geometry = (Geometry) literal.getLiteral();
-                e = geometry.getEnvelopeInternal();                
+                e = geometry.getEnvelopeInternal();
             } else {
                 throw new IOException("Cannot encode BBOX:" + gf);
             }
         }
-        
-        if(e == null || e.isNull())
+
+        if (e == null || e.isNull())
             return null;
-                
-        // Cannot check against layer bbounding box because they may be in different CRS
-        // We could insert ReferencedEnvelope fun here - note a check is already performed
+
+        // Cannot check against layer bbounding box because they may be in
+        // different CRS
+        // We could insert ReferencedEnvelope fun here - note a check is already
+        // performed
         // as part clipping the request bounding box.
-        
+
         /*
-        // find layer's bbox
-        Envelope lbb = null;
-        if(capabilities != null && capabilities.getFeatureTypes() != null && typename!=null && !"".equals(typename)){
-            List fts = capabilities.getFeatureTypes();
-            if(!fts.isEmpty()){
-                for(Iterator i=fts.iterator();i.hasNext() && lbb == null;){
-                    FeatureSetDescription fsd = (FeatureSetDescription)i.next();
-                    if(fsd!=null && typename.equals(fsd.getName())){
-                        lbb = fsd.getLatLongBoundingBox();
-                    }
-                }
-            }
-        }
-        if(lbb == null || lbb.contains(e))
-        */
+         * // find layer's bbox Envelope lbb = null; if(capabilities != null &&
+         * capabilities.getFeatureTypes() != null && typename!=null &&
+         * !"".equals(typename)){ List fts = capabilities.getFeatureTypes();
+         * if(!fts.isEmpty()){ for(Iterator i=fts.iterator();i.hasNext() && lbb ==
+         * null;){ FeatureSetDescription fsd = (FeatureSetDescription)i.next();
+         * if(fsd!=null && typename.equals(fsd.getName())){ lbb =
+         * fsd.getLatLongBoundingBox(); } } } } if(lbb == null ||
+         * lbb.contains(e))
+         */
         return e.getMinX() + "," + e.getMinY() + "," + e.getMaxX() + "," + e.getMaxY();
-        //return null;
+        // return null;
     }
 
-    //  protected for testing
-    protected FeatureReader getFeatureReaderPost(Query query,
-        Transaction transaction) throws SAXException, IOException {
+    // protected for testing
+    protected FeatureReader getFeatureReaderPost(Query query, Transaction transaction)
+            throws SAXException, IOException {
         URL postUrl = capabilities.getGetFeature().getPost();
 
         if (postUrl == null) {
             return null;
         }
 
-        
-        HttpURLConnection hc = getConnection(postUrl,auth,true);
-        
+        HttpURLConnection hc = connectionFactory.getConnection(postUrl, true);
+
         Writer w = getOutputStream(hc);
-        
+
         Map hints = new HashMap();
-        hints.put(DocumentWriter.BASE_ELEMENT,
-            WFSSchema.getInstance().getElements()[2]); // GetFeature
-        hints.put(DocumentWriter.ENCODING, encoding);
+        hints.put(DocumentWriter.BASE_ELEMENT, WFSSchema.getInstance().getElements()[2]); // GetFeature
+        hints.put(DocumentWriter.ENCODING, connectionFactory.getEncoding());
         try {
-            DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
-                hints);
+            DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w, hints);
         } catch (OperationNotSupportedException e) {
             LOGGER.warning(e.toString());
             throw new SAXException(e);
-        }finally{
+        } finally {
             w.flush();
             w.close();
         }
 
         // JE: permit possibility for GZipped data.
-        InputStream is = getInputStream(hc);
-        
+        InputStream is = connectionFactory.getInputStream(hc);
+
         WFSTransactionState ts = null;
 
         if (!(transaction == Transaction.AUTO_COMMIT)) {
@@ -810,34 +648,31 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
         SimpleFeatureType schema = getSchema(query.getTypeName());
-        
+
         SimpleFeatureType featureType;
         try {
-            featureType = DataUtilities.createSubType( schema, query.getPropertyNames(), 
-                    query.getCoordinateSystem() );
+            featureType = DataUtilities.createSubType(schema, query.getPropertyNames(), query
+                    .getCoordinateSystem());
         } catch (SchemaException e) {
-            featureType=schema;
+            featureType = schema;
         }
-        schema.getUserData().put("lenient", true );
-        WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, schema);
+        schema.getUserData().put("lenient", true);
+        WFSFeatureReader ft = WFSFeatureReader
+                .getFeatureReader(is, bufferSize, timeout, ts, schema);
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
             return new ReTypeFeatureReader(ft, featureType, false);
-        }else
+        } else
             return ft;
     }
 
-    protected FeatureReader getFeatureReader(String typeName)
-        throws IOException {
+    protected FeatureReader getFeatureReader(String typeName) throws IOException {
         return getFeatureReader(typeName, new DefaultQuery(typeName));
     }
 
-    protected FeatureReader getFeatureReader(String typeName, Query query)
-        throws IOException {
-        if ((query.getTypeName() == null)
-                || !query.getTypeName().equals(typeName)) {
+    protected FeatureReader getFeatureReader(String typeName, Query query) throws IOException {
+        if ((query.getTypeName() == null) || !query.getTypeName().equals(typeName)) {
             Query q = new DefaultQuery(query);
             ((DefaultQuery) q).setTypeName(typeName);
 
@@ -848,14 +683,16 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     /**
-     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
+     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
+     *      org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction)
-        throws IOException {
+    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
         return strategy.getFeatureReader(query, transaction);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.data.AbstractDataStore#getBounds(org.geotools.data.Query)
      */
     protected ReferencedEnvelope getBounds(Query query) throws IOException {
@@ -865,21 +702,19 @@ public class WFSDataStore extends AbstractDataStore {
 
         List fts = capabilities.getFeatureTypes(); // FeatureSetDescription
         Iterator i = fts.iterator();
-        String desiredType = query.getTypeName().substring(query.getTypeName()
-                                                              .indexOf(":") + 1);
+        String desiredType = query.getTypeName().substring(query.getTypeName().indexOf(":") + 1);
 
         while (i.hasNext()) {
             FeatureSetDescription fsd = (FeatureSetDescription) i.next();
-            String fsdName = (fsd.getName() == null) ? null
-                                                     : fsd.getName().substring(fsd.getName()
-                                                                                  .indexOf(":")
-                    + 1);
+            String fsdName = (fsd.getName() == null) ? null : fsd.getName().substring(
+                    fsd.getName().indexOf(":") + 1);
 
             if (desiredType.equals(fsdName)) {
                 Envelope env = fsd.getLatLongBoundingBox();
-                
-                ReferencedEnvelope referencedEnvelope = new ReferencedEnvelope(env,DefaultGeographicCRS.WGS84);
-                
+
+                ReferencedEnvelope referencedEnvelope = new ReferencedEnvelope(env,
+                        DefaultGeographicCRS.WGS84);
+
                 try {
                     return referencedEnvelope.transform(CRS.decode(fsd.getSRS()), true);
                 } catch (NoSuchAuthorityCodeException e) {
@@ -895,17 +730,18 @@ public class WFSDataStore extends AbstractDataStore {
         return super.getBounds(query);
     }
 
-    protected Filter[] splitFilters(Query q, Transaction t) throws IOException{
-    	// have to figure out which part of the request the server is capable of after removing the parts in the update / delete actions
-    	// [server][post]
-    	if(q.getFilter() == null)
-    		return new Filter[]{Filter.INCLUDE,Filter.INCLUDE};
-    	if(q.getTypeName() == null || t == null)
-    		return new Filter[]{Filter.INCLUDE,q.getFilter()};
-    	
-    	SimpleFeatureType ft = getSchema(q.getTypeName());
-    	
-    	List fts = capabilities.getFeatureTypes(); //FeatureSetDescription
+    protected Filter[] splitFilters(Query q, Transaction t) throws IOException {
+        // have to figure out which part of the request the server is capable of
+        // after removing the parts in the update / delete actions
+        // [server][post]
+        if (q.getFilter() == null)
+            return new Filter[] { Filter.INCLUDE, Filter.INCLUDE };
+        if (q.getTypeName() == null || t == null)
+            return new Filter[] { Filter.INCLUDE, q.getFilter() };
+
+        SimpleFeatureType ft = getSchema(q.getTypeName());
+
+        List fts = capabilities.getFeatureTypes(); // FeatureSetDescription
         boolean found = false;
         for (int i = 0; i < fts.size(); i++)
             if (fts.get(i) != null) {
@@ -913,9 +749,8 @@ public class WFSDataStore extends AbstractDataStore {
                 if (ft.getTypeName().equals(fsd.getName())) {
                     found = true;
                 } else {
-                    String fsdName = (fsd.getName() == null) ? null
-                        : fsd.getName().substring(fsd.getName()
-                        .indexOf(":") + 1);
+                    String fsdName = (fsd.getName() == null) ? null : fsd.getName().substring(
+                            fsd.getName().indexOf(":") + 1);
                     if (ft.getTypeName().equals(fsdName)) {
                         found = true;
                     }
@@ -924,46 +759,46 @@ public class WFSDataStore extends AbstractDataStore {
 
         if (!found) {
             LOGGER.warning("Could not find typeName: " + ft.getTypeName());
-            return new Filter[]{Filter.INCLUDE,q.getFilter()};
+            return new Filter[] { Filter.INCLUDE, q.getFilter() };
         }
-        WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
+        WFSTransactionState state = (t == Transaction.AUTO_COMMIT) ? null : (WFSTransactionState) t
+                .getState(this);
         WFSTransactionAccessor transactionAccessor = null;
-        if( state!=null )
-        	transactionAccessor = new WFSTransactionAccessor(state.getActions(ft.getTypeName()));
-		PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
-                .getFilterCapabilities(), ft, transactionAccessor);
+        if (state != null)
+            transactionAccessor = new WFSTransactionAccessor(state.getActions(ft.getTypeName()));
+        PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(
+                capabilities.getFilterCapabilities(), ft, transactionAccessor);
 
         q.getFilter().accept(wfsfv, null);
 
-        Filter[] f = new Filter[2]; 
+        Filter[] f = new Filter[2];
         f[0] = wfsfv.getFilterPre(); // server
         f[1] = wfsfv.getFilterPost();
 
         return f;
     }
-    
+
     /**
      * @see org.geotools.data.AbstractDataStore#getUnsupportedFilter(java.lang.String,
      *      org.geotools.filter.Filter)
      */
     protected Filter getUnsupportedFilter(String typeName, Filter filter) {
         try {
-			return splitFilters(new DefaultQuery(typeName,filter),Transaction.AUTO_COMMIT)[1];
-		} catch (IOException e) {
-			return filter;
-		}
+            return splitFilters(new DefaultQuery(typeName, filter), Transaction.AUTO_COMMIT)[1];
+        } catch (IOException e) {
+            return filter;
+        }
     }
 
     /**
      * 
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName)
-        throws IOException {
+    public FeatureSource getFeatureSource(String typeName) throws IOException {
         if (capabilities.getTransaction() != null) {
-            //			if(capabilities.getLockFeature()!=null){
-            //				return new WFSFeatureLocking(this,getSchema(typeName));
-            //			}
+            // if(capabilities.getLockFeature()!=null){
+            // return new WFSFeatureLocking(this,getSchema(typeName));
+            // }
             return new WFSFeatureStore(this, typeName);
         }
 
@@ -971,48 +806,36 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     /**
-	 * Runs {@link FidFilterVisitor} on the filter and returns the result as long as transaction is not AUTO_COMMIT or null.
-     * @param filter filter to process.
-     * @return Runs {@link FidFilterVisitor} on the filter and returns the result as long as transaction is not AUTO_COMMIT or null.
-	 */
-	public Filter processFilter(Filter filter) {
-		FidFilterVisitor visitor=new FidFilterVisitor(fidMap); 
-		Filters.accept( filter, visitor );
-		return visitor.getProcessedFilter();
-	}
-
-	private static class WFSAuthenticator extends Authenticator {
-        private PasswordAuthentication pa;
-
-        private WFSAuthenticator() {
-        	// not called
-        }
-
-        /**
-         * 
-         * @param user
-         * @param pass
-         * @param host
-         */
-        public WFSAuthenticator(String user, String pass) {
-            pa = new PasswordAuthentication(user, pass.toCharArray());
-        }
-
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return pa;
-        }
+     * Runs {@link FidFilterVisitor} on the filter and returns the result as
+     * long as transaction is not AUTO_COMMIT or null.
+     * 
+     * @param filter
+     *            filter to process.
+     * @return Runs {@link FidFilterVisitor} on the filter and returns the
+     *         result as long as transaction is not AUTO_COMMIT or null.
+     */
+    public Filter processFilter(Filter filter) {
+        FidFilterVisitor visitor = new FidFilterVisitor(fidMap);
+        Filters.accept(filter, visitor);
+        return visitor.getProcessedFilter();
     }
 
-	/**
-	 * Adds a new fid mapping to the fid map. 
-	 * @param original the before fid
-	 * @param finalFid the final fid;
-	 */
-	public synchronized void addFidMapping(String original, String finalFid) {
-		if( original==null )
-			throw new NullPointerException();
-		fidMap.put(original, finalFid);
-	}
-    
-}
+    /**
+     * Adds a new fid mapping to the fid map.
+     * 
+     * @param original
+     *            the before fid
+     * @param finalFid
+     *            the final fid;
+     */
+    public synchronized void addFidMapping(String original, String finalFid) {
+        if (original == null)
+            throw new NullPointerException();
+        fidMap.put(original, finalFid);
+    }
 
+    public WFSCapabilities getCapabilities() {
+        return capabilities;
+    }
+
+}
