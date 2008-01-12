@@ -456,7 +456,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             try {
                 t = DocumentFactory.getInstance(is, hints, logger.getLevel());
             } catch (SAXException saxEx) {
-                throw new IOException("Parsing exception: " + saxEx.getMessage(), saxEx);
+                throw (IOException) new IOException("Parsing exception: " + saxEx.getMessage()).initCause(saxEx);
             }
         }
         if (t instanceof WFSCapabilities) {
