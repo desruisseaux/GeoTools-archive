@@ -41,7 +41,7 @@ public class CreateFeatureTypeTest extends TestCase {
 		InputStream in = TestData.openStream("xml/feature-type-simple.xsd");
 		try{
 	        Schema schema = SchemaFactory.getInstance(null, in);
-	        SimpleFeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
+	        SimpleFeatureType ft = WFS_1_0_0_DataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
 	        assertEquals(Integer.class, ft.getAttribute("ID").getType().getBinding());
 	        assertEquals(String.class, ft.getAttribute("CODE").getType().getBinding());
@@ -56,7 +56,7 @@ public class CreateFeatureTypeTest extends TestCase {
 		InputStream in = TestData.openStream("xml/feature-type-choice.xsd");
 		try{
 	        Schema schema = SchemaFactory.getInstance(null, in);
-	        SimpleFeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
+	        SimpleFeatureType ft = WFS_1_0_0_DataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
 	        assertEquals(Integer.class, ft.getAttribute("ID").getType().getBinding());
 	        assertEquals(String.class, ft.getAttribute("CODE").getType().getBinding());

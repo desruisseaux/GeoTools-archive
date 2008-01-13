@@ -21,7 +21,7 @@ import org.geotools.filter.GeometryFilter;
 public class MapServerWFSStrategyOnlineTest extends TestCase {
     private static final String TYPE_NAME = "hospitals"; //$NON-NLS-1$
 
-    private WFSDataStore ds;
+    private WFS_1_0_0_DataStore ds;
 
     private int totalFeatures;
 
@@ -36,7 +36,7 @@ public class MapServerWFSStrategyOnlineTest extends TestCase {
         params.put(WFSDataStoreFactory.LENIENT.key, Boolean.TRUE);
 
         //ds=new WFSDataStore(host, null, null, null, 10000, 100, true, true);
-        ds = (WFSDataStore) dsfac.createDataStore(params);
+        ds = (WFS_1_0_0_DataStore) dsfac.createDataStore(params);
         assertTrue( ds.strategy instanceof MapServerWFSStrategy );
         FilterFactory fac=FilterFactoryFinder.createFilterFactory();
         

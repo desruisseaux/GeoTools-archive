@@ -101,7 +101,7 @@ public class GeoServerOnlineTest extends TestCase {
 
     public void testTypes() throws IOException, NoSuchElementException {
     	if( url == null) return;
-        WFSDataStore wfs; 
+        WFS_1_0_0_DataStore wfs; 
         try {
             wfs = WFSDataStoreReadTest.getDataStore(url);
         } catch (ConnectException e) {
@@ -150,7 +150,7 @@ public class GeoServerOnlineTest extends TestCase {
     }
     
     public void testSingleType() throws IOException, NoSuchElementException {
-        WFSDataStore wfs; 
+        WFS_1_0_0_DataStore wfs; 
         try {
             wfs = WFSDataStoreReadTest.getDataStore(url);
         } catch (ConnectException e) {
@@ -218,7 +218,7 @@ public class GeoServerOnlineTest extends TestCase {
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        DataStore post = (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
         
         Envelope bbox = post.getFeatureSource(post.getTypeNames()[0]).getBounds();
         WFSDataStoreReadTest.doFeatureReaderWithBBox(url,true,false,0,bbox);
@@ -228,7 +228,7 @@ public class GeoServerOnlineTest extends TestCase {
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        DataStore post = (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
         
         Envelope bbox = post.getFeatureSource(post.getTypeNames()[0]).getBounds();    
         
@@ -243,7 +243,7 @@ public class GeoServerOnlineTest extends TestCase {
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-        WFSDataStore wfs = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
+        WFS_1_0_0_DataStore wfs = (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
         FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
 
         Filter filter = fac.equals(fac.property("NAME"), fac.literal("E 58th St"));
@@ -277,7 +277,7 @@ public class GeoServerOnlineTest extends TestCase {
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,url);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000000));
-        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        DataStore post = (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
         String typename = TO_EDIT_TYPE;
         SimpleFeatureType ft = post.getSchema( typename );
         FeatureSource fs = post.getFeatureSource( typename );        

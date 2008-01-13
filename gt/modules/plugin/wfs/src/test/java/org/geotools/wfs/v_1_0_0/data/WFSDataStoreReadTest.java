@@ -60,13 +60,13 @@ public class WFSDataStoreReadTest extends TestCase {
     
     public void testEmpty(){/**/}
 
-    public static WFSDataStore getDataStore(URL server) throws IOException{
+    public static WFS_1_0_0_DataStore getDataStore(URL server) throws IOException{
         try{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // not debug
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(1000000)); //for debug
-        return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
+        return (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
 
         }catch(java.net.SocketException se){
             se.printStackTrace();
@@ -77,7 +77,7 @@ public class WFSDataStoreReadTest extends TestCase {
     public static void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException, SAXException{
     	if( url == null) return;
         try{
-        WFSDataStore wfs = getDataStore(url);
+        WFS_1_0_0_DataStore wfs = getDataStore(url);
         System.out.println("FeatureTypeTest + "+url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in ["+i+"]",wfs.getTypeNames()[i]);
@@ -103,7 +103,7 @@ public class WFSDataStoreReadTest extends TestCase {
     	if( url == null) return;
     	try{
         System.out.println("FeatureReaderTest + "+url);
-        WFSDataStore wfs = getDataStore(url);
+        WFS_1_0_0_DataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
         Query query = new DefaultQuery(wfs.getTypeNames()[i]);
@@ -134,7 +134,7 @@ public class WFSDataStoreReadTest extends TestCase {
     	if( url == null) return;
     	try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
-        WFSDataStore wfs = getDataStore(url);
+        WFS_1_0_0_DataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
         SimpleFeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
@@ -232,7 +232,7 @@ public class WFSDataStoreReadTest extends TestCase {
         if( url == null ) return; // test distabled (must be site specific)                
         try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
-        WFSDataStore wfs = getDataStore(url);
+        WFS_1_0_0_DataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
         SimpleFeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
