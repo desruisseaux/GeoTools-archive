@@ -39,10 +39,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  */
 public class WFSFeatureSource extends AbstractFeatureSource {
-    protected WFSDataStore ds;
+    protected WFS_1_0_0_DataStore ds;
     protected String fname;
 
-    protected WFSFeatureSource(WFSDataStore ds, String fname) {
+    protected WFSFeatureSource(WFS_1_0_0_DataStore ds, String fname) {
         this.ds = ds;
         this.fname = fname;
     }

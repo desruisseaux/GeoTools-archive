@@ -37,7 +37,7 @@ import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.ProgressListener;
-import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
+import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -106,7 +106,7 @@ public class WFSGeoResource extends AbstractGeoResource {
             return parent;
         }
 
-        if (adaptee.isAssignableFrom(WFSDataStore.class)) {
+        if (adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class)) {
             return parent.resolve(adaptee, monitor);
         }
 
@@ -144,7 +144,7 @@ public class WFSGeoResource extends AbstractGeoResource {
         return (adaptee.isAssignableFrom(GeoResourceInfo.class)
         || adaptee.isAssignableFrom(FeatureStore.class)
         || adaptee.isAssignableFrom(FeatureSource.class)
-        || adaptee.isAssignableFrom(WFSDataStore.class)
+        || adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class)
         || adaptee.isAssignableFrom(Service.class));
     }
 

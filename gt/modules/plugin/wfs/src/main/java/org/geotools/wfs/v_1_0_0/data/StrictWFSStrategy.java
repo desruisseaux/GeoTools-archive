@@ -50,7 +50,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
      */
     protected static final Integer COMPLIANCE_LEVEL = XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM;
 
-    public StrictWFSStrategy(WFSDataStore store) {
+    public StrictWFSStrategy(WFS_1_0_0_DataStore store) {
         super(store);
     }
 

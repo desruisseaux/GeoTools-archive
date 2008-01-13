@@ -62,7 +62,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
      * @param ds
      * @param typeName
      */
-    public WFSFeatureStore(WFSDataStore ds, String typeName) {
+    public WFSFeatureStore(WFS_1_0_0_DataStore ds, String typeName) {
         super(ds, typeName);
     }
 
@@ -154,7 +154,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                 ts.addAction(schema.getTypeName(), new InsertAction(newFeature));
 
             } catch (NoSuchElementException e) {
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 throw new IOException(e.toString());
             }
         }
@@ -165,10 +165,10 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             // if bounds are null then send an envelope to say that features were added but
             // at an unknown location.
             bounds = new ReferencedEnvelope( getSchema().getCRS() );
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
                     getTransaction(), bounds, false);
         }else{
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
                     getTransaction(), bounds, false);                   
         }
 
@@ -207,7 +207,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         // an arbitrary filter so I'm sending a NULL envelope to say "some features were removed but I don't
         // know what."  Can't be null because the convention states that null is sent on commits only.
         // JE
-        ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+        ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
         		getTransaction(), null, false);
 
         if (trans == Transaction.AUTO_COMMIT) {
@@ -262,10 +262,10 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             // if bounds are null then send an envelope to say that features were modified but
             // at an unknown location.
             bounds = new ReferencedEnvelope(getSchema().getCRS());
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);
         }else{
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);                   
         }    
         
@@ -321,9 +321,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             	}
                 ts.addAction(getSchema().getTypeName(), new InsertAction(f));
             } catch (NoSuchElementException e) {
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
             } catch (IllegalAttributeException e) {
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
             }
         }
             
@@ -333,10 +333,10 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             // if bounds are null then send an envelope to say that features were added but
             // at an unknown location.
             bounds = new ReferencedEnvelope( getSchema().getCRS() );
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);
         }else{
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+            ((WFS_1_0_0_DataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);                   
         }    
         if (trans == Transaction.AUTO_COMMIT) {

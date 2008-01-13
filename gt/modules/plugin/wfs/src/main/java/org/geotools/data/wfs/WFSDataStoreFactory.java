@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreFactory;
@@ -32,7 +33,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.io.WFSConnectionFactory;
-import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
+import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
 
@@ -47,7 +48,7 @@ import org.xml.sax.SAXException;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
  */
 @SuppressWarnings("unchecked")
-public class WFSDataStoreFactory extends AbstractDataStoreFactory {
+public final class WFSDataStoreFactory extends AbstractDataStoreFactory {
     private static final Logger logger = Logging.getLogger("org.geotools.data.wfs");
 
     /**
@@ -57,7 +58,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @author Gabriel Roldan
      * @version $Id$
      * @since 2.5.x
-     * @URL $URL$
+     * @URL $URL:
+     *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     public static class WFSFactoryParam<T> extends Param {
         private T defaultValue;
@@ -98,7 +100,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @author Gabriel Roldan
      * @version $Id$
      * @since 2.5.x
-     * @URL $URL$
+     * @URL $URL:
+     *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     private static class WFSAuthenticator extends Authenticator {
         private java.net.PasswordAuthentication pa;
@@ -281,7 +284,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final Authenticator auth;
         if (user != null && pass != null) {
             auth = new WFSAuthenticator(user, pass);
-        }else{
+        } else {
             auth = null;
         }
 
@@ -291,7 +294,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 auth, encoding);
 
         try {
-            ds = new WFSDataStore(capabilities, protocol, connectionFac, timeout, buffer, lenient);
+            ds = new WFS_1_0_0_DataStore(capabilities, protocol, connectionFac, timeout, buffer,
+                    lenient);
             perParameterSetDataStoreCache.put(new HashMap(params), ds);
         } catch (SAXException e) {
             logger.warning(e.toString());
@@ -302,6 +306,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     }
 
     /**
+     * Unsupported operation, can't create a WFS service.
+     * 
+     * @throws UnsupportedOperationException
+     *             always, as this operation is not applicable to WFS.
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)
      */
     public DataStore createNewDataStore(final Map params) throws IOException {
@@ -316,7 +324,18 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     }
 
     /**
+     * Returns the set of parameter descriptors needed to connect to a WFS.
+     * 
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
+     * @see #URL
+     * @see #PROTOCOL
+     * @see #USERNAME
+     * @see #PASSWORD
+     * @see #TIMEOUT
+     * @see #BUFFER_SIZE
+     * @see #TRY_GZIP
+     * @see #LENIENT
+     * @see #ENCODING
      */
     public Param[] getParametersInfo() {
         int length = parametersInfo.length;
@@ -326,16 +345,31 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     }
 
     /**
+     * Checks whether {@code params} contains a valid set of parameters to
+     * connecto to a WFS.
+     * <p>
+     * Rules are:
+     * <ul>
+     * <li>the mandatory {@link #URL} is provided.
+     * <li>whether both {@link #USERNAME} and {@link #PASSWORD} are provided,
+     * or none.
+     * </ul>
+     * Availability of the other optional parameters is not checked for
+     * existence.
+     * </p>
+     * 
+     * @param params
+     *            non null map of datastore parameters.
      * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
      */
-    public boolean canProcess(Map params) {
+    public boolean canProcess(final Map params) {
         if (params == null) {
-            return false;
+            throw new NullPointerException("params");
         }
-
-        // check url
-        if (!params.containsKey(URL.key)) {
-            return false; // cannot have both
+        try {
+            URL.lookUp(params);
+        } catch (Exception e) {
+            return false;
         }
 
         // check password / username
@@ -348,33 +382,6 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 return false; // must have both
             }
         }
-
-        // check for type
-        if (params.containsKey(PROTOCOL.key)) {
-            try {
-                PROTOCOL.lookUp(params);
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
-        // check for type
-        if (params.containsKey(TIMEOUT.key)) {
-            try {
-                TIMEOUT.lookUp(params);
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
-        if (params.containsKey(BUFFER_SIZE.key)) {
-            try {
-                BUFFER_SIZE.lookUp(params);
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -396,42 +403,82 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     }
 
     /**
+     * Creates a HTTP GET Method based WFS {@code GetCapabilities} request for
+     * the given protocol version.
+     * <p>
+     * If the query string in the {@code host} URL already contains a VERSION
+     * number, that version is <b>discarded</b>.
+     * </p>
      * 
      * @param host
+     *            non null URL from which to construct the WFS
+     *            {@code GetCapabilities} request by discarding the query
+     *            string, if any, and appending the propper query string.
+     * @return
+     */
+    public static URL createGetCapabilitiesRequest(URL host, Version version) {
+        String protocol = host.getProtocol();
+        String hostname = host.getHost();
+        int port = host.getPort();
+        String path = host.getPath();
+        String file = path + "?SERVICE=WFS&REQUEST=GetCapabilities&VERSION=" + version;
+        URL getCapabilities;
+        try {
+            getCapabilities = new URL(protocol, hostname, port, file);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Can't create GetCapabilities request from " + host, e);
+            return host;
+        }
+        return getCapabilities;
+    }
+
+    /**
+     * Creates a HTTP GET Method based WFS {@code GetCapabilities} request.
+     * <p>
+     * If the query string in the {@code host} URL already contains a VERSION
+     * number, that version is used, otherwise the higher supported version is
+     * used.
+     * </p>
+     * 
+     * @param host
+     *            non null URL pointing either to a base WFS service access
+     *            point, or to a full {@code GetCapabilities} request.
      * @return
      */
     public static URL createGetCapabilitiesRequest(URL host) {
         if (host == null) {
-            return null;
+            throw new NullPointerException("url");
         }
 
-        String url = host.toString();
+        String queryString = host.getQuery();
+        queryString = queryString == null || "".equals(queryString.trim()) ? "" : queryString
+                .toUpperCase();
 
-        if (host.getQuery() == null) {
-            url += "?SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities";
-        } else {
-            String t = host.getQuery().toUpperCase();
+        final Version highest = Version.highest();
 
-            if (t.indexOf("SERVICE") == -1) {
-                url += "&SERVICE=WFS";
-            }
-
-            if (t.indexOf("VERSION") == -1) {
-                url += "&VERSION=1.0.0";
-            }
-
-            if (t.indexOf("REQUEST") == -1) {
-                url += "&REQUEST=GetCapabilities";
-            }
+        if ("".equals(queryString)) {
+            return createGetCapabilitiesRequest(host, highest);
         }
 
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            WFSDataStore.LOGGER.warning(e.toString());
-
-            return host;
+        Map<String, String> params = new HashMap<String, String>();
+        String[] split = queryString.split("&");
+        for (String kvp : split) {
+            int index = kvp.indexOf('=');
+            String key = index > 0 ? kvp.substring(0, index) : kvp;
+            String value = index > 0 ? kvp.substring(index + 1) : null;
+            params.put(key, value);
         }
+
+        String request = params.get("REQUEST");
+        if ("GETCAPABILITIES".equals(request)) {
+            Version requestVersion = highest;
+            String version = params.get("VERSION");
+            if (version != null) {
+                requestVersion = Version.valueOf(version);
+            }
+            return createGetCapabilitiesRequest(host, requestVersion);
+        }
+        return createGetCapabilitiesRequest(host, highest);
     }
 
     private WFSCapabilities findCapabilities(URL host, boolean tryGZIP, Authenticator auth)

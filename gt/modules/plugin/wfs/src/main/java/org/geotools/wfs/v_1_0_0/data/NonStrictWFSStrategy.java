@@ -50,9 +50,9 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 class NonStrictWFSStrategy implements WFSStrategy {
 
-    protected WFSDataStore store;
+    protected WFS_1_0_0_DataStore store;
 
-    public NonStrictWFSStrategy(WFSDataStore store) {
+    public NonStrictWFSStrategy(WFS_1_0_0_DataStore store) {
         this.store=store;
     }
 
@@ -115,18 +115,18 @@ class NonStrictWFSStrategy implements WFSStrategy {
 
     protected Data createFeatureReaderPOST(Query query, Transaction transaction) {
         Data data=new Data();
-        if (((store.protocol & WFSDataStore.POST_PROTOCOL) == WFSDataStore.POST_PROTOCOL) ) {
+        if (((store.protocol & WFS_1_0_0_DataStore.POST_PROTOCOL) == WFS_1_0_0_DataStore.POST_PROTOCOL) ) {
             try {
                 data.reader = store.getFeatureReaderPost(query, transaction);
                 if(data.reader!=null)
                     data.reader.hasNext(); // throws spot
             } catch (SAXException e) {
                 data.reader = null;
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 data.saxException = e;
             } catch (IOException e) {
                 data.reader = null;
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 data.ioException = e;
             }
         }
@@ -135,18 +135,18 @@ class NonStrictWFSStrategy implements WFSStrategy {
 
     protected Data createFeatureReaderGET(Query query, Transaction transaction) {
         Data data=new Data();
-        if (((store.protocol & WFSDataStore.GET_PROTOCOL) == WFSDataStore.GET_PROTOCOL) ) {
+        if (((store.protocol & WFS_1_0_0_DataStore.GET_PROTOCOL) == WFS_1_0_0_DataStore.GET_PROTOCOL) ) {
             try {
                 data.reader = store.getFeatureReaderGet(query, transaction);
                 if(data.reader!=null)
                     data.reader.hasNext(); // throws spot
             } catch (SAXException e) {
                 data.reader = null;
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 data.saxException = e;
             } catch (IOException e) {
                 data.reader = null;
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 data.ioException = e;
             }
         }
@@ -160,7 +160,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
             try {
                 reader = new ForceCoordinateSystemFeatureReader(reader,query.getCoordinateSystem());
             } catch (SchemaException e) {
-                WFSDataStore.LOGGER.warning(e.toString());
+                WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                 reader = tmp;
             }
         }else{
@@ -170,7 +170,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
                 try {
                     reader = new ForceCoordinateSystemFeatureReader(reader,dataCRS);
                 } catch (SchemaException e) {
-                    WFSDataStore.LOGGER.warning(e.toString());
+                    WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                     reader = tmp;
                 }
             }
@@ -191,11 +191,11 @@ class NonStrictWFSStrategy implements WFSStrategy {
                 MathTransform toDataCRS = CRS.findMathTransform( DefaultGeographicCRS.WGS84, dataCRS );
                 maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), null, toDataCRS, 10 );                
             } catch (FactoryException e) {
-                WFSDataStore.LOGGER.warning(e.getMessage());maxbbox = null;
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());maxbbox = null;
             } catch (MismatchedDimensionException e) {
-                WFSDataStore.LOGGER.warning(e.getMessage());maxbbox = null;
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());maxbbox = null;
             } catch (TransformException e) {
-                WFSDataStore.LOGGER.warning(e.getMessage());maxbbox = null;
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());maxbbox = null;
             }
         }
         else {
@@ -206,7 +206,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
             WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
             Filters.accept( serverFilter, clipVisitor );
         } else { // give up an request everything
-            WFSDataStore.LOGGER.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
+            WFS_1_0_0_DataStore.LOGGER.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
             // filters[0] = Filter.EXCLUDE; // uncoment this line to just give up
         }
         return dataCRS;

@@ -28,10 +28,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -49,6 +53,7 @@ import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
@@ -91,7 +96,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_0_0/data/WFSDataStore.java $
  */
-public class WFSDataStore extends AbstractDataStore {
+public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataStore {
     public static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs.1.1.0");
 
     protected WFSCapabilities capabilities = null;
@@ -146,7 +151,7 @@ public class WFSDataStore extends AbstractDataStore {
      * @throws SAXException
      * @throws IOException
      */
-    public WFSDataStore(WFSCapabilities capabilities, Boolean protocol,
+    public WFS_1_0_0_DataStore(WFSCapabilities capabilities, Boolean protocol,
             WFSConnectionFactory connectionFactory, int timeout, int buffer, boolean lenient)
             throws SAXException, IOException {
         super(true);
@@ -167,6 +172,69 @@ public class WFSDataStore extends AbstractDataStore {
         this.timeout = timeout;
         this.bufferSize = buffer;
         determineCorrectStrategy();
+    }
+
+    /**
+     * @see WFSDataStore#getTitle()
+     */
+    public String getTitle() {
+        return capabilities.getService().getTitle();
+    }
+
+    /**
+     * @see WFSDataStore#getAbstract()
+     */
+    public String getAbstract() {
+        return capabilities.getService().get_abstract();
+    }
+
+    /**
+     * @see WFSDataStore#getKeywords()
+     */
+    public List<String> getKeywords() {
+        String[] keywordList = capabilities.getService().getKeywordList();
+        if (keywordList == null) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<String>(Arrays.asList(keywordList));
+    }
+
+    /**
+     * @see WFSDataStore#getTitle(String)
+     */
+    public String getTitle(String typeName) throws NoSuchElementException {
+        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
+                capabilities, typeName);
+        if (featureSetDescription == null) {
+            throw new NoSuchElementException(typeName);
+        }
+        return featureSetDescription.getTitle();
+    }
+
+    /**
+     * @see WFSDataStore#getAbstract(String)
+     */
+    public String getAbstract(String typeName) throws NoSuchElementException {
+        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
+                capabilities, typeName);
+        if (featureSetDescription == null) {
+            throw new NoSuchElementException(typeName);
+        }
+        return featureSetDescription.getAbstract();
+    }
+
+    /**
+     * @see WFSDataStore#getLatLonBoundingBox(String)
+     */
+    public ReferencedEnvelope getLatLonBoundingBox(String typeName) throws NoSuchElementException {
+        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
+                capabilities, typeName);
+        if (featureSetDescription == null) {
+            throw new NoSuchElementException(typeName);
+        }
+        Envelope envelope = featureSetDescription.getLatLongBoundingBox();
+        ReferencedEnvelope latLonEnv = new ReferencedEnvelope(envelope, DefaultGeographicCRS.WGS84);
+        return latLonEnv;
     }
 
     private void determineCorrectStrategy() {
@@ -837,5 +905,4 @@ public class WFSDataStore extends AbstractDataStore {
     public WFSCapabilities getCapabilities() {
         return capabilities;
     }
-
 }

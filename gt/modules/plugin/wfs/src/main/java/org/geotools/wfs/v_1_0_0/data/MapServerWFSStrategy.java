@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class MapServerWFSStrategy extends StrictWFSStrategy implements WFSStrategy {
 
-    public MapServerWFSStrategy( WFSDataStore store ) {
+    public MapServerWFSStrategy( WFS_1_0_0_DataStore store ) {
         super(store);
     }
     

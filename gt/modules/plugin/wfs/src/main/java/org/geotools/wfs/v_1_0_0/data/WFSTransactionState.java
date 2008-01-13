@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
  *         http://svn.geotools.org/geotools/branches/2.2.x/plugin/wfs/src/org/geotools/data/wfs/WFSTransactionState.java $
  */
 public class WFSTransactionState implements State {
-    private WFSDataStore ds = null;
+    private WFS_1_0_0_DataStore ds = null;
 
     /**
      * A map of <String, String[]>. String is the typename and String[] are the
@@ -83,7 +83,7 @@ public class WFSTransactionState implements State {
     /**
      * @param ds
      */
-    public WFSTransactionState(WFSDataStore ds) {
+    public WFSTransactionState(WFS_1_0_0_DataStore ds) {
         this.ds = ds;
     }
 
@@ -139,15 +139,15 @@ public class WFSTransactionState implements State {
             if (actions.isEmpty())
                 continue;
 
-            if (((ds.protocol & WFSDataStore.POST_PROTOCOL) == WFSDataStore.POST_PROTOCOL)
+            if (((ds.protocol & WFS_1_0_0_DataStore.POST_PROTOCOL) == WFS_1_0_0_DataStore.POST_PROTOCOL)
                     && (tr == null)) {
                 try {
                     tr = commitPost(actions);
                 } catch (OperationNotSupportedException e) {
-                    WFSDataStore.LOGGER.warning(e.toString());
+                    WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                     tr = null;
                 } catch (SAXException e) {
-                    WFSDataStore.LOGGER.warning(e.toString());
+                    WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
                     tr = null;
                 }
             }

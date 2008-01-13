@@ -17,12 +17,14 @@ import org.geotools.util.logging.Logging;
 import org.geotools.wfs.v_1_0_0.data.LogInputStream;
 
 /**
- * Handles seting up connections to a WFS taking care of GZIP and authentication
+ * Handles seting up connections to a WFS based on a WFS capabilities document,
+ * taking care of GZIP and authentication.
  * 
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
  */
 public class WFSConnectionFactory {
 
@@ -72,7 +74,7 @@ public class WFSConnectionFactory {
         return getConnection(query, tryGzip, doPost, auth);
     }
 
-    public URL getDescribeFeatureTypeURLGet(String typeName) throws MalformedURLException {
+    public URL getDescribeFeatureTypeURLGet(final String typeName) throws MalformedURLException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
         Logging.getLogger("org.geotools.data.communication").fine("Output: " + getUrl);
 

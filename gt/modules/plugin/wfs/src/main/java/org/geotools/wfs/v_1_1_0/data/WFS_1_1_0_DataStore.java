@@ -17,13 +17,28 @@
 package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.WFSCapabilitiesType;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -32,17 +47,30 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
+import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.logging.Logging;
+import org.geotools.wfs.WFSConfiguration;
+import org.geotools.wfs.io.WFSConnectionFactory;
+import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.xml.sax.SAXException;
 
 /**
+ * A WFS 1.1 DataStore implementation.
+ * 
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/WFSDataStore.java $
  */
-final class WFSDataStore implements DataStore {
+public final class WFS_1_1_0_DataStore implements WFSDataStore {
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.wfs.v_1_1_0");
+
+    private static WFSConfiguration configuration;
 
     /**
      * The WFS GetCapabilities document. Final by now, as we're not handling
@@ -55,18 +83,25 @@ final class WFSDataStore implements DataStore {
 
     private final Map<String, SimpleFeatureType> featureTypeCache;
 
+    private WFSConnectionFactory connectionFactory;
+
     /**
      * The WFS capabilities document.
      * 
      * @param capabilities
      */
     @SuppressWarnings("unchecked")
-    public WFSDataStore(final WFSCapabilitiesType capabilities) {
+    public WFS_1_1_0_DataStore(final WFSCapabilitiesType capabilities,
+            final WFSConnectionFactory connectionFactory) {
         this.capabilities = capabilities;
+        this.connectionFactory = connectionFactory;
         this.typeInfos = new HashMap<String, FeatureTypeType>();
         this.featureTypeCache = new HashMap<String, SimpleFeatureType>();
-
-        FeatureTypeType fType;
+        synchronized (WFS_1_1_0_DataStore.class) {
+            if (configuration == null) {
+                configuration = new WFSConfiguration();
+            }
+        }
         final List<FeatureTypeType> ftypes = capabilities.getFeatureTypeList().getFeatureType();
         String prefixedTypeName;
         for (FeatureTypeType ftype : ftypes) {
@@ -76,13 +111,87 @@ final class WFSDataStore implements DataStore {
     }
 
     /**
+     * @see WFSDataStore#getTitle()
+     */
+    public String getTitle() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getAbstract()
+     */
+    public String getAbstract() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getKeywords()
+     */
+    public List<String> getKeywords() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getTitle(String)
+     */
+    public String getTitle(String typeName) throws NoSuchElementException {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getAbstract(String)
+     */
+    public String getAbstract(String typeName) throws NoSuchElementException {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getLatLonBoundingBox(String)
+     */
+    public ReferencedEnvelope getLatLonBoundingBox(String typeName) throws NoSuchElementException {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * @param
      * @return the GeoTools FeatureType for the {@code typeName} as stated on
      *         the capabilities document.
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
     public SimpleFeatureType getSchema(final String typeName) throws IOException {
-        return null;
+        if (featureTypeCache.containsKey(typeName)) {
+            return featureTypeCache.get(typeName);
+        }
+        final URL describeUrl = connectionFactory.getDescribeFeatureTypeURLGet(typeName);
+        final HttpURLConnection connection = connectionFactory.getConnection(describeUrl, false);
+        String contentEncoding = connection.getContentEncoding();
+        Charset charset = Charset.forName("UTF-8"); // TODO: un-hardcode
+        if (null != contentEncoding) {
+            try {
+                charset = Charset.forName(contentEncoding);
+            } catch (UnsupportedCharsetException e) {
+                LOGGER.warning("Can't handle response encoding: " + contentEncoding
+                        + ". Trying with default");
+            }
+        }
+        Parser parser = new Parser(configuration);
+        InputStream in = connectionFactory.getInputStream(connection);
+        Reader reader = new InputStreamReader(in, charset);
+        Object parsed;
+        try {
+            parsed = parser.parse(reader);
+        } catch (SAXException e) {
+            throw new DataSourceException(e);
+        } catch (ParserConfigurationException e) {
+            throw new DataSourceException(e);
+        } finally {
+            reader.close();
+        }
+        SimpleFeatureType ftype = (SimpleFeatureType) parsed;
+        synchronized (featureTypeCache) {
+            featureTypeCache.put(typeName, ftype);
+        }
+        return ftype;
     }
 
     /**
@@ -188,5 +297,4 @@ final class WFSDataStore implements DataStore {
     public void createSchema(SimpleFeatureType featureType) throws IOException {
         throw new UnsupportedOperationException("WFS DataStore does not support createSchema");
     }
-
 }

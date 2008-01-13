@@ -34,7 +34,7 @@ import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.util.ProgressListener;
-import org.geotools.wfs.v_1_0_0.data.WFSDataStore;
+import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.xml.wfs.WFSSchema;
 
 
@@ -50,7 +50,7 @@ public class WFSService extends AbstractService {
     private List members = null;
     private ServiceInfo info = null;
     private Throwable msg = null;
-    private WFSDataStore ds = null;
+    private WFS_1_0_0_DataStore ds = null;
 
     public WFSService(Catalog parent, URI uri, Map params) {
         super(parent);
@@ -80,7 +80,7 @@ public class WFSService extends AbstractService {
             return this.members(monitor);
         }
 
-        if (adaptee.isAssignableFrom(WFSDataStore.class)) {
+        if (adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class)) {
             return getDS();
         }
 
@@ -94,7 +94,7 @@ public class WFSService extends AbstractService {
 
         return (adaptee.isAssignableFrom(ServiceInfo.class)
         || adaptee.isAssignableFrom(List.class)
-        || adaptee.isAssignableFrom(WFSDataStore.class));
+        || adaptee.isAssignableFrom(WFS_1_0_0_DataStore.class));
     }
 
     public List members(ProgressListener monitor) throws IOException {
@@ -149,15 +149,15 @@ public class WFSService extends AbstractService {
         return params;
     }
 
-    WFSDataStore getDS() throws IOException {
+    WFS_1_0_0_DataStore getDS() throws IOException {
         if (ds == null) {
-            synchronized (WFSDataStore.class) {
+            synchronized (WFS_1_0_0_DataStore.class) {
                 if (ds == null) {
                     WFSDataStoreFactory dsf = new WFSDataStoreFactory();
 
                     if (dsf.canProcess(params)) {
                         try {
-                            ds = (WFSDataStore) dsf.createDataStore(params);
+                            ds = (WFS_1_0_0_DataStore) dsf.createDataStore(params);
                         } catch (IOException e) {
                             msg = e;
                             throw e;
@@ -207,7 +207,7 @@ public class WFSService extends AbstractService {
     private class IServiceWFSInfo extends DefaultServiceInfo {
         private WFSCapabilities caps = null;
 
-        IServiceWFSInfo(WFSDataStore resource) {
+        IServiceWFSInfo(WFS_1_0_0_DataStore resource) {
             super();
 
             try {
