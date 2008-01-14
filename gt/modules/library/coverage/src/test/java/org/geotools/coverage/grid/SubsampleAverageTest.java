@@ -19,24 +19,19 @@ package org.geotools.coverage.grid;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+
 import javax.media.jai.BorderExtender;
 import javax.media.jai.BorderExtenderCopy;
 import javax.media.jai.Interpolation;
-import javax.media.jai.RenderedOp;
 
-// JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.factory.Hints;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -70,7 +65,6 @@ public class SubsampleAverageTest extends GridCoverageTest {
      */
     public SubsampleAverageTest(String name) {
         super(name);
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -132,6 +126,18 @@ public class SubsampleAverageTest extends GridCoverageTest {
         // geophysiscs view before being applied
         subsampleAverage(GridCoverageExamples.getExample(4).geophysics(false),
                 new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+        
+        // on this one the subsample average should go back to the
+        // geophysiscs view before being applied
+        subsampleAverage(GridCoverageExamples.getExample(4).geophysics(false),
+                new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+        
+        //play with a rotated coverage
+        subsampleAverage(rotateCoverage(GridCoverageExamples.getExample(4).geophysics(true),Math.PI/4),
+               null);
+
+        
+        
     }
 
     public void subsampleAverage(GridCoverage2D coverage){
@@ -140,7 +146,7 @@ public class SubsampleAverageTest extends GridCoverageTest {
 
     public void subsampleAverage(GridCoverage2D coverage,RenderingHints hints) {
         // caching initial properties
-        RenderedImage originalImage = coverage.getRenderedImage();
+        final RenderedImage originalImage = coverage.getRenderedImage();
         int w = originalImage.getWidth();
         int h = originalImage.getHeight();
 
@@ -150,16 +156,19 @@ public class SubsampleAverageTest extends GridCoverageTest {
         param.parameter("Source").setValue(coverage);
         param.parameter("scaleX").setValue(Double.valueOf(0.5));
         param.parameter("scaleY").setValue(Double.valueOf(0.5));
-        param.parameter("Interpolation").setValue(
-                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
-        param.parameter("BorderExtender").setValue(
-                BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
         GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
         RenderedImage scaledImage = scaled.getRenderedImage();
         assertTrue(scaledImage.getWidth() == (int) (w / 2.0f));
         assertTrue(scaledImage.getHeight() == (int) (h / 2.0f));
         w = scaledImage.getWidth();
         h = scaledImage.getHeight();
+
+        //check that the final envelope is close enough to the initial envelope.
+        //In a perfect world they should be the same exact thing but in practice
+        //this is quite hard to achieve when doing scaling due to the fact that
+        //the various JAI operations use some complex laws to compute the final
+        //image bounds.
+        checkEnvelopes(scaled,coverage);
 
         // show the result
         if (SHOW) {
@@ -173,11 +182,12 @@ public class SubsampleAverageTest extends GridCoverageTest {
 
         // use the default processor and then scale again
         scaled = (GridCoverage2D) Operations.DEFAULT.subsampleAverage(scaled,
-                0.3333, 0.3333, Interpolation.getInstance(Interpolation.INTERP_NEAREST),
-                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                0.3333, 0.3333);
+        checkEnvelopes(scaled,coverage);
+        
         scaledImage = scaled.getRenderedImage();
         // I had to comment this out since sometimes this evaluation fails
-        // unexpectedly. I think it is a JAI issue because here below I using
+        // unexpectedly. I think it is a JAI issue because here below I am using
         // the rule they claim to follow.
         // assertTrue(scaledImage.getWidth() == (int)(w / 3.0f));
         // assertTrue(scaledImage.getHeight() == (int)(h / 3.0f));
@@ -189,4 +199,6 @@ public class SubsampleAverageTest extends GridCoverageTest {
             assertNotNull(scaled.getRenderedImage().getData());
         }
     }
+
+
 }
