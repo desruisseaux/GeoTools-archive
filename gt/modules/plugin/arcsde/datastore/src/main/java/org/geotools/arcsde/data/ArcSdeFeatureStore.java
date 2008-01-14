@@ -147,8 +147,13 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             }
             return featureIds;
         } finally {
-            connection.getLock().unlock();
-        }
+        	try {
+                if (!connection.isTransactionActive()) {
+                    connection.close();
+                }
+            } finally {
+                connection.getLock().unlock();
+            }        }
     }
 
     @Override
@@ -199,8 +204,13 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                 writer.close();
             }
         } finally {
-            connection.getLock().unlock();
-        }
+        	try {
+                if (!connection.isTransactionActive()) {
+                    connection.close();
+                }
+            } finally {
+                connection.getLock().unlock();
+            }        }
     }
 
     /**
@@ -241,8 +251,13 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             }
         } finally {
             if (connection != null) {
-                connection.getLock().unlock();
-            }
+            	try {
+                    if (!connection.isTransactionActive()) {
+                        connection.close();
+                    }
+                } finally {
+                    connection.getLock().unlock();
+                }            }
         }
     }
 

@@ -157,13 +157,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi</artifactId>
-        </exclusion>
-      </exclusions>	  
+      <version>${project.version}</version>  
     </dependency>
 
     <dependency>
