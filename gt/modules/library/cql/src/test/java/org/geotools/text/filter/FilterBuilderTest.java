@@ -1209,7 +1209,7 @@ public class FilterBuilderTest extends TestCase {
         Expression expression = FilterBuilder.parseExpression(cqlExpression);
 
         // Test 2
-        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
+        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, '.')))";
         expression = FilterBuilder.parseExpression(cqlExpression);
         assertNotNull(expression);
         assertTrue(expression instanceof Function);

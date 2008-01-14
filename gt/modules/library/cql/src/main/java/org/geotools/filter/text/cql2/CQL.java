@@ -78,8 +78,6 @@ import org.geotools.filter.FilterTransformer;
  * </code>
  * </pre>
  *
- * </p>
- *
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
@@ -134,11 +132,16 @@ public class CQL {
 
         try {
             compiler.CompilationUnit();
-            Object result = compiler.getResult();
-            Filter builtFilter = (Filter) result;
+            Filter result = compiler.getFilter();
 
-            return builtFilter;
+            return result;
 
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
+            
         } catch (ParseException e) {
             throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
         }
@@ -185,10 +188,15 @@ public class CQL {
         try {
             c.ExpressionCompilationUnit();
         
-            Expression builtFilter = (Expression) c.getResult();
+            Expression builtFilter = c.getExpression();
 
             return builtFilter;
-
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
+            
         } catch (ParseException e) {
             throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
         }
@@ -205,9 +213,9 @@ public class CQL {
      *
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List toFilterList(final String cqlFilterList)
+    public static List<Filter> toFilterList(final String cqlFilterList)
         throws CQLException {
-        List filters = CQL.toFilterList(cqlFilterList, null);
+        List<Filter> filters = CQL.toFilterList(cqlFilterList, null);
 
         return filters;
     }
@@ -251,7 +259,7 @@ public class CQL {
      *            Expression. If it is null the method finds the default implementation.
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
+    public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
         
         FilterFactory factory = filterFactory;
@@ -264,9 +272,15 @@ public class CQL {
 
         try {
             compiler.MultipleCompilationUnit();
-            List results = compiler.getResults();
+            List<Filter> results = compiler.getResults();
 
             return results;
+
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlSourceFilterList);
 
         } catch (ParseException e) {
             throw new CQLException(e.getMessage() + ": " + cqlSourceFilterList, compiler.getToken(0), e, cqlSourceFilterList);

@@ -24,7 +24,6 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
@@ -45,7 +44,6 @@ import com.vividsolutions.jts.geom.Point;
 
 
 /**
- *
  * CQL Test
  * 
  * <p>
@@ -175,6 +173,7 @@ public class CQLTest extends TestCase {
 
         // -------------------------------------------------------------
         // <attribute_name> EXISTS
+        // TODO Exist function must be implemented in Geotools
         // -------------------------------------------------------------
         resultFilter = CQL.toFilter(FilterSample.ATTRIBUTE_NAME_EXISTS);
 
@@ -190,7 +189,6 @@ public class CQLTest extends TestCase {
 
         assertNotNull("implementation of function was expected", eqToResultFilter.getExpression1());
 
-        // TODO this function must be implemented in Geotools
     }
 
     /**
@@ -827,68 +825,6 @@ public class CQLTest extends TestCase {
         assertEquals("ATTR1 < 4 AND (NOT (ATTR2 < 4)) AND ATTR3 < 4 was expected", expected, result);
     }
 
-    /**
-     * Test for Function Unary Expressions with funcions in CQL.
-     * <p>
-     *
-     * <pre>
-     *  &lt;unary expression &gt; ::=
-     *         &lt;Literal &gt;
-     *   |     &lt;Function &gt; [*]
-     *   |     &lt;Attribute &gt;
-     *   |   ( &lt;Expression &gt;)
-     *   |   [ &lt;Expression &gt;]
-     * </pre>
-     *
-     * </p>
-     * TODO requires more test
-     */
-    public void testUnaryExpressionFunction() throws Exception {
-        Filter result;
-        Filter expected;
-
-        result = CQL.toFilter(FilterSample.FILTER_WITH_FUNCTION_ABS);
-
-        assertNotNull("filter expected", result);
-
-        expected = FilterSample.getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
-
-        // TODO BUG in Geotools method equals in Functions
-        // assertEquals( "fails due to a BUG in Geotools method equals in
-        // Functions", expected,result);
-
-        // Key: GEOT-1167 type: BUG
-        result = CQL.toFilter(FilterSample.FILTER__WITH_FUNCTION_STR_CONCAT);
-
-        assertNotNull("filter expected", result);
-
-        expected = FilterSample.getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
-
-        // TODO BUG in Geotools method equals in Functions
-        // assertEquals( "fails due to a BUG in Geotools method equals in
-        // Functions", expected, result);
-
-        // test for improvement Key: GEOT-1168
-        String cqlExpression = "A = strConcat(B, 'testParam')";
-        Filter filter = CQL.toFilter(cqlExpression);
-
-        assertTrue(filter instanceof PropertyIsEqualTo);
-
-        Expression expression = ((PropertyIsEqualTo) filter).getExpression2();
-        assertNotNull(expression);
-        assertTrue(expression instanceof Function);
-
-        Function function = (Function) expression;
-        assertEquals(2, function.getParameters().size());
-
-        Expression arg1 = (Expression) function.getParameters().get(0);
-        Expression arg2 = (Expression) function.getParameters().get(1);
-        assertTrue(arg1 instanceof PropertyName);
-        assertTrue(arg2 instanceof Literal);
-
-        assertEquals("B", ((PropertyName) arg1).getPropertyName());
-        assertEquals("testParam", ((Literal) arg2).getValue());
-    }
 
     /**
      * Test Geo Operations.
@@ -1027,17 +963,18 @@ public class CQLTest extends TestCase {
         try{
             resultFilter = CQL.toFilter("BEYOND(ATTR1, POINTS(1.0 2.0), 10.0, kilometers)");
             fail("CQLException was expected");
+        
         } catch(CQLException e){
             
             assertNotNull("Syntax error was expected (should be POINT)", e.getMessage());
         }
-    
+        
     }
 
     /**
      * Test RelGeo Operations [*]
      * <p>
-     *
+     * 
      * <pre>
      *   &lt;routine invocation &gt; ::=
      *       &lt;geoop name &gt; &lt;georoutine argument list &gt;
@@ -1051,141 +988,20 @@ public class CQLTest extends TestCase {
      *       &lt;literal&gt;
      *   |   &lt;attribute name&gt;
      * </pre>
-     *
+     * 
      * </p>
-     *
+     * 
      * @throws Exception
      */
     public void testRoutineInvocationGeneric() throws Exception {
         // TODO not implement it
         // (Mauricio Comments) This case is not implemented because the filter
         // model has not a
-        // Routine (Like functions in Expresión). We could develop easily the
-        // parser
-        // but we can not build a filter for CQL <Routine invocation>.
+        // Routine (Like functions in Expression). We could develop easily the
+        // parser but we can not build a filter for CQL <Routine invocation>.
     }
 
-    /**
-     * Test Function Expression
-     *
-     * Note: this solves the bug GEOT-1167
-     *
-     * @throws Exception
-     */
-    public void testFuncitionExpression() throws Exception {
-        Expression arg1;
-        Expression arg2;
-        Expression resultExpr;
-
-        final String cqlExpression = "strConcat(A, B)";
-
-        // simple attribute as argument
-        resultExpr = CQL.toExpression(cqlExpression);
-
-        assertNotNull(resultExpr);
-        assertTrue(resultExpr instanceof Function);
-
-        Function function1 = (Function) resultExpr;
-        assertEquals(2, function1.getParameters().size());
-
-        arg1 = (Expression) function1.getParameters().get(0);
-        assertTrue(arg1 instanceof PropertyName);
-        assertEquals("A", ((PropertyName) arg1).getPropertyName());
-
-        arg2 = (Expression) function1.getParameters().get(1);
-        assertTrue(arg2 instanceof PropertyName);
-        assertEquals("B", ((PropertyName) arg2).getPropertyName());
-
-        // compound attribute as argument
-        final String arg1Name = "gmd:aa:bb.gmd:cc.gmd:dd";
-        final String arg2Name = "gmd:ee:ff.gmd:gg.gmd:hh";
-
-        final String cqlExpression2 = "strConcat(" + arg1Name + ", " + arg2Name + ")";
-
-        resultExpr = CQL.toExpression(cqlExpression2);
-
-        assertNotNull(resultExpr);
-        assertTrue(resultExpr instanceof Function);
-
-        Function function = (Function) resultExpr;
-        assertEquals(2, function.getParameters().size());
-
-        arg1 = (Expression) function.getParameters().get(0);
-        assertTrue(arg1 instanceof PropertyName);
-
-        final String arg1Expected = arg1Name.replace('.', '/');
-        assertEquals(arg1Expected, ((PropertyName) arg1).getPropertyName());
-
-        arg2 = (Expression) function.getParameters().get(1);
-        assertTrue(arg2 instanceof PropertyName);
-
-        final String arg2Expected = arg2Name.replace('.', '/');
-        assertEquals(arg2Expected, ((PropertyName) arg2).getPropertyName());
-    }
-
-    /**
-     * This test the following improvement: GEOT-1169 This is an extension the
-     * CQL specification.
-     *
-     * <pre>
-     *  &lt;function&gt; ::= &lt;routine name &gt; &lt;argument list &gt; [*]
-     *  &lt;argument list&gt; ::=    [*]
-     *       &lt;left paren&gt; [&lt;positional arguments&gt;] &lt;right paren&gt;
-     *  &lt;positional arguments&gt; ::=
-     *       &lt;argument&gt; [ { &lt;comma&amp;gt &lt;argument&gt; }... ]
-     *  &lt;argument&gt;  ::=
-     *       &lt;literal&gt;
-     *   |   &lt;attribute name&gt;
-     *   |   &lt;function&gt;           [*]
-     *   |   &lt;binary expression&gt;  [*]
-     * </pre>
-     *
-     * @throws Exception
-     */
-    public void testFunctionExpressionWithFunctionArgs()
-        throws Exception {
-        String cqlExpression;
-        Expression expression;
-
-        // Test 1
-        cqlExpression = "strConcat(A, abs(B))";
-        expression = CQL.toExpression(cqlExpression);
-
-        // Test 2 
-        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
-        expression = CQL.toExpression(cqlExpression);
-        assertNotNull(expression);
-        assertTrue(expression instanceof Function);
-
-        Function function = (Function) expression;
-        assertEquals(2, function.getParameters().size());
-
-        Expression propertyName = (Expression) function.getParameters().get(0);
-        assertTrue(propertyName instanceof PropertyName);
-        assertEquals("A", ((PropertyName) propertyName).getPropertyName());
-
-        Expression arg2 = (Expression) function.getParameters().get(1);
-        assertTrue(arg2 instanceof Function);
-
-        function = (Function) arg2;
-        propertyName = (Expression) function.getParameters().get(0);
-        assertTrue(propertyName instanceof PropertyName);
-        assertEquals("B", ((PropertyName) propertyName).getPropertyName());
-
-        arg2 = (Expression) function.getParameters().get(1);
-        assertTrue(arg2 instanceof Function);
-
-        function = (Function) arg2;
-        propertyName = (Expression) function.getParameters().get(0);
-        assertTrue(propertyName instanceof PropertyName);
-        assertEquals("C", ((PropertyName) propertyName).getPropertyName());
-
-        arg2 = (Expression) function.getParameters().get(1);
-        assertTrue(arg2 instanceof Literal);
-        assertEquals(".", ((Literal) arg2).getValue());
-        
-        
-    }
+    
 
     /**
      * Tests Geometry Literals
@@ -1294,6 +1110,49 @@ public class CQLTest extends TestCase {
         } catch (CQLException e) {
             String message = e.getSyntaxError();
             assertFalse("error message is expected", "".equals(message));
+        }
+    }
+    
+    /**
+     * Some token errors 
+     */
+    public void testTokensError(){
+
+        // double quote in expression
+        try {
+            String cqlExpression = "strConcat(A, \".\")";
+            CQL.toExpression(cqlExpression);
+
+            fail("CQLException was expected");
+
+        } catch (CQLException e) {
+            
+            assertNotNull("Token message error was expected", e.getMessage());
+        }
+        // double quote in predicate 
+        try {
+            String cqlExpression = "A=\"2\"";
+            CQL.toFilter(cqlExpression);
+
+            fail("CQLException was expected");
+
+        } catch (CQLException e) {
+            
+            assertNotNull("Token message error was expected", e.getMessage());
+
+        }
+
+        
+        // token identifier error
+        try {
+            String cqlExpression = "1A=2";
+            CQL.toFilter(cqlExpression);
+
+            fail("CQLException was expected");
+
+        } catch (CQLException e) {
+            
+            assertNotNull("Token message error was expected", e.getMessage());
         }
     }
     
