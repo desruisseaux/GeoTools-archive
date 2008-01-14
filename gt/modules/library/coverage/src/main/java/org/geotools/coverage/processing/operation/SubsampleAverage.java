@@ -15,107 +15,34 @@
  */
 package org.geotools.coverage.processing.operation;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.BorderExtenderCopy;
-import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
-
-import org.geotools.coverage.processing.Operation2D;
-import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.coverage.Coverage;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
+import org.geotools.coverage.processing.BaseScaleOperationJAI;
 
 
 /**
- * TODO: Need documentation
+ * This operation is simply a wrapper for the JAI SubsampleAverage operation which allows
+ * me to arbitrarly scale a rendered image while smoothing it out.
+
  * 
- * 
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions.
  * @version $Id: SubsampleAverage.java 23157 2006-12-01 01:29:53Z desruisseaSubsampleAveragedCoverageator.SubsampleAverageDescriptor
  * @since 2.3
+ * @see javax.media.jai.operator.SubsampleAverageDescriptor
  * @source $URL$
- * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
- *       {@code SubsampledAverageGridCoverage2D} class. The main feature to add is the
- *       copy of interpolation and border extender parameters to the hints.
  */
-public class SubsampleAverage extends Operation2D {
+public class SubsampleAverage extends BaseScaleOperationJAI {
+	
 	/**
 	 * 
 	 */
-	public static final ParameterDescriptor scaleX = new DefaultParameterDescriptor(
-			Citations.OGC, "scaleX", Double.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			0.5,  // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * 
-	 */
-	public static final ParameterDescriptor scaleY = new DefaultParameterDescriptor(
-			Citations.OGC, "scaleY", Double.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			0.5,  // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * 
-	 */
-	public static final ParameterDescriptor Interpolation = new DefaultParameterDescriptor(
-			Citations.OGC, "Interpolation", Interpolation.class, // Value
-			// class
-			// (mandatory)
-			null, // Array of valid values
-			new InterpolationNearest(), // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * 
-	 */
-	public static final ParameterDescriptor BorderExtender = new DefaultParameterDescriptor(
-			Citations.OGC, "BorderExtender", BorderExtender.class, // Value
-			// class
-			// (mandatory)
-			null, // Array of valid values
-			BorderExtenderCopy.createInstance(BorderExtenderCopy.BORDER_COPY), // Default
-			// value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 
 	 */
 	public SubsampleAverage() {
-		super(new DefaultParameterDescriptorGroup(Citations.OGC,
-				"SubsampleAverage", new ParameterDescriptor[] { SOURCE_0,
-						scaleX, scaleY, Interpolation, BorderExtender }));
+		super("SubsampleAverage");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup,
-	 *      org.geotools.factory.Hints)
-	 */
-	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
-		return SubsampleAveragedCoverage.create(parameters,
-				(hints instanceof Hints) ? (Hints) hints : new Hints(hints));
-	}
+
 
 }

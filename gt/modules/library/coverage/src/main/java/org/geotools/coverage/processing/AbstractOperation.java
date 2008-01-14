@@ -217,7 +217,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
     }
 
     /**
-     * Returns a string représentation of this operation. The returned string is
+     * Returns a string representation of this operation. The returned string is
      * implementation dependent. It is usually provided for debugging purposes only.
      */
     @Override
