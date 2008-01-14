@@ -17,9 +17,11 @@ package org.geotools.wfs;
 
 import junit.extensions.TestSetup;
 import junit.framework.TestCase;
+import net.opengis.ows.DCPType;
 import net.opengis.ows.KeywordsType;
 import net.opengis.ows.OperationType;
 import net.opengis.ows.OperationsMetadataType;
+import net.opengis.ows.RequestMethodType;
 import net.opengis.ows.ServiceIdentificationType;
 import net.opengis.wfs.FeatureCollectionType;
 import net.opengis.wfs.FeatureTypeListType;
@@ -100,7 +102,18 @@ public class WFSParsingTest extends TestCase {
         assertNotNull(om);
 
         assertEquals(6, om.getOperation().size());
-        assertEquals("GetCapabilities", ((OperationType) om.getOperation().get(0)).getName());
+        
+        OperationType getCapsOp = (OperationType) om.getOperation().get(0);
+        assertEquals("GetCapabilities", getCapsOp.getName());
+        assertEquals( 1, getCapsOp.getDCP().size());
+        
+        DCPType dcp = (DCPType) getCapsOp.getDCP().get(0);
+        assertEquals( 1, dcp.getHTTP().getGet().size() );
+        assertEquals( 1, dcp.getHTTP().getPost().size() );
+        
+        assertEquals( "http://localhost:8080/geoserver/wfs", ((RequestMethodType) dcp.getHTTP().getGet().get(0)).getHref() );
+        assertEquals( "http://localhost:8080/geoserver/wfs", ((RequestMethodType) dcp.getHTTP().getPost().get(0)).getHref() );
+        
         assertEquals("DescribeFeatureType", ((OperationType) om.getOperation().get(1)).getName());
         assertEquals("GetFeature", ((OperationType) om.getOperation().get(2)).getName());
         assertEquals("LockFeature", ((OperationType) om.getOperation().get(3)).getName());
