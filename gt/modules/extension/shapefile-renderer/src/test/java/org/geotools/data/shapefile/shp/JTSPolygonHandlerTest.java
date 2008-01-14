@@ -23,7 +23,6 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -31,20 +30,18 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.test.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
+
+import sun.misc.Lock;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @TODO class description
@@ -65,7 +62,7 @@ public class JTSPolygonHandlerTest extends TestCase {
                 MathTransform mt = ReferencingFactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(transform));
                 
 		
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+                ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
@@ -100,7 +97,7 @@ public class JTSPolygonHandlerTest extends TestCase {
 		.createConcatenatedTransform(mt, ReferencingFactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(at)));
 
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+                ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );

@@ -23,7 +23,6 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -74,7 +73,7 @@ public class JTSMultiLineHandlerTest extends TestCase {
 					.createConcatenatedTransform(mt, at);
 		}
 
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(reader.getHeader().getShapeType(), env, 
                         mt, false, new Rectangle(512,512) ));
 		Object shape=reader.nextRecord().shape();
@@ -111,7 +110,7 @@ public class JTSMultiLineHandlerTest extends TestCase {
 		.createAffineTransform(new GeneralMatrix(at));
 		mt = ReferencingFactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+                ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false,new Rectangle(300,300)));
 		Geometry shape=(Geometry) reader.nextRecord().shape();
 		assertEquals( 3, shape.getCoordinates().length );

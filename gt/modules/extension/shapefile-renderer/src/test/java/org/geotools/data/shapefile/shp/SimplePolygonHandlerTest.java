@@ -23,7 +23,6 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -60,7 +59,7 @@ public class SimplePolygonHandlerTest extends TestCase {
                 AffineTransform transform = RendererUtilities.worldToScreenTransform(env, new Rectangle(500,500));
                 MathTransform mt = ReferencingFactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(transform));
                 
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+                ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.simple.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
@@ -90,7 +89,7 @@ public class SimplePolygonHandlerTest extends TestCase {
 		.createConcatenatedTransform(mt, ReferencingFactoryFinder.getMathTransformFactory(null)
 				.createAffineTransform(new GeneralMatrix(at)));
 
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
+                ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
 		reader.setHandler(new org.geotools.renderer.shape.shapehandler.simple.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
