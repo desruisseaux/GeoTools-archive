@@ -18,12 +18,12 @@ package org.geotools.index;
 
 import java.util.ArrayList;
 
-
 /**
  * Holds values (with associated DataDefinition)
  * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/Data.java $
  */
 public class Data {
     private DataDefinition def;
@@ -31,7 +31,7 @@ public class Data {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param def
      */
     public Data(DataDefinition def) {
@@ -42,7 +42,7 @@ public class Data {
     /**
      * Check to see if a <code>Data</code> respects its
      * <code>DataDefinition</code>
-     *
+     * 
      */
     public final boolean isValid() {
         if (this.getValuesCount() != this.def.getFieldsCount()) {
@@ -52,8 +52,8 @@ public class Data {
         boolean ret = true;
 
         for (int i = 0; i < this.def.getFieldsCount(); i++) {
-            if (!this.def.getField(i).getFieldClass().isInstance(this.getValue(
-                            i))) {
+            if (!this.def.getField(i).getFieldClass().isInstance(
+                    this.getValue(i))) {
                 ret = false;
 
                 break;
@@ -65,11 +65,11 @@ public class Data {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param val
-     *
+     * 
      * @return - this Data object
-     *
+     * 
      * @throws TreeException
      */
     public Data addValue(Object val) throws TreeException {
@@ -81,7 +81,7 @@ public class Data {
 
         if (!val.getClass().equals(def.getField(pos).getFieldClass())) {
             throw new TreeException("Wrong class type, was expecting "
-                + def.getField(pos).getFieldClass());
+                    + def.getField(pos).getFieldClass());
         }
 
         this.values.add(val);
@@ -91,7 +91,7 @@ public class Data {
 
     /**
      * Return the KeyDefinition
-     *
+     * 
      */
     public DataDefinition getDefinition() {
         return this.def;
@@ -99,7 +99,7 @@ public class Data {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getValuesCount() {
         return this.values.size();
@@ -107,9 +107,9 @@ public class Data {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param i
-     *
+     * 
      */
     public Object getValue(int i) {
         return this.values.get(i);

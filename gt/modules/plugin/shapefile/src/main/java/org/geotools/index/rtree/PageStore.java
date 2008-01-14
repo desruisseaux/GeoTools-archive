@@ -22,12 +22,12 @@ import org.geotools.index.LockManager;
 import org.geotools.index.LockTimeoutException;
 import org.geotools.index.TreeException;
 
-
 /**
- *  RTree data structure.
- *
+ * RTree data structure.
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/PageStore.java $
  */
 public abstract class PageStore {
     public static final short SPLIT_QUADRATIC = 1;
@@ -39,7 +39,7 @@ public abstract class PageStore {
     private LockManager lockManager;
 
     /**
-     *
+     * 
      */
     public PageStore() {
         this.lockManager = new LockManager();
@@ -47,37 +47,38 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param def
      * @param maxNodeEntries
      * @param minNodeEntries
      * @param splitAlg
-     *
+     * 
      * @throws TreeException
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws UnsupportedOperationException
+     *                 DOCUMENT ME!
      */
     public PageStore(DataDefinition def, int maxNodeEntries,
-        int minNodeEntries, short splitAlg) throws TreeException {
+            int minNodeEntries, short splitAlg) throws TreeException {
         this();
 
         if (minNodeEntries > (maxNodeEntries / 2)) {
             throw new TreeException("minNodeEntries shoud be <= "
-                + "maxNodeEntries / 2");
+                    + "maxNodeEntries / 2");
         }
 
         if ((splitAlg != SPLIT_LINEAR) && (splitAlg != SPLIT_QUADRATIC)) {
             throw new TreeException("Split algorithm shoud be "
-                + "SPLIT_LINEAR or SPLIT_QUADRATIC");
+                    + "SPLIT_LINEAR or SPLIT_QUADRATIC");
         }
 
         if (!def.isValid()) {
             throw new TreeException("Invalid DataDefinition");
         }
 
-        //TODO: Remove when SPLIT_LINEAR is implemented
+        // TODO: Remove when SPLIT_LINEAR is implemented
         if (splitAlg != SPLIT_QUADRATIC) {
             throw new UnsupportedOperationException(
-                "Only SPLIT_QUARDATIC is allowed by now...");
+                    "Only SPLIT_QUARDATIC is allowed by now...");
         }
 
         this.def = def;
@@ -88,50 +89,52 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public abstract Node getRoot();
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public abstract void setRoot(Node node) throws TreeException;
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param isLeaf
-     *
+     * 
      */
     public abstract Node getEmptyNode(boolean isLeaf);
 
     /**
      * Returns the Node pointed by this entry and having this Node as parent
-     *
+     * 
      * @param parentEntry
      * @param parent
-     *
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public abstract Node getNode(Entry parentEntry, Node parent)
-        throws TreeException;
+            throws TreeException;
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
-     *
+     * 
      */
     public abstract Entry createEntryPointingNode(Node node);
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return The maximum number of <code>Entry</code>s per page
      */
     public int getMaxNodeEntries() {
@@ -140,7 +143,7 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return The minimum number of <code>Entry</code>s per page
      */
     public int getMinNodeEntries() {
@@ -149,7 +152,7 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return The split algorithm to use
      */
     public short getSplitAlgorithm() {
@@ -158,7 +161,7 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public DataDefinition getDataDefinition() {
         return this.def;
@@ -166,16 +169,17 @@ public abstract class PageStore {
 
     /**
      * Frees resources used by this <code>Node</code>
-     *
-     * @param node The <code>Node</code> to free
+     * 
+     * @param node
+     *                The <code>Node</code> to free
      */
     public abstract void free(Node node);
 
     /**
      * Aquires a write lock to the store
-     *
+     * 
      * @return an Object rapresenting the lock
-     *
+     * 
      * @throws LockTimeoutException
      */
     public Lock getWriteLock() throws LockTimeoutException {
@@ -184,9 +188,9 @@ public abstract class PageStore {
 
     /**
      * Aquires a read lock to the store
-     *
+     * 
      * @return an Object rapresenting the lock
-     *
+     * 
      * @throws LockTimeoutException
      */
     public Lock getReadLock() throws LockTimeoutException {
@@ -195,7 +199,7 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param lock
      */
     public void releaseLock(Lock lock) {
@@ -204,7 +208,7 @@ public abstract class PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws TreeException
      */
     public abstract void close() throws TreeException;

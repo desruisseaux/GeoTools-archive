@@ -20,13 +20,13 @@ import java.util.Comparator;
 
 import org.geotools.index.Data;
 
-
 /**
  * A Comparator for sortin search results in ascending record number. So we can
  * read dbf & shape file forward only
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/DataComparator.java $
  */
 public class DataComparator implements Comparator {
     /**

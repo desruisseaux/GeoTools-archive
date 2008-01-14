@@ -40,6 +40,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShpFileType;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
@@ -63,16 +64,15 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id$
+ * @version $Id: ShapefileDataStoreTest.java 28476 2007-12-21 20:30:22Z jgarnett $
  * @author Ian Schneider
  */
-public class ShapefileDataStoreTest extends TestCaseSupport {
+public class IndexedShapefileDataStoreTest extends TestCaseSupport {
     final static String STATE_POP = "shapes/statepop.shp";
 
     final static String STREAM = "shapes/stream.shp";
@@ -81,7 +81,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     final static String CHINESE = "shapes/chinese_poly.shp";
 
-    public ShapefileDataStoreTest(String testName) throws IOException {
+    public IndexedShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
     }
 
@@ -104,7 +104,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             q = new DefaultQuery();
         URL url = TestData.url(resource);
         ShapefileDataStore s = new IndexedShapefileDataStore(url, null, false,
-                true, IndexedShapefileDataStore.TREE_QIX, charset);
+                true, IndexType.QIX, charset);
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
         return fs.getFeatures(q);
     }
@@ -127,13 +127,12 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testLoadChineseChars() throws Exception {
         try {
-            FeatureCollection fc = loadFeatures(CHINESE,
-                    Charset.forName("GB18030"), null);
+            FeatureCollection fc = loadFeatures(CHINESE, Charset
+                    .forName("GB18030"), null);
             SimpleFeature first = firstFeature(fc);
-            String s = (String) first.getAttribute("NAME");
-            assertEquals("\u9ed1\u9f99\u6c5f\u7701", first.getAttribute("NAME"));
-        }
-        catch( UnsupportedCharsetException no){
+            String name = (String) first.getAttribute("NAME");
+            assertEquals("\u9ed1\u9f99\u6c5f\u7701", name);
+        } catch (UnsupportedCharsetException no) {
             // this JDK has not been installed with the required
             // lanaguage
         }
@@ -162,12 +161,11 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      */
     public void testEnvelope() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
-        testEnvelope(features, IndexedShapefileDataStore.TREE_GRX);
-        testEnvelope(features, IndexedShapefileDataStore.TREE_QIX);
-        testEnvelope(features, IndexedShapefileDataStore.TREE_NONE);
+        testEnvelope(features, IndexType.QIX);
+        testEnvelope(features, IndexType.NONE);
     }
 
-    private void testEnvelope(FeatureCollection features, byte treeType)
+    private void testEnvelope(FeatureCollection features, IndexType treeType)
             throws MalformedURLException, IOException {
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(TestData
                 .url(STATE_POP), null, true, true, treeType);
@@ -191,7 +189,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         file.deleteOnExit();
 
         IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null,
-                true, true, IndexedShapefileDataStore.TREE_QIX);
+                true, true, IndexType.QIX);
         FeatureCollection features = ds.getFeatureSource().getFeatures();
         FeatureIterator indexIter = features.features();
 
@@ -202,9 +200,9 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             SimpleFeature newFeature = indexIter.next();
 
             BoundingBox bounds = newFeature.getBounds();
-            Geometry geometry = factory.toGeometry(new ReferencedEnvelope(bounds));
-            double newArea = geometry
-                    .getArea();
+            Geometry geometry = factory.toGeometry(new ReferencedEnvelope(
+                    bounds));
+            double newArea = geometry.getArea();
 
             if (smallestFeature == null || newArea < area) {
                 smallestFeature = newFeature;
@@ -214,18 +212,19 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         indexIter.close();
 
         IndexedShapefileDataStore ds2 = new IndexedShapefileDataStore(url,
-                null, false, false, IndexedShapefileDataStore.TREE_NONE);
+                null, false, false, IndexType.NONE);
 
         Envelope newBounds = ds.getBounds(Query.ALL);
         double dx = newBounds.getWidth() / 4;
         double dy = newBounds.getHeight() / 4;
         newBounds = new Envelope(newBounds.getMinX() + dx, newBounds.getMaxX()
                 - dx, newBounds.getMinY() + dy, newBounds.getMaxY() - dy);
-        
+
         CoordinateReferenceSystem crs = features.getSchema().getCRS();
-        
-        performQueryComparison(ds, ds2, new ReferencedEnvelope( newBounds, crs ));
-        performQueryComparison(ds, ds2,  new ReferencedEnvelope(smallestFeature.getBounds()));
+
+        performQueryComparison(ds, ds2, new ReferencedEnvelope(newBounds, crs));
+        performQueryComparison(ds, ds2, new ReferencedEnvelope(smallestFeature
+                .getBounds()));
 
         assertTrue(file.exists());
     }
@@ -238,11 +237,11 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection features;
         FeatureIterator indexIter;
         FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(null);
-        String geometryName = indexedDS.getSchema().getDefaultGeometry().getLocalName();
-        
-        Filter filter = fac
-                .bbox( fac.property( geometryName ), newBounds );
-        
+        String geometryName = indexedDS.getSchema().getDefaultGeometry()
+                .getLocalName();
+
+        Filter filter = fac.bbox(fac.property(geometryName), newBounds);
+
         features = indexedDS.getFeatureSource().getFeatures(filter);
         FeatureCollection features2 = baselineDS.getFeatureSource()
                 .getFeatures(filter);
@@ -269,30 +268,30 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         }
         return indexedFeatures;
     }
-
-    public void testCreateAndReadGRX() throws Exception {
-        URL url = TestData.url(STATE_POP);
-        String filename = url.getFile();
-        filename = filename.substring(0, filename.lastIndexOf("."));
-
-        File file = new File(filename + ".grx");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null,
-                true, true, IndexedShapefileDataStore.TREE_GRX);
-        FeatureCollection features = ds.getFeatureSource().getFeatures();
-        Iterator iter = features.iterator();
-
-        while (iter.hasNext()) {
-            iter.next();
-        }
-
-        // TODO: The following assertion fails
-        // assertTrue(file.exists());
-    }
+//
+//    public void testCreateAndReadGRX() throws Exception {
+//        URL url = TestData.url(STATE_POP);
+//        String filename = url.getFile();
+//        filename = filename.substring(0, filename.lastIndexOf("."));
+//
+//        File file = new File(filename + ".grx");
+//
+//        if (file.exists()) {
+//            file.delete();
+//        }
+//
+//        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(url, null,
+//                true, true, IndexType.EXPERIMENTAL_UNSUPPORTED_GRX);
+//        FeatureCollection features = ds.getFeatureSource().getFeatures();
+//        Iterator iter = features.iterator();
+//
+//        while (iter.hasNext()) {
+//            iter.next();
+//        }
+//
+//        // TODO: The following assertion fails
+//        // assertTrue(file.exists());
+//    }
 
     public void testLoadAndVerify() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
@@ -304,8 +303,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
         SimpleFeatureType schema = firstFeature(features).getFeatureType();
         assertNotNull(schema.getDefaultGeometry());
-        assertEquals("Number of Attributes", 253,
-                schema.getAttributeCount());
+        assertEquals("Number of Attributes", 253, schema.getAttributeCount());
         assertEquals("Value of statename is wrong", firstFeature(features)
                 .getAttribute("STATE_NAME"), "Illinois");
         assertEquals("Value of land area is wrong", ((Double) firstFeature(
@@ -465,7 +463,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         int idx = sds.getCount(Query.ALL);
 
         FeatureStore store = (FeatureStore) sds.getFeatureSource(sds
-                .getCurrentTypeName());
+                .getTypeNames()[0]);
 
         Transaction transaction = new DefaultTransaction();
         store.setTransaction(transaction);
@@ -485,6 +483,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         store.addFeatures(DataUtilities.collection(newFeatures1));
         store.addFeatures(DataUtilities.collection(newFeatures2));
         transaction.commit();
+        transaction.close();
         assertEquals(idx + 3, sds.getCount(Query.ALL));
 
     }
@@ -493,42 +492,44 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
         build.setName("junk");
         build.add("a", Point.class);
-        build.add("b",Byte.class);
-        build.add("c",Short.class);
-        build.add("d",Double.class);
-        build.add("e",Float.class);
-        build.add("f",String.class);
-        build.add("g",Date.class);
-        build.add("h",Boolean.class);
-        build.add("i",Number.class);
-        build.add("j",Long.class);
-        build.add("k",BigDecimal.class);
-        build.add("l",BigInteger.class);
+        build.add("b", Byte.class);
+        build.add("c", Short.class);
+        build.add("d", Double.class);
+        build.add("e", Float.class);
+        build.add("f", String.class);
+        build.add("g", Date.class);
+        build.add("h", Boolean.class);
+        build.add("i", Number.class);
+        build.add("j", Long.class);
+        build.add("k", BigDecimal.class);
+        build.add("l", BigInteger.class);
 
         return build.buildFeatureType();
     }
+
     private FeatureCollection createFeatureCollection() throws Exception {
         SimpleFeatureType featureType = createExampleSchema();
         SimpleFeatureBuilder build = new SimpleFeatureBuilder(featureType);
-        
+
         FeatureCollection features = FeatureCollections.newCollection();
         for (int i = 0, ii = 20; i < ii; i++) {
-            
-            build.add(new GeometryFactory().createPoint(new Coordinate(1,-1)));
-            build.add(new Byte( (byte) i ) );
-            build.add(new Short( (short) i));
-            build.add(new Double( i ));
-            build.add(new Float( i ));
-            build.add(new String( i + " " ));
-            build.add(new Date( i ));
-            build.add(new Boolean( true ));
+
+            build.add(new GeometryFactory().createPoint(new Coordinate(1, -1)));
+            build.add(new Byte((byte) i));
+            build.add(new Short((short) i));
+            build.add(new Double(i));
+            build.add(new Float(i));
+            build.add(new String(i + " "));
+            build.add(new Date(i));
+            build.add(new Boolean(true));
             build.add(new Integer(22));
             build.add(new Long(1234567890123456789L));
-            build.add(new BigDecimal(new BigInteger("12345678901234567890123456789"), 2));
+            build.add(new BigDecimal(new BigInteger(
+                    "12345678901234567890123456789"), 2));
             build.add(new BigInteger("12345678901234567890123456789"));
-            
-            SimpleFeature feature = build.buildFeature(null); 
-            features.add( feature );
+
+            SimpleFeature feature = build.buildFeature(null);
+            features.add(feature);
         }
         return features;
     }
@@ -546,8 +547,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     public void testGeometriesWriting() throws Exception {
         String[] wktResources = new String[] { "point", "multipoint", "line",
                 "multiline", "polygon", "multipolygon" };
-
-        PrecisionModel pm = new PrecisionModel();
 
         for (int i = 0; i < wktResources.length; i++) {
             Geometry geom = readGeometry(wktResources[i]);
@@ -583,26 +582,28 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         while (it.hasNext()) {
             SimpleFeature feature = it.next();
             SimpleFeature newFeature = fw.next();
-            
-            newFeature.setAttributes( feature.getAttributes() );            
+
+            newFeature.setAttributes(feature.getAttributes());
             fw.write();
         }
 
         fw.close();
+        assertEquals(20,  s.getFeatureSource().getFeatures().size());
     }
 
     private void runWriteReadTest(Geometry geom, boolean d3) throws Exception {
         // make features
-    	SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
         ftb.setName("Junk");
         ftb.add("a", geom.getClass());
         SimpleFeatureType type = ftb.buildFeatureType();
-        
+
         FeatureCollection features = FeatureCollections.newCollection();
 
         for (int i = 0, ii = 20; i < ii; i++) {
-            SimpleFeature feature = SimpleFeatureBuilder.build(type,new Object[] { geom.clone() }, null);
-            features.add( feature );
+            SimpleFeature feature = SimpleFeatureBuilder.build(type,
+                    new Object[] { geom.clone() }, null);
+            features.add(feature);
         }
 
         // set up file
@@ -653,7 +654,24 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         tmpFile.delete();
     }
 
+    public void testIndexOutOfDate() throws Exception {
+        File shpFile = copyShapefiles(STATE_POP);
+        ShpFileType fix = ShpFileType.FIX;
+        File fixFile = sibling(shpFile, fix.extension);
+        fixFile.delete();
+        IndexedShapefileDataStore ds = new IndexedShapefileDataStore(shpFile.toURI().toURL());
+        
+        assertFalse(ds.needsGeneration(fix));
+        long fixMod = fixFile.lastModified();
+        shpFile.setLastModified(fixMod+1000);
+        assertTrue(ds.needsGeneration(fix));
+        fixFile.setLastModified(shpFile.lastModified());
+        assertFalse(ds.needsGeneration(fix));
+        assertTrue(fixFile.delete());
+        assertTrue(ds.needsGeneration(fix));
+    }
+    
     public static void main(java.lang.String[] args) throws Exception {
-        junit.textui.TestRunner.run(suite(ShapefileDataStoreTest.class));
+        junit.textui.TestRunner.run(suite(IndexedShapefileDataStoreTest.class));
     }
 }

@@ -33,12 +33,12 @@ import org.geotools.index.rtree.PageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/fs/FileSystemPageStore.java $
  */
 public class FileSystemPageStore extends PageStore {
     protected static final byte B_SHORT = (byte) 1;
@@ -58,12 +58,13 @@ public class FileSystemPageStore extends PageStore {
     private FileSystemNode root;
 
     /**
-     * Loads an index from the specified <code>File</code>, if the file doesn't
-     * exists or is 0 length, a new index will be created with default values
-     * for maxNodeEntries, minNodeEntries and splitAlgorithm
-     *
-     * @param file The file that stores the index
-     *
+     * Loads an index from the specified <code>File</code>, if the file
+     * doesn't exists or is 0 length, a new index will be created with default
+     * values for maxNodeEntries, minNodeEntries and splitAlgorithm
+     * 
+     * @param file
+     *                The file that stores the index
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file) throws TreeException {
@@ -86,38 +87,40 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param file
      * @param def
-     *
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def)
-        throws TreeException {
+            throws TreeException {
         this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT);
     }
 
     /**
      * Create and index with the specified values, if the file exists then an
      * <code>RTreeException</code> will be thrown.
-     *
-     * @param file The file to store the index
-     * @param def DOCUMENT ME!
+     * 
+     * @param file
+     *                The file to store the index
+     * @param def
+     *                DOCUMENT ME!
      * @param maxNodeEntries
      * @param minNodeEntries
      * @param splitAlg
-     *
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def,
-        int maxNodeEntries, int minNodeEntries, short splitAlg)
-        throws TreeException {
+            int maxNodeEntries, int minNodeEntries, short splitAlg)
+            throws TreeException {
         super(def, maxNodeEntries, minNodeEntries, splitAlg);
 
         if (file.exists() && (file.length() != 0)) {
             throw new TreeException("Cannot set dataDefinition, "
-                + "maxNodesEntries and "
-                + "minNodeEntries to the existing index " + file);
+                    + "maxNodesEntries and "
+                    + "minNodeEntries to the existing index " + file);
         }
 
         if (file.isDirectory()) {
@@ -138,9 +141,9 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param file
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
@@ -165,7 +168,7 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
@@ -178,7 +181,7 @@ public class FileSystemPageStore extends PageStore {
 
         if (buf.getInt() != FILE_VERSION) {
             throw new TreeException("Wrong file version, shoud be "
-                + FILE_VERSION);
+                    + FILE_VERSION);
         }
 
         // Get the header size
@@ -240,23 +243,23 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
     private void prepareIndex() throws IOException, TreeException {
         if (this.params.getDataDef() == null) {
             throw new TreeException("Data definition cannot be null "
-                + "when creating a new index.");
+                    + "when creating a new index.");
         }
 
         Charset charset = Charset.forName("US-ASCII");
         ByteBuffer chBuf = charset.encode(this.params.getDataDef().getCharset()
-                                                     .name());
+                .name());
         chBuf.position(0);
 
         int headerSize = 22 + chBuf.capacity()
-            + (5 * this.params.getDataDef().getFieldsCount()) + 8;
+                + (5 * this.params.getDataDef().getFieldsCount()) + 8;
 
         this.header = ByteBuffer.allocate(headerSize);
 
@@ -357,8 +360,7 @@ public class FileSystemPageStore extends PageStore {
      * @see org.geotools.index.rtree.PageStore#getNode(long,
      *      org.geotools.index.rtree.Node)
      */
-    public Node getNode(Entry parentEntry, Node parent)
-        throws TreeException {
+    public Node getNode(Entry parentEntry, Node parent) throws TreeException {
         Node node = null;
         long offset = ((Long) parentEntry.getData()).longValue();
 
@@ -408,7 +410,7 @@ public class FileSystemPageStore extends PageStore {
 
             this.raFile.close();
         } catch (IOException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             throw new TreeException(e);
         }
     }
@@ -442,10 +444,11 @@ public class FileSystemPageStore extends PageStore {
     }
 
     /**
-     * If this is set to <code>true</code>, then every write to the index will
-     * call a force() on the associated channel
-     *
-     * @param b true or false
+     * If this is set to <code>true</code>, then every write to the index
+     * will call a force() on the associated channel
+     * 
+     * @param b
+     *                true or false
      */
     public void setForceChannel(boolean b) {
         this.params.setForceChannel(b);
@@ -453,7 +456,7 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return The state of Force channel parameter
      */
     public boolean getForceChannel() {

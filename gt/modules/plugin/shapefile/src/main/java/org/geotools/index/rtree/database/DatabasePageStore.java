@@ -31,12 +31,12 @@ import org.geotools.index.rtree.Entry;
 import org.geotools.index.rtree.Node;
 import org.geotools.index.rtree.PageStore;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/database/DatabasePageStore.java $
  */
 public class DatabasePageStore extends PageStore {
     protected static final int DEF_MAX = 50;
@@ -49,15 +49,17 @@ public class DatabasePageStore extends PageStore {
 
     /**
      * Constructor
-     *
+     * 
      * @param ds
-     * @param dialect DOCUMENT ME!
+     * @param dialect
+     *                DOCUMENT ME!
      * @param rtreeName
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public DatabasePageStore(DataSource ds, Dialect dialect, String rtreeName)
-        throws TreeException {
+            throws TreeException {
         super();
 
         this.dataSource = ds;
@@ -69,35 +71,39 @@ public class DatabasePageStore extends PageStore {
 
     /**
      * Constructor
-     *
+     * 
      * @param ds
-     * @param dialect DOCUMENT ME!
+     * @param dialect
+     *                DOCUMENT ME!
      * @param rtreeName
      * @param def
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public DatabasePageStore(DataSource ds, Dialect dialect, String rtreeName,
-        DataDefinition def) throws TreeException {
+            DataDefinition def) throws TreeException {
         this(ds, dialect, rtreeName, def, DEF_MAX, DEF_MIN, DEF_SPLIT);
     }
 
     /**
      * Constructor
-     *
+     * 
      * @param ds
-     * @param dialect DOCUMENT ME!
+     * @param dialect
+     *                DOCUMENT ME!
      * @param rtreeName
      * @param def
      * @param maxNodeEntries
      * @param minNodeEntries
      * @param splitAlg
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public DatabasePageStore(DataSource ds, Dialect dialect, String rtreeName,
-        DataDefinition def, int maxNodeEntries, int minNodeEntries,
-        short splitAlg) throws TreeException {
+            DataDefinition def, int maxNodeEntries, int minNodeEntries,
+            short splitAlg) throws TreeException {
         super(def, maxNodeEntries, minNodeEntries, splitAlg);
 
         this.dataSource = ds;
@@ -109,7 +115,7 @@ public class DatabasePageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws TreeException
      */
     private void createNew() throws TreeException {
@@ -209,8 +215,7 @@ public class DatabasePageStore extends PageStore {
      * @see org.geotools.index.rtree.PageStore#getNode(org.geotools.index.rtree.Entry,
      *      org.geotools.index.rtree.Node)
      */
-    public Node getNode(Entry parentEntry, Node parent)
-        throws TreeException {
+    public Node getNode(Entry parentEntry, Node parent) throws TreeException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -231,7 +236,9 @@ public class DatabasePageStore extends PageStore {
         return 0;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#getMinNodeEntries()
      */
     public int getMinNodeEntries() {
@@ -239,7 +246,9 @@ public class DatabasePageStore extends PageStore {
         return 0;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#getSplitAlgorithm()
      */
     public short getSplitAlgorithm() {
@@ -247,7 +256,9 @@ public class DatabasePageStore extends PageStore {
         return 0;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#getDataDefinition()
      */
     public DataDefinition getDataDefinition() {
@@ -255,14 +266,18 @@ public class DatabasePageStore extends PageStore {
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#free(org.geotools.index.rtree.Node)
      */
     public void free(Node node) {
         // TODO Auto-generated method stub
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#getWriteLock()
      */
     public Lock getWriteLock() throws LockTimeoutException {
@@ -270,7 +285,9 @@ public class DatabasePageStore extends PageStore {
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#getReadLock()
      */
     public Lock getReadLock() throws LockTimeoutException {
@@ -278,14 +295,18 @@ public class DatabasePageStore extends PageStore {
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#releaseLock(org.geotools.index.rtree.Lock)
      */
     public void releaseLock(Lock lock) {
         // TODO Auto-generated method stub
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.geotools.index.rtree.PageStore#close()
      */
     public void close() throws TreeException {

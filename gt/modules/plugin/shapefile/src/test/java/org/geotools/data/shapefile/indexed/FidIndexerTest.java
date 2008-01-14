@@ -17,11 +17,7 @@ package org.geotools.data.shapefile.indexed;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.indexed.FidIndexer;
-import org.geotools.data.shapefile.indexed.IndexedFidReader;
-import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
-import java.net.URL;
-
+import org.geotools.data.shapefile.ShpFiles;
 
 public class FidIndexerTest extends FIDTestCase {
     protected void tearDown() throws Exception {
@@ -32,17 +28,16 @@ public class FidIndexerTest extends FIDTestCase {
      * Test method for 'org.geotools.index.fid.FidIndexer.generate(URL)'
      */
     public void testGenerate() throws Exception {
-        URL url = FidIndexer.generate(backshp.toURL());
+        ShpFiles shpFiles = new ShpFiles(backshp.toURL());
+        FidIndexer.generate(shpFiles);
 
         IndexedShapefileDataStore ds = new IndexedShapefileDataStore(backshp
-                .toURL(), null, false, false, (byte) 0);
+                .toURL(), null, false, false, IndexType.NONE);
 
         FeatureSource fs = ds.getFeatureSource();
         int features = fs.getCount(Query.ALL);
 
-        
-		IndexedFidReader reader = new IndexedFidReader(TYPE_NAME,
-                FidIndexer.getReadChannel(url));
+        IndexedFidReader reader = new IndexedFidReader(shpFiles);
 
         try {
             assertEquals(features, reader.getCount());
@@ -50,12 +45,12 @@ public class FidIndexerTest extends FIDTestCase {
             int i = 1;
 
             while (reader.hasNext()) {
-                assertEquals(TYPE_NAME+"." + i, reader.next());
-                assertEquals(TYPE_NAME+"."+i, i-1, reader.currentIndex());
+                assertEquals(shpFiles.getTypeName() + "." + i, reader.next());
+                assertEquals(shpFiles.getTypeName() + "." + i, i - 1, reader.currentSHXIndex());
                 i++;
             }
 
-            assertEquals(features, i-1);
+            assertEquals(features, i - 1);
         } finally {
             reader.close();
         }

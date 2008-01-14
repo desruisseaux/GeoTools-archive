@@ -35,15 +35,16 @@ import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * Relational index.
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/RTree.java $
  */
 public class RTree {
-    private Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.index.rtree");
+    private Logger logger = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.rtree");
     private PageStore store;
 
     public RTree(PageStore store) throws TreeException {
@@ -52,10 +53,11 @@ public class RTree {
 
     /**
      * Gets this index bounding box
-     *
+     * 
      * @return An Envelope
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public Envelope getBounds() throws TreeException {
         this.checkOpen();
@@ -68,48 +70,51 @@ public class RTree {
     /**
      * Returns the maxiumal boudns for the provided filter.
      * <p>
-     * This method will try and produce a filter for the provided bounds,
-     * see ExtractBoundsFilterVisitor.BOUNDS_VISITOR for details of generation.
-     *
+     * This method will try and produce a filter for the provided bounds, see
+     * ExtractBoundsFilterVisitor.BOUNDS_VISITOR for details of generation.
+     * 
      * @param filter
      * @throws TreeException
-     * @throws UnsupportedFilterException For Filter.EXCLUDES
+     * @throws UnsupportedFilterException
+     *                 For Filter.EXCLUDES
      */
-    public Envelope getBounds(Filter filter)
-        throws TreeException, UnsupportedFilterException {
+    public Envelope getBounds(Filter filter) throws TreeException,
+            UnsupportedFilterException {
         this.checkOpen();
 
         Envelope env;
-        env = (Envelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope() );
-        
-        if( env == null || env.isNull() ){
-            throw new UnsupportedFilterException("Filter does not contains any Geometry");
+        env = (Envelope) filter.accept(
+                ExtractBoundsFilterVisitor.BOUNDS_VISITOR,
+                new ReferencedEnvelope());
+
+        if (env == null || env.isNull()) {
+            throw new UnsupportedFilterException(
+                    "Filter does not contains any Geometry");
         }
-                
+
         Node root = this.store.getRoot();
 
-        return env.contains(root.getBounds()) ? root.getBounds()
-                                              : this.getBoundsInternal(env, root);
+        return env.contains(root.getBounds()) ? root.getBounds() : this
+                .getBoundsInternal(env, root);
     }
 
     /*
-       public Envelope getBounds(Envelope env) {
-    
-       }
+     * public Envelope getBounds(Envelope env) {
+     *  }
      */
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param query
      * @param node
-     *
+     * 
      * @return DOCUMENT ME!
-     *
+     * 
      * @throws TreeException
      */
     private Envelope getBoundsInternal(final Envelope query, final Node node)
-        throws TreeException {
+            throws TreeException {
         Envelope result = null;
         Entry entry = null;
 
@@ -124,8 +129,8 @@ public class RTree {
                         result.expandToInclude(entry.getBounds());
                     }
                 } else {
-                    this.getBoundsInternal(query,
-                        this.store.getNode(entry, node));
+                    this.getBoundsInternal(query, this.store.getNode(entry,
+                            node));
                 }
             }
         }
@@ -139,16 +144,19 @@ public class RTree {
 
     /**
      * Performs a search on this <code>RTree</code>
-     *
-     * @param query the query <code>Envelope</code>
-     *
+     * 
+     * @param query
+     *                the query <code>Envelope</code>
+     * 
      * @return a <code>Collection</code> of <code>Data</code>
-     *
-     * @throws TreeException DOCUMENT ME!
-     * @throws LockTimeoutException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
+     * @throws LockTimeoutException
+     *                 DOCUMENT ME!
      */
-    public List search(Envelope query)
-        throws TreeException, LockTimeoutException {
+    public List search(Envelope query) throws TreeException,
+            LockTimeoutException {
         // Aquire a read lock
         Lock lock = this.store.getReadLock();
         List ret = null;
@@ -165,28 +173,33 @@ public class RTree {
 
     /**
      * Performs a search on this <code>RTree</code>
-     *
-     * @param filter a <code>Filter</code>
-     *
+     * 
+     * @param filter
+     *                a <code>Filter</code>
+     * 
      * @return a <code>Collection</code> of <code>Data</code>
-     *
+     * 
      * @throws TreeException
-     * @throws UnsupportedFilterException DOCUMENT ME!
-     * @throws LockTimeoutException DOCUMENT ME!
+     * @throws UnsupportedFilterException
+     *                 DOCUMENT ME!
+     * @throws LockTimeoutException
+     *                 DOCUMENT ME!
      */
-    public List search(Filter filter)
-        throws TreeException, UnsupportedFilterException, LockTimeoutException {
+    public List search(Filter filter) throws TreeException,
+            UnsupportedFilterException, LockTimeoutException {
         // Aquire a read lock
         Lock lock = this.store.getReadLock();
         List ret = null;
 
         try {
-            Envelope env = (Envelope) filter.accept(ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope());
-            
+            Envelope env = (Envelope) filter.accept(
+                    ExtractBoundsFilterVisitor.BOUNDS_VISITOR,
+                    new ReferencedEnvelope());
+
             if (env == null || env.isNull()) {
                 throw new UnsupportedFilterException("Not a valid filter");
             }
-            ret = this.search( env, lock);            
+            ret = this.search(env, lock);
         } finally {
             // Release the lock
             this.store.releaseLock(lock);
@@ -197,17 +210,19 @@ public class RTree {
 
     /**
      * Performs a search on the index
-     *
-     * @param query The query <code>Envelope</code>
-     * @param lock A <code>Lock</code> on the index
-     *
+     * 
+     * @param query
+     *                The query <code>Envelope</code>
+     * @param lock
+     *                A <code>Lock</code> on the index
+     * 
      * @return A <code>Collection</code> of <code>Data</code>
-     *
+     * 
      * @throws TreeException
      * @throws LockTimeoutException
      */
-    private List search(Envelope query, Lock lock)
-        throws TreeException, LockTimeoutException {
+    private List search(Envelope query, Lock lock) throws TreeException,
+            LockTimeoutException {
         long start = System.currentTimeMillis();
         this.checkOpen();
 
@@ -217,9 +232,9 @@ public class RTree {
         this.searchNode(query, root, matches);
 
         if (logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST,
-                matches.size() + " Data objects retrieved in "
-                + (System.currentTimeMillis() - start) + "ms.");
+            logger.log(Level.FINEST, matches.size()
+                    + " Data objects retrieved in "
+                    + (System.currentTimeMillis() - start) + "ms.");
         }
 
         return matches;
@@ -227,15 +242,15 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param query
      * @param node
      * @param matches
-     *
+     * 
      * @throws TreeException
      */
     private void searchNode(final Envelope query, final Node node,
-        final ArrayList matches) throws TreeException {
+            final ArrayList matches) throws TreeException {
         Entry entry = null;
 
         for (int i = 0; i < node.getEntriesCount(); i++) {
@@ -253,15 +268,15 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param bounds
      * @param data
-     *
+     * 
      * @throws TreeException
      * @throws LockTimeoutException
      */
-    public void insert(Envelope bounds, Data data)
-        throws TreeException, LockTimeoutException {
+    public void insert(Envelope bounds, Data data) throws TreeException,
+            LockTimeoutException {
         if (!data.isValid()) {
             throw new TreeException("Invalid data supplied!");
         }
@@ -279,10 +294,10 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param lock
      * @param entry
-     *
+     * 
      * @throws TreeException
      */
     private void insert(Lock lock, Entry entry) throws TreeException {
@@ -306,15 +321,15 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
      * @param newEntry
-     *
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
-    private Node chooseLeaf(Node node, Entry newEntry)
-        throws TreeException {
+    private Node chooseLeaf(Node node, Entry newEntry) throws TreeException {
         if (node.isLeaf()) {
             return node;
         }
@@ -336,8 +351,8 @@ public class RTree {
         for (Iterator iter = entries.iterator(); iter.hasNext();) {
             element = (Entry) iter.next();
 
-            currentArea = this.getAreaIncrease(element.getBounds(),
-                    newEntry.getBounds());
+            currentArea = this.getAreaIncrease(element.getBounds(), newEntry
+                    .getBounds());
 
             if (currentArea < lastArea) {
                 lastArea = currentArea;
@@ -354,10 +369,10 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
-     *
-     *
+     * 
+     * 
      * @throws TreeException
      */
     private Node[] splitNode(Node node) throws TreeException {
@@ -398,10 +413,10 @@ public class RTree {
             if (entries.size() == 0) {
                 break;
             } else {
-                /* If the remaining elements are not enough
-                 * for reaching the minNodeElements of a group
-                 * or are just right to reach it, add all entries
-                 * to the group
+                /*
+                 * If the remaining elements are not enough for reaching the
+                 * minNodeElements of a group or are just right to reach it, add
+                 * all entries to the group
                  */
                 if ((ret[0].getEntriesCount() + entries.size()) <= this.store
                         .getMinNodeEntries()) {
@@ -447,8 +462,8 @@ public class RTree {
                 } else if (d1 > d2) {
                     pointer = 1;
                 } else {
-                    /* If areas are the same the one with less
-                     * entries wins
+                    /*
+                     * If areas are the same the one with less entries wins
                      */
                     if (ret[0].getEntriesCount() < ret[1].getEntriesCount()) {
                         pointer = 0;
@@ -471,9 +486,9 @@ public class RTree {
 
     /**
      * Returns the 2 new <code>Node</code>s
-     *
+     * 
      * @param entries
-     *
+     * 
      */
     private Entry[] quadraticPickSeeds(Entry[] entries) {
         Entry[] ret = new Entry[2];
@@ -504,16 +519,16 @@ public class RTree {
     }
 
     private Entry[] linearPickSeeds(Entry[] entries) {
-        //TODO Implement
+        // TODO Implement
         return null;
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param nodes
      * @param entries
-     *
+     * 
      */
     private Entry quadraticPickNext(Node[] nodes, ArrayList entries) {
         Entry ret = null;
@@ -541,22 +556,22 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param nodes
      * @param entries
-     *
+     * 
      */
     private Entry linearPickNext(Node[] nodes, ArrayList entries) {
-        //TODO implement
+        // TODO implement
         return null;
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node1
      * @param node2
-     *
+     * 
      * @throws TreeException
      */
     private void adjustTree(Node node1, Node node2) throws TreeException {
@@ -623,14 +638,17 @@ public class RTree {
     }
 
     /**
-     * Deletes the entry with the specified <code>Envelope</code> as its bounds.<br>
-     * If more than one entry exists with the same bounds, then subsequent
-     * calls to <code>delete</code> are needed to remove all this elements.
-     *
-     * @param env The <code>Envelope</code>
-     *
+     * Deletes the entry with the specified <code>Envelope</code> as its
+     * bounds.<br>
+     * If more than one entry exists with the same bounds, then subsequent calls
+     * to <code>delete</code> are needed to remove all this elements.
+     * 
+     * @param env
+     *                The <code>Envelope</code>
+     * 
      * @throws TreeException
-     * @throws LockTimeoutException DOCUMENT ME!
+     * @throws LockTimeoutException
+     *                 DOCUMENT ME!
      */
     public void delete(Envelope env) throws TreeException, LockTimeoutException {
         this.checkOpen();
@@ -643,7 +661,7 @@ public class RTree {
 
             if (node == null) {
                 throw new TreeException(
-                    "No node found with the supplied envelope: " + env);
+                        "No node found with the supplied envelope: " + env);
             }
 
             Entry e = null;
@@ -665,15 +683,15 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param lock
      * @param node
      * @param entry
-     *
+     * 
      * @throws TreeException
      */
     private void doDelete(Lock lock, Node node, Entry entry)
-        throws TreeException {
+            throws TreeException {
         node.removeEntry(entry);
         node.save();
 
@@ -704,14 +722,17 @@ public class RTree {
 
     /**
      * Frees a non leaf Node
-     *
-     * @param node The Node to free
-     * @param entries A <code>Collection</code> used to store Node Entry
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @param node
+     *                The Node to free
+     * @param entries
+     *                A <code>Collection</code> used to store Node Entry
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     private void free(final Node node, final Collection entries)
-        throws TreeException {
+            throws TreeException {
         if (node.isLeaf()) {
             entries.addAll(node.getEntries());
         } else {
@@ -725,7 +746,7 @@ public class RTree {
 
     /**
      * Closes this index and the associated <code>PageStore</code>
-     *
+     * 
      * @throws TreeException
      */
     public void close() throws TreeException {
@@ -735,8 +756,9 @@ public class RTree {
 
     /**
      * Checks to see if the index is open
-     *
-     * @throws TreeException If the index is closed
+     * 
+     * @throws TreeException
+     *                 If the index is closed
      */
     private void checkOpen() throws TreeException {
         if (this.store == null) {
@@ -747,16 +769,17 @@ public class RTree {
     /**
      * Finds the first leaf node that contains the element with the supplied
      * envelope
-     *
-     * @param node Starting node
-     * @param envelope <code>Envelope</code> to search
-     *
+     * 
+     * @param node
+     *                Starting node
+     * @param envelope
+     *                <code>Envelope</code> to search
+     * 
      * @return The <code>Node</code> that contains the element
-     *
+     * 
      * @throws TreeException
      */
-    private Node findLeaf(Node node, Envelope envelope)
-        throws TreeException {
+    private Node findLeaf(Node node, Envelope envelope) throws TreeException {
         Node ret = null;
         Entry entry = null;
 
@@ -784,10 +807,10 @@ public class RTree {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
-     *
-     *
+     * 
+     * 
      * @throws TreeException
      */
     private Collection condenseTree(Node node) throws TreeException {
@@ -820,9 +843,10 @@ public class RTree {
 
     /**
      * Gets the area of an <code>Entry</code>
-     *
-     * @param e The <code>Entry</code>
-     *
+     * 
+     * @param e
+     *                The <code>Entry</code>
+     * 
      * @return the area
      */
     private double getEntryArea(Entry e) {
@@ -848,7 +872,7 @@ public class RTree {
         double nw = env.getWidth();
         double nh = env.getHeight();
 
-        ret += ((nw - w) * nh); // new height 
+        ret += ((nw - w) * nh); // new height
         ret += ((nh - h) * w); // old width
 
         return ret;
@@ -856,7 +880,7 @@ public class RTree {
 
     private double getAreaDifference(Envelope env, Entry e1, Entry e2) {
         return this.getEnvelopeArea(env) - this.getEntryArea(e1)
-        - this.getEntryArea(e2);
+                - this.getEntryArea(e2);
     }
 
     /**
@@ -891,12 +915,13 @@ public class RTree {
         spc.append("  ");
 
         for (int i = 0; i < node.getEntriesCount(); i++) {
-            ret.append(spc).append(node.getEntry(i)).append(System.getProperty(
-                    "line.separator"));
+            ret.append(spc).append(node.getEntry(i)).append(
+                    System.getProperty("line.separator"));
 
             if (!node.isLeaf()) {
-                ret.append(this.dump(this.store.getNode(node.getEntry(i), node),
-                        indent + 1));
+                ret
+                        .append(this.dump(this.store.getNode(node.getEntry(i),
+                                node), indent + 1));
             }
         }
 

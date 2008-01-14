@@ -18,13 +18,14 @@ package org.geotools.index;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/LockTimeoutException.java $
  */
 public class LockTimeoutException extends Exception {
     /**
-     *
+     * 
      */
     public LockTimeoutException() {
         super();
@@ -32,7 +33,7 @@ public class LockTimeoutException extends Exception {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param message
      */
     public LockTimeoutException(String message) {
@@ -41,7 +42,7 @@ public class LockTimeoutException extends Exception {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param message
      * @param cause
      */
@@ -51,7 +52,7 @@ public class LockTimeoutException extends Exception {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param cause
      */
     public LockTimeoutException(Throwable cause) {

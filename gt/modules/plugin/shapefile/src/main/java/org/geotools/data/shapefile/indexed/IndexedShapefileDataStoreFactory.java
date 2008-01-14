@@ -16,90 +16,24 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Map;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 
-
 /**
- * This factory is maintained for GeoTools 2.3 code that made use of 
+ * This factory is maintained for GeoTools 2.3 code that made use of
  * IndexedShapefileDataStoreFactory directly.
  * 
- * @deprecated Please use ShapefileDataStoreFactory, it can create an IndexedDataStore if appropriate
+ * @deprecated Please use ShapefileDataStoreFactory, it can create an
+ *             IndexedDataStore if appropriate
  * @author Chris Holmes, TOPP
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/IndexedShapefileDataStoreFactory.java $
+ * @version $Id: IndexedShapefileDataStoreFactory.java 27223 2007-09-29
+ *          19:42:29Z jgarnett $
  */
 public class IndexedShapefileDataStoreFactory extends ShapefileDataStoreFactory {
-  
-    /**
-     * This implementation only tries to make an IndexedShapefileDataStore.
-     * 
-     * @param params
-     *
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException
-     */
-    public DataStore createNewShapefile(Map params) throws IOException {
-        URL url = null;
-        DataStore ds = null;
-
-        try {
-            url = (URL) URLP.lookUp(params);
-
-            Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
-
-            if (idx == null) {
-                idx = Boolean.TRUE;
-            }
-
-            URI namespace = (URI) NAMESPACEP.lookUp(params);
-            
-            Charset dbfCharset = (Charset) DBFCHARSET.lookUp(params);
-            if (dbfCharset == null)
-                dbfCharset = Charset.forName("ISO-8859-1");
-
-            ds = new IndexedShapefileDataStore(url, namespace,
-                    false, idx.booleanValue(), IndexedShapefileDataStore.TREE_QIX, dbfCharset);
-        } catch (MalformedURLException mue) {
-            throw new DataSourceException("Unable to attatch datastore to "
-                + url, mue);
-        }
-
-        return ds;
-    }
 
     public String getDisplayName() {
         return "Shapefile (Indexed)";
     }
-    
-    //    public DataSourceMetadataEnity createMetadata( Map params )
-    //            throws IOException {
-    //        
-    //        URL url = (URL) URLP.lookUp(params);
-    //        Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-    //        Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
-    //        
-    //        String server;
-    //        String name;
-    //        if( url.getProtocol().equals("file")){
-    //            server = "localhost";
-    //            name = url.getPath();
-    //        }
-    //        else {
-    //            server = url.getHost()+":"+url.getPort();
-    //            name = url.getFile();
-    //        }
-    //        return new DataSourceMetadataEnity( server, name, "Shapefile access for "+url );
-    //    }
-
 
 }

@@ -23,12 +23,12 @@ import org.geotools.index.rtree.Entry;
 import org.geotools.index.rtree.Node;
 import org.geotools.index.rtree.PageStore;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/memory/MemoryPageStore.java $
  */
 public class MemoryPageStore extends PageStore {
     private static final int DEF_MAX = 50;
@@ -42,7 +42,7 @@ public class MemoryPageStore extends PageStore {
     }
 
     public MemoryPageStore(DataDefinition def, int max, int min, short split)
-        throws TreeException {
+            throws TreeException {
         super(def, max, min, split);
 
         this.root = new MemoryNode(max);
@@ -78,8 +78,7 @@ public class MemoryPageStore extends PageStore {
      * @see org.geotools.index.rtree.PageStore#getNode(org.geotools.index.rtree.Entry,
      *      org.geotools.index.rtree.Node)
      */
-    public Node getNode(Entry parentEntry, Node parent)
-        throws TreeException {
+    public Node getNode(Entry parentEntry, Node parent) throws TreeException {
         Node ret = (Node) parentEntry.getData();
         ret.setParent(parent);
 

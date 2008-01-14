@@ -15,7 +15,9 @@
  */
 package org.geotools.data.shapefile.indexed;
 
+import static org.geotools.data.shapefile.ShpFileType.*;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -23,19 +25,22 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FIDReader;
+import org.geotools.data.shapefile.FileReader;
+import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.resources.NIOUtilities;
 
-
 /**
  * This object reads from a file the fid of a feature in a shapefile.
- *
+ * 
  * @author Jesse
  */
-public class IndexedFidReader implements FIDReader {
-    private static final Logger LOGGER=org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
+public class IndexedFidReader implements FIDReader, FileReader {
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.data.shapefile");
     private ReadableByteChannel readChannel;
     private ByteBuffer buffer;
     private long count;
@@ -45,32 +50,33 @@ public class IndexedFidReader implements FIDReader {
     private int currentShxIndex = -1;
     private RecordNumberTracker reader;
     private long currentId;
-    StreamLogging streamLogger=new StreamLogging("IndexedFidReader");
+    /**
+     * move the reader to the recno-th entry in the file.
+     * 
+     * @param recno
+     * @throws IOException
+     */
+    private long bufferStart = Long.MIN_VALUE;
+    StreamLogging streamLogger = new StreamLogging("IndexedFidReader");
 
-    public IndexedFidReader(String typeName, ReadableByteChannel readChannel)
-        throws IOException {
-        this.typeName = typeName + ".";
-        this.readChannel = readChannel;
+    public IndexedFidReader(ShpFiles shpFiles) throws IOException {
+        this.typeName = shpFiles.getTypeName() + ".";
+        this.readChannel = shpFiles.getReadChannel(FIX, this);
         streamLogger.open();
-        getHeader();
+        getHeader(shpFiles);
 
         buffer = ByteBuffer.allocateDirect(12 * 1024);
         buffer.position(buffer.limit());
     }
 
-    public IndexedFidReader(String typeName,
-            RecordNumberTracker reader, ReadableByteChannel readChannel)
-        throws IOException {
+    public IndexedFidReader(ShpFiles shpFiles, RecordNumberTracker reader)
+            throws IOException {
+        this(shpFiles);
         this.reader = reader;
-        this.typeName = typeName + ".";
-        this.readChannel = readChannel;
-        getHeader();
 
-        buffer = ByteBuffer.allocateDirect(12 * 1024);
-        buffer.position(buffer.limit());
     }
 
-    private void getHeader() throws IOException {
+    private void getHeader(ShpFiles shpFiles) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(IndexedFidWriter.HEADER_SIZE);
         ShapefileReader.fill(buffer, readChannel);
 
@@ -87,16 +93,24 @@ public class IndexedFidReader implements FIDReader {
 
         if (version != 1) {
             throw new IOException(
-                "File is not of a compatible version for this reader or file is corrupt.");
+                    "File is not of a compatible version for this reader or file is corrupt.");
         }
 
         this.count = buffer.getLong();
         this.removes = buffer.getInt();
+        if (removes > getCount() / 2) {
+            URL url = shpFiles.acquireRead(FIX, this);
+            try {
+                DataUtilities.urlToFile(url).deleteOnExit();
+            } finally {
+                shpFiles.unlockRead(url, this);
+            }
+        }
     }
 
     /**
      * Returns the number of Fid Entries in the file.
-     *
+     * 
      * @return Returns the number of Fid Entries in the file.
      */
     public long getCount() {
@@ -104,9 +118,9 @@ public class IndexedFidReader implements FIDReader {
     }
 
     /**
-     * Returns the number of features that have been removed since the
-     * fid index was regenerated.
-     *
+     * Returns the number of features that have been removed since the fid index
+     * was regenerated.
+     * 
      * @return Returns the number of features that have been removed since the
      *         fid index was regenerated.
      */
@@ -117,53 +131,59 @@ public class IndexedFidReader implements FIDReader {
     /**
      * Returns the offset to the location in the SHX file that the fid
      * identifies. This search take logN time.
-     *
-     * @param fid the fid to find.
-     *
+     * 
+     * @param fid
+     *                the fid to find.
+     * 
      * @return Returns the record number of the record in the SHX file that the
      *         fid identifies. Will return -1 if the fid was not found.
-     *
+     * 
      * @throws IOException
-     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IllegalArgumentException
+     *                 DOCUMENT ME!
      */
     public long findFid(String fid) throws IOException {
         try {
-            long desired = Long.parseLong(fid.substring(fid.lastIndexOf(".")
-                        + 1));
+            long desired = Long.parseLong(fid
+                    .substring(fid.lastIndexOf(".") + 1));
 
             if ((desired < 0)) {
                 return -1;
             }
 
-            if( desired<count ){
+            if (desired < count) {
                 return search(desired, -1, this.count, desired - 1);
-            }else{
-                return search( desired, -1, this.count, count - 1 );
+            } else {
+                return search(desired, -1, this.count, count - 1);
             }
         } catch (NumberFormatException e) {
-            LOGGER.warning( "Fid is not recognized as a fid for this shapefile: "
-                + typeName);
+            LOGGER
+                    .warning("Fid is not recognized as a fid for this shapefile: "
+                            + typeName);
             return -1;
         }
     }
 
     /**
      * Searches for the desired record.
-     *
-     * @param desired the id of the desired record.
-     * @param minRec the last record that is known to be <em>before</em> the
-     *        desired record.
-     * @param maxRec the first record that is known to be <em>after</em> the
-     *        desired record.
-     * @param predictedRec the record that is predicted to be the desired
-     *        record.
-     *
+     * 
+     * @param desired
+     *                the id of the desired record.
+     * @param minRec
+     *                the last record that is known to be <em>before</em> the
+     *                desired record.
+     * @param maxRec
+     *                the first record that is known to be <em>after</em> the
+     *                desired record.
+     * @param predictedRec
+     *                the record that is predicted to be the desired record.
+     * 
      * @return returns the record number of the feature in the shx file.
-     *
+     * 
      * @throws IOException
      */
-    long search(long desired, long minRec, long maxRec,
-        long predictedRec) throws IOException {
+    long search(long desired, long minRec, long maxRec, long predictedRec)
+            throws IOException {
         if (minRec == maxRec) {
             return -1;
         }
@@ -176,9 +196,9 @@ public class IndexedFidReader implements FIDReader {
             return currentShxIndex;
         }
 
-        if( maxRec-minRec < 10 ){
-            return search( desired, minRec+1, maxRec, minRec+1 );
-        }else{
+        if (maxRec - minRec < 10) {
+            return search(desired, minRec + 1, maxRec, minRec + 1);
+        } else {
             long newOffset = desired - currentId;
             long newPrediction = predictedRec + newOffset;
 
@@ -202,19 +222,13 @@ public class IndexedFidReader implements FIDReader {
         }
     }
 
-    /**
-     * move the reader to the recno-th entry in the file.
-     *
-     * @param recno
-     *
-     * @throws IOException
-     */
-    private long lastRecNo = Long.MIN_VALUE;
-    private long bufferStart = Long.MIN_VALUE;
     public void goTo(long recno) throws IOException {
+        assert recno<count;
         if (readChannel instanceof FileChannel) {
-            long newPosition = IndexedFidWriter.HEADER_SIZE + (recno * IndexedFidWriter.RECORD_SIZE);
-            if(newPosition >= bufferStart + buffer.limit() || newPosition < bufferStart) {
+            long newPosition = IndexedFidWriter.HEADER_SIZE
+                    + (recno * IndexedFidWriter.RECORD_SIZE);
+            if (newPosition >= bufferStart + buffer.limit()
+                    || newPosition < bufferStart) {
                 FileChannel fc = (FileChannel) readChannel;
                 fc.position(newPosition);
                 buffer.limit(buffer.capacity());
@@ -224,22 +238,22 @@ public class IndexedFidReader implements FIDReader {
             }
         } else {
             throw new IOException(
-                "Read Channel is not a File Channel so this is not possible.");
+                    "Read Channel is not a File Channel so this is not possible.");
         }
     }
 
     public void close() throws IOException {
         try {
-            if( buffer!=null ){
-                if( buffer instanceof MappedByteBuffer ){
+            if (buffer != null) {
+                if (buffer instanceof MappedByteBuffer) {
                     NIOUtilities.clean(buffer);
                 }
             }
             if (reader != null)
                 reader.close();
         } finally {
-                readChannel.close();
-                streamLogger.close();
+            readChannel.close();
+            streamLogger.close();
         }
     }
 
@@ -269,7 +283,8 @@ public class IndexedFidReader implements FIDReader {
         }
 
         if (!hasNext()) {
-            throw new NoSuchElementException("Feature could not be read; a the index may be invalid");
+            throw new NoSuchElementException(
+                    "Feature could not be read; a the index may be invalid");
         }
 
         currentId = buffer.getLong();
@@ -279,20 +294,34 @@ public class IndexedFidReader implements FIDReader {
     }
 
     /**
-     * Returns the record number of the feature in the shx or shp that
-     * is identified by the the last fid returned by next().
-     *
+     * Returns the record number of the feature in the shx or shp that is
+     * identified by the the last fid returned by next().
+     * 
      * @return Returns the record number of the feature in the shx or shp that
      *         is identified by the the last fid returned by next().
-     *
-     * @throws NoSuchElementException DOCUMENT ME!
+     * 
+     * @throws NoSuchElementException
+     *                 DOCUMENT ME!
      */
-    public int currentIndex() {
+    public int currentSHXIndex() {
         if (currentShxIndex == -1) {
             throw new NoSuchElementException(
-                "Next must be called before there exists a current element.");
+                    "Next must be called before there exists a current element.");
         }
 
         return currentShxIndex;
+    }
+
+    /**
+     * Returns the index that is appended to the typename to construct the fid.
+     * 
+     * @return the index that is appended to the typename to construct the fid.
+     */
+    public long getCurrentFIDIndex(){
+        return currentId;
+    }
+    
+    public String id() {
+        return getClass().getName();
     }
 }

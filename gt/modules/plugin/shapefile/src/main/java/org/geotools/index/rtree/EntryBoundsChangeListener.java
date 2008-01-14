@@ -18,9 +18,10 @@ package org.geotools.index.rtree;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/EntryBoundsChangeListener.java $
  */
 public interface EntryBoundsChangeListener {
     public void boundsChanged(Entry e);

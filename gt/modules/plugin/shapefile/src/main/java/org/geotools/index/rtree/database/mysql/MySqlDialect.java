@@ -17,12 +17,12 @@ package org.geotools.index.rtree.database.mysql;
 
 import org.geotools.index.rtree.database.AbstractDialect;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/database/mysql/MySqlDialect.java $
  */
 public class MySqlDialect extends AbstractDialect {
     /**
@@ -30,6 +30,6 @@ public class MySqlDialect extends AbstractDialect {
      */
     public String getCreateTable(String tableName) {
         return "create table " + tableName + "(" + "page_id int not null,"
-        + "fl_leaf char(1) not null," + "blob_content blob";
+                + "fl_leaf char(1) not null," + "blob_content blob";
     }
 }

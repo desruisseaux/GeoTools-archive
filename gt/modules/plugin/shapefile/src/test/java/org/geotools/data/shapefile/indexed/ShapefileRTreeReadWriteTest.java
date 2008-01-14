@@ -32,20 +32,17 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-
 /**
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/indexed/ShapefileRTreeReadWriteTest.java $
+ * @version $Id: ShapefileRTreeReadWriteTest.java 27228 2007-09-29 20:24:08Z
+ *          jgarnett $
  * @author Ian Schneider
  */
 public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
-    final String[] files = {
-        "shapes/statepop.shp",
-        "shapes/polygontest.shp",
-        "shapes/pointtest.shp",
-        "shapes/holeTouchEdge.shp",
-        "shapes/stream.shp"
-    };
+    final String[] files = { "shapes/statepop.shp", "shapes/polygontest.shp",
+            "shapes/pointtest.shp", "shapes/holeTouchEdge.shp",
+            "shapes/stream.shp" };
     boolean readStarted = false;
     Exception exception = null;
 
@@ -83,75 +80,71 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
     public void testWriteTwice() throws Exception {
         copyShapefiles("shapes/stream.shp");
-    	IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(TestData.url(this, "shapes/stream.shp"));
+        IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(TestData
+                .url(this, "shapes/stream.shp"));
         String typeName = s1.getTypeNames()[0];
         FeatureSource source = s1.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
-        IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
 
-        doubleWrite(type, one, getTempFile(), maker, false);
-        doubleWrite(type, one, getTempFile(), maker, true);
-	}
+        doubleWrite(type, one, getTempFile(), false);
+        doubleWrite(type, one, getTempFile(), true);
+    }
 
-	private void doubleWrite(SimpleFeatureType type, FeatureCollection one, File tmp,
-                             IndexedShapefileDataStoreFactory maker, boolean memorymapped)
-            throws IOException, MalformedURLException {
-		IndexedShapefileDataStore s;
-		s = (IndexedShapefileDataStore) maker.createDataStore(tmp.toURL(),
-		        memorymapped);
+    private void doubleWrite(SimpleFeatureType type, FeatureCollection one,
+            File tmp, 
+            boolean memorymapped) throws IOException, MalformedURLException {
+        IndexedShapefileDataStore s;
+        s = new IndexedShapefileDataStore(tmp.toURL(),
+                memorymapped, true);
 
-		s.createSchema(type);
-		FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-		
-		store.addFeatures( one );
-		store.addFeatures( one );
+        s.createSchema(type);
+        FeatureStore store = (FeatureStore) s.getFeatureSource(type
+                .getTypeName());
 
-		s = new IndexedShapefileDataStore(tmp.toURL());
-		assertEquals(one.size()*2, store.getCount(Query.ALL));
-	}
-    
-	void test(String f) throws Exception {
-        copyShapefiles(f); // Work on File rather than URL from JAR.
-        IndexedShapefileDataStore s = new IndexedShapefileDataStore(TestData.url(f));
+        store.addFeatures(one);
+        store.addFeatures(one);
+
+        s = new IndexedShapefileDataStore(tmp.toURL());
+        assertEquals(one.size() * 2, store.getCount(Query.ALL));
+    }
+
+    void test(String f) throws Exception {
+        File file = copyShapefiles(f); // Work on File rather than URL from JAR.
+        IndexedShapefileDataStore s = new IndexedShapefileDataStore(file.toURI().toURL());
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
-        IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
-        test(type, one, getTempFile(), maker, false);
-        test(type, one, getTempFile(), maker, true);
+        test(type, one, getTempFile(), false);
+        test(type, one, getTempFile(), true);
     }
 
-    private void test(SimpleFeatureType type, FeatureCollection one, File tmp,
-        IndexedShapefileDataStoreFactory maker, boolean memorymapped)
-        throws IOException, MalformedURLException, Exception {
+    private void test(SimpleFeatureType type, FeatureCollection one, File tmp, boolean memorymapped)
+            throws IOException, MalformedURLException, Exception {
         IndexedShapefileDataStore s;
         String typeName;
-        s = (IndexedShapefileDataStore) maker.createDataStore(tmp.toURL(),
-                memorymapped);
+        s = (IndexedShapefileDataStore) new IndexedShapefileDataStore(tmp.toURL(),
+                memorymapped, true);
 
-
-        
         s.createSchema(type);
 
-        
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-        store.addFeatures( one );
-        
+        FeatureStore store = (FeatureStore) s.getFeatureSource(type
+                .getTypeName());
+        store.addFeatures(one);
+
         s = new IndexedShapefileDataStore(tmp.toURL());
         typeName = s.getTypeNames()[0];
 
         FeatureCollection two = s.getFeatureSource(typeName).getFeatures();
-        
-        compare(one.features(), two.features() );
+
+        compare(one.features(), two.features());
     }
 
     static void compare(FeatureIterator fs1, FeatureIterator fs2)
-        throws Exception {
-
+            throws Exception {
 
         int i = 0;
 
@@ -186,12 +179,12 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
                 if (!g1.equalsExact(g2)) {
                     throw new Exception("Different geometries (" + i + "):\n"
-                        + g1 + "\n" + g2);
+                            + g1 + "\n" + g2);
                 }
             } else {
                 if (!att1.equals(att2)) {
                     throw new Exception("Different attribute (" + i + "): ["
-                        + att1 + "] - [" + att2 + "]");
+                            + att1 + "] - [" + att2 + "]");
                 }
             }
         }

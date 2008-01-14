@@ -22,12 +22,12 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/Node.java $
  */
 public class Node {
     private Envelope bounds;
@@ -35,22 +35,22 @@ public class Node {
     protected int[] shapesId;
     protected List subNodes;
     protected Node parent;
-    private boolean visited=false;
-    private boolean childrenVisited=false;
-	protected int id;
-    
+    private boolean visited = false;
+    private boolean childrenVisited = false;
+    protected int id;
+
     public Node(Envelope bounds, int id, Node parent) {
-    	this.parent=parent;
-    	this.id=id;
+        this.parent = parent;
+        this.id = id;
         this.bounds = new Envelope(bounds);
         this.subNodes = new ArrayList(4);
         this.shapesId = new int[4];
         Arrays.fill(this.shapesId, -1);
     }
 
-	/**
+    /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the bounds.
      */
     public Envelope getBounds() {
@@ -59,8 +59,9 @@ public class Node {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param bounds The bounds to set.
+     * 
+     * @param bounds
+     *                The bounds to set.
      */
     public void setBounds(Envelope bounds) {
         this.bounds = bounds;
@@ -68,7 +69,7 @@ public class Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the numSubNodes.
      */
     public int getNumSubNodes() {
@@ -77,7 +78,7 @@ public class Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the number of records stored.
      */
     public int getNumShapeIds() {
@@ -86,10 +87,11 @@ public class Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param node
-     *
-     * @throws NullPointerException DOCUMENT ME!
+     * 
+     * @throws NullPointerException
+     *                 DOCUMENT ME!
      */
     public void addSubNode(Node node) {
         if (node == null) {
@@ -101,9 +103,10 @@ public class Node {
 
     /**
      * Removes a subnode
-     *
-     * @param node The subnode to remove
-     *
+     * 
+     * @param node
+     *                The subnode to remove
+     * 
      * @return true if the subnode has been removed
      */
     public boolean removeSubNode(Node node) {
@@ -111,8 +114,8 @@ public class Node {
     }
 
     /**
-     *
-     *
+     * 
+     * 
      */
     public void clearSubNodes() {
         this.subNodes.clear();
@@ -120,12 +123,14 @@ public class Node {
 
     /**
      * Gets the Node at the requested position
-     *
-     * @param pos The position
-     *
+     * 
+     * @param pos
+     *                The position
+     * 
      * @return A Node
-     *
-     * @throws StoreException DOCUMENT ME!
+     * 
+     * @throws StoreException
+     *                 DOCUMENT ME!
      */
     public Node getSubNode(int pos) throws StoreException {
         return (Node) this.subNodes.get(pos);
@@ -133,7 +138,7 @@ public class Node {
 
     /**
      * Add a shape id
-     *
+     * 
      * @param id
      */
     public void addShapeId(int id) {
@@ -151,17 +156,19 @@ public class Node {
 
     /**
      * Gets a shape id
-     *
-     * @param pos The position
-     *
+     * 
+     * @param pos
+     *                The position
+     * 
      * @return The shape id (or recno) at the requested position
-     *
-     * @throws ArrayIndexOutOfBoundsException DOCUMENT ME!
+     * 
+     * @throws ArrayIndexOutOfBoundsException
+     *                 DOCUMENT ME!
      */
     public int getShapeId(int pos) {
         if (pos >= this.numShapesId) {
             throw new ArrayIndexOutOfBoundsException("Requsted " + pos
-                + " but size = " + this.numShapesId);
+                    + " but size = " + this.numShapesId);
         }
 
         return this.shapesId[pos];
@@ -169,7 +176,7 @@ public class Node {
 
     /**
      * Sets the shape ids
-     *
+     * 
      * @param ids
      */
     public void setShapesId(int[] ids) {
@@ -191,44 +198,44 @@ public class Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the shapesId.
      */
     public int[] getShapesId() {
         return this.shapesId;
     }
 
-	public Node getParent() {
-		return parent;
-	}
+    public Node getParent() {
+        return parent;
+    }
 
-	public void setParent(Node parent) {
-		this.parent = parent;
-	}
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
 
-	public boolean isVisited() {
-		return visited;
-	}
+    public boolean isVisited() {
+        return visited;
+    }
 
-	public void setVisited(boolean visited) {
-		this.visited = visited;
-	}
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
 
-	public Node getSibling() throws StoreException {
-		if( parent==null || id==parent.getNumSubNodes()-1)
-			return null;
-		return parent.getSubNode(id+1);
-	}
+    public Node getSibling() throws StoreException {
+        if (parent == null || id == parent.getNumSubNodes() - 1)
+            return null;
+        return parent.getSubNode(id + 1);
+    }
 
-	public boolean isChildrenVisited() {
-		return childrenVisited;
-	}
+    public boolean isChildrenVisited() {
+        return childrenVisited;
+    }
 
-	public void setChildrenVisited(boolean childrenVisited) {
-		this.childrenVisited = childrenVisited;
-	}
+    public void setChildrenVisited(boolean childrenVisited) {
+        this.childrenVisited = childrenVisited;
+    }
 
-	public Node copy() throws IOException {
-		return new Node(bounds, id, parent);
-	}
+    public Node copy() throws IOException {
+        return new Node(bounds, id, parent);
+    }
 }

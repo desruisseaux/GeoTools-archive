@@ -18,12 +18,12 @@ package org.geotools.index.rtree.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/database/Dialect.java $
  */
 public interface Dialect {
     public String getCatalogQuery();
@@ -33,7 +33,7 @@ public interface Dialect {
     public String getCreateTable(String tableName);
 
     public int getNextPageId(Connection cnn, String tableName)
-        throws SQLException;
+            throws SQLException;
 
     public String getSelectPage(String tableName);
 

@@ -31,12 +31,12 @@ import org.geotools.index.rtree.Node;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/cachefs/FileSystemNode.java $
  */
 public class FileSystemNode extends Node {
     static final int ENTRY_SIZE = 40;
@@ -52,7 +52,10 @@ public class FileSystemNode extends Node {
         this.params = params;
 
         if (pageLen == 0) {
-            pageLen = (params.getMaxNodeEntries() * ENTRY_SIZE) + 9; // Flag (leaf or not)
+            pageLen = (params.getMaxNodeEntries() * ENTRY_SIZE) + 9; // Flag
+                                                                        // (leaf
+                                                                        // or
+                                                                        // not)
         }
 
         Long oOffset = null;
@@ -71,7 +74,7 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param params
      */
     public FileSystemNode(Parameters params) {
@@ -80,15 +83,18 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param params
-     * @param offset DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws TreeException DOCUMENT ME!
+     * @param offset
+     *                DOCUMENT ME!
+     * 
+     * @throws IOException
+     *                 DOCUMENT ME!
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
-    public FileSystemNode(Parameters params, long offset)
-        throws IOException, TreeException {
+    public FileSystemNode(Parameters params, long offset) throws IOException,
+            TreeException {
         this(params, false);
         this.offset = offset;
 
@@ -134,8 +140,8 @@ public class FileSystemNode extends Node {
             }
 
             if (this.isLeaf()) {
-                entry = new Entry(new Envelope(x1, x2, y1, y2),
-                        this.loadData(dataBuf, this.params.getDataDef()));
+                entry = new Entry(new Envelope(x1, x2, y1, y2), this.loadData(
+                        dataBuf, this.params.getDataDef()));
             } else {
                 entry = new Entry(new Envelope(x1, x2, y1, y2), new Long(p));
             }
@@ -146,15 +152,15 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param buf
      * @param def
-     *
-     *
+     * 
+     * 
      * @throws TreeException
      */
     private Data loadData(ByteBuffer buf, DataDefinition def)
-        throws TreeException {
+            throws TreeException {
         Data data = new Data(def);
 
         Field field = null;
@@ -187,7 +193,7 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     private ByteBuffer getEmptyByteBuffer() {
         return ByteBuffer.allocate(pageLen);
@@ -195,9 +201,9 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param dataDef
-     *
+     * 
      */
     private ByteBuffer getEmptyByteBuffer(DataDefinition dataDef) {
         int bufLen = dataDef.getEncodedLen() * this.params.getMaxNodeEntries();
@@ -207,7 +213,7 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     long getOffset() {
         return this.offset;
@@ -230,21 +236,23 @@ public class FileSystemNode extends Node {
 
     /**
      * Flushes this node to disk
+     * 
      * <pre>
      * Node page structure:
-     * 1 * byte         --> 1 = leaf, 2 = non leaf
-     * 1 * long         --> parent offset
-     * entries len * 40 --> the entries
+     * 1 * byte         --&gt; 1 = leaf, 2 = non leaf
+     * 1 * long         --&gt; parent offset
+     * entries len * 40 --&gt; the entries
      * 
      * each entry is as follow
-     * 4 * double --> the bounding box (x1, x2, y1, y2)
-     * 1 * long   --> the pointer (-1 if leaf)
+     * 4 * double --&gt; the bounding box (x1, x2, y1, y2)
+     * 1 * long   --&gt; the pointer (-1 if leaf)
      * 
      * Data pages are immediatly after leaf Node pages.
      * 
      * </pre>
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public void flush() throws TreeException {
         if (!this.flushNeeded) {
@@ -326,29 +334,22 @@ public class FileSystemNode extends Node {
             // Allocate needed space for this node
             if (this.offset == -1) {
                 /*
-                   synchronized (channel) {
-                       this.offset = channel.size();
-                       channel.position(this.offset);
-                
-                       ByteBuffer buf = this.getEmptyByteBuffer();
-                       buf.position(0);
-                       channel.write(buf);
-                
-                       if (this.isLeaf()) {
-                           buf = this.getEmptyByteBuffer(this.params.getDataDef());
-                           buf.position(0);
-                           channel.write(buf);
-                       }
-                       if (this.params.getForceChannel()) {
-                           channel.force(false);
-                       }
-                   }
+                 * synchronized (channel) { this.offset = channel.size();
+                 * channel.position(this.offset);
+                 * 
+                 * ByteBuffer buf = this.getEmptyByteBuffer(); buf.position(0);
+                 * channel.write(buf);
+                 * 
+                 * if (this.isLeaf()) { buf =
+                 * this.getEmptyByteBuffer(this.params.getDataDef());
+                 * buf.position(0); channel.write(buf); } if
+                 * (this.params.getForceChannel()) { channel.force(false); } }
                  */
                 int len = pageLen;
 
                 if (this.isLeaf()) {
                     len += (this.params.getDataDef().getEncodedLen() * this.params
-                    .getMaxNodeEntries());
+                            .getMaxNodeEntries());
                 }
 
                 this.offset = this.params.getNewNodeOffset(len);
@@ -374,82 +375,47 @@ public class FileSystemNode extends Node {
         }
 
         /*
-           try {
-               // Prepare buffers...
-               ByteBuffer buf = this.getEmptyByteBuffer();
-               ByteBuffer dataBuf = null;
-               if (this.isLeaf()) {
-                   dataBuf = this.getEmptyByteBuffer(this.params.getDataDef());
-               }
-        
-               buf.put(this.isLeaf() ? (byte)1 : (byte)2);
-               buf.putLong(this.parentOffset);
-        
-               long pointOffset = 0;
-               if (this.getEntriesCount() > 0) {
-                   Envelope env = null;
-                   for (int i = 0; i < this.getEntriesCount(); i++) {
-                       env = this.entries[i].getBounds();
-                       buf.putDouble(env.getMinX());
-                       buf.putDouble(env.getMaxX());
-                       buf.putDouble(env.getMinY());
-                       buf.putDouble(env.getMaxY());
-        
-                       Object objData = this.entries[i].getData();
-                       if (this.isLeaf()) {
-                           this.storeKeyData(dataBuf, (Data)objData);
-                           pointOffset = -1;
-                       } else {
-                           pointOffset = ((Long)objData).longValue();
-                       }
-        
-                       buf.putLong(pointOffset);
-                   }
-               }
-               synchronized (channel) {
-                   if (this.offset == -1) {
-                       // I'm a new Node
-                       this.offset = channel.size();
-                   }
-        
-                   buf.position(0);
-                   channel.position(this.offset);
-                   channel.write(buf);
-        
-                   // If I'm a leaf, then store my Data
-                   if (this.isLeaf()) {
-                       dataBuf.position(0);
-                       channel.write(dataBuf);
-                   }
-        
-                   // Change parentOffset of my childrens
-                   if (this.isChanged && !this.isLeaf()) {
-                       ByteBuffer childBuf = ByteBuffer.allocate(8);
-                       childBuf.putLong(this.offset);
-                       Long pos = null;
-                       for (int i = 0; i < this.entriesCount; i++) {
-                           pos = (Long)this.entries[i].getData();
-                           childBuf.flip();
-                           channel.position(pos.longValue() + 1);
-                           channel.write(childBuf);
-                       }
-                   }
-        
-                   if (this.params.getForceChannel()) {
-                       channel.force(false);
-                   }
-               }
-        
-           } catch (IOException e) {
-               throw new TreeException(e);
-           }
+         * try { // Prepare buffers... ByteBuffer buf =
+         * this.getEmptyByteBuffer(); ByteBuffer dataBuf = null; if
+         * (this.isLeaf()) { dataBuf =
+         * this.getEmptyByteBuffer(this.params.getDataDef()); }
+         * 
+         * buf.put(this.isLeaf() ? (byte)1 : (byte)2);
+         * buf.putLong(this.parentOffset);
+         * 
+         * long pointOffset = 0; if (this.getEntriesCount() > 0) { Envelope env =
+         * null; for (int i = 0; i < this.getEntriesCount(); i++) { env =
+         * this.entries[i].getBounds(); buf.putDouble(env.getMinX());
+         * buf.putDouble(env.getMaxX()); buf.putDouble(env.getMinY());
+         * buf.putDouble(env.getMaxY());
+         * 
+         * Object objData = this.entries[i].getData(); if (this.isLeaf()) {
+         * this.storeKeyData(dataBuf, (Data)objData); pointOffset = -1; } else {
+         * pointOffset = ((Long)objData).longValue(); }
+         * 
+         * buf.putLong(pointOffset); } } synchronized (channel) { if
+         * (this.offset == -1) { // I'm a new Node this.offset = channel.size(); }
+         * 
+         * buf.position(0); channel.position(this.offset); channel.write(buf);
+         *  // If I'm a leaf, then store my Data if (this.isLeaf()) {
+         * dataBuf.position(0); channel.write(dataBuf); }
+         *  // Change parentOffset of my childrens if (this.isChanged &&
+         * !this.isLeaf()) { ByteBuffer childBuf = ByteBuffer.allocate(8);
+         * childBuf.putLong(this.offset); Long pos = null; for (int i = 0; i <
+         * this.entriesCount; i++) { pos = (Long)this.entries[i].getData();
+         * childBuf.flip(); channel.position(pos.longValue() + 1);
+         * channel.write(childBuf); } }
+         * 
+         * if (this.params.getForceChannel()) { channel.force(false); } }
+         *  } catch (IOException e) { throw new TreeException(e); }
          */
     }
 
     /**
      * Force this node flush
-     *
-     * @throws Throwable DOCUMENT ME!
+     * 
+     * @throws Throwable
+     *                 DOCUMENT ME!
      */
     protected void finalize() throws Throwable {
         this.flush();
@@ -457,14 +423,13 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param buf
      * @param data
-     *
+     * 
      * @throws IOException
      */
-    private void storeKeyData(ByteBuffer buf, Data data)
-        throws IOException {
+    private void storeKeyData(ByteBuffer buf, Data data) throws IOException {
         Object val = null;
         Field field = null;
 
@@ -483,10 +448,11 @@ public class FileSystemNode extends Node {
             } else if (val instanceof Double) {
                 buf.putDouble(((Double) val).doubleValue());
             } else if (val instanceof String) {
-                ByteBuffer strBuffer = ByteBuffer.allocate(field.getEncodedLen());
+                ByteBuffer strBuffer = ByteBuffer.allocate(field
+                        .getEncodedLen());
 
-                ByteBuffer enc = data.getDefinition().getCharset().encode(val
-                        .toString());
+                ByteBuffer enc = data.getDefinition().getCharset().encode(
+                        val.toString());
 
                 enc.position(0);
                 strBuffer.put(enc);
@@ -498,7 +464,7 @@ public class FileSystemNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws IOException
      */
     void free() throws IOException {
@@ -507,23 +473,18 @@ public class FileSystemNode extends Node {
         }
 
         /*
-           FileChannel channel = this.params.getChannel();
-        
-           ByteBuffer buf = this.getEmptyByteBuffer();
-        
-           synchronized (channel) {
-               channel.position(this.offset);
-               channel.write(buf);
-        
-               if (this.isLeaf()) {
-                   buf = this.getEmptyByteBuffer(this.params.getDataDef());
-                   channel.write(buf);
-               }
-        
-               if (this.params.getForceChannel()) {
-                   channel.force(false);
-               }
-           }
+         * FileChannel channel = this.params.getChannel();
+         * 
+         * ByteBuffer buf = this.getEmptyByteBuffer();
+         * 
+         * synchronized (channel) { channel.position(this.offset);
+         * channel.write(buf);
+         * 
+         * if (this.isLeaf()) { buf =
+         * this.getEmptyByteBuffer(this.params.getDataDef());
+         * channel.write(buf); }
+         * 
+         * if (this.params.getForceChannel()) { channel.force(false); } }
          */
         this.flushNeeded = false;
         this.params.removeFromCache(this);

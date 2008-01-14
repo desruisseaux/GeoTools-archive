@@ -17,6 +17,8 @@ package org.geotools.data.shapefile.indexed;
 
 import junit.framework.TestCase;
 import org.geotools.TestData;
+import org.geotools.data.shapefile.ShpFiles;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,10 +26,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-
 public abstract class FIDTestCase extends TestCase {
-	protected final String TYPE_NAME = "archsites";
-	
+    protected final String TYPE_NAME = "archsites";
+
     protected File backshp;
     protected File backdbf;
     protected File backshx;
@@ -35,6 +36,8 @@ public abstract class FIDTestCase extends TestCase {
     protected File backqix;
     String filename;
     protected File fixFile;
+
+    protected ShpFiles shpFiles;
 
     protected void setUp() throws Exception {
         backshp = File.createTempFile("FIDTests", ".shp");
@@ -55,6 +58,9 @@ public abstract class FIDTestCase extends TestCase {
         fixFile.deleteOnExit();
 
         copyFiles();
+
+        shpFiles = new ShpFiles(backshx);
+
     }
 
     protected void tearDown() throws Exception {
@@ -104,10 +110,10 @@ public abstract class FIDTestCase extends TestCase {
             backqix.delete();
         }
 
-        copy(TestData.url("shapes/"+TYPE_NAME+".shp"), backshp);
-        copy(TestData.url("shapes/"+TYPE_NAME+".dbf"), backdbf);
-        copy(TestData.url("shapes/"+TYPE_NAME+".shx"), backshx);
-        copy(TestData.url("shapes/"+TYPE_NAME+".prj"), backprj);
+        copy(TestData.url("shapes/" + TYPE_NAME + ".shp"), backshp);
+        copy(TestData.url("shapes/" + TYPE_NAME + ".dbf"), backdbf);
+        copy(TestData.url("shapes/" + TYPE_NAME + ".shx"), backshx);
+        copy(TestData.url("shapes/" + TYPE_NAME + ".prj"), backprj);
     }
 
     void copy(URL src, File dst) throws IOException {

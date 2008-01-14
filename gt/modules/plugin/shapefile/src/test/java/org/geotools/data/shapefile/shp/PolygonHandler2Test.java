@@ -25,9 +25,9 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geotools.data.shapefile.indexed.TestCaseSupport;
 
-
 /**
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/shp/PolygonHandler2Test.java $
  * @version $Id$
  * @author Ian Schneider
  */
@@ -98,7 +98,7 @@ public class PolygonHandler2Test extends TestCaseSupport {
     }
 
     public static Geometry copyTo(double x, double y, double w, double h,
-        Geometry g) {
+            Geometry g) {
         if (g.getNumPoints() != 5) {
             throw new IllegalArgumentException("Geometry must have 5 points");
         }

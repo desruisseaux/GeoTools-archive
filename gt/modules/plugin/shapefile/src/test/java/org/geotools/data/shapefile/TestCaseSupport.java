@@ -36,26 +36,26 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-
 /**
  * Base class for test suite. This class is not abstract for the purpose of
- * {@link TestCaseSupportTest}, but should not be instantiated otherwise.
- * It should be extented (which is why the constructor is protected).
+ * {@link TestCaseSupportTest}, but should not be instantiated otherwise. It
+ * should be extented (which is why the constructor is protected).
  * <p>
- * Note: a nearly identical copy of this file exists in the {@code ext/shape} module.
- *
- * @source $URL$
+ * Note: a nearly identical copy of this file exists in the {@code ext/shape}
+ * module.
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/TestCaseSupport.java $
  * @version $Id$
- * @author  Ian Schneider
- * @author  Martin Desruisseaux
+ * @author Ian Schneider
+ * @author Martin Desruisseaux
  */
 public class TestCaseSupport extends TestCase {
     /**
-     * Set to {@code true} if {@code println} are wanted during normal execution.
-     * It doesn't apply to message displayed in case of errors.
+     * Set to {@code true} if {@code println} are wanted during normal
+     * execution. It doesn't apply to message displayed in case of errors.
      */
-    //protected static boolean verbose = false;
-
+    // protected static boolean verbose = false;
     /**
      * Stores all temporary files here - delete on tear down.
      */
@@ -69,8 +69,8 @@ public class TestCaseSupport extends TestCase {
     }
 
     /**
-     * Deletes all temporary files created by {@link #getTempFile}.
-     * This method is automatically run after each test.
+     * Deletes all temporary files created by {@link #getTempFile}. This method
+     * is automatically run after each test.
      */
     protected void tearDown() throws Exception {
         // it seems that not all files marked as temp will get erased, perhaps
@@ -79,38 +79,37 @@ public class TestCaseSupport extends TestCase {
         final Iterator f = tmpFiles.iterator();
         while (f.hasNext()) {
             File targetFile = (File) f.next();
-            
+
             targetFile.deleteOnExit();
-            dieDieDIE( sibling(targetFile, "dbf") );
-            dieDieDIE( sibling(targetFile, "shx") );
-            dieDieDIE( sibling(targetFile, "qix") );
-            dieDieDIE( sibling(targetFile, "fix") );
-            dieDieDIE( sibling(targetFile, "grx") );
+            dieDieDIE(sibling(targetFile, "dbf"));
+            dieDieDIE(sibling(targetFile, "shx"));
+            dieDieDIE(sibling(targetFile, "qix"));
+            dieDieDIE(sibling(targetFile, "fix"));
+            dieDieDIE(sibling(targetFile, "grx"));
             // TODDO: r i tree must die
-            dieDieDIE( sibling(targetFile, "prj") );
-            dieDieDIE( sibling(targetFile, "shp.xml") );
-                        
+            dieDieDIE(sibling(targetFile, "prj"));
+            dieDieDIE(sibling(targetFile, "shp.xml"));
+
             f.remove();
         }
         super.tearDown();
     }
-    
-    private void dieDieDIE( File file ){
-        if( file.exists() ){
-            if( file.delete() ){
+
+    private void dieDieDIE(File file) {
+        if (file.exists()) {
+            if (file.delete()) {
                 // dead
-            }
-            else {
+            } else {
                 file.deleteOnExit(); // dead later
             }
         }
     }
-    
+
     /**
      * Helper method for {@link #tearDown}.
      */
     private static File sibling(final File f, final String ext) {
-    	return new File(f.getParent(), sibling(f.getName(), ext));
+        return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
     /**
@@ -126,19 +125,25 @@ public class TestCaseSupport extends TestCase {
 
     /**
      * Read a geometry of the given name.
-     *
-     * @param  wktResource The resource name to load, without its {@code .wkt} extension.
+     * 
+     * @param wktResource
+     *                The resource name to load, without its {@code .wkt}
+     *                extension.
      * @return The geometry.
-     * @throws IOException if reading failed.
+     * @throws IOException
+     *                 if reading failed.
      */
-    protected Geometry readGeometry(final String wktResource) throws IOException {
-        final BufferedReader stream = TestData.openReader("wkt/" + wktResource + ".wkt");
+    protected Geometry readGeometry(final String wktResource)
+            throws IOException {
+        final BufferedReader stream = TestData.openReader("wkt/" + wktResource
+                + ".wkt");
         final WKTReader reader = new WKTReader();
         final Geometry geom;
         try {
             geom = reader.read(stream);
         } catch (ParseException pe) {
-            IOException e = new IOException("parsing error in resource " + wktResource);
+            IOException e = new IOException("parsing error in resource "
+                    + wktResource);
             e.initCause(pe);
             throw e;
         }
@@ -154,25 +159,28 @@ public class TestCaseSupport extends TestCase {
     }
 
     /**
-     * Creates a temporary file, to be automatically deleted at the end of the test suite.
+     * Creates a temporary file, to be automatically deleted at the end of the
+     * test suite.
      */
     protected File getTempFile() throws IOException {
         File tmpFile = File.createTempFile("test-shp", ".shp");
+        tmpFile.deleteOnExit();
         assertTrue(tmpFile.isFile());
-        
+
         // keep track of all temp files so we can delete them
         markTempFile(tmpFile);
-        
+
         return tmpFile;
     }
 
-    private void markTempFile( File tmpFile ) {
-        tmpFiles.add(tmpFile);        
+    private void markTempFile(File tmpFile) {
+        tmpFiles.add(tmpFile);
     }
 
     /**
-     * Copies the specified shape file into the {@code test-data} directory, together with its
-     * sibling ({@code .dbf}, {@code .shp}, {@code .shx} and {@code .prj} files).
+     * Copies the specified shape file into the {@code test-data} directory,
+     * together with its sibling ({@code .dbf}, {@code .shp}, {@code .shx}
+     * and {@code .prj} files).
      */
     protected File copyShapefiles(final String name) throws IOException {
         assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());

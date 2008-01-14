@@ -36,9 +36,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/catalog/shapefile/ShapefileGeoResource.java $
  */
 public class ShapefileGeoResource extends AbstractGeoResource {
     private ShapefileService parent;
@@ -58,13 +58,13 @@ public class ShapefileGeoResource extends AbstractGeoResource {
         }
 
         return adaptee.isAssignableFrom(Service.class)
-        || adaptee.isAssignableFrom(GeoResourceInfo.class)
-        || adaptee.isAssignableFrom(FeatureStore.class)
-        || adaptee.isAssignableFrom(FeatureSource.class);
+                || adaptee.isAssignableFrom(GeoResourceInfo.class)
+                || adaptee.isAssignableFrom(FeatureStore.class)
+                || adaptee.isAssignableFrom(FeatureSource.class);
     }
 
     public Object resolve(Class adaptee, ProgressListener monitor)
-        throws IOException {
+            throws IOException {
         if (adaptee == null) {
             return null;
         }
@@ -92,129 +92,128 @@ public class ShapefileGeoResource extends AbstractGeoResource {
         return null;
     }
 
-    public GeoResourceInfo getInfo(ProgressListener monitor)
-        throws IOException {
+    public GeoResourceInfo getInfo(ProgressListener monitor) throws IOException {
         if (info == null) {
             synchronized (parent.getDataStore(monitor)) {
                 if (info == null) {
-                    //calculate some meta data based on the feature type
-                    SimpleFeatureType type = getFeatureSource(monitor).getSchema();
+                    // calculate some meta data based on the feature type
+                    SimpleFeatureType type = getFeatureSource(monitor)
+                            .getSchema();
                     CoordinateReferenceSystem crs = type.getCRS();
                     String namespace = type.getName().getNamespaceURI();
                     String name = type.getTypeName();
                     String title = name;
                     String description = name;
-                    String[] keywords = new String[] {
-                            ".shp", "Shapefile", name, namespace};
+                    String[] keywords = new String[] { ".shp", "Shapefile",
+                            name, namespace };
 
-                        //calculate bounds
-                        ReferencedEnvelope bounds = null;
+                    // calculate bounds
+                    ReferencedEnvelope bounds = null;
 
-                        try {
-                            Envelope tmpBounds = getFeatureSource(monitor)
-                                                     .getBounds();
+                    try {
+                        Envelope tmpBounds = getFeatureSource(monitor)
+                                .getBounds();
 
-                            if (tmpBounds instanceof ReferencedEnvelope) {
-                                bounds = (ReferencedEnvelope) tmpBounds;
-                            } else {
-                                bounds = new ReferencedEnvelope(tmpBounds, crs);
-                            }
+                        if (tmpBounds instanceof ReferencedEnvelope) {
+                            bounds = (ReferencedEnvelope) tmpBounds;
+                        } else {
+                            bounds = new ReferencedEnvelope(tmpBounds, crs);
+                        }
 
-                            if (bounds == null) {
-                                bounds = new ReferencedEnvelope(new Envelope(),
-                                        crs);
-                                FeatureIterator reader = getFeatureSource( monitor).getFeatures().features();
-                                try{
-                                while( reader.hasNext() ) {
+                        if (bounds == null) {
+                            bounds = new ReferencedEnvelope(new Envelope(), crs);
+                            FeatureIterator reader = getFeatureSource(monitor)
+                                    .getFeatures().features();
+                            try {
+                                while (reader.hasNext()) {
                                     SimpleFeature element = reader.next();
-                                
+
                                     if (bounds.isNull()) {
-                                        bounds.init((Envelope)element.getBounds());
+                                        bounds.init((Envelope) element
+                                                .getBounds());
                                     } else {
                                         bounds.include(element.getBounds());
                                     }
                                 }
-                                }
-                                finally {
-                                	reader.close();
-                                }
+                            } finally {
+                                reader.close();
                             }
-                        } catch (Exception e) {
-                            //something bad happend, return an i dont know
-                            bounds = new ReferencedEnvelope(new Envelope(), crs);
                         }
-                        URI uri;
-                        try {
-                            uri = new URI(namespace);
-;
-                        } catch (URISyntaxException e) {
-                            uri = null;
-                        }              
-                        info = new DefaultGeoResourceInfo(title, name,
-                                description, uri, bounds, crs, keywords, null);
+                    } catch (Exception e) {
+                        // something bad happend, return an i dont know
+                        bounds = new ReferencedEnvelope(new Envelope(), crs);
                     }
-                }
-            }
-
-            return info;
-        }
-
-        protected FeatureSource getFeatureSource(ProgressListener monitor)
-            throws IOException {
-            if (featureSource == null) {
-                synchronized (parent.getDataStore(monitor)) {
-                    if (featureSource == null) {
-                        try {
-                            msg = null;
-
-                            DataStore dataStore = parent.getDataStore(monitor);
-
-                            if (dataStore != null) {
-                                featureSource = dataStore.getFeatureSource(typeName);
-                            }
-                        } 
-                        catch( IOException ioe ) {
-                        	msg = ioe;
-                        	throw ioe;
-                        } 
-                    	catch (Throwable t) {
-                            msg = t;
-                            throw (IOException) new IOException().initCause(t);
-                        }
+                    URI uri;
+                    try {
+                        uri = new URI(namespace);
+                        ;
+                    } catch (URISyntaxException e) {
+                        uri = null;
                     }
+                    info = new DefaultGeoResourceInfo(title, name, description,
+                            uri, bounds, crs, keywords, null);
                 }
             }
-
-            return featureSource;
         }
 
-        public Status getStatus() {
-            if (msg == null) {
-                if (featureSource != null) {
-                    return Status.CONNECTED;
-                }
-
-                return Status.NOTCONNECTED;
-            }
-
-            return Status.BROKEN;
-        }
-
-        public Throwable getMessage() {
-            return msg;
-        }
-
-        public URI getIdentifier() {
-            URI uri = parent.getIdentifier();
-
-            if (uri != null) {
-                try {
-                    return new URI(uri.toString() + "#" + typeName);
-                } catch (URISyntaxException e) {
-                    return null;
-                }
-            }
-
-            return null;
-        }
+        return info;
     }
+
+    protected FeatureSource getFeatureSource(ProgressListener monitor)
+            throws IOException {
+        if (featureSource == null) {
+            synchronized (parent.getDataStore(monitor)) {
+                if (featureSource == null) {
+                    try {
+                        msg = null;
+
+                        DataStore dataStore = parent.getDataStore(monitor);
+
+                        if (dataStore != null) {
+                            featureSource = dataStore
+                                    .getFeatureSource(typeName);
+                        }
+                    } catch (IOException ioe) {
+                        msg = ioe;
+                        throw ioe;
+                    } catch (Throwable t) {
+                        msg = t;
+                        throw (IOException) new IOException().initCause(t);
+                    }
+                }
+            }
+        }
+
+        return featureSource;
+    }
+
+    public Status getStatus() {
+        if (msg == null) {
+            if (featureSource != null) {
+                return Status.CONNECTED;
+            }
+
+            return Status.NOTCONNECTED;
+        }
+
+        return Status.BROKEN;
+    }
+
+    public Throwable getMessage() {
+        return msg;
+    }
+
+    public URI getIdentifier() {
+        URI uri = parent.getIdentifier();
+
+        if (uri != null) {
+            try {
+                return new URI(uri.toString() + "#" + typeName);
+            } catch (URISyntaxException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+}

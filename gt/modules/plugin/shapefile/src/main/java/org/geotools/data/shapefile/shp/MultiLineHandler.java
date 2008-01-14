@@ -28,347 +28,347 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
-
 /*
- * $Id$
- * @author aaime
- * @author Ian Schneider
+ * $Id$ @author
+ * aaime @author Ian Schneider
  */
 /**
  * The default JTS handler for shapefile. Currently uses the default JTS
  * GeometryFactory, since it doesn't seem to matter.
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/shp/MultiLineHandler.java $
  */
 public class MultiLineHandler implements ShapeHandler {
-	final ShapeType shapeType;
+    final ShapeType shapeType;
 
-	GeometryFactory geometryFactory = new GeometryFactory();
+    GeometryFactory geometryFactory = new GeometryFactory();
 
-	CSBuilder builder = CSBuilderFactory.getDefaultBuilder();
+    CSBuilder builder = CSBuilderFactory.getDefaultBuilder();
 
-	double[] x;
+    double[] x;
 
-	double[] y;
+    double[] y;
 
-	double[] z;
+    double[] z;
 
-	/** Create a MultiLineHandler for ShapeType.ARC */
-	public MultiLineHandler() {
-		shapeType = ShapeType.ARC;
-	}
+    /** Create a MultiLineHandler for ShapeType.ARC */
+    public MultiLineHandler() {
+        shapeType = ShapeType.ARC;
+    }
 
-	/**
-	 * Create a MultiLineHandler for one of: <br>
-	 * ShapeType.ARC,ShapeType.ARCM,ShapeType.ARCZ
-	 * 
-	 * @param type
-	 *            The ShapeType to use.
-	 * @throws ShapefileException
-	 *             If the ShapeType is not correct (see constructor).
-	 */
-	public MultiLineHandler(ShapeType type) throws ShapefileException {
-		if ((type != ShapeType.ARC) && (type != ShapeType.ARCM)
-				&& (type != ShapeType.ARCZ)) {
-			throw new ShapefileException(
-					"MultiLineHandler constructor - expected type to be 3,13 or 23");
-		}
+    /**
+     * Create a MultiLineHandler for one of: <br>
+     * ShapeType.ARC,ShapeType.ARCM,ShapeType.ARCZ
+     * 
+     * @param type
+     *                The ShapeType to use.
+     * @throws ShapefileException
+     *                 If the ShapeType is not correct (see constructor).
+     */
+    public MultiLineHandler(ShapeType type) throws ShapefileException {
+        if ((type != ShapeType.ARC) && (type != ShapeType.ARCM)
+                && (type != ShapeType.ARCZ)) {
+            throw new ShapefileException(
+                    "MultiLineHandler constructor - expected type to be 3,13 or 23");
+        }
 
-		shapeType = type;
-	}
+        shapeType = type;
+    }
 
-	/**
-	 * Get the type of shape stored
-	 * (ShapeType.ARC,ShapeType.ARCM,ShapeType.ARCZ)
-	 */
-	public ShapeType getShapeType() {
-		return shapeType;
-	}
+    /**
+     * Get the type of shape stored
+     * (ShapeType.ARC,ShapeType.ARCM,ShapeType.ARCZ)
+     */
+    public ShapeType getShapeType() {
+        return shapeType;
+    }
 
-	/** */
-	public int getLength(Object geometry) {
-		MultiLineString multi = (MultiLineString) geometry;
+    /** */
+    public int getLength(Object geometry) {
+        MultiLineString multi = (MultiLineString) geometry;
 
-		int numlines;
-		int numpoints;
-		int length;
+        int numlines;
+        int numpoints;
+        int length;
 
-		numlines = multi.getNumGeometries();
-		numpoints = multi.getNumPoints();
+        numlines = multi.getNumGeometries();
+        numpoints = multi.getNumPoints();
 
-		if (shapeType == ShapeType.ARC) {
-			length = 44 + (4 * numlines) + (numpoints * 16);
-		} else if (shapeType == ShapeType.ARCM) {
-			length = 44 + (4 * numlines) + (numpoints * 16) + 8 + 8
-					+ (8 * numpoints);
-		} else if (shapeType == ShapeType.ARCZ) {
-			length = 44 + (4 * numlines) + (numpoints * 16) + 8 + 8
-					+ (8 * numpoints) + 8 + 8 + (8 * numpoints);
-		} else {
-			throw new IllegalStateException("Expected ShapeType of Arc, got "
-					+ shapeType);
-		}
+        if (shapeType == ShapeType.ARC) {
+            length = 44 + (4 * numlines) + (numpoints * 16);
+        } else if (shapeType == ShapeType.ARCM) {
+            length = 44 + (4 * numlines) + (numpoints * 16) + 8 + 8
+                    + (8 * numpoints);
+        } else if (shapeType == ShapeType.ARCZ) {
+            length = 44 + (4 * numlines) + (numpoints * 16) + 8 + 8
+                    + (8 * numpoints) + 8 + 8 + (8 * numpoints);
+        } else {
+            throw new IllegalStateException("Expected ShapeType of Arc, got "
+                    + shapeType);
+        }
 
-		return length;
-	}
+        return length;
+    }
 
-	private Object createNull() {
-		return geometryFactory.createMultiLineString((LineString[]) null);
-	}
+    private Object createNull() {
+        return geometryFactory.createMultiLineString((LineString[]) null);
+    }
 
-	public Object readOld(ByteBuffer buffer, ShapeType type) {
-		if (type == ShapeType.NULL) {
-			return createNull();
-		}
-		int dimensions = shapeType == ShapeType.ARCZ ? 3 : 2;
-		//read bounding box (not needed)
-		buffer.position(buffer.position() + 4 * 8);
+    public Object readOld(ByteBuffer buffer, ShapeType type) {
+        if (type == ShapeType.NULL) {
+            return createNull();
+        }
+        int dimensions = shapeType == ShapeType.ARCZ ? 3 : 2;
+        // read bounding box (not needed)
+        buffer.position(buffer.position() + 4 * 8);
 
-		int numParts = buffer.getInt();
-		int numPoints = buffer.getInt(); //total number of points
+        int numParts = buffer.getInt();
+        int numPoints = buffer.getInt(); // total number of points
 
-		int[] partOffsets = new int[numParts];
+        int[] partOffsets = new int[numParts];
 
-		//points = new Coordinate[numPoints];
-		for (int i = 0; i < numParts; i++) {
-			partOffsets[i] = buffer.getInt();
-		}
+        // points = new Coordinate[numPoints];
+        for (int i = 0; i < numParts; i++) {
+            partOffsets[i] = buffer.getInt();
+        }
 
-		LineString[] lines = new LineString[numParts];
-		// Coordinate[] coords = new Coordinate[numPoints];
-		prepareCoordinateArrays(numPoints);
+        LineString[] lines = new LineString[numParts];
+        // Coordinate[] coords = new Coordinate[numPoints];
+        prepareCoordinateArrays(numPoints);
 
-		for (int t = 0; t < numPoints; t++) {
-			x[t] = buffer.getDouble();
-			y[t] = buffer.getDouble();
-			// coords[t] = new Coordinate(buffer.getDouble(),
-			// buffer.getDouble());
-		}
+        for (int t = 0; t < numPoints; t++) {
+            x[t] = buffer.getDouble();
+            y[t] = buffer.getDouble();
+            // coords[t] = new Coordinate(buffer.getDouble(),
+            // buffer.getDouble());
+        }
 
-		if (dimensions == 3) {
-			//z min, max
-			buffer.position(buffer.position() + 2 * 8);
-			for (int t = 0; t < numPoints; t++) {
-				// coords[t].z = buffer.getDouble(); //z value
-				z[t] = buffer.getDouble();
-			}
-		}
+        if (dimensions == 3) {
+            // z min, max
+            buffer.position(buffer.position() + 2 * 8);
+            for (int t = 0; t < numPoints; t++) {
+                // coords[t].z = buffer.getDouble(); //z value
+                z[t] = buffer.getDouble();
+            }
+        }
 
-		int offset = 0;
-		int start = 0;
-		int finish;
-		int length;
+        int offset = 0;
+        int start = 0;
+        int finish;
+        int length;
 
-		for (int part = 0; part < numParts; part++) {
-			if (part == (numParts - 1)) {
-				finish = numPoints;
-			} else {
-				finish = partOffsets[part + 1];
-			}
+        for (int part = 0; part < numParts; part++) {
+            if (part == (numParts - 1)) {
+                finish = numPoints;
+            } else {
+                finish = partOffsets[part + 1];
+            }
 
-			length = finish - start;
-			start = finish;
+            length = finish - start;
+            start = finish;
 
-			// Lines may be either composed of 0, 2 or more coordinates, but not
-			// just one.
-			// since some tools produce such files, we work around it by
-			// duplicating the single
-			// coordinate
-			// Coordinate[] points = null;
-			if (length == 1)
-				// points = new Coordinate[2];
-				builder.start(2, dimensions);
-			else
-				// points = new Coordinate[length];
-				builder.start(length, dimensions);
+            // Lines may be either composed of 0, 2 or more coordinates, but not
+            // just one.
+            // since some tools produce such files, we work around it by
+            // duplicating the single
+            // coordinate
+            // Coordinate[] points = null;
+            if (length == 1)
+                // points = new Coordinate[2];
+                builder.start(2, dimensions);
+            else
+                // points = new Coordinate[length];
+                builder.start(length, dimensions);
 
-			for (int i = 0; i < length; i++) {
-				builder.setOrdinate(x[offset], 0, i);
-				builder.setOrdinate(y[offset], 1, i);
-				if (dimensions == 3)
-					builder.setOrdinate(z[offset], 2, i);
-				// points[i] = coords[offset];
-				offset++;
-			}
+            for (int i = 0; i < length; i++) {
+                builder.setOrdinate(x[offset], 0, i);
+                builder.setOrdinate(y[offset], 1, i);
+                if (dimensions == 3)
+                    builder.setOrdinate(z[offset], 2, i);
+                // points[i] = coords[offset];
+                offset++;
+            }
 
-			if (length == 1) {
-				// points[1] = (Coordinate) points[0].clone();
-				builder.setOrdinate(x[offset - 1], 0, 1);
-				builder.setOrdinate(y[offset - 1], 1, 1);
-				if (dimensions == 3)
-					builder.setOrdinate(z[offset - 1], 2, 1);
-			}
+            if (length == 1) {
+                // points[1] = (Coordinate) points[0].clone();
+                builder.setOrdinate(x[offset - 1], 0, 1);
+                builder.setOrdinate(y[offset - 1], 1, 1);
+                if (dimensions == 3)
+                    builder.setOrdinate(z[offset - 1], 2, 1);
+            }
 
-			lines[part] = geometryFactory.createLineString(builder.end());
-		}
+            lines[part] = geometryFactory.createLineString(builder.end());
+        }
 
-		return geometryFactory.createMultiLineString(lines);
-	}
+        return geometryFactory.createMultiLineString(lines);
+    }
 
-	public Object read(ByteBuffer buffer, ShapeType type) {
-		if (type == ShapeType.NULL) {
-			return createNull();
-		}
-		int dimensions = (shapeType == ShapeType.ARCZ) ? 3 : 2;
-		//read bounding box (not needed)
-		buffer.position(buffer.position() + 4 * 8);
+    public Object read(ByteBuffer buffer, ShapeType type) {
+        if (type == ShapeType.NULL) {
+            return createNull();
+        }
+        int dimensions = (shapeType == ShapeType.ARCZ) ? 3 : 2;
+        // read bounding box (not needed)
+        buffer.position(buffer.position() + 4 * 8);
 
-		int numParts = buffer.getInt();
-		int numPoints = buffer.getInt(); //total number of points
+        int numParts = buffer.getInt();
+        int numPoints = buffer.getInt(); // total number of points
 
-		int[] partOffsets = new int[numParts];
+        int[] partOffsets = new int[numParts];
 
-		//points = new Coordinate[numPoints];
-		for (int i = 0; i < numParts; i++) {
-			partOffsets[i] = buffer.getInt();
-		}
-		// read the first two coordinates and start building the coordinate
-		// sequences
-		CoordinateSequence[] lines = new CoordinateSequence[numParts];
-		int finish, start = 0;
-		int length = 0;
-		boolean clonePoint = false;
-		for (int part = 0; part < numParts; part++) {
-		      start = partOffsets[part];
-		      
-		      if (part == (numParts - 1)) {
-		        finish = numPoints;
-		      } else {
-		        finish = partOffsets[part + 1];
-		      }
+        // points = new Coordinate[numPoints];
+        for (int i = 0; i < numParts; i++) {
+            partOffsets[i] = buffer.getInt();
+        }
+        // read the first two coordinates and start building the coordinate
+        // sequences
+        CoordinateSequence[] lines = new CoordinateSequence[numParts];
+        int finish, start = 0;
+        int length = 0;
+        boolean clonePoint = false;
+        for (int part = 0; part < numParts; part++) {
+            start = partOffsets[part];
 
-			length = finish - start;
-			if (length == 1) {
-				length = 2;
-				clonePoint = true;
-			} else {
-				clonePoint = false;
-			}
+            if (part == (numParts - 1)) {
+                finish = numPoints;
+            } else {
+                finish = partOffsets[part + 1];
+            }
 
-			builder.start(length, dimensions);
-			for (int i = 0; i < length; i++) {
-				builder.setOrdinate(buffer.getDouble(), 0, i);
-				builder.setOrdinate(buffer.getDouble(), 1, i);
-			}
-			
-			if(clonePoint) {
-				builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
-				builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
-			}
+            length = finish - start;
+            if (length == 1) {
+                length = 2;
+                clonePoint = true;
+            } else {
+                clonePoint = false;
+            }
 
-			lines[part] = builder.end();
-		}
+            builder.start(length, dimensions);
+            for (int i = 0; i < length; i++) {
+                builder.setOrdinate(buffer.getDouble(), 0, i);
+                builder.setOrdinate(buffer.getDouble(), 1, i);
+            }
 
-		// if we have another coordinate, read and add to the coordinate
-		// sequences
-		if (dimensions == 3) {
-			//z min, max
-			buffer.position(buffer.position() + 2 * 8);
-			for (int part = 0; part < numParts; part++) {
-		      start = partOffsets[part];
+            if (clonePoint) {
+                builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
+                builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
+            }
 
-		      if (part == (numParts - 1)) {
-					finish = numPoints;
-				} else {
-					finish = partOffsets[part + 1];
-				}
+            lines[part] = builder.end();
+        }
 
-				length = finish - start;
-				if (length == 1) {
-					length = 2;
-					clonePoint = true;
-				} else {
-					clonePoint = false;
-				}
+        // if we have another coordinate, read and add to the coordinate
+        // sequences
+        if (dimensions == 3) {
+            // z min, max
+            buffer.position(buffer.position() + 2 * 8);
+            for (int part = 0; part < numParts; part++) {
+                start = partOffsets[part];
 
-				for (int i = 0; i < length; i++) {
-					builder.setOrdinate(lines[part], buffer.getDouble(), 2, i);
-				}
+                if (part == (numParts - 1)) {
+                    finish = numPoints;
+                } else {
+                    finish = partOffsets[part + 1];
+                }
 
-			}
-		}
+                length = finish - start;
+                if (length == 1) {
+                    length = 2;
+                    clonePoint = true;
+                } else {
+                    clonePoint = false;
+                }
 
-		// Prepare line strings and return the multilinestring
-		LineString[] lineStrings = new LineString[numParts];
-		for (int part = 0; part < numParts; part++) {
-			lineStrings[part] = geometryFactory.createLineString(lines[part]);
-		}
+                for (int i = 0; i < length; i++) {
+                    builder.setOrdinate(lines[part], buffer.getDouble(), 2, i);
+                }
 
-		return geometryFactory.createMultiLineString(lineStrings);
-	}
+            }
+        }
 
-	/**
-	 * @param numPoints
-	 */
-	private void prepareCoordinateArrays(int numPoints) {
-		if (x == null || x.length < numPoints) {
-			x = new double[numPoints];
-			y = new double[numPoints];
-			z = new double[numPoints];
-		}
-	}
+        // Prepare line strings and return the multilinestring
+        LineString[] lineStrings = new LineString[numParts];
+        for (int part = 0; part < numParts; part++) {
+            lineStrings[part] = geometryFactory.createLineString(lines[part]);
+        }
 
-	public void write(ByteBuffer buffer, Object geometry) {
-		MultiLineString multi = (MultiLineString) geometry;
+        return geometryFactory.createMultiLineString(lineStrings);
+    }
 
-		Envelope box = multi.getEnvelopeInternal();
-		buffer.putDouble(box.getMinX());
-		buffer.putDouble(box.getMinY());
-		buffer.putDouble(box.getMaxX());
-		buffer.putDouble(box.getMaxY());
+    /**
+     * @param numPoints
+     */
+    private void prepareCoordinateArrays(int numPoints) {
+        if (x == null || x.length < numPoints) {
+            x = new double[numPoints];
+            y = new double[numPoints];
+            z = new double[numPoints];
+        }
+    }
 
-		int numParts = multi.getNumGeometries();
+    public void write(ByteBuffer buffer, Object geometry) {
+        MultiLineString multi = (MultiLineString) geometry;
 
-		buffer.putInt(numParts);
-		int npoints = multi.getNumPoints();
-		buffer.putInt(npoints);
+        Envelope box = multi.getEnvelopeInternal();
+        buffer.putDouble(box.getMinX());
+        buffer.putDouble(box.getMinY());
+        buffer.putDouble(box.getMaxX());
+        buffer.putDouble(box.getMaxY());
 
-		LineString[] lines = new LineString[numParts];
-		int idx = 0;
+        int numParts = multi.getNumGeometries();
 
-		for (int i = 0; i < numParts; i++) {
-			lines[i] = (LineString) multi.getGeometryN(i);
-			buffer.putInt(idx);
-			idx = idx + lines[i].getNumPoints();
-		}
+        buffer.putInt(numParts);
+        int npoints = multi.getNumPoints();
+        buffer.putInt(npoints);
 
-		Coordinate[] coords = multi.getCoordinates();
+        LineString[] lines = new LineString[numParts];
+        int idx = 0;
 
-		for (int t = 0; t < npoints; t++) {
-			buffer.putDouble(coords[t].x);
-			buffer.putDouble(coords[t].y);
-		}
+        for (int i = 0; i < numParts; i++) {
+            lines[i] = (LineString) multi.getGeometryN(i);
+            buffer.putInt(idx);
+            idx = idx + lines[i].getNumPoints();
+        }
 
-		if (shapeType == ShapeType.ARCZ) {
-			double[] zExtreame = JTSUtilities.zMinMax(coords);
+        Coordinate[] coords = multi.getCoordinates();
 
-			if (Double.isNaN(zExtreame[0])) {
-				buffer.putDouble(0.0);
-				buffer.putDouble(0.0);
-			} else {
-				buffer.putDouble(zExtreame[0]);
-				buffer.putDouble(zExtreame[1]);
-			}
+        for (int t = 0; t < npoints; t++) {
+            buffer.putDouble(coords[t].x);
+            buffer.putDouble(coords[t].y);
+        }
 
-			for (int t = 0; t < npoints; t++) {
-				double z = coords[t].z;
+        if (shapeType == ShapeType.ARCZ) {
+            double[] zExtreame = JTSUtilities.zMinMax(coords);
 
-				if (Double.isNaN(z)) {
-					buffer.putDouble(0.0);
-				} else {
-					buffer.putDouble(z);
-				}
-			}
-		}
+            if (Double.isNaN(zExtreame[0])) {
+                buffer.putDouble(0.0);
+                buffer.putDouble(0.0);
+            } else {
+                buffer.putDouble(zExtreame[0]);
+                buffer.putDouble(zExtreame[1]);
+            }
 
-		if (shapeType == ShapeType.ARCZ) {
-			buffer.putDouble(-10E40);
-			buffer.putDouble(-10E40);
+            for (int t = 0; t < npoints; t++) {
+                double z = coords[t].z;
 
-			for (int t = 0; t < npoints; t++) {
-				buffer.putDouble(-10E40);
-			}
-		}
-	}
+                if (Double.isNaN(z)) {
+                    buffer.putDouble(0.0);
+                } else {
+                    buffer.putDouble(z);
+                }
+            }
+        }
+
+        if (shapeType == ShapeType.ARCZ) {
+            buffer.putDouble(-10E40);
+            buffer.putDouble(-10E40);
+
+            for (int t = 0; t < npoints; t++) {
+                buffer.putDouble(-10E40);
+            }
+        }
+    }
 
 }
 
@@ -436,5 +436,5 @@ public class MultiLineHandler implements ShapeHandler {
  * 
  * Revision 1.1 2002/02/11 16:54:43 jmacgill added shapefile code and
  * directories
- *  
+ * 
  */

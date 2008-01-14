@@ -15,14 +15,10 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import org.geotools.data.shapefile.indexed.FidIndexer;
-import org.geotools.data.shapefile.indexed.IndexedFidReader;
-import org.geotools.data.shapefile.indexed.IndexedFidWriter;
-import org.geotools.data.shapefile.shp.IndexFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.channels.FileChannel;
 
+import org.geotools.data.shapefile.shp.IndexFile;
 
 public class IndexedFidWriterTest extends FIDTestCase {
     private IndexFile indexFile;
@@ -34,11 +30,9 @@ public class IndexedFidWriterTest extends FIDTestCase {
 
     private void initWriter() throws IOException, MalformedURLException {
         close();
-        indexFile = new IndexFile(FidIndexer.getReadChannel(backshx.toURL()));
+        indexFile = new IndexFile(shpFiles, false);
 
-        FileChannel writeChannel = FidIndexer.getWriteChannel(fixFile.toURL());
-        writer = new IndexedFidWriter(writeChannel,
-                new IndexedFidReader(TYPE_NAME, writeChannel));
+        writer = new IndexedFidWriter(shpFiles);
     }
 
     protected void tearDown() throws Exception {
@@ -87,20 +81,19 @@ public class IndexedFidWriterTest extends FIDTestCase {
             assertEquals((long) i, writer.next());
         }
 
-    	writer.write();
+        writer.write();
         close();
 
-        
         initWriter();
 
-        for (int i = 1, j = indexFile.getRecordCount()-1; i < j; i++) {
+        for (int i = 1, j = indexFile.getRecordCount() - 1; i < j; i++) {
             assertTrue(writer.hasNext());
             assertEquals((long) i + 1, writer.next());
         }
     }
 
     public void testRemoveCounting() throws Exception {
-    	FidIndexer.generate(backshp.toURL());
+        FidIndexer.generate(backshp.toURL());
         initWriter();
         writer.next();
         writer.remove();
@@ -109,20 +102,19 @@ public class IndexedFidWriterTest extends FIDTestCase {
         writer.next();
         writer.remove();
 
-        while( writer.hasNext()) {
-        	writer.next();
+        while (writer.hasNext()) {
+            writer.next();
             writer.write();
         }
 
         close();
-        IndexedFidReader reader = new IndexedFidReader(TYPE_NAME, FidIndexer
-				.getReadChannel(fixFile.toURL()));
-        try{
-        	assertEquals(3, reader.getRemoves());
-        }finally{
-        	reader.close();
+        IndexedFidReader reader = new IndexedFidReader(shpFiles);
+        try {
+            assertEquals(3, reader.getRemoves());
+        } finally {
+            reader.close();
         }
-        
+
         // remove some more features
         initWriter();
         writer.next();
@@ -135,24 +127,22 @@ public class IndexedFidWriterTest extends FIDTestCase {
         writer.next();
         writer.next();
         writer.remove();
-        while( writer.hasNext()) {
-        	writer.next();
+        while (writer.hasNext()) {
+            writer.next();
             writer.write();
         }
 
         close();
-        
-        reader = new IndexedFidReader(TYPE_NAME, FidIndexer
-				.getReadChannel(fixFile.toURL()));
-        try{
-        	assertEquals(6, reader.getRemoves());
-        }finally{
-        	reader.close();
+
+        reader = new IndexedFidReader(shpFiles);
+        try {
+            assertEquals(6, reader.getRemoves());
+        } finally {
+            reader.close();
         }
-        
-        
-	}
-    
+
+    }
+
     /*
      * Test method for 'org.geotools.index.fid.IndexedFidWriter.write()'
      */

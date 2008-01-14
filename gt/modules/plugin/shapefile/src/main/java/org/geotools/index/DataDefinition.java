@@ -18,12 +18,12 @@ package org.geotools.index;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-
 /**
  * Field definition
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/DataDefinition.java $
  */
 public class DataDefinition {
     private Charset charset;
@@ -36,7 +36,7 @@ public class DataDefinition {
 
     public final boolean isValid() {
         return (this.charset != null) && !this.charset.equals("")
-        && (this.fields.size() > 0);
+                && (this.fields.size() > 0);
     }
 
     public int getFieldsCount() {
@@ -51,30 +51,19 @@ public class DataDefinition {
      * Well known classes
      * 
      * <ul>
-     * <li>
-     * Short
-     * </li>
-     * <li>
-     * Integer
-     * </li>
-     * <li>
-     * Long
-     * </li>
-     * <li>
-     * Float
-     * </li>
-     * <li>
-     * Double
-     * </li>
-     * <li>
-     * Date
-     * </li>
+     * <li> Short </li>
+     * <li> Integer </li>
+     * <li> Long </li>
+     * <li> Float </li>
+     * <li> Double </li>
+     * <li> Date </li>
      * </ul>
      * 
-     *
+     * 
      * @param clazz
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public void addField(Class clazz) {
         if (clazz.isAssignableFrom(Short.class)) {
@@ -90,14 +79,14 @@ public class DataDefinition {
             this.fields.add(new Field(clazz, 8));
         } else {
             throw new IllegalArgumentException("Unknow len of class " + clazz
-                + "use addField(int)");
+                    + "use addField(int)");
         }
     }
 
     /**
      * For classes with unknown length; this values will be threated as
      * <code>String</code>s and truncated at the specified len
-     *
+     * 
      * @param len
      */
     public void addField(int len) {
@@ -106,7 +95,7 @@ public class DataDefinition {
 
     /**
      * Character set values are encoded in.
-     *
+     * 
      */
     public Charset getCharset() {
         return charset;
@@ -131,7 +120,7 @@ public class DataDefinition {
     /**
      * Gets the len of this field after the encoding, this method may be
      * different from getLen() only if exists strings in the definition
-     *
+     * 
      */
     public int getEncodedLen() {
         int len = 0;
@@ -148,7 +137,7 @@ public class DataDefinition {
 
     /**
      * Inner class for Data fields
-     *
+     * 
      * @author Tommaso Nolli
      */
     public class Field {
@@ -162,7 +151,7 @@ public class DataDefinition {
 
         /**
          * DOCUMENT ME!
-         *
+         * 
          */
         public Class getFieldClass() {
             return clazz;
@@ -170,7 +159,7 @@ public class DataDefinition {
 
         /**
          * DOCUMENT ME!
-         *
+         * 
          */
         public int getLen() {
             return len;
@@ -178,7 +167,7 @@ public class DataDefinition {
 
         /**
          * DOCUMENT ME!
-         *
+         * 
          */
         public int getEncodedLen() {
             int ret = this.len;

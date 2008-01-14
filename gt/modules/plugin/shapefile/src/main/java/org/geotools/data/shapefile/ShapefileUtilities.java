@@ -15,22 +15,23 @@
  */
 package org.geotools.data.shapefile;
 
-
 /**
- *
- * @author  Ian Schneider
- * @source $URL$
+ * 
+ * @author Ian Schneider
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileUtilities.java $
  */
 public class ShapefileUtilities {
-    
-    private ShapefileUtilities() {}
-    
+
+    private ShapefileUtilities() {
+    }
+
     /**
      * Marshal a given Object into the given Class.
      */
-    public static Object forAttribute(final Object o,Class colType) {
+    public static Object forAttribute(final Object o, Class colType) {
         Object object;
-        if(colType == Integer.class) {
+        if (colType == Integer.class) {
             object = o;
         } else if ((colType == Short.class) || (colType == Byte.class)) {
             object = new Integer(((Number) o).intValue());
@@ -40,7 +41,7 @@ public class ShapefileUtilities {
             object = new Double(((Number) o).doubleValue());
         } else if (Number.class.isAssignableFrom(colType)) {
             object = o;
-        } else if(colType == String.class) {
+        } else if (colType == String.class) {
             if (o == null) {
                 object = o;
             } else {
@@ -52,15 +53,14 @@ public class ShapefileUtilities {
             object = o;
         } else {
             if (colType != null) {
-                throw new RuntimeException("Cannot convert " + colType.getName());
+                throw new RuntimeException("Cannot convert "
+                        + colType.getName());
             } else {
                 throw new RuntimeException("Null Class for conversion");
             }
         }
-        
+
         return object;
     }
-    
-    
-    
+
 }

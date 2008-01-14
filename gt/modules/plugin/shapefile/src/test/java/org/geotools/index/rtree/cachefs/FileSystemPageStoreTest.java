@@ -15,25 +15,27 @@
  */
 package org.geotools.index.rtree.cachefs;
 
-import junit.framework.TestCase;
-import org.geotools.index.DataDefinition;
-import org.geotools.index.TreeException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
+import junit.framework.TestCase;
+
+import org.geotools.index.DataDefinition;
+import org.geotools.index.TreeException;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/index/rtree/cachefs/FileSystemPageStoreTest.java $
  */
 public class FileSystemPageStoreTest extends TestCase {
     /**
      * Constructor for FileSystemPageStoreTest.
-     *
+     * 
      * @param arg0
      */
     public FileSystemPageStoreTest(String arg0) {
@@ -48,9 +50,9 @@ public class FileSystemPageStoreTest extends TestCase {
         file.deleteOnExit();
 
         try {
-            FileSystemPageStore fps = new FileSystemPageStore(file);
+             new FileSystemPageStore(file);
             fail("Cannot create a FileSystemPageStore without a "
-                + "DataDefinition");
+                    + "DataDefinition");
         } catch (TreeException e) {
             file.delete();
             // Ok, the file must exist
@@ -60,14 +62,13 @@ public class FileSystemPageStoreTest extends TestCase {
     /*
      * Test for void FileSystemPageStore(File, DataDefinition)
      */
-    public void testFileSystemPageStoreFileDataDefinition()
-        throws Exception {
+    public void testFileSystemPageStoreFileDataDefinition() throws Exception {
         File file = File.createTempFile("geotools2b", ".grx");
         file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
 
         try {
-            FileSystemPageStore fps = new FileSystemPageStore(file, dd);
+            new FileSystemPageStore(file, dd);
             fail("Cannot use an empty DataDefinition");
         } catch (TreeException e) {
             // OK
@@ -83,7 +84,7 @@ public class FileSystemPageStoreTest extends TestCase {
      * Test for void FileSystemPageStore(File, DataDefinition, int, int, short)
      */
     public void testFileSystemPageStoreFileDataDefinitionintintshort()
-        throws Exception {
+            throws Exception {
         File file = File.createTempFile("geotools2c", ".grx");
         file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");

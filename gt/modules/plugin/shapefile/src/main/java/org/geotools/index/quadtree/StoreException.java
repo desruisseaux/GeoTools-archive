@@ -17,13 +17,14 @@ package org.geotools.index.quadtree;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/StoreException.java $
  */
 public class StoreException extends Exception {
 
-	private static final long serialVersionUID = -3356954193373344773L;
+    private static final long serialVersionUID = -3356954193373344773L;
 
     public StoreException() {
         super();

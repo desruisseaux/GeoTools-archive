@@ -20,19 +20,19 @@ import org.geotools.index.TreeException;
 import org.geotools.index.rtree.Entry;
 import org.geotools.index.rtree.Node;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/memory/MemoryNode.java $
  */
 public class MemoryNode extends Node {
     private Node parent;
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param maxNodeEntries
      */
     public MemoryNode(int maxNodeEntries) {

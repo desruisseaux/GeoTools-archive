@@ -27,12 +27,12 @@ import org.geotools.index.TreeException;
 import org.geotools.index.rtree.Entry;
 import org.geotools.index.rtree.Node;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/database/DatabaseNode.java $
  */
 public class DatabaseNode extends Node {
     private DataSource dataSource;
@@ -43,14 +43,14 @@ public class DatabaseNode extends Node {
 
     /**
      * Constructor
-     *
+     * 
      * @param maxNodeEntries
      * @param ds
      * @param dialect
      * @param tableName
      */
     public DatabaseNode(int maxNodeEntries, DataSource ds, Dialect dialect,
-        String tableName) {
+            String tableName) {
         super(maxNodeEntries);
         this.dataSource = ds;
         this.dialect = dialect;
@@ -59,17 +59,18 @@ public class DatabaseNode extends Node {
 
     /**
      * Constructor that retrieves data from the db
-     *
+     * 
      * @param maxNodeEntries
      * @param ds
      * @param dialect
      * @param tableName
      * @param pageId
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public DatabaseNode(int maxNodeEntries, DataSource ds, Dialect dialect,
-        String tableName, Integer pageId) throws TreeException {
+            String tableName, Integer pageId) throws TreeException {
         this(maxNodeEntries, ds, dialect, tableName);
 
         // TODO Retrieve the data
@@ -106,15 +107,15 @@ public class DatabaseNode extends Node {
 
     /**
      * Inserts this Node into the database
-     *
+     * 
      * @param cnn
      * @param bytes
-     *
+     * 
      * @throws SQLException
      * @throws IOException
      */
-    protected void doInsert(Connection cnn, byte[] bytes)
-        throws SQLException, IOException {
+    protected void doInsert(Connection cnn, byte[] bytes) throws SQLException,
+            IOException {
         PreparedStatement pst = null;
 
         try {
@@ -146,15 +147,15 @@ public class DatabaseNode extends Node {
 
     /**
      * Update the databse with this Node informations
-     *
+     * 
      * @param cnn
      * @param bytes
-     *
+     * 
      * @throws SQLException
      * @throws IOException
      */
-    protected void doUpdate(Connection cnn, byte[] bytes)
-        throws SQLException, IOException {
+    protected void doUpdate(Connection cnn, byte[] bytes) throws SQLException,
+            IOException {
         PreparedStatement pst = null;
 
         try {
@@ -212,7 +213,7 @@ public class DatabaseNode extends Node {
         }
 
         return new DatabaseNode(this.maxNodeEntries, this.dataSource,
-            this.dialect, this.tableName, this.parentId);
+                this.dialect, this.tableName, this.parentId);
     }
 
     /**
@@ -224,7 +225,7 @@ public class DatabaseNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the pageId.
      */
     public Integer getPageId() {
@@ -233,8 +234,9 @@ public class DatabaseNode extends Node {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param pageId The pageId to set.
+     * 
+     * @param pageId
+     *                The pageId to set.
      */
     public void setPageId(Integer pageId) {
         this.pageId = pageId;

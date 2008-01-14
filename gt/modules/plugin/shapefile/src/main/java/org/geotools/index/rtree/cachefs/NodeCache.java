@@ -20,16 +20,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/cachefs/NodeCache.java $
  */
 public class NodeCache extends LinkedHashMap {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.index.rtree");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.rtree");
     private final int maxElements;
 
     /**
@@ -41,8 +41,9 @@ public class NodeCache extends LinkedHashMap {
 
     /**
      * Constructor
-     *
-     * @param capacity the capacity of the cache
+     * 
+     * @param capacity
+     *                the capacity of the cache
      */
     public NodeCache(int capacity) {
         super(capacity);

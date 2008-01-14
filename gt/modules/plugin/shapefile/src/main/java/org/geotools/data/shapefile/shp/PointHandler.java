@@ -22,97 +22,100 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-
 /**
  * Wrapper for a Shapefile point.
- *
+ * 
  * @author aaime
  * @author Ian Schneider
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/shp/PointHandler.java $
  * 
  */
 public class PointHandler implements ShapeHandler {
 
-  final ShapeType shapeType;
-  GeometryFactory geometryFactory = new GeometryFactory();
-  
-  public PointHandler(ShapeType type) throws ShapefileException {
-    if ((type != ShapeType.POINT) && (type != ShapeType.POINTM) && (type != ShapeType.POINTZ)) { // 2d, 2d+m, 3d+m
-      throw new ShapefileException(
-      "PointHandler constructor: expected a type of 1, 11 or 21");
+    final ShapeType shapeType;
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    public PointHandler(ShapeType type) throws ShapefileException {
+        if ((type != ShapeType.POINT) && (type != ShapeType.POINTM)
+                && (type != ShapeType.POINTZ)) { // 2d, 2d+m, 3d+m
+            throw new ShapefileException(
+                    "PointHandler constructor: expected a type of 1, 11 or 21");
+        }
+
+        shapeType = type;
     }
-    
-    shapeType = type;
-  }
-  
-  public PointHandler() {
-    shapeType = ShapeType.POINT; //2d
-  }
-  
-  /**
-   * Returns the shapefile shape type value for a point
-   * @return int Shapefile.POINT
-   */
-  public ShapeType getShapeType() {
-    return shapeType;
-  }
-  
-  
-  public int getLength(Object geometry) {
-    int length;
-    if (shapeType == ShapeType.POINT) {
-      length = 20;
-    } else if (shapeType == ShapeType.POINTM) {
-      length = 28;
-    } else if (shapeType == ShapeType.POINTZ) {
-      length = 36;
-    } else {
-      throw new IllegalStateException("Expected ShapeType of Point, got" + shapeType);
+
+    public PointHandler() {
+        shapeType = ShapeType.POINT; // 2d
     }
-    return length;
-  }
-  
-  public Object read(ByteBuffer buffer, ShapeType type) {
-    if (type == ShapeType.NULL) {
-      return createNull();
+
+    /**
+     * Returns the shapefile shape type value for a point
+     * 
+     * @return int Shapefile.POINT
+     */
+    public ShapeType getShapeType() {
+        return shapeType;
     }
-    
-    double x = buffer.getDouble();
-    double y = buffer.getDouble();
-    double z = Double.NaN;
-    
-    if (shapeType == ShapeType.POINTM) {
-      buffer.getDouble();
+
+    public int getLength(Object geometry) {
+        int length;
+        if (shapeType == ShapeType.POINT) {
+            length = 20;
+        } else if (shapeType == ShapeType.POINTM) {
+            length = 28;
+        } else if (shapeType == ShapeType.POINTZ) {
+            length = 36;
+        } else {
+            throw new IllegalStateException("Expected ShapeType of Point, got"
+                    + shapeType);
+        }
+        return length;
     }
-    
-    if (shapeType == ShapeType.POINTZ) {
-      z = buffer.getDouble();
+
+    public Object read(ByteBuffer buffer, ShapeType type) {
+        if (type == ShapeType.NULL) {
+            return createNull();
+        }
+
+        double x = buffer.getDouble();
+        double y = buffer.getDouble();
+        double z = Double.NaN;
+
+        if (shapeType == ShapeType.POINTM) {
+            buffer.getDouble();
+        }
+
+        if (shapeType == ShapeType.POINTZ) {
+            z = buffer.getDouble();
+        }
+
+        return geometryFactory.createPoint(new Coordinate(x, y, z));
     }
-    
-    return geometryFactory.createPoint(new Coordinate(x, y, z));
-  }
-  
-  private Object createNull() {
-    return geometryFactory.createPoint(new Coordinate(Double.NaN,Double.NaN,Double.NaN));
-  }
-  
-  public void write(ByteBuffer buffer, Object geometry) {
-    Coordinate c = ((Point) geometry).getCoordinate();
-    
-    buffer.putDouble(c.x);
-    buffer.putDouble(c.y);
-    
-    if (shapeType == ShapeType.POINTZ) {
-      if (Double.isNaN(c.z)) { // nan means not defined
-        buffer.putDouble(0.0);
-      } else {
-        buffer.putDouble(c.z);
-      }
+
+    private Object createNull() {
+        return geometryFactory.createPoint(new Coordinate(Double.NaN,
+                Double.NaN, Double.NaN));
     }
-    
-    if ((shapeType == ShapeType.POINTZ) || (shapeType == ShapeType.POINTM)) {
-      buffer.putDouble(-10E40); //M
+
+    public void write(ByteBuffer buffer, Object geometry) {
+        Coordinate c = ((Point) geometry).getCoordinate();
+
+        buffer.putDouble(c.x);
+        buffer.putDouble(c.y);
+
+        if (shapeType == ShapeType.POINTZ) {
+            if (Double.isNaN(c.z)) { // nan means not defined
+                buffer.putDouble(0.0);
+            } else {
+                buffer.putDouble(c.z);
+            }
+        }
+
+        if ((shapeType == ShapeType.POINTZ) || (shapeType == ShapeType.POINTM)) {
+            buffer.putDouble(-10E40); // M
+        }
     }
-  }
-  
+
 }

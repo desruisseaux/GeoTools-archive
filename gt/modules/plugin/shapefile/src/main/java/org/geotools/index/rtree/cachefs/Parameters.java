@@ -24,12 +24,12 @@ import java.util.Stack;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.TreeException;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/cachefs/Parameters.java $
  */
 public class Parameters {
     private int maxNodeEntries;
@@ -49,7 +49,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public FileChannel getChannel() {
         return channel;
@@ -57,7 +57,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public DataDefinition getDataDef() {
         return dataDef;
@@ -65,7 +65,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getMaxNodeEntries() {
         return maxNodeEntries;
@@ -73,7 +73,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getMinNodeEntries() {
         return minNodeEntries;
@@ -81,7 +81,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public short getSplitAlg() {
         return splitAlg;
@@ -89,7 +89,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param channel
      */
     public void setChannel(FileChannel channel) {
@@ -98,7 +98,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param definition
      */
     public void setDataDef(DataDefinition definition) {
@@ -107,7 +107,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param i
      */
     public void setMaxNodeEntries(int i) {
@@ -116,7 +116,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param i
      */
     public void setMinNodeEntries(int i) {
@@ -125,7 +125,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param s
      */
     public void setSplitAlg(short s) {
@@ -134,7 +134,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public boolean getForceChannel() {
         return forceChannel;
@@ -142,7 +142,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param b
      */
     public void setForceChannel(boolean b) {
@@ -151,7 +151,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public Stack getFreePages() {
         return freePages;
@@ -159,15 +159,14 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param stack
      */
     public void setFreePages(Stack stack) {
         freePages = stack;
     }
 
-    public synchronized void setNodeCacheSize(int size)
-        throws TreeException {
+    public synchronized void setNodeCacheSize(int size) throws TreeException {
         if (this.cache != null) {
             this.flushCache();
         }
@@ -184,16 +183,17 @@ public class Parameters {
     /**
      * Gets a <code>FileSystemNode</code> from the cache, if the node is non
      * there, a new node will be created and added to the cache.
-     *
-     * @param offset The node offset
-     *
+     * 
+     * @param offset
+     *                The node offset
+     * 
      * @return a <code>FileSystemNode</code>
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
     public synchronized FileSystemNode getFromCache(long offset)
-        throws IOException, TreeException {
+            throws IOException, TreeException {
         FileSystemNode node = null;
 
         if (this.cache != null) {
@@ -210,14 +210,14 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param len
-     *
-     *
-     * @throws IOException DOCUMENT ME!
+     * 
+     * 
+     * @throws IOException
+     *                 DOCUMENT ME!
      */
-    public synchronized long getNewNodeOffset(int len)
-        throws IOException {
+    public synchronized long getNewNodeOffset(int len) throws IOException {
         long offset = 0L;
 
         if (this.newNodeOffset == 0L) {
@@ -233,13 +233,14 @@ public class Parameters {
 
     /**
      * Soters a <code>FileSystemNode</code> in the cache.
-     *
-     * @param node the <code>FileSystemNode</code> to store
-     *
+     * 
+     * @param node
+     *                the <code>FileSystemNode</code> to store
+     * 
      * @throws TreeException
      */
     public synchronized void putToCache(FileSystemNode node)
-        throws TreeException {
+            throws TreeException {
         if (this.cache != null) {
             // If we have a cache store the node, we'll flush it later
             this.cache.put(new Long(node.getOffset()), node);
@@ -251,8 +252,9 @@ public class Parameters {
 
     /**
      * Removes a node from the cache
-     *
-     * @param node the node to remove
+     * 
+     * @param node
+     *                the node to remove
      */
     public synchronized void removeFromCache(FileSystemNode node) {
         if (this.cache != null) {
@@ -262,7 +264,7 @@ public class Parameters {
 
     /**
      * Flushes all nodes and clears the cache
-     *
+     * 
      * @throws TreeException
      */
     public synchronized void flushCache() throws TreeException {
@@ -273,7 +275,8 @@ public class Parameters {
         Iterator iter = this.cache.keySet().iterator();
 
         while (iter.hasNext()) {
-            FileSystemNode element = (FileSystemNode) this.cache.get(iter.next());
+            FileSystemNode element = (FileSystemNode) this.cache.get(iter
+                    .next());
             element.flush();
         }
 

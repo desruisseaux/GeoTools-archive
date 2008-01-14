@@ -19,18 +19,19 @@ package org.geotools.data.shapefile.shp;
 import org.geotools.data.DataSourceException;
 
 /**
- * Thrown when an error relating to the shapefile
- * occures
- * @source $URL$
+ * Thrown when an error relating to the shapefile occures
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/shp/ShapefileException.java $
  */
 public class ShapefileException extends DataSourceException {
 
-	private static final long serialVersionUID = -6523799964553991364L;
+    private static final long serialVersionUID = -6523799964553991364L;
 
-	public ShapefileException(String s) {
+    public ShapefileException(String s) {
         super(s);
     }
-    
+
     public ShapefileException(String s, Throwable cause) {
         super(s, cause);
     }

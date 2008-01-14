@@ -24,12 +24,12 @@ import org.geotools.index.rtree.memory.MemoryPageStore;
 import java.io.File;
 import java.util.Collection;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/index/rtree/RTreeTest.java $
  */
 public class RTreeTest extends TestCase {
     private static final short FILE = 0;
@@ -39,7 +39,7 @@ public class RTreeTest extends TestCase {
 
     /**
      * Constructor for RTreeTest.
-     *
+     * 
      * @param arg0
      */
     public RTreeTest(String arg0) {

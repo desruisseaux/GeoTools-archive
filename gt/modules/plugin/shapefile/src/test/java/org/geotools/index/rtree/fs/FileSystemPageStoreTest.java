@@ -23,17 +23,17 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/index/rtree/fs/FileSystemPageStoreTest.java $
  */
 public class FileSystemPageStoreTest extends TestCase {
     /**
      * Constructor for FileSystemPageStoreTest.
-     *
+     * 
      * @param arg0
      */
     public FileSystemPageStoreTest(String arg0) {
@@ -48,9 +48,9 @@ public class FileSystemPageStoreTest extends TestCase {
         file.deleteOnExit();
 
         try {
-            FileSystemPageStore fps = new FileSystemPageStore(file);
+            new FileSystemPageStore(file);
             fail("Cannot create a FileSystemPageStore without a "
-                + "DataDefinition");
+                    + "DataDefinition");
         } catch (TreeException e) {
             // Ok, the file must exist
         }
@@ -59,14 +59,13 @@ public class FileSystemPageStoreTest extends TestCase {
     /*
      * Test for void FileSystemPageStore(File, DataDefinition)
      */
-    public void testFileSystemPageStoreFileDataDefinition()
-        throws Exception {
+    public void testFileSystemPageStoreFileDataDefinition() throws Exception {
         File file = File.createTempFile("geotoolsf2", ".grx");
         file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
 
         try {
-            FileSystemPageStore fps = new FileSystemPageStore(file, dd);
+            new FileSystemPageStore(file, dd);
             fail("Cannot use an empty DataDefinition");
         } catch (TreeException e) {
             // OK
@@ -82,7 +81,7 @@ public class FileSystemPageStoreTest extends TestCase {
      * Test for void FileSystemPageStore(File, DataDefinition, int, int, short)
      */
     public void testFileSystemPageStoreFileDataDefinitionintintshort()
-        throws Exception {
+            throws Exception {
         File file = File.createTempFile("geotools2g", ".grx");
         file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");

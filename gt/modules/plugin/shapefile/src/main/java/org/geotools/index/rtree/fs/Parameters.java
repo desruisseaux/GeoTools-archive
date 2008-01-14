@@ -21,12 +21,12 @@ import java.util.Stack;
 
 import org.geotools.index.DataDefinition;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/fs/Parameters.java $
  */
 public class Parameters {
     private int maxNodeEntries;
@@ -43,7 +43,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public FileChannel getChannel() {
         return channel;
@@ -51,7 +51,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public DataDefinition getDataDef() {
         return dataDef;
@@ -59,7 +59,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getMaxNodeEntries() {
         return maxNodeEntries;
@@ -67,7 +67,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getMinNodeEntries() {
         return minNodeEntries;
@@ -75,7 +75,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public short getSplitAlg() {
         return splitAlg;
@@ -83,7 +83,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param channel
      */
     public void setChannel(FileChannel channel) {
@@ -92,7 +92,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param definition
      */
     public void setDataDef(DataDefinition definition) {
@@ -101,7 +101,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param i
      */
     public void setMaxNodeEntries(int i) {
@@ -110,7 +110,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param i
      */
     public void setMinNodeEntries(int i) {
@@ -119,7 +119,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param s
      */
     public void setSplitAlg(short s) {
@@ -128,7 +128,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public boolean getForceChannel() {
         return forceChannel;
@@ -136,7 +136,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param b
      */
     public void setForceChannel(boolean b) {
@@ -145,7 +145,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public Stack getFreePages() {
         return freePages;
@@ -153,7 +153,7 @@ public class Parameters {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param stack
      */
     public void setFreePages(Stack stack) {

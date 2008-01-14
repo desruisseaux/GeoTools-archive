@@ -15,21 +15,24 @@
  */
 package org.geotools.data.shapefile.indexed;
 
+import static org.geotools.data.shapefile.ShpFileType.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.geotools.data.shapefile.FileWriter;
+import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.resources.NIOUtilities;
 
 /**
- * The Writer writes out the fid and record number of features to the fid
- * index file.
- *
+ * The Writer writes out the fid and record number of features to the fid index
+ * file.
+ * 
  * @author Jesse
  */
-public class IndexedFidWriter {
+public class IndexedFidWriter implements FileWriter {
     public static final int HEADER_SIZE = 13;
     public static final int RECORD_SIZE = 12;
     private FileChannel channel;
@@ -41,37 +44,45 @@ public class IndexedFidWriter {
 
     private long current;
 
-    private long position ;
+    private long position;
     private int removes;
-    StreamLogging streamLogger=new StreamLogging("IndexedFidReader");
+    StreamLogging streamLogger = new StreamLogging("IndexedFidReader");
 
+    public IndexedFidWriter(ShpFiles shpFiles) throws IOException {
+        if (!shpFiles.isLocal()) {
+            throw new IllegalArgumentException(
+                    "Currently only local files are supported for writing");
+        }
+        this.channel = (FileChannel) shpFiles.getWriteChannel(FIX, this);
 
-    public IndexedFidWriter(FileChannel writeChannel,
-        IndexedFidReader reader2) throws IOException {
-        this.channel = writeChannel;
-        reader = reader2;
+        reader = new IndexedFidReader(shpFiles);
         streamLogger.open();
         allocateBuffers();
         removes = reader.getRemoves();
         writeBuffer.position(HEADER_SIZE);
         closed = false;
-        position=0;
-        current=-1;
-        recordIndex=0;
-        fidIndex=0;
+        position = 0;
+        current = -1;
+        recordIndex = 0;
+        fidIndex = 0;
+    }
+
+    private IndexedFidWriter() {
     }
 
     /**
      * Allocate some buffers for writing.
      */
     private void allocateBuffers() {
-        writeBuffer = ByteBuffer.allocateDirect(HEADER_SIZE+RECORD_SIZE * 1024);
+        writeBuffer = ByteBuffer.allocateDirect(HEADER_SIZE + RECORD_SIZE
+                * 1024);
     }
 
     /**
      * Drain internal buffers into underlying channels.
-     *
-     * @throws IOException DOCUMENT ME!
+     * 
+     * @throws IOException
+     *                 DOCUMENT ME!
      */
     private void drain() throws IOException {
         writeBuffer.flip();
@@ -103,17 +114,17 @@ public class IndexedFidWriter {
 
     public long next() throws IOException {
 
-        if( current != -1)
+        if (current != -1)
             write();
 
         if (reader.hasNext()) {
-            String fid = reader.next();
-            fidIndex = Integer.parseInt(fid.substring(fid.lastIndexOf(".") + 1));
+            reader.next();
+            fidIndex = reader.getCurrentFIDIndex();
         } else {
             fidIndex++;
         }
 
-        current=fidIndex;
+        current = fidIndex;
 
         return fidIndex;
     }
@@ -125,28 +136,27 @@ public class IndexedFidWriter {
 
         try {
 
-            while(hasNext())
+            while (hasNext())
                 next();
 
-            if( current!=-1 )
+            if (current != -1)
                 write();
 
             drain();
             writeHeader();
         } finally {
-            try{
-
-                if( writeBuffer!=null ){
-                    if( writeBuffer instanceof MappedByteBuffer ){
+            try {
+                reader.close();
+            } finally {
+                if (writeBuffer != null) {
+                    if (writeBuffer instanceof MappedByteBuffer) {
                         NIOUtilities.clean(writeBuffer);
                     }
                 }
 
-                if( channel.isOpen() )
+                if (channel.isOpen())
                     channel.close();
                 streamLogger.close();
-            }finally{
-                reader.close();
             }
         }
 
@@ -154,60 +164,89 @@ public class IndexedFidWriter {
     }
 
     /**
-     * Increments the fidIndex by 1.  Indicates that a feature was
-     * removed from the location.  This is intended to ensure that FIDs stay
-     * constant over time.  Consider the following case of 5 features. feature
-     * 1 has fid typename.0 feature 2 has fid typename.1 feature 3 has fid
-     * typename.2 feature 4 has fid typename.3 feature 5 has fid typename.4
-     * when feature 3 is removed/deleted the following usage of the write
-     * should take place:  next();  (move to feature 1) next(); (move to
-     * feature 2) next();  (move to feature 3) remove();(delete feature 3)
-     * next();  (move to feature 4)  // optional write(); (write feature 4)
-     * next();  (move to feature 5) write(); (write(feature 5)
-     *
+     * Increments the fidIndex by 1. Indicates that a feature was removed from
+     * the location. This is intended to ensure that FIDs stay constant over
+     * time. Consider the following case of 5 features. feature 1 has fid
+     * typename.0 feature 2 has fid typename.1 feature 3 has fid typename.2
+     * feature 4 has fid typename.3 feature 5 has fid typename.4 when feature 3
+     * is removed/deleted the following usage of the write should take place:
+     * next(); (move to feature 1) next(); (move to feature 2) next(); (move to
+     * feature 3) remove();(delete feature 3) next(); (move to feature 4) //
+     * optional write(); (write feature 4) next(); (move to feature 5) write();
+     * (write(feature 5)
+     * 
      * @throws IOException
      */
     public void remove() throws IOException {
-        if( current==-1 )
-            throw new IOException("Current fid index is null, next must be called before remove");
+        if (current == -1)
+            throw new IOException(
+                    "Current fid index is null, next must be called before remove");
         if (hasNext()) {
             removes++;
-            current=-1;
+            current = -1;
 
-            //            reader.next();
+            // reader.next();
         }
     }
 
     /**
-     * Writes the current fidIndex.  Writes to the same place in the
-     * file each time.  Only {@link #next()} moves forward in the file.
-     *
+     * Writes the current fidIndex. Writes to the same place in the file each
+     * time. Only {@link #next()} moves forward in the file.
+     * 
      * @throws IOException
-     *
+     * 
      * @see #next()
      * @see #remove()
      */
     public void write() throws IOException {
-        if( current==-1 )
-            throw new IOException("Current fid index is null, next must be called before remove");
+        if (current == -1)
+            throw new IOException(
+                    "Current fid index is null, next must be called before write()");
 
         if (writeBuffer == null) {
             allocateBuffers();
         }
 
-        if (writeBuffer.remaining()<RECORD_SIZE) {
+        if (writeBuffer.remaining() < RECORD_SIZE) {
             drain();
         }
 
         writeBuffer.putLong(current);
         writeBuffer.putInt(recordIndex);
 
-
         recordIndex++;
-        current=-1;
+        current = -1;
     }
 
     public boolean isClosed() {
         return closed;
     }
+
+    public String id() {
+        return getClass().getName();
+    }
+
+    public static final IndexedFidWriter EMPTY_WRITER = new IndexedFidWriter(){
+        @Override
+        public void close() throws IOException {
+        }
+        @Override
+        public boolean hasNext() throws IOException {
+            return false;
+        }
+        @Override
+        public boolean isClosed() {
+            return false;
+        }
+        @Override
+        public void write() throws IOException {
+        }
+        @Override
+        public long next() throws IOException {
+            return 0;
+        }
+        @Override
+        public void remove() throws IOException {
+        }
+    };
 }

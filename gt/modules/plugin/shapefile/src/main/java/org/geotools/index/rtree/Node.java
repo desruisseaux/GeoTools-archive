@@ -24,12 +24,12 @@ import org.geotools.index.TreeException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/Node.java $
  */
 public abstract class Node implements EntryBoundsChangeListener {
     private boolean leaf;
@@ -47,7 +47,7 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * Adds an <code>Entry</code> to this <code>Node</code>
-     *
+     * 
      * @param entry
      */
     public final void addEntry(Entry entry) {
@@ -65,8 +65,9 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * Removes an <code>Entry</code> from this <code>Node</code>
-     *
-     * @param entry The <code>Entry</code> to remove
+     * 
+     * @param entry
+     *                The <code>Entry</code> to remove
      */
     public final void removeEntry(Entry entry) {
         Entry[] newEntries = new Entry[this.entries.length];
@@ -103,7 +104,7 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public boolean isLeaf() {
         return leaf;
@@ -111,7 +112,7 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param b
      */
     public void setLeaf(boolean b) {
@@ -120,7 +121,7 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public int getEntriesCount() {
         return this.entriesCount;
@@ -128,12 +129,12 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * Gets the n<i>th</i> Element
-     *
+     * 
      * @param n
-     *
+     * 
      */
     public Entry getEntry(int n) {
-        return (Entry) this.entries[n];
+        return this.entries[n];
     }
 
     public Collection getEntries() {
@@ -149,8 +150,8 @@ public abstract class Node implements EntryBoundsChangeListener {
     /**
      * The bounds of this node.
      * <p>
-     * You will need to look at the prj to produce a referneced envelope
-     * for wider use.
+     * You will need to look at the prj to produce a referneced envelope for
+     * wider use.
      * 
      * @return The bounds
      */
@@ -171,7 +172,7 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * Saves this <code>Node</code>; this method calls doSave()
-     *
+     * 
      * @throws TreeException
      */
     public final void save() throws TreeException {
@@ -181,31 +182,34 @@ public abstract class Node implements EntryBoundsChangeListener {
 
     /**
      * DOCUMENT ME!
-     *
-     *
-     * @throws TreeException DOCUMENT ME!
+     * 
+     * 
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
     public abstract Node getParent() throws TreeException;
 
     /**
      * Sets the parent of this <code>Node</code>
-     *
-     * @param node The parent <code>Node</code>
+     * 
+     * @param node
+     *                The parent <code>Node</code>
      */
     public abstract void setParent(Node node);
 
     /**
      * Returns the Entry pointing the specified <code>Node</code>
-     *
-     * @param node The <code>Node</code>
-     *
+     * 
+     * @param node
+     *                The <code>Node</code>
+     * 
      * @return The <code>Entry</code>
      */
     protected abstract Entry getEntry(Node node);
 
     /**
      * Saves this <code>Node</code>; called from save()
-     *
+     * 
      * @throws TreeException
      */
     protected abstract void doSave() throws TreeException;

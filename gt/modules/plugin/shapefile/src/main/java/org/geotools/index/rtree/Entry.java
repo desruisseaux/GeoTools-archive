@@ -16,30 +16,28 @@
  */
 package org.geotools.index.rtree;
 
-import org.geotools.index.Data;
-
 import com.vividsolutions.jts.geom.Envelope;
-
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/Entry.java $
  */
-public class Entry implements Cloneable {
+public class Entry<T> implements Cloneable {
     private Envelope bounds;
-    private Object data;
+    private T data;
     private EntryBoundsChangeListener listener;
 
-    public Entry(Envelope e, Object data) {
+    public Entry(Envelope e, T data) {
         this.bounds = e;
         this.data = data;
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public Envelope getBounds() {
         return bounds;
@@ -47,13 +45,13 @@ public class Entry implements Cloneable {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(T data) {
         this.data = data;
     }
 
@@ -64,12 +62,12 @@ public class Entry implements Cloneable {
         Entry e = (Entry) obj;
 
         return this.bounds.equals(e.getBounds())
-        && this.data.equals(e.getData());
+                && this.data.equals(e.getData());
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param envelope
      */
     void setBounds(Envelope envelope) {
@@ -99,7 +97,7 @@ public class Entry implements Cloneable {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param listener
      */
     public void setListener(EntryBoundsChangeListener listener) {

@@ -29,12 +29,12 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.util.ProgressListener;
 
-
 /**
  * Implementation of a service handle for shapefiles.
- *
+ * 
  * @see org.geotools.gtcatalog.Service
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/catalog/shapefile/ShapefileService.java $
  */
 public class ShapefileService extends AbstractService {
     private ServiceInfo info;
@@ -57,12 +57,12 @@ public class ShapefileService extends AbstractService {
         }
 
         return adaptee.isAssignableFrom(ServiceInfo.class)
-        || adaptee.isAssignableFrom(List.class)
-        || adaptee.isAssignableFrom(ShapefileDataStore.class);
+                || adaptee.isAssignableFrom(List.class)
+                || adaptee.isAssignableFrom(ShapefileDataStore.class);
     }
 
     public Object resolve(Class adaptee, ProgressListener monitor)
-        throws IOException {
+            throws IOException {
         if (adaptee == null) {
             return null;
         }
@@ -82,18 +82,14 @@ public class ShapefileService extends AbstractService {
         return null;
     }
 
-    public ServiceInfo getInfo(ProgressListener monitor)
-        throws IOException {
+    public ServiceInfo getInfo(ProgressListener monitor) throws IOException {
         if (info == null) {
             synchronized (getDataStore(monitor)) {
                 if (info == null) {
-                    String title = getIdentifier()
-                                       .getPath();
+                    String title = getIdentifier().getPath();
                     String description = getIdentifier().toString();
-                    String[] keywords = new String[] {
-                            ".shp", "Shapefile",
-                            getDataStore(monitor).getTypeNames()[0]
-                        };
+                    String[] keywords = new String[] { ".shp", "Shapefile",
+                            getDataStore(monitor).getTypeNames()[0] };
 
                     info = new DefaultServiceInfo(title, description, null,
                             null, null, null, keywords, null);
@@ -105,7 +101,7 @@ public class ShapefileService extends AbstractService {
     }
 
     protected ShapefileDataStore getDataStore(ProgressListener monitor)
-        throws IOException {
+            throws IOException {
         if (dataStore == null) {
             synchronized (ShapefileDataStore.class) {
                 if (dataStore == null) {
@@ -114,62 +110,62 @@ public class ShapefileService extends AbstractService {
                             msg = null;
                             dataStore = (ShapefileDataStore) factory
                                     .createDataStore(params);
-                            } catch( IOException io){
-                                msg = io; // save message for later
-                                throw io;                        
-                            } catch (Throwable t) {
-                                msg = t; //save error to report back later                                
-                                throw (IOException) new IOException().initCause(t);
-                            }
+                        } catch (IOException io) {
+                            msg = io; // save message for later
+                            throw io;
+                        } catch (Throwable t) {
+                            msg = t; // save error to report back later
+                            throw (IOException) new IOException().initCause(t);
                         }
                     }
                 }
             }
-            return dataStore;
         }
-
-        public List members(ProgressListener monitor) throws IOException {
-            if (members == null) {
-                synchronized (getDataStore(monitor)) {
-                    if (members == null) {
-                        members = new LinkedList();
-
-                        String[] typenames = getDataStore(monitor).getTypeNames();
-
-                        if (typenames != null) {
-                            for (int i = 0; i < typenames.length; i++) {
-                                members.add(new ShapefileGeoResource(this,
-                                        typenames[i]));
-                            }
-                        }
-                    }
-                }
-            }
-
-            return members;
-        }
-
-        public Map getConnectionParams() {
-            return params;
-        }
-
-        public Status getStatus() {
-            if (msg == null) {
-                if (dataStore != null) {
-                    return Status.CONNECTED;
-                }
-
-                return Status.NOTCONNECTED;
-            }
-
-            return Status.BROKEN;
-        }
-
-        public Throwable getMessage() {
-            return msg;
-        }
-
-        public URI getIdentifier() {
-            return uri;
-        }
+        return dataStore;
     }
+
+    public List members(ProgressListener monitor) throws IOException {
+        if (members == null) {
+            synchronized (getDataStore(monitor)) {
+                if (members == null) {
+                    members = new LinkedList();
+
+                    String[] typenames = getDataStore(monitor).getTypeNames();
+
+                    if (typenames != null) {
+                        for (int i = 0; i < typenames.length; i++) {
+                            members.add(new ShapefileGeoResource(this,
+                                    typenames[i]));
+                        }
+                    }
+                }
+            }
+        }
+
+        return members;
+    }
+
+    public Map getConnectionParams() {
+        return params;
+    }
+
+    public Status getStatus() {
+        if (msg == null) {
+            if (dataStore != null) {
+                return Status.CONNECTED;
+            }
+
+            return Status.NOTCONNECTED;
+        }
+
+        return Status.BROKEN;
+    }
+
+    public Throwable getMessage() {
+        return msg;
+    }
+
+    public URI getIdentifier() {
+        return uri;
+    }
+}
