@@ -58,7 +58,8 @@ public class UnknownFormat extends AbstractGridFormat implements Format {
 	 * @see AbstractGridFormat#getReader(Object)
 	 */
 	public GridCoverageReader getReader(java.lang.Object source) {
-		return null;
+		throw new UnsupportedOperationException(
+			"Trying to get a reader from an unknown format.");
 	}
 
 	/**
