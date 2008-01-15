@@ -15,19 +15,28 @@
  */
 package org.geotools.renderer.shape;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.GeometryFilter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.And;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.spatial.Intersects;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -69,7 +78,7 @@ public class QueryTest extends TestCase {
         TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
     }
 
-    public void dtestBBOXFilter() throws Exception {
+    public void testBBOXFilter() throws Exception {
         BBoxExpression bbox = TestUtilites.filterFactory.createBBoxExpression(new Envelope(
                     -4, -2, 0, -3));
         String geom = source.getSchema().getDefaultGeometry().getLocalName();

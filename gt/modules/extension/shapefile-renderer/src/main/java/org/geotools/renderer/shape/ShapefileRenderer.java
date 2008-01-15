@@ -822,11 +822,16 @@ public class ShapefileRenderer implements GTRenderer {
         
         FilterAttributeExtractor qae = new FilterAttributeExtractor();
         query.getFilter().accept(qae,null);
-        Set ftsAttributes=new LinkedHashSet(sae.getAttributeNameSet());
+        Set ftsAttributes = new LinkedHashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
         if (sae.getDefaultGeometryUsed()
 				&& (!ftsAttributes.contains(schema.getDefaultGeometry().getLocalName()))) {
         	ftsAttributes.add(schema.getDefaultGeometry().getLocalName());
+		} else {
+	        // the code following assumes the geometry column is the last one
+		    // make sure it's the last for good
+	        ftsAttributes.remove(schema.getDefaultGeometry().getLocalName());
+	        ftsAttributes.add(schema.getDefaultGeometry().getLocalName());
 		}
         return (String[]) ftsAttributes.toArray(new String[0]);
     }

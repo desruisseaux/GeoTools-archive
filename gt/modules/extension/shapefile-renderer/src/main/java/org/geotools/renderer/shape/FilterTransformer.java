@@ -110,8 +110,8 @@ public class FilterTransformer extends DuplicatingFilterVisitor {
                 return getFactory(extraData).literal(JTS.transform((com.vividsolutions.jts.geom.Geometry)value, mt));
             }
             if( value instanceof Envelope ){
-                ReferencedEnvelope start = new ReferencedEnvelope((Envelope)value, fromCRS);
-                return getFactory(extraData).literal(start.transform(toCRS, true));
+                ReferencedEnvelope start = new ReferencedEnvelope((Envelope)value, toCRS);
+                return getFactory(extraData).literal(JTS.transform((Envelope) start, mt));
             }
         } catch (MismatchedDimensionException e) {
             throw new RuntimeException(e);
@@ -119,9 +119,7 @@ public class FilterTransformer extends DuplicatingFilterVisitor {
             throw new RuntimeException(e);
         } catch (TransformException e) {
             throw new RuntimeException(e);
-        } catch (FactoryException e) {
-            throw new RuntimeException(e);
-        }
+        } 
         return super.visit(expression, extraData);
     }
 }
