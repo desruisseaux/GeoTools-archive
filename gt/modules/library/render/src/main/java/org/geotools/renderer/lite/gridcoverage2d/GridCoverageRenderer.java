@@ -319,8 +319,8 @@ public final class GridCoverageRenderer {
 		//
 		// ///////////////////////////////////////////////////////////////////
 		// math transform from source to target crs
-		final MathTransform sourceCRSToDestinationCRSTransformation = StreamingRenderer
-				.getMathTransform(sourceCoverageCRS, destinationCRS);
+		final MathTransform sourceCRSToDestinationCRSTransformation = CRS
+				.findMathTransform(sourceCoverageCRS, destinationCRS, true);
 		final MathTransform destinationCRSToSourceCRSTransformation = sourceCRSToDestinationCRSTransformation
 				.inverse();
 		final boolean doReprojection = !sourceCRSToDestinationCRSTransformation
@@ -849,7 +849,8 @@ public final class GridCoverageRenderer {
 		param.parameter("xTrans").setValue(new Float(xTrans));
 		param.parameter("yTrans").setValue(new Float(yTrans));
 		param.parameter("Interpolation").setValue(interpolation);
-		param.parameter("BorderExtender").setValue(be);
+		if(be!=null)
+			hints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER,be));
 		return (GridCoverage2D) scaleFactory.doOperation(param, hints);
 
 	}
@@ -913,8 +914,8 @@ public final class GridCoverageRenderer {
 				param.parameter("qsFilterArray").setValue(
 						new float[] { 0.5F, 1.0F / 3.0F, 0.0F, -1.0F / 12.0F });
 			param.parameter("Interpolation").setValue(interpolation);
-			if(!(interpolation instanceof InterpolationNearest))
-				param.parameter("BorderExtender").setValue(be);
+			if(be!=null)
+				hints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER,be));
 			preScaledGridCoverage = (GridCoverage2D) filteredSubsampleFactory
 					.doOperation(param, hints);
 
@@ -960,7 +961,7 @@ public final class GridCoverageRenderer {
      * @param transform
      * @return
      */
-    private boolean isScaleTranslate(MathTransform transform) {
+    private static boolean isScaleTranslate(MathTransform transform) {
         if(!(transform instanceof AffineTransform))
 			return false;
 		final AffineTransform at = new AffineTransform((AffineTransform) transform);

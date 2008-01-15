@@ -31,20 +31,18 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.geotools.resources.CRSUtilities;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeodeticCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -62,16 +60,14 @@ public final class RendererUtilities {
 
 	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(RendererUtilities.class.getName());
 
-	private final static DefaultGeographicCRS GeogCRS = DefaultGeographicCRS.WGS84;;
-
     /**
      * Helber class for building affine transforms. We use one instance per thread,
      * in order to avoid the need for {@code synchronized} statements.
      */
-    private static final ThreadLocal/*<GridToEnvelopeMapper>*/ gridToEnvelopeMappers =
-            new ThreadLocal/*<GridToEnvelopeMapper>*/() {
+    private static final ThreadLocal<GridToEnvelopeMapper> gridToEnvelopeMappers =
+            new ThreadLocal<GridToEnvelopeMapper>() {
                 @Override
-                protected Object/*<GridToEnvelopeMapper>*/ initialValue() {
+                protected GridToEnvelopeMapper initialValue() {
                     final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
                     mapper.setGridType(PixelInCell.CELL_CORNER);
                     return mapper;
@@ -226,7 +222,7 @@ public final class RendererUtilities {
 		// build the transform
 		//
 		// //
-		AffineTransform pixelToWorld = worldToScreen.createInverse();
+		final AffineTransform pixelToWorld = worldToScreen.createInverse();
 
 		// //
 		//
@@ -295,9 +291,7 @@ public final class RendererUtilities {
 			int imageWidth, int imageHeight, double DPI)
 			throws TransformException, FactoryException {
 
-		// simboss: TODO TO BE REMOVED
-		// we need to take into account axes swapping. We can do that by
-		// preconcatenating an axes swapping to the transform we perform below
+
 		final CoordinateReferenceSystem tempCRS = CRS.getHorizontalCRS(coordinateReferenceSystem);
         if(tempCRS==null)
             throw new TransformException(Errors.format(
@@ -331,13 +325,8 @@ public final class RendererUtilities {
 		cs[3] = p2.y;
 
 		// transform the provided crs to WGS84 lon,lat
-		MathTransform transform = CRS.findMathTransform(tempCRS,
+		final MathTransform transform = CRS.findMathTransform(tempCRS,
 				DefaultGeographicCRS.WGS84, true);
-		// transform = ConcatenatedTransform.create(preTransform, transform);//
-		// TODO
-		// TO
-		// BE
-		// REMOVED
 		transform.transform(cs, 0, csLatLong, 0, 2);
 
 		// in long/lat format
@@ -346,10 +335,9 @@ public final class RendererUtilities {
 				|| (csLatLong[1] < -90) || (csLatLong[1] > 90)
 				|| (csLatLong[3] < -90) || (csLatLong[3] > 90)) {
 			// we have a problem -- the bbox is outside the 'world' so distance
-			// will fail
-			// we handle this by making a new measurement for a smaller portion
+			// will fail we handle this by making a new measurement for a smaller portion
 			// of the image - the portion thats inside the world.
-			// if the request is outside the world then we need to throw an
+			// If the request is outside the world then we need to throw an
 			// error
 
 			if ((csLatLong[0] > csLatLong[2]) || (csLatLong[1] > csLatLong[3]))
@@ -525,8 +513,8 @@ public final class RendererUtilities {
 	                      envelope.getCoordinateReferenceSystem()));
 			// make sure the crs is 2d
 			envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
-			MathTransform toWGS84 = StreamingRenderer.getMathTransform(tempCRS,
-					GeogCRS);
+			final MathTransform toWGS84 = CRS.findMathTransform(tempCRS,
+					DefaultGeographicCRS.WGS84);
 
 			// //
 			// Try to compute the source crs envelope, either by asking CRS or
@@ -540,12 +528,11 @@ public final class RendererUtilities {
 					// try to compute the envelope by reprojecting the WGS84
 					// envelope
 					sourceCRSEnvelope = CRS.transform(toWGS84
-							.inverse(), CRS.getEnvelope(GeogCRS));
+							.inverse(), CRS.getEnvelope(DefaultGeographicCRS.WGS84));
 				} catch (TransformException e) {
-					// for some transformatio this is normal, it's not possible
+					// for some transformations this is normal, it's not possible
 					// to project the whole WGS84 envelope in many transforms,
-					// such
-					// as Mercator or Gauss (the transform does diverge)
+					// such as Mercator or Gauss (the transform does diverge)
 				}catch ( AssertionError ae){
                                     // same reason as above basically.  For some 
                                     // projections the assertion will complain.  Nothing can be done about this
@@ -561,10 +548,8 @@ public final class RendererUtilities {
 			// images bigger than the world (thanks Dave!!!)
 			//
 			// It is important to note that I also have to update the image
-			// width in
-			// case the provided envelope is bigger than the envelope of the
-			// source
-			// crs.
+			// width in case the provided envelope is bigger than the envelope of the
+			// source crs.
 			// //
 			final GeneralEnvelope intersectedEnvelope = new GeneralEnvelope(
 					envelope);
@@ -590,7 +575,7 @@ public final class RendererUtilities {
 			// //
 			final GeneralEnvelope geographicEnvelope = CRS.transform(
 					toWGS84, intersectedEnvelope);
-			geographicEnvelope.setCoordinateReferenceSystem(GeogCRS);
+			geographicEnvelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
 
 			// //
 			//
@@ -600,7 +585,7 @@ public final class RendererUtilities {
 			//
 			// //
 			final GeodeticCalculator calculator = new GeodeticCalculator(
-					GeogCRS);
+					DefaultGeographicCRS.WGS84);
 			final DirectPosition lowerLeftCorner = geographicEnvelope
 					.getLowerCorner();
 			final DirectPosition upperRightCorner = geographicEnvelope
