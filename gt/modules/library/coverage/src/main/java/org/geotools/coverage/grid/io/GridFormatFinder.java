@@ -77,12 +77,12 @@ public final class GridFormatFinder {
 	 *         have registered factories, and whose available method returns
 	 *         true.
 	 */
-	public static synchronized Set getAvailableFormats() {
+	public static synchronized Set<GridFormatFactorySpi> getAvailableFormats() {
 		// get all GridFormatFactorySpi implementations
 		scanForPlugins();
-		final Iterator it = getServiceRegistry().
+		final Iterator<GridFormatFactorySpi> it = getServiceRegistry().
 			getServiceProviders(GridFormatFactorySpi.class, true);
-		final Set formats= new HashSet(5,1.0f);
+		final Set<GridFormatFactorySpi> formats= new HashSet<GridFormatFactorySpi>();
 		while (it.hasNext()) {
 			final GridFormatFactorySpi spi = (GridFormatFactorySpi) it.next();
 			if (spi.isAvailable())
@@ -139,9 +139,9 @@ public final class GridFormatFinder {
 	 *         implementations.
 	 */
 	public static Format[] getFormatArray() {
-		final Set formats = GridFormatFinder.getAvailableFormats();
-		final List formatSet = new ArrayList(formats.size());
-		for (Iterator iter = formats.iterator(); iter.hasNext();) {
+		final Set<GridFormatFactorySpi> formats = GridFormatFinder.getAvailableFormats();
+		final List<Format> formatSet = new ArrayList<Format>(formats.size());
+		for (Iterator<GridFormatFactorySpi> iter = formats.iterator(); iter.hasNext();) {
 			final GridFormatFactorySpi element = (GridFormatFactorySpi) iter.next();
 			formatSet.add(element.createFormat());
 		}
@@ -157,10 +157,10 @@ public final class GridFormatFinder {
 	 * @return an unmodifiable {@link Set} comprising all the {@link Format}
 	 *         that can read the {@link Object} o.
 	 */
-	public static synchronized Set findFormats(Object o) {
-		final Set availaibleFormats = getAvailableFormats();
-		final Set formats=new HashSet();
-		final Iterator it = availaibleFormats.iterator();
+	public static synchronized Set<Format> findFormats(Object o) {
+		final Set<GridFormatFactorySpi> availaibleFormats = getAvailableFormats();
+		final Set<Format> formats=new HashSet<Format>();
+		final Iterator<GridFormatFactorySpi> it = availaibleFormats.iterator();
 		while (it.hasNext()) {
 			// get the factory
 			final GridFormatFactorySpi spi = (GridFormatFactorySpi) it.next();
@@ -196,8 +196,8 @@ public final class GridFormatFinder {
 	 *         accept it.
 	 */
 	public static synchronized Format findFormat(Object o) {
-		final Set formats = findFormats(o);
-		final Iterator it = formats.iterator();
+		final Set<Format> formats = findFormats(o);
+		final Iterator<Format> it = formats.iterator();
 		if (it.hasNext())
 			return (Format) it.next();
 		return new UnknownFormat();
