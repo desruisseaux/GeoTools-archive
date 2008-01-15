@@ -280,7 +280,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Cycling over the features
+		// Cycling over the files that have filtered out
 		//
 		// /////////////////////////////////////////////////////////////////////
 		numFiles = files.size();
@@ -289,8 +289,27 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 		FeatureWriter fw = null;
 		boolean doneSomething = false;
 		for (int i = 0; i < numFiles; i++) {
-			final File fileBeingProcessed = ((File) filesIt.next());
+
+			
 			StringBuffer message;
+			// //
+			//
+			// Check that this file is actually good to go
+			//
+			// //			
+			final File fileBeingProcessed = ((File) filesIt.next());
+			if(!fileBeingProcessed.exists()||!fileBeingProcessed.canRead()||!fileBeingProcessed.isFile())
+			{
+				// send a message
+				message = new StringBuffer("Skipped file ").append(
+						files.get(i)).append(
+						" snce it seems invalid.");
+				if (LOGGER.isLoggable(Level.INFO))
+					LOGGER.info(message.toString());
+				fireEvent(message.toString(), ((i * 99.0) / numFiles));
+				continue;
+			}
+
 			// //
 			//
 			// Anyone has asked us to stop?
@@ -376,7 +395,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 									.toString());
 				final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 						.findFormat(files.get(i));
-				if (format == null) {
+				if (format == null||!format.accepts(files.get(i))) {
 					// release resources
 					try {
 						inStream.close();
