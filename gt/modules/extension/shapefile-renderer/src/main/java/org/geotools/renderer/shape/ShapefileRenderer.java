@@ -1437,14 +1437,20 @@ public class ShapefileRenderer implements GTRenderer {
     }
     
     private void renderWithStreamingRenderer(MapLayer layer, Graphics2D graphics, Rectangle paintArea, ReferencedEnvelope envelope, AffineTransform transform) {
-		MapContext context=new DefaultMapContext(new MapLayer[]{layer}, envelope.getCoordinateReferenceSystem());
-		StreamingRenderer renderer=new StreamingRenderer();
-		renderer.setContext(context);
-		renderer.setJava2DHints(getJava2DHints());
-		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
-		rendererHints2.put(LABEL_CACHE_KEY, new IntegratingLabelCache(labelCache));
-		renderer.setRendererHints(rendererHints2);
-		renderer.paint(graphics, paintArea, envelope, transform);
+		MapContext context = null;
+		try {
+		    context = new DefaultMapContext(new MapLayer[]{layer}, envelope.getCoordinateReferenceSystem());
+    		StreamingRenderer renderer=new StreamingRenderer();
+    		renderer.setContext(context);
+    		renderer.setJava2DHints(getJava2DHints());
+    		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
+    		rendererHints2.put(LABEL_CACHE_KEY, new IntegratingLabelCache(labelCache));
+    		renderer.setRendererHints(rendererHints2);
+    		renderer.paint(graphics, paintArea, envelope, transform);
+		} finally {
+		    if(context != null)
+		        context.clearLayerList();
+		}
 	}
 
 	/**
