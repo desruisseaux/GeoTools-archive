@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.openoffice;
 
-// J2SE dependencies
 import java.text.Format;
 import java.text.ParseException;
 import java.text.DecimalFormatSymbols;
@@ -24,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
-// OpenOffice dependencies
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.XSingleServiceFactory;
 import com.sun.star.lang.XMultiServiceFactory;
@@ -34,7 +32,6 @@ import com.sun.star.registry.XRegistryKey;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.uno.AnyConverter;
 
-// GeoAPI dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -58,7 +55,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.Extent;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.measure.Angle;
 import org.geotools.measure.Latitude;
@@ -74,7 +70,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -310,7 +306,7 @@ public final class Referencing extends Formulas implements XReferencing {
         return FactoryHelper.writeRegistryServiceInfo(classname, __serviceName, registry)
             && FactoryHelper.writeRegistryServiceInfo(classname, ADDIN_SERVICE, registry);
     }
-    
+
     /**
      * The service name that can be used to create such an object by a factory.
      */
@@ -395,7 +391,7 @@ public final class Referencing extends Formulas implements XReferencing {
         operation = opFactory.createOperation(sourceCRS, targetCRS);
         final Logger logger = getLogger();
         if (logger.isLoggable(Level.FINER)) {
-            final LogRecord record = Logging.format(Level.FINER,
+            final LogRecord record = Loggings.format(Level.FINER,
                     LoggingKeys.CREATED_COORDINATE_OPERATION_$3,
                     getIdentifier(operation), getIdentifier(sourceCRS), getIdentifier(targetCRS));
             record.setSourceClassName(Referencing.class.getName());
@@ -844,7 +840,7 @@ public final class Referencing extends Formulas implements XReferencing {
                 coords[i] = pt.getOrdinate(i);
             }
             result[j] = coords;
-        }    
+        }
         return result;
     }
 
@@ -892,7 +888,7 @@ public final class Referencing extends Formulas implements XReferencing {
                 calculator.getOrthodromicDistance(),
                 calculator.getAzimuth()
             };
-        }    
+        }
         return result;
     }
 
@@ -944,7 +940,7 @@ public final class Referencing extends Formulas implements XReferencing {
                 continue;
             }
             result[j] = targetPt.getCoordinates();
-        }    
+        }
         return result;
     }
 

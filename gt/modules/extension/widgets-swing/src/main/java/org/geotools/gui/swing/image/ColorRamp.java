@@ -58,8 +58,9 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -678,9 +679,8 @@ public class ColorRamp extends JComponent {
                 graduation = new LogarithmicNumberGraduation(units);
             }
         } else {
-            org.geotools.util.logging.Logging.getLogger(ColorRamp.class).
-                    log(Logging.format(Level.WARNING, LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1,
-                        Classes.getShortClassName(tr)));
+            Logging.getLogger(ColorRamp.class).log(Loggings.format(Level.WARNING,
+                    LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1, Classes.getShortClassName(tr)));
             graduation = new NumberGraduation(units);
         }
         if (graduation == reuse) {

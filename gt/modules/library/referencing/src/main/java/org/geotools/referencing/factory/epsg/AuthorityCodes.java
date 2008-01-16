@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.AbstractSet;
 import java.util.AbstractMap;
@@ -24,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
@@ -33,11 +31,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Projection;
 
-// Geotools dependencies
-import org.geotools.resources.i18n.Logging;
+import org.geotools.util.logging.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -369,7 +366,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                                     final String       method,
                                     final SQLException exception)
     {
-        org.geotools.util.logging.Logging.unexpectedException(LOGGER, classe, method, exception);
+        Logging.unexpectedException(LOGGER, classe, method, exception);
     }
 
     /**
@@ -377,11 +374,11 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      */
     private static void recoverableException(final String method, final SQLException exception) {
         // Uses the FINE level instead of WARNING because it may be a recoverable error.
-        LogRecord record = Logging.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
+        LogRecord record = Loggings.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
         record.setSourceClassName(AuthorityCodes.class.getName());
         record.setSourceMethodName(method);
         record.setThrown(exception);
-        org.geotools.util.logging.Logging.getLogger(LOGGER).log(record);        
+        Logging.getLogger(LOGGER).log(record);
     }
 
     /**
@@ -473,7 +470,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         }
         return asMap;
     }
-    
+
     /**
      * A view of {@link AuthorityCodes} as a map, with authority codes as key and
      * object names as values.

@@ -47,11 +47,10 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.Classes;
 
 
 /**
@@ -878,7 +877,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
              * illegal - the result is an empty set - but it is worth to notify the
              * user since this case has some chances to be an user error.
              */
-            final LogRecord record = Logging.format(Level.WARNING,
+            final LogRecord record = Loggings.format(Level.WARNING,
                     LoggingKeys.MISMATCHED_COORDINATE_OPERATION_FACTORIES_$2, sourceCode, targetCode);
             record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
             record.setSourceClassName(AuthorityFactoryAdapter.class.getName());

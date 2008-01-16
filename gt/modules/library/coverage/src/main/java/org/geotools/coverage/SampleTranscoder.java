@@ -42,8 +42,9 @@ import javax.media.jai.registry.RenderedRegistryMode;
 import org.geotools.coverage.grid.AbstractGridCoverage;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.util.logging.Logging;
 import org.geotools.image.TransfertRectIter;
 
 
@@ -123,7 +124,7 @@ final class SampleTranscoder extends PointOpImage {
             // TODO: Check if this case occurs sometime, and fill pixel values if it does.
             //       If it happen to occurs, we will need to fix other GeoTools operations
             //       as well.
-            org.geotools.util.logging.Logging.getLogger(SampleTranscoder.class).warning(
+            Logging.getLogger(SampleTranscoder.class).warning(
                     "Bounds mismatch: " + destRect + " and " + bounds);
         }
         WritableRectIter iterator = RectIterFactory.createWritable(dest, bounds);
@@ -273,7 +274,7 @@ final class SampleTranscoder extends PointOpImage {
             registry.registerFactory(RenderedRegistryMode.MODE_NAME, OPERATION_NAME,
                                      "geotools.org", new CRIF());
         } catch (IllegalArgumentException exception) {
-            final LogRecord record = Logging.format(Level.SEVERE,
+            final LogRecord record = Loggings.format(Level.SEVERE,
                    LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
             // Note: GridSampleDimension is the public class that use this transcoder.
             record.setSourceClassName(GridSampleDimension.class.getName());

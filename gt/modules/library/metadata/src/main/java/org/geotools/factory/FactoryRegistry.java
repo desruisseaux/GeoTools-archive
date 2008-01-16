@@ -23,11 +23,12 @@ import java.lang.ref.Reference;
 import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -76,7 +77,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * The logger for all events related to factory registry.
      */
-    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.factory");
+    protected static final Logger LOGGER = Logging.getLogger("org.geotools.factory");
 
     /**
      * The logger level for debug messages.
@@ -932,7 +933,7 @@ public class FactoryRegistry extends ServiceRegistry {
             cause.append(": ");
             cause.append(message);
         }
-        final LogRecord record = Logging.format(Level.WARNING,
+        final LogRecord record = Loggings.format(Level.WARNING,
                 LoggingKeys.CANT_LOAD_SERVICE_$2, name, cause.toString());
         if (showStackTrace) {
             record.setThrown(error);
@@ -946,7 +947,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * Prepares a message to be logged if any provider has been registered.
      */
     private static StringBuilder getLogHeader(final Class<?> category) {
-        return new StringBuilder(Logging.getResources(null).getString(
+        return new StringBuilder(Loggings.getResources(null).getString(
                 LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, category));
     }
 

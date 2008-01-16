@@ -37,7 +37,7 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.BackingStoreException;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -410,7 +410,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      * Logs a warning when an object can't be created from the specified factory.
      */
     private static void log(final Exception exception, final AuthorityFactory factory) {
-        final LogRecord record = Logging.format(Level.WARNING,
+        final LogRecord record = Loggings.format(Level.WARNING,
                                  LoggingKeys.CANT_CREATE_COORDINATE_OPERATION_$1,
                                  factory.getAuthority().getTitle());
         record.setSourceClassName(AuthorityBackedFactory.class.getName());

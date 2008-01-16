@@ -65,7 +65,7 @@ import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.coverage.CoverageUtilities;
@@ -587,7 +587,7 @@ final class Resampler2D extends GridCoverage2D {
             MathTransform gridToCRS = targetGG.getGridToCRS();
             targetGG = new GridGeometry2D(actualGR, gridToCRS, targetCRS);
             if (!automaticGR) {
-                log(Logging.getResources(locale).getLogRecord(Level.WARNING,
+                log(Loggings.getResources(locale).getLogRecord(Level.WARNING,
                     LoggingKeys.ADJUSTED_GRID_GEOMETRY_$1, sourceCoverage.getName().toString(locale)));
             }
         }
@@ -603,7 +603,7 @@ final class Resampler2D extends GridCoverage2D {
         assert CRS.equalsIgnoreMetadata(targetCoverage.getCoordinateReferenceSystem(), targetCRS) : targetGG;
         assert targetCoverage.getGridGeometry().getGridRange2D().equals(targetImage.getBounds())  : targetGG;
         if (AbstractProcessor.LOGGER.isLoggable(LOGGING_LEVEL)) {
-            log(Logging.getResources(locale).getLogRecord(LOGGING_LEVEL,
+            log(Loggings.getResources(locale).getLogRecord(LOGGING_LEVEL,
                 LoggingKeys.APPLIED_RESAMPLE_$11, new Object[] {
                 /*  {0} */ sourceCoverage.getName().toString(locale),
                 /*  {1} */ sourceCoverage.getCoordinateReferenceSystem().getName().getCode(),

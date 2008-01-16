@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies and extensions
 import java.util.*;
 import java.io.File;
 import java.net.URI;
@@ -37,7 +36,6 @@ import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
@@ -52,7 +50,6 @@ import org.opengis.referencing.operation.*;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.Citations;
@@ -78,7 +75,7 @@ import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -87,6 +84,7 @@ import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
 import org.geotools.util.Version;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -373,7 +371,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @see #getAxisName
      */
     private final Map<String,AxisName> axisNames = new HashMap<String,AxisName>();
-    
+
     /**
      * Cache for axis numbers. This service is not provided by {@link BufferedAuthorityFactory}
      * since the number of axis is used internally in this class.
@@ -381,7 +379,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @see #getDimensionForCRS
      */
     private final Map<String,Short> axisCounts = new HashMap<String,Short>();
-    
+
     /**
      * Cache for projection checks. This service is not provided by {@link BufferedAuthorityFactory}
      * since the check that a transformation is a projection is used internally in this class.
@@ -389,7 +387,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @see #isProjection
      */
     private final Map<String,Boolean> codeProjection = new HashMap<String,Boolean>();
-    
+
 
     /**
      * Pool of naming systems, used for caching.
@@ -469,8 +467,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             result.close();
             statement.close();
         } catch (SQLException exception) {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER,
-                    DirectEpsgFactory.class, "getAuthority", exception);
+            Logging.unexpectedException(LOGGER, DirectEpsgFactory.class, "getAuthority", exception);
             return Citations.EPSG;
         }
         return authority;
@@ -1200,7 +1197,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        LOGGER.log(Logging.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID,code));
+                        LOGGER.log(Loggings.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID, code));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);
@@ -1335,10 +1332,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         return returnValue;
     }
 
-    /** 
+    /**
      * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
      * no conversion informations, then this method will returns {@code null}.
-     *  
+     *
      * @param  code The EPSG code of the {@link GeodeticDatum}.
      * @param  toClose The result set to close if this method is going to invokes
      *         {@link #createDatum} recursively. This hack is necessary because many
@@ -1455,7 +1452,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 parameters.ey = -parameters.ey;
             }
             bwInfos.set(i, parameters);
-        }            
+        }
         return (BursaWolfParameters[]) bwInfos.toArray(new BursaWolfParameters[size]);
     }
 
@@ -1512,8 +1509,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
                 } catch (NumberFormatException exception) {
                     // Not a fatal error...
-                    org.geotools.util.logging.Logging.unexpectedException(LOGGER,
-                            DirectEpsgFactory.class, "createDatum", exception);
+                    Logging.unexpectedException(LOGGER, DirectEpsgFactory.class, "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -1799,7 +1795,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             throw noSuchAuthorityCode(CoordinateSystem.class, code);
         }
         return returnValue;
-        
+
     }
 
     /**
@@ -2060,10 +2056,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 descriptor = new DefaultParameterDescriptor(properties, type,
                                     null, null, null, null, unit, true);
                 returnValue = (ParameterDescriptor) ensureSingleton(descriptor, returnValue, code);
-            }            
+            }
         } catch (SQLException exception) {
             throw databaseFailure(OperationMethod.class, code, exception);
-        }            
+        }
         if (returnValue == null) {
              throw noSuchAuthorityCode(OperationMethod.class, code);
         }
@@ -2233,7 +2229,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             }
         } catch (SQLException exception) {
             throw databaseFailure(OperationMethod.class, code, exception);
-        }            
+        }
         if (returnValue == null) {
              throw noSuchAuthorityCode(OperationMethod.class, code);
         }
@@ -2301,10 +2297,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         final Short cached = axisCounts.get(code);
         final short dimension;
         if (cached == null) {
-        	stmt = prepareStatement("Dimension", 
+        	stmt = prepareStatement("Dimension",
             		"  SELECT COUNT(COORD_AXIS_CODE)"
                     +  " FROM [Coordinate Axis]"
-                    + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE " 
+                    + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE "
                     +                           " FROM [Coordinate Reference System]"
                     +                          " WHERE COORD_REF_SYS_CODE = ?)");
 	        stmt.setString(1, code);
@@ -2337,7 +2333,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
 	        result.close();
 	        projection = Boolean.valueOf(found);
 	        codeProjection.put(code, projection);
-        } 
+        }
         return projection.booleanValue();
     }
 
@@ -2608,7 +2604,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             result.close();
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateOperation.class, code, exception);
-        }            
+        }
         if (returnValue == null) {
              throw noSuchAuthorityCode(CoordinateOperation.class, code);
         }
@@ -2976,7 +2972,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
              * was already closed. However we will log a message only if we actually closed
              * the connection, otherwise the log records are a little bit misleading.
              */
-            LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+            LOGGER.log(Loggings.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
         }
     }
 

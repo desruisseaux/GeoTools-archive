@@ -48,8 +48,9 @@ import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.NameFactory;
 
@@ -469,8 +470,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             if (remarks == null) {
                 remarks = growable;
             } else if (!growable.isSubsetOf(remarks)) {
-                org.geotools.util.logging.Logging.getLogger(AbstractIdentifiedObject.class).
-                        log(Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
+                Logging.getLogger(AbstractIdentifiedObject.class).
+                        log(Loggings.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
         /*
@@ -485,8 +486,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                     if (current == null) {
                         subProperties.put(prefix, growable);
                     } else if (!growable.isSubsetOf(current)) {
-                        org.geotools.util.logging.Logging.getLogger(AbstractIdentifiedObject.class)
-                                .log(Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
+                        Logging.getLogger(AbstractIdentifiedObject.class)
+                                .log(Loggings.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
                     }
                 }
             }

@@ -16,7 +16,6 @@
  */
 package org.geotools.image;
 
-// J2SE dependencies
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.ColorModel;
@@ -42,20 +41,19 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-// JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.TileComputationListener;
 import javax.media.jai.TileRequest;
 import javax.media.jai.TileScheduler;
 
-// Geotools dependencies
 import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.WeakValueHashMap;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -102,7 +100,7 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * The logger for information messages.
      */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.image");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.image");
 
     /**
      * The thickness (in pixels) of the box to draw around deferred tiles, or 0 for disabling
@@ -197,7 +195,7 @@ public final class DeferredPlanarImage extends PlanarImage
      * This array will be constructed only when first needed.
      */
     private transient Raster[] pendings;
-   
+
     /**
      * Constructs a new instance of {@code DeferredPlanarImage}.
      *
@@ -300,7 +298,7 @@ public final class DeferredPlanarImage extends PlanarImage
          * Flag that this tile will need to be repainted later and returns an empty tile.
          */
         if (LOGGER.isLoggable(Level.FINER)) {
-            final LogRecord record = Logging.format(Level.FINER,
+            final LogRecord record = Loggings.format(Level.FINER,
                   LoggingKeys.DEFERRED_TILE_PAINTING_$2, tileX, tileY);
             record.setSourceClassName(DeferredPlanarImage.class.getName());
             record.setSourceMethodName("getTile");
@@ -315,8 +313,8 @@ public final class DeferredPlanarImage extends PlanarImage
         pendings[tileIndice] = raster;
         fireTileUpdate(tileX, tileY, true);
         return raster;
-    } 
-        
+    }
+
     /**
      * Returns a databuffer for the specified sample model. If the image use an
      * {@link IndexColorModel} and a {@linkplain IndexColorModel#getTransparentPixel

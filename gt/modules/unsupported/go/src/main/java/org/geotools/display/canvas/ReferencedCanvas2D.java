@@ -19,7 +19,6 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies and extensions
 import java.awt.Shape;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -34,7 +33,6 @@ import javax.units.SI;
 import javax.units.NonSI;
 import javax.units.ConversionException;
 
-// OpenGIS dependencies
 import org.opengis.go.display.DisplayFactory;
 import org.opengis.go.display.primitive.Graphic;
 import org.opengis.referencing.datum.Ellipsoid;
@@ -45,10 +43,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -402,8 +399,8 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
              */
             if (log) {
                 final LogRecord record;
-                record = Logging.getResources(getLocale()).getLogRecord(Level.WARNING,
-                                              LoggingKeys.UNEXPECTED_UNIT_$1, unit);
+                record = Loggings.getResources(getLocale()).getLogRecord(
+                        Level.WARNING, LoggingKeys.UNEXPECTED_UNIT_$1, unit);
                 record.setSourceClassName(ReferencedCanvas2D.class.getName());
                 record.setSourceMethodName("setObjectiveCRS");
                 record.setThrown(exception);

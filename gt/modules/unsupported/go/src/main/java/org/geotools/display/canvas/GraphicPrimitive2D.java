@@ -17,20 +17,17 @@
 
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.awt.Graphics2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.display.canvas.RenderingContext;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -77,7 +74,7 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
      *     Returns a transform from the rendering CRS to the <cite>Java2D</cite> CRS in
      *     "dots" units (usually 1/72 of inch). This transformation is zoom dependent.</p></li>
      * </ul>
-     * 
+     *
      * By default, painting is done in the <cite>Java2D</cite> user space (a.k.a.
      * {@linkplain RenderingContext#displayCRS display CRS}. However, the CRS can
      * easily be switched. An implementation may looks like as below:
@@ -157,8 +154,8 @@ public abstract class GraphicPrimitive2D extends ReferencedGraphic2D {
     final void logCacheRebuild(final String classname) {
         final Logger logger = getLogger();
         if (logger.isLoggable(Level.FINER)) {
-            final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.FINER,
-                                             LoggingKeys.UPDATE_RENDERER_CACHE_$1, getName());
+            final LogRecord record = Loggings.getResources(getLocale()).getLogRecord(Level.FINER,
+                    LoggingKeys.UPDATE_RENDERER_CACHE_$1, getName());
             record.setSourceClassName(classname);
             record.setSourceMethodName("paint");
             logger.log(record);

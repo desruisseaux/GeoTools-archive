@@ -41,7 +41,7 @@ public final class LoggingKeys {
     public static final int ADJUSTED_GRID_GEOMETRY_$1 = 0;
 
     /**
-     * Ambiguity between inverse flattening and semi minor axis length for ellipsoid "{0}". Using inverse flattening.
+     * Ambiguity between inverse flattening and semi minor axis length. Using inverse flattening.
      */
     public static final int AMBIGUOUS_ELLIPSOID = 1;
 
@@ -152,6 +152,12 @@ public final class LoggingKeys {
      * Failure in the primary factory: {0} Now trying the fallback factory...
      */
     public static final int FALLBACK_FACTORY_$1 = 45;
+
+    /**
+     * Found {0} reference systems in {1} elements. The most frequent appears {2} time and the less
+     * frequent appears {3} times.
+     */
+    public static final int FOUND_MISMATCHED_CRS_$4 = 48;
 
     /**
      * Ignored "{0}" hint.

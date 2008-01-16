@@ -48,7 +48,7 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.projection.MapProjection;   // For javadoc
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 
 import static org.geotools.referencing.AbstractIdentifiedObject.nameMatches;
 
@@ -271,7 +271,7 @@ final class ProjectionAnalyzer {
             }
         }
         if (warning != null) {
-            final LogRecord record = Logging.format(Level.WARNING,
+            final LogRecord record = Loggings.format(Level.WARNING,
                     LoggingKeys.APPLIED_UNIT_CONVERSION_$3, warning, unit, SI.METER);
             record.setSourceClassName(getClass().getName());
             record.setSourceMethodName("createLinearConversion"); // This is the public method.

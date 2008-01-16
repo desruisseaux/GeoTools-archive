@@ -34,7 +34,7 @@ import org.opengis.util.ScopedName;
 import org.geotools.util.LocalName;
 import org.geotools.util.NameFactory;
 import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
@@ -214,7 +214,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
      */
     private void reload() throws IOException {
         assert Thread.holdsLock(this);
-        LOGGER.log(Logging.format(Level.FINE, LoggingKeys.LOADING_DATUM_ALIASES_$1, aliasURL));
+        LOGGER.log(Loggings.format(Level.FINE, LoggingKeys.LOADING_DATUM_ALIASES_$1, aliasURL));
         final BufferedReader in = new BufferedReader(new InputStreamReader(aliasURL.openStream()));
         /*
          * Parses the title line. This line contains authority names as column titles.
@@ -290,7 +290,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
      * Logs an {@link IOException}.
      */
     private void log(final IOException exception) {
-        LogRecord record = Logging.format(Level.WARNING, LoggingKeys.CANT_READ_FILE_$1, aliasURL);
+        LogRecord record = Loggings.format(Level.WARNING, LoggingKeys.CANT_READ_FILE_$1, aliasURL);
         record.setSourceClassName(DatumAliases.class.getName());
         record.setSourceMethodName("reload");
         record.setThrown(exception);

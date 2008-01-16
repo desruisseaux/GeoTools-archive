@@ -33,7 +33,7 @@ import org.geotools.resources.IndexedResourceBundle;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Logging extends IndexedResourceBundle {
+public class Loggings extends IndexedResourceBundle {
     /**
      * Returns resources in the given locale.
      *
@@ -41,11 +41,11 @@ public class Logging extends IndexedResourceBundle {
      * @return Resources in the given locale.
      * @throws MissingResourceException if resources can't be found.
      */
-    public static Logging getResources(Locale locale) throws MissingResourceException {
+    public static Loggings getResources(Locale locale) throws MissingResourceException {
         if (locale == null) {
             locale = Locale.getDefault();
         }
-        return (Logging) getBundle(Logging.class.getName(), locale);
+        return (Loggings) getBundle(Loggings.class.getName(), locale);
         /*
          * We rely on cache capability of ResourceBundle.
          */

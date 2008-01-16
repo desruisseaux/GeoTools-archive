@@ -26,7 +26,7 @@ import org.geotools.util.Version;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -140,7 +140,7 @@ final class URN_Parser {
         if (!expected.isAssignableFrom(type.type)) {
             // Build a simplified URN, omitting "urn:ogc:def" and version number.
             final String urn = "..." + SEPARATOR + type + SEPARATOR + authority + SEPARATOR + code;
-            final LogRecord record = Logging.format(Level.WARNING,
+            final LogRecord record = Loggings.format(Level.WARNING,
                     LoggingKeys.MISMATCHED_URN_TYPE_$1, urn);
             // Set the source to the public or protected method.
             record.setSourceClassName(URN_AuthorityFactory.class.getName());

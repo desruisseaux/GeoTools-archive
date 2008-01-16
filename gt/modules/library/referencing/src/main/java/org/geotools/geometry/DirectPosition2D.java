@@ -50,13 +50,15 @@ import org.geotools.resources.Utilities;
  * <p>
  * <b>Note 2:</b><blockquote>
  * <strong>Do not mix instances of this class with ordinary {@link Point2D} instances in a
- * {@link java.util.Set} or as {@link java.util.Map} keys.</strong> It is not possible to meet
- * both {@link Point2D#hashCode} and {@link DirectPosition#hashCode} contract, and this class
+ * {@link java.util.HashSet} or as {@link java.util.HashMap} keys.</strong> It is not possible to
+ * meet both {@link Point2D#hashCode} and {@link DirectPosition#hashCode} contract, and this class
  * choose to implements the later. Concequently, <strong>{@link #hashCode} is inconsistent with
  * {@link Point2D#equals}</strong> (but is consistent with {@link DirectPosition#equals}).
  * <p>
  * In other words, it is safe to add instances of {@code DirectPosition2D} in a
- * {@code Set<DirectPosition>}, but it is unsafe to add them in a {@code Set<Point2D>}.
+ * {@code HashSet<DirectPosition>}, but it is unsafe to add them in a {@code HashSet<Point2D>}.
+ * Collections that do not rely on {@link Object#hashCode}, like {@link java.util.ArrayList},
+ * are safe in all cases.
  * </blockquote>
  *
  * @since 2.0

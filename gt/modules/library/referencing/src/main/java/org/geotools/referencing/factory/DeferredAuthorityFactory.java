@@ -29,7 +29,7 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -220,7 +220,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                         backingStore = null;
                     } catch (FactoryException exception) {
                         backingStore = null;
-                        final LogRecord record = Logging.format(Level.WARNING,
+                        final LogRecord record = Loggings.format(Level.WARNING,
                                 LoggingKeys.CANT_DISPOSE_BACKING_STORE);
                         record.setSourceMethodName("run");
                         record.setSourceClassName(Disposer.class.getName());

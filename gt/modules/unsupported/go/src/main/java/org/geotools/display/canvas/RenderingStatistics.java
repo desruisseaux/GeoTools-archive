@@ -17,7 +17,6 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,8 +24,7 @@ import java.util.logging.LogRecord;
 import javax.units.Unit;
 import javax.units.SI;
 
-// Geotools dependencies
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -186,7 +184,7 @@ final class RenderingStatistics {
             locale = Locale.getDefault();
             title  = Vocabulary.format(VocabularyKeys.UNKNOW);
         }
-        final Logging resources = Logging.getResources(locale);
+        final Loggings resources = Loggings.getResources(locale);
         final LogRecord  record;
         if (total==0 || rendered==0) {
             record = resources.getLogRecord(LEVEL, LoggingKeys.PAINTING_LAYER_$2, title, ellapsed);

@@ -72,7 +72,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
@@ -1121,7 +1121,7 @@ testLinear: for (int i=0; i<numBands; i++) {
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = getLocale();
-            final LogRecord record = Logging.getResources(locale).getLogRecord(
+            final LogRecord record = Loggings.getResources(locale).getLogRecord(
                                      AbstractProcessor.OPERATION,
                                      LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
@@ -1180,7 +1180,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                 }
                 serializedImage = new SerializableRenderedImage(source, false, null,
                                                                 tileEncoding, null, null);
-                final LogRecord record = Logging.format(Level.FINE,
+                final LogRecord record = Loggings.format(Level.FINE,
                         LoggingKeys.CREATED_SERIALIZABLE_IMAGE_$2, getName(), tileEncoding);
                 record.setSourceClassName(GridCoverage2D.class.getName());
                 record.setSourceMethodName("writeObject");

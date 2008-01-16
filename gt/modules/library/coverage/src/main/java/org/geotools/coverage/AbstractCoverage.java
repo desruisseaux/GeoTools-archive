@@ -50,7 +50,6 @@ import java.util.Vector;
 
 import javax.media.jai.ImageFunction;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.InterpolationNearest;  // For Javadoc
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
@@ -58,13 +57,12 @@ import javax.media.jai.PropertySourceImpl;
 import javax.media.jai.TiledImage;
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
-import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
+import javax.media.jai.operator.ImageFunctionDescriptor;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.CommonPointRule;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.GeometryValuePair;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.AttributeValues;
 import org.opengis.coverage.DomainObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -89,7 +87,6 @@ import org.geotools.util.SimpleInternationalString;
 
 import org.geotools.io.LineWriter;
 import org.geotools.resources.Classes;
-import org.geotools.resources.XArray;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -127,21 +124,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * For compatibility during cross-version serialization.
      */
     private static final long serialVersionUID = -2989320942499746295L;
-
-    /**
-     * The set of default axis name.
-     */
-    private static final InternationalString[] DIMENSION_NAMES = {
-        new SimpleInternationalString("x"),
-        new SimpleInternationalString("y"),
-        new SimpleInternationalString("z"),
-        new SimpleInternationalString("t")
-    };
-
-    /**
-     * The sequence of string to returns when there is no metadata.
-     */
-    private static final String[] NO_PROPERTIES = new String[0];
 
     /**
      * The sample dimension to make visible by {@link #getRenderableImage}.
@@ -239,42 +221,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
-    }
-
-    /**
-     * Returns the names of each dimension in this coverage. Typically these
-     * names are "x", "y", "z" and "t". The number of items in the sequence is
-     * the number of dimensions in the coverage. Grid coverages are typically
-     * 2D (<var>x</var>, <var>y</var>) while other coverages may be
-     * 3D (<var>x</var>, <var>y</var>, <var>z</var>) or
-     * 4D (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>).
-     * The {@linkplain #getDimension number of dimensions} of the coverage is
-     * the number of entries in the list of dimension names.
-     * <p>
-     * The default implementation ask for
-     * {@linkplain CoordinateSystem coordinate system} axis names, or returns
-     * "x", "y"... if this coverage has no CRS.
-     *
-     * @return The names of each dimension. The array's length is equals to
-     *         {@link #getDimension}.
-     *
-     * @deprecated This information can be obtained from the underlying coordinate system.
-     */
-    public InternationalString[] getDimensionNames() {
-        final InternationalString[] names;
-        if (crs != null) {
-            final CoordinateSystem cs = crs.getCoordinateSystem();
-            names = new InternationalString[cs.getDimension()];
-            for (int i=0; i<names.length; i++) {
-                names[i] = new SimpleInternationalString(cs.getAxis(i).getName().getCode());
-            }
-        } else {
-            names = XArray.resize(DIMENSION_NAMES, getDimension());
-            for (int i=DIMENSION_NAMES.length; i<names.length; i++) {
-                names[i] = new SimpleInternationalString("dim" + (i + 1));
-            }
-        }
-        return names;
     }
 
     /**
@@ -502,9 +448,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns a sequence of boolean values for a given point in the coverage. A value for each
      * {@linkplain SampleDimension sample dimension} is included in the sequence. The default
-     * interpolation type used when accessing grid values for points which fall between grid
-     * cells is {@linkplain InterpolationNearest nearest neighbor}, but it can be changed by
-     * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
+     * interpolation type used when accessing grid values for points which fall between grid cells
+     * is {@linkplain javax.media.jai.InterpolationNearest nearest neighbor}, but it can be changed
+     * by some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
      *
@@ -537,9 +483,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns a sequence of byte values for a given point in the coverage. A value for each
      * {@linkplain SampleDimension sample dimension} is included in the sequence. The default
-     * interpolation type used when accessing grid values for points which fall between grid
-     * cells is {@linkplain InterpolationNearest nearest neighbor}, but it can be changed by
-     * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
+     * interpolation type used when accessing grid values for points which fall between grid cells
+     * is {@linkplain javax.media.jai.InterpolationNearest nearest neighbor}, but it can be changed
+     * by some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
      *
@@ -574,9 +520,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns a sequence of integer values for a given point in the coverage. A value for each
      * {@linkplain SampleDimension sample dimension} is included in the sequence. The default
-     * interpolation type used when accessing grid values for points which fall between grid
-     * cells is {@linkplain InterpolationNearest nearest neighbor}, but it can be changed by
-     * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
+     * interpolation type used when accessing grid values for points which fall between grid cells
+     * is {@linkplain javax.media.jai.InterpolationNearest nearest neighbor}, but it can be changed
+     * by some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
      *
@@ -609,9 +555,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns a sequence of float values for a given point in the coverage. A value for each
      * {@linkplain SampleDimension sample dimension} is included in the sequence. The default
-     * interpolation type used when accessing grid values for points which fall between grid
-     * cells is {@linkplain InterpolationNearest nearest neighbor}, but it can be changed by
-     * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
+     * interpolation type used when accessing grid values for points which fall between grid cells
+     * is {@linkplain javax.media.jai.InterpolationNearest nearest neighbor}, but it can be changed
+     * by some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
      *
@@ -644,9 +590,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns a sequence of double values for a given point in the coverage. A value for each
      * {@linkplain SampleDimension sample dimension} is included in the sequence. The default
-     * interpolation type used when accessing grid values for points which fall between grid
-     * cells is {@linkplain InterpolationNearest nearest neighbor}, but it can be changed by
-     * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
+     * interpolation type used when accessing grid values for points which fall between grid cells
+     * is {@linkplain javax.media.jai.InterpolationNearest nearest neighbor}, but it can be changed
+     * by some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
      *
@@ -923,14 +869,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
             if ((area == null || area instanceof Rectangle2D) &&
                     crsToGrid.getShearX() == 0 && crsToGrid.getShearY() == 0)
             {
-                image = JAI.create("ImageFunction", new ParameterBlock()
-                        .add(this)                               // The functional description
-                        .add(gridBounds.width)                   // The image width
-                        .add(gridBounds.height)                  // The image height
-                        .add((float) (1/crsToGrid.getScaleX()))  // The X scale factor
-                        .add((float) (1/crsToGrid.getScaleY()))  // The Y scale factor
-                        .add((float) crsToGrid.getTranslateX())  // The X translation
-                        .add((float) crsToGrid.getTranslateY()), // The Y translation
+                image = ImageFunctionDescriptor.create(this, // The functional description
+                        gridBounds.width,                    // The image width
+                        gridBounds.height,                   // The image height
+                        (float) (1/crsToGrid.getScaleX()),   // The X scale factor
+                        (float) (1/crsToGrid.getScaleY()),   // The Y scale factor
+                        (float) crsToGrid.getTranslateX(),   // The X translation
+                        (float) crsToGrid.getTranslateY(),   // The Y translation
                         new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout()
                                 .setMinX       (gridBounds.x)
                                 .setMinY       (gridBounds.y)
@@ -1203,40 +1148,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     public List<? extends Coverage> getSources() {
         return Collections.emptyList();
-    }
-
-    /**
-     * List of metadata keywords for a coverage. If no metadata is available,
-     * the sequence will be empty. The default implementation gets the list of
-     * metadata names from the {@link #getPropertyNames()} method.
-     *
-     * @return the list of metadata keywords for a coverage.
-     *
-     * @deprecated Use {@link #getPropertyNames()} instead.
-     */
-    public String[] getMetadataNames() {
-        final String[] list = getPropertyNames();
-        return (list != null) ? list : NO_PROPERTIES;
-    }
-
-    /**
-     * Retrieve the metadata value for a given metadata name. The default
-     * implementation query the {@link #getProperty(String)} method.
-     *
-     * @param name Metadata keyword for which to retrieve data.
-     * @return the metadata value for a given metadata name.
-     * @throws MetadataNameNotFoundException
-     *             if there is no value for the specified metadata name.
-     *
-     * @deprecated Use {@link #getProperty(String)} instead.
-     */
-    public String getMetadataValue(final String name) throws MetadataNameNotFoundException {
-        final Object value = getProperty(name);
-        if (value == java.awt.Image.UndefinedProperty) {
-            throw new MetadataNameNotFoundException(Errors.format(
-                    ErrorKeys.UNDEFINED_PROPERTY_$1, name));
-        }
-        return (value != null) ? value.toString() : null;
     }
 
     /**

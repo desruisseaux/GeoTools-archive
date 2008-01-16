@@ -981,12 +981,12 @@ public final class ErrorKeys {
     public static final int UNMODIFIABLE_METADATA = 200;
 
     /**
-     * Can't convert "{0}" to a number.
+     * Can't parse "{0}" as a number.
      */
     public static final int UNPARSABLE_NUMBER_$1 = 138;
 
     /**
-     * Unparsable text "{0}". Check characters following "{1}".
+     * Can't parse "{0}" because "{1}" is unrecognized.
      */
     public static final int UNPARSABLE_STRING_$2 = 139;
 

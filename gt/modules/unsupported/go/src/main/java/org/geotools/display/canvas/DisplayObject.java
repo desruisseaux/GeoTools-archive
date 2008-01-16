@@ -19,7 +19,6 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,11 +28,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
-// OpenGIS dependencies
 import org.opengis.go.display.primitive.Graphic;
 
-// Geotools dependencies
-import org.geotools.resources.i18n.Logging;
+import org.geotools.util.logging.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -52,7 +50,7 @@ public class DisplayObject {
     /**
      * The logger for the GO implementation module.
      */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.display");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.display");
 
     /**
      * List of classes that provides rendering hints as public static fields.
@@ -175,7 +173,7 @@ public class DisplayObject {
      * Returns the rendering hint associated with the hint name. The default implementation looks
      * for a rendering hint key of the given name in some known classes like {@link RenderingHints}
      * and {@link javax.media.jai.JAI}, and invokes {@link #getRenderingHint} with that key.
-     * 
+     *
      * @param  name the name of the hint.
      * @return The hint value for the specified key, or {@code null} if none.
      */
@@ -210,7 +208,7 @@ public class DisplayObject {
         if (key != null) {
             setRenderingHint(key, value);
         } else {
-            getLogger().fine(Logging.getResources(getLocale()).getString(
+            getLogger().fine(Loggings.getResources(getLocale()).getString(
                     LoggingKeys.HINT_IGNORED_$1, name));
         }
     }
@@ -364,7 +362,7 @@ public class DisplayObject {
                                    final String  sourceMethodName,
                                    final Exception exception)
     {
-        org.geotools.util.logging.Logging.unexpectedException(getLogger(),
+        Logging.unexpectedException(getLogger(),
                 sourceClassName, sourceMethodName, exception);
     }
 

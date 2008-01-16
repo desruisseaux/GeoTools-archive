@@ -50,7 +50,7 @@ import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -393,10 +393,10 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         if (ALLOW_REGISTRATION && context != null) {
             try {
                 context.bind(datasourceName, source);
-                record = Logging.format(Level.INFO,
+                record = Loggings.format(Level.INFO,
                         LoggingKeys.CREATED_DATASOURCE_ENTRY_$1, datasourceName);
             } catch (NamingException exception) {
-                record = Logging.format(Level.WARNING,
+                record = Loggings.format(Level.WARNING,
                         LoggingKeys.CANT_BIND_DATASOURCE_$1, datasourceName);
                 record.setThrown(exception);
             }
@@ -428,7 +428,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             throw new FactoryException(Errors.format(ErrorKeys.CANT_CONNECT_DATABASE_$1, "EPSG"),
                                        exception);
         }
-        log(Logging.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
+        log(Loggings.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
         if (factory instanceof DirectEpsgFactory) {
             ((DirectEpsgFactory) factory).buffered = this;
         }

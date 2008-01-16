@@ -54,7 +54,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -1399,9 +1399,9 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final Logger logger = getLogger();
         if (logger.isLoggable(Level.FINER)) {
             // FINER is the default level for entering, returning, or throwing an exception.
-            final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.FINER,
-                                             LoggingKeys.INITIALIZING_TRANSFORMATION_$2,
-                                             toString(sourceCRS), toString(targetCRS));
+            final LogRecord record = Loggings.getResources(getLocale()).getLogRecord(Level.FINER,
+                    LoggingKeys.INITIALIZING_TRANSFORMATION_$2,
+                    toString(sourceCRS), toString(targetCRS));
             record.setSourceClassName (sourceClassName.getName());
             record.setSourceMethodName(sourceMethodName);
             logger.log(record);

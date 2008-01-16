@@ -49,7 +49,7 @@ import org.geotools.factory.BufferedFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -258,7 +258,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
                     }
                 }
             }
-            final LogRecord record = Logging.format(Level.WARNING,
+            final LogRecord record = Loggings.format(Level.WARNING,
                     LoggingKeys.UNAVAILABLE_AUTHORITY_FACTORY_$1, title);
             record.setSourceClassName(getClass().getName());
             record.setSourceMethodName("isAvailable");

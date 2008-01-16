@@ -17,7 +17,6 @@
 
 package org.geotools.display.canvas;
 
-// J2SE Utilities
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
@@ -29,27 +28,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
-// J2SE Graphics
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.AlphaComposite;
 
-// J2SE Geometries
 import java.awt.Shape;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
-// J2SE Images
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 
-// J2SE widgets
 import java.awt.Frame;
 import java.awt.Dialog;
 import java.awt.Component;
@@ -60,23 +55,19 @@ import javax.swing.JInternalFrame;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentAdapter;
 import java.beans.PropertyChangeEvent;
-
-// JAI dependencies
 import javax.media.jai.GraphicsJAI;
 
-// OpenGIS dependencies
 import org.opengis.go.display.DisplayFactory;
 import org.opengis.go.display.primitive.Graphic;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.DerivedCRS;
 
-// Geotools dependencies
 import org.geotools.util.RangeSet;
 import org.geotools.resources.GraphicsUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 
@@ -828,7 +819,7 @@ renderOffscreen:while (true) {
          */
         final Logger logger = getLogger();
         if (logger.isLoggable(Level.FINEST)) {
-            final Logging resources = Logging.getResources(getLocale());
+            final Loggings resources = Loggings.getResources(getLocale());
             final String name = (graphic!=null) ? graphic.getName()
                                                 : Vocabulary.format(VocabularyKeys.UNKNOW);
             final LogRecord record;
@@ -884,7 +875,7 @@ renderOffscreen:while (true) {
      */
     private void handleOffscreenException(final Graphic graphic, final Exception exception) {
         final Locale locale = getLocale();
-        final LogRecord record = Logging.getResources(locale).getLogRecord(Level.FINE,
+        final LogRecord record = Loggings.getResources(locale).getLogRecord(Level.FINE,
                 LoggingKeys.OFFSCREEN_RENDERING_FAILED_$1, graphic.getName());
         record.setSourceClassName(BufferedCanvas2D.class.getName());
         record.setSourceMethodName("paint");

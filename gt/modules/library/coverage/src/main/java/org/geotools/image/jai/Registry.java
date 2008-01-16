@@ -16,22 +16,19 @@
  */
 package org.geotools.image.jai;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.awt.image.renderable.RenderedImageFactory;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.registry.RIFRegistry;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.util.logging.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -79,7 +76,7 @@ public final class Registry {
             registry.registerDescriptor(new NodataFilterDescriptor());
             RIFRegistry.register(registry, op, "org.geotools", new NodataFilterCRIF());
 
-            record  = Logging.format(Level.CONFIG, LoggingKeys.REGISTERED_JAI_OPERATIONS);
+            record  = Loggings.format(Level.CONFIG, LoggingKeys.REGISTERED_JAI_OPERATIONS);
             op = null;
         } catch (IllegalArgumentException exception) {
             /*
@@ -87,7 +84,7 @@ public final class Registry {
              * is likely to fails (since it tries to load operations declared in META-INF/services,
              * and some of them depend on JAI operations).
              */
-            record = Logging.getResources(null).getLogRecord(Level.WARNING,
+            record = Loggings.getResources(null).getLogRecord(Level.WARNING,
                      LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, op);
             record.setThrown(exception);
         }
@@ -149,7 +146,7 @@ public final class Registry {
                 RIFRegistry.setPreference(registry, operation, product,
                                           allowed ? nativeFactory : javaFactory,
                                           allowed ? javaFactory : nativeFactory);
-                final LogRecord record = Logging.format(Level.CONFIG,
+                final LogRecord record = Loggings.format(Level.CONFIG,
                                                  LoggingKeys.NATIVE_ACCELERATION_STATE_$2,
                                                  operation, Integer.valueOf(allowed ? 1 : 0));
                 log("setNativeAccelerationAllowed", record);
@@ -163,6 +160,6 @@ public final class Registry {
     private static void log(final String method, final LogRecord record) {
         record.setSourceClassName(Registry.class.getName());
         record.setSourceMethodName(method);
-        org.geotools.util.logging.Logging.getLogger(Registry.class).log(record);
+        Logging.getLogger(Registry.class).log(record);
     }
 }

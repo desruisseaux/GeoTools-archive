@@ -18,12 +18,12 @@ package org.geotools.resources.i18n;
 
 
 /**
- * English language resource.
+ * French language resource.
  *
  * @since 2.2
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Logging_en extends Logging {
+public class Loggings_fr extends Loggings {
 }

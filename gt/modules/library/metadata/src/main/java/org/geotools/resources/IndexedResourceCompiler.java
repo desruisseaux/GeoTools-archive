@@ -56,7 +56,7 @@ public final class IndexedResourceCompiler implements Comparator<Object> {
     private static final Class<? extends IndexedResourceBundle>[] RESOURCES_TO_PROCESS = new Class[] {
         org.geotools.resources.i18n.Descriptions.class,
         org.geotools.resources.i18n.Vocabulary  .class,
-        org.geotools.resources.i18n.Logging     .class,
+        org.geotools.resources.i18n.Loggings    .class,
         org.geotools.resources.i18n.Errors      .class
     };
 
