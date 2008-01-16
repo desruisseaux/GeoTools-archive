@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import org.geotools.data.DataUtilities;
 
@@ -111,13 +112,22 @@ public class ShpFiles {
 
     }
 
+    /**
+     * This verifies that this class has been closed correctly (nothing locking)
+     */
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+        dispose();
+    }
+
+    void dispose() {
         if (numberOfLocks() != 0) {
-            ShapefileDataStoreFactory.LOGGER
-                    .severe("Not all locks were released before ShpFiles was finalized: "
-                            + this.lockers);
+            for( ShpFilesLocker locker : lockers ) {
+                ShapefileDataStoreFactory.LOGGER.log(Level.SEVERE, "The following locker was not released "
+                        + locker +"\n it was created with the following stack trace",
+                        locker.getTrace());
+            }
         }
     }
 
@@ -431,33 +441,35 @@ public class ShpFiles {
      * 
      */
     public ReadableByteChannel getReadChannel(ShpFileType type,
-            FileReader requestor) throws IOException {
+            FileReader requestor )
+            throws IOException {
         URL url = acquireRead(type, requestor);
-
         ReadableByteChannel channel = null;
+        try {
+            if (isLocal()) {
 
-        if (isLocal()) {
+                File file = DataUtilities.urlToFile(url);
 
-            File file = DataUtilities.urlToFile(url);
+                if (!file.exists()) {
+                    throw new FileNotFoundException(file.toString());
+                }
 
-            if (!file.exists()) {
-                throw new FileNotFoundException(file.toString());
+                if (!file.canRead()) {
+                    throw new IOException("File is unreadable : " + file);
+                }
+
+                RandomAccessFile raf = new RandomAccessFile(file, "r");
+                channel = new FileChannelDecorator(raf.getChannel(), this, url, requestor);
+
+            } else {
+                InputStream in = url.openConnection().getInputStream();
+                channel = new ReadableByteChannelDecorator(Channels.newChannel(in), this, url,
+                        requestor);
             }
-
-            if (!file.canRead()) {
-                throw new IOException("File is unreadable : " + file);
-            }
-
-            RandomAccessFile raf = new RandomAccessFile(file, "r");
-            channel = new FileChannelDecorator(raf.getChannel(), this, url,
-                    requestor);
-
-        } else {
-            InputStream in = url.openConnection().getInputStream();
-            channel = new ReadableByteChannelDecorator(Channels.newChannel(in),
-                    this, url, requestor);
+        } catch (IOException e) {
+            unlockRead(url, requestor);
+            throw e;
         }
-
         return channel;
     }
 
@@ -484,28 +496,32 @@ public class ShpFiles {
      *                 if there is an error opening the stream
      */
     public WritableByteChannel getWriteChannel(ShpFileType type,
-            FileWriter requestor) throws IOException {
+            FileWriter requestor )
+            throws IOException {
 
         URL url = acquireWrite(type, requestor);
 
         WritableByteChannel channel;
+        try {
+            if (isLocal()) {
 
-        if (isLocal()) {
+                File file = DataUtilities.urlToFile(url);
 
-            File file = DataUtilities.urlToFile(url);
+                RandomAccessFile raf = new RandomAccessFile(file, "rw");
+                channel = new FileChannelDecorator(raf.getChannel(), this, url, requestor);
 
-            RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            channel = new FileChannelDecorator(raf.getChannel(), this, url,
-                    requestor);
+                ((FileChannel) channel).lock();
 
-            ((FileChannel) channel).lock();
+            } else {
+                OutputStream out = url.openConnection().getOutputStream();
+                channel = new WritableByteChannelDecorator(Channels.newChannel(out), this, url,
+                        requestor);
+            }
 
-        } else {
-            OutputStream out = url.openConnection().getOutputStream();
-            channel = new WritableByteChannelDecorator(
-                    Channels.newChannel(out), this, url, requestor);
+        } catch (IOException e) {
+            unlockRead(url, requestor);
+            throw e;
         }
-
         return channel;
     }
 

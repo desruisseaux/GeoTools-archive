@@ -9,31 +9,52 @@ class ShpFilesLocker {
     final URL url;
     final FileReader reader;
     final FileWriter writer;
+    private Trace trace;
 
-    public ShpFilesLocker(URL url, FileReader reader) {
+    public ShpFilesLocker( URL url, FileReader reader ) {
         this.url = url;
         this.reader = reader;
         this.writer = null;
-        ShapefileDataStoreFactory.LOGGER.fine("Read lock: " + url + " by "
-                + reader.id());
-//        new Exception("Locking "+url+" for read by "+reader+" in thread "+threadName).printStackTrace();
+        ShapefileDataStoreFactory.LOGGER.fine("Read lock: " + url + " by " + reader.id());
+        setTraceException();
     }
 
-    public ShpFilesLocker(URL url, FileWriter writer) {
+    public ShpFilesLocker( URL url, FileWriter writer ) {
         this.url = url;
         this.reader = null;
         this.writer = writer;
-        ShapefileDataStoreFactory.LOGGER.fine("Write lock: " + url + " by "
-                + writer.id());
-//        new Exception("Locking "+url+" for write by "+writer+" in thread "+threadName).printStackTrace();
+        ShapefileDataStoreFactory.LOGGER.fine("Write lock: " + url + " by " + writer.id());
+        setTraceException();
+    }
+
+    private void setTraceException() {
+        String name = Thread.currentThread().getName();
+        String type, id;
+        if (reader != null) {
+            type = "read";
+            id = reader.id();
+        } else {
+            type = "write";
+            id = writer.id();
+        }
+        trace = new Trace("Locking " + url + " for " + type + " by " + id + " in thread " + name);
     }
 
     /**
-     * Verifies that the url and requestor are the same as the url and the
-     * reader or writer of this class. assertions are used so this will do
-     * nothing if assertions are not enabled.
+     * Returns the Exception that is created when the Locker is created. This is simply a way of
+     * determining who created the Locker.
+     * 
+     * @return the Exception that is created when the Locker is created
      */
-    public void compare(URL url2, Object requestor) {
+    public Exception getTrace() {
+        return trace;
+    }
+
+    /**
+     * Verifies that the url and requestor are the same as the url and the reader or writer of this
+     * class. assertions are used so this will do nothing if assertions are not enabled.
+     */
+    public void compare( URL url2, Object requestor ) {
         URL url = this.url;
         assert (url2 == url) : "Expected: " + url + " but got: " + url2;
         assert (reader == null || requestor == reader) : "Expected the requestor and the reader to be the same object: "
@@ -62,7 +83,7 @@ class ShpFilesLocker {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals( Object obj ) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -86,6 +107,15 @@ class ShpFilesLocker {
         } else if (!writer.equals(other.writer))
             return false;
         return true;
+    }
+
+    private static class Trace extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+        public Trace( String message ) {
+            super(message);
+        }
     }
 
 }

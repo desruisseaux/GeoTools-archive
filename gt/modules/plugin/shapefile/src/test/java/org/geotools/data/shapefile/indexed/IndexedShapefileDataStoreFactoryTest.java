@@ -26,6 +26,7 @@ import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.shapefile.TestCaseSupport;
 
 /**
  * @source $URL:
@@ -94,7 +95,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
             boolean createIndex) throws Exception {
         copyShapefiles(IndexedShapefileDataStoreTest.STATE_POP);
         Map map = new HashMap();
-        map.put(ShapefileDataStoreFactory.URLP.key, TestData.url(this,
+        map.put(ShapefileDataStoreFactory.URLP.key, TestData.url(TestCaseSupport.class,
                 IndexedShapefileDataStoreTest.STATE_POP));
         map.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
                 createIndex ? Boolean.TRUE : Boolean.FALSE);
@@ -175,7 +176,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
      */
     public void testCreateDataStoreURL() throws IOException {
         copyShapefiles(IndexedShapefileDataStoreTest.STATE_POP);
-        DataStore ds = factory.createDataStore(TestData.url(this,
+        DataStore ds = factory.createDataStore(TestData.url(TestCaseSupport.class,
                 IndexedShapefileDataStoreTest.STATE_POP));
         testDataStore(IndexType.QIX, true, (IndexedShapefileDataStore) ds);
     }

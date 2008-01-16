@@ -223,6 +223,11 @@ public class ShapefileFeatureWriter implements FeatureWriter {
             }
         }
 
+        doClose();
+        clean();
+    }
+
+    protected void doClose() throws IOException {
         // close reader, flush headers, and copy temp files, if any
         try {
             featureReader.close();
@@ -237,7 +242,6 @@ public class ShapefileFeatureWriter implements FeatureWriter {
             featureReader = null;
             shpWriter = null;
             dbfWriter = null;
-            clean();
         }
     }
 

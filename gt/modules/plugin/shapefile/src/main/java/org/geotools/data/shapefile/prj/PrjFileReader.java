@@ -48,6 +48,7 @@ public class PrjFileReader implements FileReader {
     StreamLogging streamLogger = new StreamLogging("PRJ reader");
 
     org.opengis.referencing.crs.CoordinateReferenceSystem cs;
+    private boolean memoryMapped=true;
 
     // private int[] content;
 
@@ -106,6 +107,7 @@ public class PrjFileReader implements FileReader {
             FileChannel fc = (FileChannel) channel;
             buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             buffer.position((int) fc.position());
+            memoryMapped = true;
         } else {
             // Some other type of channel
             // start with a 8K buffer, should be more than adequate
@@ -130,7 +132,7 @@ public class PrjFileReader implements FileReader {
 
     public void close() throws IOException {
         if (buffer != null) {
-            if (buffer instanceof MappedByteBuffer) {
+            if (buffer instanceof MappedByteBuffer && !memoryMapped) {
                 NIOUtilities.clean(buffer);
             }
             buffer = null;

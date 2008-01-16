@@ -15,7 +15,8 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.FIX;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -60,13 +61,7 @@ public class IndexedFidReader implements FIDReader, FileReader {
     StreamLogging streamLogger = new StreamLogging("IndexedFidReader");
 
     public IndexedFidReader(ShpFiles shpFiles) throws IOException {
-        this.typeName = shpFiles.getTypeName() + ".";
-        this.readChannel = shpFiles.getReadChannel(FIX, this);
-        streamLogger.open();
-        getHeader(shpFiles);
-
-        buffer = ByteBuffer.allocateDirect(12 * 1024);
-        buffer.position(buffer.limit());
+        init( shpFiles, shpFiles.getReadChannel(FIX, this) );
     }
 
     public IndexedFidReader(ShpFiles shpFiles, RecordNumberTracker reader)
@@ -74,6 +69,20 @@ public class IndexedFidReader implements FIDReader, FileReader {
         this(shpFiles);
         this.reader = reader;
 
+    }
+
+    public IndexedFidReader( ShpFiles shpFiles, ReadableByteChannel in ) throws IOException {
+        init(shpFiles, in);
+    }
+
+    private void init( ShpFiles shpFiles, ReadableByteChannel in ) throws IOException {
+        this.typeName = shpFiles.getTypeName() + ".";
+        this.readChannel = in;
+        streamLogger.open();
+        getHeader(shpFiles);
+
+        buffer = ByteBuffer.allocateDirect(12 * 1024);
+        buffer.position(buffer.limit());
     }
 
     private void getHeader(ShpFiles shpFiles) throws IOException {

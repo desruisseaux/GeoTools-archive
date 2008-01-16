@@ -1,5 +1,6 @@
 package org.geotools.data.shapefile.indexed;
 
+import static org.geotools.data.shapefile.ShpFileType.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,6 +13,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileFeatureWriter;
 import org.geotools.data.shapefile.ShpFileType;
 import org.geotools.data.shapefile.ShpFiles;
+import org.geotools.data.shapefile.StorageFile;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -35,10 +37,12 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
             throws IOException {
         super(typeName, shpFiles, attsReader, featureReader);
         this.indexedShapefileDataStore = datastore;
-        if (!datastore.indexUseable(ShpFileType.FIX)) {
+        if (!datastore.indexUseable(FIX)) {
             this.fidWriter = IndexedFidWriter.EMPTY_WRITER;
         } else {
-            this.fidWriter = new IndexedFidWriter(shpFiles);
+            StorageFile storageFile = shpFiles.getStorageFile(FIX);
+            storageFiles.put(FIX, storageFile);
+            this.fidWriter = new IndexedFidWriter(shpFiles, storageFile);
         }
     }
 
@@ -84,7 +88,6 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
         super.close();
 
         try {
-            fidWriter.close();
             if (shpFiles.isLocal()) {
                 if (indexedShapefileDataStore.needsGeneration(ShpFileType.FIX)) {
                     FidIndexer.generate(shpFiles);
@@ -105,6 +108,18 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
         }
     }
 
+    @Override
+    protected void doClose() throws IOException {
+        super.doClose();
+        try{
+            fidWriter.close();
+        }catch(Throwable e){
+            indexedShapefileDataStore.treeType = IndexType.NONE;
+            ShapefileDataStoreFactory.LOGGER.log(Level.WARNING,
+                    "Error creating Feature ID index", e);
+        }
+    }
+    
     private void deleteFile(ShpFileType shpFileType) {
         URL url = shpFiles.acquireWrite(shpFileType, this);
         try {

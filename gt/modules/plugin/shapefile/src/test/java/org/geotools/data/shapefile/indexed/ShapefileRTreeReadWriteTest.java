@@ -25,6 +25,7 @@ import org.geotools.TestData;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
+import org.geotools.data.shapefile.TestCaseSupport;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -81,7 +82,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
     public void testWriteTwice() throws Exception {
         copyShapefiles("shapes/stream.shp");
         IndexedShapefileDataStore s1 = new IndexedShapefileDataStore(TestData
-                .url(this, "shapes/stream.shp"));
+                .url(TestData.class, "shapes/stream.shp"));
         String typeName = s1.getTypeNames()[0];
         FeatureSource source = s1.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
@@ -90,6 +91,8 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
         doubleWrite(type, one, getTempFile(), false);
         doubleWrite(type, one, getTempFile(), true);
+        
+        s1.dispose();
     }
 
     private void doubleWrite(SimpleFeatureType type, FeatureCollection one,
@@ -120,6 +123,8 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
         test(type, one, getTempFile(), false);
         test(type, one, getTempFile(), true);
+        
+        s.dispose();
     }
 
     private void test(SimpleFeatureType type, FeatureCollection one, File tmp, boolean memorymapped)
@@ -141,6 +146,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
         FeatureCollection two = s.getFeatureSource(typeName).getFeatures();
 
         compare(one.features(), two.features());
+        s.dispose();
     }
 
     static void compare(FeatureIterator fs1, FeatureIterator fs2)
@@ -152,14 +158,10 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
             SimpleFeature f1 = fs1.next();
             SimpleFeature f2 = fs2.next();
 
-            if ((i++ % 50) == 0) {
-                if (verbose) {
-                    System.out.print("*");
-                }
-            }
-
             compare(f1, f2);
         }
+        fs1.close();
+        fs2.close();
     }
 
     static void compare(SimpleFeature f1, SimpleFeature f2) throws Exception {
@@ -190,8 +192,4 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
         }
     }
 
-    public static final void main(String[] args) throws Exception {
-        verbose = true;
-        junit.textui.TestRunner.run(suite(ShapefileRTreeReadWriteTest.class));
-    }
 }

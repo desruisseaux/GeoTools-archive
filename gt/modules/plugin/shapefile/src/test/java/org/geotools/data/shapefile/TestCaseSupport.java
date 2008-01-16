@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -59,7 +60,7 @@ public class TestCaseSupport extends TestCase {
     /**
      * Stores all temporary files here - delete on tear down.
      */
-    private final List tmpFiles = new ArrayList();
+    private final List<File> tmpFiles = new ArrayList<File>();
 
     /**
      * Creates a new instance of {@code TestCaseSupport} with the given name.
@@ -73,20 +74,24 @@ public class TestCaseSupport extends TestCase {
      * is automatically run after each test.
      */
     protected void tearDown() throws Exception {
+        
+        Runtime.getRuntime().runFinalization();
         // it seems that not all files marked as temp will get erased, perhaps
         // this is because they have been rewritten? Don't know, don't _really_
         // care, so I'll just delete everything
-        final Iterator f = tmpFiles.iterator();
+        final Iterator<File> f = tmpFiles.iterator();
         while (f.hasNext()) {
             File targetFile = (File) f.next();
 
-            targetFile.deleteOnExit();
+            dieDieDIE(targetFile);
             dieDieDIE(sibling(targetFile, "dbf"));
             dieDieDIE(sibling(targetFile, "shx"));
+            // Quad tree index
             dieDieDIE(sibling(targetFile, "qix"));
+            // Feature ID index
             dieDieDIE(sibling(targetFile, "fix"));
+            // R-Tree index
             dieDieDIE(sibling(targetFile, "grx"));
-            // TODDO: r i tree must die
             dieDieDIE(sibling(targetFile, "prj"));
             dieDieDIE(sibling(targetFile, "shp.xml"));
 
@@ -100,6 +105,7 @@ public class TestCaseSupport extends TestCase {
             if (file.delete()) {
                 // dead
             } else {
+                System.out.println("Couldn't delete "+file);
                 file.deleteOnExit(); // dead later
             }
         }
@@ -108,7 +114,7 @@ public class TestCaseSupport extends TestCase {
     /**
      * Helper method for {@link #tearDown}.
      */
-    private static File sibling(final File f, final String ext) {
+    protected static File sibling(final File f, final String ext) {
         return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
@@ -155,7 +161,10 @@ public class TestCaseSupport extends TestCase {
      * Returns the first feature in the given feature collection.
      */
     protected SimpleFeature firstFeature(FeatureCollection fc) {
-        return fc.features().next();
+        FeatureIterator features = fc.features();
+        SimpleFeature next = features.next();
+        features.close();
+        return next;
     }
 
     /**
@@ -183,25 +192,48 @@ public class TestCaseSupport extends TestCase {
      * and {@code .prj} files).
      */
     protected File copyShapefiles(final String name) throws IOException {
-        assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());
-        assertTrue(TestData.copy(this, sibling(name, "shp")).canRead());
+        assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "dbf")).canRead());
+        assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shp")).canRead());
         try {
-            assertTrue(TestData.copy(this, sibling(name, "shx")).canRead());
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shx")).canRead());
         } catch (FileNotFoundException e) {
             // Ignore: this file is optional.
         }
         try {
-            assertTrue(TestData.copy(this, sibling(name, "prj")).canRead());
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "prj")).canRead());
         } catch (FileNotFoundException e) {
             // Ignore: this file is optional.
         }
-        return TestData.copy(this, name);
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "fix")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "qix")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "grx")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shp.xml")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        File copy = TestData.copy(TestCaseSupport.class, name);
+        markTempFile(copy);
+        
+        return copy;
     }
 
     /**
      * Returns the test suite for the given class.
      */
-    public static Test suite(Class c) {
+    public static Test suite(Class<?> c) {
         return new TestSuite(c);
     }
 }

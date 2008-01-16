@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.geotools.TestData;
 import org.geotools.data.shapefile.ShpFiles;
+import org.geotools.data.shapefile.TestCaseSupport;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -30,7 +31,7 @@ public class ShpXmlFileReaderTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        URL example = TestData.url(this, "example.shp.xml");
+        URL example = TestData.url(TestCaseSupport.class, "example.shp.xml");
         ShpFiles shpFiles = new ShpFiles(example);
 
         reader = new ShpXmlFileReader(shpFiles);

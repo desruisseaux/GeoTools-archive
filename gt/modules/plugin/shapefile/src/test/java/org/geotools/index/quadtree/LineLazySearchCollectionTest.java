@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.geotools.data.shapefile.ShpFiles;
+import org.geotools.data.shapefile.TestCaseSupport;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
-import org.geotools.data.shapefile.indexed.TestCaseSupport;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;

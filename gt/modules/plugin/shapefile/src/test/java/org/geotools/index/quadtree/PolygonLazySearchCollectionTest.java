@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.geotools.data.shapefile.TestCaseSupport;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
-import org.geotools.data.shapefile.indexed.TestCaseSupport;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

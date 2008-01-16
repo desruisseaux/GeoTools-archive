@@ -5,8 +5,10 @@ package org.geotools.data.shapefile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
@@ -16,8 +18,7 @@ import java.util.TreeSet;
 import org.geotools.data.DataUtilities;
 
 /**
- * Encapsulates the idea of a file for writing data to and then later updating
- * the original.
+ * Encapsulates the idea of a file for writing data to and then later updating the original.
  * 
  * @author jesse
  */
@@ -26,7 +27,7 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
     private final File tempFile;
     private final ShpFileType type;
 
-    public StorageFile(ShpFiles shpFiles, File tempFile, ShpFileType type) {
+    public StorageFile( ShpFiles shpFiles, File tempFile, ShpFileType type ) {
         this.shpFiles = shpFiles;
         this.tempFile = tempFile;
         this.type = type;
@@ -42,15 +43,14 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
     }
 
     public FileChannel getWriteChannel() throws IOException {
-        return new FileOutputStream(tempFile).getChannel();
+        return new RandomAccessFile(tempFile, "rw").getChannel();
     }
 
     /**
-     * Replaces the file that the temporary file is acting as a transactional
-     * type cache for. Acts similar to a commit.
+     * Replaces the file that the temporary file is acting as a transactional type cache for. Acts
+     * similar to a commit.
      * 
      * @see #replaceOriginals(StorageFile...)
-     * 
      * @throws IOException
      */
     public void replaceOriginal() throws IOException {
@@ -58,33 +58,27 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
     }
 
     /**
-     * Takes a collection of StorageFiles and performs the replace functionality
-     * described in {@link #replaceOriginal()}. However, all files that are
-     * part of the same {@link ShpFiles} are done within a lock so all of the
-     * updates for all the Files of a Shapefile can be updated within a single
-     * lock.
+     * Takes a collection of StorageFiles and performs the replace functionality described in
+     * {@link #replaceOriginal()}. However, all files that are part of the same {@link ShpFiles}
+     * are done within a lock so all of the updates for all the Files of a Shapefile can be updated
+     * within a single lock.
      * 
-     * @param storageFiles
-     *                files to execute the replace functionality.
-     * 
+     * @param storageFiles files to execute the replace functionality.
      * @throws IOException
      */
-    public static void replaceOriginals(StorageFile... storageFiles)
-            throws IOException {
-        SortedSet<StorageFile> files = new TreeSet<StorageFile>(Arrays
-                .asList(storageFiles));
+    public static void replaceOriginals( StorageFile... storageFiles ) throws IOException {
+        SortedSet<StorageFile> files = new TreeSet<StorageFile>(Arrays.asList(storageFiles));
 
         ShpFiles currentShpFiles = null;
         URL shpURL = null;
         StorageFile locker = null;
-        for (StorageFile storageFile : files) {
+        for( StorageFile storageFile : files ) {
             if (currentShpFiles != storageFile.shpFiles) {
                 // there's a new set of files so unlock old and lock new.
                 unlock(currentShpFiles, shpURL, locker);
                 locker = storageFile;
                 currentShpFiles = storageFile.shpFiles;
-                shpURL = currentShpFiles.acquireWrite(ShpFileType.SHP,
-                        storageFile);
+                shpURL = currentShpFiles.acquireWrite(ShpFileType.SHP, storageFile);
             }
 
             File storage = storageFile.getFile();
@@ -98,27 +92,16 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
 
                 if (dest.exists()) {
                     if (!dest.delete())
-                        throw new IOException(
-                                "Unable to delete original file: " + url);
+//                        ShapefileDataStoreFactory.LOGGER.severe("Unable to delete the file: "+dest+" when attempting to replace with temporary copy");
+                        throw new IOException("Unable to delete original file: " + url);
                 }
 
                 if (storage.exists() && !storage.renameTo(dest)) {
-                    FileChannel in = null;
-                    FileChannel out = null;
-                    try {
-                        in = new FileInputStream(storage).getChannel();
-                        out = new FileOutputStream(dest).getChannel();
-
-                        long len = in.size();
-                        long copied = out.transferFrom(in, 0, in.size());
-
-                        if (len != copied) {
-                            throw new IOException("unable to complete write: "
-                                    + url);
-                        }
-                    } finally {
-                            in.close();
-                            out.close();
+//                    ShapefileDataStoreFactory.LOGGER.finer("Unable to rename temporary file to the file: "+dest+" when attempting to replace with temporary copy");
+                    
+                    copyFile(storage, url, dest);
+                    if (!storage.delete()) {
+                        storage.deleteOnExit();
                     }
                 }
             } finally {
@@ -133,16 +116,40 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
 
     }
 
+    private static void copyFile( File storage, URL url, File dest ) throws FileNotFoundException,
+            IOException {
+        FileChannel in = null;
+        FileChannel out = null;
+        try {
+            in = new FileInputStream(storage).getChannel();
+            out = new FileOutputStream(dest).getChannel();
+
+            // magic number for Windows, 64Mb - 32Kb)
+            int maxCount = (64 * 1024 * 1024) - (32 * 1024);
+            long size = in.size();
+            long position = 0;
+            while( position < size ) {
+                position += in.transferTo(position, maxCount, out);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
+
     private URL getSrcURLForWrite() {
         return shpFiles.acquireWrite(type, this);
     }
 
-    private void unlockWriteURL(URL url) {
+    private void unlockWriteURL( URL url ) {
         shpFiles.unlockWrite(url, this);
     }
 
-    private static void unlock(ShpFiles currentShpFiles, URL shpURL,
-            StorageFile locker) {
+    private static void unlock( ShpFiles currentShpFiles, URL shpURL, StorageFile locker ) {
         // no lock to be unlocked
         if (currentShpFiles == null) {
             return;
@@ -154,7 +161,7 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
     /**
      * Just groups together files that have the same ShpFiles instance
      */
-    public int compareTo(StorageFile o) {
+    public int compareTo( StorageFile o ) {
         if (this == o) {
             return 0;
         }

@@ -988,4 +988,5 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
     public String id() {
         return getClass().getName() + ": " + getCurrentTypeName();
     }
+    
 }

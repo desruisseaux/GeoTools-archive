@@ -107,4 +107,12 @@ public class LazySearchCollection extends AbstractCollection<Data> implements
         }
     }
 
+    public void closeIterator( Iterator<Data> iter ) throws IOException {
+        try {
+            tree.close(iter);
+        } catch (StoreException e) {
+            throw (IOException) new IOException(e.getLocalizedMessage()).initCause(e);
+        }
+    }
+
 }

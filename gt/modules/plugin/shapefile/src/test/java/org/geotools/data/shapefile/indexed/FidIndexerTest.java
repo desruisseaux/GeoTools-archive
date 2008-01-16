@@ -15,11 +15,17 @@
  */
 package org.geotools.data.shapefile.indexed;
 
+import java.io.IOException;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.shapefile.ShpFiles;
 
 public class FidIndexerTest extends FIDTestCase {
+    public  FidIndexerTest( ) throws IOException {
+        super("FidIndexerTest");
+    }
+
     protected void tearDown() throws Exception {
         super.tearDown();
     }

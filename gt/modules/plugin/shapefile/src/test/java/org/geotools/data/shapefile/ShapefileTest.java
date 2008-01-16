@@ -104,8 +104,8 @@ public class ShapefileTest extends TestCaseSupport {
         copyShapefiles(STATEPOP);
         copyShapefiles(STATEPOP_IDX);
         final URL url1 = TestData.url(STATEPOP); // Backed by InputStream
-        final URL url2 = TestData.url(this, STATEPOP); // Backed by File
-        final URL url3 = TestData.url(this, STATEPOP_IDX);
+        final URL url2 = TestData.url(TestCaseSupport.class, STATEPOP); // Backed by File
+        final URL url3 = TestData.url(TestCaseSupport.class, STATEPOP_IDX);
         final ShapefileReader reader1 = new ShapefileReader(new ShpFiles(url1),
                 false, false);
         final ShapefileReader reader2 = new ShapefileReader(new ShpFiles(url2),
@@ -174,7 +174,7 @@ public class ShapefileTest extends TestCaseSupport {
     }
 
     public void testDuplicateColumnNames() throws Exception {
-        File file = TestData.file(this, "bad/state.shp");
+        File file = TestData.file(TestCaseSupport.class, "bad/state.shp");
         ShapefileDataStore dataStore = new ShapefileDataStore(file.toURL());
         FeatureSource states = dataStore.getFeatureSource();
         SimpleFeatureType schema = states.getSchema();
@@ -199,7 +199,7 @@ public class ShapefileTest extends TestCaseSupport {
             }
             copyShapefiles(STATEPOP);
             reader.close();
-            c2 = TestData.url(this, STATEPOP);
+            c2 = TestData.url(TestCaseSupport.class, STATEPOP);
             reader = new ShapefileReader(new ShpFiles(c2), false, false);
             for (int i = 0, ii = offsets.size(); i < ii; i++) {
                 reader.shapeAt(((Integer) offsets.get(i)).intValue());

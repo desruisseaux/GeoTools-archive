@@ -21,6 +21,10 @@ import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.shp.IndexFile;
 
 public class IndexedFidReaderTest extends FIDTestCase {
+    public IndexedFidReaderTest(  ) throws IOException {
+        super("IndexedFidReaderTest");
+    }
+
     private IndexedFidReader reader;
 
     private IndexFile indexFile;
@@ -66,14 +70,13 @@ public class IndexedFidReaderTest extends FIDTestCase {
         reader.close();
 
         ShpFiles shpFiles = new ShpFiles(fixFile);
-
         IndexedFidWriter writer = new IndexedFidWriter(shpFiles);
         try {
             writer.next();
             writer.next();
             writer.next();
             writer.remove();
-            while (writer.hasNext()) {
+            while( writer.hasNext() ) {
                 writer.next();
             }
         } finally {

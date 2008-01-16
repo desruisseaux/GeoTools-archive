@@ -41,6 +41,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShpFileType;
+import org.geotools.data.shapefile.TestCaseSupport;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
@@ -95,7 +96,11 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(url);
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
 
-        return fs.getFeatures(q);
+        FeatureCollection features = fs.getFeatures(q);
+
+        s.dispose();
+        
+        return features;
     }
 
     protected FeatureCollection loadFeatures(String resource, Charset charset,
@@ -106,7 +111,9 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         ShapefileDataStore s = new IndexedShapefileDataStore(url, null, false,
                 true, IndexType.QIX, charset);
         FeatureSource fs = s.getFeatureSource(s.getTypeNames()[0]);
-        return fs.getFeatures(q);
+        FeatureCollection features = fs.getFeatures(q);
+        s.dispose();
+        return features;
     }
 
     protected FeatureCollection loadFeatures(IndexedShapefileDataStore s)
@@ -120,7 +127,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
     public void testLoadDanishChars() throws Exception {
         FeatureCollection fc = loadFeatures(DANISH, null);
-        SimpleFeature first = fc.features().next();
+        SimpleFeature first = firstFeature(fc);
         // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
@@ -148,12 +155,13 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testSpacesInPath() throws Exception {
-        URL u = TestData.url(this, "folder with spaces/pointtest.shp");
+        URL u = TestData.url(TestCaseSupport.class, "folder with spaces/pointtest.shp");
         File f = new File(URLDecoder.decode(u.getFile(), "UTF-8"));
         assertTrue(f.exists());
 
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(u);
         loadFeatures(s);
+        s.dispose();
     }
 
     /**
@@ -173,6 +181,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection all = s.getFeatureSource(typeName).getFeatures();
 
         assertEquals(features.getBounds(), all.getBounds());
+        s.dispose();
     }
 
     public void testCreateAndReadQIX() throws Exception {
@@ -227,6 +236,8 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
                 .getBounds()));
 
         assertTrue(file.exists());
+        ds.dispose();
+        ds2.dispose();
     }
 
     private ArrayList performQueryComparison(
@@ -363,6 +374,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
             for (FeatureIterator i = fc.features(); i.hasNext();) {
                 assertEquals(-1, ((Byte) i.next().getAttribute(1)).byteValue());
             }
+            sds.dispose();
         } catch (Throwable t) {
             if (System.getProperty("os.name").startsWith("Windows")) {
                 System.out.println("Ignore " + t
@@ -373,6 +385,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
                 throw t;
             }
         }
+        
     }
 
     /**
@@ -402,6 +415,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
                 assertEquals(--idx, loadFeatures(sds).size());
             }
+            sds.dispose();
         } catch (Throwable t) {
             if (System.getProperty("os.name").startsWith("Windows")) {
                 System.out.println("Ignore " + t
@@ -445,6 +459,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
                 assertEquals(--idx, loadFeatures(sds).size());
             }
+            sds.dispose();
         } catch (Throwable t) {
             if (System.getProperty("os.name").startsWith("Windows")) {
                 System.out.println("Ignore " + t
@@ -485,6 +500,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         transaction.commit();
         transaction.close();
         assertEquals(idx + 3, sds.getCount(Query.ALL));
+        sds.dispose();
 
     }
 
@@ -542,6 +558,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(tmpFile
                 .toURL());
         writeFeatures(s, features);
+        s.dispose();
     }
 
     public void testGeometriesWriting() throws Exception {
@@ -616,6 +633,8 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         s.createSchema(type);
         writeFeatures(s, features);
 
+        s.dispose();
+        
         // read features
         s = new IndexedShapefileDataStore(tmpFile.toURL());
 
@@ -650,7 +669,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
                         + Arrays.asList(fromShape.getCoordinates()));
             }
         }
-
+        s.dispose();
         tmpFile.delete();
     }
 
@@ -669,6 +688,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         assertFalse(ds.needsGeneration(fix));
         assertTrue(fixFile.delete());
         assertTrue(ds.needsGeneration(fix));
+        ds.dispose();
     }
     
     public static void main(java.lang.String[] args) throws Exception {

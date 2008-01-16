@@ -14,9 +14,17 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
     protected void setUp() throws Exception {
         super.setUp();
         getClass().getClassLoader().setDefaultAssertionStatus(true);
+        
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        Runtime.getRuntime().runFinalization();
     }
 
-    public void testAcquireRead1() throws Exception {
+    public void testAcquireRead1() throws Throwable {
         ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
 
         URL url = shpFiles.acquireRead(DBF, this);
@@ -45,9 +53,10 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
         shpFiles.unlockRead(result2.value, this);
         shpFiles.unlockRead(result1.value, testWriter);
         shpFiles.unlockRead(url, this);
+        shpFiles.finalize();
     }
 
-    public void testUnlockReadAssertion() throws Exception {
+    public void testUnlockReadAssertion() throws Throwable {
         ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
 
         URL url = shpFiles.acquireRead(DBF, this);
@@ -79,9 +88,10 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
 
         shpFiles.unlockRead(result1.value, testWriter);
         shpFiles.unlockRead(url, this);
+        shpFiles.finalize();
     }
 
-    public void testUnlockWriteAssertion() throws Exception {
+    public void testUnlockWriteAssertion() throws Throwable {
         ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
 
         URL url = shpFiles.acquireWrite(DBF, this);
@@ -111,6 +121,9 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
             fail(e.getMessage());
         }
 
+        shpFiles.unlockWrite(url, this);
+        shpFiles.unlockWrite(result1.value, testWriter);
+        shpFiles.finalize();
     }
 
     public String id() {

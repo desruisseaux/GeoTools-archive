@@ -166,7 +166,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
 
     public void testSpacesInPath() throws Exception {
-        URL u = TestData.url(this, "folder with spaces/pointtest.shp");
+        URL u = TestData.url(TestCaseSupport.class, "folder with spaces/pointtest.shp");
         File f = new File(URLDecoder.decode(u.getFile(), "UTF-8"));
         assertTrue(f.exists());
         ShapefileDataStore s = new ShapefileDataStore(u);
@@ -637,7 +637,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                                                         // URL point into the
                                                         // JAR file.
         ShapefileDataStore store = (ShapefileDataStore) new ShapefileDataStoreFactory()
-                .createDataStore(TestData.url(this, STREAM));
+                .createDataStore(TestData.url(TestCaseSupport.class, STREAM));
         int count = 0;
         FeatureReader reader = store.getFeatureReader();
         try {

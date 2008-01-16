@@ -60,10 +60,11 @@ public class IndexedShapefileAttributeReader extends ShapefileAttributeReader
         try {
             super.close();
         } finally {
-            goodRecs = null;
             if( closeableCollection!=null ){
+                closeableCollection.closeIterator(goodRecs);
                 closeableCollection.close();
             }
+            goodRecs = null;
         }
     }
 

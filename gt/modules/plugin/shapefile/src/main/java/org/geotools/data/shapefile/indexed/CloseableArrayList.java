@@ -6,6 +6,7 @@ package org.geotools.data.shapefile.indexed;
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.geotools.index.CloseableCollection;
 import org.geotools.index.Data;
@@ -45,6 +46,10 @@ public class CloseableArrayList extends AbstractList<Data> implements
 
     public boolean add(Data o) {
         return container.add(o);
+    }
+
+    public void closeIterator( Iterator<Data> iter ) throws IOException {
+        // do nothing
     }
     
 }

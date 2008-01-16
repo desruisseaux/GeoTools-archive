@@ -143,7 +143,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
     private void test(String f) throws Exception {
         copyShapefiles(f); // Work on File rather than URL from JAR.
-        ShapefileDataStore s = new ShapefileDataStore(TestData.url(this, f));
+        ShapefileDataStore s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f));
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();

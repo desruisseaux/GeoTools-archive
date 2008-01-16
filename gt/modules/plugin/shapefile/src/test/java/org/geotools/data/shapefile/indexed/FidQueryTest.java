@@ -44,6 +44,10 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class FidQueryTest extends FIDTestCase {
+    public  FidQueryTest(  ) throws IOException {
+        super("FidQueryTest");
+    }
+
     private IndexedShapefileDataStore ds;
 
     private static final FilterFactory2 fac = CommonFactoryFinder
@@ -58,7 +62,7 @@ public class FidQueryTest extends FIDTestCase {
 
         super.setUp();
 
-        URL url = backshp.toURL();
+        URL url = backshp.toURI().toURL();
         ds = new IndexedShapefileDataStore(url, null, false, true,
                 IndexType.QIX);
         numFeatures = 0;

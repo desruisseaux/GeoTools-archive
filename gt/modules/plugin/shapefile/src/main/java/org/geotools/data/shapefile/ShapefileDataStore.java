@@ -1060,4 +1060,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     public String toString() {
         return "Shapefile datastore for :" + shpFiles.get(SHP);
     }
+    @Override
+    public void dispose() {
+        super.dispose();
+        shpFiles.dispose();
+    }
 }
+

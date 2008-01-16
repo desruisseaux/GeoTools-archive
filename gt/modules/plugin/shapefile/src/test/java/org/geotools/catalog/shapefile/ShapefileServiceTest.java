@@ -17,6 +17,7 @@ package org.geotools.catalog.shapefile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -25,9 +26,13 @@ import java.util.List;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.ServiceInfo;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.shapefile.indexed.TestCaseSupport;
+import org.geotools.data.shapefile.TestCaseSupport;
 
 public class ShapefileServiceTest extends TestCaseSupport {
+    public ShapefileServiceTest(  ) throws IOException {
+        super("ShapefileServiceTest");
+    }
+
     final static String STATE_POP = "shapes/statepop.shp";
 
     /**
