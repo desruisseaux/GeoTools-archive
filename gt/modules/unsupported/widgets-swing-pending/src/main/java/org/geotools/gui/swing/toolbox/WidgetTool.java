@@ -24,7 +24,7 @@ import javax.swing.JComponent;
  * widget tool are top level tools because they offer an interface for the user
  * @author johann sorel
  */
-public interface WidgetTool extends Tool{
+public interface WidgetTool {
 
     public final WidgetToolListener[] EMPTY_TREETOOLLISTENER_ARRAY = {};
     

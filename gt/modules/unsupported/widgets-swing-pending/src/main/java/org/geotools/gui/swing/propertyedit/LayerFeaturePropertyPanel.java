@@ -214,7 +214,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     public String getTitle() {
-        return BUNDLE.getString("featuretable");
+        return BUNDLE.getString("feature_table");
     }
 
     public ImageIcon getIcon() {

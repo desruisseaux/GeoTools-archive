@@ -17,6 +17,7 @@
 
 package org.geotools.gui.swing.toolbox.tooltree;
 
+import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 import java.util.EventListener;
 
 /**
@@ -24,6 +25,6 @@ import java.util.EventListener;
  */
 public interface ToolTreeListener extends EventListener{
 
-    public void treeToolActivated(TreeToolDescriptor tool);
+    public void treeToolActivated(WidgetToolDescriptor tool);
     
 }

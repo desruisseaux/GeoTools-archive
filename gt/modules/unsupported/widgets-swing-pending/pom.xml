@@ -324,6 +324,13 @@
       <version>1.8</version>
     </dependency>
 
+    <!-- jts-wrapper -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-jts-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <!-- picocontainer-1.2.jar -->
     <dependency>
       <groupId>picocontainer</groupId>
@@ -360,7 +367,7 @@
     </dependency>
 
 
-
+    
 
 
     <!-- swing-layout.jar -->

@@ -21,13 +21,13 @@ import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.tooltree.Parameter;
 import org.geotools.gui.swing.toolbox.WidgetTool;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
+import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 
 /**
  *
  * @author johann sorel
  */
-public class ShapeCreationTTDescriptor implements TreeToolDescriptor{
+public class ShapeCreationTTDescriptor implements WidgetToolDescriptor{
 
    
     private final String[] path = ToolTreePaths.getInstance().FILE_CREATE.getPath();

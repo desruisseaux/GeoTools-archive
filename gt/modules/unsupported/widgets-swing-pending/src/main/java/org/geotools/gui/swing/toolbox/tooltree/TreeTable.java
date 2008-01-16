@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.toolbox.tooltree;
 
+import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
@@ -37,10 +38,10 @@ final class TreeTable extends JXTreeTable implements MouseListener {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tooltree/Bundle");
     
     
-    protected final TreeToolDescriptor[] EMPTY_TREETOOLDESCRIPTOR_ARRAY = {};
+    protected final WidgetToolDescriptor[] EMPTY_TREETOOLDESCRIPTOR_ARRAY = {};
     protected final EventListenerList LISTENERS = new EventListenerList();
     private final ToolPackTreeNode root;
-    private final Map<TreeToolDescriptor, ToolTreeNode> tools = new HashMap<TreeToolDescriptor, ToolTreeNode>();
+    private final Map<WidgetToolDescriptor, ToolTreeNode> tools = new HashMap<WidgetToolDescriptor, ToolTreeNode>();
     private DefaultTreeTableModel model;
 
     /**
@@ -64,7 +65,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
         addMouseListener(this);
     }
 
-    void addTool(TreeToolDescriptor tool) {
+    void addTool(WidgetToolDescriptor tool) {
 
         if (!tools.containsKey(tool)) {
 
@@ -134,7 +135,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
 
     }
 
-    void removeTool(TreeToolDescriptor tool) {
+    void removeTool(WidgetToolDescriptor tool) {
 
         if (tools.containsKey(tool)) {
             ToolTreeNode node = tools.get(tool);
@@ -155,7 +156,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
         }
     }
 
-    TreeToolDescriptor[] getTreeToolDescriptors() {
+    WidgetToolDescriptor[] getTreeToolDescriptors() {
         return tools.keySet().toArray(EMPTY_TREETOOLDESCRIPTOR_ARRAY);
     }
 
@@ -165,7 +166,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
             TreePath path = getTreeSelectionModel().getSelectionPath();
             Object node = path.getLastPathComponent();
             if (node instanceof ToolTreeNode) {
-                TreeToolDescriptor tool = (TreeToolDescriptor) ((ToolTreeNode) node).getUserObject();
+                WidgetToolDescriptor tool = (WidgetToolDescriptor) ((ToolTreeNode) node).getUserObject();
                 fireActivation(tool);
             }
         }
@@ -183,7 +184,7 @@ final class TreeTable extends JXTreeTable implements MouseListener {
     public void mouseExited(MouseEvent e) {
     }
 
-    private void fireActivation(TreeToolDescriptor tool) {
+    private void fireActivation(WidgetToolDescriptor tool) {
         ToolTreeListener[] listeners = getToolTreeListeners();
 
         for (ToolTreeListener listener : listeners) {

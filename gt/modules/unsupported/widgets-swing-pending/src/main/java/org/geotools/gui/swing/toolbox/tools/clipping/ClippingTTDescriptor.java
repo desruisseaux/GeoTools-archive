@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tools.svg2mif;
+package org.geotools.gui.swing.toolbox.tools.clipping;
 
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -25,15 +25,18 @@ import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 
 /**
  *
- * @author Laurent Jegou
+ * @author johann sorel
  */
-public class SVG2MIFTTDescriptor implements WidgetToolDescriptor{
+public class ClippingTTDescriptor implements WidgetToolDescriptor{
 
-    private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();    
-    String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/svg2mif/Bundle").getString("title");
+   
+    private final String[] path = ToolTreePaths.getInstance().ANALYSE_GEOMETRIE.getPath();
     
-    public String getTitle(){
-        return "SVG > MIF";
+    private String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/clipping/Bundle").getString("clip");
+       
+    
+    public String getTitle() {
+        return title;
     }
 
     public String[] getPath() {
@@ -41,7 +44,7 @@ public class SVG2MIFTTDescriptor implements WidgetToolDescriptor{
     }
 
     public WidgetTool createTool(Map parameters) {
-        return new SVG2MIFTool();
+        return new ClippingTool(parameters);
     }
 
     public Parameter[] getParametersInfo() {

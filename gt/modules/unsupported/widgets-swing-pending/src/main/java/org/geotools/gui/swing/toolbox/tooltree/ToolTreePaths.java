@@ -25,10 +25,14 @@ import java.lang.ref.WeakReference;
 public class ToolTreePaths {
 
     private static WeakReference<ToolTreePaths> ref = null;
-        
-    public ToolTreePath FILE = new ToolTreePath(null,"file");
-    public ToolTreePath FILE_CONVERT = new ToolTreePath(FILE,"convert");
-    public ToolTreePath FILE_CREATE = new ToolTreePath(FILE,"create");
+    
+    
+    public final ToolTreePath ANALYSE = new ToolTreePath(null,"analyse");
+    public final ToolTreePath ANALYSE_GEOMETRIE = new ToolTreePath(ANALYSE,"geometry");
+    public final ToolTreePath FILE = new ToolTreePath(null,"file");
+    public final ToolTreePath FILE_CONVERT = new ToolTreePath(FILE,"convert");
+    public final ToolTreePath FILE_CREATE = new ToolTreePath(FILE,"create");
+    
     
     
         

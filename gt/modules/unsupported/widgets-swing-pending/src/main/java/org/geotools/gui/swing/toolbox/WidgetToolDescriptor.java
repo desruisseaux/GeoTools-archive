@@ -14,15 +14,16 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tooltree;
+package org.geotools.gui.swing.toolbox;
 
+import org.geotools.gui.swing.toolbox.tooltree.*;
 import org.geotools.gui.swing.toolbox.WidgetTool;
 import java.util.Map;
 
 /**
  * @author johann sorel
  */
-public interface TreeToolDescriptor {
+public interface WidgetToolDescriptor {
 
     /**
      * empty Parameter array
@@ -35,6 +36,7 @@ public interface TreeToolDescriptor {
     public String getTitle();
     
     /**
+     * used to categorize a widget tool
      * @return String Path ex: {utilities,convert}
      */
     public String[] getPath();

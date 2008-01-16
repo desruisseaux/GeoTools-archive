@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.toolbox.tooltree;
 
+import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import javax.swing.JComponent;
@@ -42,15 +43,15 @@ public class JToolTree extends JComponent{
         add(BorderLayout.CENTER,pane);        
     }
     
-    public void addTool(TreeToolDescriptor tool){
+    public void addTool(WidgetToolDescriptor tool){
         treetable.addTool(tool);
     }
     
-    public void removeTool(TreeToolDescriptor tool){
+    public void removeTool(WidgetToolDescriptor tool){
         treetable.removeTool(tool);
     }
     
-    public TreeToolDescriptor[] getTreeToolDescriptors(){
+    public WidgetToolDescriptor[] getTreeToolDescriptors(){
         return treetable.getTreeToolDescriptors();
     }
     

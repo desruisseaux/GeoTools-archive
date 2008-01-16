@@ -21,13 +21,13 @@ import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.tooltree.Parameter;
 import org.geotools.gui.swing.toolbox.WidgetTool;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.tooltree.TreeToolDescriptor;
+import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
 
 /**
  *
  * @author johann Sorel
  */
-public class VDem2CSVTTDescriptor implements TreeToolDescriptor{
+public class VDem2CSVTTDescriptor implements WidgetToolDescriptor{
 
     private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();
     String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle").getString("title");
