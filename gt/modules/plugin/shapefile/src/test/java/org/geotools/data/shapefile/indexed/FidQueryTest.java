@@ -95,7 +95,6 @@ public class FidQueryTest extends FIDTestCase {
         SimpleFeatureType schema = ds.getSchema();
 
         SimpleFeatureBuilder build = new SimpleFeatureBuilder(schema);
-        System.out.println(schema);
         GeometryFactory gf = new GeometryFactory();
         build.add(gf.createPoint((new Coordinate(0, 0))));
         build.add(new Long(0));

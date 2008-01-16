@@ -128,6 +128,7 @@ public class ShpFiles {
                         + locker +"\n it was created with the following stack trace",
                         locker.getTrace());
             }
+            lockers.clear(); // so as not to get this log again.
         }
     }
 
@@ -519,7 +520,7 @@ public class ShpFiles {
             }
 
         } catch (IOException e) {
-            unlockRead(url, requestor);
+            unlockWrite(url, requestor);
             throw e;
         }
         return channel;

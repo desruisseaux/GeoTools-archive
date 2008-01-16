@@ -123,7 +123,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     public void testLoadDanishChars() throws Exception {
         FeatureCollection fc = loadFeatures(DANISH, Query.ALL);
-        SimpleFeature first = fc.features().next();
+        SimpleFeature first = firstFeature(fc);
 
         // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
@@ -133,7 +133,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         try {
             FeatureCollection fc = loadFeatures(CHINESE, Charset
                     .forName("GB18030"), null);
-            SimpleFeature first = fc.features().next();
+            SimpleFeature first = firstFeature(fc);
             String s = (String) first.getAttribute("NAME");
             assertEquals("\u9ed1\u9f99\u6c5f\u7701", s);
         } catch (UnsupportedCharsetException no) {
@@ -684,10 +684,14 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
         query = new DefaultQuery(s.getSchema().getTypeName(), gf,
                 new String[] { "the_geom" });
+
+        reader.close();
         reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(1, reader.getFeatureType().getAttributeCount());
         assertEquals("the_geom", reader.getFeatureType().getAttribute(0)
                 .getLocalName());
+
+        reader.close();
 
         // here not, we need state_name in the feature type, so open the dbf
         // file please
@@ -697,6 +701,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 new String[] { "the_geom" });
         reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(s.getSchema(), reader.getFeatureType());
+        reader.close();
     }
 
     /**

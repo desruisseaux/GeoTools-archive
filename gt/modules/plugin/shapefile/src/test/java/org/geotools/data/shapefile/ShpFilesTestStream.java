@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.geotools.TestData;
+
 import junit.framework.TestCase;
 
 public class ShpFilesTestStream extends TestCase implements
@@ -88,7 +90,7 @@ public class ShpFilesTestStream extends TestCase implements
         }
     }
 
-    public void testGetReadChannel() throws IOException {
+    public void testGetReadChannelFileChannel() throws IOException {
         writeDataToFiles();
 
         ShpFileType[] types = ShpFileType.values();
@@ -97,6 +99,19 @@ public class ShpFilesTestStream extends TestCase implements
         }
     }
 
+    public void testGetReadChannelURL() throws IOException {
+        ShpFiles files = new ShpFiles(TestData.url("shapes/statepop.shp"));
+        
+        assertFalse(files.isLocal());
+        
+        ReadableByteChannel read = files.getReadChannel(SHP, this);
+        
+        assertEquals(1, files.numberOfLocks());
+        
+        read.close();
+        
+        assertEquals(0, files.numberOfLocks());
+    }
     private void doRead(ShpFileType shpFileType) throws IOException {
         ReadableByteChannel in = files.getReadChannel(shpFileType, this);
         assertEquals(1, files.numberOfLocks());

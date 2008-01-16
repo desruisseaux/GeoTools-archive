@@ -35,7 +35,7 @@ public class ReadableByteChannelDecorator implements ReadableByteChannel {
     public void close() throws IOException {
         try {
             wrapped.close();
-        } catch (Exception e) {
+        } finally {
             if (!closed) {
                 closed = true;
                 shapefileFiles.unlockRead(url, requestor);
