@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import static java.lang.Double.doubleToLongBits;
 
 import org.opengis.util.Cloneable;
-import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -34,17 +34,30 @@ import org.geotools.resources.Utilities;
 /**
  * Holds the coordinates for a two-dimensional position within some coordinate reference system.
  * <p>
- * <strong>Note:</strong> This class inherits {@linkplain #x x} and {@linkplain #y y} fields. But
- * despite their names, they don't need to be oriented toward {@linkplain AxisDirection#EAST East}
- * and {@linkplain AxisDirection#NORTH North} respectively. The (<var>x</var>,<var>y</var>) axis
- * can have any orientation and should be understood as "ordinate 0" and "ordinate 1" values
- * instead. This is not specific to this implementation; in Java2D too, the visual axis orientation
- * depend on the {@linkplain java.awt.Graphics2D#getTransform affine transform in the graphics
- * context}.
+ * <b>Note 1:</b><blockquote>
+ * This class inherits {@linkplain #x x} and {@linkplain #y y} fields. But despite their names,
+ * they don't need to be oriented toward {@linkplain org.opengis.referencing.cs.AxisDirection#EAST
+ * East} and {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North}.
+ * The (<var>x</var>,<var>y</var>) axis can have any orientation and should be understood as
+ * "<cite>ordinate 0</cite>" and "<cite>ordinate 1</cite>" values instead. This is not specific
+ * to this implementation; in Java2D too, the visual axis orientation depend on the
+ * {@linkplain java.awt.Graphics2D#getTransform affine transform in the graphics context}.
  * <p>
  * The rational for avoiding axis orientation restriction is that other {@link DirectPosition}
- * implementation do not have such restriction, and anyway it would be hard to generalize (what
- * to do with {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
+ * implementation do not have such restriction, and it would be hard to generalize (what to do
+ * with {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH_EAST North-East} direction?).
+ * </blockquote>
+ * <p>
+ * <b>Note 2:</b><blockquote>
+ * <strong>Do not mix instances of this class with ordinary {@link Point2D} instances in a
+ * {@link java.util.Set} or as {@link java.util.Map} keys.</strong> It is not possible to meet
+ * both {@link Point2D#hashCode} and {@link DirectPosition#hashCode} contract, and this class
+ * choose to implements the later. Concequently, <strong>{@link #hashCode} is inconsistent with
+ * {@link Point2D#equals}</strong> (but is consistent with {@link DirectPosition#equals}).
+ * <p>
+ * In other words, it is safe to add instances of {@code DirectPosition2D} in a
+ * {@code Set<DirectPosition>}, but it is unsafe to add them in a {@code Set<Point2D>}.
+ * </blockquote>
  *
  * @since 2.0
  * @source $URL$
@@ -52,7 +65,7 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  *
  * @see DirectPosition1D
- * @see GeneralPosition
+ * @see GeneralDirectPosition
  * @see java.awt.geom.Point2D
  */
 public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable, Cloneable {
@@ -83,7 +96,8 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
     /**
      * Constructs a 2D position from the specified ordinates. Despite their name,
      * the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
-     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * ({@linkplain org.opengis.referencing.cs.AxisDirection#EAST  East},
+     *  {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North}).
      * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y}
      * fields. See the {@linkplain DirectPosition2D class javadoc} for details.
      */
@@ -94,7 +108,8 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
     /**
      * Constructs a 2D position from the specified ordinates in the specified CRS. Despite
      * their name, the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
-     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * ({@linkplain org.opengis.referencing.cs.AxisDirection#EAST  East},
+     *  {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North}).
      * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y}
      * fields. The actual axis orientations are determined by the specified CRS.
      * See the {@linkplain DirectPosition2D class javadoc} for details.
@@ -242,31 +257,44 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
     }
 
     /**
-     * Returns a hash value for this coordinate. This method do <strong>not</strong> takes
-     * the {@linkplain #getCoordinateReferenceSystem coordinate reference system} in account,
-     * and can not be overriden on purpose. This is necessary in order to stay consistent with
-     * the {@code hashCode} and {@code equals} contract defined in {@link Point2D}.
+     * Returns a hash value for this coordinate. This method implements the
+     * {@link DirectPosition#hashCode} contract, not the {@link Point2D#hashCode} contract.
      */
     @Override
-    public final int hashCode() {
-        return super.hashCode();
+    public int hashCode() {
+        return AbstractDirectPosition.hashCode(this);
     }
 
     /**
-     * Compares this point with the specified object for equality.
+     * Compares this point with the specified object for equality. If the given object implements
+     * the {@link DirectPosition} interface, then the comparaison is performed as specified in its
+     * {@link DirectPosition#equals} contract. Otherwise the comparaison is performed as specified
+     * in {@link Point2D#equals}.
      */
     @Override
-    public final boolean equals(final Object object) {
-        if (!super.equals(object)) {
+    public boolean equals(final Object object) {
+        /*
+         * If the other object implements the DirectPosition interface, performs
+         * the comparaison as specified in DirectPosition.equals(Object) contract.
+         */
+        if (object instanceof DirectPosition) {
+            final DirectPosition other = (DirectPosition) object;
+            if (other.getDimension() == 2 &&
+                doubleToLongBits(other.getOrdinate(0)) == doubleToLongBits(x) &&
+                doubleToLongBits(other.getOrdinate(1)) == doubleToLongBits(y) &&
+                Utilities.equals(other.getCoordinateReferenceSystem(), crs))
+            {
+                assert hashCode() == other.hashCode() : this;
+                return true;
+            }
             return false;
         }
-        if (!(object instanceof DirectPosition)) {
-            // Do NOT check the CRS if the given object is an ordinary Point2D.
-            // This is necessary in order to respect the contract defined in Point2D.
-            return true;
-        }
-        return Utilities.equals(getCoordinateReferenceSystem(),
-                ((DirectPosition) object).getCoordinateReferenceSystem());
+        /*
+         * Otherwise performs the comparaison as in Point2D.equals(Object).
+         * Do NOT check the CRS if the given object is an ordinary Point2D.
+         * This is necessary in order to respect the contract defined in Point2D.
+         */
+        return super.equals(object);
     }
 
     /**

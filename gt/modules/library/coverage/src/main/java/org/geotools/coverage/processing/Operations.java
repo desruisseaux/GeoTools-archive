@@ -20,7 +20,6 @@ import java.awt.RenderingHints;
 import java.util.Map;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.KernelJAI;
 
 import org.opengis.coverage.Coverage;
@@ -486,7 +485,8 @@ public class Operations {
                               final double xTrans, final double yTrans)
             throws CoverageProcessingException
     {
-        return scale(source, xScale, yScale, xTrans, yTrans, new InterpolationNearest());
+        return scale(source, xScale, yScale, xTrans, yTrans,
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
     }
 
     /**
@@ -501,7 +501,6 @@ public class Operations {
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Scale
-     *
      *
      * @since 2.3
      */
@@ -607,18 +606,13 @@ public class Operations {
     /**
      * Subsamples an image by averaging over a moving window
      *
-     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
-     *       construction time. Investigate which way should be encouraged.
-     *
      * @param source   The source coverage.
      * @param scaleX   The scale factor along the <var>x</var> axis.
      * @param scaleY   The scale factor along the <var>y</var> axis.
-     * @param interpolation The interpolation to use, or {@code null} for the default.
-     * @param be The border extender, or {@code null} for the default.
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SubsampleAverage
-     * 
+     *
      * @since 2.3
      */
     public GridCoverage subsampleAverage(final GridCoverage   source,
@@ -667,7 +661,8 @@ public class Operations {
                                           final float[]      qsFilter)
             throws CoverageProcessingException
     {
-        return filteredSubsample(source, scaleX, scaleY, qsFilter, new InterpolationNearest());
+        return filteredSubsample(source, scaleX, scaleY, qsFilter,
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
     }
 
     /**

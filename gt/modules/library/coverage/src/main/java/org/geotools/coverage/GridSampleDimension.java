@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;  // For javadoc
 import java.awt.image.IndexColorModel;
-import java.awt.image.RenderedImage;
+import java.awt.image.RenderedImage;  // For javadoc
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import java.util.Locale;
 import javax.units.Unit;
 
 import javax.media.jai.JAI;
-import javax.media.jai.util.Range;
+import javax.media.jai.util.Range;  // For javadoc
 
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.ColorInterpretation;
@@ -1439,17 +1439,19 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     public GridSampleDimension rescale(final double scale, final double offset) {
         final MathTransform1D sampleToGeophysics = Category.createLinearTransform(scale, offset);
         final Category[] categories = (Category[]) getCategories().toArray();
-        final Category[] reference  = categories.clone();
+        boolean changed = false;
         for (int i=0; i<categories.length; i++) {
-            if (categories[i].isQuantitative()) {
-                categories[i] = categories[i].rescale(sampleToGeophysics);
+            Category category = categories[i];
+            if (category.isQuantitative()) {
+                category = category.rescale(sampleToGeophysics);
             }
-            categories[i] = categories[i].geophysics(isGeophysics);
+            category = category.geophysics(isGeophysics);
+            if (!categories[i].equals(category)) {
+                categories[i] = category;
+                changed = true;
+            }
         }
-        if (Arrays.equals(categories, reference)) {
-            return this;
-        }
-        return new GridSampleDimension(description, categories, getUnits());
+        return changed ? new GridSampleDimension(description, categories, getUnits()) : this;
     }
 
     /**

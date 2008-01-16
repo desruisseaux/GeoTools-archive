@@ -159,13 +159,20 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      */
     @Override
     public int hashCode() {
-        final int dimension = getDimension();
+        return hashCode(this);
+    }
+
+    /**
+     * Returns a hash value for the given coordinate.
+     */
+    static int hashCode(final DirectPosition position) {
+        final int dimension = position.getDimension();
         int code = 1;
         for (int i=0; i<dimension; i++) {
-            final long bits = Double.doubleToLongBits(getOrdinate(i));
+            final long bits = Double.doubleToLongBits(position.getOrdinate(i));
             code = 31 * code + ((int)(bits) ^ (int)(bits >>> 32));
         }
-        final CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crs = position.getCoordinateReferenceSystem();
         if (crs != null) {
             code += crs.hashCode();
         }
@@ -199,21 +206,5 @@ public abstract class AbstractDirectPosition implements DirectPosition {
             }
         }
         return false;
-    }
-
-    /**
-     * Returns a deep copy of this position.
-     *
-     * @deprecated Will be removed after GeoAPI update.
-     *             Uncommented the methods in subclasses.
-     */
-    @Override
-    public AbstractDirectPosition clone() {
-        try {
-            return (AbstractDirectPosition) super.clone();
-        } catch (CloneNotSupportedException exception) {
-            // Should not happen, since we are cloneable.
-            throw new AssertionError(exception);
-        }
     }
 }

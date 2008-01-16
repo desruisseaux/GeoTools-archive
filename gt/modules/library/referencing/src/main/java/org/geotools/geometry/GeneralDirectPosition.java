@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.opengis.util.Cloneable;
-import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -46,7 +45,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * a more efficient implementation.
  * <p>
  * Most methods in this implementation are final for performance reason.
- * 
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -104,7 +103,8 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
     /**
      * Constructs a 2D position from the specified ordinates. Despite their name, the
      * (<var>x</var>,<var>y</var>) coordinates don't need to be oriented toward
-     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * ({@linkplain org.opengis.referencing.cs.AxisDirection#EAST  East},
+     *  {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North}).
      * See the {@link DirectPosition2D} javadoc for details.
      */
     public GeneralDirectPosition(final double x, final double y) {
@@ -114,8 +114,9 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
     /**
      * Constructs a 3D position from the specified ordinates. Despite their name, the
      * (<var>x</var>,<var>y</var>,<var>z</var>) coordinates don't need to be oriented toward
-     * ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North},
-     * {@linkplain AxisDirection#UP Up}).
+     * ({@linkplain org.opengis.referencing.cs.AxisDirection#EAST  East},
+     *  {@linkplain org.opengis.referencing.cs.AxisDirection#NORTH North},
+     *  {@linkplain org.opengis.referencing.cs.AxisDirection#UP    Up}).
      */
     public GeneralDirectPosition(final double x, final double y, final double z) {
         ordinates = new double[] {x,y,z};
@@ -166,7 +167,7 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
 
     /**
      * The length of coordinate sequence (the number of entries).
-     * This may be less than or equal to the dimensionality of the 
+     * This may be less than or equal to the dimensionality of the
      * {@linkplain #getCoordinateReferenceSystem() coordinate reference system}.
      *
      * @return The dimensionality of this position.
