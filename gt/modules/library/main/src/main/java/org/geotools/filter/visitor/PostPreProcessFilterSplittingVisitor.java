@@ -18,6 +18,7 @@ package org.geotools.filter.visitor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
@@ -902,7 +903,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
 	        // ~~(a|b) == ~(~a + ~b) substitution
 	        // a|b == ~(~a + ~b) negative simpilification
 	        Iterator i = filter.getChildren().iterator();
-            Filter and = ff.and(new ArrayList());
+	        List translated = new ArrayList();
 	
 	        while (i.hasNext()) {
 	            Filter f = (Filter) i.next();
@@ -911,12 +912,13 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
 	                // simplify it 
                     Not logic = (Not) f;
                     Filter next = logic.getFilter();
-                    and = ff.and(and, next);
+                    translated.add(next);
 	            } else {
-	                and = ff.and(and,ff.not(f));
+	                translated.add(ff.not(f));
 	            }
 	        }
 	
+	        Filter and = ff.and(translated);
 	        return ff.not(and);
 	    }
 
