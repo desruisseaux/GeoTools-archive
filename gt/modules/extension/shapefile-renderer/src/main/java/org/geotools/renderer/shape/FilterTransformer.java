@@ -15,6 +15,9 @@
  */
 package org.geotools.renderer.shape;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.geometry.jts.JTS;
@@ -22,8 +25,12 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.matrix.Matrix2;
+import org.geotools.util.logging.Logging;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.DWithin;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -31,6 +38,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Transforms all GeometryExpressions with the provided transform.
@@ -40,6 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jesse
  */
 public class FilterTransformer extends DuplicatingFilterVisitor {
+    static final Logger LOGGER = Logging.getLogger(FilterTransformer.class);
 
     MathTransform mt;
     CoordinateReferenceSystem fromCRS;
@@ -103,6 +112,62 @@ public class FilterTransformer extends DuplicatingFilterVisitor {
 		
     }
     
+    @Override
+    public Object visit(Beyond filter, Object extraData) {
+        // given a distance filter the best bet for transformation is to turn it into a intersects/disjoint
+        // filter against a buffered geometry (affine tx and reprojection can turn the initial reference geometry
+        // into... anything, and the distance would not make sense anymore.
+        double distance = filter.getDistance();
+        if(filter.getExpression1() instanceof Literal) {
+            Literal transformed = bufferTransformGeometry((Literal) filter.getExpression1(), distance, extraData);
+            return getFactory(extraData).disjoint(transformed, filter.getExpression2());
+        } else if(filter.getExpression2() instanceof Literal) {
+            Literal transformed = bufferTransformGeometry((Literal) filter.getExpression2(), distance, extraData);
+            return getFactory(extraData).disjoint(filter.getExpression1(), transformed);
+        } else {
+            LOGGER.log(Level.WARNING, "Could not transform this filter because " +
+            		"it does not use a geometry literal: {0}.\n" +
+            		"The resulting of filtering will be most likely wrong", new Object[] {filter});
+            return filter;
+        }
+    }
+    
+    @Override
+    public Object visit(DWithin filter, Object extraData) {
+        double distance = filter.getDistance();
+        if(filter.getExpression1() instanceof Literal) {
+            Literal transformed = bufferTransformGeometry((Literal) filter.getExpression1(), distance, extraData);
+            return getFactory(extraData).intersects(transformed, filter.getExpression2());
+        } else if(filter.getExpression2() instanceof Literal) {
+            Literal transformed = bufferTransformGeometry((Literal) filter.getExpression2(), distance, extraData);
+            return getFactory(extraData).intersects(filter.getExpression1(), transformed);
+        } else {
+            LOGGER.log(Level.WARNING, "Could not transform this filter because " +
+                    "it does not use a geometry literal: {0}.\n" +
+                    "The resulting of filtering will be most likely wrong", new Object[] {filter});
+            return filter;
+        }
+    }
+    
+    /**
+     * Given a geometry literal, it buffers it with the provided distance, and then
+     * transforms it with the given reprojection/affine transform we're applying.
+     * Used to transform distance filters
+     * @param geom
+     * @param distance
+     * @return
+     */
+    private Literal bufferTransformGeometry(Literal geomLiteral, double distance, Object extraData) {
+        try {
+            Geometry geometry = geomLiteral.evaluate(null, Geometry.class);
+            Geometry buffered = geometry.buffer(distance);
+            Geometry transformed = JTS.transform(buffered, mt);
+            return getFactory(extraData).literal(transformed);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Object visit(Literal expression, Object extraData) {
         Object value = expression.getValue();
         try {

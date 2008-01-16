@@ -29,16 +29,20 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.And;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Intersects;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -104,4 +108,72 @@ public class QueryTest extends TestCase {
             });
         TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
     }
+    
+    public void testMixedFilter() throws Exception {
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Intersects bbox = ff.intersects(ff.property("the_geom"), ff.literal(new ReferencedEnvelope(-4, -2, 0, -3, null)));
+        PropertyIsEqualTo idEqual = ff.equals(ff.property("ID"), ff.literal(1.0));
+        PropertyIsEqualTo nameEqual = ff.equals(ff.property("NAME"), ff.literal("dave street"));
+        And filter = ff.and(Arrays.asList(new org.opengis.filter.Filter[] {bbox, idEqual, nameEqual}));
+
+        Query q = new DefaultQuery("theme1", filter);
+        map.getLayer(0).setQuery(q);
+
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
+        renderer.addRenderListener(new RenderListener() {
+                public void featureRenderer(SimpleFeature feature) {
+                    assertEquals("theme1.1", feature.getID());
+                }
+
+                public void errorOccurred(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
+    }
+    
+    public void testBeyondFilter() throws Exception {
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        GeometryFactory gf = new GeometryFactory();
+        Literal point = ff.literal(gf.createPoint(new Coordinate(1, 0)));
+        Beyond filter = ff.beyond(ff.property("the_geom"), point, 0.3, (String) null);
+
+        Query q = new DefaultQuery("theme1", filter);
+        map.getLayer(0).setQuery(q);
+
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
+        renderer.addRenderListener(new RenderListener() {
+                public void featureRenderer(SimpleFeature feature) {
+                    assertEquals("theme1.2", feature.getID());
+                }
+
+                public void errorOccurred(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
+    }
+    
+    public void testDWithinFilter() throws Exception {
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        GeometryFactory gf = new GeometryFactory();
+        Literal point = ff.literal(gf.createPoint(new Coordinate(1, 0)));
+        DWithin filter = ff.dwithin(ff.property("the_geom"), point, 0.15, (String) null);
+
+        Query q = new DefaultQuery("theme1", filter);
+        map.getLayer(0).setQuery(q);
+
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
+        renderer.addRenderListener(new RenderListener() {
+                public void featureRenderer(SimpleFeature feature) {
+                    assertEquals("theme1.1", feature.getID());
+                }
+
+                public void errorOccurred(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
+    }
+
 }
