@@ -19,6 +19,7 @@ package org.geotools.resources;
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.Locale;
 
 
@@ -803,10 +804,25 @@ public final class XArray {
      * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
-    public static boolean isSorted(final char[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] < array[i-1])
+    public static <T> boolean isSorted(final T[] array, final Comparator<T> comparator) {
+        for (int i=1; i<array.length; i++) {
+            if (comparator.compare(array[i], array[i-1]) < 0) {
                 return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if all elements in the specified array are in increasing order.
+     * This method is usefull in assertions.
+     */
+    public static boolean isSorted(final char[] array) {
+        for (int i=1; i<array.length; i++) {
+            if (array[i] < array[i-1]) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -815,9 +831,11 @@ public final class XArray {
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final byte[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] < array[i-1])
+        for (int i=1; i<array.length; i++) {
+            if (array[i] < array[i-1]) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -826,9 +844,11 @@ public final class XArray {
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final short[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] < array[i-1])
+        for (int i=1; i<array.length; i++) {
+            if (array[i] < array[i-1]) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -837,9 +857,11 @@ public final class XArray {
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final int[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] < array[i-1])
+        for (int i=1; i<array.length; i++) {
+            if (array[i] < array[i-1]) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -848,9 +870,11 @@ public final class XArray {
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final long[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] < array[i-1])
+        for (int i=1; i<array.length; i++) {
+            if (array[i] < array[i-1]) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -897,9 +921,11 @@ public final class XArray {
      * This method is usefull in assertions.
      */
     public static boolean isStrictlySorted(final int[] array) {
-        for (int i=1; i<array.length; i++)
-            if (array[i] <= array[i-1])
+        for (int i=1; i<array.length; i++) {
+            if (array[i] <= array[i-1]) {
                 return false;
+            }
+        }
         return true;
     }
 

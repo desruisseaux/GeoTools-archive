@@ -68,7 +68,7 @@ public class GridToEnvelopeMapperTest extends TestCase {
     public static Test suite() {
         return new TestSuite(GridToEnvelopeMapperTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -166,7 +166,7 @@ public class GridToEnvelopeMapperTest extends TestCase {
         ///////////////////////////////////////////////////////////////
         ///  Tests the creation when a CRS is available.
         ///
-        envelope = (GeneralEnvelope) envelope.clone();
+        envelope = envelope.clone();
         envelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
         mapper.setEnvelope(envelope);
         assertFalse(mapper.getSwapXY());
@@ -191,7 +191,7 @@ public class GridToEnvelopeMapperTest extends TestCase {
         ///////////////////////////////////////////////////////////////
         ///  Tests the creation with a (latitude, longitude) CRS.
         ///
-        envelope = (GeneralEnvelope) envelope.clone();
+        envelope = envelope.clone();
         envelope.setCoordinateReferenceSystem(new DefaultGeographicCRS("WGS84",
                 DefaultGeodeticDatum.WGS84, new DefaultEllipsoidalCS("WGS84",
                 DefaultCoordinateSystemAxis.LATITUDE,

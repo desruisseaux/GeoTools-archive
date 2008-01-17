@@ -48,9 +48,8 @@ public class AmbiguousMetadataException extends MetadataException {
      * @param alias   The alias used for for the key {@code key}, or {@code null} if none. This is
      *                usually the name used in the external file parsed.
      */
-    public AmbiguousMetadataException(final String          message,
-                                      final MetadataBuilder.Key key,
-                                      final String            alias)
+    public AmbiguousMetadataException(final String message, final MetadataBuilder.Key<?> key,
+                                      final String alias)
     {
         super((message!=null) ? message :  Errors.format(
               ErrorKeys.INCONSISTENT_PROPERTY_$1, alias), key, alias);

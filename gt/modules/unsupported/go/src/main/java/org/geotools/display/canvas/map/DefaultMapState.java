@@ -83,7 +83,7 @@ public class DefaultMapState extends DefaultCanvasState implements Map2DState {
 
     /**
      * Gets the pixel width of the {@link Canvas} represented by this map state.
-     */             
+     */
     public int getPixelWidth() {
         return width;
     }
@@ -123,7 +123,7 @@ public class DefaultMapState extends DefaultCanvasState implements Map2DState {
     public double getScale() {
         return scale;
     }
-    
+
     /**
      * Gets the envelope of the {@link Canvas} represented by this map state. This is the
      * <em>visible</em> geographic map boundary, in objective CRS. This envelope is scale
@@ -132,13 +132,14 @@ public class DefaultMapState extends DefaultCanvasState implements Map2DState {
      * @see org.geotools.display.canvas.ReferencedCanvas#getEnvelope
      */
     public Envelope getEnvelope() {
-        return (Envelope) envelope.clone();
+        return envelope.clone();
     }
 
     /**
      * Determines if the given object is the same type of canvas state object and has
      * values equal to this one.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;

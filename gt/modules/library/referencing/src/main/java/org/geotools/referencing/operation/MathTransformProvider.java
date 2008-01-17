@@ -16,19 +16,13 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies and extensions
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
@@ -45,11 +39,8 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 
-// Geotools dependencies
-import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -109,7 +100,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
      * @param parameters The set of parameters (never {@code null}).
      */
-    public MathTransformProvider(final Map properties,
+    public MathTransformProvider(final Map<String,?> properties,
                                  final int sourceDimensions,
                                  final int targetDimensions,
                                  final ParameterDescriptorGroup parameters)
@@ -121,9 +112,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static Map toMap(final IdentifiedObject parameters) {
+    private static Map<String,Object> toMap(final IdentifiedObject parameters) {
         ensureNonNull("parameters", parameters);
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(NAME_KEY,        parameters.getName());
         properties.put(IDENTIFIERS_KEY, parameters.getIdentifiers().toArray(EMPTY_IDENTIFIER_ARRAY));
         properties.put(ALIAS_KEY,       parameters.getAlias()      .toArray(EMPTY_ALIAS_ARRAY));
@@ -240,7 +231,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Put the identifiers into a properties map suitable for {@link IdentifiedObject}
      * constructor.
      */
-    private static Map toMap(final ReferenceIdentifier[] identifiers) {
+    private static Map<String,Object> toMap(final ReferenceIdentifier[] identifiers) {
         ensureNonNull("identifiers", identifiers);
         if (identifiers.length == 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
@@ -257,9 +248,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                 id[idCount++] = candidate;
             }
         }
-        id    = (ReferenceIdentifier[]) XArray.resize(id,       idCount);
-        alias = (GenericName[])         XArray.resize(alias, aliasCount);
-        final Map properties = new HashMap(4, 0.8f);
+        id    = XArray.resize(id,       idCount);
+        alias = XArray.resize(alias, aliasCount);
+        final Map<String,Object> properties = new HashMap<String,Object>(4, 0.8f);
         properties.put(NAME_KEY,        identifiers[0]);
         properties.put(IDENTIFIERS_KEY, id);
         properties.put(ALIAS_KEY,       alias);
@@ -307,7 +298,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
          * the provider-supplied parameters to uses its alias for understanding the user
          * parameter names.
          */
-        final ParameterValueGroup copy = (ParameterValueGroup) parameters.createValue();
+        final ParameterValueGroup copy = parameters.createValue();
         copy(values, copy);
         return copy;
     }
@@ -336,7 +327,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                  * Contains sub-group - invokes 'copy' recursively.
                  */
                 final GeneralParameterDescriptor descriptor;
-                descriptor = ((ParameterDescriptorGroup) copy.getDescriptor()).descriptor(name);
+                descriptor = copy.getDescriptor().descriptor(name);
                 if (descriptor instanceof ParameterDescriptorGroup) {
                     final ParameterValueGroup groups = (ParameterValueGroup) descriptor.createValue();
                     copy((ParameterValueGroup) value, groups);
@@ -412,7 +403,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
          *       or something similar.
          */
         final GeneralParameterDescriptor search;
-        search = ((ParameterDescriptorGroup) group.getDescriptor()).descriptor(name);
+        search = group.getDescriptor().descriptor(name);
         if (search instanceof ParameterDescriptor) {
             for (final Iterator it=group.values().iterator(); it.hasNext();) {
                 final GeneralParameterValue candidate = (GeneralParameterValue) it.next();

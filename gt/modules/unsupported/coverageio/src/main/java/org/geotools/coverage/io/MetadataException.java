@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.io;
 
-// J2SE dependencies
 import javax.imageio.IIOException;
 
 
@@ -39,7 +38,7 @@ public class MetadataException extends IIOException {
     /**
      * The key for the faulty metadata, or {@code null} if none.
      */
-    private final MetadataBuilder.Key key;
+    private final MetadataBuilder.Key<?> key;
 
     /**
      * The alias used for the metadata, or {@code null} if none.
@@ -79,9 +78,8 @@ public class MetadataException extends IIOException {
      * @param alias   The alias used for for the key {@code key}, or {@code null} if none. This is
      *                usually the name used in the external file parsed.
      */
-    public MetadataException(final String          message,
-                             final MetadataBuilder.Key key,
-                             final String            alias)
+    public MetadataException(final String message, final MetadataBuilder.Key<?> key,
+                             final String alias)
     {
         super(message);
         this.key   = key;
@@ -97,9 +95,8 @@ public class MetadataException extends IIOException {
      * @param alias   The alias used for for the key {@code key}, or {@code null} if none. This is
      *                usually the name used in the external file parsed.
      */
-    public MetadataException(final Exception         cause,
-                             final MetadataBuilder.Key key,
-                             final String            alias)
+    public MetadataException(final Exception cause, final MetadataBuilder.Key<?> key,
+                             final String alias)
     {
         super(cause.getLocalizedMessage(), cause);
         this.key   = key;
@@ -112,7 +109,7 @@ public class MetadataException extends IIOException {
      *
      * @return The metadata key, or {@code null} if none.
      */
-    public MetadataBuilder.Key getMetadataKey() {
+    public MetadataBuilder.Key<?> getMetadataKey() {
         return key;
     }
 
@@ -140,7 +137,7 @@ public class MetadataException extends IIOException {
      */
     @Override
     public String toString() {
-        final MetadataBuilder.Key key = getMetadataKey();
+        final MetadataBuilder.Key<?> key = getMetadataKey();
         final String alias = getMetadataAlias();
         if (key == null && alias == null) {
             return super.toString();
