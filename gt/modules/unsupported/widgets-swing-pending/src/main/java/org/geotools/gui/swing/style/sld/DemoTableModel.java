@@ -54,6 +54,7 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
             StyledLayerDescriptor sld = (StyledLayerDescriptor) parser.parse( input );
             rules = SLD.styles(sld)[0].getFeatureTypeStyles()[0].getRules();
         } catch (Exception e) {
+            rules = new Rule[0];
             e.printStackTrace();
         }
     }
