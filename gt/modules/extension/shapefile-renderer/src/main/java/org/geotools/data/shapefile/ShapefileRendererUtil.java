@@ -120,7 +120,7 @@ public class ShapefileRendererUtil {
             throws MalformedURLException {
         if (datastore instanceof IndexedShapefileDataStore) {
             IndexedShapefileDataStore ids = (IndexedShapefileDataStore)datastore;
-            if( ids.indexUseable(ShpFileType.FIX) )
+            if( !ids.indexUseable(ShpFileType.FIX) )
                 return createBasicFidReader(datastore, tracker);
             try{
                 return new IndexedFidReader(ids.shpFiles);

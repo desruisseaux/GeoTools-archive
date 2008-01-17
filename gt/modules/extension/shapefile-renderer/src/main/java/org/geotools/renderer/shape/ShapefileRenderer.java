@@ -388,9 +388,9 @@ public class ShapefileRenderer implements GTRenderer {
         Diff diff=null;
 
         try {
-			diff = state.diff(typename);
-			modified = diff.modified2;
-			added=diff.added;
+            diff = state.diff(typename);
+            modified = diff.modified2;
+            added = diff.added;
             fids = new HashSet();
         } catch (IOException e) {
             fids = Collections.EMPTY_SET;
