@@ -681,7 +681,7 @@ public class ShapefileRenderer implements GTRenderer {
                         shpreader.close();
                     }
                 } finally {
-                    if (fidReader == null)
+                    if (fidReader != null)
                         fidReader.close();
                 }
             }
