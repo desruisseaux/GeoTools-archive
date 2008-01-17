@@ -1,9 +1,8 @@
 /**
  * 
  */
-package org.geotools.data.shapefile.indexed;
+package org.geotools.data.shapefile;
 
-import org.geotools.data.shapefile.FileWriter;
 
 public final class BasicShpFileWriter implements FileWriter {
     private String id;
