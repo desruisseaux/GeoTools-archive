@@ -14,8 +14,41 @@ import java.net.URL;
  */
 public enum ShpFileType {
 
-    SHP("shp"), DBF("dbf"), SHX("shx"), PRJ("prj"), QIX("qix"), FIX("fix"), SHP_XML(
-            "shp.xml"), GRX("grx");
+    /**
+     * The .shp file. It contains the geometries of the shapefile
+     */
+    SHP("shp"),
+    /**
+     * the .dbf file, it contains the attribute information of the shapefile
+     */
+    DBF("dbf"),
+    /**
+     * the .shx file, it contains index information of the existing features
+     */
+    SHX("shx"),
+    /**
+     * the .prj file, it contains the projection information of the shapefile
+     */
+    PRJ("prj"),
+    /**
+     * the .qix file, A quad tree spatial index of the shapefile. It is the same
+     * format the mapservers shptree tool generates
+     */
+    QIX("qix"),
+    /**
+     * the .fix file, it contains all the Feature IDs for constant time lookup
+     * by fid also so that the fids stay consistent across deletes and adds
+     */
+    FIX("fix"),
+    /**
+     * the .shp.xml file, it contains the metadata about the shapefile
+     */
+    SHP_XML("shp.xml"),
+    /**
+     * the .grx file, an RTree spatial index of the shapefile.  This is not longer supported
+     * @deprecated
+     */
+    GRX("grx");
 
     public final String extension;
     public final String extensionWithPeriod;

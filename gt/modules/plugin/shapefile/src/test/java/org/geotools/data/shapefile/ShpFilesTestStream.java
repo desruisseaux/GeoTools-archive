@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -66,7 +68,47 @@ public class ShpFilesTestStream extends TestCase implements
         }
     }
 
-    public void testOpenInputStream() throws IOException {
+    public void testExceptionGetInputStream() throws Exception {
+        ShpFiles shpFiles = new ShpFiles(new URL("http://blah/blah.shp"));
+        try{
+            shpFiles.getInputStream(SHP, this);
+            fail("maybe test is bad?  We want an exception here");
+        }catch(Throwable e){
+            assertEquals(0, shpFiles.numberOfLocks());
+        }
+    }
+
+    public void testExceptionGetOutputStream() throws Exception {
+        ShpFiles shpFiles = new ShpFiles(new URL("http://blah/blah.shp"));
+        try{
+            shpFiles.getOutputStream(SHP, this);
+            fail("maybe test is bad?  We want an exception here");
+        }catch(Throwable e){
+            assertEquals(0, shpFiles.numberOfLocks());
+        }
+    }
+
+    public void testExceptionGetWriteChannel() throws Exception {
+        ShpFiles shpFiles = new ShpFiles(new URL("http://blah/blah.shp"));
+        try{
+            shpFiles.getWriteChannel(SHP, this);
+            fail("maybe test is bad?  We want an exception here");
+        }catch(Throwable e){
+            assertEquals(0, shpFiles.numberOfLocks());
+        }
+    }
+
+    public void testExceptionGetReadChannel() throws Exception {
+        ShpFiles shpFiles = new ShpFiles(new URL("http://blah/blah.shp"));
+        try{
+            shpFiles.getReadChannel(SHP, this);
+            fail("maybe test is bad?  We want an exception here");
+        }catch(Throwable e){
+            assertEquals(0, shpFiles.numberOfLocks());
+        }
+    }
+    
+    public void testGetInputStream() throws IOException {
         writeDataToFiles();
 
         ShpFileType[] types = ShpFileType.values();
@@ -87,6 +129,22 @@ public class ShpFilesTestStream extends TestCase implements
                 assertEquals(0, files.numberOfLocks());
             }
             assertEquals(shpFileType.name(), read);
+        }
+    }
+
+    public void testGetWriteStream() throws IOException {
+
+        ShpFileType[] types = ShpFileType.values();
+        for (ShpFileType shpFileType : types) {
+            
+            OutputStream out = files.getOutputStream(shpFileType, this);
+            assertEquals(1, files.numberOfLocks());
+            try {
+                out.write((byte)2);
+            } finally {
+                out.close();
+                assertEquals(0, files.numberOfLocks());
+            }
         }
     }
 

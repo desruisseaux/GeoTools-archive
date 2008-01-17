@@ -14,6 +14,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import org.geotools.data.DataUtilities;
 
@@ -95,7 +96,7 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
                         ShapefileDataStoreFactory.LOGGER.severe("Unable to delete the file: "+dest+" when attempting to replace with temporary copy.");
                         if( storageFile.shpFiles.numberOfLocks()>0 ){
                             ShapefileDataStoreFactory.LOGGER.severe("The problem is almost certainly caused by the fact that there are still locks being held on the shapefiles.  Probably a reader or writer was left unclosed");
-                            storageFile.shpFiles.logCurrentLockers();
+                            storageFile.shpFiles.logCurrentLockers(Level.SEVERE);
                         }
 //                        throw new IOException("Unable to delete original file: " + url);
                     }
