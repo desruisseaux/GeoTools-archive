@@ -32,7 +32,17 @@ import org.geotools.data.DataUtilities;
 
 /**
  * The collection of all the files that are the shapefile and its metadata and
- * indices
+ * indices.
+ * 
+ * <p>
+ * This class has methods for performing actions on the files.  Currently mainly for obtaining read and write channels and streams.  But in the
+ * future a move method may be introduced.
+ * </p>
+ * 
+ *  <p>
+ *  Note: The method that require locks (such as getInputStream()) will automatically acquire locks and the javadocs should document how to 
+ *  release the lock.  Therefore the methods {@link #acquireRead(ShpFileType, FileReader)} and {@link #acquireWrite(ShpFileType, FileWriter)}svn 
+ *  </p>
  * 
  * @author jesse
  */
