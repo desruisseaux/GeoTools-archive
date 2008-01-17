@@ -123,15 +123,19 @@ public class ShpFiles {
 
     void dispose() {
         if (numberOfLocks() != 0) {
-            for( ShpFilesLocker locker : lockers ) {
-                ShapefileDataStoreFactory.LOGGER.log(Level.SEVERE, "The following locker was not released "
-                        + locker +"\n it was created with the following stack trace",
-                        locker.getTrace());
-            }
+            logCurrentLockers();
             lockers.clear(); // so as not to get this log again.
         }
     }
 
+    public void logCurrentLockers() {
+        for( ShpFilesLocker locker : lockers ) {
+            ShapefileDataStoreFactory.LOGGER.log(Level.SEVERE, "The following locker still has a lock÷ "
+                    + locker +"\n it was created with the following stack trace",
+                    locker.getTrace());
+        }
+    }
+    
     private String baseName(Object obj) {
         for (ShpFileType type : ShpFileType.values()) {
             String base = null;

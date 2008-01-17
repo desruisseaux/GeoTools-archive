@@ -91,13 +91,18 @@ public final class StorageFile implements Comparable<StorageFile>, FileWriter {
                     return;
 
                 if (dest.exists()) {
-                    if (!dest.delete())
-//                        ShapefileDataStoreFactory.LOGGER.severe("Unable to delete the file: "+dest+" when attempting to replace with temporary copy");
-                        throw new IOException("Unable to delete original file: " + url);
+                    if (!dest.delete()){
+                        ShapefileDataStoreFactory.LOGGER.severe("Unable to delete the file: "+dest+" when attempting to replace with temporary copy.");
+                        if( storageFile.shpFiles.numberOfLocks()>0 ){
+                            ShapefileDataStoreFactory.LOGGER.severe("The problem is almost certainly caused by the fact that there are still locks being held on the shapefiles.  Probably a reader or writer was left unclosed");
+                            storageFile.shpFiles.logCurrentLockers();
+                        }
+//                        throw new IOException("Unable to delete original file: " + url);
+                    }
                 }
 
                 if (storage.exists() && !storage.renameTo(dest)) {
-//                    ShapefileDataStoreFactory.LOGGER.finer("Unable to rename temporary file to the file: "+dest+" when attempting to replace with temporary copy");
+                    ShapefileDataStoreFactory.LOGGER.finer("Unable to rename temporary file to the file: "+dest+" when attempting to replace with temporary copy");
                     
                     copyFile(storage, url, dest);
                     if (!storage.delete()) {
