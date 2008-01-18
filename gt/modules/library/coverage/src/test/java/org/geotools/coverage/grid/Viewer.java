@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -30,15 +29,10 @@ import java.util.Locale;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-// JAI dependencies
 import javax.media.jai.GraphicsJAI;
 import javax.media.jai.PlanarImage;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.resources.Arguments;
@@ -96,12 +90,13 @@ public class Viewer extends JPanel {
      */
     public Viewer(final GridCoverage2D coverage) {
         this(coverage.getRenderedImage());
-        categories = (GridSampleDimension) coverage.getSampleDimension(0);
+        categories = coverage.getSampleDimension(0);
     }
 
     /**
-     * Paint this component.
+     * Paints this component.
      */
+    @Override
     public void paintComponent(final Graphics graphics) {
         super.paintComponent(graphics);
         final GraphicsJAI g = GraphicsJAI.createGraphicsJAI((Graphics2D) graphics, this);

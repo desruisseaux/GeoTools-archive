@@ -514,6 +514,8 @@ class CategoryList extends AbstractList<Category>
      *         quantitative category.
      *
      * @see Category#getRange
+     *
+     * @todo Returns an instance of {@link MeasurementRange} if we are a geophysics category list.
      */
     public final NumberRange getRange() {
         if (range == null) {

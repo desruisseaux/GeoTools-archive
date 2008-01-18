@@ -401,7 +401,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * the no data values, minimum and maximum values and a color table if one is associated
      * with the dimension. A coverage must have at least one sample dimension.
      */
-    public SampleDimension getSampleDimension(final int index) {
+    public GridSampleDimension getSampleDimension(final int index) {
         return sampleDimensions[index];
     }
 
