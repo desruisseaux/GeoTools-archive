@@ -123,7 +123,7 @@ public class CQL {
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
 
-        CQLCompiler compiler = createCompiler(cqlPredicate,filterFactory);
+        CQLCompiler compiler = makeCompiler(cqlPredicate,filterFactory);
 
         try {
             compiler.CompilationUnit();
@@ -142,6 +142,23 @@ public class CQL {
         }
 
     }
+    
+    /**
+     * Initializes and create the new compiler
+     * @param predicate
+     * @param filterFactory
+     * @return CQLCompiler
+     */
+    private static CQLCompiler makeCompiler(final String predicate, final FilterFactory filterFactory) {
+
+        FilterFactory ff = filterFactory;
+
+        if (ff == null) {
+            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
+        }
+        
+        return new CQLCompiler(predicate, ff);
+    }
 
     /**
      * creates a new instance of compiler
@@ -151,13 +168,7 @@ public class CQL {
      */
     protected static CQLCompiler createCompiler(final String predicate, final FilterFactory filterFactory) {
 
-        FilterFactory ff = filterFactory;
-
-        if (ff == null) {
-            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-        
-        return new CQLCompiler(predicate, ff);
+        return new CQLCompiler(predicate, filterFactory);
     }
 
     /**
@@ -190,7 +201,7 @@ public class CQL {
     public static Expression toExpression(final String cqlExpression,
                                           final FilterFactory filterFactory) throws CQLException {
 
-        CQLCompiler c = createCompiler(cqlExpression, filterFactory);
+        CQLCompiler c = makeCompiler(cqlExpression, filterFactory);
 
         try {
             c.ExpressionCompilationUnit();
@@ -269,7 +280,7 @@ public class CQL {
     public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
 
-        CQLCompiler compiler = createCompiler(cqlSourceFilterList, filterFactory);
+        CQLCompiler compiler = makeCompiler(cqlSourceFilterList, filterFactory);
 
         try {
             compiler.MultipleCompilationUnit();
