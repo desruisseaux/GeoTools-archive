@@ -69,7 +69,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @version $Id$
  * @since 2.5
  */
-final class CQLCompiler extends CQLParser {
+public class CQLCompiler extends CQLParser {
     private static final String ATTRIBUTE_PATH_SEPARATOR = "/";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
@@ -89,7 +89,7 @@ final class CQLCompiler extends CQLParser {
      * @param cqlSource 
      * @param filterFactory
      */
-    CQLCompiler(final String cqlSource, final FilterFactory filterFactory) {
+    public CQLCompiler(final String cqlSource, final FilterFactory filterFactory) {
         
         super(new StringReader(cqlSource));
         this.cqlSource = cqlSource;

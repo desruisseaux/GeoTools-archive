@@ -68,6 +68,7 @@ public class CQLExtensionTest extends TestCase {
         assertNotNull(filter);
         assertTrue(Filter.INCLUDE.equals(filter));
     }
+    
 
     /**
      * An EXCLUDE token is parsed as {@link Filter#EXCLUDE}

@@ -1168,7 +1168,17 @@ public class CQLTest extends TestCase {
     public void testCharacterStringLiteral() throws Exception{
     	
     	PropertyIsEqualTo eqFilter; 
-    	
+
+    	// space check
+    	final String strWithSpace = "ALL PRACTICES";
+    	Filter filterWithSpace = CQL.toFilter("practice='" +  strWithSpace + "'");
+        assertNotNull(filterWithSpace);
+        assertTrue(filterWithSpace instanceof PropertyIsEqualTo);
+
+        eqFilter = (PropertyIsEqualTo) filterWithSpace;
+        Expression spacesLiteral = eqFilter.getExpression2();
+        assertEquals(strWithSpace, spacesLiteral.toString());
+        
         // empty string ''
     	Filter emptyFilter = CQL.toFilter("MAJOR_WATERSHED_SYSTEM = ''");
 

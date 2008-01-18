@@ -19,14 +19,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+
 import javax.xml.transform.TransformerException;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.FilterTransformer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -43,7 +44,7 @@ import org.geotools.filter.FilterTransformer;
  * This class provides three methods, {@link #toFilter(String)},
  * {@link #toExpression(String)} and {@link #toFilterList(String)}; and an
  * overloaded version of each one for the user to provide a
- * {@link FilterFactory2} implementation to use.
+ * {@link FilterFactory} implementation to use.
  * </p>
  * <p>
  * <h2>Usage</h2>
@@ -78,15 +79,15 @@ import org.geotools.filter.FilterTransformer;
  * </code>
  * </pre>
  *
- * @since 2.4
- * @author Mauricio Pazos - Axios Engineering
- * @author Gabriel Roldan - Axios Engineering
+ * @since 2.5
+ * @author Mauricio Pazos (Axios Engineering)
+ * @author Gabriel Roldan (Axios Engineering)
  * @version $Id$
  * @source $URL:
  *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
 public class CQL {
-    private CQL() {
+    protected CQL() {
         // do nothing, private constructor
         // to indicate it is a pure utility class
     }
@@ -121,14 +122,8 @@ public class CQL {
      */
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
-        
-        FilterFactory ff = filterFactory;
-        
-        if (ff == null) {
-            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
 
-        CQLCompiler compiler = new CQLCompiler(cqlPredicate, ff);
+        CQLCompiler compiler = createCompiler(cqlPredicate,filterFactory);
 
         try {
             compiler.CompilationUnit();
@@ -146,6 +141,23 @@ public class CQL {
             throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
         }
 
+    }
+
+    /**
+     * creates a new instance of compiler
+     * @param predicate
+     * @param ff
+     * @return CQLCompiler
+     */
+    protected static CQLCompiler createCompiler(final String predicate, final FilterFactory filterFactory) {
+
+        FilterFactory ff = filterFactory;
+
+        if (ff == null) {
+            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
+        }
+        
+        return new CQLCompiler(predicate, ff);
     }
 
     /**
@@ -176,14 +188,9 @@ public class CQL {
      *         <code>cqlExpression</code>.
      */
     public static Expression toExpression(final String cqlExpression,
-        final FilterFactory filterFactory) throws CQLException {
-        FilterFactory factory = filterFactory;
+                                          final FilterFactory filterFactory) throws CQLException {
 
-        if (factory == null) {
-            factory = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-
-        CQLCompiler c = new CQLCompiler(cqlExpression, factory);
+        CQLCompiler c = createCompiler(cqlExpression, filterFactory);
 
         try {
             c.ExpressionCompilationUnit();
@@ -261,14 +268,8 @@ public class CQL {
      */
     public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
-        
-        FilterFactory factory = filterFactory;
 
-        if (factory == null) {
-            factory = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-
-        CQLCompiler compiler = new CQLCompiler(cqlSourceFilterList, factory);
+        CQLCompiler compiler = createCompiler(cqlSourceFilterList, filterFactory);
 
         try {
             compiler.MultipleCompilationUnit();
