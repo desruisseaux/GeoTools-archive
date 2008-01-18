@@ -125,7 +125,13 @@ public class DataUtilitiesTest extends DataTestCase {
         URL url = new URL(urlString);
         
         File file = DataUtilities.urlToFile(url);
-        assertEquals( expectedFilePath, file.getPath());
+
+        String os = System.getProperty("os.name");
+        if (os.toUpperCase().contains("WINDOWS")) {
+            assertEquals( expectedFilePath.replaceAll("/", "\\\\"), file.getPath());
+        }else {
+            assertEquals( expectedFilePath, file.getPath());
+        }
         
     }
 
