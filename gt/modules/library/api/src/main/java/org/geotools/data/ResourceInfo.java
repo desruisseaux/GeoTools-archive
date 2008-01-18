@@ -133,13 +133,7 @@ public interface ResourceInfo {
      * <li>ESPG 4326 (another LatLong)
      * </ul>
      * </p>
-     * <p>
-     * Known Mappings:
-     * <ul>
-     * <li>1st part of the Dublin Core Coverage
-     * <li>wfs LatLongBbox
-     * </ul>
-     * </p>
+     * 
      * @return Bounding box of the resource (in natvie CRS), envelope.isNull() will return true if not known
      */
     ReferencedEnvelope getBounds();
@@ -163,6 +157,13 @@ public interface ResourceInfo {
      * This method was considered because some services maintain this
      * information as metadata. If it was a bit more common (and axis order more consistent)
      * it would be worth considering.
+     * <p>
+     * Known Mappings:
+     * <ul>
+     * <li>1st part of the Dublin Core Coverage
+     * <li>wfs LatLongBbox
+     * </ul>
+     * </p>
      */
     // ReferencedEnvelope getLatLongBbox();
 }
