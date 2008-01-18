@@ -16,6 +16,13 @@
 package org.geotools.wfs.v_1_0_0.data;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.Icon;
 
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.DataStore;
@@ -24,16 +31,21 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
+import org.geotools.data.ows.FeatureSetDescription;
+import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
- * DOCUMENT ME!
+ * {@link FeatureSource} extension interface to provide WFS specific extra
+ * information.
  *
  * @author dzwiers 
  * @source $URL$
@@ -47,6 +59,58 @@ public class WFSFeatureSource extends AbstractFeatureSource {
         this.fname = fname;
     }
 
+    /**
+     * Resource information from the wfs capabilities document.
+     * @return ResoruceInfo from the capabilities document
+     */
+    public ResourceInfo getInfo(){
+        return new ResourceInfo(){
+            public ReferencedEnvelope getBounds() {
+                return ds.getLatLonBoundingBox( fname );
+            }
+            public CoordinateReferenceSystem getCRS() {
+                return getBounds().getCoordinateReferenceSystem();
+            }
+            public String getDescription() {
+                return ds.getAbstract( fname );
+            }
+            public Icon getIcon() {
+                return null; // Talk to Eclisia!
+            }
+            public Set<String> getKeywords() {
+                Set words = new HashSet();
+                words.addAll( ds.getKeywords() );
+                words.add( fname );
+                
+                return words; // probably should be unmodifiable?
+            }
+
+            public String getName() {
+                return fname;
+            }
+
+            
+            public URI getSchema() {
+                try {
+                    return ds.connectionFactory.getDescribeFeatureTypeURLGet(fname).toURI();
+                } catch (MalformedURLException e) {
+                    return null;
+                } catch (URISyntaxException e) {
+                    return null;
+                }
+            }
+
+            public String getTitle() {
+                FeatureSetDescription descriptor =
+                    WFSCapabilities.getFeatureSetDescription(
+                        ds.capabilities, fname );
+                
+                return descriptor != null ? descriptor.getTitle() : fname;                
+                //return ds.getTitle( fname );
+            }            
+        };        
+    }
+    
     /**
      * 
      * @see org.geotools.data.FeatureSource#getDataStore()

@@ -30,7 +30,7 @@ import org.geotools.filter.FilterCapabilities;
  * @source $URL$
  */
 public class WFSCapabilities extends Capabilities {
-    private List featureTypes; // FeatureSetDescriptions
+    private List<FeatureSetDescription> featureTypes; // FeatureSetDescriptions
     private OperationType describeFeatureType;
     private OperationType getCapabilities;
     private OperationType getFeature;
@@ -76,7 +76,7 @@ public class WFSCapabilities extends Capabilities {
      *
      * @return Returns the featureTypes.
      */
-    public List getFeatureTypes() {
+    public List<FeatureSetDescription> getFeatureTypes() {
         return featureTypes;
     }
 

@@ -36,11 +36,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import javax.naming.OperationNotSupportedException;
+import javax.swing.Icon;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -50,6 +52,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
@@ -174,6 +177,40 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         determineCorrectStrategy();
     }
 
+    public ServiceInfo getInfo() {
+        return new ServiceInfo(){
+            public String getDescription() {
+                return getAbstract();
+            }
+
+            public Icon getIcon() {
+                return null; // talk to Eclesia the icons are in renderer?
+            }
+            public Set<String> getKeywords() {
+                return getKeywords();
+            }
+
+            public URI getPublisher() {
+                return null; // help?
+            }
+
+            public URI getSchema() {
+                return null; // WFS 1.0.0 uri here
+            }
+
+            public URI getSource() {
+                try {
+                    return capabilities.getGetCapabilities().getGet().toURI();
+                } catch (URISyntaxException e) {
+                    return null;
+                }
+            }
+
+            public String getTitle() {
+                return capabilities.getService().getTitle();
+            }            
+        };
+    }
     /**
      * @see WFSDataStore#getTitle()
      */

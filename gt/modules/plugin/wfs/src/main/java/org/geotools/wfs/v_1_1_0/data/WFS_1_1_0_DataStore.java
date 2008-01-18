@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -31,8 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.opengis.wfs.FeatureTypeType;
@@ -45,6 +49,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.data.wfs.WFSDataStore;
@@ -110,6 +115,37 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         }
     }
 
+    public ServiceInfo getInfo() {
+        return new ServiceInfo(){
+            public String getDescription() {
+                return getAbstract();
+            }
+
+            public Icon getIcon() {
+                return null; // talk to Eclesia the icons are in renderer?
+            }
+            public Set<String> getKeywords() {
+                return getKeywords();
+            }
+
+            public URI getPublisher() {
+                return null; // help?
+            }
+
+            public URI getSchema() {
+                return null; // WFS 1.0.0 uri here
+            }
+
+            public URI getSource() {
+                throw new UnsupportedOperationException("Not implemented yet");
+            }
+
+            public String getTitle() {
+                throw new UnsupportedOperationException("Not implemented yet");
+            }            
+        };
+    }
+    
     /**
      * @see WFSDataStore#getTitle()
      */
