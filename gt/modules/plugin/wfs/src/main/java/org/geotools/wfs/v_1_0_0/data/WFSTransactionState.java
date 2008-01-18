@@ -15,6 +15,7 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
+import static org.geotools.data.wfs.HttpMethod.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -123,7 +124,7 @@ public class WFSTransactionState implements State {
     public void commit() throws IOException {
         // TODO deal with authID and locking ... WFS only allows one authID /
         // transaction ...
-        TransactionResult tr = null;
+        TransactionResult transactionResult = null;
 
         Map copiedActions;
         synchronized (actionMap) {
@@ -139,16 +140,15 @@ public class WFSTransactionState implements State {
             if (actions.isEmpty())
                 continue;
 
-            if (((ds.protocol & WFS_1_0_0_DataStore.POST_PROTOCOL) == WFS_1_0_0_DataStore.POST_PROTOCOL)
-                    && (tr == null)) {
+            if (ds.preferredProtocol == POST && (transactionResult == null)) {
                 try {
-                    tr = commitPost(actions);
+                    transactionResult = commitPost(actions);
                 } catch (OperationNotSupportedException e) {
                     WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
-                    tr = null;
+                    transactionResult = null;
                 } catch (SAXException e) {
                     WFS_1_0_0_DataStore.LOGGER.warning(e.toString());
-                    tr = null;
+                    transactionResult = null;
                 }
             }
 
@@ -166,15 +166,15 @@ public class WFSTransactionState implements State {
             // }
             // }
 
-            if (tr == null) {
+            if (transactionResult == null) {
                 throw new IOException("An error occured while committing.");
             }
 
-            if (tr.getStatus() == TransactionResult.FAILED) {
-                throw new IOException(tr.getError().toString());
+            if (transactionResult.getStatus() == TransactionResult.FAILED) {
+                throw new IOException(transactionResult.getError().toString());
             }
 
-            List newFids = tr.getInsertResult();
+            List newFids = transactionResult.getInsertResult();
             int currentInsertIndex = 0;
             for (Iterator iter2 = actions.iterator(); iter2.hasNext();) {
                 Object action = iter2.next();
@@ -227,7 +227,7 @@ public class WFSTransactionState implements State {
             return null;
         }
 
-        HttpURLConnection hc = ds.connectionFactory.getConnection(postUrl, true);
+        HttpURLConnection hc = ds.connectionFactory.getConnection(postUrl, POST);
         // System.out.println("connection to commit");
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT, WFSSchema.getInstance().getElements()[24]); // Transaction

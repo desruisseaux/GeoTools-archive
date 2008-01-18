@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002-2008, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,8 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
+import static org.geotools.data.wfs.HttpMethod.GET;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,9 +28,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,6 @@ import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.WFSCapabilitiesType;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
@@ -52,12 +50,13 @@ import org.geotools.data.Query;
 import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
+import org.geotools.data.wfs.HttpMethod;
 import org.geotools.data.wfs.WFSDataStore;
+import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFSConfiguration;
-import org.geotools.wfs.io.WFSConnectionFactory;
 import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -88,7 +87,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
 
     private final Map<String, SimpleFeatureType> featureTypeCache;
 
-    private WFSConnectionFactory connectionFactory;
+    private WFS110ProtocolHandler connectionFactory;
 
     /**
      * The WFS capabilities document.
@@ -96,12 +95,11 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @param capabilities
      */
     @SuppressWarnings("unchecked")
-    public WFS_1_1_0_DataStore(final WFSCapabilitiesType capabilities,
-            final WFSConnectionFactory connectionFactory) {
-        this.capabilities = capabilities;
+    public WFS_1_1_0_DataStore(final WFS110ProtocolHandler connectionFactory) {
         this.connectionFactory = connectionFactory;
         this.typeInfos = new HashMap<String, FeatureTypeType>();
         this.featureTypeCache = new HashMap<String, SimpleFeatureType>();
+        this.capabilities = connectionFactory.getCapabilities();
         synchronized (WFS_1_1_0_DataStore.class) {
             if (configuration == null) {
                 configuration = new WFSConfiguration();
@@ -189,6 +187,20 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     }
 
     /**
+     * @see WFSDataStore#getDefaultCrs(String)
+     */
+    public String getDefaultCrs(String typeName) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * @see WFSDataStore#getOperation(WFSOperationType, HttpMethod)
+     */
+    public URL getOperation(WFSOperationType operationType, HttpMethod method) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * @param
      * @return the GeoTools FeatureType for the {@code typeName} as stated on
      *         the capabilities document.
@@ -199,7 +211,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
             return featureTypeCache.get(typeName);
         }
         final URL describeUrl = connectionFactory.getDescribeFeatureTypeURLGet(typeName);
-        final HttpURLConnection connection = connectionFactory.getConnection(describeUrl, false);
+        final HttpURLConnection connection = connectionFactory.getConnection(describeUrl, GET);
         String contentEncoding = connection.getContentEncoding();
         Charset charset = Charset.forName("UTF-8"); // TODO: un-hardcode
         if (null != contentEncoding) {

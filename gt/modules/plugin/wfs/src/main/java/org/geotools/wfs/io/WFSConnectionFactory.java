@@ -1,8 +1,13 @@
 package org.geotools.wfs.io;
 
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.data.wfs.WFSOperationType.DESCRIBE_FEATURETYPE;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -11,13 +16,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.HttpMethod;
+import org.geotools.data.wfs.Version;
+import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.v_1_0_0.data.LogInputStream;
 
 /**
- * Handles seting up connections to a WFS based on a WFS capabilities document,
+ * Handles setting up connections to a WFS based on a WFS capabilities document,
  * taking care of GZIP and authentication.
  * 
  * @author Gabriel Roldan
@@ -26,61 +32,82 @@ import org.geotools.wfs.v_1_0_0.data.LogInputStream;
  * @URL $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
  */
-public class WFSConnectionFactory {
+public abstract class WFSConnectionFactory {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.wfs.io");
 
-    private final WFSCapabilities capabilities;
-
+    private Version wfsVersion;
+    
     private final boolean tryGzip;
 
     private final Authenticator auth;
 
     private String encoding;
 
-    public WFSConnectionFactory(final WFSCapabilities capabilities, final boolean tryGzip,
-            final Authenticator auth, String encoding) {
-        this.capabilities = capabilities;
+    public WFSConnectionFactory(final Version version, final boolean tryGzip, final Authenticator auth, String encoding) {
+        this.wfsVersion = version;
         this.tryGzip = tryGzip;
         this.auth = auth;
         this.encoding = encoding;
     }
 
+    public Version getVersion(){
+        return wfsVersion;
+    }
+
+    /**
+     * Returns whether the service supports the given operation for the given
+     * HTTP method.
+     * 
+     * @param operation
+     * @param method
+     * @return
+     */
+    public abstract boolean supports(WFSOperationType operation, HttpMethod method);
+
+    /**
+     * 
+     * @param operation
+     * @param method
+     * @return The URL access point for the given operation and method
+     * @throws UnsupportedOperationException
+     *             if the combination operation/method is not supported by the
+     *             service
+     * @see #supports(WFSOperationType, HttpMethod)
+     */
+    public abstract URL getOperationURL(WFSOperationType operation, HttpMethod method)
+            throws UnsupportedOperationException;
+
+    /**
+     * Returns the preferred character encoding name to encode requests in
+     * 
+     * @return
+     */
     public String getEncoding() {
         return encoding;
     }
 
-    public HttpURLConnection createGetCapabilitiesConnection(final boolean doPost)
-            throws IOException {
-        OperationType getCapabilities = capabilities.getGetCapabilities();
-        return getConnection(getCapabilities, doPost);
-    }
-
     public HttpURLConnection createDescribeFeatureTypeConnection(final String typeName,
-            final boolean doPost) throws IOException {
+            HttpMethod method) throws IOException, IllegalArgumentException {
         URL query;
-        if (doPost) {
-            query = capabilities.getDescribeFeatureType().getPost();
+        if (HttpMethod.POST == method) {
+            query = getOperationURL(WFSOperationType.DESCRIBE_FEATURETYPE, HttpMethod.POST);
         } else {
             query = getDescribeFeatureTypeURLGet(typeName);
         }
         if (query == null) {
             return null;
         }
-        return getConnection(query, doPost);
+        return getConnection(query, method);
     }
 
-    public HttpURLConnection getConnection(URL query, boolean doPost) throws IOException {
-        return getConnection(query, tryGzip, doPost, auth);
+    public HttpURLConnection getConnection(URL query, HttpMethod method) throws IOException {
+        return getConnection(query, tryGzip, method, auth);
     }
 
     public URL getDescribeFeatureTypeURLGet(final String typeName) throws MalformedURLException {
-        URL getUrl = capabilities.getDescribeFeatureType().getGet();
+        URL getUrl = getOperationURL(DESCRIBE_FEATURETYPE, GET);
         Logging.getLogger("org.geotools.data.communication").fine("Output: " + getUrl);
-
-        if (getUrl == null) {
-            return null;
-        }
 
         String query = getUrl.getQuery();
         query = query == null ? null : query.toUpperCase();
@@ -99,7 +126,7 @@ public class WFSConnectionFactory {
         }
 
         if ((query == null) || (query.indexOf("VERSION") == -1)) {
-            url += "&VERSION=" + capabilities.getVersion();
+            url += "&VERSION=" + getVersion();
         }
 
         if ((query == null) || (query.indexOf("REQUEST") == -1)) {
@@ -112,25 +139,11 @@ public class WFSConnectionFactory {
         return getUrl;
     }
 
-    private HttpURLConnection getConnection(final OperationType operation, final boolean isPost)
-            throws IOException {
-        final URL url;
-        if (isPost) {
-            url = operation.getPost();
-        } else {
-            url = operation.getGet();
-        }
-
-        HttpURLConnection connection = getConnection(url, tryGzip, isPost, auth);
-
-        return connection;
-    }
-
     public static HttpURLConnection getConnection(final URL url, final boolean tryGzip,
-            final boolean isPost, final Authenticator auth) throws IOException {
+            final HttpMethod method, final Authenticator auth) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-        if (isPost) {
+        if (POST == method) {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-type", "text/xml, application/xml");
@@ -158,6 +171,11 @@ public class WFSConnectionFactory {
         return connection;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.geotools.wfs.io.WFSProtocolManager#getInputStream(java.net.HttpURLConnection)
+     */
     public InputStream getInputStream(HttpURLConnection hc) throws IOException {
         return getInputStream(hc, tryGzip);
     }

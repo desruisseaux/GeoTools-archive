@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2004-2008, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.wfs;
 
 import java.util.ArrayList;
@@ -11,7 +26,8 @@ import java.util.List;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/Version.java $
  */
 public enum Version {
     v1_0_0("1.0.0"), v1_1_0("1.1.0");
@@ -30,5 +46,23 @@ public enum Version {
         List<Version> versions = new ArrayList<Version>(Arrays.asList(values()));
         Collections.sort(versions);
         return versions.get(versions.size() - 1);
+    }
+
+    /**
+     * To be used instead of {@code valueOf(String)}, as valueOf in enum can't
+     * be overridden and the argument string must match exactly the enum name,
+     * yet we want a lookup by version number.
+     * 
+     * @param version
+     * @return the Version corresponding to {@code version} or {@code null} if
+     *         not found.
+     */
+    public static Version find(final String version) {
+        for (Version v : values()) {
+            if (v.version.equals(version)) {
+                return v;
+            }
+        }
+        return null;
     }
 }

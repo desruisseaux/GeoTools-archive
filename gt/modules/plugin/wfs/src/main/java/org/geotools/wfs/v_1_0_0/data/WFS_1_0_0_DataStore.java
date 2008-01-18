@@ -15,6 +15,8 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
+import static org.geotools.data.wfs.HttpMethod.*;
+import static org.geotools.data.wfs.WFSOperationType.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +58,9 @@ import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.HttpMethod;
 import org.geotools.data.wfs.WFSDataStore;
+import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
@@ -70,7 +74,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.io.WFSConnectionFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
@@ -104,13 +107,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
     protected WFSCapabilities capabilities = null;
 
-    protected static final int AUTO_PROTOCOL = 3;
-
-    protected static final int POST_PROTOCOL = 1;
-
-    protected static final int GET_PROTOCOL = 2;
-
-    protected int protocol = AUTO_PROTOCOL; // visible for transaction
+    protected HttpMethod preferredProtocol = POST; // visible for transaction
 
     private final int bufferSize;
 
@@ -120,7 +117,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
     private boolean lenient;
 
-    WFSConnectionFactory connectionFactory;
+    WFS100ProtocolHandler connectionFactory;
 
     private String[] typeNames = null;
 
@@ -154,23 +151,14 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * @throws SAXException
      * @throws IOException
      */
-    public WFS_1_0_0_DataStore(WFSCapabilities capabilities, Boolean protocol,
-            WFSConnectionFactory connectionFactory, int timeout, int buffer, boolean lenient)
-            throws SAXException, IOException {
+    public WFS_1_0_0_DataStore(HttpMethod protocol, WFS100ProtocolHandler connectionFactory,
+            int timeout, int buffer, boolean lenient) throws SAXException, IOException {
         super(true);
-        this.capabilities = capabilities;
+        this.capabilities = connectionFactory.getCapabilities();
         this.connectionFactory = connectionFactory;
         this.lenient = lenient;
 
-        if (protocol == null) {
-            this.protocol = AUTO_PROTOCOL;
-        } else {
-            if (protocol.booleanValue()) {
-                this.protocol = POST_PROTOCOL;
-            } else {
-                this.protocol = GET_PROTOCOL;
-            }
-        }
+        this.preferredProtocol = protocol;
 
         this.timeout = timeout;
         this.bufferSize = buffer;
@@ -274,6 +262,29 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         return latLonEnv;
     }
 
+    /**
+     * @see WFSDataStore#getDefaultCrs(String)
+     */
+    public String getDefaultCrs(String typeName) {
+        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
+                capabilities, typeName);
+        if (featureSetDescription == null) {
+            throw new NoSuchElementException(typeName);
+        }
+        return featureSetDescription.getSRS();
+    }
+
+    /**
+     * @see WFSDataStore#getOperation(WFSOperationType, HttpMethod)
+     */
+    public URL getOperation(WFSOperationType operationType, HttpMethod method) {
+        try {
+            return connectionFactory.getOperationURL(operationType, method);
+        } catch (UnsupportedOperationException e) {
+            return null;
+        }
+    }
+
     private void determineCorrectStrategy() {
         URL host = capabilities.getGetCapabilities().getGet();
         if (host == null) {
@@ -322,12 +333,24 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
         // TODO sanity check for request with capabilities obj
 
-        SimpleFeatureType t = null;
+        SimpleFeatureType featureType = null;
         SAXException sax = null;
         IOException io = null;
-        if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
+        if (preferredProtocol == POST) {
             try {
-                t = getSchemaPost(typeName);
+                featureType = getSchemaPost(typeName);
+            } catch (SAXException e) {
+                LOGGER.warning(e.toString());
+                sax = e;
+            } catch (IOException e) {
+                LOGGER.warning(e.toString());
+                io = e;
+            }
+        }
+        // post either wasn't the prefferred protocol or it didn't work
+        if (featureType == null) {
+            try {
+                featureType = getSchemaGet(typeName);
             } catch (SAXException e) {
                 LOGGER.warning(e.toString());
                 sax = e;
@@ -337,23 +360,12 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             }
         }
 
-        if (((protocol & GET_PROTOCOL) == GET_PROTOCOL) && (t == null)) {
-            try {
-                t = getSchemaGet(typeName);
-            } catch (SAXException e) {
-                LOGGER.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                LOGGER.warning(e.toString());
-                io = e;
+        if (featureType == null) {
+            if (sax != null) {
+                throw new DataSourceException(sax);
             }
-        }
-
-        if (t == null && sax != null)
-            throw new DataSourceException(sax);
-
-        if (t == null && io != null)
             throw io;
+        }
 
         // set crs?
         FeatureSetDescription fsd = WFSCapabilities
@@ -368,7 +380,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             try {
                 if (crsName != null) {
                     crs = CRS.decode(crsName);
-                    t = WFSFeatureTypeTransformer.transform(t, crs);
+                    featureType = WFSFeatureTypeTransformer.transform(featureType, crs);
                 }
             } catch (FactoryException e) {
                 LOGGER.warning(e.getMessage());
@@ -379,10 +391,10 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
         if (ftName != null) {
             SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
-            build.init(t);
+            build.init(featureType);
             build.setName(ftName);
 
-            t = build.buildFeatureType();
+            featureType = build.buildFeatureType();
             // t = FeatureTypeBuilder.newFeatureType(
             // t.getAttributeTypes(),
             // ftName==null?typeName:ftName,
@@ -395,23 +407,22 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             URL url = connectionFactory.getDescribeFeatureTypeURLGet(typeName);
             if (url != null) {
                 SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
-                build.init(t);
+                build.init(featureType);
                 build.setNamespaceURI(url.toURI());
-                t = build.buildFeatureType();
+                featureType = build.buildFeatureType();
             }
         } catch (URISyntaxException e) {
             throw (RuntimeException) new RuntimeException(e);
         }
-        if (t != null) {
-            featureTypeCache.put(typeName, t);
+        if (featureType != null) {
+            featureTypeCache.put(typeName, featureType);
         }
-        return t;
+        return featureType;
     }
 
     // protected for testing
     protected SimpleFeatureType getSchemaGet(String typeName) throws SAXException, IOException {
-        HttpURLConnection hc = connectionFactory.createDescribeFeatureTypeConnection(typeName,
-                false);
+        HttpURLConnection hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, GET);
         if (hc == null) {
             return null;
         }
@@ -458,10 +469,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     protected SimpleFeatureType getSchemaPost(String typeName) throws IOException, SAXException {
         // getConnection(postUrl, tryGZIP, false, auth);
         HttpURLConnection hc;
-        hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, true);
-        if (hc == null) {
-            return null;
-        }
+        hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, POST);
 
         // write request
         Writer osw = getOutputStream(hc);
@@ -576,7 +584,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         Logging.getLogger("org.geotools.data.wfs").fine(url);
         Logging.getLogger("org.geotools.data.communication").fine("Output: " + url);
         getUrl = new URL(url);
-        HttpURLConnection hc = connectionFactory.getConnection(getUrl, false);
+        HttpURLConnection hc = connectionFactory.getConnection(getUrl, GET);
         InputStream is = connectionFactory.getInputStream(hc);
         WFSTransactionState ts = null;
 
@@ -722,7 +730,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             return null;
         }
 
-        HttpURLConnection hc = connectionFactory.getConnection(postUrl, true);
+        HttpURLConnection hc = connectionFactory.getConnection(postUrl, POST);
 
         Writer w = getOutputStream(hc);
 

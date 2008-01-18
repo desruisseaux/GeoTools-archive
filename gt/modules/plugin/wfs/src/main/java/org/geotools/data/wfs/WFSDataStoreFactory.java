@@ -15,6 +15,11 @@
  */
 package org.geotools.data.wfs;
 
+import static org.geotools.data.wfs.HttpMethod.GET;
+import static org.geotools.data.wfs.HttpMethod.POST;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -28,13 +33,22 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.geotools.data.AbstractDataStoreFactory;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.util.logging.Logging;
+import org.geotools.wfs.WFS;
 import org.geotools.wfs.io.WFSConnectionFactory;
+import org.geotools.wfs.v_1_0_0.data.WFS100ProtocolHandler;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
-import org.geotools.xml.DocumentFactory;
+import org.geotools.wfs.v_1_1_0.data.WFS110ProtocolHandler;
+import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
@@ -48,7 +62,7 @@ import org.xml.sax.SAXException;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
  */
 @SuppressWarnings("unchecked")
-public final class WFSDataStoreFactory extends AbstractDataStoreFactory {
+public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     private static final Logger logger = Logging.getLogger("org.geotools.data.wfs");
 
     /**
@@ -255,18 +269,28 @@ public final class WFSDataStoreFactory extends AbstractDataStoreFactory {
      */
     public static final WFSFactoryParam<Boolean> LENIENT = parametersInfo[8];
 
-    protected Map<Map, DataStore> perParameterSetDataStoreCache = new HashMap();
+    protected Map<Map, WFSDataStore> perParameterSetDataStoreCache = new HashMap();
 
     /**
+     * Requests the WFS Capabilities document from the
+     * {@link WFSDataStoreFactory#URL url} parameter in {@code params} and
+     * returns a {@link WFSDataStore} accoding to the version of the
+     * GetCapabilities document returned.
+     * <p>
+     * Note the {@code URL} provided as parameter must refer to the actual
+     * {@code GetCapabilities} request. If you need to specify a preferred
+     * version or want the GetCapabilities request to be generated from a base
+     * URL build the URL with the
+     * {@link #createGetCapabilitiesRequest(URL, Version)} first.
+     * </p>
+     * 
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
-    public DataStore createDataStore(final Map params) throws IOException {
-        // TODO check that we can use hashcodes in this manner -- think it's ok,
-        // particularily for regular usage
+    public WFSDataStore createDataStore(final Map params) throws IOException {
         if (perParameterSetDataStoreCache.containsKey(params)) {
-            return (DataStore) perParameterSetDataStoreCache.get(params);
+            return perParameterSetDataStoreCache.get(params);
         }
-        final URL host = URL.lookUp(params);
+        final URL getCapabilitiesRequest = URL.lookUp(params);
         final Boolean protocol = PROTOCOL.lookUp(params);
         final String user = USERNAME.lookUp(params);
         final String pass = PASSWORD.lookUp(params);
@@ -288,21 +312,48 @@ public final class WFSDataStoreFactory extends AbstractDataStoreFactory {
             auth = null;
         }
 
-        final WFSCapabilities capabilities = findCapabilities(host, tryGZIP, auth);
-        DataStore ds = null;
-        final WFSConnectionFactory connectionFac = new WFSConnectionFactory(capabilities, tryGZIP,
-                auth, encoding);
+        final WFSDataStore dataStore;
+        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest, tryGZIP,
+                auth);
+        Element rootElement;
+        {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(wfsCapabilitiesRawData);
+            rootElement = parseCapabilities(inputStream);
 
-        try {
-            ds = new WFS_1_0_0_DataStore(capabilities, protocol, connectionFac, timeout, buffer,
-                    lenient);
-            perParameterSetDataStoreCache.put(new HashMap(params), ds);
-        } catch (SAXException e) {
-            logger.warning(e.toString());
-            throw new IOException(e.toString());
+            String localName = rootElement.getLocalName();
+            String namespace = rootElement.getNamespaceURI();
+            if (!WFS.NAMESPACE.equals(namespace)
+                    || !WFS.WFS_Capabilities.getLocalPart().equals(localName)) {
+                throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "
+                        + namespace + "#" + localName);
+            }
         }
 
-        return ds;
+        final String capsVersion = rootElement.getAttribute("version");
+        final Version version = Version.find(capsVersion);
+
+        if (Version.v1_0_0 == version) {
+            InputStream reader = new ByteArrayInputStream(wfsCapabilitiesRawData);
+            final WFS100ProtocolHandler connectionFac = new WFS100ProtocolHandler(reader, tryGZIP,
+                    auth, encoding);
+
+            try {
+                HttpMethod prefferredProtocol = Boolean.TRUE.equals(protocol) ? POST : GET;
+                dataStore = new WFS_1_0_0_DataStore(prefferredProtocol, connectionFac, timeout,
+                        buffer, lenient);
+            } catch (SAXException e) {
+                logger.warning(e.toString());
+                throw new IOException(e.toString());
+            }
+        } else {
+            InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
+            final WFS110ProtocolHandler connectionFac = new WFS110ProtocolHandler(capsIn, tryGZIP,
+                    auth, encoding);
+            dataStore = new WFS_1_1_0_DataStore(connectionFac);
+        }
+
+        perParameterSetDataStoreCache.put(new HashMap(params), dataStore);
+        return dataStore;
     }
 
     /**
@@ -481,38 +532,49 @@ public final class WFSDataStoreFactory extends AbstractDataStoreFactory {
         return createGetCapabilitiesRequest(host, highest);
     }
 
-    private WFSCapabilities findCapabilities(URL host, boolean tryGZIP, Authenticator auth)
-            throws IOException {
+    /**
+     * Package visible to be overridden by unit test.
+     * 
+     * @param capabilitiesUrl
+     * @param tryGZIP
+     * @param auth
+     * @return
+     * @throws IOException
+     */
+    byte[] loadCapabilities(final URL capabilitiesUrl, final boolean tryGZIP,
+            final Authenticator auth) throws IOException {
+        byte[] wfsCapabilitiesRawData;
+        HttpURLConnection hc = WFSConnectionFactory.getConnection(capabilitiesUrl, tryGZIP, GET,
+                auth);
+        InputStream inputStream = WFSConnectionFactory.getInputStream(hc, tryGZIP);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buff = new byte[1024];
+        int readCount;
+        while ((readCount = inputStream.read(buff)) != -1) {
+            out.write(buff, 0, readCount);
+        }
+        wfsCapabilitiesRawData = out.toByteArray();
+        return wfsCapabilitiesRawData;
+    }
 
-        // TODO support using POST for getCapabilities
-
-        Object t = null;
-        Map hints = new HashMap();
-        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
+    private Element parseCapabilities(ByteArrayInputStream inputStream) throws IOException,
+            DataSourceException {
+        Element rootElement;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder documentBuilder;
         try {
-            // try and complete the url first
-            URL capabilitiesUrl = createGetCapabilitiesRequest(host);
-            HttpURLConnection hc = WFSConnectionFactory.getConnection(capabilitiesUrl, tryGZIP,
-                    false, auth);
-            InputStream is = WFSConnectionFactory.getInputStream(hc, tryGZIP);
-            t = DocumentFactory.getInstance(is, hints, logger.getLevel());
-        } catch (Throwable e) {
-            // try the url as given second
-            HttpURLConnection hc = WFSConnectionFactory.getConnection(host, tryGZIP, false, auth);
-            InputStream is = WFSConnectionFactory.getInputStream(hc, tryGZIP);
-            try {
-                t = DocumentFactory.getInstance(is, hints, logger.getLevel());
-            } catch (SAXException saxEx) {
-                throw (IOException) new IOException("Parsing exception: " + saxEx.getMessage()).initCause(saxEx);
-            }
+            documentBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
         }
-        if (t instanceof WFSCapabilities) {
-            return (WFSCapabilities) t;
-        } else {
-            throw new IllegalStateException(
-                    "The specified URL Should have returned a 'WFSCapabilities' object. Returned a "
-                            + ((t == null) ? "null value."
-                                    : (t.getClass().getName() + " instance.")));
+        Document document;
+        try {
+            document = documentBuilder.parse(inputStream);
+        } catch (SAXException e) {
+            throw new DataSourceException("Error parsing capabilities document", e);
         }
+        rootElement = document.getDocumentElement();
+        return rootElement;
     }
 }
