@@ -1,4 +1,4 @@
-package org.geotools.catalog.styling;
+package org.geotools.repository.styling;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.catalog.AbstractFileService;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.ServiceInfo;
-import org.geotools.catalog.defaults.DefaultServiceInfo;
-import org.geotools.styling.Style;
+import org.geotools.repository.AbstractFileService;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.ServiceInfo;
+import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.util.ProgressListener;
 

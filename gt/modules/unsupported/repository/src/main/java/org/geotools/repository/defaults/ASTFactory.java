@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
 import java.util.LinkedList;
 import java.util.List;

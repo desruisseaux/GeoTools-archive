@@ -70,6 +70,7 @@
          <module>ogr</module>
          <module>gml3</module>
          <module>repository</module>
+         <module>tile</module>
        </modules>
      </profile>
 
@@ -100,7 +101,6 @@
     <module>oracle-spatial</module>
     <module>postgis-versioned</module>
     <module>tiger</module>
-    <module>tile</module>
     <module>mappane</module>
     <module>repository</module>
     <module>coveragetools</module>

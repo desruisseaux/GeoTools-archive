@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,16 +28,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.catalog.AbstractCatalog;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.CatalogInfo;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveChangeListener;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceInfo;
+import org.geotools.repository.AbstractCatalog;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.CatalogInfo;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.GeoResourceInfo;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveChangeListener;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceInfo;
 import org.geotools.util.ListenerList;
 import org.geotools.util.ProgressListener;
 

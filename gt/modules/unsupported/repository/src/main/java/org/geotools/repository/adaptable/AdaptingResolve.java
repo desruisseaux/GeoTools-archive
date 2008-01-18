@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
+package org.geotools.repository.adaptable;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.Resolve;
-import org.geotools.catalog.ResolveAdapterFactory;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveChangeListener;
-import org.geotools.catalog.Service;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.Resolve;
+import org.geotools.repository.ResolveAdapterFactory;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveChangeListener;
+import org.geotools.repository.Service;
 import org.geotools.resources.Utilities;
 import org.geotools.util.ProgressListener;
 

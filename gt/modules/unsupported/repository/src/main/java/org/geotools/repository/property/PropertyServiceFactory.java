@@ -1,4 +1,4 @@
-package org.geotools.catalog.property;
+package org.geotools.repository.property;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -8,10 +8,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
 import org.geotools.data.property.PropertyDataStoreFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFactory;
 
 /**
  * Creates a new property service.

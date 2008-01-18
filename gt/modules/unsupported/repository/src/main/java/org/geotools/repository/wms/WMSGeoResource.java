@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.wms;
+package org.geotools.repository.wms;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,22 +22,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.geotools.catalog.AbstractGeoResource;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.Resolve;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
-import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
-import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.repository.AbstractGeoResource;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.GeoResourceInfo;
+import org.geotools.repository.Resolve;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.Service;
+import org.geotools.repository.defaults.DefaultGeoResourceInfo;
+import org.geotools.repository.defaults.DefaultResolveChangeEvent;
+import org.geotools.repository.defaults.DefaultResolveDelta;
 import org.geotools.util.ProgressListener;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

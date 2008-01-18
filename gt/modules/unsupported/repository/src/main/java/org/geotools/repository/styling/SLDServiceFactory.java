@@ -1,4 +1,4 @@
-package org.geotools.catalog.styling;
+package org.geotools.repository.styling;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -6,9 +6,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFactory;
+
 
 public class SLDServiceFactory implements ServiceFactory {
 

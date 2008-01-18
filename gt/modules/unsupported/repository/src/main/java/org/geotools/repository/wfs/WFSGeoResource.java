@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.wfs;
+package org.geotools.repository.wfs;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,21 +21,21 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.catalog.AbstractGeoResource;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
-import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
-import org.geotools.catalog.defaults.DefaultResolveDelta;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.repository.AbstractGeoResource;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.GeoResourceInfo;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.Service;
+import org.geotools.repository.defaults.DefaultGeoResourceInfo;
+import org.geotools.repository.defaults.DefaultResolveChangeEvent;
+import org.geotools.repository.defaults.DefaultResolveDelta;
 import org.geotools.util.ProgressListener;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.opengis.feature.simple.SimpleFeatureType;

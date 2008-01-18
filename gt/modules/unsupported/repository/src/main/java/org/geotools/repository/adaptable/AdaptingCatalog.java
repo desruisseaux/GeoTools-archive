@@ -13,16 +13,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
+package org.geotools.repository.adaptable;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.CatalogInfo;
-
-import org.geotools.catalog.Service;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.CatalogInfo;
+import org.geotools.repository.Service;
 import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;

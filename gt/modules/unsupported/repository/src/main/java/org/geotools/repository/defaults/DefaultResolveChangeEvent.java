@@ -14,11 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
-import org.geotools.catalog.Resolve;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveDelta;
+import org.geotools.repository.Resolve;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveDelta;
 
 
 /**
@@ -29,7 +29,7 @@ import org.geotools.catalog.ResolveDelta;
  */
 public class DefaultResolveChangeEvent implements ResolveChangeEvent {
     private Object source;
-    private Type type;
+    private ResolveChangeEvent.Type type;
     private ResolveDelta delta; // may be null for some events
     private Resolve handle; // may be null for some events
 

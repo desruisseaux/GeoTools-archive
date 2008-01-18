@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
 /**
  * Use the visitor pattern to traverse the AST

@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.shapefile;
+package org.geotools.repository.shapefile;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -22,10 +22,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFactory;
 
 public class ShapefileServiceFactory implements ServiceFactory {
 

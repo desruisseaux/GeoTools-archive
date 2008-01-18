@@ -55,6 +55,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -218,13 +219,12 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 FeatureTypes.DEFAULT_NAMESPACE, "polygonFeature"));
     }
 
-    public void testCreateSchema() throws Exception {
+    public void testCreateSchemaWithEmptyCRS() throws Exception {
         File file = new File("test.shp");
         URL toURL = file.toURL();
         ShapefileDataStore ds = new ShapefileDataStore(toURL);
         ds.createSchema(DataUtilities.createType("test", "geom:MultiPolygon"));
 
-        // ds = new ShapefileDataStore(toURL); this is not needed?
         assertEquals("test", ds.getSchema().getTypeName());
 
         file.deleteOnExit();
@@ -238,10 +238,48 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             file.deleteOnExit();
 
         file = new File("test.shx");
-        if (file.exists())
+        if (file.exists()){
             file.deleteOnExit();
+        }
     }
 
+    public void testCreateSchemaWithCRS() throws Exception {
+        File file = new File("test.shp");
+        URL toURL = file.toURL();
+        ShapefileDataStore ds = new ShapefileDataStore(toURL);
+        SimpleFeatureType featureType = DataUtilities.createType("test", "geom:MultiPolygon:srid=32615");
+        CoordinateReferenceSystem crs = featureType.getDefaultGeometry().getCRS(); 
+        assertNotNull( crs );
+        
+        ds.createSchema(featureType);
+        
+        assertEquals("test", ds.getSchema().getTypeName());
+
+        CoordinateReferenceSystem crs2 = ds.getSchema().getDefaultGeometry().getCRS();
+        assertNotNull( crs2 );
+        assertEquals( crs.getName(), crs2.getName() );
+        
+        file.deleteOnExit();
+        file = new File("test.dbf");
+        file.deleteOnExit();
+        file = new File("test.shp");
+        file.deleteOnExit();
+
+        file = new File("test.prj");
+        if (file.exists())
+            file.deleteOnExit();
+
+        file = new File("test.shx");
+        if (file.exists()){
+            file.deleteOnExit();
+        }
+        
+        file = new File("test.prj");
+        if( file.exists()){
+            file.deleteOnExit();
+        }
+    }
+    
     public void testForceCRS() throws Exception {
         File file = new File("test.shp");
         URL toURL = file.toURL();

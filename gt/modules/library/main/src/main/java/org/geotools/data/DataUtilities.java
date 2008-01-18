@@ -1332,11 +1332,16 @@ public class DataUtilities {
      * </p>
      * 
      * <p>
-     * You may indicate the default Geometry with an astrix: "*geom:Geometry".
+     * You may indicate the default Geometry with an astrix: "*geom:Geometry". You
+     * may also indicate the srid (used to look up a EPSG code).
      * </p>
      * 
      * <p>
-     * Example:<code>name:"",age:0,geom:Geometry,centroid:Point,url:java.io.URL"</code>
+     * Examples:
+     * <ul>
+     * <li><code>name:"",age:0,geom:Geometry,centroid:Point,url:java.io.URL"</code>
+     * <li><code>id:String,polygonProperty:Polygon:srid=32615</code>
+     * </ul>
      * </p>
      *
      * @param identification identification of FeatureType:

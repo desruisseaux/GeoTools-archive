@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.shapefile;
+package org.geotools.repository.shapefile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,10 +23,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceInfo;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.TestCaseSupport;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceInfo;
 
 public class ShapefileServiceTest extends TestCaseSupport {
     public ShapefileServiceTest(  ) throws IOException {

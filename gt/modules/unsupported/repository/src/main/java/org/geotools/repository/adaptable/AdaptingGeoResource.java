@@ -13,13 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
+package org.geotools.repository.adaptable;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.GeoResourceInfo;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.GeoResourceInfo;
 import org.geotools.util.ProgressListener;
 
 public class AdaptingGeoResource extends AdaptingResolve implements GeoResource {

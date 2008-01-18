@@ -14,13 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
 import java.net.URI;
 
 import javax.swing.Icon;
 
-import org.geotools.catalog.ServiceInfo;
+import org.geotools.repository.ServiceInfo;
 
 /**
  * Implementation of ServiceInfo.

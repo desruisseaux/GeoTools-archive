@@ -1,4 +1,3 @@
-package org.geotools.catalog.postgis;
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -15,19 +14,18 @@ package org.geotools.catalog.postgis;
  *    Lesser General Public License for more details.
  *
  */
+package org.geotools.repository.postgis;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.DataStoreService;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.ServiceInfo;
-import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.DataStoreService;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.ServiceInfo;
+import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.util.ProgressListener;
 
 public class PostGISService extends DataStoreService {

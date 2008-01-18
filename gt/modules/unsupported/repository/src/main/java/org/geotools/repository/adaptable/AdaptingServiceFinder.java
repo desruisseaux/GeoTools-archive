@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
+package org.geotools.repository.adaptable;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFinder;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFinder;
 
 /**
  * ServiceFinder decorator for adapting catalog.

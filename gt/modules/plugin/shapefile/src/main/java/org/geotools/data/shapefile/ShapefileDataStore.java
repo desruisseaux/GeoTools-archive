@@ -809,7 +809,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 prjWriter.close();
             }
         }
-
+        else {
+            LOGGER.warning("PRJ file not generated for null CoordinateReferenceSystem");
+        }
         StorageFile.replaceOriginals(shpStoragefile, shxStoragefile,
                 dbfStoragefile, prjStoragefile);
 

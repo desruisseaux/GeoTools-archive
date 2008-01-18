@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.wfs;
+package org.geotools.repository.wfs;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,16 +23,16 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.geotools.catalog.AbstractService;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.ServiceInfo;
-import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
-import org.geotools.catalog.defaults.DefaultResolveDelta;
-import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSDataStoreFactory;
+import org.geotools.repository.AbstractService;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.ServiceInfo;
+import org.geotools.repository.defaults.DefaultResolveChangeEvent;
+import org.geotools.repository.defaults.DefaultResolveDelta;
+import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.util.ProgressListener;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.xml.wfs.WFSSchema;

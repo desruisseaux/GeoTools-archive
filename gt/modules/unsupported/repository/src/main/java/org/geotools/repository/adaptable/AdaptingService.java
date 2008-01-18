@@ -13,14 +13,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
+package org.geotools.repository.adaptable;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceInfo;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceInfo;
 import org.geotools.util.ProgressListener;
 
 public class AdaptingService extends AdaptingResolve implements Service {

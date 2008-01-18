@@ -13,9 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.adaptable;
-
-import org.geotools.catalog.ResolveAdapterFactory;
+package org.geotools.repository.adaptable;
 
 /**
  * Implemented by {@link ResolveAdapterFactory} instances who need 

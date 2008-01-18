@@ -1,4 +1,4 @@
-package org.geotools.catalog.styling;
+package org.geotools.repository.styling;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,13 +6,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import org.geotools.catalog.AbstractFileGeoResource;
-import org.geotools.catalog.AbstractFileService;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
+import org.geotools.repository.AbstractFileGeoResource;
+import org.geotools.repository.AbstractFileService;
+import org.geotools.repository.GeoResourceInfo;
+import org.geotools.repository.defaults.DefaultGeoResourceInfo;
 import org.geotools.styling.SLDParser;
-import org.geotools.styling.SLDTransformer;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;

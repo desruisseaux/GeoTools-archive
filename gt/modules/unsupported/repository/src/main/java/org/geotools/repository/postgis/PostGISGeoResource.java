@@ -1,7 +1,7 @@
-package org.geotools.catalog.postgis;
+package org.geotools.repository.postgis;
 
-import org.geotools.catalog.DataStoreService;
-import org.geotools.catalog.FeatureSourceGeoResource;
+import org.geotools.repository.DataStoreService;
+import org.geotools.repository.FeatureSourceGeoResource;
 
 public class PostGISGeoResource extends FeatureSourceGeoResource {
 

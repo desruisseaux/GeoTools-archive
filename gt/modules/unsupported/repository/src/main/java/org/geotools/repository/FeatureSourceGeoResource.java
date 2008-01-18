@@ -13,24 +13,22 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog;
+package org.geotools.repository;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.repository.defaults.DefaultGeoResourceInfo;
 import org.geotools.util.ProgressListener;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Resource implementation for resources which can map or resolve to a 

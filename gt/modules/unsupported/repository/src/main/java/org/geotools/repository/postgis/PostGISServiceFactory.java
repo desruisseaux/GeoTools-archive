@@ -1,14 +1,14 @@
-package org.geotools.catalog.postgis;
+package org.geotools.repository.postgis;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFactory;
 
 public class PostGISServiceFactory implements ServiceFactory {
 

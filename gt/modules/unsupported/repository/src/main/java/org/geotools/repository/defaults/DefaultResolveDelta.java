@@ -14,17 +14,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
-import org.geotools.catalog.Resolve;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.ResolveDeltaVisitor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.geotools.repository.Resolve;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.ResolveDeltaVisitor;
 
 
 /**

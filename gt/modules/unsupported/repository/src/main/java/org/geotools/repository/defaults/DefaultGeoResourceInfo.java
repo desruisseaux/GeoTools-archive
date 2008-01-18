@@ -14,14 +14,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
+
+import java.net.URI;
+
+import javax.swing.Icon;
+
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.repository.GeoResourceInfo;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.net.URI;
-import javax.swing.Icon;
 
 
 /**

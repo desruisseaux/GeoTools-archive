@@ -14,12 +14,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.defaults;
+package org.geotools.repository.defaults;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.Service;
-import org.geotools.catalog.ServiceFactory;
-import org.geotools.catalog.ServiceFinder;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +23,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.geotools.repository.Catalog;
+import org.geotools.repository.Service;
+import org.geotools.repository.ServiceFactory;
+import org.geotools.repository.ServiceFinder;
 
 
 /**

@@ -1,4 +1,4 @@
-package org.geotools.catalog;
+package org.geotools.repository;
 
 import java.net.URI;
 import java.util.Map;

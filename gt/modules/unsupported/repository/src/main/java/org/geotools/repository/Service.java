@@ -14,11 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog;
+package org.geotools.repository;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import org.geotools.util.ProgressListener;
 
 

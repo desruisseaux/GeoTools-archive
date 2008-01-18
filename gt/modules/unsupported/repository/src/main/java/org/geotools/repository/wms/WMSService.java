@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.catalog.wms;
+package org.geotools.repository.wms;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,14 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.catalog.AbstractService;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveDelta;
-import org.geotools.catalog.ServiceInfo;
-import org.geotools.catalog.defaults.DefaultResolveChangeEvent;
-import org.geotools.catalog.defaults.DefaultResolveDelta;
-import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.ows.GetCapabilitiesRequest;
 import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.ows.Layer;
@@ -47,6 +39,14 @@ import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
+import org.geotools.repository.AbstractService;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveDelta;
+import org.geotools.repository.ServiceInfo;
+import org.geotools.repository.defaults.DefaultResolveChangeEvent;
+import org.geotools.repository.defaults.DefaultResolveDelta;
+import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.util.ProgressListener;
 import org.xml.sax.SAXException;
 
