@@ -15,8 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.defaults.DefaultCatalog;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.defaults.DefaultCatalog;
 
 /**
  * A demo class illustrating some of the various parts of the geotools api.

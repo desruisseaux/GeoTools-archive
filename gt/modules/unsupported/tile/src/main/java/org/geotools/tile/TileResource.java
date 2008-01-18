@@ -5,12 +5,12 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.Resolve;
-import org.geotools.catalog.ResolveChangeEvent;
-import org.geotools.catalog.ResolveChangeListener;
-import org.geotools.catalog.Service;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.GeoResourceInfo;
+import org.geotools.repository.Resolve;
+import org.geotools.repository.ResolveChangeEvent;
+import org.geotools.repository.ResolveChangeListener;
+import org.geotools.repository.Service;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
 

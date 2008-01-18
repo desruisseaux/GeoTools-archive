@@ -3,7 +3,8 @@ package org.geotools.tile;
 import java.net.URI;
 import java.util.SortedSet;
 
-import org.geotools.catalog.GeoResourceInfo;
+import org.geotools.repository.GeoResourceInfo;
+
 
 /**
  * Captures all the information used to define a tile map.

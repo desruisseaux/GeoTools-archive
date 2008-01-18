@@ -1,6 +1,7 @@
 package org.geotools.tile;
 
-import org.geotools.catalog.ServiceInfo;
+import org.geotools.repository.ServiceInfo;
+
 
 /**
  * Description of tile service, including name,title,icon,bounds,tile size
