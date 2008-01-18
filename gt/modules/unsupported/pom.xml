@@ -102,7 +102,6 @@
     <module>postgis-versioned</module>
     <module>tiger</module>
     <module>mappane</module>
-    <module>repository</module>
     <module>coveragetools</module>
     <module>xml-gpx</module>
     <module>gpx</module>
