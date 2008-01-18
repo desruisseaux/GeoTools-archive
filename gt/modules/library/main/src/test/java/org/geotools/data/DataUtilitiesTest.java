@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -77,37 +78,70 @@ public class DataUtilitiesTest extends DataTestCase {
     }
 
     public void testUrlToFile() throws Exception {
-        handleFile( System.getProperty("user.home"));
-        handleFile( System.getProperty("user.dir"));
+        handleFile(System.getProperty("user.home"));
+        handleFile(System.getProperty("user.dir"));
 
-        String arch = System.getProperty("os.arch");
         String os = System.getProperty("os.name");
-        
-        if( !os.toUpperCase().contains("WINDOWS")){
-            return;
+
+        String c = "C:\\";
+        String cOne = "C:\\one";
+        String cOneTwo = "C:\\one\\two";
+        String cOneTwoThreeSpace = "C:\\one\\two\\and three";
+        String d = "D:\\";
+        String slashOne = "/one";
+        String one = "one";
+        String slashoneTwoThree = "/one/two/and three";
+
+        if (os.toUpperCase().contains("WINDOWS")) {
+            handleFile(c);
+            handleFile(cOne);
+            handleFile(cOneTwo);
+            handleFile(cOneTwoThreeSpace);
+            handleFile(d);
+            if (TestData.isExtensiveTest())
+                handleFile("\\\\host\\share\\file");
+        } else {
+            handleFile(slashOne);
+
+            handleFile(one);
+            handleFile(slashoneTwoThree);
         }
-        handleFile( "C:\\" );        
-        handleFile( "C:\\one" );
-        handleFile( "C:\\one\\two" );
-        handleFile( "C:\\one\\two\\and three" );
-        handleFile( "D:\\" );
-        if(TestData.isExtensiveTest())
-            handleFile( "\\\\host\\share\\file" ); 
+        
+        String prefix = "file://";
+        assertURL(one, prefix+one);
+        assertURL(slashOne, prefix+slashOne);
+        assertURL("C:", prefix+replaceSlashes(c));
+        assertURL(replaceSlashes(cOne), prefix+replaceSlashes(cOne));
+        assertURL(replaceSlashes(cOneTwo), prefix+replaceSlashes(cOneTwo));
+        assertURL(replaceSlashes(cOneTwoThreeSpace), prefix+replaceSlashes(cOneTwoThreeSpace));
+        
+        
     }
+    private String replaceSlashes(String string) {
+        return string.replaceAll("\\\\", "/");
+    }
+
+    private void assertURL(String expectedFilePath, String urlString) throws MalformedURLException {
+        URL url = new URL(urlString);
+        
+        File file = DataUtilities.urlToFile(url);
+        assertEquals( expectedFilePath, file.getPath());
+        
+    }
+
     public void handleFile( String path ) throws Exception {
         File file = new File( path );
         URI uri = file.toURI();
         URL url = file.toURL();
         URL url2 = file.toURI().toURL();
-        URI uri2 = url2.toURI();
         
-        assertEquals( "jdk contract", file, new File( uri ));
+        assertEquals( "jdk contract", file.getAbsoluteFile(), new File( uri ));
 
         File toFile = DataUtilities.urlToFile( url );        
-        assertEquals( path+":url", file, toFile);
-        
+        assertEquals( path+":url", file.getAbsoluteFile(), toFile);
+
         File toFile2 = DataUtilities.urlToFile( url2 );        
-        assertEquals( path+":url2", file, toFile2 );
+        assertEquals( path+":url2", file.getAbsoluteFile(), toFile2 );
     }
     /**
      * Test for {@link DataUtilities#attributeNames(FeatureType)}
