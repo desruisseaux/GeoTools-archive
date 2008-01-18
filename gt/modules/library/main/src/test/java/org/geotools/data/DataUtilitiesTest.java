@@ -110,7 +110,7 @@ public class DataUtilitiesTest extends DataTestCase {
         String prefix = "file://";
         assertURL(one, prefix+one);
         assertURL(slashOne, prefix+slashOne);
-        assertURL("C:", prefix+replaceSlashes(c));
+        assertURL(replaceSlashes(c), prefix+replaceSlashes(c));
         assertURL(replaceSlashes(cOne), prefix+replaceSlashes(cOne));
         assertURL(replaceSlashes(cOneTwo), prefix+replaceSlashes(cOneTwo));
         assertURL(replaceSlashes(cOneTwoThreeSpace), prefix+replaceSlashes(cOneTwoThreeSpace));
@@ -130,6 +130,9 @@ public class DataUtilitiesTest extends DataTestCase {
         if (os.toUpperCase().contains("WINDOWS")) {
             assertEquals( expectedFilePath.replaceAll("/", "\\\\"), file.getPath());
         }else {
+            if( expectedFilePath.endsWith("/") ){
+                expectedFilePath = expectedFilePath.substring(0,expectedFilePath.length()-1);
+            }
             assertEquals( expectedFilePath, file.getPath());
         }
         
