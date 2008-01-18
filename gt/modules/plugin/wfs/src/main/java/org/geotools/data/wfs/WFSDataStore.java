@@ -1,10 +1,9 @@
 package org.geotools.data.wfs;
 
-import java.util.List;
+import java.net.URL;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.ServiceInfo;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
@@ -23,5 +22,36 @@ public interface WFSDataStore extends DataStore {
      * 
      * @return ServiceInfo
      */
-    ServiceInfo getInfo();
+    public String getTitle(String typeName) throws NoSuchElementException;
+
+    /**
+     * 
+     * @param typeName
+     *            the type name to return the Abstract from.
+     * @return
+     * @throws NoSuchElementException
+     *             if typeName does not correspond to a FeatureType declared in
+     *             the WFS capabilities document.
+     */
+    public String getAbstract(String typeName) throws NoSuchElementException;
+
+    /**
+     * The bounds of {@code typeName} in {@code EPSG:4326} as stated in the WFS
+     * capabilities document.
+     * 
+     * @param typeName
+     *            the type name to return the WGS84 bounds from.
+     * @return
+     * @throws NoSuchElementException
+     *             if typeName does not correspond to a FeatureType declared in
+     *             the WFS capabilities document.
+     */
+    public ReferencedEnvelope getLatLonBoundingBox(String typeName) throws NoSuchElementException;
+    
+    public URL getOperation(WFSOperationType operationType, HttpMethod method);
+    
+    public String getDefaultCrs(String typeName);
+    
+    //Gonna replace the above metadta fetching methods 
+    //ServiceInfo getInfo();
 }
