@@ -73,6 +73,18 @@ public class AffineTransform2D extends XAffineTransform
     }
 
     /**
+     * Constructs a new {@code AffineTransform2D} from 6 values representing the 6 specifiable
+     * entries of the 3&times;3 transformation matrix. Those values are given unchanged to the
+     * {@link AffineTransform#AffineTransform(double,double,double,double,double,double) super
+     * class constructor}.
+     *
+     * @since 2.5
+     */
+    public AffineTransform2D(double m00, double m10, double m01, double m11, double m02, double m12) {
+        super(m00, m10, m01, m11, m02, m12);
+    }
+
+    /**
      * Throws an {@link UnsupportedOperationException} when a mutable method
      * is invoked, since {@code AffineTransform2D} must be immutable.
      */
