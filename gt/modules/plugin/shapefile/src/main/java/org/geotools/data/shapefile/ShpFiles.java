@@ -227,10 +227,34 @@ public class ShpFiles {
     public int numberOfLocks() {
         return lockers.size();
     }
-
     /**
-     * Acquire a URL for read only purposes. If the file is known not to exist
-     * the lock is not acquired. It is recommended that get*Stream or
+     * Acquire a File for read only purposes. It is recommended that get*Stream or
+     * get*Channel methods are used when reading or writing to the file is
+     * desired.
+     * 
+     * 
+     * @see #getInputStream(ShpFileType, FileReader)
+     * @see #getReadChannel(ShpFileType, FileReader)
+     * @see #getWriteChannel(ShpFileType, FileReader)
+     * 
+     * @param type
+     *                the type of the file desired.
+     * @param requestor
+     *                the object that is requesting the File. The same object
+     *                must release the lock and is also used for debugging.
+     * @return the File type requested 
+     */
+    public File acquireReadFile(ShpFileType type,
+            FileReader requestor) {
+        if(!isLocal() ){
+            throw new IllegalStateException("This method only applies if the files are local");
+        }
+        URL url = acquireRead(type, requestor);
+        return DataUtilities.urlToFile(url);
+    }
+    
+    /**
+     * Acquire a URL for read only purposes.  It is recommended that get*Stream or
      * get*Channel methods are used when reading or writing to the file is
      * desired.
      * 
@@ -244,8 +268,7 @@ public class ShpFiles {
      * @param requestor
      *                the object that is requesting the URL. The same object
      *                must release the lock and is also used for debugging.
-     * @return the URL to the file of the type requested or null if the file is
-     *         known to not exist
+     * @return the URL to the file of the type requested
      */
     public URL acquireRead(ShpFileType type, FileReader requestor) {
         readWriteLock.lock();
@@ -297,6 +320,24 @@ public class ShpFiles {
     }
 
     /**
+     * Unlocks a read lock. The file and requestor must be the the same as the
+     * one of the lockers.
+     * 
+     * @param file
+     *                file that was locked
+     * @param requestor
+     *                the class that requested the file
+     */
+    public void unlockRead(File file, FileReader requestor) {
+        Collection<URL> allURLS = urls.values();
+        for (URL url : allURLS) {
+            if (DataUtilities.urlToFile(url).equals(file)) {
+                unlockRead(url, requestor);
+            }
+        }
+    }
+
+    /**
      * Unlocks a read lock. The url and requestor must be the the same as the
      * one of the lockers.
      * 
@@ -324,8 +365,34 @@ public class ShpFiles {
     }
 
     /**
-     * Acquire a URL for read and write purposes. If the file is known not to
-     * exist the lock is not acquired
+     * Acquire a File for read and write purposes. 
+     * <p> It is recommended that get*Stream or
+     * get*Channel methods are used when reading or writing to the file is
+     * desired.
+     * </p>
+     * 
+     * @see #getInputStream(ShpFileType, FileReader)
+     * @see #getReadChannel(ShpFileType, FileReader)
+     * @see #getWriteChannel(ShpFileType, FileReader)
+
+     * 
+     * @param type
+     *                the type of the file desired.
+     * @param requestor
+     *                the object that is requesting the File. The same object
+     *                must release the lock and is also used for debugging.
+     * @return the File to the file of the type requested
+     */
+    public File acquireWriteFile(ShpFileType type,
+            FileWriter requestor) {
+        if(!isLocal() ){
+            throw new IllegalStateException("This method only applies if the files are local");
+        }
+        URL url = acquireWrite(type, requestor);
+        return DataUtilities.urlToFile(url);
+    }
+    /**
+     * Acquire a URL for read and write purposes. 
      * <p> It is recommended that get*Stream or
      * get*Channel methods are used when reading or writing to the file is
      * desired.
@@ -341,8 +408,7 @@ public class ShpFiles {
      * @param requestor
      *                the object that is requesting the URL. The same object
      *                must release the lock and is also used for debugging.
-     * @return the URL to the file of the type requested or null if the file is
-     *         known to not exist
+     * @return the URL to the file of the type requested
      */
     public URL acquireWrite(ShpFileType type, FileWriter requestor) {
         readWriteLock.lock();
@@ -394,6 +460,24 @@ public class ShpFiles {
         lockers.add(new ShpFilesLocker(url, requestor));
 
         return new Result<URL, State>(url, State.GOOD);
+    }
+
+    /**
+     * Unlocks a read lock. The file and requestor must be the the same as the
+     * one of the lockers.
+     * 
+     * @param file
+     *                file that was locked
+     * @param requestor
+     *                the class that requested the file
+     */
+    public void unlockWrite(File file, FileWriter requestor) {
+        Collection<URL> allURLS = urls.values();
+        for (URL url : allURLS) {
+            if (DataUtilities.urlToFile(url).equals(file)) {
+                unlockWrite(url, requestor);
+            }
+        }
     }
 
     /**
@@ -756,4 +840,5 @@ public class ShpFiles {
         File file = DataUtilities.urlToFile(url);
         return file.exists();
     }
+
 }

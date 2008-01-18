@@ -2,6 +2,7 @@ package org.geotools.data.shapefile;
 
 import static org.geotools.data.shapefile.ShpFileType.*;
 
+import java.io.File;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -22,6 +23,50 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
         super.tearDown();
 
         Runtime.getRuntime().runFinalization();
+    }
+
+    public void testAcquireReadFile() throws Throwable {
+        ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
+
+        try{
+        shpFiles.acquireReadFile(DBF, this);
+        fail("Not a file should send exception");
+        }catch(IllegalStateException e ){
+            // good
+        }
+        
+
+        String path = "somefile.shp";
+        shpFiles = new ShpFiles("file://"+path);
+
+        File file = shpFiles.acquireReadFile(SHP, this);
+        assertEquals(path, file.getPath());
+        assertEquals(1, shpFiles.numberOfLocks());
+        
+        shpFiles.unlockRead(file, this);
+        shpFiles.finalize();
+    }
+    public void testAcquireWriteFile() throws Throwable {
+        ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
+
+        try{
+        shpFiles.acquireWriteFile(DBF, this);
+        fail("Not a file should send exception");
+        }catch(IllegalStateException e ){
+            // good
+        }
+        
+
+        String path = "somefile.shp";
+        shpFiles = new ShpFiles("file://"+path);
+
+        File file = shpFiles.acquireWriteFile(SHP, this);
+        assertEquals(path, file.getPath());
+        assertEquals(1, shpFiles.numberOfLocks());
+        
+        shpFiles.unlockWrite(file, this);
+        assertEquals(0, shpFiles.numberOfLocks());
+        shpFiles.finalize();
     }
 
     public void testAcquireRead1() throws Throwable {
