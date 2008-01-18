@@ -380,7 +380,9 @@ public class SLDTransformer extends TransformerBase {
 
             encodeGeometryProperty(line.getGeometryPropertyName());
 
-            line.getStroke().accept(this);
+            if( line.getStroke() != null ){
+                line.getStroke().accept(this);
+            }
             end("LineSymbolizer");
         }
 

@@ -2037,7 +2037,7 @@ public final class StreamingRenderer implements GTRenderer {
                 return geom.getType().getCRS();
             }
         } else if ( currLayer.getSource() != null ) {
-        	return currLayer.getSource().getInfo().getCRS();
+        	return currLayer.getSource().getCRS();
         }
         
         return null;

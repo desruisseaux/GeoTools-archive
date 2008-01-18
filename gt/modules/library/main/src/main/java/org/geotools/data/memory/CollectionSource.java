@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.data.Transaction;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Used to quickly adapt a collection for APIs expecting to
@@ -24,9 +24,15 @@ import org.opengis.filter.capability.FilterCapabilities;
 public final class CollectionSource {
 
     private Collection collection;
-
+    private CoordinateReferenceSystem crs;
+    
     public CollectionSource( Collection collection ){
+        this( collection, null );
+    }
+    
+    public CollectionSource( Collection collection, CoordinateReferenceSystem crs ){
         this.collection = Collections.unmodifiableCollection( collection );
+        this.crs = crs;
     }
     
     public Collection content() {
@@ -73,9 +79,9 @@ public final class CollectionSource {
     public void setTransaction( Transaction t ) {
         // ignored
     }
-
-    public GeoResourceInfo getInfo() {
-        return null; // TODO: info? at least scan through for bounds
+    
+    public CoordinateReferenceSystem getCRS(){
+        return crs;
     }
 
 }
