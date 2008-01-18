@@ -120,9 +120,13 @@ public interface ResourceInfo {
     Icon getIcon();
 
     /**
-     * Returns the BBox of the resource if one exists, The null envelope otherwise.
+     * Bounding box of the resource (in the native CRS), envelope isNull otherwise.
      * <p>
-     * The bounds are returned in (ie should be reprojected to) Lat Long:
+     * You can transform this envelope to Lat Long with a single line:
+     * <code>
+     * info.getBounds().transform( DefaultGeographicCRS.WGS84, true );
+     * </code>
+     * Here are several other options for LatLong:
      * <ul>
      * <li>DefaultGeographicCRS.WGS84
      * <li>EPSG:4369 (LatLong NAD83)
@@ -133,10 +137,10 @@ public interface ResourceInfo {
      * Known Mappings:
      * <ul>
      * <li>1st part of the Dublin Core Coverage
+     * <li>wfs LatLongBbox
      * </ul>
      * </p>
-     * 
-     * @return Lat Long bounding box of the resource
+     * @return Bounding box of the resource (in natvie CRS), envelope.isNull() will return true if not known
      */
     ReferencedEnvelope getBounds();
 
@@ -147,10 +151,18 @@ public interface ResourceInfo {
      * <ul>
      * <li>2nd part of the Dublin Core Coverage
      * <li>Shapefile prj file
+     * <li>WFS SRS
      * </ul>
      * </p>
      *
      * @return CRS of the resource, or <code>null</code> if unknown.
      */
     CoordinateReferenceSystem getCRS();
+    
+    /**
+     * This method was considered because some services maintain this
+     * information as metadata. If it was a bit more common (and axis order more consistent)
+     * it would be worth considering.
+     */
+    // ReferencedEnvelope getLatLongBbox();
 }
