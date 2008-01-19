@@ -366,9 +366,21 @@
       <version>2.2.2</version>
     </dependency>
 
+    <!-- WFS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-wfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+      
+    <!-- WMS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-wms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     
-
 
     <!-- swing-layout.jar -->
     <dependency>

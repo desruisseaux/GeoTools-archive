@@ -29,6 +29,11 @@ public class ToolTreePaths {
     
     public final ToolTreePath ANALYSE = new ToolTreePath(null,"analyse");
     public final ToolTreePath ANALYSE_GEOMETRIE = new ToolTreePath(ANALYSE,"geometry");
+    
+    public final ToolTreePath DATABASE = new ToolTreePath(null,"database");
+    public final ToolTreePath DATABASE_CONVERT = new ToolTreePath(DATABASE,"convert");
+    public final ToolTreePath DATABASE_CREATE = new ToolTreePath(DATABASE,"create");
+    
     public final ToolTreePath FILE = new ToolTreePath(null,"file");
     public final ToolTreePath FILE_CONVERT = new ToolTreePath(FILE,"convert");
     public final ToolTreePath FILE_CREATE = new ToolTreePath(FILE,"create");

@@ -41,7 +41,7 @@ import org.geotools.renderer.shape.ShapefileRenderer;
 public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     private Thread thread = null;
-    private BufferComponent comp = new BufferComponent();
+    private final BufferComponent comp = new BufferComponent();
     private final MapContext buffercontext = new OneLayerContext();
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
@@ -231,7 +231,7 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     private class BufferComponent extends JComponent {
 
-        private BufferedImage img;
+        private BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
         public void setBuffer(BufferedImage buf) {
             img = buf;

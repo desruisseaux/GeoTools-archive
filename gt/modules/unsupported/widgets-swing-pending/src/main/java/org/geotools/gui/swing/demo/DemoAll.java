@@ -62,6 +62,8 @@ import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.JServerDataPanel;
+import org.geotools.gui.swing.datachooser.JWFSDataPanel;
+import org.geotools.gui.swing.datachooser.JWMSDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.JDefaultEditableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
@@ -895,6 +897,9 @@ public class DemoAll extends javax.swing.JFrame {
             if (chk_server.isSelected()) {
                 lst.add(new JServerDataPanel());
             }
+            
+            lst.add(new JWFSDataPanel());
+            lst.add(new JWMSDataPanel());
 
             JDataChooser jdc = new JDataChooser(null, lst);
 
