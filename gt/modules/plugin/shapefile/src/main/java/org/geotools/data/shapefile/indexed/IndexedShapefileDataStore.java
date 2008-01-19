@@ -830,7 +830,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
 
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
-     */
+     *
     public FeatureSource getFeatureSource(final String typeName)
             throws IOException {
         final SimpleFeatureType featureType = getSchema(typeName);
@@ -908,6 +908,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
             };
         }
     }
+    */
 
     //
     // /**

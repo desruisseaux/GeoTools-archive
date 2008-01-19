@@ -15,7 +15,11 @@
  */
 package org.geotools.data.shapefile;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.DBF;
+import static org.geotools.data.shapefile.ShpFileType.PRJ;
+import static org.geotools.data.shapefile.ShpFileType.SHP;
+import static org.geotools.data.shapefile.ShpFileType.SHP_XML;
+import static org.geotools.data.shapefile.ShpFileType.SHX;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -36,20 +40,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.AbstractFeatureLocking;
-import org.geotools.data.AbstractFeatureSource;
-import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultFIDReader;
 import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
+import org.geotools.data.ResourceInfo;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
@@ -113,7 +114,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected SimpleFeatureType schema; // read only
     protected boolean useMemoryMappedBuffer = true;
     protected Charset dbfCharset;
+    
+    private ServiceInfo info;
 
+    private ResourceInfo resourceInfo;
     /**
      * Creates a new instance of ShapefileDataStore.
      * 
@@ -189,6 +193,44 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         this(url, namespace, useMemoryMapped, DEFAULT_STRING_CHARSET);
     }
 
+    /**
+     * Access a ServiceInfo object for this shapefile.
+     * 
+     * @return ShapefileServiceInfo describing service.
+     */
+    public synchronized ServiceInfo getInfo(){
+        if( info == null ){
+            if( isLocal() ){
+                info = new ShapefileFileServiceInfo( this );
+            }
+            else {
+                info = new ShapefileURLServiceInfo( this );
+            }
+        }
+        return info;
+    }
+    
+    /**
+     * Used by FeatureSource / FeatureStore / FeatureLocking to 
+     * access a single ResourceInfo.
+     * 
+     * @param typeName
+     * @return ResourceInfo
+     */
+    synchronized ResourceInfo getInfo( String typeName ) {
+        if( resourceInfo == null ){
+            if( isLocal() ){
+                // we may be able to make this instance writable
+                // allowing users to store values into shapefile metadata?
+                resourceInfo = new ShapefileFileResourceInfo( this );
+            }
+            else {
+                resourceInfo = new ShapefileURLResourceInfo( this );
+            }
+        }
+        return resourceInfo;
+    }
+    
     /**
      * Set this if you need BDF strings to be decoded in a {@link Charset} other
      * than ISO-8859-1
@@ -896,75 +938,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         if (isWriteable) {
             if (getLockingManager() != null) {
-                return new AbstractFeatureLocking(HINTS) {
-                    public DataStore getDataStore() {
-                        return ShapefileDataStore.this;
-                    }
-
-                    public void addFeatureListener(FeatureListener listener) {
-                        listenerManager.addFeatureListener(this, listener);
-                    }
-
-                    public void removeFeatureListener(FeatureListener listener) {
-                        listenerManager.removeFeatureListener(this, listener);
-                    }
-
-                    public SimpleFeatureType getSchema() {
-                        return featureType;
-                    }
-
-                    public ReferencedEnvelope getBounds(Query query)
-                            throws IOException {
-                        return ShapefileDataStore.this.getBounds(query);
-                    }
-                };
+                return new ShapefileFeatureLocking(this, HINTS, featureType);
             }
-
-            return new AbstractFeatureStore(HINTS) {
-                public DataStore getDataStore() {
-                    return ShapefileDataStore.this;
-                }
-
-                public void addFeatureListener(FeatureListener listener) {
-                    listenerManager.addFeatureListener(this, listener);
-                }
-
-                public void removeFeatureListener(FeatureListener listener) {
-                    listenerManager.removeFeatureListener(this, listener);
-                }
-
-                public SimpleFeatureType getSchema() {
-                    return featureType;
-                }
-
-                public ReferencedEnvelope getBounds(Query query)
-                        throws IOException {
-                    return ShapefileDataStore.this.getBounds(query);
-                }
-            };
+            else {
+                return new ShapefileFeatureStore(this, HINTS, featureType);
+            }
         }
-
-        return new AbstractFeatureSource(HINTS) {
-            public DataStore getDataStore() {
-                return ShapefileDataStore.this;
-            }
-
-            public void addFeatureListener(FeatureListener listener) {
-                listenerManager.addFeatureListener(this, listener);
-            }
-
-            public void removeFeatureListener(FeatureListener listener) {
-                listenerManager.removeFeatureListener(this, listener);
-            }
-
-            public SimpleFeatureType getSchema() {
-                return featureType;
-            }
-
-            public ReferencedEnvelope getBounds(Query query) throws IOException {
-                return ShapefileDataStore.this.getBounds(query);
-            }
-        };
+        return new ShapefileFeatureSource(this, HINTS, featureType);
     }
 
     /**
@@ -1067,5 +1047,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         super.dispose();
         shpFiles.dispose();
     }
+    
 }
 
