@@ -483,9 +483,12 @@ public class Layer implements Comparable {
 
             //Locate a BBOx if we can
             while( tempBBox == null && parentLayer != null ) {
-                tempBBox = (CRSEnvelope) parentLayer.getBoundingBoxes().get(epsgCode);
+                HashMap boxes = parentLayer.getBoundingBoxes();
+                if(boxes!=null){
+                	tempBBox = (CRSEnvelope) boxes.get(epsgCode);
                 
-                parentLayer = parentLayer.getParent();
+                	parentLayer = parentLayer.getParent();
+                }
             }
     
             //Otherwise, locate a LatLon BBOX
@@ -513,9 +516,9 @@ public class Layer implements Comparable {
                 if (latLonBBox == null) {
                     //TODO could convert another bbox to latlon?
                     tempBBox = new CRSEnvelope("EPSG:4326", -180, -90, 180, 90);
+                }else{
+                	tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
                 }
-                
-                tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
             }
             
             if (tempBBox == null) {
