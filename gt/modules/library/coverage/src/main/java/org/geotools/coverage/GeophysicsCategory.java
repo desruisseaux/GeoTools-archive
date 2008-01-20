@@ -19,17 +19,15 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.Color;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -51,7 +49,7 @@ final class GeophysicsCategory extends Category {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7164422654831370784L;
-    
+
     /**
      * Creates a new instance of geophysics category.
      *
@@ -62,18 +60,20 @@ final class GeophysicsCategory extends Category {
     GeophysicsCategory(Category inverse, boolean isQuantitative) throws TransformException {
         super(inverse, isQuantitative);
     }
-    
+
     /**
      * Returns the category name localized in the specified locale.
      */
+    @Override
     public InternationalString getName() {
         assert !(inverse instanceof GeophysicsCategory);
         return inverse.getName();
     }
-    
+
     /**
      * Returns the set of colors for this category.
      */
+    @Override
     public Color[] getColors() {
         assert !(inverse instanceof GeophysicsCategory);
         return inverse.getColors();
@@ -90,6 +90,7 @@ final class GeophysicsCategory extends Category {
      *       need some more sophesticated algorithm for the most general cases. Such
      *       a general algorithm would be usefull in the super-class constructor as well.
      */
+    @Override
     public NumberRange getRange() throws IllegalStateException {
         if (range == null) try {
             final MathTransform1D tr = inverse.transform;
@@ -123,21 +124,24 @@ final class GeophysicsCategory extends Category {
      * is an identity transformation. If this category is not a quantitative one, then
      * this method returns {@code null}.
      */
+    @Override
     public MathTransform1D getSampleToGeophysics() {
         return isQuantitative() ? LinearTransform1D.IDENTITY : null;
     }
-    
+
     /**
      * Returns {@code true} if this category is quantitative.
      */
+    @Override
     public boolean isQuantitative() {
         assert !(inverse instanceof GeophysicsCategory) : inverse;
         return inverse.isQuantitative();
     }
-    
+
     /**
      * Returns a new category for the same range of sample values but a different color palette.
      */
+    @Override
     public Category recolor(final Color[] colors) {
         assert !(inverse instanceof GeophysicsCategory) : inverse;
         return inverse.recolor(colors).inverse;
@@ -146,6 +150,7 @@ final class GeophysicsCategory extends Category {
     /**
      * Changes the mapping from sample to geophysics values.
      */
+    @Override
     public Category rescale(MathTransform1D sampleToGeophysics) {
         if (sampleToGeophysics.isIdentity()) {
             return this;
@@ -157,10 +162,25 @@ final class GeophysicsCategory extends Category {
 
     /**
      * If {@code false}, returns a category with the original sample values.
+     *
+     * @deprecated Use {@link #view} instead.
      */
+    @Override
+    @Deprecated
     public Category geophysics(final boolean toGeophysics) {
         assert !(inverse instanceof GeophysicsCategory) : inverse;
         return inverse.geophysics(toGeophysics);
+    }
+
+    /**
+     * If {@link ViewType#NATIVE}, returns a category with the original sample values.
+     *
+     * @since 2.5
+     */
+    @Override
+    public Category view(final ViewType type) {
+        assert !(inverse instanceof GeophysicsCategory) : inverse;
+        return inverse.view(type);
     }
 
 
@@ -214,6 +234,7 @@ final class GeophysicsCategory extends Category {
         /**
          * Returns the minimum value with the specified inclusive or exclusive state.
          */
+        @Override
         public double getMinimum(final boolean inclusive) {
             return (inclusive == isMinIncluded()) ? getMinimum() : minimum2;
         }
@@ -221,6 +242,7 @@ final class GeophysicsCategory extends Category {
         /**
          * Returns the maximum value with the specified inclusive or exclusive state.
          */
+        @Override
         public double getMaximum(final boolean inclusive) {
             return (inclusive == isMaxIncluded()) ? getMaximum() : maximum2;
         }

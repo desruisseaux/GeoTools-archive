@@ -220,8 +220,10 @@ final class Resampler2D extends GridCoverage2D {
             }
             sameGG  = (targetGG == null || equivalent(targetGG, sourceGG));
             sameCRS = CRS.equalsIgnoreMetadata(targetCRS, sourceCRS);
-            if (sameGG && (sameCRS || CRS.equalsIgnoreMetadata(targetCRS, compatibleSourceCRS))) {
-                return sourceCoverage;
+            if (sameGG) {
+                if (sameCRS || CRS.equalsIgnoreMetadata(targetCRS, compatibleSourceCRS)) {
+                    return sourceCoverage;
+                }
             }
             if (sourceCoverage instanceof Resampler2D) {
                 final List<GridCoverage> sources = sourceCoverage.getSources();
@@ -514,8 +516,19 @@ final class Resampler2D extends GridCoverage2D {
             } else if (xmin == xminS && xmax == xmaxS &&
                        ymin == yminS && ymax == ymaxS)
             {
-                // Optimization in case we have nothing to do, not even a crop.
-                return create(sourceCoverage, sourceImage, targetGG, actionTaken);
+                /*
+                 * Optimization in case we have nothing to do, not even a crop. Reverts to the
+                 * original image BEFORE to creates Resampler2D, which is why we don't invoke
+                 * 'create' static method. Note that while there is nothing to do, the target
+                 * CRS is not identical to the source CRS (so we need to create a new coverage)
+                 * otherwise this condition would have been detected sooner in this method.
+                 */
+                switch (actionTaken) {
+                    case USE_NATIVE_VIEW:     sourceCoverage = sourceCoverage.geophysics(true);  break;
+                    case USE_GEOPHYSICS_VIEW: sourceCoverage = sourceCoverage.geophysics(false); break;
+                }
+                return new Resampler2D(sourceCoverage, sourceImage, targetGG,
+                        sourceCoverage.getSampleDimensions());
             }
         }
         /*

@@ -163,6 +163,11 @@ final class SampleTranscoder extends PointOpImage {
      */
     private static final class Descriptor extends OperationDescriptorImpl {
         /**
+         * For cross-version serialization.
+         */
+        private static final long serialVersionUID = -4204913600785080791L;
+
+        /**
          * Construct the descriptor.
          */
         public Descriptor() {

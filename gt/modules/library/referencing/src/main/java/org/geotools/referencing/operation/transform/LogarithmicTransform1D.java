@@ -87,7 +87,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * Serialized in order to avoid rounding error if this transform
      * is actually the one which was created from the inverse.
      */
-    private MathTransform inverse;
+    private MathTransform1D inverse;
 
     /**
      * Constructs a new logarithmic transform which is the
@@ -166,7 +166,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * Creates the inverse transform of this object.
      */
     @Override
-    public MathTransform inverse() {
+    public MathTransform1D inverse() {
         if (inverse == null) {
             inverse = new ExponentialTransform1D(this);
         }

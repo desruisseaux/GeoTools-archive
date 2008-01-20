@@ -15,8 +15,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -37,5 +38,21 @@ final class ProjectiveTransform2D extends ProjectiveTransform implements MathTra
      */
     public ProjectiveTransform2D(final Matrix matrix) {
         super(matrix);
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
+    }
+
+    /**
+     * Creates an inverse transform using the specified matrix.
+     */
+    @Override
+    MathTransform2D createInverse(final Matrix matrix) {
+        return new ProjectiveTransform2D(matrix);
     }
 }

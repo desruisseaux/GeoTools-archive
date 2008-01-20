@@ -192,6 +192,40 @@ public final class CoverageUtilities {
     }
 
     /**
+     * Returns {@code true} if the provided {@link GridCoverage}
+     * has {@link Category} objects with a real transformation.
+     * <p>
+     * Common use case for this method is understanding if a {@link GridCoverage} has an
+     * accompanying Geophysics or non-Geophysics view, which means a dicotomy between the
+     * coverage with the "real" data and the coverage with the rendered version of the original
+     * data exists. An example is when you have raw data whose data type is float and you want
+     * to render them using a palette. You usually do this by specifying a set of {@link Category}
+     * object which will map some intervals of the raw data to some specific colors. The rendered
+     * version that we will create using the method {@link GridCoverage2D#geophysics(false)} will
+     * be backed by a RenderedImage with an IndexColorModel representing the colors provided in
+     * the Categories.
+     *
+     * @param gridCoverage
+     *            to check for the existence of categories with tranformations
+     *            between original data and their rendered counterpart.
+     * @return {@code false} if this coverage has only a single view associated with it,
+     *         {@code true} otherwise.
+     */
+    public static boolean hasRenderingCategories(final GridCoverage gridCoverage) {
+        // getting all the SampleDimensions of this coverage, if any exist
+        final int numSampleDimensions = gridCoverage.getNumSampleDimensions();
+        if (numSampleDimensions == 0) {
+            return false;
+        }
+        final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
+        for (int i=0; i<numSampleDimensions; i++) {
+            sampleDimensions[i] = gridCoverage.getSampleDimension(i);
+        }
+        // do they have any transformation that is not the identity?
+        return hasTransform(sampleDimensions);
+    }
+
+    /**
      * Returns {@code true} if at least one of the specified sample dimensions has a
      * {@linkplain SampleDimension#getSampleToGeophysics sample to geophysics} transform
      * which is not the identity transform.
@@ -375,39 +409,5 @@ public final class CoverageUtilities {
             }
         }
         return OperationStrategy.APPLY_COLOR_EXPANSION;
-    }
-
-    /**
-     * Returns {@code true} if the provided {@link GridCoverage}
-     * has {@link Category} objects with a real transformation.
-     * <p>
-     * Common use case for this method is understanding if a {@link GridCoverage} has an
-     * accompanying Geophysiscs or non-Geophysics view, which means a dicotomy between the
-     * coverage with the "real" data and the coverage with the rendered version of the original
-     * data exists. An example is when you have raw data whose data type is float and you want
-     * to render them using a palette. You usually do this by specifying a set of {@link Category}
-     * object which will map some intervals of the raw data to some specific colors. The rendered
-     * version that we will create using the method {@link GridCoverage2D#geophysics(false)} will
-     * be backed by a RenderedImage with an IndexColorModel representing the colors provided in
-     * the Categories.
-     *
-     * @param gridCoverage
-     *            to check for the existence of categories with tranformations
-     *            between original data and their rendered counterpart.
-     * @return {@code false} if this coverage has only a single view associated with it,
-     *         {@code true} otherwise.
-     */
-    public static boolean hasRenderingCategories(final GridCoverage gridCoverage) {
-        // getting all the SampleDimensions of this coverage, if any exist
-        final int numSampleDimensions = gridCoverage.getNumSampleDimensions();
-        if (numSampleDimensions == 0) {
-            return false;
-        }
-        final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
-        for (int i=0; i<numSampleDimensions; i++) {
-            sampleDimensions[i] = gridCoverage.getSampleDimension(i);
-        }
-        // do they have any transformation that is not the identity?
-        return hasTransform(sampleDimensions);
     }
 }

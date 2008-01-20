@@ -17,7 +17,6 @@
 package org.geotools.image.jai;
 
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.awt.image.renderable.RenderedImageFactory;
@@ -93,13 +92,13 @@ public final class Registry {
     }
 
     /**
-     * Allows or disallow native acceleration for the specified JAI operation. By default, JAI uses
-     * hardware accelerated methods when available. For example, it make use of MMX instructions on
-     * Intel processors. Unfortunatly, some native method crash the Java Virtual Machine under some
-     * circonstances.  For example on JAI 1.1.2, the "Affine" operation on an image with float data
-     * type, bilinear interpolation and an {@link javax.media.jai.ImageLayout} rendering hint cause
-     * an exception in medialib native code.  Disabling the native acceleration (i.e using the pure
-     * Java version) is a convenient workaround until Sun fix the bug.
+     * Allows or disallow native acceleration for the specified operation on the given JAI instance.
+     * By default, JAI uses hardware accelerated methods when available. For example, it make use of
+     * MMX instructions on Intel processors. Unfortunatly, some native method crash the Java Virtual
+     * Machine under some circonstances. For example on JAI 1.1.2, the {@code "Affine"} operation on
+     * an image with float data type, bilinear interpolation and an {@link javax.media.jai.ImageLayout}
+     * rendering hint cause an exception in medialib native code. Disabling the native acceleration
+     * (i.e using the pure Java version) is a convenient workaround until Sun fix the bug.
      * <p>
      * <strong>Implementation note:</strong> the current implementation assumes that factories for
      * native implementations are declared in the {@code com.sun.media.jai.mlib} package, while
@@ -107,26 +106,31 @@ public final class Registry {
      * package. It work for Sun's 1.1.2 implementation, but may change in future versions. If this
      * method doesn't recognize the package, it does nothing.
      *
-     * @param operation The operation name (e.g. "Affine").
+     * @param operation The operation name (e.g. {@code "Affine"}).
      * @param allowed {@code false} to disallow native acceleration.
-     * @param jai the instance of {@link JAI} we are going to work on.
+     * @param jai The instance of {@link JAI} we are going to work on. This argument can be
+     *        omitted for the {@linkplain JAI#getDefaultInstance default JAI instance}.
      *
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854">JAI bug report 4906854</a>
+     *
+     * @since 2.5
      */
     public synchronized static void setNativeAccelerationAllowed(final String operation,
                                                                  final boolean  allowed,
                                                                  final JAI jai)
     {
-        final String             product = "com.sun.media.jai";
+        final String product = "com.sun.media.jai";
         final OperationRegistry registry = jai.getOperationRegistry();
-        final List             factories = registry.getOrderedFactoryList(
-                                           RenderedRegistryMode.MODE_NAME, operation, product);
+
+        // TODO: Check if we can remove SuppressWarnings with a future JAI version.
+        @SuppressWarnings("unchecked")
+        final List<RenderedImageFactory> factories = registry.getOrderedFactoryList(
+                RenderedRegistryMode.MODE_NAME, operation, product);
         if (factories != null) {
             RenderedImageFactory   javaFactory = null;
             RenderedImageFactory nativeFactory = null;
             Boolean               currentState = null;
-            for (final Iterator it=factories.iterator(); it.hasNext();) {
-                final RenderedImageFactory factory = (RenderedImageFactory) it.next();
+            for (final RenderedImageFactory factory : factories) {
                 final String pack = factory.getClass().getPackage().getName();
                 if (pack.equals("com.sun.media.jai.mlib")) {
                     nativeFactory = factory;
@@ -155,31 +159,17 @@ public final class Registry {
             }
         }
     }
-    
+
     /**
-     * Allows or disallow native acceleration for the specified JAI operation. By default, JAI uses
-     * hardware accelerated methods when available. For example, it make use of MMX instructions on
-     * Intel processors. Unfortunatly, some native method crash the Java Virtual Machine under some
-     * circonstances.  For example on JAI 1.1.2, the "Affine" operation on an image with float data
-     * type, bilinear interpolation and an {@link javax.media.jai.ImageLayout} rendering hint cause
-     * an exception in medialib native code.  Disabling the native acceleration (i.e using the pure
-     * Java version) is a convenient workaround until Sun fix the bug.
-     * <p>
-     * <strong>Implementation note:</strong> the current implementation assumes that factories for
-     * native implementations are declared in the {@code com.sun.media.jai.mlib} package, while
-     * factories for pure java implementations are declared in the {@code com.sun.media.jai.opimage}
-     * package. It work for Sun's 1.1.2 implementation, but may change in future versions. If this
-     * method doesn't recognize the package, it does nothing.
+     * Allows or disallow native acceleration for the specified operation on the
+     * {@linkplain JAI#getDefaultInstance default JAI instance}. This method is
+     * a shortcut for <code>{@linkplain #setNativeAccelerationAllowed(String,boolean,JAI)
+     * setNativeAccelerationAllowed}(operation, allowed, JAI.getDefaultInstance())</code>.
      *
-     * @param operation The operation name (e.g. "Affine").
-     * @param allowed {@code false} to disallow native acceleration.
-     *
-     * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854">JAI bug report 4906854</a>
+     * @see #setNativeAccelerationAllowed(String, boolean, JAI)
      */
-    public synchronized static void setNativeAccelerationAllowed(final String operation,
-                                                                 final boolean  allowed)
-    {
-    	setNativeAccelerationAllowed(operation, allowed,JAI.getDefaultInstance());
+    public static void setNativeAccelerationAllowed(final String operation, final boolean allowed) {
+    	setNativeAccelerationAllowed(operation, allowed, JAI.getDefaultInstance());
     }
 
     /**

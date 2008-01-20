@@ -1333,7 +1333,7 @@ public final class CRS {
             if (targetPt == null) {
                 try {
                     // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-                    mt = (MathTransform2D) mt.inverse();
+                    mt = mt.inverse();
                 } catch (NoninvertibleTransformException exception) {
                     unexpectedException("transform", exception);
                     return destination;

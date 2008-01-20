@@ -362,7 +362,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * Creates the inverse transform of this object.
      */
     @Override
-    public synchronized final MathTransform inverse() throws NoninvertibleTransformException {
+    public synchronized MathTransform inverse() throws NoninvertibleTransformException {
         assert isValid();
         if (inverse == null) {
             inverse = createConcatenatedTransform(transform2.inverse(), transform1.inverse());

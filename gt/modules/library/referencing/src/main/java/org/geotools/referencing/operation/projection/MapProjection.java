@@ -199,7 +199,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * The inverse of this map projection. Will be created only when needed.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform2D inverse;
 
     /**
      * Constructs a new map projection from the suplied parameters.
@@ -533,7 +533,7 @@ public abstract class MapProjection extends AbstractMathTransform
             final double distance;
             if (inverse) {
                 // Computes orthodromic distance (spherical model) in metres.
-                point = ((MathTransform2D)inverse()).transform(point, point);
+                point = inverse().transform(point, point);
                 distance  = orthodromicDistance(point, target);
                 longitude = point.getX();
                 latitude  = point.getY();
@@ -1038,13 +1038,21 @@ public abstract class MapProjection extends AbstractMathTransform
                 throw firstException;
             }
         }
+
+        /**
+         * Returns the original map projection.
+         */
+        @Override
+        public MathTransform2D inverse() {
+            return (MathTransform2D) super.inverse();
+        }
     }
 
     /**
      * Returns the inverse of this map projection.
      */
     @Override
-    public final MathTransform inverse() {
+    public final MathTransform2D inverse() {
         // No synchronization. Not a big deal if this method is invoked in
         // the same time by two threads resulting in two instances created.
         if (inverse == null) {

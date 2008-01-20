@@ -508,14 +508,14 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /** Creates the inverse transform of this object. */
         @Override
-        public MathTransform inverse() {
+        public MathTransform2D inverse() {
             if (super.inverse == null) {
                 super.inverse = new As2D(super.abridged,
                         super.a + super.da, super.b + super.db,
                         super.a, super.b, -super.dx, -super.dy, -super.dz);
                 super.inverse.inverse = this;
             }
-            return super.inverse;
+            return (MathTransform2D) super.inverse;
         }
     }
 

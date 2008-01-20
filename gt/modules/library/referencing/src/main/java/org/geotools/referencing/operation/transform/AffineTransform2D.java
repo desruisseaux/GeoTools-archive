@@ -23,7 +23,6 @@ import java.util.prefs.Preferences;
 
 import org.opengis.util.Cloneable;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -167,7 +166,7 @@ public class AffineTransform2D extends XAffineTransform
      *
      * @throws NoninvertibleTransformException if this transform can't be inverted.
      */
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
             if (isIdentity()) {
                 inverse = this;

@@ -500,11 +500,11 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * @throws NoninvertibleTransformException if no inverse warp were specified at construction time.
      */
     @Override
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
         if (inverse != null) {
             return inverse;
         } else {
-            return super.inverse();
+            return (MathTransform2D) super.inverse();
         }
     }
 

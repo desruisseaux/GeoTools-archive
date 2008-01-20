@@ -152,7 +152,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     /**
      * The inverse math transform. Will be constructed only when first requested.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform2D inverse;
 
     /**
      * Constructs a localization grid using the specified data.
@@ -593,7 +593,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * Returns the inverse transform.
      */
     @Override
-    public MathTransform inverse() {
+    public MathTransform2D inverse() {
         if (inverse == null) {
             inverse = new Inverse();
         }
@@ -717,6 +717,14 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
                 srcOff += postIncrement;
                 dstOff += postIncrement;
             }
+        }
+
+        /**
+         * Returns the original localization grid transform.
+         */
+        @Override
+        public MathTransform2D inverse() {
+            return (MathTransform2D) super.inverse();
         }
 
         /**

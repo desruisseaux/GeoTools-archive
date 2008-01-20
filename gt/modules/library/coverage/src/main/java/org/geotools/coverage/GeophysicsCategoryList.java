@@ -24,6 +24,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import javax.units.Unit;
 
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.resources.Utilities;
 
 
@@ -102,7 +103,7 @@ final class GeophysicsCategoryList extends CategoryList {
         super(categories, unit, true, inverse);
         this.unit    = unit;
         this.ndigits = getFractionDigitCount(categories);
-        assert isScaled(true);
+        assert isScaled(ViewType.GEOPHYSICS);
     }
 
     /**
@@ -116,13 +117,14 @@ final class GeophysicsCategoryList extends CategoryList {
         final double EPS = 1E-6;
         final int length=categories.length;
         for (int i=0; i<length; i++) {
-            final Category geophysics = categories[i].geophysics(true);
-            final Category samples    = categories[i].geophysics(false);
+            final Category category   = categories[i];
+            final Category geophysics = category.view(ViewType.GEOPHYSICS);
+            final Category samples    = category.view(ViewType.NATIVE);
             final double ln = Math.log10((geophysics.maximum - geophysics.minimum)/
                                          (   samples.maximum -    samples.minimum));
             if (!Double.isNaN(ln)) {
                 final int n = -(int)(Math.floor(ln + EPS));
-                if (n>ndigits) {
+                if (n > ndigits) {
                     ndigits = Math.min(n, MAX_DIGITS);
                 }
             }
@@ -139,7 +141,7 @@ final class GeophysicsCategoryList extends CategoryList {
     @Override
     public CategoryList geophysics(final boolean toGeophysics) {
         final CategoryList scaled = toGeophysics ? this : inverse;
-        assert scaled.isScaled(toGeophysics);
+        assert scaled.isScaled(toGeophysics ? ViewType.GEOPHYSICS : ViewType.NATIVE);
         return scaled;
     }
 

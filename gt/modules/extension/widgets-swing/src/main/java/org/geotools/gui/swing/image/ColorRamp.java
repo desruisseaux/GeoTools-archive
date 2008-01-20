@@ -654,7 +654,7 @@ public class ColorRamp extends JComponent {
              * We look at the derivative, which should be constant everywhere for a linear
              * scale and be proportional to the inverse of 'x' for a logarithmic one.
              */
-            tr = (MathTransform1D) tr.inverse();
+            tr = tr.inverse();
             final double EPS   = 1E-6; // For rounding error.
             final double ratio = tr.derivative(minimum) / tr.derivative(maximum);
             if (Math.abs(ratio-1) <= EPS) {

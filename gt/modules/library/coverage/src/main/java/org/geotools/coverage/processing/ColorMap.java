@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.units.Unit;
@@ -48,7 +47,7 @@ import org.geotools.resources.image.ColorUtilities;
 /**
  * Colors associated to categories. This is the parameter type for the
  * {@link org.geotools.coverage.processing.operation.Recolor} operation.
- * 
+ *
  * @since 2.4
  * @source $URL$
  * @version $Id$
@@ -78,7 +77,7 @@ public class ColorMap implements Serializable {
      * The {@link #ANY_QUANTITATIVE_CATEGORY} key is replaced by {@code null} in
      * order to avoid confusion with user-specified category with the exact name.
      */
-    private Map/*<String,Object>*/ colorMap;
+    private Map<String,Object> colorMap;
 
     /**
      * The range of values for quantitative categories. Values are {@link NumberRange} instances
@@ -87,7 +86,7 @@ public class ColorMap implements Serializable {
      * The {@link #ANY_QUANTITATIVE_CATEGORY} key is replaced by {@code null} in
      * order to avoid confusion with user-specified category with the exact name.
      */
-    private Map/*<String,NumberRange>*/ colorRanges;
+    private Map<String,NumberRange> colorRanges;
 
     /**
      * If {@code true}, the ARGB values corresponding to any {@linkplain Category category}
@@ -116,10 +115,9 @@ public class ColorMap implements Serializable {
      * @param map A map of ({@linkplain Category#getName category name},
      *        {@linkplain Color colors}) pairs.
      */
-    public ColorMap(final Map/*<? extends CharSequence,Color[]>*/ colorMap) {
-        for (final Iterator it=colorMap.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
-            setColors((CharSequence) entry.getKey(), (Color[]) entry.getValue());
+    public ColorMap(final Map<? extends CharSequence,Color[]> colorMap) {
+        for (final Map.Entry<? extends CharSequence,Color[]> entry : colorMap.entrySet()) {
+            setColors(entry.getKey(), entry.getValue());
         }
     }
 
@@ -152,7 +150,7 @@ public class ColorMap implements Serializable {
         final String name = unlocalized(category);
         if (colors != null) {
             if (colorMap == null) {
-                colorMap = new HashMap();
+                colorMap = new HashMap<String,Object>();
             }
             colorMap.put(name, colors);
         } else if (colorMap != null) {
@@ -231,7 +229,7 @@ public class ColorMap implements Serializable {
         if (colors instanceof Color) {
             return new Color[] {(Color) colors};
         }
-        return (Color[]) ((Color[]) colors).clone();
+        return ((Color[]) colors).clone();
     }
 
     /**
@@ -304,7 +302,7 @@ public class ColorMap implements Serializable {
         final String name = unlocalized(category);
         if (range != null) {
             if (colorRanges == null) {
-                colorRanges = new HashMap();
+                colorRanges = new HashMap<String,NumberRange>();
             }
             colorRanges.put(name, range);
         } else if (colorRanges != null) {
@@ -356,11 +354,11 @@ public class ColorMap implements Serializable {
             return null;
         }
         final String name = unlocalized(category);
-        NumberRange range = (NumberRange) colorRanges.get(name);
+        NumberRange range = colorRanges.get(name);
         if (range == null) {
             if (name!=null && category instanceof InternationalString) {
                 // Unlocalized name not found. Search using the localized flavor.
-                range = (NumberRange) colorRanges.get(category.toString());
+                range = colorRanges.get(category.toString());
             }
         }
         return range;
@@ -398,7 +396,7 @@ public class ColorMap implements Serializable {
             }
             MathTransform1D tr = category.getSampleToGeophysics();
             if (tr != null) try {
-                tr = (MathTransform1D) tr.inverse();
+                tr = tr.inverse();
                 minimum = tr.transform(minimum);
                 maximum = tr.transform(maximum);
             } catch (TransformException e) {
@@ -572,10 +570,10 @@ public class ColorMap implements Serializable {
      * appears last.
      */
     private CharSequence[] getCategoryNames() {
-        final Set/*<String>*/ names;
+        final Set<String> names;
         if (colorMap != null) {
             if (colorRanges != null) {
-                names = new HashSet(colorMap.keySet());
+                names = new HashSet<String>(colorMap.keySet());
                 names.addAll(colorRanges.keySet());
             } else {
                 names = colorMap.keySet();
@@ -584,11 +582,11 @@ public class ColorMap implements Serializable {
             if (colorRanges != null) {
                 names = colorRanges.keySet();
             } else {
-                names = Collections.EMPTY_SET;
+                names = Collections.emptySet();
             }
         }
         int count = names.size();
-        final CharSequence[] asArray = (CharSequence[]) names.toArray(new CharSequence[count]);
+        final CharSequence[] asArray = names.toArray(new CharSequence[count]);
         for (int i=count; --i>=0;) {
             if (asArray[i] == null) {
                 System.arraycopy(asArray, i+1, asArray, i, --count-i);

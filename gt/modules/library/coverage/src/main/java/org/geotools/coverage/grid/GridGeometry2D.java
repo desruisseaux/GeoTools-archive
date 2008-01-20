@@ -497,7 +497,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (gridToCRS2D == null) {
             return null;
         } else try {
-            return (MathTransform2D) gridToCRS2D.inverse();
+            return gridToCRS2D.inverse();
         } catch (NoninvertibleTransformException exception) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                     Classes.getClass(gridToCRS2D)), exception);

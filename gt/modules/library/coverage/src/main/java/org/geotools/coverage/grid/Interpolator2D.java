@@ -217,7 +217,7 @@ public final class Interpolator2D extends GridCoverage2D {
             //       two pixels. If we want center of mass located at pixel centers, we must keep
             //       the (0.5, 0.5) translation provided by 'GridGeometry' for interpolation other
             //       than nearest-neighbor.
-            toGrid = (MathTransform2D) transform.inverse();
+            toGrid = transform.inverse();
         } catch (NoninvertibleTransformException exception) {
             throw new IllegalArgumentException(exception);
         }

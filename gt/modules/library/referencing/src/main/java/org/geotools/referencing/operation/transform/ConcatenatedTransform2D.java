@@ -19,6 +19,7 @@ package org.geotools.referencing.operation.transform;
 
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -50,5 +51,13 @@ final class ConcatenatedTransform2D extends ConcatenatedTransform implements Mat
     @Override
     boolean isValid() {
         return super.isValid() && getSourceDimensions()==2 && getTargetDimensions()==2;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
     }
 }

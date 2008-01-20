@@ -34,8 +34,10 @@ import org.geotools.resources.LazySet;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @depreacted Please use CoverageFactoryFinder
+ *
+ * @deprecated Please use {@link CoverageFactoryFinder}.
  */
+@Deprecated
 public final class FactoryFinder {
     /**
      * Do not allows any instantiation of this class.

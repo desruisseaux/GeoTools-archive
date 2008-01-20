@@ -20,9 +20,10 @@ package org.geotools.referencing.operation.transform;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 import org.geotools.referencing.operation.matrix.XMatrix;
 
@@ -109,5 +110,13 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
         final XMatrix matrix2 = toXMatrix(transform2.derivative(transform1.transform(point,null)));
         matrix2.multiply(matrix1);
         return matrix2;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
     }
 }

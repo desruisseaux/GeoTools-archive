@@ -55,6 +55,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ColorUtilities;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.util.NumberRange;
 
 
@@ -673,8 +674,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             return null;
         }
         final CategoryList list = new CategoryList(categories, units);
-        if (CategoryList.isScaled(categories, false)) return list;
-        if (CategoryList.isScaled(categories, true )) return list.inverse;
+        if (CategoryList.isScaled(categories, ViewType.NATIVE))     return list;
+        if (CategoryList.isScaled(categories, ViewType.GEOPHYSICS)) return list.inverse;
         throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
     }
 
@@ -714,7 +715,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         boolean isMainValid = true;
         boolean qualitative = false;
         if (list != null) {
-            for (int i = list.size(); --i >= 0;) {
+            for (int i=list.size(); --i >= 0;) {
                 final MathTransform1D candidate = list.get(i).getSampleToGeophysics();
                 if (candidate == null) {
                     qualitative = true;
@@ -725,7 +726,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
                 }
                 main = candidate;
             }
-            this.isGeophysics = list.isScaled(true);
+            this.isGeophysics = list.isScaled(ViewType.GEOPHYSICS);
         } else {
             this.isGeophysics = false;
         }
@@ -867,7 +868,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 
     /**
      * Returns all categories in this sample dimension. Note that a {@link Category} object may
-     * apply to an arbitrary range of sample values.    Consequently, the first element in this
+     * apply to an arbitrary range of sample values. Consequently, the first element in this
      * collection may not be directly related to the sample value {@code 0}.
      *
      * @return The list of categories in this sample dimension, or {@code null} if none.
@@ -997,7 +998,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /**
-     * Returns the minimum value occurring in this sample dimension.
+     * Returns the minimum value occurring in this sample dimension (inclusive).
      * The default implementation fetch this value from the categories supplied at
      * construction time. If the minimum value can't be computed, then this method
      * returns {@link Double#NEGATIVE_INFINITY}.
@@ -1015,7 +1016,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /**
-     * Returns the maximum value occurring in this sample dimension.
+     * Returns the maximum value occurring in this sample dimension (inclusive).
      * The default implementation fetch this value from the categories supplied at
      * construction time. If the maximum value can't be computed, then this method
      * returns {@link Double#POSITIVE_INFINITY}.
@@ -1242,43 +1243,51 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /**
-     * If {@code true}, returns the geophysics companion of this sample dimension. By
-     * definition, a <cite>geophysics sample dimension</cite> is a sample dimension with a
-     * {@linkplain #getRange range of sample values} transformed in such a way that the
-     * {@link #getSampleToGeophysics sampleToGeophysics} transform is always the identity
-     * transform, or {@code null} if no such transform existed in the first place. In
+     * @deprecated Use {@link #view} instead.
+     */
+    @Deprecated
+    public GridSampleDimension geophysics(final boolean geo) {
+        return view(geo ? ViewType.GEOPHYSICS : ViewType.NATIVE);
+    }
+
+    /**
+     * Returns the specified view of this sample dimension. By definition, a
+     * <cite>{@linkplain ViewType#GEOPHYSICS geophysics} sample dimension</cite> is a sample
+     * dimension with a {@linkplain #getRange range of sample values} transformed in such a
+     * way that the {@link #getSampleToGeophysics sampleToGeophysics} transform is always the
+     * identity transform, or {@code null} if no such transform existed in the first place. In
      * other words, the range of sample values in all category maps directly the "real world"
      * values without the need for any transformation.
      * <p>
-     * {@code GridSampleDimension} objects live by pair: a <cite>geophysics</cite> one
-     * (used for computation) and a <cite>non-geophysics</cite> one (used for packing data, usually
-     * as integers). The {@code geo} argument specifies which object from the pair is wanted,
-     * regardless if this method is invoked on the geophysics or non-geophysics instance of the
-     * pair. In other words, the result of {@code geophysics(b1).geophysics(b2).geophysics(b3)}
-     * depends only on the value in the last call ({@code b3}).
+     * {@code GridSampleDimension} objects live by pair: a <cite>{@linkplain ViewType#GEOPHYSICS
+     * geophysics}</cite> one (used for computation) and a <cite>{@linkplain ViewType#NATIVE
+     * native}</cite> one (used for packing data, usually as integers). The {@code type} argument
+     * specifies which object from the pair is wanted, regardless if this method is invoked on the
+     * geophysics or native instance of the pair.
      *
-     * @param  geo {@code true} to get a sample dimension with an identity
+     * @param  type {@link ViewType#GEOPHYSICS} to get a sample dimension with an identity
      *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or {@code false} to get back the
-     *         original sample dimension.
+     *         sample values} matching the geophysics values, or {@link ViewType#NATIVE} to get
+     *         back the original sample dimension.
      * @return The sample dimension. Never {@code null}, but may be {@code this}.
      *
-     * @see Category#geophysics
-     * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
+     * @see Category#view
+     * @see org.geotools.coverage.grid.GridCoverage2D#view
+     *
+     * @since 2.5
      */
-    public GridSampleDimension geophysics(final boolean geo) {
-        if (geo == isGeophysics) {
+    public GridSampleDimension view(final ViewType type) {
+        if (type.equals(ViewType.GEOPHYSICS) == isGeophysics) {
             return this;
         }
         if (inverse == null) {
             if (categories != null) {
-                inverse = new GridSampleDimension(description,
-                        categories.inverse);
+                inverse = new GridSampleDimension(description, categories.inverse);
                 inverse.inverse = this;
             } else {
                 /*
                  * If there is no categories, then there is no real difference between
-                 * "geophysics" and "indexed" sample dimensions.  Both kinds of sample
+                 * "geophysics" and "native" sample dimensions.  Both kinds of sample
                  * dimensions would be identical objects, so we are better to just
                  * returns 'this'.
                  */
@@ -1445,7 +1454,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             if (category.isQuantitative()) {
                 category = category.rescale(sampleToGeophysics);
             }
-            category = category.geophysics(isGeophysics);
+            category = category.view(isGeophysics ? ViewType.GEOPHYSICS : ViewType.NATIVE);
             if (!categories[i].equals(category)) {
                 categories[i] = category;
                 changed = true;

@@ -184,7 +184,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     transient String tileEncoding;
 
     /**
-     * Construct a new grid coverage with the same parameter than the specified
+     * Constructs a new grid coverage with the same parameter than the specified
      * coverage. This constructor is useful when creating a coverage with
      * identical data, but in which some method has been overridden in order to
      * process data differently (e.g. interpolating them).
@@ -959,7 +959,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 transforms[i] = sampleDimensions[i].geophysics(false).getSampleToGeophysics();
                 if (transforms[i]!=null && !geo) {
                     // We are going to convert geophysics values to packed one.
-                    transforms[i] = (MathTransform1D) transforms[i].inverse();
+                    transforms[i] = transforms[i].inverse();
                 }
             }
             LookupTableJAI table = LookupTableFactory.create(sourceType, targetType, transforms);
@@ -1015,7 +1015,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                     }
                     if (!geo) {
                         // We are going to convert geophysics values to packed one.
-                        transform = (MathTransform1D) transform.inverse();
+                        transform = transform.inverse();
                     }
                     final double offset = transform.transform(0);
                     final double scale  = transform.derivative(Double.NaN);

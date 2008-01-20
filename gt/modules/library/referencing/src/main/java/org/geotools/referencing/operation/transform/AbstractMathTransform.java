@@ -779,11 +779,11 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
 
         /**
          * Returns the inverse of this math transform, which is the enclosing math transform.
-         * This method is declared final because some implementation assume that the inverse
+         * This behavior should not be changed since some implementation assume that the inverse
          * of {@code this} is always {@code AbstractMathTransform.this}.
          */
         @Override
-        public final MathTransform inverse() {
+        public MathTransform inverse() {
             return AbstractMathTransform.this;
         }
 

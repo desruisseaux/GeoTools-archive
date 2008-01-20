@@ -78,7 +78,7 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * The inverse of this transform. Created only when first needed.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform1D inverse;
 
     /**
      * Constructs a new linear transform. This constructor is provided for subclasses only.
@@ -154,7 +154,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * Creates the inverse transform of this object.
      */
     @Override
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    public MathTransform1D inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
             if (isIdentity()) {
                 inverse = this;
@@ -164,7 +164,7 @@ public class LinearTransform1D extends AbstractMathTransform
                 inverse.inverse = this;
                 this.inverse = inverse;
             } else {
-                inverse = super.inverse();
+                inverse = (MathTransform1D) super.inverse();
             }
         }
         return inverse;

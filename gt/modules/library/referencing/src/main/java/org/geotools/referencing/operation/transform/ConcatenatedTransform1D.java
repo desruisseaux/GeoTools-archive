@@ -22,6 +22,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -74,5 +75,13 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
         final Matrix m = derivative(p);
         assert m.getNumRow()==1 && m.getNumCol()==1;
         return m.getElement(0,0);
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform1D inverse() throws NoninvertibleTransformException {
+        return (MathTransform1D) super.inverse();
     }
 }

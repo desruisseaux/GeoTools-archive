@@ -494,7 +494,7 @@ public final class MathTransformTest extends TestCase {
         parameters.parameter("base").setValue(base);
         final MathTransform1D direct =
              (MathTransform1D) factory.createParameterizedTransform(parameters);
-        final MathTransform1D inverse = (MathTransform1D) direct.inverse();
+        final MathTransform1D inverse = direct.inverse();
         final DirectPosition1D point = new DirectPosition1D();
         for (int i=0; i<expected.length; i++) {
             final double x = input[i];

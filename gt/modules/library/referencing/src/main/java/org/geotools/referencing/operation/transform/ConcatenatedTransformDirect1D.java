@@ -19,6 +19,7 @@ package org.geotools.referencing.operation.transform;
 
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -84,5 +85,13 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
         final double value1 = transform1.derivative(value);
         final double value2 = transform2.derivative(transform1.transform(value));
         return value2 * value1;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform1D inverse() throws NoninvertibleTransformException {
+        return (MathTransform1D) super.inverse();
     }
 }
