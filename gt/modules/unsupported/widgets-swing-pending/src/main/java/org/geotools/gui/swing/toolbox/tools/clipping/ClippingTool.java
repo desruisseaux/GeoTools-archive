@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.geotools.data.DataStore;
@@ -59,8 +57,6 @@ import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
-import org.geotools.gui.swing.event.GeoMouseEvent;
-import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
 import org.geotools.gui.swing.toolbox.AbstractWidgetTool;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
@@ -162,16 +158,15 @@ public class ClippingTool extends AbstractWidgetTool {
     }
 
     private boolean verify() {
-        if( outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")
-          && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage") ){
-            
+        if (outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage") && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+
             Class jtsClass = clipLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
             if (jtsClass.equals(Polygon.class) || jtsClass.equals(MultiPolygon.class)) {
                 gui_ok.setEnabled(true);
                 return true;
             }
-            
+
         }
         gui_ok.setEnabled(false);
         return false;
@@ -282,25 +277,36 @@ public class ClippingTool extends AbstractWidgetTool {
             CoordinateReferenceSystem clipCRS,
             FeatureCollection outCol,
             SimpleFeature inSF,
-            SimpleFeatureType outType) 
+            SimpleFeatureType outType)
             throws IllegalArgumentException {
 
+        boolean sameCRS = inCRS.equals(clipCRS);
+        MathTransform transformToClipCRS = null;
+        MathTransform transformToInCRS = null;
 
         Geometry inGeom = null;
 
-        if (inCRS.equals(clipCRS)) {
+
+
+        if (sameCRS) {
             inGeom = (Geometry) inSF.getDefaultGeometry();
         } else {
+
             try {
-                MathTransform transform = CRS.findMathTransform(inCRS, clipCRS);
-                inGeom = JTS.transform((Geometry) inSF.getDefaultGeometry(), transform);
+                transformToClipCRS = CRS.findMathTransform(inCRS, clipCRS);
+                transformToInCRS = CRS.findMathTransform(clipCRS, inCRS);
+            } catch (FactoryException ex) {
+                throw new IllegalArgumentException();
+            }
+
+            try {
+                inGeom = JTS.transform((Geometry) inSF.getDefaultGeometry(), transformToClipCRS);
             } catch (MismatchedDimensionException ex) {
                 throw new IllegalArgumentException();
             } catch (TransformException ex) {
                 throw new IllegalArgumentException();
-            } catch (FactoryException ex) {
-                throw new IllegalArgumentException();
             }
+
         }
 
         if (inGeom != null) {
@@ -317,7 +323,7 @@ public class ClippingTool extends AbstractWidgetTool {
                 throw new IllegalArgumentException();
             }
 
-            
+
             if (clipCol != null) {
                 FeatureIterator ite = clipCol.features();
 
@@ -328,12 +334,23 @@ public class ClippingTool extends AbstractWidgetTool {
 
                     if (inGeom.intersects(clipGeom)) {
                         Geometry partGeom = inGeom.intersection(clipGeom);
-                        outGeom = (outGeom == null) ? partGeom : outGeom.union(partGeom) ;                        
+                        outGeom = (outGeom == null) ? partGeom : outGeom.union(partGeom);
                     }
                 }
 
                 if (outGeom != null) {
-                    
+
+                    //we project back to original CRS if needed
+                    if (!sameCRS) {
+                        try {
+                            outGeom = JTS.transform( outGeom, transformToInCRS );
+                        } catch (MismatchedDimensionException ex) {
+                            throw new IllegalArgumentException();
+                        } catch (TransformException ex) {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+
                     //we verify the geometry is a Multi-Geometry
                     if (outGeom instanceof Point) {
                         outGeom = GEOMETRY_FACTORY.createMultiPoint(new Point[]{(Point) outGeom});
@@ -355,7 +372,7 @@ public class ClippingTool extends AbstractWidgetTool {
                             values[i] = outGeom;
                         } else {
                             Object obj = inSF.getAttribute(attlink.get(oneAttribut.getName().toString()));
-                            values[i] = (obj != null) ? obj : oneAttribut.getDefaultValue() ;                            
+                            values[i] = (obj != null) ? obj : oneAttribut.getDefaultValue();
                         }
                     }
 
@@ -535,7 +552,7 @@ public class ClippingTool extends AbstractWidgetTool {
             }
 
         }
-        
+
         verify();
 }//GEN-LAST:event_gui_but_outfileActionPerformed
 
@@ -557,7 +574,7 @@ public class ClippingTool extends AbstractWidgetTool {
                 gui_jtf_inexternal.setText(inLayer.getTitle());
             }
         }
-        
+
         verify();
     }//GEN-LAST:event_gui_but_infileActionPerformed
 
@@ -579,15 +596,15 @@ public class ClippingTool extends AbstractWidgetTool {
                 gui_jtf_clipexternal.setText(clipLayer.getTitle());
             }
         }
-        
+
         verify();
     }//GEN-LAST:event_gui_but_clipfileActionPerformed
 
     private void gui_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_okActionPerformed
-        
-        
-        
-        
+
+
+
+
         new clipThread().start();                
 }//GEN-LAST:event_gui_okActionPerformed
 
@@ -663,18 +680,18 @@ public class ClippingTool extends AbstractWidgetTool {
                 String name = outStore.getTypeNames()[0];
                 FeatureSource source = outStore.getFeatureSource(name);
                 fillLayer(outCol, source);
-                
+
                 fireObjectCreation(outStore);
-                
+
             } catch (IOException ex) {
                 gui_progress.setString(error);
-            } catch (IllegalArgumentException i){
+            } catch (IllegalArgumentException i) {
                 gui_progress.setString(error);
             } finally {
                 gui_ok.setEnabled(true);
             }
 
-            
+
         }
     }
 }
