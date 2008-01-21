@@ -53,6 +53,8 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
     private boolean mustupdate = false;
     private boolean complete = false;
     private int nbthread = 0;
+    
+    private double rotation = 0d;
 
     /**
      * create a default MergeBufferedImageStrategy
@@ -258,6 +260,14 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         mergeBuffer();
     }
 
+         public void setRotation(double d) {
+        rotation = d;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+    
     //-----------------------PRIVATES CLASSES-----------------------------------
     private class DrawingThread extends Thread {
 

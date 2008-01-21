@@ -114,5 +114,19 @@ public interface RenderingStrategy {
      * @return array of StrategyListener
      */
     public StrategyListener[] getStrategyListeners();
+    
+    /**
+     * set map rotation
+     * @param d
+     */
+    public void setRotation(double d);
+    
+    /**
+     * get map rotation
+     * @return double
+     */
+    public double getRotation();
+    
+    
         
 }

@@ -18,6 +18,8 @@ package org.geotools.gui.swing.map.map2d.strategy;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.event.ComponentEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,8 +28,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,17 +45,15 @@ import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * Not optimize Strategy, use a single bufferedImage. slow.
  * Must repaint everything each time.
  * @author Johann Sorel
  */
-public class SingleBufferedImageStrategy implements RenderingStrategy {
+public class SingleVolatileImageStrategy implements RenderingStrategy {
 
     private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
     private final EventListenerList listeners = new EventListenerList();
@@ -62,18 +62,20 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private Envelope compMapArea = null;
     private ReferencedEnvelope oldAreaOfInterest = null;
     private Rectangle oldRect = null;
-    private final DrawingThread thread = new DrawingThread();
+    private final DrawingThread drawingThread = new DrawingThread();
+    private final RepaintingThread paintingThread = new RepaintingThread();
     private final BufferComponent comp = new BufferComponent();
     private final MapContext buffercontext = new OneLayerContext();
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
+    private boolean isDrawing = false;
     
     private double rotation = 0d;
 
     /**
      * create a default SingleBufferedImageStrategy
      */
-    public SingleBufferedImageStrategy() {
+    public SingleVolatileImageStrategy() {
         this(new ShapefileRenderer());
     }
 
@@ -81,7 +83,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
      * create a default SingleBufferedImageStrategy with a specific GTRenderer
      * @param renderer
      */
-    public SingleBufferedImageStrategy(GTRenderer renderer) {
+    public SingleVolatileImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();
 
@@ -105,7 +107,8 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
         });
 
-        thread.start();
+        drawingThread.start();
+        paintingThread.start();
 
     }
 
@@ -177,7 +180,10 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private void fit() {
 
         if (checkAspect() && context != null) {
-            reset();
+            compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+            mustupdate = true;
+            drawingThread.wake();
+            paintingThread.wake();
         }
 
 
@@ -202,8 +208,39 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         return changed;
     }
 
+    private synchronized void renderOn(Graphics2D ig) {
+
+        Rectangle newRect = comp.getBounds();
+        Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
+
+        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+            getRenderer().setContext(context);
+            try {
+                getRenderer().paint((Graphics2D) ig, mapRectangle, context.getAreaOfInterest());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private synchronized VolatileImage createBackBuffer() {
+
+        Rectangle newRect = comp.getBounds();
+        Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
+
+
+        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+            return GC.createCompatibleVolatileImage(mapRectangle.width, mapRectangle.height, VolatileImage.TRANSLUCENT);
+        } else {
+            return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
+        }
+    }
+
+
     //------------------TRIGGERS------------------------------------------------
     private void fireRenderingEvent(boolean isRendering) {
+
+        isDrawing = isRendering;
 
         StrategyListener[] lst = getStrategyListeners();
 
@@ -266,25 +303,8 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
 
-            
-            AffineTransform transform = null;
-            try{
-               AffineTransform  t1 = RendererUtilities.worldToScreenTransform(compMapArea, newRect, context.getCoordinateReferenceSystem());
-               transform = new AffineTransform(t1);
-                transform.rotate(rotation);
-            }catch (TransformException e){
-                e.printStackTrace();
-            }
-            
             renderer.setContext(context);
-            
-            if(transform != null){
-                renderer.paint((Graphics2D)ig, newRect, transform);
-            }else{                
-                renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
-            }
-            
-            
+            renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
             return buf;
         } else {
             return null;
@@ -301,9 +321,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     }
 
     public void reset() {
-        compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
-            mustupdate = true;
-            thread.wake();
+        fit();
     }
 
     public void setRenderer(GTRenderer renderer) {
@@ -362,16 +380,15 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     public StrategyListener[] getStrategyListeners() {
         return listeners.getListeners(StrategyListener.class);
     }
-    
+
      public void setRotation(double d) {
         rotation = d;
-        reset();
     }
 
     public double getRotation() {
         return rotation;
     }
-
+    
     //------------------------PRIVATES CLASSES----------------------------------
     private class MapLayerListListen implements MapLayerListListener {
 
@@ -411,7 +428,9 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
                     mustupdate = false;
                     fireRenderingEvent(true);
                     if (context != null && compMapArea != null) {
-                        comp.setBuffer(createBufferImage(context));
+                        VolatileImage img = createBackBuffer();
+                        comp.setBuffer(img);
+                        renderOn(img.createGraphics());
                     }
                     fireRenderingEvent(false);
                 }
@@ -433,11 +452,46 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         }
     }
 
+    private class RepaintingThread extends Thread {
+
+        @Override
+        public void run() {
+
+            while (true) {
+
+                comp.repaint();
+
+                while (isDrawing) {
+                    try {
+                        sleep(300);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    comp.repaint();
+                }
+
+                block();
+            }
+        }
+
+        public synchronized void wake() {
+            notifyAll();
+        }
+
+        private synchronized void block() {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private class BufferComponent extends JComponent {
 
-        private BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        private VolatileImage img = null;
 
-        public void setBuffer(BufferedImage buf) {
+        public void setBuffer(VolatileImage buf) {
             img = buf;
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -449,7 +503,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         }
 
         public BufferedImage getBuffer() {
-            return img;
+            return img.getSnapshot();
         }
 
         @Override
@@ -459,8 +513,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
         }
         }
-
-   
 }
     
     

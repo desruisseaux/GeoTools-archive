@@ -50,6 +50,7 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -66,6 +67,7 @@ import org.geotools.styling.Symbolizer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
  * Default implementation of navigableMap2D
@@ -165,6 +167,23 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
         Filter f = null;
 
+//        MathTransform transform = null;
+//        
+//        try {
+//                transform = CRS.findMathTransform(, clipCRS);
+//            } catch (FactoryException ex) {
+//                throw new IllegalArgumentException();
+//            }
+//
+//            try {
+//                inGeom = JTS.transform((Geometry) inSF.getDefaultGeometry(), transformToClipCRS);
+//            } catch (MismatchedDimensionException ex) {
+//                throw new IllegalArgumentException();
+//            } catch (TransformException ex) {
+//                throw new IllegalArgumentException();
+//            }
+        
+        
         try {
             String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
             if (name.equals("")) {
