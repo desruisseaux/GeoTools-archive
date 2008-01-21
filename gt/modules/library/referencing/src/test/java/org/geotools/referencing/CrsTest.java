@@ -84,6 +84,13 @@ public final class CrsTest extends TestCase {
     }
 
     /**
+     * Tests simple decode.
+     */
+    public void testDecode() throws FactoryException {
+        assertSame(DefaultGeographicCRS.WGS84, CRS.decode("WGS84(DD)"));
+    }
+
+    /**
      * Tests the transformations of an envelope.
      */
     public void testEnvelopeTransformation() throws FactoryException, TransformException {
