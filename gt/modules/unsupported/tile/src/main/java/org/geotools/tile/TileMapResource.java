@@ -3,8 +3,8 @@ package org.geotools.tile;
 import java.io.IOException;
 import java.net.URI;
 
-import org.geotools.repository.AbstractGeoResource;
-import org.geotools.repository.GeoResourceInfo;
+import javax.net.ssl.SSLEngineResult$Status;
+
 import org.geotools.util.ProgressListener;
 
 public class TileMapResource extends AbstractGeoResource {

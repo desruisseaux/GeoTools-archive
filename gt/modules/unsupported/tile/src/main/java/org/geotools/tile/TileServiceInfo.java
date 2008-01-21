@@ -1,6 +1,6 @@
 package org.geotools.tile;
 
-import org.geotools.repository.ServiceInfo;
+import org.geotools.data.ServiceInfo;
 
 
 /**

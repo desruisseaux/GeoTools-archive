@@ -1,4 +1,4 @@
-package org.geotools.repository.property;
+package org.geotools.catalog.property;
 
 import java.io.File;
 import java.io.FilenameFilter;
