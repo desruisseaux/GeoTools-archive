@@ -13,16 +13,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.wfs;
+package org.geotools.wfs.protocol;
 
 /**
- * Enumeration for the possible operations a WFS may implement.
+ * Enumeration to specify the preferred HTTP method a WFS datastore to use then
+ * accessing WFS operations.
  * 
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
  * @URL $URL$
  */
-public enum WFSOperationType {
-    GET_CAPABILITIES, DESCRIBE_FEATURETYPE, GET_FEATURE, GET_GML_OBJECT, LOCK_FEATURE, GET_FEATURE_WITH_LOCK, TRANSACTION;
+public enum HttpMethod {
+    GET, POST;
 }

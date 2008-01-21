@@ -15,8 +15,9 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
-import static org.geotools.data.wfs.HttpMethod.*;
-import static org.geotools.data.wfs.WFSOperationType.*;
+import static org.geotools.wfs.protocol.HttpMethod.GET;
+import static org.geotools.wfs.protocol.HttpMethod.POST;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,14 +31,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,9 +58,7 @@ import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.data.wfs.HttpMethod;
 import org.geotools.data.wfs.WFSDataStore;
-import org.geotools.data.wfs.WFSOperationType;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
@@ -74,6 +72,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
+import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
@@ -168,14 +167,18 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     public ServiceInfo getInfo() {
         return new ServiceInfo(){
             public String getDescription() {
-                return getAbstract();
+                return capabilities.getService().get_abstract();
             }
 
             public Icon getIcon() {
                 return null; // talk to Eclesia the icons are in renderer?
             }
             public Set<String> getKeywords() {
-                return getKeywords();
+                String[] keywordList = capabilities.getService().getKeywordList();
+                if (keywordList == null) {
+                    return Collections.emptySet();
+                }
+                return new HashSet<String>(Arrays.asList(keywordList));
             }
 
             public URI getPublisher() {
@@ -183,7 +186,11 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             }
 
             public URI getSchema() {
-                return null; // WFS 1.0.0 uri here
+                try {
+                    return new URI("http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd");
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             public URI getSource() {
@@ -198,91 +205,6 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
                 return capabilities.getService().getTitle();
             }            
         };
-    }
-    /**
-     * @see WFSDataStore#getTitle()
-     */
-    public String getTitle() {
-        return capabilities.getService().getTitle();
-    }
-
-    /**
-     * @see WFSDataStore#getAbstract()
-     */
-    public String getAbstract() {
-        return capabilities.getService().get_abstract();
-    }
-
-    /**
-     * @see WFSDataStore#getKeywords()
-     */
-    public List<String> getKeywords() {
-        String[] keywordList = capabilities.getService().getKeywordList();
-        if (keywordList == null) {
-            return Collections.emptyList();
-        }
-        return new ArrayList<String>(Arrays.asList(keywordList));
-    }
-
-    /**
-     * @see WFSDataStore#getTitle(String)
-     */
-    public String getTitle(String typeName) throws NoSuchElementException {
-        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
-                capabilities, typeName);
-        if (featureSetDescription == null) {
-            throw new NoSuchElementException(typeName);
-        }
-        return featureSetDescription.getTitle();
-    }
-
-    /**
-     * @see WFSDataStore#getAbstract(String)
-     */
-    public String getAbstract(String typeName) throws NoSuchElementException {
-        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
-                capabilities, typeName);
-        if (featureSetDescription == null) {
-            throw new NoSuchElementException(typeName);
-        }
-        return featureSetDescription.getAbstract();
-    }
-
-    /**
-     * @see WFSDataStore#getLatLonBoundingBox(String)
-     */
-    public ReferencedEnvelope getLatLonBoundingBox(String typeName) throws NoSuchElementException {
-        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
-                capabilities, typeName);
-        if (featureSetDescription == null) {
-            throw new NoSuchElementException(typeName);
-        }
-        Envelope envelope = featureSetDescription.getLatLongBoundingBox();
-        ReferencedEnvelope latLonEnv = new ReferencedEnvelope(envelope, DefaultGeographicCRS.WGS84);
-        return latLonEnv;
-    }
-
-    /**
-     * @see WFSDataStore#getDefaultCrs(String)
-     */
-    public String getDefaultCrs(String typeName) {
-        FeatureSetDescription featureSetDescription = WFSCapabilities.getFeatureSetDescription(
-                capabilities, typeName);
-        if (featureSetDescription == null) {
-            throw new NoSuchElementException(typeName);
-        }
-        return featureSetDescription.getSRS();
-    }
-
-    /**
-     * @see WFSDataStore#getOperation(WFSOperationType, HttpMethod)
-     */
-    public URL getOperation(WFSOperationType operationType, HttpMethod method) {
-        try {
-            return connectionFactory.getOperationURL(operationType, method);
-        } catch (UnsupportedOperationException e) {
-            return null;
-        }
     }
 
     private void determineCorrectStrategy() {
@@ -907,7 +829,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * 
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
+    public WFSFeatureSource getFeatureSource(String typeName) throws IOException {
         if (capabilities.getTransaction() != null) {
             // if(capabilities.getLockFeature()!=null){
             // return new WFSFeatureLocking(this,getSchema(typeName));

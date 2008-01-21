@@ -21,6 +21,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 
@@ -30,6 +32,7 @@ import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
@@ -39,57 +42,80 @@ import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 /**
  * {@link FeatureSource} extension interface to provide WFS specific extra
  * information.
- *
- * @author dzwiers 
- * @source $URL$
+ * 
+ * @author dzwiers
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_0_0/data/WFSFeatureSource.java $
  */
-public class WFSFeatureSource extends AbstractFeatureSource {
+public class WFSFeatureSource extends AbstractFeatureSource implements org.geotools.data.wfs.WFSFeatureSource{
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
+
     protected WFS_1_0_0_DataStore ds;
+
     protected String fname;
+
+    private FeatureSetDescription featureSetDescription;
 
     protected WFSFeatureSource(WFS_1_0_0_DataStore ds, String fname) {
         this.ds = ds;
         this.fname = fname;
+        this.featureSetDescription = WFSCapabilities.getFeatureSetDescription(ds.getCapabilities(),
+                fname);
     }
 
     /**
      * Resource information from the wfs capabilities document.
+     * 
      * @return ResoruceInfo from the capabilities document
      */
-    public ResourceInfo getInfo(){
-        return new ResourceInfo(){
+    public ResourceInfo getInfo() {
+        return new ResourceInfo() {
             public ReferencedEnvelope getBounds() {
-                return ds.getLatLonBoundingBox( fname );
+                try {
+                    return ds.getBounds(new DefaultQuery(fname));
+                } catch (IOException e) {
+                    return new ReferencedEnvelope();
+                }
             }
+
             public CoordinateReferenceSystem getCRS() {
-                return getBounds().getCoordinateReferenceSystem();
+                try {
+                    return CRS.decode(featureSetDescription.getSRS());
+                } catch (NoSuchAuthorityCodeException e) {
+                    LOGGER.log(Level.INFO, e.getMessage(), e);
+                } catch (FactoryException e) {
+                    LOGGER.log(Level.INFO, e.getMessage(), e);
+                }
+                return null;
             }
+
             public String getDescription() {
-                return ds.getAbstract( fname );
+                return featureSetDescription.getAbstract();
             }
+
             public Icon getIcon() {
                 return null; // Talk to Eclisia!
             }
+
+            @SuppressWarnings("unchecked")
             public Set<String> getKeywords() {
-                Set words = new HashSet();
-                words.addAll( ds.getKeywords() );
-                words.add( fname );
-                
-                return words; // probably should be unmodifiable?
+                return new HashSet<String>(featureSetDescription.getKeywords());
             }
 
             public String getName() {
                 return fname;
             }
 
-            
             public URI getSchema() {
                 try {
                     return ds.connectionFactory.getDescribeFeatureTypeURLGet(fname).toURI();
@@ -101,16 +127,15 @@ public class WFSFeatureSource extends AbstractFeatureSource {
             }
 
             public String getTitle() {
-                FeatureSetDescription descriptor =
-                    WFSCapabilities.getFeatureSetDescription(
-                        ds.capabilities, fname );
-                
-                return descriptor != null ? descriptor.getTitle() : fname;                
-                //return ds.getTitle( fname );
-            }            
-        };        
+                String title = featureSetDescription.getTitle();
+                if (null == title || title.trim().length() == 0) {
+                    title = getName();
+                }
+                return title;
+            }
+        };
     }
-    
+
     /**
      * 
      * @see org.geotools.data.FeatureSource#getDataStore()
@@ -140,11 +165,11 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getSchema()
      */
     public SimpleFeatureType getSchema() {
-    	try {
-			return ds.getSchema(fname);
-		} catch (IOException e) {
-			return null;
-		}
+        try {
+            return ds.getSchema(fname);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     /**
@@ -152,8 +177,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getBounds()
      */
     public ReferencedEnvelope getBounds() throws IOException {
-        return getBounds((fname == null) ? Query.ALL
-                                      : new DefaultQuery(fname));
+        return getBounds((fname == null) ? Query.ALL : new DefaultQuery(fname));
     }
 
     /**
@@ -184,20 +208,20 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) throws IOException  {
-        SimpleFeatureType schema = getSchema();        
+    public FeatureCollection getFeatures(Query query) throws IOException {
+        SimpleFeatureType schema = getSchema();
         String typeName = schema.getTypeName();
-        
-        if( query.getTypeName() == null ){ // typeName unspecified we will "any" use a default
+
+        if (query.getTypeName() == null) { // typeName unspecified we will
+            // "any" use a default
             DefaultQuery defaultQuery = new DefaultQuery(query);
-            defaultQuery.setTypeName( typeName );
+            defaultQuery.setTypeName(typeName);
         }
-        
-        if( !typeName.equals( query.getTypeName() ) ){
-            return new EmptyFeatureCollection( schema );
-        }
-        else {
-            return new DefaultFeatureResults(this, query);    
+
+        if (!typeName.equals(query.getTypeName())) {
+            return new EmptyFeatureCollection(schema);
+        } else {
+            return new DefaultFeatureResults(this, query);
         }
     }
 
@@ -215,6 +239,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      */
     public static class WFSFeatureResults extends DefaultFeatureResults {
         private WFSFeatureSource fs;
+
         private Query query;
 
         /**
@@ -223,7 +248,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * @param query
          */
         public WFSFeatureResults(WFSFeatureSource fs, Query query) throws IOException {
-        	super(fs, query);
+            super(fs, query);
             this.query = query;
             this.fs = fs;
         }
@@ -232,7 +257,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * 
          * @see org.geotools.data.FeatureResults#getSchema()
          */
-        public SimpleFeatureType getSchema(){
+        public SimpleFeatureType getSchema() {
             return fs.getSchema();
         }
 
@@ -248,13 +273,13 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * 
          * @see org.geotools.data.FeatureResults#getBounds()
          */
-        public ReferencedEnvelope getBounds(){
+        public ReferencedEnvelope getBounds() {
             try {
-				return fs.getBounds(query);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+                return fs.getBounds(query);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         /**

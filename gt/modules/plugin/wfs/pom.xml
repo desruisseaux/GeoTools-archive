@@ -107,7 +107,8 @@
           <excludes>
             <!-- The following tests are skipped because they do not extend OnlineTestCase -->
             <exclude>**/WFSDataStoreTest.java</exclude>
-            <exclude>**/WFSDataStoreFactoryTest.java</exclude>
+            <exclude>**/WFSFeatureSourceTest.java</exclude>
+
             <exclude>**/CubewerksOnlineTest.java</exclude>
             <exclude>**/DMSolutionOnlineTest.java</exclude>
             <exclude>**/GeoServerOnlineTest.java</exclude>

@@ -15,8 +15,8 @@
  */
 package org.geotools.data.wfs;
 
-import static org.geotools.data.wfs.HttpMethod.GET;
-import static org.geotools.data.wfs.HttpMethod.POST;
+import static org.geotools.wfs.protocol.HttpMethod.GET;
+import static org.geotools.wfs.protocol.HttpMethod.POST;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +42,9 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
-import org.geotools.wfs.io.WFSConnectionFactory;
+import org.geotools.wfs.protocol.HttpMethod;
+import org.geotools.wfs.protocol.Version;
+import org.geotools.wfs.protocol.WFSConnectionFactory;
 import org.geotools.wfs.v_1_0_0.data.WFS100ProtocolHandler;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.wfs.v_1_1_0.data.WFS110ProtocolHandler;
@@ -525,7 +527,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             Version requestVersion = highest;
             String version = params.get("VERSION");
             if (version != null) {
-                requestVersion = Version.valueOf(version);
+                requestVersion = Version.find(version);
             }
             return createGetCapabilitiesRequest(host, requestVersion);
         }

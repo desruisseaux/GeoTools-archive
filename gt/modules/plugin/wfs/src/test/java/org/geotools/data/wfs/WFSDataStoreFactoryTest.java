@@ -17,8 +17,9 @@ import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
 public class WFSDataStoreFactoryTest extends TestCase {
 
     private WFSDataStoreFactory dsf;
+
     private Map params;
-    
+
     public WFSDataStoreFactoryTest(String name) {
         super(name);
     }
@@ -36,15 +37,16 @@ public class WFSDataStoreFactoryTest extends TestCase {
     }
 
     public void testCanProcess() {
-        //URL not set
+        // URL not set
         assertFalse(dsf.canProcess(params));
-        
-        params.put(WFSDataStoreFactory.URL.key, "http://someserver.example.org/wfs?request=GetCapabilities");
+
+        params.put(WFSDataStoreFactory.URL.key,
+                "http://someserver.example.org/wfs?request=GetCapabilities");
         assertTrue(dsf.canProcess(params));
-        
+
         params.put(WFSDataStoreFactory.USERNAME.key, "groldan");
         assertFalse(dsf.canProcess(params));
-        
+
         params.put(WFSDataStoreFactory.PASSWORD.key, "secret");
         assertTrue(dsf.canProcess(params));
     }
@@ -56,7 +58,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
 
         capabilitiesFile = "deegree_capabilities_1_1_0.xml";
         testCreateDataStore_WFS_1_1_0(capabilitiesFile);
-}
+    }
 
     private void testCreateDataStore_WFS_1_1_0(String capabilitiesFile) throws IOException {
         // override caps loading not to set up an http connection at all but to

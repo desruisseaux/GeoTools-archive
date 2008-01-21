@@ -15,12 +15,10 @@
  */
 package org.geotools.data.wfs;
 
-import java.net.URL;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.io.IOException;
 
 import org.geotools.data.DataStore;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.data.ServiceInfo;
 
 /**
  * {@link DataStore} extension interface to provide WFS specific extra
@@ -29,51 +27,18 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStore.java $
  */
 public interface WFSDataStore extends DataStore {
-    
-    public String getTitle();
-    
     /**
-     * Provide access to ServiceInfo generated from the wfs capabilities document.
-     * 
-     * @return ServiceInfo
+     * @return service information
      */
-    public String getTitle(String typeName) throws NoSuchElementException;
+    ServiceInfo getInfo();
 
-    public String getAbstract();
-    
     /**
-     * 
-     * @param typeName
-     *            the type name to return the Abstract from.
-     * @return
-     * @throws NoSuchElementException
-     *             if typeName does not correspond to a FeatureType declared in
-     *             the WFS capabilities document.
+     * Overrides getFeatureSource to return WFSFeatureSource while the standard
+     * API does not defines a getInfo method
      */
-    public String getAbstract(String typeName) throws NoSuchElementException;
-
-    public List<String> getKeywords();
-    
-    /**
-     * The bounds of {@code typeName} in {@code EPSG:4326} as stated in the WFS
-     * capabilities document.
-     * 
-     * @param typeName
-     *            the type name to return the WGS84 bounds from.
-     * @return
-     * @throws NoSuchElementException
-     *             if typeName does not correspond to a FeatureType declared in
-     *             the WFS capabilities document.
-     */
-    public ReferencedEnvelope getLatLonBoundingBox(String typeName) throws NoSuchElementException;
-    
-    public URL getOperation(WFSOperationType operationType, HttpMethod method);
-    
-    public String getDefaultCrs(String typeName);
-    
-    //Gonna replace the above metadta fetching methods 
-    //ServiceInfo getInfo();
+    WFSFeatureSource getFeatureSource(String typeName) throws IOException;
 }

@@ -15,7 +15,8 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
-import static org.geotools.data.wfs.HttpMethod.*;
+import static org.geotools.wfs.protocol.HttpMethod.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
