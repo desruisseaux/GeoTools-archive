@@ -23,8 +23,6 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.units.Unit;
-
-import org.geotools.coverage.grid.ViewType;
 import org.geotools.resources.Utilities;
 
 
@@ -103,7 +101,7 @@ final class GeophysicsCategoryList extends CategoryList {
         super(categories, unit, true, inverse);
         this.unit    = unit;
         this.ndigits = getFractionDigitCount(categories);
-        assert isScaled(ViewType.GEOPHYSICS);
+        assert isGeophysics(true);
     }
 
     /**
@@ -118,10 +116,10 @@ final class GeophysicsCategoryList extends CategoryList {
         final int length=categories.length;
         for (int i=0; i<length; i++) {
             final Category category   = categories[i];
-            final Category geophysics = category.view(ViewType.GEOPHYSICS);
-            final Category samples    = category.view(ViewType.NATIVE);
+            final Category geophysics = category.geophysics(true);
+            final Category packed     = category.geophysics(false);
             final double ln = Math.log10((geophysics.maximum - geophysics.minimum)/
-                                         (   samples.maximum -    samples.minimum));
+                                         (    packed.maximum -     packed.minimum));
             if (!Double.isNaN(ln)) {
                 final int n = -(int)(Math.floor(ln + EPS));
                 if (n > ndigits) {
@@ -133,15 +131,15 @@ final class GeophysicsCategoryList extends CategoryList {
     }
 
     /**
-     * If {@code toGeophysics} is {@code false}, cancel the action of a previous
-     * call to {@code geophysics(true)}. This method always returns a list of categories
-     * in which <code>{@link Category#geophysics(boolean) Category.geophysics}(toGeophysics)</code>
+     * If {@code geo} is {@code false}, cancel the action of a previous call to
+     * {@code geophysics(true)}. This method always returns a list of categories in which
+     * <code>{@linkplain Category#geophysics(boolean) Category.geophysics}(geo)</code>
      * has been invoked for each category.
      */
     @Override
-    public CategoryList geophysics(final boolean toGeophysics) {
-        final CategoryList scaled = toGeophysics ? this : inverse;
-        assert scaled.isScaled(toGeophysics ? ViewType.GEOPHYSICS : ViewType.NATIVE);
+    public CategoryList geophysics(final boolean geo) {
+        final CategoryList scaled = geo ? this : inverse;
+        assert scaled.isGeophysics(geo);
         return scaled;
     }
 

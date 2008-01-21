@@ -107,7 +107,7 @@ final class GridCoverageViews {
                     continue;
                 }
                 photographic = false;
-                if (band != band.view(ViewType.GEOPHYSICS)) {
+                if (band != band.geophysics(true)) {
                     geophysics = false;
                 }
             }
@@ -118,7 +118,7 @@ final class GridCoverageViews {
         } else if (photographic) {
             type = ViewType.PHOTOGRAPHIC;
         } else {
-            type = ViewType.NATIVE;
+            type = ViewType.PACKED;
         }
         views.put(type, coverage);
     }
@@ -163,13 +163,14 @@ final class GridCoverageViews {
             }
             image = op.getSourceImage(0);
         }
+        final boolean                geophysics = ViewType.GEOPHYSICS.equals(type);
         final SampleModel           sourceModel = image.getSampleModel();
         final int                      numBands = sourceModel.getNumBands();
         final GridSampleDimension[] sourceBands = coverage.getSampleDimensions();
         final GridSampleDimension[] targetBands = sourceBands.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {
-            targetBands[i] = targetBands[i].view(type);
+            targetBands[i] = targetBands[i].geophysics(geophysics);
         }
         /*
          * If the target bands are equal to the source bands, then there is nothing to do.

@@ -31,12 +31,12 @@ import javax.media.jai.operator.ScaleDescriptor; // For javadoc
  * in different ways. Some views are more appropriate than others depending of the kind of work
  * to be performed. For example numerical computations on meteorological or oceanographical data
  * should be performed on the {@linkplain #GEOPHYSICS geophysics} view, while renderings are
- * better performed with the {@linkplain #DISPLAYABLE displayable} view.
+ * better performed with the {@linkplain #RENDERED rendered} view.
  * <p>
  * Different views are sometime synonymous for a given coverage. For example the
- * {@linkplain #NATIVE native} and {@linkplain #DISPLAYABLE displayable} views are identical
+ * {@linkplain #NATIVE native} and {@linkplain #RENDERED rendered} views are identical
  * when the coverage values are unsigned 8 or 16 bits integers, but distincts if the native
- * values are <em>signed</em> integers. This is because in the later case, the negative values
+ * values are 32 bits integers. This is because in the later case, the 32 bits integer values
  * can not be processed directly by an {@linkplain IndexColorModel index color model}.
  *
  * @since 2.4
@@ -55,8 +55,8 @@ public enum ViewType {
      * their conditions):
      * <p>
      * <ul>
-     *   <li>If the values are stored as unsigned integers, then the native view may
-     *       be identical to the {@linkplain #DISPLAYABLE displayable} view.</li>
+     *   <li>If the values are stored as unsigned integers not greater than 16 bits, then the
+     *       native view may be identical to the {@linkplain #RENDERED rendered} view.</li>
      *   <li>If all missing values are represented by {@linkplain Float#isNaN some kind of
      *       NaN values}, then the native view may be identical to the
      *       {@linkplain #GEOPHYSICS geophysics} view.</li>
@@ -64,9 +64,22 @@ public enum ViewType {
      * <p>
      * Interpolations other than {@linkplain InterpolationNearest nearest neighbor} are
      * not allowed. Conversions to the RGB color space are not allowed neither, for the
-     * same reasons than the {@linkplain #DISPLAYABLE displayable} view.
+     * same reasons than the {@linkplain #RENDERED rendered} view.
      */
     NATIVE(false, false, false),
+
+    /**
+     * Coverage data are packed, usually as integers convertible to geophysics values. The conversion
+     * is performed by the {@linkplain org.geotools.coverage.GridSampleDimension#getSampleToGeophysics
+     * sample to geophysics} transform.
+     * <p>
+     * This view is often synonymous to {@link #RENDERED}, but may be different for some data types
+     * that are incompatible with {@linkplain IndexColorModel index color model} (e.g. 32 bits
+     * integer). This view is always exclusive with {@link #GEOPHYSICS}.
+     *
+     * @since 2.5
+     */
+    PACKED(false, false, false),
 
     /**
      * Coverage data are compatible with common Java2D {@linkplain ColorModel color models}.
@@ -87,7 +100,7 @@ public enum ViewType {
      * interpolation between a "real" value (for example a value convertible to the above-cited
      * SST) and "pad" value would produce a wrong result.
      */
-    DISPLAYABLE(false, false, false),
+    RENDERED(false, false, false),
 
     /**
      * Coverage data are the values of some geophysics phenomenon, for example an elevation
@@ -124,6 +137,12 @@ public enum ViewType {
      * or similar color space instead.
      */
     PHOTOGRAPHIC(true, true, true);
+
+    /**
+     * @deprecated Renamed as {@link #RENDERED}.
+     */
+    @Deprecated
+    public static final ViewType DISPLAYABLE = RENDERED;
 
     /**
      * {@code true} if interpolations other than {@linkplain InterpolationNearest

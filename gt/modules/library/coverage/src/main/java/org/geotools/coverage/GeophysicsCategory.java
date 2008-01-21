@@ -162,25 +162,12 @@ final class GeophysicsCategory extends Category {
 
     /**
      * If {@code false}, returns a category with the original sample values.
-     *
-     * @deprecated Use {@link #view} instead.
      */
     @Override
-    @Deprecated
-    public Category geophysics(final boolean toGeophysics) {
+    public Category geophysics(final boolean geo) {
+        // Assertion below is for preventing recursive invocation.
         assert !(inverse instanceof GeophysicsCategory) : inverse;
-        return inverse.geophysics(toGeophysics);
-    }
-
-    /**
-     * If {@link ViewType#NATIVE}, returns a category with the original sample values.
-     *
-     * @since 2.5
-     */
-    @Override
-    public Category view(final ViewType type) {
-        assert !(inverse instanceof GeophysicsCategory) : inverse;
-        return inverse.view(type);
+        return inverse.geophysics(geo);
     }
 
 

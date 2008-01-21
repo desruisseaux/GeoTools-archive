@@ -40,7 +40,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
-import org.geotools.coverage.grid.ViewType;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.wkt.UnformattableObjectException;
@@ -156,7 +155,7 @@ class CategoryList extends AbstractList<Category>
     private transient InternationalString name;
 
     /**
-     * Construct a category list using the specified array of categories.
+     * Constructs a category list using the specified array of categories.
      *
      * @param  categories The list of categories.
      * @param  units The geophysics unit, or {@code null} if none.
@@ -167,15 +166,15 @@ class CategoryList extends AbstractList<Category>
             throws IllegalArgumentException
     {
         this(categories, units, false, null);
-        assert isScaled(ViewType.NATIVE);
+        assert isGeophysics(false);
     }
 
     /**
-     * Construct a category list using the specified array of categories.
+     * Constructs a category list using the specified array of categories.
      *
      *         <STRONG>This constructor is for internal use only</STRONG>
      *
-     * It is not private only because {@link GeophysicsCategoryList} need this constructor.
+     * It is not private only because {@link GeophysicsCategoryList} needs this constructor.
      *
      * @param  categories The list of categories.
      * @param  units The geophysics unit, or {@code null} if none.
@@ -192,23 +191,22 @@ class CategoryList extends AbstractList<Category>
             throws IllegalArgumentException
     {
         /*
-         * Check if we are constructing a geophysics category list,  then rescale all cagegories
+         * Checks if we are constructing a geophysics category list, then rescale all cagegories
          * according. We may loose the user intend by doing so (he may have specified explicitly
          * a list of GeophysicsCategory), but this is the SampleDimension's job to keep trace of
          * it.
          */
-        final ViewType type = (this instanceof GeophysicsCategoryList) ?
-                ViewType.GEOPHYSICS : ViewType.NATIVE;
-        assert (inverse != null ? ViewType.GEOPHYSICS : ViewType.NATIVE) == type;
+        final boolean geophysics = (inverse != null);
+        assert geophysics == (this instanceof GeophysicsCategoryList) : geophysics;
         this.categories = categories = categories.clone();
         for (int i=0; i<categories.length; i++) {
-            categories[i] = categories[i].view(type);
+            categories[i] = categories[i].geophysics(geophysics);
         }
         Arrays.sort(categories, this);
         assert isSorted(categories);
-        assert isScaled(type);
+        assert isGeophysics(geophysics);
         /*
-         * Construct the array of Category.minimum values. During
+         * Constructs the array of Category.minimum values. During
          * the loop, we make sure there is no overlapping ranges.
          */
         boolean hasGaps = false;
@@ -220,7 +218,7 @@ class CategoryList extends AbstractList<Category>
                 final Category previous = categories[i-1];
                 if (compare(minimum, previous.maximum) <= 0) {
                     // Two categories have overlapping range;
-                    // Format an error message...............
+                    // Formats an error message.
                     final NumberRange range1 = categories[i-1].getRange();
                     final NumberRange range2 = categories[i-0].getRange();
                     final Comparable[] args = new Comparable[] {
@@ -238,7 +236,7 @@ class CategoryList extends AbstractList<Category>
                     }
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.RANGE_OVERLAP_$4, args));
                 }
-                // Check if there is a gap between this category and the previous one.
+                // Checks if there is a gap between this category and the previous one.
                 if (!Double.isNaN(minimum) && minimum!=previous.getRange().getMaximum(false)) {
                     hasGaps = true;
                 }
@@ -253,7 +251,7 @@ class CategoryList extends AbstractList<Category>
         final long nodataBits = Double.doubleToRawLongBits(Double.NaN);
         for (int i=categories.length; --i>=0;) {
             final Category candidate = categories[i];
-            final double value = candidate.view(ViewType.GEOPHYSICS).minimum;
+            final double value = candidate.geophysics(true).minimum;
             if (Double.isNaN(value)) {
                 nodata = candidate;
                 if (Double.doubleToRawLongBits(value) == nodataBits) {
@@ -274,7 +272,7 @@ class CategoryList extends AbstractList<Category>
         for (int i=categories.length; --i>=0;) {
             final Category candidate = categories[i];
             if (candidate.isQuantitative()) {
-                final Category candidatePeer = candidate.view(ViewType.NATIVE);
+                final Category candidatePeer = candidate.geophysics(false);
                 final double candidateRange = candidatePeer.maximum - candidatePeer.minimum;
                 if (candidateRange >= range) {
                     range = candidateRange;
@@ -337,9 +335,8 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
-     * La comparaison ne tient pas compte des valeurs {@code NaN}. Cette
-     * méthode n'est utilisée que pour les {@code assert}.
+     * Returns {@code true} if the specified categories are sorted. This method
+     * ignores {@code NaN} values. This method is used for assertions only.
      */
     static boolean isSorted(final Category[] categories) {
         for (int i=1; i<categories.length; i++) {
@@ -414,38 +411,44 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * If {@code toGeophysics} is {@code true}, returns a list of categories scaled
-     * to geophysics values. This method always returns a list of categories in which
-     * {@link Category#view} has been invoked for each category.
+     * If {@code geo} is {@code true}, returns a list of categories scaled to
+     * geophysics values. This method always returns a list of categories in which
+     * <code>{@linkplain Category#geophysics(boolean) Category.geophysics}(geo)</code>
+     * has been invoked for each category.
      */
-    public CategoryList geophysics(final boolean toGeophysics) {
-        final CategoryList scaled = toGeophysics ? inverse : this;
-        assert scaled.isScaled(toGeophysics ? ViewType.GEOPHYSICS : ViewType.NATIVE);
+    public CategoryList geophysics(final boolean geo) {
+        final CategoryList scaled = geo ? inverse : this;
+        assert scaled.isGeophysics(geo);
         return scaled;
     }
 
     /**
-     * Verify if all categories are scaled to the specified state.
-     * This is used mostly in assertion statements.
+     * Verifies if all categories are of the specified type. {@code true} is for
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} and {@code false} is
+     * for {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} data. This method is used
+     * mostly in assertion statements.
      *
-     * @param  type The desired state for every categories.
-     * @return {@code true} if all categories are in the specified state.
+     * @param  geo The desired type for every categories.
+     * @return {@code true} if all categories are in the specified type.
      */
-    final boolean isScaled(final ViewType type) {
-        return isScaled(categories, type);
+    final boolean isGeophysics(final boolean geo) {
+        return isGeophysics(categories, geo);
     }
 
     /**
-     * Verify if all categories are scaled to the specified state.
+     * Verifies if all categories are of the specified type. {@code true} is for
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} and {@code false} is
+     * for {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} data. This method is used
+     * mostly in assertion statements.
      *
      * @param  categories The categories to test.
-     * @param  type The desired state for every categories.
-     * @return {@code true} if all categories are in the specified state.
+     * @param  geo The desired type for every categories.
+     * @return {@code true} if all categories are in the specified type.
      */
-    static boolean isScaled(final Category[] categories, final ViewType type) {
+    static boolean isGeophysics(final Category[] categories, final boolean geo) {
         for (int i=0; i<categories.length; i++) {
             final Category category = categories[i];
-            if (category.view(type) != category) {
+            if (category.geophysics(geo) != category) {
                 return false;
             }
         }

@@ -30,11 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import javax.units.Unit;
-
 import javax.media.jai.JAI;
-import javax.media.jai.util.Range;  // For javadoc
 
-import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.PaletteInterpretation;
@@ -55,7 +52,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ColorUtilities;
-import org.geotools.coverage.grid.ViewType;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 
 
@@ -121,8 +118,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * <p>
      * Assertions:
      *  <ul>
-     *    <li>{@code isGeophysics} == {@code categories.isScaled(true)}.</li>
-     *    <li>{@code isGeophysics} != {@code categories.isScaled(false)}, except
+     *    <li>{@code isGeophysics} == {@code categories.isGeophysics(true)}.</li>
+     *    <li>{@code isGeophysics} != {@code categories.isGeophysics(false)}, except
      *        if {@code categories.geophysics(true) == categories.geophysics(false)}</li>
      * </ul>
      */
@@ -177,15 +174,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     private final InternationalString description;
 
     /**
-     * Constructs a sample dimension with no description and no category.
-     *
-     * @deprecated Use {@link #GridSampleDimension(CharSequence)} instead.
-     */
-    public GridSampleDimension() {
-        this(null, (CategoryList) null);
-    }
-
-    /**
      * Constructs a sample dimension with specified name and no category.
      *
      * @param description
@@ -224,26 +212,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         // ("Relax constraint on placement of this()/super() call in constructors").
         this(description, list(categoriesNames));
-    }
-
-    /**
-     * Constructs a sample dimension with a set of qualitative categories only.
-     * This constructor expects only a sequence of category names for the values
-     * contained in a sample dimension. This allows for names to be assigned to
-     * numerical values. The first entry in the sequence relates to a cell value
-     * of zero. For example: [0]="Background", [1]="Water", [2]="Forest",
-     * [3]="Urban". The created sample dimension will have no unit and a default
-     * set of colors.
-     *
-     * @param categoriesNames
-     *            Sequence of category names for the values contained in a
-     *            sample dimension, as {@link String} or
-     *            {@link InternationalString} objects.
-     *
-     * @deprecated Replaced by {@link #GridSampleDimension(CharSequence, CharSequence[])}.
-     */
-    public GridSampleDimension(final CharSequence[] categoriesNames) {
-        this(null, categoriesNames);
     }
 
     /** Constructs a list of categories. Used by constructors only. */
@@ -288,29 +256,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         // ("Relax constraint on placement of this()/super() call in constructors").
         this(description, list(names, colors));
-    }
-
-    /**
-     * Constructs a sample dimension with a set of qualitative categories and
-     * colors. This constructor expects a sequence of category names for the
-     * values contained in a sample dimension. This allows for names to be
-     * assigned to numerical values. The first entry in the sequence relates to
-     * a cell value of zero. For example: [0]="Background", [1]="Water",
-     * [2]="Forest", [3]="Urban". The created sample dimension will have no unit
-     * and a default set of colors.
-     *
-     * @param names
-     *            Sequence of category names for the values contained in a
-     *            sample dimension, as {@link String} or
-     *            {@link InternationalString} objects.
-     * @param colors
-     *            Color to assign to each category. This array must have the
-     *            same length than {@code names}.
-     *
-     * @deprecated Replaced by {@link #GridSampleDimension(CharSequence, CharSequence[], Color[])}.
-     */
-    public GridSampleDimension(final CharSequence[] names, final Color[] colors) {
-        this(null, names, colors);
     }
 
     /** Constructs a list of categories. Used by constructors only. */
@@ -640,42 +585,14 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         this(description, list(categories, units));
     }
 
-    /**
-     * Constructs a sample dimension with an arbitrary set of categories, which
-     * may be both quantitative and qualitative. It is possible to specify more
-     * than one quantitative categories, providing that their sample value
-     * ranges do not overlap. Quantitative categories can map sample values to
-     * geophysics values using arbitrary relation (not necessarly linear).
-     *
-     * @param categories
-     *            The list of categories.
-     * @param units
-     *            The unit information for this sample dimension. May be
-     *            {@code null} if no category has units. This unit apply to
-     *            values obtained after the
-     *            {@link #getSampleToGeophysics sampleToGeophysics}
-     *            transformation.
-     * @throws IllegalArgumentException
-     *             if {@code categories} contains incompatible categories. If
-     *             may be the case for example if two or more categories have
-     *             overlapping ranges of sample values.
-     *
-     * @deprecated Use {@link #GridSampleDimension(CharSequence, Category[], Unit)} instead.
-     */
-    public GridSampleDimension(final Category[] categories, final Unit units)
-            throws IllegalArgumentException
-    {
-        this(null, categories, units);
-    }
-
     /** Construct a list of categories. Used by constructors only. */
     private static CategoryList list(final Category[] categories, final Unit units) {
         if (categories == null) {
             return null;
         }
         final CategoryList list = new CategoryList(categories, units);
-        if (CategoryList.isScaled(categories, ViewType.NATIVE))     return list;
-        if (CategoryList.isScaled(categories, ViewType.GEOPHYSICS)) return list.inverse;
+        if (CategoryList.isGeophysics(categories, false)) return list;
+        if (CategoryList.isGeophysics(categories, true )) return list.inverse;
         throw new IllegalArgumentException(Errors.format(ErrorKeys.MIXED_CATEGORIES));
     }
 
@@ -726,7 +643,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
                 }
                 main = candidate;
             }
-            this.isGeophysics = list.isScaled(ViewType.GEOPHYSICS);
+            this.isGeophysics = list.isGeophysics(true);
         } else {
             this.isGeophysics = false;
         }
@@ -763,11 +680,10 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /**
-     * Wrap the specified OpenGIS's sample dimension into a Geotools's
+     * Wraps the specified OpenGIS's sample dimension into a Geotools's
      * implementation of {@code GridSampleDimension}.
      *
-     * @param sd
-     *            The sample dimension to wrap into a Geotools implementation.
+     * @param sd The sample dimension to wrap into a Geotools implementation.
      */
     public static GridSampleDimension wrap(final SampleDimension sd) {
         if (sd instanceof GridSampleDimension) {
@@ -803,7 +719,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * Returns a code value indicating grid value data type.
      * This will also indicate the number of bits for the data type.
      *
-     * @return a code value indicating grid value data type.
+     * @return A code value indicating grid value data type.
      */
     public SampleDimensionType getSampleDimensionType() {
         final NumberRange range = getRange();
@@ -1049,9 +965,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @see #getMinimumValue
      * @see #getMaximumValue
      *
-     * @todo We should do a better job in {@code CategoryList.getRange()} when selecting
-     *       the appropriate data type. {@link TypeMap#getSampleDimensionType(Range)}
-     *       may be of some help.
+     * @todo We should do a better job in {@code CategoryList.getRange()} when selecting the
+     *       appropriate data type. {@link TypeMap#getSampleDimensionType} may be of some help.
      */
     public NumberRange getRange() {
         return (categories!=null) ? categories.getRange() : null;
@@ -1243,41 +1158,35 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     }
 
     /**
-     * @deprecated Use {@link #view} instead.
-     */
-    @Deprecated
-    public GridSampleDimension geophysics(final boolean geo) {
-        return view(geo ? ViewType.GEOPHYSICS : ViewType.NATIVE);
-    }
-
-    /**
-     * Returns the specified view of this sample dimension. By definition, a
-     * <cite>{@linkplain ViewType#GEOPHYSICS geophysics} sample dimension</cite> is a sample
-     * dimension with a {@linkplain #getRange range of sample values} transformed in such a
-     * way that the {@link #getSampleToGeophysics sampleToGeophysics} transform is always the
-     * identity transform, or {@code null} if no such transform existed in the first place. In
-     * other words, the range of sample values in all category maps directly the "real world"
-     * values without the need for any transformation.
+     * Returns the {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} or
+     * {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} view of this sample dimension.
+     * By definition, a <cite>geophysics sample dimension</cite> is a sample dimension with a
+     * {@linkplain #getRange range of sample values} transformed in such a way that the
+     * {@linkplain #getSampleToGeophysics sample to geophysics} transform is always the
+     * {@linkplain MathTransform1D#isIdentity identity} transform, or {@code null} if no such
+     * transform existed in the first place. In other words, the range of sample values in all
+     * {@linkplain Category categories} maps directly the "<cite>real world</cite>" values
+     * without the need for any transformation.
      * <p>
-     * {@code GridSampleDimension} objects live by pair: a <cite>{@linkplain ViewType#GEOPHYSICS
-     * geophysics}</cite> one (used for computation) and a <cite>{@linkplain ViewType#NATIVE
-     * native}</cite> one (used for packing data, usually as integers). The {@code type} argument
-     * specifies which object from the pair is wanted, regardless if this method is invoked on the
-     * geophysics or native instance of the pair.
+     * {@code GridSampleDimension} objects live by pair: a
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} one (used for
+     * computation) and a {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} one
+     * (used for storing data, usually as integers). The {@code geo} argument specifies which
+     * object from the pair is wanted, regardless if this method is invoked on the geophysics or
+     * packed instance of the pair.
      *
-     * @param  type {@link ViewType#GEOPHYSICS} to get a sample dimension with an identity
+     * @param  geo {@code true} to get a sample dimension with an identity
      *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or {@link ViewType#NATIVE} to get
-     *         back the original sample dimension.
+     *         values} matching the {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     *         geophysics} values, or {@code false} to get back the
+     *         {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} sample dimension.
      * @return The sample dimension. Never {@code null}, but may be {@code this}.
      *
-     * @see Category#view
+     * @see Category#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#view
-     *
-     * @since 2.5
      */
-    public GridSampleDimension view(final ViewType type) {
-        if (type.equals(ViewType.GEOPHYSICS) == isGeophysics) {
+    public GridSampleDimension geophysics(final boolean geo) {
+        if (geo == isGeophysics) {
             return this;
         }
         if (inverse == null) {
@@ -1287,7 +1196,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             } else {
                 /*
                  * If there is no categories, then there is no real difference between
-                 * "geophysics" and "native" sample dimensions.  Both kinds of sample
+                 * "geophysics" and "packed" sample dimensions. Both kinds of sample
                  * dimensions would be identical objects, so we are better to just
                  * returns 'this'.
                  */
@@ -1359,8 +1268,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Returns a color model for this sample dimension. The default implementation create a color
      * model with 1 band using each category's colors as returned by {@link Category#getColors}.
-     * The returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * {@code GridSampleDimension} instance is "geophysics", or an integer data type otherwise.
+     * The returned color model will typically use {@link java.awt.image.DataBuffer#TYPE_FLOAT} if
+     * this sample dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     * geophysics}, or an integer data type otherwise.
      * <p>
      * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
      * special implementations of {@code GridSampleDimension}. In this particular case,
@@ -1382,8 +1292,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Returns a color model for this sample dimension. The default implementation create the
      * color model using each category's colors as returned by {@link Category#getColors}. The
-     * returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * {@code GridSampleDimension} instance is "geophysics", or an integer data type otherwise.
+     * returned color model will typically use {@link java.awt.image.DataBuffer#TYPE_FLOAT} if
+     * this sample dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     * geophysics}, or an integer data type otherwise.
      *
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
@@ -1454,7 +1365,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             if (category.isQuantitative()) {
                 category = category.rescale(sampleToGeophysics);
             }
-            category = category.view(isGeophysics ? ViewType.GEOPHYSICS : ViewType.NATIVE);
+            category = category.geophysics(isGeophysics);
             if (!categories[i].equals(category)) {
                 categories[i] = category;
                 changed = true;

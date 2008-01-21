@@ -27,7 +27,6 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
-import org.geotools.coverage.grid.ViewType;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
@@ -790,53 +789,41 @@ public class Category implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #view} instead.
-     */
-    @Deprecated
-    public Category geophysics(final boolean geo) {
-        return geo ? inverse : this;
-    }
-
-    /**
-     * Returns the specified view of this category.
-     * By definition, a <cite>{@linkplain ViewType#GEOPHYSICS geophysics} category</cite> is a
-     * category with a {@linkplain #getRange range of sample values} transformed in such a way
-     * that the {@link #getSampleToGeophysics sampleToGeophysics} transform is always the identity
-     * transform, or {@code null} if no such transform existed in the first place. In other words,
-     * the range of sample values in a geophysics category maps directly the "real world" values
-     * without the need for any transformation.
+     * Returns the {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} or
+     * {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} of this category.
+     * By definition, a <cite>geophysics category</cite> is a category with a
+     * {@linkplain #getRange range of sample values} transformed in such a way that the
+     * {@linkplain #getSampleToGeophysics sample to geophysics} transform is always the
+     * {@linkplain MathTransform1D#isIdentity identity} transform, or {@code null} if no
+     * such transform existed in the first place. In other words, the range of sample values
+     * in a geophysics category maps directly the "<cite>real world</cite>" values without the
+     * need for any transformation.
      * <p>
      * {@code Category} objects live by pair: a
-     * <cite>{@linkplain ViewType#GEOPHYSICS geophysics}</cite> one (used for computation)
-     * and a <cite>{@linkplain ViewType#NATIVE native}</cite> one (used for packing data,
-     * usually as integers). The {@code type} argument specifies which object from the pair
-     * is wanted, regardless if this method is invoked on the geophysics or native instance
-     * of the pair.
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} one (used for
+     * computation) and a {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} one
+     * (used for storing data, usually as integers). The {@code geo} argument specifies which
+     * object from the pair is wanted, regardless if this method is invoked on the geophysics or
+     * packed instance of the pair.
      * <p>
-     * Newly constructed categories are native (i.e. a {@linkplain #getSampleToGeophysics
-     * sample to geophysics} transform must be applied in order to gets geophysics values).
+     * Newly constructed categories are {@linkplain org.geotools.coverage.grid.ViewType#PACKED
+     * packed} (i.e. a {@linkplain #getSampleToGeophysics sample to geophysics} transform must
+     * be applied in order to gets {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     * geophysics} values).
      *
-     * @param  type {@link ViewType#GEOPHYSICS} to get a category with an identity
-     *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or {@link ViewType#NATIVE} to get
-     *         back the original category (the one constructed with {@code new Category(...)}).
+     * @param  geo {@code true} to get a category with an identity
+     *         {@linkplain #getSampleToGeophysics transform} and a
+     *         {@linkplain #getRange range of values} matching the
+     *         {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} values, or
+     *         {@code false} to get the {@linkplain org.geotools.coverage.grid.ViewType#PACKED
+     *         packed} category (the one constructed with {@code new Category(...)}).
      * @return The category. Never {@code null}, but may be {@code this}.
      *
-     * @see GridSampleDimension#view
+     * @see GridSampleDimension#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#view
-     *
-     * @since 2.5
      */
-    public Category view(final ViewType type) {
-        switch (type) {
-            case PHOTOGRAPHIC: // Fall through
-            case DISPLAYABLE:  // Fall through
-            case NATIVE:      return this;
-            case GEOPHYSICS:  return inverse;
-            default: {
-                throw new IllegalArgumentException();
-            }
-        }
+    public Category geophysics(final boolean geo) {
+        return geo ? inverse : this;
     }
 
     /**
