@@ -143,8 +143,8 @@ public class JMap2DMouseCoordPanel extends javax.swing.JPanel {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         
-        if(map != null && map.getContext() != null){
-            defaultCRS = map.getContext().getCoordinateReferenceSystem();            
+        if(map != null && map.getRenderingStrategy().getContext() != null){
+            defaultCRS = map.getRenderingStrategy().getContext().getCoordinateReferenceSystem();            
         }
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -188,7 +188,7 @@ public class JMap2DMouseCoordPanel extends javax.swing.JPanel {
             event.getX();
             
             Rectangle rec = map.getComponent().getBounds();            
-            Envelope env = map.getMapArea();
+            Envelope env = map.getRenderingStrategy().getMapArea();
             
             if(env!=null && rec!= null){
                 GeometryFactory geofact = new GeometryFactory();
@@ -197,7 +197,7 @@ public class JMap2DMouseCoordPanel extends javax.swing.JPanel {
                 
                 
                 if(defaultCRS != null){
-                    CoordinateReferenceSystem sourceCRS = map.getContext().getCoordinateReferenceSystem();
+                    CoordinateReferenceSystem sourceCRS = map.getRenderingStrategy().getContext().getCoordinateReferenceSystem();
                     CoordinateReferenceSystem targetCRS = defaultCRS;
                     
                     try{

@@ -61,8 +61,7 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
 
                         if (map != null && layer != null) {
                             try {
-                                map.setMapArea(layer.getBounds());
-                                map.refresh();
+                                map.getRenderingStrategy().setMapArea(layer.getBounds());
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }

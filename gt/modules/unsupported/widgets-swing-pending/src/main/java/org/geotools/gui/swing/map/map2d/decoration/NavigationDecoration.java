@@ -108,13 +108,13 @@ public class NavigationDecoration extends JPanel implements MapDecoration{
         gui_east.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(map != null && map.getMapArea() != null){
-                    Envelope oldEnv = map.getMapArea();
+                if(map != null && map.getRenderingStrategy().getMapArea() != null){
+                    Envelope oldEnv = map.getRenderingStrategy().getMapArea();
                     double deplacement = oldEnv.getWidth()/ratio;                    
                     Coordinate coord1 = new Coordinate(oldEnv.getMinX() + deplacement, oldEnv.getMinY());
                     Coordinate coord2 = new Coordinate(oldEnv.getMaxX() + deplacement, oldEnv.getMaxY());                    
                     Envelope newEnv = new Envelope( coord1,coord2);
-                    map.setMapArea(newEnv);                    
+                    map.getRenderingStrategy().setMapArea(newEnv);                    
                 }
             }
         });
@@ -122,13 +122,13 @@ public class NavigationDecoration extends JPanel implements MapDecoration{
         gui_north.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(map != null && map.getMapArea() != null){
-                    Envelope oldEnv = map.getMapArea();
+                if(map != null && map.getRenderingStrategy().getMapArea() != null){
+                    Envelope oldEnv = map.getRenderingStrategy().getMapArea();
                     double deplacement = oldEnv.getWidth()/ratio;                    
                     Coordinate coord1 = new Coordinate(oldEnv.getMinX() , oldEnv.getMinY() + deplacement);
                     Coordinate coord2 = new Coordinate(oldEnv.getMaxX() , oldEnv.getMaxY() + deplacement);                    
                     Envelope newEnv = new Envelope( coord1,coord2);
-                    map.setMapArea(newEnv);                    
+                    map.getRenderingStrategy().setMapArea(newEnv);                    
                 }
             }
         });
@@ -136,13 +136,13 @@ public class NavigationDecoration extends JPanel implements MapDecoration{
         gui_south.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(map != null && map.getMapArea() != null){
-                    Envelope oldEnv = map.getMapArea();
+                if(map != null && map.getRenderingStrategy().getMapArea() != null){
+                    Envelope oldEnv = map.getRenderingStrategy().getMapArea();
                     double deplacement = oldEnv.getWidth()/ratio;                    
                     Coordinate coord1 = new Coordinate(oldEnv.getMinX(), oldEnv.getMinY() - deplacement);
                     Coordinate coord2 = new Coordinate(oldEnv.getMaxX(), oldEnv.getMaxY() - deplacement);                    
                     Envelope newEnv = new Envelope( coord1,coord2);
-                    map.setMapArea(newEnv);                    
+                    map.getRenderingStrategy().setMapArea(newEnv);                    
                 }
             }
         });
@@ -150,13 +150,13 @@ public class NavigationDecoration extends JPanel implements MapDecoration{
         gui_west.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(map != null && map.getMapArea() != null){
-                    Envelope oldEnv = map.getMapArea();
+                if(map != null && map.getRenderingStrategy().getMapArea() != null){
+                    Envelope oldEnv = map.getRenderingStrategy().getMapArea();
                     double deplacement = oldEnv.getWidth()/ratio;                    
                     Coordinate coord1 = new Coordinate(oldEnv.getMinX() - deplacement, oldEnv.getMinY());
                     Coordinate coord2 = new Coordinate(oldEnv.getMaxX() - deplacement, oldEnv.getMaxY());                    
                     Envelope newEnv = new Envelope( coord1,coord2);
-                    map.setMapArea(newEnv);                    
+                    map.getRenderingStrategy().setMapArea(newEnv);                    
                 }
             }
         });

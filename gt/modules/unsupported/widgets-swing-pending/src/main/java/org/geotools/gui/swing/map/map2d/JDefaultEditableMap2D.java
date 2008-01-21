@@ -243,6 +243,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private void editAddGeometry(Geometry[] geoms) {
 
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null && editionLayer != null) {
 
             for (Geometry geom : geoms) {
@@ -374,6 +376,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private void setMemoryLayerGeometry(List<Geometry> geoms) {
 
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null && memoryLayer != null) {
 
             for (Geometry geom : geoms) {
@@ -458,26 +462,26 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     //---------------------MAP 2D-----------------------------------------------
-    @Override
-    public void setMapArea(Envelope mapArea) {
-        super.setMapArea(mapArea);
-
-        repaintMemoryLayer();
-    }
-
-    @Override
-    public void setContext(MapContext newcontext) {
-
-        if (this.context != null) {
-            this.context.removeMapLayerListListener(mapLayerListlistener);
-        }
-
-        if (newcontext != null) {
-            newcontext.addMapLayerListListener(mapLayerListlistener);
-        }
-
-        super.setContext(newcontext);
-    }
+//    @Override
+//    public void setMapArea(Envelope mapArea) {
+//        super.setMapArea(mapArea);
+//
+//        repaintMemoryLayer();
+//    }
+//
+//    @Override
+//    public void setContext(MapContext newcontext) {
+//
+//        if (this.context != null) {
+//            this.context.removeMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        if (newcontext != null) {
+//            newcontext.addMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        super.setContext(newcontext);
+//    }
 
     //--------------------EDITABLE MAP2D----------------------------------------
     public void setEditedMapLayer(MapLayer layer) {

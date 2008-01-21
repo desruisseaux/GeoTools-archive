@@ -112,7 +112,6 @@ public class DemoAll extends javax.swing.JFrame {
     private final WidgetToolDescriptor vdem2csvTool = new VDem2CSVTTDescriptor();
     private final WidgetToolDescriptor svg2mifTool = new SVG2MIFTTDescriptor();
     private final WidgetToolDescriptor clipTool = new ClippingTTDescriptor();
-    
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
@@ -153,7 +152,7 @@ public class DemoAll extends javax.swing.JFrame {
 
             public void contextActivated(TreeContextEvent event) {
                 if (event.getMapContext() != null) {
-                    map.setContext(event.getMapContext());
+                    map.getRenderingStrategy().setContext(event.getMapContext());
                 }
             }
 
@@ -224,19 +223,8 @@ public class DemoAll extends javax.swing.JFrame {
             }
         });
 
-        SwingUtilities.invokeLater(new Runnable() {
+        map.getRenderingStrategy().setContext(context);
 
-            public void run() {
-                map.setContext(context);
-
-                try {
-                    map.setMapArea(map.getContext().getLayerBounds());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-
-            }
-        });
 
     }
 
@@ -897,7 +885,7 @@ public class DemoAll extends javax.swing.JFrame {
             if (chk_server.isSelected()) {
                 lst.add(new JServerDataPanel());
             }
-            
+
             lst.add(new JWFSDataPanel());
             lst.add(new JWMSDataPanel());
 
@@ -964,7 +952,7 @@ public class DemoAll extends javax.swing.JFrame {
     }//GEN-LAST:event_guiChkShapeCreateToolActionPerformed
 
     private void jCheckBoxMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem1ActionPerformed
-       if (jCheckBoxMenuItem1.isSelected()) {
+        if (jCheckBoxMenuItem1.isSelected()) {
             tooltree.addTool(clipTool);
         } else {
             tooltree.removeTool(clipTool);

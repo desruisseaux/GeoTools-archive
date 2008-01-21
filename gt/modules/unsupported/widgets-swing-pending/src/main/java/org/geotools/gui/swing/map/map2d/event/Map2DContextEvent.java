@@ -36,8 +36,8 @@ public class Map2DContextEvent extends EventObject{
      * @param oldone : previous MapContext
      * @param newone : new MapContext
      */
-    public Map2DContextEvent(Map2D map, MapContext oldone, MapContext newone){
-        super(map);
+    public Map2DContextEvent(Object strategy, MapContext oldone, MapContext newone){
+        super(strategy);
         oldContext = oldone;
         newContext = newone;
     }

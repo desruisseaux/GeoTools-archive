@@ -118,6 +118,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @return JTS Coordinate
      */
     protected Coordinate toMapCoord(int mx, int my) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         Rectangle bounds = getBounds();
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
@@ -131,6 +133,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @return JTS geometry (corresponding to a square of 6x6 pixel around mouse coordinate)
      */
     protected Geometry mousePositionToGeometry(double mx, double my) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null) {
             Rectangle bounds = getBounds();
             double width = mapArea.getWidth();
@@ -223,6 +227,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
@@ -237,6 +243,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private void doMouseSelection(double mx, double my, double ex, double ey) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null) {
             Rectangle bounds = getBounds();
             double width = mapArea.getWidth();
@@ -268,28 +276,28 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     //-------------------MAP2D--------------------------------------------------
-    @Override
-    public void setContext(MapContext context) {
-        selectionMapContext.clearLayerList();
-        copies.clear();
-
-        if (this.context != null) {
-            this.context.removeMapLayerListListener(mapLayerListlistener);
-        }
-
-        if (context != null) {
-            context.addMapLayerListListener(mapLayerListlistener);
-        }
-
-        super.setContext(context);
-    }
-
-    @Override
-    public void setMapArea(Envelope mapArea) {
-        super.setMapArea(mapArea);
-
-        updateOverLayer();
-    }
+//    @Override
+//    public void setContext(MapContext context) {
+//        selectionMapContext.clearLayerList();
+//        copies.clear();
+//
+//        if (this.context != null) {
+//            this.context.removeMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        if (context != null) {
+//            context.addMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        super.setContext(context);
+//    }
+//
+//    @Override
+//    public void setMapArea(Envelope mapArea) {
+//        super.setMapArea(mapArea);
+//
+//        updateOverLayer();
+//    }
 
     //----------------------SELECTABLE MAP2D------------------------------------
     public void addSelectableLayer(MapLayer layer) {
@@ -339,6 +347,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     protected SimpleFeature findFeature(Geometry geom, MapLayer layer) {
+        
+        MapContext context = renderingStrategy.getContext();
         Filter f = null;
 
         if ((context == null) || (selectionMapContext.getLayerCount() == 0) || (layer == null)) {
@@ -382,6 +392,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     public void doSelection(Geometry geometry) {
+        
+        MapContext context = renderingStrategy.getContext();
         Filter f = null;
 
         if ((context == null) || (selectionMapContext.getLayerCount() == 0)) {

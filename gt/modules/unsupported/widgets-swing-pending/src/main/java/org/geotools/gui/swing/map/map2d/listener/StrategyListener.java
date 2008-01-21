@@ -17,6 +17,8 @@
 package org.geotools.gui.swing.map.map2d.listener;
 
 import java.util.EventListener;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 
 /**
  * StrategyListener used to listen to RenderingStrategy events 
@@ -29,5 +31,18 @@ public interface StrategyListener extends EventListener{
      * @param rendering : true if the strategy strat working, false when it stops
      */
     public void setRendering(boolean rendering);
+    
+    
+    /**
+     * called when Map2d MapArea changed
+     * @param event : Map2DMapAreaEvent
+     */
+    public void mapAreaChanged(Map2DMapAreaEvent event);
+    
+    /**
+     * called when MapContext changed
+     * @param event : Map2DContextEvent
+     */
+    public void mapContextChanged(Map2DContextEvent event);
     
 }

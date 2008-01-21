@@ -40,6 +40,8 @@ import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 /**
  * JMap2DControlBar is a JPanel to handle Navigation state for a NavigableMap2D
@@ -47,7 +49,7 @@ import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
  * 
  * @author johann sorel
  */
-public class JMap2DControlBar extends JPanel implements Map2DListener, NavigableMap2DListener {
+public class JMap2DControlBar extends JPanel implements Map2DListener, StrategyListener, NavigableMap2DListener {
 
     private final List<Envelope> mapAreas = new ArrayList<Envelope>();
     private Envelope lastMapArea = null;
@@ -96,8 +98,8 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
                 if (map != null) {
 
                     try {
-                        map.setMapArea(map.getContext().getLayerBounds());
-                        map.refresh();
+                        map.getRenderingStrategy().setMapArea(map.getRenderingStrategy().getContext().getLayerBounds());
+                        //map.refresh();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -114,8 +116,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
 
                     index++;
                     if (index < mapAreas.size()) {
-                        map.setMapArea(mapAreas.get(index));
-                        map.refresh();
+                        map.getRenderingStrategy().setMapArea(mapAreas.get(index));
                     }
                     if (index == mapAreas.size() - 1) {
                         gui_nextArea.setEnabled(false);
@@ -133,8 +134,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
 
                     index--;
                     if (index >= 0) {
-                        map.setMapArea(mapAreas.get(index));
-                        map.refresh();
+                        map.getRenderingStrategy().setMapArea(mapAreas.get(index));
                     }
                     if (index == 0) {
                         gui_previousArea.setEnabled(false);
@@ -184,7 +184,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
 
             public void actionPerformed(ActionEvent e) {
                 if (map != null) {
-                    map.refresh();
+                    map.getRenderingStrategy().reset();
                 }
             }
         });
@@ -233,7 +233,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
             if (map instanceof NavigableMap2D) {
                 ((NavigableMap2D) map).removeNavigableMap2DListener(this);
             }
-            lastMapArea = map.getMapArea();
+            lastMapArea = map.getRenderingStrategy().getMapArea();
         }
 
         if (map2d instanceof Map2D) {
@@ -365,5 +365,13 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
                 gui_other.setSelected(true);
                 break;
         }
+    }
+
+    public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
+       oldStrategy.removeStrategyListener(this);
+       newStrategy.addStrategyListener(this);
+    }
+
+    public void setRendering(boolean rendering) {
     }
 }

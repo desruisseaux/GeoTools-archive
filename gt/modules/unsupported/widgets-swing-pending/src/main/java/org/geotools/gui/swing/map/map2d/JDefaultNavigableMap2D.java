@@ -152,6 +152,8 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
         private void processDrag(int x1, int y1, int x2, int y2) {
 
+            Envelope mapArea = renderingStrategy.getMapArea();
+            
             if (mapArea != null) {
 
                 if ((x1 == x2) && (y1 == y2)) {
@@ -195,7 +197,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         ll = new Coordinate(left, bottom);
                         ur = new Coordinate(right, top);
 
-                        setMapArea(fixAspectRatio(getBounds(), new Envelope(ll, ur)));
+                        renderingStrategy.setMapArea(  new Envelope(ll, ur) );
                         //mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
                         break;
 
@@ -208,7 +210,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         ll = new Coordinate(left, bottom);
                         ur = new Coordinate(right, top);
 
-                        setMapArea(fixAspectRatio(getBounds(), new Envelope(ll, ur)));
+                        renderingStrategy.setMapArea( new Envelope(ll, ur) );
 //                        mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
                         break;
 
@@ -231,7 +233,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         double nDeltaY2 = (deltaY2 * nHeight) / mapHeight;
                         ur = new Coordinate(mapArea.getMaxX() + nDeltaX2, mapArea.getMaxY() + nDeltaY2);
 
-                        setMapArea(fixAspectRatio(getBounds(), new Envelope(ll, ur)));
+                        renderingStrategy.setMapArea( new Envelope(ll, ur) );
                         break;
                 }
 
@@ -239,6 +241,8 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
         public void mouseClicked(MouseEvent e) {
+            
+            Envelope mapArea = renderingStrategy.getMapArea();
             
             if (mapArea != null) {
                 // TODO Auto-generated method stub
@@ -286,7 +290,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
                 switch (actionState) {
                     case PAN:
-                        setMapArea(new Envelope(ll, ur));
+                        renderingStrategy.setMapArea(new Envelope(ll, ur));
                         repaint();
                         break;
                     case ZOOM_IN:
@@ -301,7 +305,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         processDrag(x1, y1, x2, y2);
                         break;
                     case ZOOM_OUT:
-                        setMapArea(new Envelope(ll, ur));
+                        renderingStrategy.setMapArea(new Envelope(ll, ur));
                         repaint();
                         break;
                     default:

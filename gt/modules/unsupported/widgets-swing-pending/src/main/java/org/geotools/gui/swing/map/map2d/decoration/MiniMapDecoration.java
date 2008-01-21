@@ -127,25 +127,25 @@ public class MiniMapDecoration extends AbstractMapDecoration {
 
         @Override
         protected void paintComponent(Graphics g) {
-            Rectangle newRect = getBounds();
-
-            if (map != null && !newRect.equals(oldRect)) {
-                System.out.println("la");
-                try {
-                    BufferedImage img = new BufferedImage(newRect.width, newRect.height, BufferedImage.TYPE_INT_ARGB);                    
-                    Envelope env = fixAspectRatio(newRect, map.getContext().getLayerBounds(), map.getContext());
-                    map.getRenderingStrategy().getRenderer().paint((Graphics2D) img.getGraphics(), newRect, env);
-                    minimap = img;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            
-            oldRect = newRect;
-
-            if(minimap != null){
-                g.drawImage(minimap, 0, 0, this);
-            }
+//            Rectangle newRect = getBounds();
+//
+//            if (map != null && !newRect.equals(oldRect)) {
+//                System.out.println("la");
+//                try {
+//                    BufferedImage img = new BufferedImage(newRect.width, newRect.height, BufferedImage.TYPE_INT_ARGB);                    
+//                    Envelope env = fixAspectRatio(newRect, map.getContext().getLayerBounds(), map.getContext());
+//                    map.getRenderingStrategy().getRenderer().paint((Graphics2D) img.getGraphics(), newRect, env);
+//                    minimap = img;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            
+//            oldRect = newRect;
+//
+//            if(minimap != null){
+//                g.drawImage(minimap, 0, 0, this);
+//            }
         }
     }
 
