@@ -23,12 +23,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.Name;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -298,7 +302,19 @@ public class GML2ParsingUtils {
 
             try {
                 return CRS.decode(raw.toString());
-            } catch (Exception e) {
+            } catch (NoSuchAuthorityCodeException e) {
+                // HACK HACK HACK!: remove when
+                // http://jira.codehaus.org/browse/GEOT-1659 is fixed
+                final String crs = raw.toString();
+                if (crs.toUpperCase().startsWith("URN")) {
+                    String code = crs.substring(crs.lastIndexOf(":") + 1);
+                    try {
+                        return CRS.decode("EPSG:" + code);
+                    } catch (Exception e1) {
+                        throw new RuntimeException("Could not create crs: " + srs, e);
+                    }
+                }
+            } catch (FactoryException e) {
                 throw new RuntimeException("Could not create crs: " + srs, e);
             }
         }

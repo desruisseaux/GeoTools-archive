@@ -31,7 +31,6 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
@@ -77,7 +76,7 @@ public final class ImageUtilities {
      * {@link RenderingHints} for requesting Nearest Neighbor intepolation.
      */
     public static final RenderingHints NN_INTERPOLATION_HINT = new RenderingHints(
-                    JAI.KEY_INTERPOLATION, new InterpolationNearest());
+                    JAI.KEY_INTERPOLATION, Interpolation.getInstance(Interpolation.INTERP_NEAREST));
 
     /**
      * {@link RenderingHints} for avoiding caching of {@link JAI} {@link RenderedOp}s.

@@ -45,6 +45,7 @@ import org.geotools.resources.image.ColorUtilities;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Andrea Aimes
  */
 final class BandSelector2D extends GridCoverage2D {
     /**
@@ -75,7 +76,6 @@ final class BandSelector2D extends GridCoverage2D {
     {
         super(source.getName(),                      // The grid source name
               image,                                 // The underlying data
-              (org.geotools.coverage.grid.GridGeometry2D)
               source.getGridGeometry(),              // The grid geometry (unchanged).
               bands,                                 // The sample dimensions
               new GridCoverage2D[] {source},         // The source grid coverages.
@@ -95,7 +95,7 @@ final class BandSelector2D extends GridCoverage2D {
     static GridCoverage2D create(final ParameterValueGroup parameters, RenderingHints hints) {
         /*
          * Fetch all parameters, clone them if needed. The "VisibleSampleDimension" parameter is
-         * Geotools-specific and optional. We get it has an Integer both for catching null value,
+         * Geotools-specific and optional. We get it as an Integer both for catching null value,
          * and also because it is going to be stored as an image's property anyway.
          */
         GridCoverage2D source = (GridCoverage2D) parameters.parameter("Source").getValue();
@@ -136,10 +136,22 @@ final class BandSelector2D extends GridCoverage2D {
             }
             sourceImage       = source.getRenderedImage();
             visibleSourceBand = CoverageUtilities.getVisibleBand(sourceImage);
-            visibleTargetBand = (visibleBand!=null) ? visibleBand.intValue() :
-                                (bandIndices!=null) ? bandIndices[visibleSourceBand] :
-                                                                  visibleSourceBand;
-            if (bandIndices==null && visibleSourceBand==visibleTargetBand) {
+            if (visibleBand != null) {
+                visibleTargetBand = mapSourceToTarget(visibleBand.intValue(), bandIndices);
+                if (visibleSourceBand < 0) {
+                    // TODO: localize
+                    throw new IllegalArgumentException("Visible sample dimension is " +
+                    		"not among the ones specified in SampleDimensions param");
+                }
+            } else {
+                // Try to keep the original one, if it hasn't been selected, fall
+                // back on the first selected band.
+                visibleTargetBand = mapSourceToTarget(visibleSourceBand, bandIndices);
+                if (visibleTargetBand < 0) {
+                    visibleTargetBand = 0;
+                }
+            }
+            if (bandIndices == null && visibleSourceBand == visibleTargetBand) {
                 return source;
             }
             if (!(source instanceof BandSelector2D)) {
@@ -152,14 +164,14 @@ final class BandSelector2D extends GridCoverage2D {
              * band. For example we could change the visible band from 0 to 1, and then come
              * back to 0 later.
              */
-            final int[] parentIndices = ((BandSelector2D)source).bandIndices;
+            final int[] parentIndices = ((BandSelector2D) source).bandIndices;
             if (parentIndices != null) {
                 if (bandIndices != null) {
                     for (int i=0; i<bandIndices.length; i++) {
                         bandIndices[i] = parentIndices[bandIndices[i]];
                     }
                 } else {
-                    bandIndices = (int[])parentIndices.clone();
+                    bandIndices = parentIndices.clone();
                 }
             }
             assert source.getSources().size() == 1 : source;
@@ -215,6 +227,26 @@ final class BandSelector2D extends GridCoverage2D {
         final PlanarImage image = OperationJAI.getJAI(hints).createNS(operation, params, hints);
         image.setProperty("GC_VisibleBand", visibleBand);
         return new BandSelector2D(source, image, targetBands, bandIndices);
+    }
+
+    /**
+     * Maps the specified source band number to the target band index after the
+     * selection/reordering process imposed by targetSampleDimensions is applied.
+     *
+     * @param  sourceBand  The indice of a source band.
+     * @param  bandIndices The indices of source bands to be retained for target, or {@code null}.
+     * @return The target band indice, or {@code -1} if not found.
+     */
+    private static int mapSourceToTarget(final int sourceBand, final int[] bandIndices) {
+        if (bandIndices == null) {
+            return sourceBand;
+        }
+        for (int i=0; i<bandIndices.length; i++) {
+            if (bandIndices[i] == sourceBand) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**

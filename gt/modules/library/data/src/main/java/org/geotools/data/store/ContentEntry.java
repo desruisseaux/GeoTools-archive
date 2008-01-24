@@ -78,7 +78,7 @@ public final class ContentEntry {
         this.state = new HashMap<Transaction, ContentState>();
 
         //create a state for the auto commit transaction
-        ContentState autoState = dataStore.createContentState(null);
+        ContentState autoState = dataStore.createContentState(this);
         autoState.setTransaction(Transaction.AUTO_COMMIT);
         this.state.put(Transaction.AUTO_COMMIT, autoState);
     }

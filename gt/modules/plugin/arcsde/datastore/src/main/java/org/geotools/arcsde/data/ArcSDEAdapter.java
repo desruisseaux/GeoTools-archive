@@ -397,10 +397,10 @@ public class ArcSDEAdapter {
 
             // didn't found in the ArcSDE Java API the way of knowing
             // if an SeColumnDefinition is nillable
-            attName = seColumns[i].getName();
+            attName = colDef.getName();
             isNilable = true;
             defValue = null;
-            fieldLen = seColumns[i].getSize();
+            fieldLen = colDef.getSize();
 
             final Integer sdeType = Integer.valueOf(colDef.getType());
 
@@ -414,11 +414,13 @@ public class ArcSDEAdapter {
                 typeClass = getGeometryTypeFromLayerMask(seShapeType);
                 isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
                 defValue = ArcSDEGeometryBuilder.defaultValueFor(typeClass);
-
-            } else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
-                throw new DataSourceException("Raster columns are not supported yet");
             } else {
                 typeClass = getJavaBinding(sdeType);
+                if (typeClass == null) {
+                    LOGGER.info("Found an unsupported ArcSDE data type: " + sdeType
+                            + " for column " + attName + ". Ignoring it.");
+                    continue;
+                }
                 // @TODO: add restrictions once the Restrictions utility methods
                 // are implemented
                 // Set restrictions = Restrictions.createLength(name, typeClass,
@@ -479,14 +481,11 @@ public class ArcSDEAdapter {
      * </p>
      * 
      * @param sdeType
-     * @return
+     * @return the java binding for the given sde data type or {@code null} if
+     *         its not supported
      */
     public static Class getJavaBinding(final Integer sdeType) {
         Class javaClass = (Class) sde2JavaTypes.get(sdeType);
-        if (javaClass == null) {
-            throw new NoSuchElementException("No java class binding for SeColumn type "
-                    + sdeType.intValue());
-        }
         return javaClass;
     }
 

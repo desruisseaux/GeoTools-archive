@@ -192,7 +192,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                             }
                         }
                     } finally {
-                        JDBCDataStore.closeSafe(primaryKeys);
+                        getDataStore().closeSafe(primaryKeys);
                     }
 
                     if (name == null) {
@@ -219,10 +219,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                                     continue;
                                 }
                             } finally {
-                                JDBCDataStore.closeSafe(relationships);
+                                getDataStore().closeSafe(relationships);
                             }
                         } finally {
-                            JDBCDataStore.closeSafe(st);
+                            getDataStore().closeSafe(st);
                         }
                     }
 
@@ -245,7 +245,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
 
                     //if still not found, resort to Object
                     if (binding == null) {
-                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + name);
+                        getDataStore().getLogger().warning("Could not find mapping for:" + name);
                         binding = Object.class;
                     }
 
@@ -266,7 +266,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         } catch (Exception e) {
                             String msg = "Error occured determing srid for " + tableName + "."
                                 + name;
-                            getDataStore().LOGGER.log(Level.WARNING, msg, e);
+                            getDataStore().getLogger().log(Level.WARNING, msg, e);
                         }
 
                         tb.add(name, binding, srid);
@@ -315,7 +315,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         try {
             if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
                 //calculate manually, dont use datastore optimization
-                JDBCDataStore.LOGGER.fine("Calculating size manually");
+                getDataStore().getLogger().fine("Calculating size manually");
 
                 int count = 0;
 
@@ -353,7 +353,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         try {
             if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
                 //calculate manually, dont use datastore optimization
-                JDBCDataStore.LOGGER.fine("Calculating bounds manually");
+                getDataStore().getLogger().fine("Calculating bounds manually");
 
                 ReferencedEnvelope bounds = new ReferencedEnvelope(getSchema().getCRS());
 
@@ -365,6 +365,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         bounds.init(f.getBounds());
 
                         while (i.hasNext()) {
+                            f = i.next();
                             bounds.include(f.getBounds());
                         }
                     }
@@ -401,7 +402,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         
         //build up a statement for the content
         String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
-        JDBCDataStore.LOGGER.fine(sql);
+        getDataStore().getLogger().fine(sql);
 
         //grab connection
         Connection cx = getDataStore().getConnection(getState());
@@ -441,7 +442,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                 //build up a statement for the content, inserting only so we dont want
                 // the query to return any data ==> Filter.EXCLUDE
                 String sql = getDataStore().selectSQL(getSchema(), Filter.EXCLUDE, query.getSortBy());
-                JDBCDataStore.LOGGER.fine(sql);
+                getDataStore().getLogger().fine(sql);
 
                 return new JDBCInsertFeatureWriter( sql, cx, this, query.getHints() );
             }
@@ -453,7 +454,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             
             //build up a statement for the content
             String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
-            JDBCDataStore.LOGGER.fine(sql);
+            getDataStore().getLogger().fine(sql);
             
             if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {
                 writer = new JDBCUpdateFeatureWriter( sql, cx, this, query.getHints() );

@@ -112,7 +112,7 @@ public class MySQLDialect extends SQLDialect {
         encodeColumnName(columnName, sql);
         sql.append(" is not null LIMIT 1");
 
-        JDBCDataStore.LOGGER.fine(sql.toString());
+        dataStore.getLogger().fine(sql.toString());
 
         Statement st = cx.createStatement();
 
@@ -127,10 +127,10 @@ public class MySQLDialect extends SQLDialect {
                     return null;
                 }
             } finally {
-                JDBCDataStore.closeSafe(rs);
+                dataStore.closeSafe(rs);
             }
         } finally {
-            JDBCDataStore.closeSafe(st);
+            dataStore.closeSafe(st);
         }
     }
 
@@ -242,7 +242,7 @@ public class MySQLDialect extends SQLDialect {
 
         try {
             String sql = "SELECT max( " + columnName + ")+1" + " FROM " + tableName;
-            JDBCDataStore.LOGGER.fine(sql);
+            dataStore.getLogger().fine(sql);
 
             ResultSet rs = st.executeQuery(sql);
 
@@ -251,10 +251,10 @@ public class MySQLDialect extends SQLDialect {
 
                 return new Integer(rs.getInt(1));
             } finally {
-                JDBCDataStore.closeSafe(rs);
+                dataStore.closeSafe(rs);
             }
         } finally {
-            JDBCDataStore.closeSafe(st);
+            dataStore.closeSafe(st);
         }
     }
 }

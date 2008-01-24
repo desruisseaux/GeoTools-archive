@@ -8,6 +8,7 @@ import static org.geotools.data.shapefile.ShpFileType.SHP;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataUtilities;
 
@@ -114,9 +117,21 @@ public class ShpFiles {
                             + " is not one of the files types that is known to be associated with a shapefile");
         }
 
+        String urlString = url.toExternalForm();
+        char lastChar = urlString.charAt(urlString.length()-1);
+        boolean upperCase = Character.isUpperCase(lastChar);
+
         for (ShpFileType type : ShpFileType.values()) {
+            
+            String extensionWithPeriod = type.extensionWithPeriod;
+            if( upperCase ){
+                extensionWithPeriod = extensionWithPeriod.toUpperCase();
+            }else{
+                extensionWithPeriod = extensionWithPeriod.toLowerCase();
+            }
+            
             URL newURL;
-            String string = base + type.extensionWithPeriod;
+            String string = base + extensionWithPeriod;
             try {
                 newURL = new URL(url, string);
             } catch (MalformedURLException e) {
@@ -126,6 +141,50 @@ public class ShpFiles {
             urls.put(type, newURL);
         }
 
+        // if the files are local check each file to see if it exists
+        // if not then search for a file of the same name but try all combinations of the 
+        // different cases that the extension can be made up of.
+        // IE Shp, SHP, Shp, ShP etc...
+        if( isLocal() ){
+            Set<Entry<ShpFileType, URL>> entries = urls.entrySet();
+            Map<ShpFileType, URL> toUpdate = new HashMap<ShpFileType, URL>();
+            for (Entry<ShpFileType, URL> entry : entries) {
+                if( !exists(entry.getKey()) ){
+                    url = findExistingFile(entry.getKey(), entry.getValue());
+                    if( url!=null ){
+                        toUpdate.put(entry.getKey(), url);
+                    }
+                }
+            }
+            
+            urls.putAll(toUpdate);
+            
+        }
+        
+    }
+
+    private URL findExistingFile(ShpFileType shpFileType, URL value) {
+        final File file = DataUtilities.urlToFile(value);
+        File directory = file.getParentFile();
+        if( directory==null ){
+            // doesn't exist
+            return null;
+        }
+        File[] files = directory.listFiles(new FilenameFilter(){
+
+            public boolean accept(File dir, String name) {
+                return file.getName().equalsIgnoreCase(name);
+            }
+            
+        });
+        if( files.length>0 ){
+            try {
+                return files[0].toURI().toURL();
+            } catch (MalformedURLException e) {
+                ShapefileDataStoreFactory.LOGGER.log(Level.SEVERE, "", e);
+            }
+        }
+        return null;
     }
 
     /**

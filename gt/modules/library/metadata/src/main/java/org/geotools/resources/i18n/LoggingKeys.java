@@ -231,8 +231,8 @@ public final class LoggingKeys {
     public static final int RESSAMPLING_RENDERED_IMAGE_$3 = 15;
 
     /**
-     * Creates a {1,choice,0#packed view|1#geophysics view} of grid coverage "{0}" using operation
-     * "{2}".
+     * Creates a {1,choice,0#packed|1#geophysics|2#photographic} view of grid coverage "{0}" using
+     * operation "{2}".
      */
     public static final int SAMPLE_TRANSCODE_$3 = 16;
 

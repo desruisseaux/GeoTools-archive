@@ -41,7 +41,6 @@ import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.processing.operation.FilteredSubsample;
 import org.geotools.factory.Hints;
 import org.geotools.resources.coverage.CoverageUtilities;
-import org.geotools.resources.coverage.OperationStrategy;
 
 
 /**
@@ -215,7 +214,7 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         assertTrue(!isIndexed
                 || (interp instanceof InterpolationNearest)
                 || !(scaledImage.getColorModel() instanceof IndexColorModel)
-                || CoverageUtilities.prepareSourceForOperation(coverage, interp, false, null) == OperationStrategy.USE_GEOPHYSICS_VIEW);
+                || CoverageUtilities.preferredViewForOperation(coverage, interp, false, null) == ViewType.GEOPHYSICS);
         isIndexed = scaledImage.getColorModel() instanceof IndexColorModel;
         w = scaledImage.getWidth();
         h = scaledImage.getHeight();
@@ -239,7 +238,7 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         assertTrue(!isIndexed
                 || (interp instanceof InterpolationNearest)
                 || !(scaledImage.getColorModel() instanceof IndexColorModel)
-                ||CoverageUtilities.prepareSourceForOperation(coverage, interp, false, null) == OperationStrategy.USE_GEOPHYSICS_VIEW);
+                ||CoverageUtilities.preferredViewForOperation(coverage, interp, false, null) == ViewType.GEOPHYSICS);
         checkEnvelopes(coverage, scaled);
         if (SHOW) {
             Viewer.show(scaled, scaled.getName().toString());

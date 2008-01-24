@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureLock;
@@ -28,6 +30,8 @@ import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.InProcessLockingManager;
+import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
@@ -129,8 +133,14 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
     public final FeatureWriter getWriter( Query query, int flags ) throws IOException {
         query = joinQuery( query );
         
-        //apply wrappers
-        return getWriterInternal( query, flags );
+        FeatureWriter writer = getWriterInternal( query, flags );
+        
+        //TODO: apply wrappers
+        
+        //TODO: turn locking on / off
+        LockingManager lockingManager = getDataStore().getLockingManager();
+        return ((InProcessLockingManager)lockingManager).checkedWriter(writer, transaction);
+        
     }
     
     /**
@@ -360,21 +370,28 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * Locks features specified by a filter.
      */
     public final int lockFeatures(Filter filter) throws IOException {
+        Logger logger = getDataStore().getLogger();
+        
         String typeName = getSchema().getTypeName(); 
         
         FeatureReader reader = getReader(filter);
         try {
             int locked = 0;
             while( reader.hasNext() ) {
+                SimpleFeature feature = reader.next();
                 try {
-                    SimpleFeature feature = reader.next();
                     getDataStore().getLockingManager()
-                        .lockFeatureID(typeName, feature.getID(), transaction, lock);    
+                        .lockFeatureID(typeName, feature.getID(), transaction, lock);
+                    
+                    logger.fine( "Locked feature: " + feature.getID() );
                     locked++;
                 }
                 catch( FeatureLockException e ) {
                     //ignore
-                    //TODO: log this
+                    String msg = "Unable to lock feature:" + feature.getID() + "." + 
+                        " Change logging to FINEST for stack trace";
+                    logger.fine( msg );
+                    logger.log( Level.FINEST, "Unable to lock feature: " + feature.getID(), e );
                 }
             }
             

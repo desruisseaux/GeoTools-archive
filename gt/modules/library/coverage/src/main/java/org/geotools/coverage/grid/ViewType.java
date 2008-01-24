@@ -43,6 +43,8 @@ import javax.media.jai.operator.ScaleDescriptor; // For javadoc
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see GridCoverage2D#view
  */
 public enum ViewType {
     /**
@@ -136,7 +138,15 @@ public enum ViewType {
      * Interpolation are not allowed on indexed values. They must be performed on the RGB
      * or similar color space instead.
      */
-    PHOTOGRAPHIC(true, true, true);
+    PHOTOGRAPHIC(true, true, true),
+
+    /**
+     * Special value for returning the same coverage unchanged.
+     * This value can be used as a "<cite>no operation</cite>" instruction.
+     *
+     * @since 2.5
+     */
+    SAME(false, false, false);
 
     /**
      * @deprecated Renamed as {@link #RENDERED}.
