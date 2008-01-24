@@ -671,6 +671,10 @@ public class JDBCFeatureReader implements FeatureReader {
         }
 
         public Object getAttribute(int index) throws IndexOutOfBoundsException {
+            return getAttributeInternal( index, mapToResultSetIndex(index) );
+        }
+
+        private int mapToResultSetIndex( int index ) {
             //map the index to result set
             int rsindex = index;
             try {
@@ -687,13 +691,13 @@ public class JDBCFeatureReader implements FeatureReader {
             }
             
             rsindex++;
-            return getAttributeInternal( index, rsindex );
+            return rsindex;
         }
-
+        
         private Object getAttributeInternal( int index, int rsindex ) {
-            if ( values[index] == null ) {
+            if ( values[index] == null && !dirty[index]) {
                 synchronized (this) {
-                    if ( values[index] == null ) {
+                    if ( values[index] == null && !dirty[index]) {
                         //load the value from the result set, check the case 
                         // in which its a geometry, this case the dialect needs
                         // to read it
