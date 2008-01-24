@@ -15,18 +15,19 @@
  */
 package org.geotools.filter.visitor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.function.FilterFunction_geometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.spatial.BBOX;
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.function.FilterFunction_geometryType;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
 
@@ -81,8 +82,21 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
         orFilter.accept(visitor, null);
 		
 		// f1 could be pre-processed but since f2 can't all the processing has to be done on the client side :-(
-		assertEquals(orFilter, visitor.getFilterPost());
-		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
+        assertEquals(Filter.INCLUDE, visitor.getFilterPre());
+        assertEquals(orFilter, visitor.getFilterPost());
+	}
+	
+	public void testMassOrFilter() throws Exception {
+	    List filters = new ArrayList();
+	    for (int i = 0; i < 10000; i++) {
+            filters.add(ff.equals(ff.property(nameAtt), ff.literal("" + i)));
+        }
+	    Or orFilter = ff.or(filters);
+	    visitor = newVisitor(simpleLogicalCaps);
+	    // this would have throw the thing into a stack overflow error
+        orFilter.accept(visitor, null);
+        assertEquals(orFilter, visitor.getFilterPre());
+        assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 	}
 
 

@@ -79,9 +79,10 @@ public class InterpolationTest extends TestCase {
     	 // We can create and show a coverage image of the interpolation within the Envelope
     	GridCoverageFactory gcf = new GridCoverageFactory();
     	GridCoverage2D coverage = gcf.create("Intepolated Coverage",  interp.get2DGrid(), env);//.show();
-
     	
-    	Assert.assertEquals( Double.parseDouble((coverage.evaluate(a, (Set)(new HashSet())).iterator().next()).toString()), pointsAndValues.get(a).floatValue(), 0.01);
+    	
+    	//Assert.assertEquals( Double.parseDouble((coverage.evaluate(a, (Set)(new HashSet())).iterator().next()).toString()), pointsAndValues.get(a).floatValue(), 0.01);
+    	Assert.assertEquals( coverage.evaluate(a, new float[1])[0], pointsAndValues.get(a).floatValue(), 0.01);
     	
     	
     	// We can also get interpolated value at any DirectPosition
@@ -90,10 +91,7 @@ public class InterpolationTest extends TestCase {
     	Assert.assertEquals( interp.getValue(b), pointsAndValues.get(b).floatValue(), 0.0);
     	Assert.assertEquals( interp.getValue(c), pointsAndValues.get(c).floatValue(), 0.0);
     	Assert.assertEquals( interp.getValue(d), pointsAndValues.get(d).floatValue(), 0.0);
-        
-         
-        
-    	//TODO --- test case!
+       
     	
     }
     

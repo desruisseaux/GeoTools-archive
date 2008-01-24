@@ -17,9 +17,11 @@
 package org.geotools.data.shapefile.shp.xml;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.InputStream;
 
+import org.geotools.data.shapefile.FileReader;
+import org.geotools.data.shapefile.ShpFileType;
+import org.geotools.data.shapefile.ShpFiles;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -27,57 +29,70 @@ import org.jdom.input.SAXBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class ShpXmlFileReader {
+public class ShpXmlFileReader implements FileReader {
 
     Document dom;
-    
+
     /**
      * Parse metadataFile (currently for bounding box information).
      * <p>
-     *  
+     * 
      * </p>
-     * @param metadatFileURL
+     * 
+     * @param shapefileFiles
      * @throws JDOMException
      * @throws IOException
      */
-    public ShpXmlFileReader(URL metadatFileURL) throws JDOMException, IOException {
+    public ShpXmlFileReader(ShpFiles shapefileFiles) throws JDOMException,
+            IOException {
         SAXBuilder builder = new SAXBuilder(false);
-        
-        URLConnection connection = metadatFileURL.openConnection();
 
-        dom = builder.build(connection.getInputStream());
+        InputStream inputStream = shapefileFiles.getInputStream(
+                ShpFileType.SHP_XML, this);
+        try {
+            dom = builder.build(inputStream);
+        } finally {
+            inputStream.close();
+        }
     }
-    
+
     public Metadata parse() {
-        return parseMetadata( dom.getRootElement() );
+        return parseMetadata(dom.getRootElement());
     }
-    
+
     protected Metadata parseMetadata(Element root) {
         Metadata meta = new Metadata();
-        meta.setIdinfo( parseIdInfo( root.getChild("idinfo")) );
-        
+        meta.setIdinfo(parseIdInfo(root.getChild("idinfo")));
+
         return meta;
     }
-    protected IdInfo parseIdInfo(Element element ) {
+
+    protected IdInfo parseIdInfo(Element element) {
         IdInfo idInfo = new IdInfo();
-        
+
         Element bounding = element.getChild("spdom").getChild("bounding");
-        idInfo.setBounding( parseBounding( bounding ) );
-        
+        idInfo.setBounding(parseBounding(bounding));
+
         Element lbounding = element.getChild("spdom").getChild("lbounding");
-        idInfo.setLbounding( parseBounding( lbounding ) );
-        
+        idInfo.setLbounding(parseBounding(lbounding));
+
         return idInfo;
     }
-    protected Envelope parseBounding( Element bounding ) {
-        if( bounding == null ) return new Envelope();
-        
+
+    protected Envelope parseBounding(Element bounding) {
+        if (bounding == null)
+            return new Envelope();
+
         double minX = Double.parseDouble(bounding.getChildText("westbc"));
         double maxX = Double.parseDouble(bounding.getChildText("eastbc"));
         double minY = Double.parseDouble(bounding.getChildText("southbc"));
         double maxY = Double.parseDouble(bounding.getChildText("northbc"));
-        
+
         return new Envelope(minX, maxX, minY, maxY);
-    }    
-    
+    }
+
+    public String id() {
+        return "Shp Xml Reader";
+    }
+
 }

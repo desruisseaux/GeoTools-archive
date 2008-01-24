@@ -68,7 +68,7 @@ public final class CrsTest extends TestCase {
      * Tests the {@link CRS#getSupportedAuthorities} method.
      */
     public void testSupportedAuthorities() {
-        final Set withoutAlias = CRS.getSupportedAuthorities(false);
+        final Set<String> withoutAlias = CRS.getSupportedAuthorities(false);
         assertTrue (withoutAlias.contains("CRS"));
         assertTrue (withoutAlias.contains("AUTO2"));
         assertTrue (withoutAlias.contains("urn:ogc:def"));
@@ -76,11 +76,18 @@ public final class CrsTest extends TestCase {
         assertFalse(withoutAlias.contains("AUTO"));
         assertFalse(withoutAlias.contains("urn:x-ogc:def"));
 
-        final Set withAlias = CRS.getSupportedAuthorities(true);
+        final Set<String> withAlias = CRS.getSupportedAuthorities(true);
         assertTrue (withAlias.containsAll(withoutAlias));
         assertFalse(withoutAlias.containsAll(withAlias));
         assertTrue (withAlias.contains("AUTO"));
         assertTrue (withAlias.contains("urn:x-ogc:def"));
+    }
+
+    /**
+     * Tests simple decode.
+     */
+    public void testDecode() throws FactoryException {
+        assertSame(DefaultGeographicCRS.WGS84, CRS.decode("WGS84(DD)"));
     }
 
     /**

@@ -18,13 +18,14 @@ package org.geotools.index;
 
 /**
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/Lock.java $
  */
 public interface Lock {
-    
+
     public static short SHARED = 1;
     public static short EXCLUSIVE = 2;
-    
+
     public short getType();
-    
+
 }

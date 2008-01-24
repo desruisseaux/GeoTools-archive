@@ -18,10 +18,10 @@ package org.geotools.gui.swing.style.sld;
 
 import java.io.InputStream;
 
+import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
@@ -35,6 +35,8 @@ import org.geotools.xml.Parser;
  */
 public class DemoTableModel extends AbstractTableModel implements TableModel {
 
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/styleproperty/defaultset/Bundle"); 
+    
     Rule[] rules = null;
 
     /**
@@ -52,6 +54,7 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
             StyledLayerDescriptor sld = (StyledLayerDescriptor) parser.parse( input );
             rules = SLD.styles(sld)[0].getFeatureTypeStyles()[0].getRules();
         } catch (Exception e) {
+            rules = new Rule[0];
             e.printStackTrace();
         }
     }
@@ -68,7 +71,15 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
         if (columnIndex == 0) {
             return rules[rowIndex].getSymbolizers()[0];
         } else if (columnIndex == 1) {
-            return TextBundle.getResource().getString( rules[rowIndex].getName());
+            
+            String str = null;
+            try{
+                str = BUNDLE.getString( rules[rowIndex].getName() );
+            }catch(Exception e){      
+                str = "-missing key- " + rules[rowIndex].getName();
+            }
+            
+            return str;
         }
         return "n/a";
     }

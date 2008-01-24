@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,36 +19,28 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies and extensions
 import java.util.List;
 import java.util.Iterator;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 import javax.units.SI;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.cs.AbstractCS;
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
@@ -56,7 +48,9 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.projection.MapProjection;   // For javadoc
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
+
+import static org.geotools.referencing.AbstractIdentifiedObject.nameMatches;
 
 
 /**
@@ -114,7 +108,7 @@ final class ProjectionAnalyzer {
     /**
      * The map projection parameters values, or a copy of them.
      */
-    private List/*<GeneralParameterValue>*/ parameters;
+    private List<GeneralParameterValue> parameters;
 
     /**
      * Constructs a {@code ProjectionAnalyzer} for the specified projected CRS. This constructor
@@ -214,7 +208,7 @@ final class ProjectionAnalyzer {
      * @return The affine transform.
      */
     private XMatrix normalizedToProjection() {
-        parameters = new LinkedList(parameters); // Keep the original list unchanged.
+        parameters = new LinkedList<GeneralParameterValue>(parameters); // Keep the original list unchanged.
         /*
          * Creates a matrix which will conceptually stands between the normalized transform and
          * the 'projectedScale' transform. The matrix dimensions are selected accordingly using
@@ -242,12 +236,11 @@ final class ProjectionAnalyzer {
          */
         Unit unit = null;
         String warning = null;
-        for (final Iterator it=parameters.iterator(); it.hasNext();) {
-            final GeneralParameterValue parameter = (GeneralParameterValue) it.next();
+        for (final Iterator<GeneralParameterValue> it=parameters.iterator(); it.hasNext();) {
+            final GeneralParameterValue parameter = it.next();
             if (parameter instanceof ParameterValue) {
                 final ParameterValue value = (ParameterValue) parameter;
-                // TODO: remove the cast below when we will be allowed to compile for J2SE 1.5.
-                final ParameterDescriptor descriptor = (ParameterDescriptor) value.getDescriptor();
+                final ParameterDescriptor descriptor = value.getDescriptor();
                 if (Number.class.isAssignableFrom(descriptor.getValueClass())) {
                     if (nameMatches(descriptor, "scale_factor")) {
                         final double scale = value.doubleValue();
@@ -278,7 +271,7 @@ final class ProjectionAnalyzer {
             }
         }
         if (warning != null) {
-            final LogRecord record = Logging.format(Level.WARNING,
+            final LogRecord record = Loggings.format(Level.WARNING,
                     LoggingKeys.APPLIED_UNIT_CONVERSION_$3, warning, unit, SI.METER);
             record.setSourceClassName(getClass().getName());
             record.setSourceMethodName("createLinearConversion"); // This is the public method.
@@ -292,14 +285,14 @@ final class ProjectionAnalyzer {
      * The order parameter order is irrelevant. The common parameters are removed
      * from both lists.
      */
-    private static boolean parameterValuesEqual(final List/*<GeneralParameterValue>*/ source,
-                                                final List/*<GeneralParameterValue>*/ target,
+    private static boolean parameterValuesEqual(final List<GeneralParameterValue> source,
+                                                final List<GeneralParameterValue> target,
                                                 final double errorTolerance)
     {
-search: for (final Iterator targetIter=target.iterator(); targetIter.hasNext();) {
-            final GeneralParameterValue targetPrm = (GeneralParameterValue) targetIter.next();
-            for (final Iterator sourceIter=source.iterator(); sourceIter.hasNext();) {
-                final GeneralParameterValue sourcePrm = (GeneralParameterValue) sourceIter.next();
+search: for (final Iterator<GeneralParameterValue> targetIter=target.iterator(); targetIter.hasNext();) {
+            final GeneralParameterValue targetPrm = targetIter.next();
+            for (final Iterator<GeneralParameterValue> sourceIter=source.iterator(); sourceIter.hasNext();) {
+                final GeneralParameterValue sourcePrm = sourceIter.next();
                 if (!nameMatches(sourcePrm.getDescriptor(), targetPrm.getDescriptor())) {
                     continue;
                 }
@@ -401,7 +394,7 @@ search: for (final Iterator targetIter=target.iterator(); targetIter.hasNext();)
         final ProjectionAnalyzer target = new ProjectionAnalyzer(targetCRS);
         if (!nameMatches(source.projection.getMethod(), target.projection.getMethod())) {
             /*
-             * In theory, we can not find a linear conversion if the operation method is 
+             * In theory, we can not find a linear conversion if the operation method is
              * not the same. In practice, it still hapen in some occasions.  For example
              * "Transverse Mercator" and "Transverse Mercator (South Oriented)"  are two
              * distinct operation methods in EPSG point of view, but in Geotools the South
@@ -454,21 +447,5 @@ search: for (final Iterator targetIter=target.iterator(); targetIter.hasNext();)
             targetScale.setIdentity();
         }
         return targetScale;
-    }
-
-    /**
-     * Temporary convenience method to be deleted when we will be allow
-     * to use static imports in J2SE 1.5.
-     */
-    private static boolean nameMatches(final IdentifiedObject object, final String name) {
-        return AbstractIdentifiedObject.nameMatches(object, name);
-    }
-
-    /**
-     * Temporary convenience method to be deleted when we will be allow
-     * to use static imports in J2SE 1.5.
-     */
-    private static boolean nameMatches(final IdentifiedObject o1, final IdentifiedObject o2) {
-        return AbstractIdentifiedObject.nameMatches(o1, o2);
     }
 }

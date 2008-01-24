@@ -19,14 +19,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+
 import javax.xml.transform.TransformerException;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.FilterTransformer;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -43,7 +44,7 @@ import org.geotools.filter.FilterTransformer;
  * This class provides three methods, {@link #toFilter(String)},
  * {@link #toExpression(String)} and {@link #toFilterList(String)}; and an
  * overloaded version of each one for the user to provide a
- * {@link FilterFactory2} implementation to use.
+ * {@link FilterFactory} implementation to use.
  * </p>
  * <p>
  * <h2>Usage</h2>
@@ -78,17 +79,15 @@ import org.geotools.filter.FilterTransformer;
  * </code>
  * </pre>
  *
- * </p>
- *
- * @since 2.4
- * @author Mauricio Pazos - Axios Engineering
- * @author Gabriel Roldan - Axios Engineering
+ * @since 2.5
+ * @author Mauricio Pazos (Axios Engineering)
+ * @author Gabriel Roldan (Axios Engineering)
  * @version $Id$
  * @source $URL:
  *        http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/text/cql2/CQL.java $
  */
 public class CQL {
-    private CQL() {
+    protected CQL() {
         // do nothing, private constructor
         // to indicate it is a pure utility class
     }
@@ -123,26 +122,53 @@ public class CQL {
      */
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
-        
-        FilterFactory ff = filterFactory;
-        
-        if (ff == null) {
-            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
 
-        CQLCompiler compiler = new CQLCompiler(cqlPredicate, ff);
+        CQLCompiler compiler = makeCompiler(cqlPredicate,filterFactory);
 
         try {
             compiler.CompilationUnit();
-            Object result = compiler.getResult();
-            Filter builtFilter = (Filter) result;
+            Filter result = compiler.getFilter();
 
-            return builtFilter;
+            return result;
 
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
+            
         } catch (ParseException e) {
             throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
         }
 
+    }
+    
+    /**
+     * Initializes and create the new compiler
+     * @param predicate
+     * @param filterFactory
+     * @return CQLCompiler
+     */
+    private static CQLCompiler makeCompiler(final String predicate, final FilterFactory filterFactory) {
+
+        FilterFactory ff = filterFactory;
+
+        if (ff == null) {
+            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
+        }
+        
+        return new CQLCompiler(predicate, ff);
+    }
+
+    /**
+     * creates a new instance of compiler
+     * @param predicate
+     * @param ff
+     * @return CQLCompiler
+     */
+    protected static CQLCompiler createCompiler(final String predicate, final FilterFactory filterFactory) {
+
+        return new CQLCompiler(predicate, filterFactory);
     }
 
     /**
@@ -173,22 +199,22 @@ public class CQL {
      *         <code>cqlExpression</code>.
      */
     public static Expression toExpression(final String cqlExpression,
-        final FilterFactory filterFactory) throws CQLException {
-        FilterFactory factory = filterFactory;
+                                          final FilterFactory filterFactory) throws CQLException {
 
-        if (factory == null) {
-            factory = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-
-        CQLCompiler c = new CQLCompiler(cqlExpression, factory);
+        CQLCompiler c = makeCompiler(cqlExpression, filterFactory);
 
         try {
             c.ExpressionCompilationUnit();
         
-            Expression builtFilter = (Expression) c.getResult();
+            Expression builtFilter = c.getExpression();
 
             return builtFilter;
-
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
+            
         } catch (ParseException e) {
             throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
         }
@@ -205,9 +231,9 @@ public class CQL {
      *
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List toFilterList(final String cqlFilterList)
+    public static List<Filter> toFilterList(final String cqlFilterList)
         throws CQLException {
-        List filters = CQL.toFilterList(cqlFilterList, null);
+        List<Filter> filters = CQL.toFilterList(cqlFilterList, null);
 
         return filters;
     }
@@ -251,22 +277,22 @@ public class CQL {
      *            Expression. If it is null the method finds the default implementation.
      * @return a List of {@link Filter}, one for each input CQL statement
      */
-    public static List toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
+    public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
-        
-        FilterFactory factory = filterFactory;
 
-        if (factory == null) {
-            factory = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-
-        CQLCompiler compiler = new CQLCompiler(cqlSourceFilterList, factory);
+        CQLCompiler compiler = makeCompiler(cqlSourceFilterList, filterFactory);
 
         try {
             compiler.MultipleCompilationUnit();
-            List results = compiler.getResults();
+            List<Filter> results = compiler.getResults();
 
             return results;
+
+        } catch( TokenMgrError e){
+            // note: TokenMgrError is an unchecked exception then the caller cannot 
+            // recovery itself if some lexical error happen. This clause catch that 
+            // exception an transform it in checked exception.
+            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlSourceFilterList);
 
         } catch (ParseException e) {
             throw new CQLException(e.getMessage() + ": " + cqlSourceFilterList, compiler.getToken(0), e, cqlSourceFilterList);

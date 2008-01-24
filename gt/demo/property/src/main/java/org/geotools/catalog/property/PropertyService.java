@@ -7,13 +7,13 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.DataStoreService;
-import org.geotools.catalog.GeoResource;
-import org.geotools.catalog.ServiceInfo;
-import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataStore;
 import org.geotools.data.property.PropertyDataStoreFactory;
+import org.geotools.repository.Catalog;
+import org.geotools.repository.DataStoreService;
+import org.geotools.repository.GeoResource;
+import org.geotools.repository.ServiceInfo;
+import org.geotools.repository.defaults.DefaultServiceInfo;
 import org.geotools.util.ProgressListener;
 
 /**

@@ -280,75 +280,7 @@ public class CropTest extends GridCoverageTest {
 
 	}
 
-	/**
-	 * Projects the specified image to the specified CRS using the specified
-	 * hints. The result will be displayed in a window if {@link #SHOW} is set
-	 * to {@code true}.
-	 * 
-	 * @return The operation name which was applied on the image, or
-	 *         {@code null} if none.
-	 */
-	private static GridCoverage2D projectTo(final GridCoverage2D coverage,
-			final CoordinateReferenceSystem targetCRS,
-			final GridGeometry2D geometry, final Hints hints,
-			final boolean useGeophysics) {
-		final AbstractProcessor processor = (hints != null) ? new DefaultProcessor(
-				hints)
-				: AbstractProcessor.getInstance();
-		final String arg1;
-		final Object value1;
-		final String arg2;
-		final Object value2;
-		if (targetCRS != null) {
-			arg1 = "CoordinateReferenceSystem";
-			value1 = targetCRS;
-			if (geometry != null) {
-				arg2 = "GridGeometry";
-				value2 = geometry;
-			} else {
-				arg2 = "InterpolationType";
-				value2 = "bilinear";
-			}
-		} else {
-			arg1 = "GridGeometry";
-			value1 = geometry;
-			arg2 = "InterpolationType";
-			value2 = "bilinear";
-		}
-		GridCoverage2D projected = coverage.geophysics(useGeophysics);
-		final ParameterValueGroup param = processor.getOperation("Resample")
-				.getParameters();
-		param.parameter("Source").setValue(projected);
-		param.parameter(arg1).setValue(value1);
-		param.parameter(arg2).setValue(value2);
-		projected = (GridCoverage2D) processor.doOperation(param);
-		final RenderedImage image = projected.getRenderedImage();
-		projected = projected.geophysics(false);
-		String operation = null;
-		if (image instanceof RenderedOp) {
-			operation = ((RenderedOp) image).getOperationName();
-			AbstractProcessor.LOGGER.fine("Applied \"" + operation
-					+ "\" JAI operation.");
-		}
-		if (SHOW) {
-			Viewer.show(projected, operation);
-		} else {
-			// Force computation
-			assertNotNull(projected.getRenderedImage().getData());
-		}
-		return projected;
-	}
 
-	/**
-	 * Returns the "Sample to geophysics" transform as an affine transform.
-	 */
-	private static AffineTransform getAffineTransform(
-			final GridCoverage2D coverage) {
-		AffineTransform tr;
-		tr = (AffineTransform) ((GridGeometry2D) coverage.getGridGeometry())
-				.getGridToCRS2D();
-		tr = new AffineTransform(tr); // Change the type to the default Java2D
-		// implementation.
-		return tr;
-	}
+
+
 }

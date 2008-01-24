@@ -20,9 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapLayer;
@@ -40,7 +38,7 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
      * @param map 
      */
     public LayerZoomItem(Map map) {
-        this.setText(TextBundle.getResource().getString("zoom_to_layer"));
+        this.setText(BUNDLE.getString("zoom_to_layer"));
         setMap(map);
         init();
     }
@@ -63,8 +61,7 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
 
                         if (map != null && layer != null) {
                             try {
-                                map.setMapArea(layer.getBounds());
-                                map.refresh();
+                                map.getRenderingStrategy().setMapArea(layer.getBounds());
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -75,13 +72,13 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
    
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer != null) ;
+            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
         }
         return false;
     }
 
     public Component getComponent(SelectionData[] selection) {
-        layer = selection[0].layer;
+        layer = selection[0].getLayer();
         this.setEnabled((map != null));
 
         return this;

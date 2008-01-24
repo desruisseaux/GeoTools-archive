@@ -22,7 +22,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import javax.sql.DataSource;
+
 // Geotools dependencies
+import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
@@ -48,6 +51,8 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @deprecated Replaced by {@link FactoryOnAccess}.
  */
 public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements DataSource {
+    private static final long serialVersionUID = 5425165051212823860L;
+
     /**
      * Creates a new instance of this data source
      */
@@ -60,7 +65,7 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
      * <code>{@linkplain #NORMAL_PRIORITY NORMAL_PRIORITY} - 10</code>.
      */
     public int getPriority() {
-        return NORMAL_PRIORITY;
+        return AbstractFactory.NORMAL_PRIORITY;
     }
 
     /**

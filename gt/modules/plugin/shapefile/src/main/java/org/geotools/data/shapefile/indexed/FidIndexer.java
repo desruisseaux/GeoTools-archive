@@ -15,151 +15,67 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import java.io.File;
-import java.io.FileInputStream;
+import static org.geotools.data.shapefile.ShpFileType.*;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.URL;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataUtilities;
+import org.geotools.data.shapefile.ShpFileType;
+import org.geotools.data.shapefile.ShpFiles;
+import org.geotools.data.shapefile.StorageFile;
 import org.geotools.data.shapefile.shp.IndexFile;
-
 
 /**
  * Creates a .fix file (fid index).
- *
+ * 
  * @author Jesse
  */
 public class FidIndexer {
-	static Logger LOGGER=org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
-    public static synchronized URL generate(URL shpURL) throws IOException {
-    	LOGGER.fine("Generating fids for "+shpURL);
+    static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.data.shapefile");
+
+    /**
+     * Generates the FID index file for the shpFile
+     */
+    public static synchronized void generate(URL shpURL) throws IOException {
+        generate(new ShpFiles(shpURL));
+    }
+
+    /**
+     * Generates the FID index file for the shpFiles
+     */
+    public static void generate(ShpFiles shpFiles) throws IOException {
+        LOGGER.fine("Generating fids for " + shpFiles.get(SHP));
+
+        
+        IndexFile indexFile = null;
+        StorageFile file = shpFiles.getStorageFile(FIX);
         IndexedFidWriter writer = null;
-        IndexFile indexFile=null;
-
+        
         try {
-            String filename;
+            indexFile = new IndexFile(shpFiles, false);
 
-            try {
-                filename = java.net.URLDecoder.decode(shpURL.toString(),
-                        "US-ASCII");
-                filename = filename.substring(0, filename.lastIndexOf(".shp"));
-            } catch (java.io.UnsupportedEncodingException use) {
-                throw new java.net.MalformedURLException("Unable to decode "
-                    + shpURL + " cause " + use.getMessage());
-            }
-
-            int indexslash = filename.lastIndexOf(File.pathSeparator);
-
-            if (indexslash == -1) {
-                indexslash = 0;
-            }
-
-            URL fixURL = new URL(filename + ".fix");
-            URL indexURL = new URL(filename + ".shx");
-            
-            if( DataUtilities.urlToFile(fixURL).exists() )
-            	return fixURL;
-            
-            if( !(DataUtilities.urlToFile(indexURL).exists()) )
-            	return null;
-            
-			indexFile = new IndexFile(getReadChannel(indexURL));
-            FileChannel writeChannel = getWriteChannel(fixURL);
-
-            writer = new IndexedFidWriter(writeChannel,
-                    new IndexedFidReader(filename.substring(indexslash),
-                        writeChannel));
+            // writer closes channel for you.
+            writer = new IndexedFidWriter(shpFiles, file);
 
             for (int i = 0, j = indexFile.getRecordCount(); i < j; i++) {
                 writer.next();
             }
 
-            return fixURL;
         } finally {
-        	try{
-            if (indexFile != null) {
-            	indexFile.close();
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+                file.replaceOriginal();
+            } finally {
+                if (indexFile != null) {
+                    indexFile.close();
+                }
             }
-        	}finally{
-
-            if (writer != null) {
-                writer.close();
-            }
-        	}
         }
     }
 
-    /**
-     * Obtain a ReadableByteChannel from the given URL. If the url
-     * protocol is file, a FileChannel will be returned. Otherwise a generic
-     * channel will be obtained from the urls input stream.
-     *
-     * @param url DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    protected static ReadableByteChannel getReadChannel(URL url)
-        throws IOException {
-        ReadableByteChannel channel = null;
-
-        if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
-
-            File file = DataUtilities.urlToFile(url);
-
-            if (!file.exists()) {
-                throw new IOException("File doesn't exist: " + file);
-            }
-
-            if (!file.canRead()) {
-                throw new IOException("File isn't readable: " + file);
-            }
-
-            FileInputStream in = new FileInputStream(file);
-            channel = in.getChannel();
-        } else {
-            InputStream in = url.openConnection().getInputStream();
-            channel = Channels.newChannel(in);
-        }
-
-        return channel;
-    }
-
-    /**
-     * Obtain a WritableByteChannel from the given URL. If the url
-     * protocol is file, a FileChannel will be returned. Currently, this
-     * method will return a generic channel for remote urls, however both
-     * shape and dbf writing can only occur with a local FileChannel channel.
-     *
-     * @param url DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    protected static FileChannel getWriteChannel(URL url)
-        throws IOException {
-        FileChannel channel;
-
-        if (url.getProtocol().equals("file")) { // && useMemoryMappedBuffer) {
-
-            File file = DataUtilities.urlToFile(url);
-
-            RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            channel = raf.getChannel();
-
-            ((FileChannel) channel).lock();
-
-            return channel;
-        } else {
-            return null;
-        }
-    }
 }

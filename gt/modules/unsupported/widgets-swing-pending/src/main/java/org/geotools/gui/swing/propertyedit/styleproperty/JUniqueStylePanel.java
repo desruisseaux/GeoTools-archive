@@ -8,7 +8,6 @@ package org.geotools.gui.swing.propertyedit.styleproperty;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
@@ -53,7 +52,7 @@ public class JUniqueStylePanel extends javax.swing.JPanel implements PropertyPan
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("uniquestyle");
+        return BUNDLE.getString("uniquestyle");
     }
 
     public void setTarget(MapLayer layer) {

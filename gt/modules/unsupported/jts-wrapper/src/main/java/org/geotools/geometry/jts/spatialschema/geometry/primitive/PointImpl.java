@@ -101,7 +101,7 @@ public class PointImpl extends GeometryImpl implements Point {
      * the values of the object and we would not know.
      */
     public DirectPosition getPosition() {
-        return (DirectPosition) position.clone();
+        return new DirectPositionImpl(position);
     }
 
     /**
@@ -113,7 +113,7 @@ public class PointImpl extends GeometryImpl implements Point {
         if (isMutable()) {
             CoordinateReferenceSystem myCRS = getCoordinateReferenceSystem();
             CoordinateReferenceSystem pointCRS = position.getCoordinateReferenceSystem();
-            DirectPosition copy = (DirectPosition) position.clone();
+            DirectPosition copy = new DirectPositionImpl(position);
             if ((myCRS != null) && (pointCRS != null) && (!myCRS.equals(pointCRS))) {
                 // Do the conversion.
                 try {

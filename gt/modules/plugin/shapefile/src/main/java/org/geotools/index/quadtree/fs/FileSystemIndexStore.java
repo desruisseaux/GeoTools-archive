@@ -33,22 +33,22 @@ import org.geotools.index.quadtree.StoreException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/fs/FileSystemIndexStore.java $
  */
 public class FileSystemIndexStore implements IndexStore {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.index.quadtree");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.quadtree");
     private File file;
     private byte byteOrder;
 
     /**
      * Constructor. The byte order defaults to NEW_MSB_ORDER
-     *
+     * 
      * @param file
      */
     public FileSystemIndexStore(File file) {
@@ -58,7 +58,7 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * Constructor
-     *
+     * 
      * @param file
      * @param byteOrder
      */
@@ -122,16 +122,20 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * Wites a tree node to the qix file
-     *
-     * @param node The node
-     * @param channel DOCUMENT ME!
-     * @param order byte order
-     *
+     * 
+     * @param node
+     *                The node
+     * @param channel
+     *                DOCUMENT ME!
+     * @param order
+     *                byte order
+     * 
      * @throws IOException
-     * @throws StoreException DOCUMENT ME!
+     * @throws StoreException
+     *                 DOCUMENT ME!
      */
     private void writeNode(Node node, FileChannel channel, ByteOrder order)
-        throws IOException, StoreException {
+            throws IOException, StoreException {
         int offset = this.getSubNodeOffset(node);
 
         ByteBuffer buf = ByteBuffer.allocate((4 * 8) + (3 * 4)
@@ -164,11 +168,12 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * Calculates the offset
-     *
+     * 
      * @param node
-     *
-     *
-     * @throws StoreException DOCUMENT ME!
+     * 
+     * 
+     * @throws StoreException
+     *                 DOCUMENT ME!
      */
     private int getSubNodeOffset(Node node) throws StoreException {
         int offset = 0;
@@ -188,7 +193,7 @@ public class FileSystemIndexStore implements IndexStore {
      * Loads a quadrtee stored in a '.qix' file. <b>WARNING:</b> The resulting
      * quadtree will be immutable; if you perform an insert, an
      * <code>UnsupportedOperationException</code> will be thrown.
-     *
+     * 
      * @see org.geotools.index.quadtree.IndexStore#load()
      */
     public QuadTree load(IndexFile indexfile) throws StoreException {
@@ -197,7 +202,7 @@ public class FileSystemIndexStore implements IndexStore {
         try {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("Opening QuadTree "
-                    + this.file.getCanonicalPath());
+                        + this.file.getCanonicalPath());
             }
 
             final FileInputStream fis = new FileInputStream(file);
@@ -212,25 +217,25 @@ public class FileSystemIndexStore implements IndexStore {
             buf.flip();
 
             tree = new QuadTree(buf.getInt(), buf.getInt(), indexfile) {
-                        public void insert(int recno, Envelope bounds) {
-                            throw new UnsupportedOperationException(
-                                "File quadtrees are immutable");
-                        }
+                public void insert(int recno, Envelope bounds) {
+                    throw new UnsupportedOperationException(
+                            "File quadtrees are immutable");
+                }
 
-                        public boolean trim() {
-                            return false;
-                        }
+                public boolean trim() {
+                    return false;
+                }
 
-                        public void close() throws StoreException {
-                        	super.close();
-                            try {
-                                channel.close();
-                                fis.close();
-                            } catch (IOException e) {
-                                throw new StoreException(e);
-                            }
-                        }
-                    };
+                public void close() throws StoreException {
+                    super.close();
+                    try {
+                        channel.close();
+                        fis.close();
+                    } catch (IOException e) {
+                        throw new StoreException(e);
+                    }
+                }
+            };
 
             tree.setRoot(FileSystemNode.readNode(0, null, channel, order));
 
@@ -244,9 +249,9 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param order
-     *
+     * 
      */
     private static ByteOrder byteToOrder(byte order) {
         ByteOrder ret = null;
@@ -275,7 +280,7 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the byteOrder.
      */
     public int getByteOrder() {
@@ -284,8 +289,9 @@ public class FileSystemIndexStore implements IndexStore {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param byteOrder The byteOrder to set.
+     * 
+     * @param byteOrder
+     *                The byteOrder to set.
      */
     public void setByteOrder(byte byteOrder) {
         this.byteOrder = byteOrder;

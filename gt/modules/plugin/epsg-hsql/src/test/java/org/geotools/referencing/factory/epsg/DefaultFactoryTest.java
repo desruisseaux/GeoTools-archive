@@ -31,7 +31,6 @@ import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.geometry.Envelope;
@@ -281,7 +280,10 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals("4273", getIdentifier(crs));
         try {
             assertTrue(factory.isConnected());
-            Thread.currentThread().sleep(800);
+            Thread.sleep(800);
+            System.gc();
+            System.runFinalization();
+            Thread.sleep(200);
             System.gc();
             System.runFinalization();
             assertFalse(factory.isConnected());
@@ -368,12 +370,12 @@ public class DefaultFactoryTest extends TestCase {
      * Tests the {@code getAuthorityCodes()} method.
      */
     public void testAuthorityCodes() throws FactoryException {
-        final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        final Set<String> crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(crs.isEmpty());
         assertEquals("Check size() consistency", crs.size(), crs.size());
         assertTrue(crs.size() > 0); // Must be after the 'assertEquals' above.
 
-        final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
+        final Set<String> geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
         assertTrue (geographicCRS instanceof AuthorityCodes);
         assertFalse(geographicCRS.isEmpty());
         assertTrue (geographicCRS.size() > 0);
@@ -381,24 +383,22 @@ public class DefaultFactoryTest extends TestCase {
         assertFalse(geographicCRS.containsAll(crs));
         assertTrue (crs.containsAll(geographicCRS));
 
-        final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
+        final Set<String> projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
         assertTrue (projectedCRS instanceof AuthorityCodes);
         assertFalse(projectedCRS.isEmpty());
         assertTrue (projectedCRS.size() > 0);
         assertTrue (projectedCRS.size() < crs.size());
         assertFalse(projectedCRS.containsAll(crs));
         assertTrue (crs.containsAll(projectedCRS));
-//        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
 
-        final Set datum = factory.getAuthorityCodes(Datum.class);
+        final Set<String> datum = factory.getAuthorityCodes(Datum.class);
         assertTrue (datum instanceof AuthorityCodes);
         assertFalse(datum.isEmpty());
         assertTrue (datum.size() > 0);
-//        assertTrue(Collections.disjoint(datum, crs));
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+        assertTrue(Collections.disjoint(datum, crs));
 
-        final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
+        final Set<String> geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
         assertTrue (geodeticDatum instanceof AuthorityCodes);
         assertFalse(geodeticDatum.isEmpty());
         assertTrue (geodeticDatum.size() > 0);
@@ -417,10 +417,10 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue("Dummy type", factory.getAuthorityCodes(String.class).isEmpty());
 
         // Tests projections, which are handle in a special way.
-        final Set operations      = factory.getAuthorityCodes(Operation     .class);
-        final Set conversions     = factory.getAuthorityCodes(Conversion    .class);
-        final Set projections     = factory.getAuthorityCodes(Projection    .class);
-        final Set transformations = factory.getAuthorityCodes(Transformation.class);
+        final Set<String> operations      = factory.getAuthorityCodes(Operation     .class);
+        final Set<String> conversions     = factory.getAuthorityCodes(Conversion    .class);
+        final Set<String> projections     = factory.getAuthorityCodes(Projection    .class);
+        final Set<String> transformations = factory.getAuthorityCodes(Transformation.class);
 
         assertTrue (operations      instanceof AuthorityCodes);
         assertTrue (conversions     instanceof AuthorityCodes);
@@ -437,9 +437,8 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue (operations .containsAll(conversions));
         assertTrue (operations .containsAll(transformations));
 
-        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
-//        assertTrue (Collections.disjoint(conversions, transformations));
-//        assertFalse(Collections.disjoint(conversions, projections));
+        assertTrue (Collections.disjoint(conversions, transformations));
+        assertFalse(Collections.disjoint(conversions, projections));
 
         assertFalse(operations     .isEmpty());
         assertFalse(conversions    .isEmpty());
@@ -456,7 +455,7 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue (units.size() > 0);
 
         // Tests the fusion of all types
-        final Set all = factory.getAuthorityCodes(IdentifiedObject.class);
+        final Set<String> all = factory.getAuthorityCodes(IdentifiedObject.class);
         assertFalse(all instanceof AuthorityCodes); // Usually a HashSet.
         assertTrue (all.containsAll(crs));
         assertTrue (all.containsAll(datum));

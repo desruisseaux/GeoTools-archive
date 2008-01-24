@@ -23,7 +23,6 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
 /**
@@ -42,7 +41,7 @@ public class DeleteItem implements TreePopupItem{
     public DeleteItem(final JContextTree tree){
         this.tree = tree;
         
-        deleteitem = new JMenuItem( TextBundle.getResource().getString("delete") );
+        deleteitem = new JMenuItem( BUNDLE.getString("delete") );
         deleteitem.setIcon( IconBundle.getResource().getIcon("16_delete") );
         deleteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,0));
         
@@ -55,7 +54,7 @@ public class DeleteItem implements TreePopupItem{
     }
     
     public boolean isValid(SelectionData[] selection) {
-        return true;
+        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
     }
 
     public Component getComponent(SelectionData[] selection) {

@@ -297,7 +297,7 @@ public final class CRS {
      * @param  authority The authority name (for example {@code "EPSG"}).
      * @return The set of supported codes. May be empty, but never null.
      */
-    public static Set/*<String>*/ getSupportedCodes(final String authority) {
+    public static Set<String> getSupportedCodes(final String authority) {
         return DefaultAuthorityFactory.getSupportedCodes(authority);
     }
 
@@ -311,7 +311,7 @@ public final class CRS {
      *
      * @since 2.3.1
      */
-    public static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
+    public static Set<String> getSupportedAuthorities(final boolean returnAliases) {
         return DefaultAuthorityFactory.getSupportedAuthorities(returnAliases);
     }
 
@@ -449,7 +449,11 @@ public final class CRS {
         if (envelope != null) {
             final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
             if (sourceCRS != null) try {
-                crs = CRSUtilities.getCRS2D(crs);
+                crs = CRS.getHorizontalCRS(crs);
+                if (crs == null) {
+                    throw new TransformException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1,
+                            crs.getName()));
+                }
                 if (!equalsIgnoreMetadata(sourceCRS, crs)) {
                     final GeneralEnvelope e;
                     e = transform(findMathTransform(sourceCRS, crs, true), envelope);
@@ -1329,7 +1333,7 @@ public final class CRS {
             if (targetPt == null) {
                 try {
                     // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-                    mt = (MathTransform2D) mt.inverse();
+                    mt = mt.inverse();
                 } catch (NoninvertibleTransformException exception) {
                     unexpectedException("transform", exception);
                     return destination;

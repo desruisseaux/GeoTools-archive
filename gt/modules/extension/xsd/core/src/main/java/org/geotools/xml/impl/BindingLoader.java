@@ -15,19 +15,25 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.Map;
+
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.ConstructorInjectionComponentAdapter;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
+import org.picocontainer.defaults.InstanceComponentAdapter;
+
 import javax.xml.namespace.QName;
 import org.geotools.xml.Binding;
 
 
 public class BindingLoader {
-    MutablePicoContainer container;
-
-    public BindingLoader() {
-        container = new DefaultPicoContainer();
+    
+    Map bindings;
+    
+    public BindingLoader( Map bindings ) {
+        this.bindings = bindings;
     }
 
     /**
@@ -41,13 +47,15 @@ public class BindingLoader {
      *
      */
     public Binding loadBinding(QName qName, MutablePicoContainer context) {
-        ComponentAdapter adapter = container.getComponentAdapter(qName);
-
-        if (adapter == null) {
+        Object o = bindings.get( qName );
+        if ( o == null ) {
             return null;
         }
-
-        return (Binding) adapter.getComponentInstance(context);
+        if ( o instanceof Class ) {
+            return loadBinding(qName, (Class)o, context);
+        }
+        
+        return (Binding) o;
     }
 
     /**
@@ -60,14 +68,11 @@ public class BindingLoader {
      * no such binding could be created.
      *
      */
-    public Binding loadBinding(Class bindingClass, MutablePicoContainer context) {
-        ComponentAdapter adapter = container.getComponentAdapterOfType(bindingClass);
-
-        if (adapter == null) {
-            return null;
-        }
-
-        return (Binding) adapter.getComponentInstance(context);
+    public Binding loadBinding(QName qName, Class bindingClass, MutablePicoContainer context) {
+        //instantiate within the given context
+        ComponentAdapter adapter = 
+            new ConstructorInjectionComponentAdapter( qName, bindingClass );
+        return (Binding) adapter.getComponentInstance( context );
     }
 
     /**
@@ -78,21 +83,15 @@ public class BindingLoader {
      * @return The binding class, or null if no such class exists.
      */
     protected ComponentAdapter getBinding(QName type) {
-        return container.getComponentAdapter(type);
-    }
-
-    /**
-     * @return The container which houses the bindings.
-     */
-    public MutablePicoContainer getContainer() {
-        return container;
-    }
-
-    /**
-     * Sets the container which houses bindings.
-     *
-     */
-    public void setContainer(MutablePicoContainer container) {
-        this.container = container;
+        Object o = bindings.get( type );
+        if ( o == null ) {
+            return null;
+        }
+        
+        if ( o instanceof Class ) {
+            return new ConstructorInjectionComponentAdapter( null, (Class) o ); 
+        }
+        
+        return new InstanceComponentAdapter( null, o );
     }
 }

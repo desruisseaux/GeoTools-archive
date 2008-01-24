@@ -63,12 +63,7 @@ public class GpxFeatureWriter implements FeatureWriter {
             
             Encoder encoder = new Encoder(configuration);
             encoder.setNamespaceAware(false);
-            
-            try {
-                encoder.encode(dataStore.getGpxData(), GPX.gpx, System.out);
-            } catch (SAXException e) {
-                throw new IOException("endoing error: " + e);
-            }
+            encoder.encode(dataStore.getGpxData(), GPX.gpx, System.out);
             
             // TODO drop file lock
     

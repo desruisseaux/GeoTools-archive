@@ -15,9 +15,15 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+
 import org.geotools.gml3.GML;
+import org.geotools.xlink.XLINK;
 import org.geotools.xml.*;
 
 
@@ -86,10 +92,10 @@ public class GeometryPropertyTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        if (GML._Geometry.equals(name)) {
-            return object;
-        }
-
-        return null;
+        return GML3EncodingUtils.getProperty((Geometry) object, name );
+    }
+    
+    public List getProperties(Object object) throws Exception {
+        return GML3EncodingUtils.getProperties((Geometry) object);
     }
 }

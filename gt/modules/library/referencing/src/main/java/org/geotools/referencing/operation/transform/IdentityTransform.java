@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -17,11 +17,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.Matrix;
@@ -29,7 +27,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
@@ -53,7 +50,7 @@ public class IdentityTransform extends AbstractMathTransform
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5339040282922138164L;
-    
+
     /**
      * The input and output dimension.
      */
@@ -64,7 +61,7 @@ public class IdentityTransform extends AbstractMathTransform
      * Elements in this array will be created only when first requested.
      */
     private static final LinearTransform[] POOL = new LinearTransform[8];
-    
+
     /**
      * Constructs an identity transform of the specified dimension.
      */
@@ -94,15 +91,16 @@ public class IdentityTransform extends AbstractMathTransform
         }
         return candidate;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      * This implementation always returns {@code true}.
      */
+    @Override
     public boolean isIdentity() {
         return true;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      * This implementation always returns {@code true}.
@@ -110,14 +108,14 @@ public class IdentityTransform extends AbstractMathTransform
     public boolean isIdentity(double tolerance) {
         return true;
     }
-    
+
     /**
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
         return dimension;
     }
-    
+
     /**
      * Gets the dimension of output points.
      */
@@ -128,6 +126,7 @@ public class IdentityTransform extends AbstractMathTransform
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return ProjectiveTransform.ProviderAffine.PARAMETERS;
     }
@@ -137,31 +136,34 @@ public class IdentityTransform extends AbstractMathTransform
      *
      * @return A copy of the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return ProjectiveTransform.getParameterValues(getMatrix());
     }
-    
+
     /**
      * Returns a copy of the identity matrix.
      */
     public Matrix getMatrix() {
         return MatrixFactory.create(dimension+1);
     }
-    
+
     /**
      * Gets the derivative of this transform at a point. For an identity transform,
      * the derivative is the same everywhere.
      */
+    @Override
     public Matrix derivative(final DirectPosition point) {
         return MatrixFactory.create(dimension);
     }
-    
+
     /**
      * Copies the values from {@code ptSrc} to {@code ptDst}.
      * Overrides the super-class method for performance reason.
      *
      * @since 2.2
      */
+    @Override
     public DirectPosition transform(final DirectPosition ptSrc, final DirectPosition ptDst) {
         if (ptSrc.getDimension() == dimension) {
             if (ptDst == null) {
@@ -181,16 +183,17 @@ public class IdentityTransform extends AbstractMathTransform
             throw new AssertionError(e); // Should never happen.
         }
     }
-    
+
     /**
      * Transforms an array of floating point coordinates by this transform.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
         System.arraycopy(srcPts, srcOff, dstPts, dstOff, numPts*dimension);
     }
-    
+
     /**
      * Transforms an array of floating point coordinates by this transform.
      */
@@ -199,28 +202,31 @@ public class IdentityTransform extends AbstractMathTransform
     {
         System.arraycopy(srcPts, srcOff, dstPts, dstOff, numPts*dimension);
     }
-    
+
     /**
      * Returns the inverse transform of this object, which
      * is this transform itself
      */
+    @Override
     public MathTransform inverse() {
         return this;
     }
-    
+
     /**
      * Returns a hash value for this transform.
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID + dimension;
     }
-    
+
     /**
      * Compares the specified object with
      * this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization

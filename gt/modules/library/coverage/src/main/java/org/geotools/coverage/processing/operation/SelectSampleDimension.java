@@ -49,7 +49,7 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
  * This operation can also be used for selecting a different "visible sample dimension". Some
  * images may contain useful data in more than one sample dimension, but renderer the content
  * using only 1 sample dimension at time. The {@code "VisibleSampleDimension"} parameter can be
- * used for selecting this sample dimension. If ommited, then the new grid coverage will inherit
+ * used for selecting this sample dimension. If omitted, then the new grid coverage will inherit
  * its source's visible sample dimension.
  *
  * <P><STRONG>Name:</STRONG>&nbsp;<CODE>"SelectSampleDimension"</CODE><BR>

@@ -3,7 +3,7 @@ package it.geosolutions.utils.progress;
 import java.util.EventObject;
 
 /**
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions.
  * 
  */
 public class ProcessingEvent extends EventObject {

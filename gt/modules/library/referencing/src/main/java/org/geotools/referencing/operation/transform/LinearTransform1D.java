@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,10 +17,8 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
@@ -30,7 +28,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.operation.matrix.Matrix2;
 import org.geotools.referencing.operation.LinearTransform;
@@ -72,7 +69,7 @@ public class LinearTransform1D extends AbstractMathTransform
      * The value which is multiplied to input values.
      */
     public final double scale;
-    
+
     /**
      * The value to add to input values.
      */
@@ -81,7 +78,7 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * The inverse of this transform. Created only when first needed.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform1D inverse;
 
     /**
      * Constructs a new linear transform. This constructor is provided for subclasses only.
@@ -115,6 +112,7 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return ProjectiveTransform.ProviderAffine.PARAMETERS;
     }
@@ -126,17 +124,18 @@ public class LinearTransform1D extends AbstractMathTransform
      *
      * @return A copy of the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return ProjectiveTransform.getParameterValues(getMatrix());
     }
-    
+
     /**
      * Gets the dimension of input points, which is 1.
      */
     public int getSourceDimensions() {
         return 1;
     }
-    
+
     /**
      * Gets the dimension of output points, which is 1.
      */
@@ -150,11 +149,12 @@ public class LinearTransform1D extends AbstractMathTransform
     public Matrix getMatrix() {
         return new Matrix2(scale, offset, 0, 1);
     }
-    
+
     /**
      * Creates the inverse transform of this object.
      */
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    @Override
+    public MathTransform1D inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
             if (isIdentity()) {
                 inverse = this;
@@ -164,19 +164,20 @@ public class LinearTransform1D extends AbstractMathTransform
                 inverse.inverse = this;
                 this.inverse = inverse;
             } else {
-                inverse = super.inverse();
+                inverse = (MathTransform1D) super.inverse();
             }
         }
         return inverse;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      */
+    @Override
     public boolean isIdentity() {
        return isIdentity(0);
     }
-    
+
     /**
      * Tests whether this transform does not move any points by using the provided tolerance.
      * This method work in the same way than
@@ -188,34 +189,36 @@ public class LinearTransform1D extends AbstractMathTransform
         tolerance = Math.abs(tolerance);
         return Math.abs(offset) <= tolerance && Math.abs(scale-1) <= tolerance;
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.  This implementation is different
      * from the default {@link AbstractMathTransform#derivative} implementation in that no
      * coordinate point is required and {@link Double#NaN} may be a legal output value for
      * some users.
      */
+    @Override
     public Matrix derivative(final DirectPosition point) throws TransformException {
         return new Matrix1(scale);
     }
-    
+
     /**
      * Gets the derivative of this function at a value.
      */
     public double derivative(final double value) {
         return scale;
     }
-    
+
     /**
      * Transforms the specified value.
      */
     public double transform(double value) {
         return offset + scale*value;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
@@ -231,7 +234,7 @@ public class LinearTransform1D extends AbstractMathTransform
             }
         }
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -250,22 +253,24 @@ public class LinearTransform1D extends AbstractMathTransform
             }
         }
     }
-    
+
     /**
      * Returns a hash value for this transform.
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         long code;
         code = (int)serialVersionUID + Double.doubleToRawLongBits(offset);
         code =  code*37              + Double.doubleToRawLongBits(scale);
         return (int)(code >>> 32) ^ (int)code;
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -285,5 +290,5 @@ public class LinearTransform1D extends AbstractMathTransform
              */
         }
         return false;
-    }    
+    }
 }

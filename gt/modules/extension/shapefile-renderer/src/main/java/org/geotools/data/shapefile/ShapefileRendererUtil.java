@@ -98,25 +98,32 @@ public class ShapefileRendererUtil {
     }
 
     public static IndexedDbaseFileReader getDBFReader( ShapefileDataStore ds ) throws IOException {
-        return new IndexedDbaseFileReader(ds.getReadChannel(ds.dbfURL), ds.useMemoryMappedBuffer, ds.getStringCharset());
+        return new IndexedDbaseFileReader(ds.shpFiles, ds.useMemoryMappedBuffer, ds.getStringCharset());
     }
+    private static final FileReader FILE_READER = new FileReader(){
+
+        public String id() {
+            return ShapefileRendererUtil.class.getName()+"$"+getClass().getName();
+        }
+        
+    };
 
     public static ReadableByteChannel getShpReadChannel( ShapefileDataStore ds ) throws IOException {
-        return ds.getReadChannel(ds.shpURL);
+        return ds.shpFiles.getReadChannel(ShpFileType.SHP, FILE_READER );
     }
 
     public static URL getshpURL( ShapefileDataStore ds ) {
-        return ds.shpURL;
+        return ds.shpFiles.acquireRead(ShpFileType.SHP, FILE_READER);
     }
 
     public static FIDReader getFidReader( ShapefileDataStore datastore, RecordNumberTracker tracker )
             throws MalformedURLException {
         if (datastore instanceof IndexedShapefileDataStore) {
             IndexedShapefileDataStore ids = (IndexedShapefileDataStore)datastore;
-            if( ids.fixURL==null )
+            if( !ids.indexUseable(ShpFileType.FIX) )
                 return createBasicFidReader(datastore, tracker);
             try{
-                return new IndexedFidReader(datastore.getCurrentTypeName(), tracker, datastore.getReadChannel(ids.fixURL));
+                return new IndexedFidReader(ids.shpFiles);
             }catch (Exception e) {
                 return createBasicFidReader(datastore,tracker);
             }
@@ -148,5 +155,9 @@ public class ShapefileRendererUtil {
             }
 
         };
+    }
+
+    public static ShpFiles getShpFiles(ShapefileDataStore ds) {
+        return ds.shpFiles;
     }
 }

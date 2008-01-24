@@ -16,10 +16,9 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.util.Locale;
+import java.text.FieldPosition;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -28,7 +27,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
@@ -69,7 +67,7 @@ public final class BoundingBoxes {
     }
 
     /**
-     * Initialize a geographic bounding box from the specified envelope. If the envelope contains
+     * Initializes a geographic bounding box from the specified envelope. If the envelope contains
      * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
      * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
      *
@@ -124,13 +122,14 @@ public final class BoundingBoxes {
     public static String toString(final GeographicBoundingBox box,
                                   final String pattern, final Locale locale)
     {
-        final StringBuilder buffer = new StringBuilder();
-        final AngleFormat  format;
+        final AngleFormat format;
         format = (locale!=null) ? new AngleFormat(pattern, locale) : new AngleFormat(pattern);
-        return buffer
-                .append(format.format(new  Latitude(box.getNorthBoundLatitude()))).append(", ")
-                .append(format.format(new Longitude(box.getWestBoundLongitude()))).append(" - ")
-                .append(format.format(new  Latitude(box.getSouthBoundLatitude()))).append(", ")
-                .append(format.format(new Longitude(box.getEastBoundLongitude()))).toString();
+        final FieldPosition pos = new FieldPosition(0);
+        final StringBuffer buffer = new StringBuffer();
+        format.format(new  Latitude(box.getNorthBoundLatitude()), buffer, pos).append(", ");
+        format.format(new Longitude(box.getWestBoundLongitude()), buffer, pos).append(" - ");
+        format.format(new  Latitude(box.getSouthBoundLatitude()), buffer, pos).append(", ");
+        format.format(new Longitude(box.getEastBoundLongitude()), buffer, pos);
+        return buffer.toString();
     }
 }

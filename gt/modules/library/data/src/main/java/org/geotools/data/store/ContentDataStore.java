@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.data.ContentFeatureCollection;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -28,7 +27,6 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.FeatureFactory;
@@ -87,7 +85,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Justin Deoliveira, The Open Planning Project
  */
 public abstract class ContentDataStore implements DataStore {
-	/**
+
+    /**
+     * writer flags
+     */
+    protected final static int WRITER_ADD = 0x01<<0;
+    protected final static int WRITER_UPDATE = 0x01<<1;
+    
+    /**
      * name, entry map
      */
     final protected Map<Name,ContentEntry> entries;
@@ -116,7 +121,12 @@ public abstract class ContentDataStore implements DataStore {
      * namespace uri of the datastore itself, or default namespace
      */
     protected String namespaceURI;
-
+    
+    /**
+     * locking manager
+     */
+    protected LockingManager lockingManager;
+    
     public ContentDataStore() {
         this.entries = new HashMap<Name,ContentEntry>();
     }
@@ -308,18 +318,18 @@ public abstract class ContentDataStore implements DataStore {
         ContentFeatureSource featureSource = createFeatureSource(entry);
         featureSource.setTransaction(tx);
         
-        if ( tx != Transaction.AUTO_COMMIT ) {
-            //setup the transaction state
-            synchronized (tx) {
-                if ( tx.getState( typeName ) == null ) {
-                    tx.putState( typeName, createTransactionState(featureSource) );
-                }
-            }
-        }
+//        if ( tx != Transaction.AUTO_COMMIT ) {
+//            //setup the transaction state
+//            synchronized (tx) {
+//                if ( tx.getState( typeName ) == null ) {
+//                    tx.putState( typeName, createTransactionState(featureSource) );
+//                }
+//            }
+//        }
         
         return featureSource;
     }
-
+    
     /**
      * Returns a feature reader for the specified query and transaction.
      * <p>
@@ -335,10 +345,7 @@ public abstract class ContentDataStore implements DataStore {
             throw new IllegalArgumentException( "Query does not specify type.");
         }
         
-        FeatureCollection collection = 
-           getFeatureSource(query.getTypeName(),tx).getFeatures( query );
-
-        return new DelegateFeatureReader(collection.getSchema(), collection.features());
+        return getFeatureSource(query.getTypeName(),tx).getReader( query );
     }
 
     /**
@@ -352,11 +359,32 @@ public abstract class ContentDataStore implements DataStore {
     public final FeatureWriter getFeatureWriter(String typeName, Filter filter,
         Transaction tx) throws IOException {
         
-        ContentFeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
-        return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
+        ContentFeatureStore featureStore = ensureFeatureStore(typeName,tx);
+        return featureStore.getWriter( filter , WRITER_UPDATE | WRITER_ADD );
         
     }
  
+    /**
+     * Helper method which gets a feature source ensuring that it is a feature 
+     * store as well. If not it throws an IOException.
+     * 
+     * @param typeName The name of the feature source.
+     * @param tx A transaction handle.
+     * 
+     * @throws IOException If the feature source is not a store.
+     *
+     */
+    protected final ContentFeatureStore ensureFeatureStore(String typeName, Transaction tx) 
+        throws IOException {
+        
+        ContentFeatureSource featureSource = getFeatureSource(typeName,tx);
+        if ( !( featureSource instanceof ContentFeatureStore)) {
+            throw new IOException(typeName + " is read only" );
+        }
+
+        return (ContentFeatureStore) featureSource;
+    }
+    
     /**
      * Returns a feature writer for the specified type name and transaction.
      * <p>
@@ -381,24 +409,22 @@ public abstract class ContentDataStore implements DataStore {
     public final FeatureWriter getFeatureWriterAppend(String typeName, Transaction tx)
         throws IOException {
         
-        ContentFeatureCollection collection = getFeatureSource(typeName,tx).getFeatures();
-        return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
+        ContentFeatureStore featureStore = ensureFeatureStore(typeName,tx);
+        return featureStore.getWriter( Filter.INCLUDE , WRITER_ADD );
     }
 
     public final LockingManager getLockingManager() {
-        return null;
+        return lockingManager;
     }
 
     public final FeatureSource getView(Query query) throws IOException, SchemaException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public final void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException {
     }
 
-  
-    
     public final void dispose() {
         for ( ContentEntry entry :  entries.values() ) {
             entry.dispose();
@@ -538,6 +564,6 @@ public abstract class ContentDataStore implements DataStore {
      * @param featureSource The feature source / store for the new transaction
      * state.
      */
-    protected abstract Transaction.State createTransactionState(ContentFeatureSource featureSource)
-        throws IOException;
+//    protected abstract Transaction.State createTransactionState(ContentFeatureSource featureSource)
+//        throws IOException;
 }

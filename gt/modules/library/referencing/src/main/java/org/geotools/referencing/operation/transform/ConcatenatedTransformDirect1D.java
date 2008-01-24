@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,9 +17,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -37,21 +37,21 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 1064398659892864966L;
-    
+
     /**
      * The first math transform. This field is identical
      * to {@link ConcatenatedTransform#transform1}. Only
      * the type is different.
      */
     private final MathTransform1D transform1;
-    
+
     /**
      * The second math transform. This field is identical
      * to {@link ConcatenatedTransform#transform1}. Only
      * the type is different.
      */
     private final MathTransform1D transform2;
-    
+
     /**
      * Constructs a concatenated transform.
      */
@@ -62,21 +62,22 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
         this.transform1 = transform1;
         this.transform2 = transform2;
     }
-    
+
     /**
-     * Check if transforms are compatibles with this implementation.
+     * Checks if transforms are compatibles with this implementation.
      */
+    @Override
     boolean isValid() {
         return super.isValid() && getSourceDimensions()==1 && getTargetDimensions()==1;
     }
-    
+
     /**
      * Transforms the specified value.
      */
     public double transform(final double value) throws TransformException {
         return transform2.transform(transform1.transform(value));
     }
-    
+
     /**
      * Gets the derivative of this function at a value.
      */
@@ -84,5 +85,13 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
         final double value1 = transform1.derivative(value);
         final double value2 = transform2.derivative(transform1.transform(value));
         return value2 * value1;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform1D inverse() throws NoninvertibleTransformException {
+        return (MathTransform1D) super.inverse();
     }
 }

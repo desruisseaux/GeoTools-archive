@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.event.EventListenerList;
 
 import org.geotools.data.DataStore;
@@ -34,7 +34,6 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.GridCoverageFinder;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
@@ -53,6 +52,8 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
+    private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
+    
     private static File LASTPATH = null;
     private EventListenerList listeners = new EventListenerList();
 
@@ -84,7 +85,8 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         gui_choose = new javax.swing.JFileChooser();
 
         but_nouveau.setIcon(IconBundle.getResource().getIcon("16_data_add"));
-        but_nouveau.setText(TextBundle.getResource().getString("add"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle"); // NOI18N
+        but_nouveau.setText(bundle.getString("add")); // NOI18N
         but_nouveau.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         but_nouveau.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -102,7 +104,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_nouveau)
                 .addContainerGap())
@@ -123,6 +125,8 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
         RandomStyleFactory rsf = new RandomStyleFactory();
 
+        String errorStr = BUNDLE.getString("DefaultFileTypeChooser_error");
+        
         File[] files = gui_choose.getSelectedFiles();
         for (File f : files) {
             LASTPATH = f;
@@ -135,7 +139,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                     layer.setTitle(f.getName());
                     layers.add(layer);
                 } catch (IOException ex) {
-                    jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    jtf_error.setText(errorStr);
                 }
             } else {
 
@@ -147,16 +151,16 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                         layer.setTitle(f.getName());
                         layers.add(layer);
                     } catch (TransformException ex) {
-                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        jtf_error.setText(errorStr);
                     } catch (FactoryRegistryException ex) {
-                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        jtf_error.setText(errorStr);
                     } catch (SchemaException ex) {
-                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        jtf_error.setText(errorStr);
                     } catch (IllegalAttributeException ex) {
-                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                        jtf_error.setText(errorStr);
                     }
                 } else {
-                    jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    jtf_error.setText(errorStr);
                 }
             }
             LASTPATH = f;
@@ -181,7 +185,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("files");
+        return BUNDLE.getString("files");
     }
 
     public Component getChooserComponent() {

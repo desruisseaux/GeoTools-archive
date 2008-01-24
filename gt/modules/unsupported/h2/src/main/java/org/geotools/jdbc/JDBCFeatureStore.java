@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.jdbc;
 
 import java.io.IOException;
@@ -5,22 +20,28 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 
-import org.geotools.data.ContentFeatureCollection;
-import org.geotools.data.FeatureStore;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.FilteringFeatureReader;
+import org.geotools.data.FilteringFeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Association;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 
 /**
  * FeatureStore implementation for jdbc based relational database tables.
@@ -28,98 +49,95 @@ import com.vividsolutions.jts.geom.Geometry;
  * All the operations of this class are delegated to {@link JDBCFeatureCollection}
  * via the {@link #all(ContentState)} and {@link #filtered(ContentState, Filter)}
  * methods.
- * 
+ *
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  */
 public final class JDBCFeatureStore extends ContentFeatureStore {
-
+    
     /**
      * primary key of the table
      */
     PrimaryKey primaryKey;
-    
+
     /**
      * Creates the new feature store.
      * @param entry The datastore entry.
+     * @param query The defining query.
      */
-    public JDBCFeatureStore(ContentEntry entry) throws IOException {
-        super(entry);
-        
+    public JDBCFeatureStore(ContentEntry entry,Query query) throws IOException {
+        super(entry,query);
+
         //TODO: cache this
-        primaryKey =  ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
+        primaryKey = ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
     }
-    
+
     /**
      * Type narrow to {@link JDBCDataStore}.
      */
     public JDBCDataStore getDataStore() {
         return (JDBCDataStore) super.getDataStore();
     }
+
     /**
      * Type narrow to {@link JDBCState}.
      */
     public JDBCState getState() {
         return (JDBCState) super.getState();
     }
-    
+
     /**
      * Returns the primary key of the table backed by feature store.
      */
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
-    
-    /**
-     * This method operates by delegating to the 
-     * {@link JDBCFeatureCollection#update(AttributeDescriptor[], Object[])}
-     * method provided by the feature collection resulting from 
-     * {@link #filtered(ContentState, Filter)}.
-     * 
-     * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
-     */
-    public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
-            Filter filter) throws IOException {
-        
-        if ( filter == null ) {
-            String msg = "Must specify a filter, must not be null.";
-            throw new IllegalArgumentException( msg );
-        }
-        
-        JDBCFeatureCollection features = 
-            (JDBCFeatureCollection) filtered(getState(), filter);
-        features.update(type, value);
-    }
-    
+
+//    /**
+//     * This method operates by delegating to the
+//     * {@link JDBCFeatureCollection#update(AttributeDescriptor[], Object[])}
+//     * method provided by the feature collection resulting from
+//     * {@link #filtered(ContentState, Filter)}.
+//     *
+//     * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
+//     */
+//    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
+//        throws IOException {
+//        if (filter == null) {
+//            String msg = "Must specify a filter, must not be null.";
+//            throw new IllegalArgumentException(msg);
+//        }
+//
+//        JDBCFeatureCollection features = (JDBCFeatureCollection) filtered(getState(), filter);
+//        features.update(type, value);
+//    }
+
     /**
      * Builds the feature type from database metadata.
      */
     protected SimpleFeatureType buildFeatureType() throws IOException {
-        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder( );
-        
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+
         //set up the name
         String tableName = entry.getName().getLocalPart();
-        tb.setName( tableName );
-        
+        tb.setName(tableName);
+
         //set the namespace, if not null
         if (entry.getName().getNamespaceURI() != null) {
             tb.setNamespaceURI(entry.getName().getNamespaceURI());
-        }
-        else {
+        } else {
             //use the data store
-            tb.setNamespaceURI( getDataStore().getNamespaceURI() );
+            tb.setNamespaceURI(getDataStore().getNamespaceURI());
         }
-        
+
         //grab the schema
         String databaseSchema = getDataStore().getDatabaseSchema();
-        
+
         //ensure we have a connection
-        Connection cx = getDataStore().getConnection( getState() );
-        
+        Connection cx = getDataStore().getConnection(getState());
+
         //get metadata about columns from database
         try {
-            
-            
             DatabaseMetaData metaData = cx.getMetaData();
 
             /*
@@ -148,10 +166,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
 
             try {
                 SQLDialect dialect = getDataStore().getSQLDialect();
-                
+
                 while (columns.next()) {
                     String name = columns.getString("COLUMN_NAME");
-    
+
                     //do not include primary key in the type
                     /*
                      *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
@@ -161,151 +179,298 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                      *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
                      *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
                      */
-                    ResultSet primaryKeys = 
-                        metaData.getPrimaryKeys(null, databaseSchema, tableName);
-                    
+                    ResultSet primaryKeys = metaData.getPrimaryKeys(null, databaseSchema, tableName);
+
                     try {
                         while (primaryKeys.next()) {
                             String keyName = primaryKeys.getString("COLUMN_NAME");
-        
+
                             if (name.equals(keyName)) {
                                 name = null;
-        
+
                                 break;
                             }
                         }
+                    } finally {
+                        JDBCDataStore.closeSafe(primaryKeys);
                     }
-                    finally {
-                        JDBCDataStore.closeSafe( primaryKeys );
-                    }
-                   
+
                     if (name == null) {
                         continue;
                     }
-    
-                    //check for foreign key
-                    if ( getDataStore().isForeignKeyAware() ) {
-                        //foreign key aware, any columns that are foreign keys
-                        // should be made associations
-                        //TODO: for now we assume the foreign key is always a 
-                        //single column
-                        
-                       /*  <LI><B>PKTABLE_CAT</B> String => primary key table catalog 
-                        *      being imported (may be <code>null</code>)
-                        *  <LI><B>PKTABLE_SCHEM</B> String => primary key table schema
-                        *      being imported (may be <code>null</code>)
-                        *  <LI><B>PKTABLE_NAME</B> String => primary key table name
-                        *      being imported
-                        *  <LI><B>PKCOLUMN_NAME</B> String => primary key column name
-                        *      being imported
-                        *  <LI><B>FKTABLE_CAT</B> String => foreign key table catalog (may be <code>null</code>)
-                        *  <LI><B>FKTABLE_SCHEM</B> String => foreign key table schema (may be <code>null</code>)
-                        *  <LI><B>FKTABLE_NAME</B> String => foreign key table name
-                        *  <LI><B>FKCOLUMN_NAME</B> String => foreign key column name
-                        *  <LI><B>KEY_SEQ</B> short => sequence number within a foreign key
-                        *  <LI><B>UPDATE_RULE</B> short => What happens to a
-                        *       foreign key when the primary key is updated:
-                        *  <LI><B>DELETE_RULE</B> short => What happens to 
-                        *      the foreign key when primary is deleted.
-                        *  <LI><B>FK_NAME</B> String => foreign key name (may be <code>null</code>)
-                        *  <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
-                        *  <LI><B>DEFERRABILITY</B> short => can the evaluation of foreign key 
-                        *      constraints be deferred until commit
-                        */
-                        ResultSet foreignKeys = 
-                            metaData.getImportedKeys(null, databaseSchema, tableName);
-                        
+
+                    //check for association
+                    if (getDataStore().isAssociations()) {
+                        getDataStore().ensureAssociationTablesExist(cx);
+
+                        //check for an association
+                        String sql = getDataStore().selectRelationshipSQL(tableName, name);
+
+                        Statement st = cx.createStatement();
+
                         try {
-                            while( foreignKeys.next() ) {
-                                String keyName = foreignKeys.getString( "FKCOLUMN_NAME" );
-                                if ( name.equals( keyName ) ) {
-                                    String associatedTypeName = 
-                                        foreignKeys.getString("PKTABLE_NAME");
-                                    
+                            ResultSet relationships = st.executeQuery(sql);
+
+                            try {
+                                if (relationships.next()) {
                                     //found, create a special mapping 
-                                    tb.userData( "jdbc.associatedTypeName", associatedTypeName )
-                                        .add( name, Association.class );
+                                    tb.add(name, Association.class);
+
                                     continue;
                                 }
-                            }    
-                        }
-                        finally {
-                            JDBCDataStore.closeSafe( foreignKeys );
+                            } finally {
+                                JDBCDataStore.closeSafe(relationships);
+                            }
+                        } finally {
+                            JDBCDataStore.closeSafe(st);
                         }
                     }
-                    
-                    
+
                     //figure out the type mapping
-                    
+
                     //first ask the dialect
-                    Class binding = dialect.getMapping( columns );
-                   
-                    if ( binding == null ) {
+                    Class binding = dialect.getMapping(columns);
+
+                    if (binding == null) {
                         //determine from type mappings
                         int dataType = columns.getInt("DATA_TYPE");
                         binding = getDataStore().getMapping(dataType);
                     }
-                    if ( binding == null ) {
+
+                    if (binding == null) {
                         //determine from type name mappings
-                        String typeName = columns.getString( "TYPE_NAME");
-                        binding = getDataStore().getMapping( typeName );
+                        String typeName = columns.getString("TYPE_NAME");
+                        binding = getDataStore().getMapping(typeName);
                     }
-                    
+
                     //if still not found, resort to Object
-                    if ( binding == null ) {
-                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + name );
+                    if (binding == null) {
+                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + name);
                         binding = Object.class;
+                    }
+
+                    //nullability
+                    if ( "NO".equalsIgnoreCase( columns.getString( "IS_NULLABLE" ) ) ) {
+                        tb.nillable(false);
+                        tb.minOccurs(1);
                     }
                     
                     //determine if this attribute is a geometry or not
-                    if ( Geometry.class.isAssignableFrom( binding ) ) {
+                    if (Geometry.class.isAssignableFrom(binding)) {
                         //add the attribute as a geometry, try to figure out 
                         // its srid first
                         Integer srid = null;
+
                         try {
-                            srid = dialect.getGeometrySRID( databaseSchema , tableName, name, cx );
+                            srid = dialect.getGeometrySRID(databaseSchema, tableName, name, cx);
+                        } catch (Exception e) {
+                            String msg = "Error occured determing srid for " + tableName + "."
+                                + name;
+                            getDataStore().LOGGER.log(Level.WARNING, msg, e);
                         }
-                        catch( Exception e ) {
-                            String msg = "Error occured determing srid for " 
-                                + tableName + "." + name;
-                            getDataStore().LOGGER.log( Level.WARNING, msg, e );
-                        }
-                        
-                        tb.add( name, binding, srid );
-                    }
-                    else {
+
+                        tb.add(name, binding, srid);
+                    } else {
                         //add the attribute
-                        tb.add(name, binding);    
+                        tb.add(name, binding);
                     }
-                    
                 }
-    
+
                 return tb.buildFeatureType();
+            } finally {
+                getDataStore().closeSafe(columns);
             }
-            finally {
-                getDataStore().closeSafe( columns );
-            }
-           
-        }
-        catch( SQLException e ) {
+        } catch (SQLException e) {
             String msg = "Error occurred building feature type";
-            throw (IOException) new IOException( ).initCause(e); 
-        } 
-    }
-    
-    protected JDBCFeatureCollection all(ContentState state) {
-        return new JDBCFeatureCollection( this, getState() );
+            throw (IOException) new IOException().initCause(e);
+        }
     }
 
-    protected JDBCFeatureCollection filtered(ContentState state, Filter filter) {
-        return new JDBCFeatureCollection( this, getState(), filter );
+    /**
+     * Helper method for splitting a filter.
+     */
+    Filter[] splitFilter(Filter original) {
+        Filter[] split = new Filter[2];
+        if ( original != null ) {
+            //create a filter splitter
+            PostPreProcessFilterSplittingVisitor splitter = new PostPreProcessFilterSplittingVisitor(getDataStore()
+                    .getFilterCapabilities(), getSchema(), null);
+            original.accept(splitter, null);
+        
+            split[0] = splitter.getFilterPre();
+            split[1] = splitter.getFilterPost();
+        }
+        
+        return split;
+    }
+
+    protected int getCountInternal(Query query) throws IOException {
+        JDBCDataStore dataStore = getDataStore();
+
+        //split the filter
+        Filter[] split = splitFilter( query.getFilter() );
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
+        
+        try {
+            if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
+                //calculate manually, dont use datastore optimization
+                JDBCDataStore.LOGGER.fine("Calculating size manually");
+
+                int count = 0;
+
+                //grab a reader
+                FeatureReader reader = getReader( query );
+                try {
+                    while (reader.hasNext()) {
+                        reader.next();
+                        count++;
+                    }
+                } finally {
+                    reader.close();
+                }
+
+                return count;
+            } else {
+                //no post filter, we have a preFilter, or preFilter is null.. 
+                // either way we can use the datastore optimization
+                return dataStore.getCount(getSchema(), preFilter, dataStore.getConnection(getState()));
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     
-    protected JDBCFeatureCollection sorted(ContentState state, SortBy[] sort,
-            Filter filter) {
-        JDBCFeatureCollection collection = filtered( state, filter );
-        collection.setSort(sort);
+    protected ReferencedEnvelope getBoundsInternal(Query query)
+            throws IOException {
+        JDBCDataStore dataStore = getDataStore();
+
+        //split the filter
+        Filter[] split = splitFilter( query.getFilter() );
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
+
+        try {
+            if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
+                //calculate manually, dont use datastore optimization
+                JDBCDataStore.LOGGER.fine("Calculating bounds manually");
+
+                ReferencedEnvelope bounds = new ReferencedEnvelope(getSchema().getCRS());
+
+                //grab a reader
+                FeatureReader i = getReader(postFilter);
+                try {
+                    if (i.hasNext()) {
+                        SimpleFeature f = (SimpleFeature) i.next();
+                        bounds.init(f.getBounds());
+
+                        while (i.hasNext()) {
+                            bounds.include(f.getBounds());
+                        }
+                    }
+                } finally {
+                    i.close();
+                }
+
+                return bounds;
+            } 
+            else {
+                //post filter was null... pre can be set or null... either way
+                // use datastore optimization
+                Connection cx = dataStore.getConnection(getState());
+                return dataStore.getBounds(getSchema(), preFilter, cx);
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    protected boolean canFilter() {
+        return true;
+    }
+    
+    protected boolean canSort() {
+        return true;
+    }
+    
+    protected FeatureReader getReaderInternal(Query query) throws IOException {
         
-        return collection;
+        Filter[] split = splitFilter(query.getFilter());
+        Filter preFilter = split[0];
+        Filter postFilter = split[1];
+        
+        //build up a statement for the content
+        String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
+        JDBCDataStore.LOGGER.fine(sql);
+
+        //grab connection
+        Connection cx = getDataStore().getConnection(getState());
+        
+        //create the reader
+        FeatureReader reader;
+        try {
+            reader = new JDBCFeatureReader( sql, cx, this, query.getHints() );
+        } catch (SQLException e) {
+            throw (IOException) new IOException("error create reader").initCause( e );
+        }
+
+        //if post filter, wrap it
+        if (postFilter != null && postFilter != Filter.INCLUDE) {
+            reader = new FilteringFeatureReader(reader,postFilter);
+        }
+
+        return reader;
+    }
+    
+    protected FeatureWriter getWriterInternal(Query query, int flags)
+            throws IOException {
+        
+        if ( flags == 0 ) {
+            throw new IllegalArgumentException( "no write flags set" );
+        }
+        
+        //get connection from current state
+        Connection cx = getDataStore().getConnection(getState());
+        
+        Filter postFilter;
+        //check for update only case
+        FeatureWriter writer;
+        try {
+            //check for insert only
+            if ( (flags | WRITER_ADD) == WRITER_ADD ) {
+                //build up a statement for the content, inserting only so we dont want
+                // the query to return any data ==> Filter.EXCLUDE
+                String sql = getDataStore().selectSQL(getSchema(), Filter.EXCLUDE, query.getSortBy());
+                JDBCDataStore.LOGGER.fine(sql);
+
+                return new JDBCInsertFeatureWriter( sql, cx, this, query.getHints() );
+            }
+            
+            //split the filter
+            Filter[] split = splitFilter(query.getFilter());
+            Filter preFilter = split[0];
+            postFilter = split[1];
+            
+            //build up a statement for the content
+            String sql = getDataStore().selectSQL(getSchema(), preFilter, query.getSortBy());
+            JDBCDataStore.LOGGER.fine(sql);
+            
+            if ( (flags | WRITER_UPDATE) == WRITER_UPDATE ) {
+                writer = new JDBCUpdateFeatureWriter( sql, cx, this, query.getHints() );
+            }
+            else {
+                //update insert case
+                writer = new JDBCUpdateInsertFeatureWriter( sql, cx, this, query.getHints() );
+            }
+        } 
+        catch (SQLException e) {
+            throw (IOException) new IOException( ).initCause(e);
+        }
+        
+        //check for post filter and wrap accordingly
+        if ( postFilter != null && postFilter != Filter.INCLUDE ) {
+            writer = new FilteringFeatureWriter( writer, postFilter );
+        }
+        return writer;
     }
 }

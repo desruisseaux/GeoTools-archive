@@ -23,7 +23,6 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
 /**
@@ -42,7 +41,7 @@ public class DuplicateItem implements TreePopupItem{
     public DuplicateItem(final JContextTree tree){
         this.tree = tree;
         
-        duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );
+        duplicateitem = new JMenuItem( BUNDLE.getString("duplicate") );
         duplicateitem.setIcon( IconBundle.getResource().getIcon("16_duplicate") );
         duplicateitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
         
@@ -55,7 +54,7 @@ public class DuplicateItem implements TreePopupItem{
     }
     
     public boolean isValid(SelectionData[] selection) {
-        return true;
+        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
     }
 
     public Component getComponent(SelectionData[] selection) {

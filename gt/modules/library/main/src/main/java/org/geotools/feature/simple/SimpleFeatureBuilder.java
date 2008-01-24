@@ -526,4 +526,26 @@ public class SimpleFeatureBuilder {
 		}
 		return builder.buildFeature(featureId);
 	}
+        
+    /**
+     * Copies an existing feature, retyping it in the process.
+     * <p>
+     * If the feature type contians attributes in which the oringial feature 
+     * does not have a value for, the value in the resulting feature is set to
+     * <code>null</code>.
+     * </p>
+     * @param feature The original feature.
+     * @param featureType The target feature type.
+     *  
+     * @return The copied feature, with a new type.
+     */
+    public static SimpleFeature retype(SimpleFeature feature, SimpleFeatureType featureType) {
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
+        for ( Iterator a = featureType.getAttributes().iterator(); a.hasNext(); ) {
+            AttributeDescriptor att = (AttributeDescriptor) a.next();
+            Object value = feature.getAttribute( att.getName() );
+            builder.set(att.getName(), value);
+        }
+        return builder.buildFeature(feature.getID());
+    }
 }

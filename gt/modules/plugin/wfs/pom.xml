@@ -86,6 +86,16 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-xml-wfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.opengis</groupId>
+      <artifactId>wfs</artifactId>
+      <version>1.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -96,6 +106,9 @@
         <configuration>
           <excludes>
             <!-- The following tests are skipped because they do not extend OnlineTestCase -->
+            <exclude>**/WFSDataStoreTest.java</exclude>
+            <exclude>**/WFSFeatureSourceTest.java</exclude>
+
             <exclude>**/CubewerksOnlineTest.java</exclude>
             <exclude>**/DMSolutionOnlineTest.java</exclude>
             <exclude>**/GeoServerOnlineTest.java</exclude>

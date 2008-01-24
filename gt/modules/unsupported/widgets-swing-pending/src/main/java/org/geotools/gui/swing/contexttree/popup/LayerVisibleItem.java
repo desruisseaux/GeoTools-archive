@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
 
@@ -41,7 +40,7 @@ public class LayerVisibleItem extends JCheckBoxMenuItem implements TreePopupItem
      * Creates a new instance of LayerVisibleControl 
      */
     public LayerVisibleItem() {
-        this.setText( TextBundle.getResource().getString("visible"));
+        this.setText( BUNDLE.getString("visible"));
         init();
     }
         
@@ -56,13 +55,13 @@ public class LayerVisibleItem extends JCheckBoxMenuItem implements TreePopupItem
      
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer != null) ;
+            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
         }
         return false;
     }
 
     public Component getComponent(SelectionData[] selection) {
-        layer = selection[0].layer;
+        layer = selection[0].getLayer();
         this.setSelected(layer.isVisible());
         
         return this;

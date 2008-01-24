@@ -351,7 +351,7 @@ public class GeographicMetadata extends IIOMetadata {
         } else if (owner instanceof GeographicImageWriter) {
             ((GeographicImageWriter) owner).warningOccurred(record);
         } else {
-            Logging.getLogger("org.geotools.image.io.metadata").log(record);
+            Logging.getLogger(GeographicMetadata.class).log(record);
         }
     }
 

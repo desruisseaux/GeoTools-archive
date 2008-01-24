@@ -17,10 +17,10 @@
  */
 package it.geosolutions.utils.imagemosaic;
 
+import it.geosolutions.utils.progress.BaseArgumentsManager;
 import it.geosolutions.utils.progress.ExceptionEvent;
 import it.geosolutions.utils.progress.ProcessingEvent;
 import it.geosolutions.utils.progress.ProcessingEventListener;
-import it.geosolutions.utils.progress.ProgressManager;
 
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -51,9 +51,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.commons.cli2.option.DefaultOption;
-import org.apache.commons.cli2.option.GroupImpl;
-import org.apache.commons.cli2.util.HelpFormatter;
+import org.apache.commons.cli2.Option;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.WildcardFilter;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -83,33 +81,66 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
- * This classis in charge for creating the index for a mosaic of images that we
- * want to tie together as a sigle bg coverage.
+ * This class is in responsible for creating the index for a mosaic of images
+ * that we want to tie together as a single coverage.
  * 
  * <p>
- * To get instructions on how to run the toll just run it without any arguments
- * and nice and clean help will be printed to the command line.
+ * To get instructions on how to run the tool just run it without any argument
+ * and a nice and clean help message will be printed to the command line.
+ * 
+ * <p>
+ * Anyway an example of a suitable list of argumentBuilder can be seen here
+ * below:
+ * 
+ * <p>
+ * -s H:\\work\\data\\merano_aime -w *.tif -name merano -abs
+ * <p>
+ * where:
+ * <ol>
+ * <li>-s H:\\work\\data\\merano_aime is the source directory</li>
+ * <li>-w *.tif is he wildcard for the files to process</li>
+ * <li>-name merano sets the name for the output shape</li>
+ * <li>-abs asks the tool to use absolute paths instead of relative</li>
+ * </ol>
  * 
  * 
  * <p>
  * It is worth to point out that this tool comes as a command line tool but it
- * has been built with in mind a GUI. It has the capapbility to register
+ * has been built with GUI in mind . It has the capability to register
  * {@link ProcessingEventListener} object that receive notifications about what
  * is going on. Moreover it delegates all the computations to an external
- * thread, hence we can stop the tool in the middle of processig with no so many
- * concerns (hopefully :-) ).
+ * thread, hence we can stop the tool in the middle of processing with no so
+ * many concerns (hopefully :-) ).
  * <p>
  * 
- * <p>
  * 
- * @author Simone Giannecchini
- * @author Alessio Fabiani
+ * @author Simone Giannecchini, GeoSolutions
+ * @author Alessio Fabiani, GeoSolutions
  * @author Blaz Repnik
  * @version 0.3
  * 
  */
-public class MosaicIndexBuilder extends ProgressManager implements Runnable,
-		ProcessingEventListener {
+public class MosaicIndexBuilder extends BaseArgumentsManager implements
+		Runnable, ProcessingEventListener {
+
+	/** Default Logger * */
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("it.geosolutions.utils.imagemosaic");
+
+	/** Program Version */
+	private final static String VERSION = "0.3";
+
+	private final static String NAME = "MosaicIndexBuilder";
+
+	private final Option locationOpt;
+
+	private final Option nameOpt;
+
+	private final Option relativePathOpt;
+
+	private final Option wildcardOpt;
+
+	private String locationPath;
 
 	/**
 	 * Number of resolution levels for the coverages.
@@ -124,24 +155,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	/** Number of files to process. */
 	private int numFiles;
 
-	/** Default Logger * */
-	private final static Logger LOG = org.geotools.util.logging.Logging
-			.getLogger("it.geosolutions.utils.imagemosaic");
-
-	/** Program Version */
-	private final static String versionNumber = "0.2";
-
-	private static final double EPS = 1E-4;
-
-	private final DefaultOption locationOpt;
-
-	private String locationPath;
-
-	private final DefaultOption wildcardOpt;
-
 	private String wildcardString = "*.*";
-
-	private DefaultOption nameOpt;
 
 	/**
 	 * Index file name. Default is index.
@@ -174,19 +188,25 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 
 	private CoordinateReferenceSystem actualCRS = null;
 
+	private boolean absolute = false;
+
 	/**
 	 * Recurses the directory tree and returns valid files.
 	 */
-	private void recurse(List allFiles, String locationPath) {
-		File dir = new File(locationPath);
-		FileFilter fileFilter = new WildcardFilter(wildcardString);
-		File[] files = dir.listFiles(fileFilter);
-		File[] dirs = dir.listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
+	private void recurse(List<File> allFiles, String locationPath) {
+		final File dir = new File(locationPath);
+		final FileFilter fileFilter = new WildcardFilter(wildcardString);
+		final File[] files = dir.listFiles(fileFilter);
+		final File[] dirs = dir
+				.listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
+
 		for (int i = 0; i < files.length; i++) {
 			allFiles.add(files[i]);
 		}
+
 		for (int i = 0; i < dirs.length; i++) {
-			recurse(allFiles, locationPath + '/' + dirs[i].getName());
+			recurse(allFiles, new StringBuilder(locationPath).append('/')
+					.append(dirs[i].getName()).toString());
 		}
 	}
 
@@ -214,7 +234,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					"/error.txt").toString(), append);
 			handler.setLevel(Level.SEVERE);
 			// Add to the desired logger
-			LOG.addHandler(handler);
+			LOGGER.addHandler(handler);
 		} catch (SecurityException el) {
 			fireException(el);
 			return;
@@ -229,10 +249,10 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		// our metadata files
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final Set skipFiles = new HashSet(Arrays.asList(new String[] {
-				indexName + ".shp", indexName + ".dbf", indexName + ".shx",
-				indexName + ".prj", "error.txt", "error.txt.lck",
-				indexName + ".properties" }));
+		final Set<String> skipFiles = new HashSet<String>(Arrays
+				.asList(new String[] { indexName + ".shp", indexName + ".dbf",
+						indexName + ".shx", indexName + ".prj", "error.txt",
+						"error.txt.lck", indexName + ".properties" }));
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -249,30 +269,47 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			index = new ShapefileDataStore(new File(locationPath + "/"
 					+ indexName + ".shp").toURL());
 		} catch (MalformedURLException ex) {
-			if (LOG.isLoggable(Level.SEVERE))
-				LOG.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 			fireException(ex);
 			return;
 		}
 
-		/** Fixed local variables * */
-		// final File dir = new File(locationPath);
-		final List files = new ArrayList(25);
+		final List<File> files = new ArrayList<File>();
 		recurse(files, locationPath);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Cycling over the features
+		// Cycling over the files that have filtered out
 		//
 		// /////////////////////////////////////////////////////////////////////
 		numFiles = files.size();
 		String validFileName = null;
-		final Iterator filesIt = files.iterator();
+		final Iterator<File> filesIt = files.iterator();
 		FeatureWriter fw = null;
 		boolean doneSomething = false;
 		for (int i = 0; i < numFiles; i++) {
-			final File fileBeingProcessed = ((File) filesIt.next());
+
+			
 			StringBuffer message;
+			// //
+			//
+			// Check that this file is actually good to go
+			//
+			// //			
+			final File fileBeingProcessed = ((File) filesIt.next());
+			if(!fileBeingProcessed.exists()||!fileBeingProcessed.canRead()||!fileBeingProcessed.isFile())
+			{
+				// send a message
+				message = new StringBuffer("Skipped file ").append(
+						files.get(i)).append(
+						" snce it seems invalid.");
+				if (LOGGER.isLoggable(Level.INFO))
+					LOGGER.info(message.toString());
+				fireEvent(message.toString(), ((i * 99.0) / numFiles));
+				continue;
+			}
+
 			// //
 			//
 			// Anyone has asked us to stop?
@@ -282,8 +319,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				message = new StringBuffer("Stopping requested at file  ")
 						.append(i).append(" of ").append(numFiles).append(
 								" files");
-				if (LOG.isLoggable(Level.FINE)) {
-					LOG.fine(message.toString());
+				if (LOGGER.isLoggable(Level.FINE)) {
+					LOGGER.fine(message.toString());
 				}
 				fireEvent(message.toString(), ((i * 100.0) / numFiles));
 				return;
@@ -302,8 +339,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			message = new StringBuffer("Now indexing file ")
 					.append(validFileName);
 
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.fine(message.toString());
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(message.toString());
 			}
 			fireEvent(message.toString(), ((i * 100.0) / numFiles));
 			try {
@@ -318,8 +355,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				final ImageInputStream inStream = ImageIO
 						.createImageInputStream(fileBeingProcessed);
 				inStream.mark();
-				final Iterator it = ImageIO.getImageReaders(inStream);
-
+				final Iterator<ImageReader> it = ImageIO.getImageReaders(inStream);
 				ImageReader r = null;
 				if (it.hasNext()) {
 					r = (ImageReader) it.next();
@@ -341,27 +377,25 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							":No ImageIO readeres avalaible.");
-					if (LOG.isLoggable(Level.INFO))
-						LOG.info(message.toString());
+					if (LOGGER.isLoggable(Level.INFO))
+						LOGGER.info(message.toString());
 					fireEvent(message.toString(), ((i * 99.0) / numFiles));
 					continue;
 				}
 
 				// ////////////////////////////////////////////////////////
 				//
-				//
 				// STEP 2
-				// Getting a coverage reader for this coverage. Right now we can
-				// index
-				// Geotiff or WorldImage
-				//
+				// Getting a coverage reader for this coverage.
 				//
 				// ////////////////////////////////////////////////////////
-				if (LOG.isLoggable(Level.FINE))
-					LOG.fine(new StringBuffer("Getting a reader").toString());
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER
+							.fine(new StringBuffer("Getting a reader")
+									.toString());
 				final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 						.findFormat(files.get(i));
-				if (format == null) {
+				if (format == null||!format.accepts(files.get(i))) {
 					// release resources
 					try {
 						inStream.close();
@@ -377,8 +411,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							": File format is not supported.");
-					if (LOG.isLoggable(Level.INFO))
-						LOG.info(message.toString());
+					if (LOGGER.isLoggable(Level.INFO))
+						LOGGER.info(message.toString());
 					fireEvent(message.toString(), ((i * 99.0) / numFiles));
 					continue;
 				}
@@ -407,7 +441,6 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// models, crs, etc....
 					//
 					// /////////////////////////////////////////////////////////////////////
-
 					defaultCM = its.getColorModel();
 					if (defaultCM instanceof IndexColorModel) {
 						IndexColorModel icm = (IndexColorModel) defaultCM;
@@ -423,6 +456,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					defaultSM = its.getSampleModel();
 					defaultCRS = actualCRS;
 					globEnvelope = new GeneralEnvelope(envelope);
+
 					// /////////////////////////////////////////////////////////////////////
 					//
 					// getting information about resolution
@@ -491,15 +525,16 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					skipFeature = (i > 0 ? !(CRS.equalsIgnoreMetadata(
 							defaultCRS, actualCRS)) : false);
 					if (skipFeature)
-						LOG.warning(new StringBuffer("Skipping image ").append(
-								files.get(i)).append(
-								" because CRSs do not match.").toString());
+						LOGGER.warning(new StringBuffer("Skipping image ")
+								.append(files.get(i)).append(
+										" because CRSs do not match.")
+								.toString());
 					skipFeature = checkColorModels(defaultCM, defaultPalette,
 							actualCM);
 					if (skipFeature)
-						LOG.warning(new StringBuffer("Skipping image ").append(
-								files.get(i)).append(
-								" because color models do not match.")
+						LOGGER.warning(new StringBuffer("Skipping image ")
+								.append(files.get(i)).append(
+										" because color models do not match.")
 								.toString());
 					// defaultCM.getNumComponents()==actualCM.getNumComponents()&&
 					// defaultCM.getClass().equals(actualCM.getClass())
@@ -509,7 +544,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// .getDataType() &&
 					//
 					// if (skipFeature)
-					// LOG
+					// LOGGER
 					// .warning(new StringBuffer("Skipping image ")
 					// .append(files.get(i))
 					// .append(
@@ -520,7 +555,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// r.getHeight(0)), defaultCRS);
 					// if (Math.abs((resX - res[0]) / resX) > EPS
 					// || Math.abs(resY - res[1]) > EPS) {
-					// LOG.warning(new StringBuffer("Skipping image ").append(
+					// LOGGER.warning(new StringBuffer("Skipping image
+					// ").append(
 					// files.get(i)).append(
 					// " because resolutions does not match.")
 					// .toString());
@@ -537,20 +573,19 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				// ////////////////////////////////////////////////////////
 				if (!skipFeature) {
 
-					// final SimpleFeature feature = SimpleFeatureBuilder.build(
-					// this.simpleFeatureType, new Object[]{ point, "Here"},
-					// "flag.1" );
 					final SimpleFeature feature = fw.next();
 					feature.setAttribute(1, geomFactory
 							.toGeometry(new ReferencedEnvelope(
 									(Envelope) envelope)));
-					feature.setAttribute(0, validFileName);
+					feature.setAttribute(0, absolute ? new StringBuilder(
+							this.locationPath).append(File.separatorChar)
+							.append(validFileName).toString() : validFileName);
 					fw.write();
 
 					message = new StringBuffer("Done with file ").append(files
 							.get(i));
-					if (LOG.isLoggable(Level.FINE)) {
-						LOG.fine(message.toString());
+					if (LOGGER.isLoggable(Level.FINE)) {
+						LOGGER.fine(message.toString());
 					}
 					message.append('\n');
 					fireEvent(message.toString(), (((i + 1) * 99.0) / numFiles));
@@ -596,7 +631,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			t.commit();
 			t.close();
 		} catch (IOException e) {
-			LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		createPropertiesFiles(globEnvelope, doneSomething);
 
@@ -618,13 +653,14 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			//
 			// /////////////////////////////////////////////////////////////////////
 			message = new StringBuffer("Creating final properties file ");
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.fine(message.toString());
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(message.toString());
 			}
 			fireEvent(message.toString(), 99.9);
 
 			// envelope
 			final Properties properties = new Properties();
+			properties.setProperty("AbsolutePath", Boolean.toString(absolute));
 			properties.setProperty("NumFiles", Integer.toString(numFiles));
 			properties.setProperty("Envelope2D", new StringBuffer(Double
 					.toString(globEnvelope.getMinimum(0))).append(",").append(
@@ -650,26 +686,26 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				properties.store(new BufferedOutputStream(new FileOutputStream(
 						locationPath + "/" + indexName + ".properties")), "");
 			} catch (FileNotFoundException e) {
-				if (LOG.isLoggable(Level.SEVERE))
-					LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.SEVERE))
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				fireEvent(e.getLocalizedMessage(), 0);
 			} catch (IOException e) {
-				if (LOG.isLoggable(Level.SEVERE))
-					LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.SEVERE))
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				fireEvent(e.getLocalizedMessage(), 0);
 			}
 
 			// processing information
 			message = new StringBuffer("Done!!!");
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.fine(message.toString());
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(message.toString());
 			}
 			fireEvent(message.toString(), 100);
 		} else {
 			// processing information
 			message = new StringBuffer("No file to process!!!");
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.fine(message.toString());
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(message.toString());
 			}
 			fireEvent(message.toString(), 100);
 		}
@@ -776,67 +812,44 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	 * Default constructor
 	 */
 	public MosaicIndexBuilder() {
+		super(NAME, VERSION);
 		// /////////////////////////////////////////////////////////////////////
 		// Options for the command line
 		// /////////////////////////////////////////////////////////////////////
-		helpOpt = optionBuilder.withShortName("h").withShortName("?")
-				.withLongName("helpOpt").withDescription("print this message.")
-				.create();
-		versionOpt = optionBuilder.withShortName("v")
-				.withLongName("versionOpt").withDescription(
-						"print the versionOpt.").create();
 		locationOpt = optionBuilder.withShortName("s").withLongName(
 				"source_directory").withArgument(
-				arguments.withName("source").withMinimum(1).withMaximum(1)
-						.create()).withDescription(
+				argumentBuilder.withName("source").withMinimum(1)
+						.withMaximum(1).create()).withDescription(
 				"path where files are located").withRequired(true).create();
 		wildcardOpt = optionBuilder.withShortName("w").withLongName(
 				"wildcardOpt").withArgument(
-				arguments.withName("wildcardOpt").withMinimum(0).withMaximum(1)
-						.create()).withDescription(
+				argumentBuilder.withName("wildcardOpt").withMinimum(0)
+						.withMaximum(1).create()).withDescription(
 				"wildcardOpt to use for selecting files").withRequired(false)
 				.create();
 
 		nameOpt = optionBuilder.withShortName("name")
 				.withLongName("index_name").withArgument(
-						arguments.withName("name").withMinimum(0)
+						argumentBuilder.withName("name").withMinimum(0)
 								.withMaximum(1).create()).withDescription(
 						"name for the index file").withRequired(false).create();
 
-		priorityOpt = optionBuilder.withShortName("p").withLongName(
-				"thread_priority").withArgument(
-				arguments.withName("priority").withMinimum(0).withMaximum(1)
-						.create()).withDescription(
-				"priority for the underlying thread").withRequired(false)
+		relativePathOpt = optionBuilder.withShortName("abs").withLongName(
+				"absolute_path").withDescription(
+				"whether or not paths shuld be absolute").withRequired(false)
 				.create();
 
-		cmdOpts.add(helpOpt);
-		cmdOpts.add(versionOpt);
-		cmdOpts.add(locationOpt);
-		cmdOpts.add(wildcardOpt);
-		cmdOpts.add(nameOpt);
-		cmdOpts.add(priorityOpt);
-
-		optionsGroup = new GroupImpl(cmdOpts, "Options", "All the options", 1,
-				10);
+		addOption(locationOpt);
+		addOption(wildcardOpt);
+		addOption(nameOpt);
+		addOption(relativePathOpt);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Help Formatter
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final HelpFormatter cmdHlp = new HelpFormatter("| ", "  ", " |", 75);
-		cmdHlp.setShellCommand("MosaicIndexBuilder");
-		cmdHlp.setHeader("Help");
-		cmdHlp.setFooter(new StringBuffer(
-				"MosaicIndexBuilder - GeoSolutions S.a.s (C) 2006 - v ")
-				.append(MosaicIndexBuilder.versionNumber).toString());
-		cmdHlp
-				.setDivider("|-------------------------------------------------------------------------|");
-
-		cmdParser.setGroup(optionsGroup);
-		cmdParser.setHelpOption(helpOpt);
-		cmdParser.setHelpFormatter(cmdHlp);
+		finishInitialization();
 	}
 
 	/**
@@ -851,69 +864,57 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		if (mosaicIndexBuilder.parseArgs(args)) {
 			final Thread t = new Thread(mosaicIndexBuilder,
 					"MosaicIndexBuilder");
-			t.setPriority(mosaicIndexBuilder.priority);
+			t.setPriority(mosaicIndexBuilder.getPriority());
 			t.start();
 			try {
 				t.join();
 			} catch (InterruptedException e) {
-				LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 
 		} else
-			LOG.fine("Exiting...");
+			LOGGER.fine("Exiting...");
 
 	}
 
-	private boolean parseArgs(String[] args) {
-		cmdLine = cmdParser.parseAndHelp(args);
-		if (cmdLine != null && cmdLine.hasOption(versionOpt)) {
-			System.out.print(new StringBuffer(
-					"MosaicIndexBuilder - GeoSolutions S.a.s (C) 2006 - v")
-					.append(MosaicIndexBuilder.versionNumber).toString());
-			System.exit(1);
-
-		} else if (cmdLine != null) {
-			// ////////////////////////////////////////////////////////////////
-			//
-			// parsing command line parameters and setting up
-			// Mosaic Index Builder options
-			//
-			// ////////////////////////////////////////////////////////////////
-			locationPath = (String) cmdLine.getValue(locationOpt);
-			final File inDir = new File(locationPath);
-			if (!inDir.isDirectory()) {
-				LOG
-						.severe("Provided input dir does not exist or is not a dir!");
-				return false;
-			}
-			try {
-				locationPath = inDir.getCanonicalPath();
-				locationPath = locationPath.replace('\\', '/');
-			} catch (IOException e) {
-				LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				return false;
-			}
-			// wildcard
-			if (cmdLine.hasOption(wildcardOpt))
-				wildcardString = (String) cmdLine.getValue(wildcardOpt);
-
-			// index name
-			if (cmdLine.hasOption(nameOpt))
-				indexName = (String) cmdLine.getValue(nameOpt);
-
-			// //
-			//
-			// Thread priority
-			//
-			// //
-			// index name
-			if (cmdLine.hasOption(priorityOpt))
-				priority = Integer.parseInt((String) cmdLine
-						.getValue(priorityOpt));
-			return true;
-
+	public boolean parseArgs(String[] args) {
+		if (!super.parseArgs(args))
+			return false;
+		// ////////////////////////////////////////////////////////////////
+		//
+		// parsing command line parameters and setting up
+		// Mosaic Index Builder options
+		//
+		// ////////////////////////////////////////////////////////////////
+		locationPath = (String) getOptionValue(locationOpt);
+		final File inDir = new File(locationPath);
+		if (!inDir.isDirectory()) {
+			LOGGER.severe("Provided input dir does not exist or is not a dir!");
+			return false;
 		}
-		return false;
+		try {
+			locationPath = inDir.getCanonicalPath();
+			locationPath = locationPath.replace('\\', '/');
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return false;
+		}
+		// wildcard
+		if (hasOption(wildcardOpt))
+			wildcardString = (String) getOptionValue(wildcardOpt);
+
+		// index name
+		if (hasOption(nameOpt))
+			indexName = (String) getOptionValue(nameOpt);
+
+		// //
+		//
+		// Type of path
+		//
+		// //
+		if (hasOption(relativePathOpt))
+			absolute = true;
+		return true;
 
 	}
 
@@ -977,14 +978,14 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	 *            precetnage of the progress as well as on what is happening.
 	 */
 	public void getNotification(ProcessingEvent event) {
-		LOG.info(new StringBuffer("Progress is at ").append(
+		LOGGER.info(new StringBuffer("Progress is at ").append(
 				event.getPercentage()).append("\n").append(
 				"attached message is: ").append(event.getMessage()).toString());
 
 	}
 
 	public void exceptionOccurred(ExceptionEvent event) {
-		LOG.log(Level.SEVERE, "An error occurred during processing", event
+		LOGGER.log(Level.SEVERE, "An error occurred during processing", event
 				.getException());
 	}
 
@@ -996,7 +997,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		this.locationPath = locationPath;
 		final File inDir = new File(locationPath);
 		if (!inDir.isDirectory()) {
-			LOG.severe("Provided input dir does not exist or is not a dir!");
+			LOGGER.severe("Provided input dir does not exist or is not a dir!");
 			throw new IllegalArgumentException(
 					"Provided input dir does not exist or is not a dir!");
 		}
@@ -1004,7 +1005,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			locationPath = inDir.getCanonicalPath();
 			locationPath = locationPath.replace('\\', '/');
 		} catch (IOException e) {
-			LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			final IllegalArgumentException ex = new IllegalArgumentException();
 			ex.initCause(e);
 			throw ex;

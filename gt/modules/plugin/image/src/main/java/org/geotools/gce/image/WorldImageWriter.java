@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
@@ -51,7 +50,6 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -60,9 +58,9 @@ import org.opengis.referencing.operation.TransformException;
  * write to, as this is how the format is determined. The directory that file is
  * located in must also already exist.
  * 
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions
  * @author rgould
- * @author alessio fabiani
+ * @author Alessio Fabiani, GeoSolutions
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageWriter.java $
  */
@@ -118,22 +116,17 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 				throw new RuntimeException(
 						"WorldImageWriter::write:It is not possible writing to an URL!");
 			}
-		} /*
-			 * else if (!(destination instanceof ImageOutputStream) &&
-			 * !(destination instanceof File)) throw new RuntimeException(
-			 * "WorldImageWriter::write:It is not possible writing to an URL!");
-			 */
+		} 
 
 		// //
 		//
 		// managing hints
 		//
 		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
 		if (hints != null) {
-			if (this.hints == null) {
-				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-				this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
-			}
+			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
 	}
@@ -266,9 +259,6 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 		// CRS information
 		//
 		// ////////////////////////////////////////////////////////////////////
-		final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
-				.getCoordinateReferenceSystem());
-		final CoordinateSystem cs = crs.getCoordinateSystem();
 		final AffineTransform gridToWorld = (AffineTransform) gc
 				.getGridGeometry().getGridToCRS();
 		final boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);

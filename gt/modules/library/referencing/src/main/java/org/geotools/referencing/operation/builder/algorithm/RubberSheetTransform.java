@@ -22,6 +22,7 @@ import java.util.Iterator;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
@@ -45,7 +46,7 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
  */
 public class RubberSheetTransform extends AbstractMathTransform implements MathTransform2D {
     /**
-     * Helper variable to hold triangle. It is use for optimalization of searching in TIN for 
+     * Helper variable to hold triangle. It is use for optimalization of searching in TIN for
      * triangle containing points that are transformed.
      */
     private TINTriangle previousTriangle = null;
@@ -157,7 +158,15 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
                 return triangle;
             }
         }
-
         throw (new TransformException("Points are outside the scope"));
+    }
+
+    /**
+     * Returns the inverse transform.
+     * @return
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
     }
 }

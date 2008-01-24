@@ -25,7 +25,6 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -48,7 +47,7 @@ public class PasteItem implements TreePopupItem {
     public PasteItem(final JContextTree tree) {
         this.tree = tree;
 
-        pasteitem = new JMenuItem(TextBundle.getResource().getString("paste"));
+        pasteitem = new JMenuItem(BUNDLE.getString("paste"));
         pasteitem.setIcon(IconBundle.getResource().getIcon("16_paste"));
         pasteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 
@@ -76,7 +75,7 @@ public class PasteItem implements TreePopupItem {
 
 
         if (contexts.size() > 0) {
-            tooltip += "<b>&nbsp " + TextBundle.getResource().getString("contexts") + "</b> : &nbsp";
+            tooltip += "<b>&nbsp " + BUNDLE.getString("contexts") + "</b> : &nbsp";
 
             for (MapContext context : contexts) {
                 tooltip += "<br>&nbsp &nbsp - " + context.getTitle() +"&nbsp &nbsp &nbsp";
@@ -91,7 +90,7 @@ public class PasteItem implements TreePopupItem {
                 tooltip += "<br>";
             }
 
-            tooltip += "<b>&nbsp " + TextBundle.getResource().getString("layers") + "</b> : &nbsp";
+            tooltip += "<b>&nbsp " + BUNDLE.getString("layers") + "</b> : &nbsp";
 
             for (MapLayer layer : layers) {
                 tooltip += "<br>&nbsp &nbsp - " + layer.getTitle() +"&nbsp &nbsp &nbsp";
@@ -106,7 +105,7 @@ public class PasteItem implements TreePopupItem {
     }
 
     public boolean isValid(SelectionData[] selection) {
-        return true;
+        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
     }
 
     public Component getComponent(SelectionData[] selection) {

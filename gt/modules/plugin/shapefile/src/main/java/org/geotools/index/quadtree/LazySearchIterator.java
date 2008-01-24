@@ -25,128 +25,125 @@ import java.util.NoSuchElementException;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
-import org.geotools.index.TreeException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Iterator that search the quad tree depth first.  32000 indices are cached at a time and each time a node is
- * visited the indices are removed from the node so that the memory footprint is kept small.  Note that if other
- * iterators operate on the same tree then they can interfere with each other.
+ * Iterator that search the quad tree depth first. 32000 indices are cached at a
+ * time and each time a node is visited the indices are removed from the node so
+ * that the memory footprint is kept small. Note that if other iterators operate
+ * on the same tree then they can interfere with each other.
  * 
  * @author Jesse
  */
-public class LazySearchIterator implements Iterator {
+public class LazySearchIterator implements Iterator<Data> {
 
-	static final DataDefinition DATA_DEFINITION = new DataDefinition("US-ASCII");
+    static final DataDefinition DATA_DEFINITION = new DataDefinition("US-ASCII");
 
-	private static final int MAX_INDICES = 32768;
-	static {
-		DATA_DEFINITION.addField(Integer.class);
-		DATA_DEFINITION.addField(Long.class);
-	}
+    private static final int MAX_INDICES = 32768;
+    static {
+        DATA_DEFINITION.addField(Integer.class);
+        DATA_DEFINITION.addField(Long.class);
+    }
 
-	Data next = null;
+    Data next = null;
 
-	Node current;
+    Node current;
 
-	int idIndex = 0;
+    int idIndex = 0;
 
-	private boolean closed;
+    private boolean closed;
 
-	private Envelope bounds;
+    private Envelope bounds;
 
-	Iterator data;
+    Iterator data;
 
+    private IndexFile indexfile;
 
-	private IndexFile indexfile;
+    public LazySearchIterator(Node root, IndexFile indexfile, Envelope bounds) {
+        super();
+        this.current = root;
+        this.bounds = bounds;
+        this.closed = false;
+        this.next = null;
+        this.indexfile = indexfile;
+    }
 
-	public LazySearchIterator(Node root, IndexFile indexfile, Envelope bounds) {
-		super();
-		this.current = root;
-		this.bounds = bounds;
-		this.closed = false;
-		this.next = null;
-		this.indexfile=indexfile;
-	}
+    public boolean hasNext() {
+        if (closed)
+            throw new IllegalStateException("Iterator has been closed!");
+        if (next != null)
+            return true;
+        if (data != null && data.hasNext()) {
+            next = (Data) data.next();
+        } else {
+            fillCache();
+            if (data != null && data.hasNext())
+                next = (Data) data.next();
+        }
+        return next != null;
+    }
 
+    private void fillCache() {
+        List indices = new ArrayList();
+        ArrayList dataList = new ArrayList();
+        try {
+            while (indices.size() < MAX_INDICES && current != null) {
+                if (idIndex < current.getNumShapeIds() && !current.isVisited()
+                        && current.getBounds().intersects(bounds)) {
+                    indices.add(new Integer(current.getShapeId(idIndex)));
+                    idIndex++;
+                } else {
+                    current.setShapesId(new int[0]);
+                    idIndex = 0;
+                    boolean foundUnvisited = false;
+                    for (int i = 0; i < current.getNumSubNodes(); i++) {
+                        Node node = current.getSubNode(i);
+                        if (!node.isVisited()
+                                && node.getBounds().intersects(bounds)) {
+                            foundUnvisited = true;
+                            current = node;
+                            break;
+                        }
+                    }
+                    if (!foundUnvisited) {
+                        current.setVisited(true);
+                        current = current.getParent();
+                    }
+                }
+            }
+            // sort so offset lookup is faster
+            Collections.sort(indices);
+            for (Iterator iter = indices.iterator(); iter.hasNext();) {
+                Integer recno = (Integer) iter.next();
+                Data data = new Data(DATA_DEFINITION);
+                data.addValue(new Integer(recno.intValue() + 1));
+                data.addValue(new Long(indexfile.getOffsetInBytes(recno
+                        .intValue())));
+                dataList.add(data);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (StoreException e) {
+            throw new RuntimeException(e);
+        }
+        data = dataList.iterator();
+    }
 
+    public Data next() {
+        if (!hasNext())
+            throw new NoSuchElementException("No more elements available");
+        Data temp = next;
+        next = null;
+        return temp;
+    }
 
-	public boolean hasNext() {
-		if (closed)
-			throw new IllegalStateException("Iterator has been closed!");
-		if (next != null)
-			return true;
-		if (data != null && data.hasNext()) {
-			next = (Data) data.next();
-		} else {
-			fillCache();
-			if( data!=null && data.hasNext() )
-				next = (Data) data.next();
-		}
-		return next != null;
-	}
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 
-	private void fillCache() {
-		List indices=new ArrayList();
-		ArrayList dataList=new ArrayList();
-		try {
-			while (indices.size() < MAX_INDICES && current!=null) {
-				if (idIndex < current.getNumShapeIds() && !current.isVisited() && current.getBounds().intersects(bounds)) {
-					indices.add(new Integer( current.getShapeId(idIndex) ) );
-					idIndex++;
-				} else {
-					current.setShapesId(new int[0]);
-					idIndex = 0;
-					boolean foundUnvisited=false;
-					for (int i = 0; i < current.getNumSubNodes(); i++) {
-						Node node = current.getSubNode(i);
-						if (!node.isVisited()
-								&& node.getBounds().intersects(bounds)){
-						foundUnvisited=true;
-						current = node;
-						break;
-						}
-					}
-					if( !foundUnvisited ){
-						current.setVisited(true);
-						current=current.getParent();
-					}
-				}
-			}
-			// sort so offset lookup is faster
-			Collections.sort(indices);
-			for (Iterator iter = indices.iterator(); iter.hasNext();) {
-				Integer recno = (Integer) iter.next();
-				Data data=new Data(DATA_DEFINITION);
-				data.addValue(new Integer(recno.intValue()+1));
-				data.addValue(new Long(indexfile.getOffsetInBytes(recno.intValue())));
-				dataList.add(data);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (TreeException e) {
-			throw new RuntimeException(e);
-		} catch (StoreException e) {
-			throw new RuntimeException(e);
-		}
-		data=dataList.iterator();
-	}
-
-	public Object next() {
-		if (!hasNext())
-			throw new NoSuchElementException("No more elements available");
-		Data temp = next;
-		next=null;
-		return temp;
-	}
-
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
-
-	public void close() throws StoreException {
-		this.closed = true;
-	}
+    public void close() throws StoreException {
+        this.closed = true;
+    }
 
 }

@@ -45,7 +45,7 @@ import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -92,7 +92,7 @@ public class DefaultProcessor extends AbstractProcessor {
          * for serious trouble.
          */
         if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            LOGGER.log(Logging.format(Level.SEVERE,
+            LOGGER.log(Loggings.format(Level.SEVERE,
                     LoggingKeys.EXCESSIVE_TILE_CACHE_$1, maxMemory / (1024 * 1024.0)));
         }
     }

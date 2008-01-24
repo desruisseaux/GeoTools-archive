@@ -35,6 +35,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
+
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
@@ -72,14 +75,23 @@ public class ParseExecutor implements Visitor {
     }
 
     public void visit(Binding binding) {
-        //reload out of context, we do this so that the binding can pick up any new dependencies
-        // providedb by this particular context
-        Class bindingClass = binding.getClass();
-        binding = (Binding) context.getComponentInstanceOfType(binding.getClass());
+        //TODO: the check for InstanceBinding is a temporary measure to allow 
+        // for bindings that are not registered by class, but by instance. 
+        // in the long term we intend to ditch pico container b/c our inection 
+        // needs are quite trivial and can be handled by some simple reflection
+        if ( !( binding instanceof InstanceBinding ) ) {
+            //reload out of context, we do this so that the binding can pick up any new dependencies
+            // providedb by this particular context
+            Class bindingClass = binding.getClass();
+            QName bindingTarget = binding.getTarget();
+            
+            binding = (Binding) context.getComponentInstanceOfType(binding.getClass());
 
-        if (binding == null) {
-            binding = parser.getBindingLoader().loadBinding(bindingClass, context);
+            if (binding == null) {
+                binding = parser.getBindingLoader().loadBinding(bindingTarget,bindingClass, context);
+            }    
         }
+        
 
         //execute the binding
         try {

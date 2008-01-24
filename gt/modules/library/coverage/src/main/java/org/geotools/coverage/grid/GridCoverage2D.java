@@ -35,7 +35,6 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,24 +43,17 @@ import java.util.logging.LogRecord;
 import javax.units.Unit;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.NullOpImage;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedImageAdapter;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.LookupDescriptor;
-import javax.media.jai.operator.PiecewiseDescriptor;
-import javax.media.jai.operator.RescaleDescriptor;
 import javax.media.jai.remote.SerializableRenderedImage;
-import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -75,11 +67,12 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
@@ -170,6 +163,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private final boolean isGeophysics;
 
     /**
+     * Used for transforming a direct position from arbitrary to internal CRS.
+     * Will be created only when first needed. Note that the target CRS should
+     * be two-dimensional, not the {@link #crs} value.
+     */
+    private transient TransformedDirectPosition arbitraryToInternal;
+
+    /**
      * {@code true} if this coverage has been disposed.
      *
      * @see #dispose
@@ -184,7 +184,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     transient String tileEncoding;
 
     /**
-     * Construct a new grid coverage with the same parameter than the specified
+     * Constructs a new grid coverage with the same parameter than the specified
      * coverage. This constructor is useful when creating a coverage with
      * identical data, but in which some method has been overridden in order to
      * process data differently (e.g. interpolating them).
@@ -209,9 +209,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * (including the {@linkplain CoordinateReferenceSystem coordinate reference system}) is
      * inferred from the grid geometry.
      * <p>
-     * This constructor accepts an optional set of properties. "Properties" in <cite>Java Advanced
-     * Imaging</cite> is what OpenGIS calls "Metadata". Keys are {@link String} objects
-     * ({@link CaselessStringKey} are accepted as well), while values may be any {@link Object}.
+     * This constructor accepts an optional set of properties. Keys are {@link String} objects
+     * ({@link javax.media.jai.util.CaselessStringKey} are accepted as well), while values may
+     * be any {@link Object}.
      *
      * @param name         The grid coverage name.
      * @param image        The image.
@@ -235,7 +235,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                                    GridGeometry2D   gridGeometry,
                              final GridSampleDimension[]   bands,
                              final GridCoverage[]        sources,
-                             final Map                properties)
+                             final Map<?,?>           properties)
             throws IllegalArgumentException
     {
         super(name, gridGeometry.getCoordinateReferenceSystem(), sources, image, properties);
@@ -302,10 +302,10 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * This string will be typically used as a message in an exception to be thrown.
      * <p>
      * Note that a succesful check at construction time may fails later if the image is part
-     * of a JAI chain (i.e. is a {@link RenderedOp}) and its bounds has been edited (i.e the
-     * image node as been re-rendered). Since {@code GridCoverage} are immutable by design,
-     * we are not allowed to propagate the image change here. The {@link #getGridGeometry} method
-     * will thrown an {@link IllegalStateException} in this case.
+     * of a JAI chain (i.e. is a {@link javax.media.jai.RenderedOp}) and its bounds has been
+     * edited (i.e the image node as been re-rendered). Since {@code GridCoverage2D} are immutable
+     * by design, we are not allowed to propagate the image change here. The {@link #getGridGeometry}
+     * method will thrown an {@link IllegalStateException} in this case.
      */
     private static String checkConsistency(final RenderedImage image, final GridGeometry2D grid) {
         final GridRange range = grid.getGridRange();
@@ -375,8 +375,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Returns the two-dimensional part of this grid coverage CRS. This is usually (but not
-     * always) identical to the {@linkplain #getCoordinateReferenceSystem full CRS}.
+     * Returns the two-dimensional part of this grid coverage CRS. If the
+     * {@linkplain #getCoordinateReferenceSystem complete CRS} is two-dimensional, then this
+     * method returns the same CRS. Otherwise it returns a CRS for the two first axis having
+     * a {@linkplain GridRange#length length} greater than 1 in the grid range. Note that those
+     * axis are garanteed to appears in the same order than in the complete CRS.
      *
      * @see #getCoordinateReferenceSystem
      */
@@ -398,7 +401,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * the no data values, minimum and maximum values and a color table if one is associated
      * with the dimension. A coverage must have at least one sample dimension.
      */
-    public SampleDimension getSampleDimension(final int index) {
+    public GridSampleDimension getSampleDimension(final int index) {
         return sampleDimensions[index];
     }
 
@@ -411,7 +414,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
 
     /**
      * Returns the interpolation used for all {@code evaluate(...)} methods.
-     * The default implementation returns {@link InterpolationNearest}.
+     * The default implementation returns {@link javax.media.jai.InterpolationNearest}.
      *
      * @return The interpolation.
      */
@@ -516,9 +519,36 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @param  point The point to transform into a {@link Point2D} object.
      * @return The specified point as a {@link Point2D} object.
+     * @throws CannotEvaluateException if a reprojection was required and failed.
      * @throws MismatchedDimensionException if the point doesn't have the expected dimension.
      */
-    private Point2D toPoint2D(final DirectPosition point) throws MismatchedDimensionException {
+    private Point2D toPoint2D(final DirectPosition point)
+            throws CannotEvaluateException, MismatchedDimensionException
+    {
+        /*
+         * If the point contains a CRS, transforms the point on the fly to this coverage CRS.
+         * Note that we transform directly to the 2D CRS, so we don't need to look at the grid
+         * geometry for interpreting the result.
+         */
+        final CoordinateReferenceSystem sourceCRS = point.getCoordinateReferenceSystem();
+        if (sourceCRS != null) {
+            synchronized (this) {
+                if (arbitraryToInternal == null) {
+                    final CoordinateReferenceSystem targetCRS = getCoordinateReferenceSystem2D();
+                    arbitraryToInternal = new TransformedDirectPosition(sourceCRS, targetCRS, null);
+                }
+                try {
+                    arbitraryToInternal.transform(point);
+                } catch (TransformException exception) {
+                    throw new CannotEvaluateException(pointOutsideCoverage(point), exception);
+                }
+                return arbitraryToInternal.toPoint2D();
+            }
+        }
+        /*
+         * If the point did not contains any CRS, take only the axis specified by the grid
+         * geometry and copy in a new Point2D instance.
+         */
         final int actual   = point.getDimension();
         final int expected = crs.getCoordinateSystem().getDimension();
         if (actual != expected) {
@@ -528,6 +558,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (point instanceof Point2D) {
             return (Point2D) point;
         }
+        assert gridGeometry.axisDimensionX < gridGeometry.axisDimensionY;
         return new Point2D.Double(point.getOrdinate(gridGeometry.axisDimensionX),
                                   point.getOrdinate(gridGeometry.axisDimensionY));
     }
@@ -738,6 +769,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     protected class Renderable extends AbstractCoverage.Renderable {
         /**
+         * For compatibility during cross-version serialization.
+         */
+        private static final long serialVersionUID = 4544636336787905450L;
+
+        /**
          * Constructs a renderable image.
          */
         public Renderable() {
@@ -784,14 +820,17 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * transform is the identity transform for all sample dimensions. "No data" values are
      * expressed by {@linkplain Float#NaN NaN} numbers.
      * <p>
-     * This method may be understood as applying the JAI's {@linkplain PiecewiseDescriptor
-     * piecewise} operation with breakpoints specified by the {@link Category} objects in
+     * This method may be understood as applying the JAI's
+     * {@linkplain javax.media.jai.operator.PiecewiseDescriptor piecewise}
+     * operation with breakpoints specified by the {@link Category} objects in
      * each sample dimension. However, it is more general in that the transformation specified
      * with each breakpoint doesn't need to be linear. On an implementation note, this method
      * will really try to use the first of the following operations which is found applicable:
-     * <cite>identity</cite>, {@linkplain LookupDescriptor lookup}, {@linkplain RescaleDescriptor
-     * rescale}, {@linkplain PiecewiseDescriptor piecewise} and in last ressort a more general
-     * (but slower) <cite>sample transcoding</cite> algorithm.
+     * <cite>identity</cite>,
+     * {@linkplain javax.media.jai.operator.LookupDescriptor lookup},
+     * {@linkplain javax.media.jai.operator.RescaleDescriptor rescale},
+     * {@linkplain javax.media.jai.operator.PiecewiseDescriptor piecewise} and in
+     * last ressort a more general (but slower) <cite>sample transcoding</cite> algorithm.
      * <p>
      * {@code GridCoverage} objects live by pair: a <cite>geophysics</cite> one (used for
      * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
@@ -806,9 +845,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @see GridSampleDimension#geophysics
      * @see Category#geophysics
-     * @see LookupDescriptor
-     * @see RescaleDescriptor
-     * @see PiecewiseDescriptor
+     * @see javax.media.jai.operator.LookupDescriptor
+     * @see javax.media.jai.operator.RescaleDescriptor
+     * @see javax.media.jai.operator.PiecewiseDescriptor
      */
     public GridCoverage2D geophysics(final boolean geo) {
         if (geo == isGeophysics) {
@@ -920,7 +959,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 transforms[i] = sampleDimensions[i].geophysics(false).getSampleToGeophysics();
                 if (transforms[i]!=null && !geo) {
                     // We are going to convert geophysics values to packed one.
-                    transforms[i] = (MathTransform1D) transforms[i].inverse();
+                    transforms[i] = transforms[i].inverse();
                 }
             }
             LookupTableJAI table = LookupTableFactory.create(sourceType, targetType, transforms);
@@ -976,7 +1015,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                     }
                     if (!geo) {
                         // We are going to convert geophysics values to packed one.
-                        transform = (MathTransform1D) transform.inverse();
+                        transform = transform.inverse();
                     }
                     final double offset = transform.transform(0);
                     final double scale  = transform.derivative(Double.NaN);
@@ -1082,7 +1121,7 @@ testLinear: for (int i=0; i<numBands; i++) {
             final int        index = operation.lastIndexOf('.');
             final String shortName = (index>=0) ? operation.substring(index+1) : operation;
             final Locale    locale = getLocale();
-            final LogRecord record = Logging.getResources(locale).getLogRecord(
+            final LogRecord record = Loggings.getResources(locale).getLogRecord(
                                      AbstractProcessor.OPERATION,
                                      LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
@@ -1141,7 +1180,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                 }
                 serializedImage = new SerializableRenderedImage(source, false, null,
                                                                 tileEncoding, null, null);
-                final LogRecord record = Logging.format(Level.FINE,
+                final LogRecord record = Loggings.format(Level.FINE,
                         LoggingKeys.CREATED_SERIALIZABLE_IMAGE_$2, getName(), tileEncoding);
                 record.setSourceClassName(GridCoverage2D.class.getName());
                 record.setSourceMethodName("writeObject");

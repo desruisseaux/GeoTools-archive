@@ -36,8 +36,8 @@ public class Map2DMapAreaEvent extends EventObject{
      * @param oldone : JTS Envelope old MapArea
      * @param newone : JTS Envelope new MapArea
      */
-    public Map2DMapAreaEvent(Map2D map, Envelope oldone, Envelope newone){
-        super(map);
+    public Map2DMapAreaEvent(Object strategy, Envelope oldone, Envelope newone){
+        super(strategy);
         oldEnvelope = oldone;
         newEnvelope = newone;
     }

@@ -40,10 +40,11 @@ import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -58,7 +59,7 @@ public abstract class AbstractProcessor {
     /**
      * The logger for coverage processing operations.
      */
-    public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.coverage.processing");
+    public static final Logger LOGGER = Logging.getLogger("org.geotools.coverage.processing");
 
     /**
      * The logging level for reporting coverage operations.
@@ -166,7 +167,7 @@ public abstract class AbstractProcessor {
                             ((Interpolator2D) result).getInterpolation());
             }
             final Locale locale = getLocale();
-            final LogRecord record = Logging.getResources(locale).getLogRecord(
+            final LogRecord record = Loggings.getResources(locale).getLogRecord(
                                      OPERATION, LoggingKeys.APPLIED_OPERATION_$4,
                                      getName((source!=null) ? source : result, locale),
                                      operationName, interp, Integer.valueOf(fromCache ? 1 : 0));

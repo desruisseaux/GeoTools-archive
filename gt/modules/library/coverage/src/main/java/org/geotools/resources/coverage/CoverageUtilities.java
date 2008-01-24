@@ -45,7 +45,10 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.NumberRange;
 
 
@@ -93,6 +96,41 @@ public final class CoverageUtilities {
             }
         }
         return CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
+    }
+    
+    /**
+     * Returns a two-dimensional horizontal CRS for the given coverage. This method performs a
+     * <cite>best effort</cite>; the returned CRS is not garanteed to succed.
+     *
+     * @param  coverage The coverage for which to obtains a two-dimensional horizontal CRS.
+     * @return The two-dimensional horizontal CRS.
+     * @throws TransformException if the CRS can't be reduced to two dimensions.
+     */
+    public static CoordinateReferenceSystem getHorizontalCRS(final Coverage coverage)
+            throws TransformException
+    {
+    	CoordinateReferenceSystem returnedCRS=null;
+        if (coverage instanceof GridCoverage2D) {
+        	returnedCRS= ((GridCoverage2D) coverage).getCoordinateReferenceSystem2D();
+        }
+        if (coverage instanceof GridCoverage) {
+            final GridGeometry2D geometry =
+                    GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
+            if (geometry.isDefined(GridGeometry2D.CRS)) {
+            	returnedCRS= geometry.getCoordinateReferenceSystem2D();
+            } else try {
+            	returnedCRS= geometry.reduce(coverage.getCoordinateReferenceSystem());
+            } catch (FactoryException exception) {
+                // Ignore; we will fallback on the code below.
+            }
+        }
+        if(returnedCRS==null)
+        	returnedCRS= CRS.getHorizontalCRS(coverage.getCoordinateReferenceSystem());
+        if(returnedCRS==null)
+                throw new TransformException(Errors.format(
+                          ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
+                          returnedCRS));
+        return returnedCRS;
     }
 
     /**
@@ -151,6 +189,40 @@ public final class CoverageUtilities {
             }
         }
         return background;
+    }
+
+    /**
+     * Returns {@code true} if the provided {@link GridCoverage}
+     * has {@link Category} objects with a real transformation.
+     * <p>
+     * Common use case for this method is understanding if a {@link GridCoverage} has an
+     * accompanying Geophysics or non-Geophysics view, which means a dicotomy between the
+     * coverage with the "real" data and the coverage with the rendered version of the original
+     * data exists. An example is when you have raw data whose data type is float and you want
+     * to render them using a palette. You usually do this by specifying a set of {@link Category}
+     * object which will map some intervals of the raw data to some specific colors. The rendered
+     * version that we will create using the method {@link GridCoverage2D#geophysics(false)} will
+     * be backed by a RenderedImage with an IndexColorModel representing the colors provided in
+     * the Categories.
+     *
+     * @param gridCoverage
+     *            to check for the existence of categories with tranformations
+     *            between original data and their rendered counterpart.
+     * @return {@code false} if this coverage has only a single view associated with it,
+     *         {@code true} otherwise.
+     */
+    public static boolean hasRenderingCategories(final GridCoverage gridCoverage) {
+        // getting all the SampleDimensions of this coverage, if any exist
+        final int numSampleDimensions = gridCoverage.getNumSampleDimensions();
+        if (numSampleDimensions == 0) {
+            return false;
+        }
+        final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
+        for (int i=0; i<numSampleDimensions; i++) {
+            sampleDimensions[i] = gridCoverage.getSampleDimension(i);
+        }
+        // do they have any transformation that is not the identity?
+        return hasTransform(sampleDimensions);
     }
 
     /**
@@ -337,39 +409,5 @@ public final class CoverageUtilities {
             }
         }
         return OperationStrategy.APPLY_COLOR_EXPANSION;
-    }
-
-    /**
-     * Returns {@code true} if the provided {@link GridCoverage}
-     * has {@link Category} objects with a real transformation.
-     * <p>
-     * Common use case for this method is understanding if a {@link GridCoverage} has an
-     * accompanying Geophysiscs or non-Geophysics view, which means a dicotomy between the
-     * coverage with the "real" data and the coverage with the rendered version of the original
-     * data exists. An example is when you have raw data whose data type is float and you want
-     * to render them using a palette. You usually do this by specifying a set of {@link Category}
-     * object which will map some intervals of the raw data to some specific colors. The rendered
-     * version that we will create using the method {@link GridCoverage2D#geophysics(false)} will
-     * be backed by a RenderedImage with an IndexColorModel representing the colors provided in
-     * the Categories.
-     *
-     * @param gridCoverage
-     *            to check for the existence of categories with tranformations
-     *            between original data and their rendered counterpart.
-     * @return {@code false} if this coverage has only a single view associated with it,
-     *         {@code true} otherwise.
-     */
-    public static boolean hasRenderingCategories(final GridCoverage gridCoverage) {
-        // getting all the SampleDimensions of this coverage, if any exist
-        final int numSampleDimensions = gridCoverage.getNumSampleDimensions();
-        if (numSampleDimensions == 0) {
-            return false;
-        }
-        final SampleDimension[] sampleDimensions = new SampleDimension[numSampleDimensions];
-        for (int i=0; i<numSampleDimensions; i++) {
-            sampleDimensions[i] = gridCoverage.getSampleDimension(i);
-        }
-        // do they have any transformation that is not the identity?
-        return hasTransform(sampleDimensions);
     }
 }

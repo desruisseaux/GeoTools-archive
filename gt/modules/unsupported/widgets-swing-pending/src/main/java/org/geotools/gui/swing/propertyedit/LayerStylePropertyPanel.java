@@ -18,7 +18,6 @@ package org.geotools.gui.swing.propertyedit;
 
 
 import javax.swing.ImageIcon;
-import org.geotools.gui.swing.i18n.TextBundle;
 
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
@@ -65,7 +64,7 @@ public class LayerStylePropertyPanel extends MultiPropertyPanel {
 
     @Override
     public String getTitle() {
-        return TextBundle.getResource().getString("style");
+        return BUNDLE.getString("style");
     }
 
     @Override
@@ -75,7 +74,7 @@ public class LayerStylePropertyPanel extends MultiPropertyPanel {
 
     @Override
     public String getToolTip() {
-        return TextBundle.getResource().getString("style");
+        return BUNDLE.getString("style");
     }
 
 }

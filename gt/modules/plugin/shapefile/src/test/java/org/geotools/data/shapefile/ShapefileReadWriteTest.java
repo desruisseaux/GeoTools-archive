@@ -34,21 +34,17 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-
 /**
- *
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/ShapefileReadWriteTest.java $
  * @version $Id$
  * @author Ian Schneider
  */
 public class ShapefileReadWriteTest extends TestCaseSupport {
-    final String[] files = {
-        "shapes/statepop.shp",
-        "shapes/polygontest.shp",
-        "shapes/pointtest.shp",
-        "shapes/holeTouchEdge.shp",
-        "shapes/stream.shp"
-    };
+    final String[] files = { "shapes/statepop.shp", "shapes/polygontest.shp",
+            "shapes/pointtest.shp", "shapes/holeTouchEdge.shp",
+            "shapes/stream.shp" };
 
     /** Creates a new instance of ShapefileReadWriteTest */
     public ShapefileReadWriteTest(String name) throws IOException {
@@ -62,7 +58,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
             try {
                 test(files[i]);
             } catch (Exception e) {
-                System.out.println("File failed:"+files[i]+" "+e);
+                System.out.println("File failed:" + files[i] + " " + e);
                 e.printStackTrace();
                 errors.append("\nFile " + files[i] + " : " + e.getMessage());
                 bad = e;
@@ -79,23 +75,24 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
     public void testConcurrentReadWrite() throws Exception {
         System.gc();
-        System.runFinalization(); // If some streams are still open, it may help to close them.
+        System.runFinalization(); // If some streams are still open, it may
+        // help to close them.
         final File file = getTempFile();
         Runnable reader = new Runnable() {
             public void run() {
                 int cutoff = 0;
                 FileInputStream fr = null;
-                try {    
+                try {
                     fr = new FileInputStream(file);
-                    try {                        
+                    try {
                         fr.read();
                     } catch (IOException e1) {
                         exception = e1;
                         return;
                     }
-//                    if (verbose) {
-//                        System.out.println("locked");
-//                    }
+                    // if (verbose) {
+                    // System.out.println("locked");
+                    // }
                     readStarted = true;
                     while (cutoff < 10) {
                         synchronized (this) {
@@ -115,9 +112,8 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
                     }
                 } catch (FileNotFoundException e) {
                     assertTrue(false);
-                }
-                finally {
-                    if( fr != null ) {
+                } finally {
+                    if (fr != null) {
                         try {
                             fr.close();
                         } catch (IOException e) {
@@ -131,7 +127,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         Thread readThread = new Thread(reader);
         readThread.start();
         while (!readStarted) {
-            if (exception != null) {                
+            if (exception != null) {
                 throw exception;
             }
             Thread.sleep(100);
@@ -139,7 +135,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         test(files[0]);
     }
 
-    private static void fail(String message, Throwable cause)  {
+    private static void fail(String message, Throwable cause) {
         AssertionFailedError fail = new AssertionFailedError(message);
         fail.initCause(cause);
         throw fail;
@@ -147,7 +143,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
     private void test(String f) throws Exception {
         copyShapefiles(f); // Work on File rather than URL from JAR.
-        ShapefileDataStore s = new ShapefileDataStore(TestData.url(this, f));
+        ShapefileDataStore s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f));
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
@@ -156,40 +152,41 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
         test(type, one, tmp, maker, true);
-        
-        File tmp2 = getTempFile(); // TODO consider reuse tmp results in failure
+
+        File tmp2 = getTempFile(); // TODO consider reuse tmp results in
+        // failure
         test(type, one, tmp2, maker, false);
     }
 
-    private void test(SimpleFeatureType type, FeatureCollection original, File tmp,
-            ShapefileDataStoreFactory maker, boolean memorymapped)
+    private void test(SimpleFeatureType type, FeatureCollection original,
+            File tmp, ShapefileDataStoreFactory maker, boolean memorymapped)
             throws IOException, MalformedURLException, Exception {
-        
+
         ShapefileDataStore shapefile;
         String typeName;
         shapefile = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
-                memorymapped);       
-        
+                memorymapped);
+
         shapefile.createSchema(type);
-                
+
         FeatureStore store = (FeatureStore) shapefile.getFeatureSource(type
                 .getTypeName());
-        
+
         store.addFeatures(original);
-                    
+
         FeatureCollection copy = store.getFeatures();
         compare(original, copy);
-        
-        
-        if( true ){
-            // review open         
-            ShapefileDataStore review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped );        
-            typeName = review.getTypeNames()[0];            
-            FeatureSource featureSource = featureSource = review.getFeatureSource(typeName);
+
+        if (true) {
+            // review open
+            ShapefileDataStore review = new ShapefileDataStore(tmp.toURL(), tmp
+                    .toURI(), memorymapped);
+            typeName = review.getTypeNames()[0];
+            FeatureSource featureSource = review.getFeatureSource(typeName);
             FeatureCollection again = featureSource.getFeatures();
-            
-            compare(copy, again );
-            compare(original, again );
+
+            compare(copy, again);
+            compare(original, again);
         }
     }
 
@@ -204,7 +201,6 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         FeatureIterator iterator1 = one.features();
         FeatureIterator iterator2 = two.features();
 
-        int i = 0;
         while (iterator1.hasNext()) {
             SimpleFeature f1 = iterator1.next();
             SimpleFeature f2 = iterator2.next();
@@ -243,7 +239,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     }
 
     public static final void main(String[] args) throws Exception {
-        //verbose = true;
+        // verbose = true;
         junit.textui.TestRunner.run(suite(ShapefileReadWriteTest.class));
     }
 }

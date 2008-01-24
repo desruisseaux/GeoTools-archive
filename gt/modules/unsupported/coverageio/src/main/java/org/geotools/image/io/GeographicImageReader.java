@@ -219,6 +219,21 @@ public abstract class GeographicImageReader extends ImageReader {
     }
 
     /**
+     * Returns the number of dimension of the image at the given index.
+     * The default implementation always returns 2.
+     *
+     * @param  imageIndex The image index.
+     * @return The number of dimension for the image at the given index.
+     * @throws IOException if an error occurs reading the information from the input source.
+     *
+     * @since 2.5
+     */
+    public int getDimension(final int imageIndex) throws IOException {
+        checkImageIndex(imageIndex);
+        return 2;
+    }
+
+    /**
      * Returns metadata associated with the input source as a whole. Since many raw images
      * can't store metadata, the default implementation returns {@code null}.
      *
@@ -513,18 +528,28 @@ public abstract class GeographicImageReader extends ImageReader {
         double          maximumFillValue = 0; // Only in the visible band, and must be positive.
         final GeographicMetadata metadata = getGeographicMetadata(imageIndex);
         if (metadata != null) {
-            final int maxBand = metadata.getNumBands();
+            final int numMetadataBands = metadata.getNumBands();
             for (int i=0; i<numBands; i++) {
-                int bandIndex = (sourceBands != null) ? sourceBands[i] : i;
-                if (bandIndex < 0 || bandIndex >= maxBand) {
-                    warningOccurred("getRawImageType", indexOutOfBounds(bandIndex, 0, maxBand));
-                    if (sourceBands != null) {
-                        continue; // Next bands may be okay.
-                    } else {
+                final int sourceBand = (sourceBands != null) ? sourceBands[i] : i;
+                if (sourceBand < 0 || sourceBand >= numMetadataBands) {
+                    if (numMetadataBands != 1) {
+                        /*
+                         * If the metadata declares excactly one band, we assume that it is aimed
+                         * to applied for all ImageReader band. We need to apply this patch for
+                         * now because of an inconsistency between Metadata and ImageReader in
+                         * NetCDF files: the former associates NetCDF variables to bands, while
+                         * the later associates NetCDF variables to image index.
+                         *
+                         * TODO: We need to fix this inconcistency after we reviewed
+                         * GeographicMetadata.
+                         */
+                        warningOccurred("getRawImageType", indexOutOfBounds(sourceBand, 0, numMetadataBands));
+                    }
+                    if (numMetadataBands == 0) {
                         break; // We are sure that next bands will not be better.
                     }
                 }
-                final Band band = metadata.getBand(bandIndex);
+                final Band band = metadata.getBand(Math.min(sourceBand, numMetadataBands-1));
                 final double[] nodataValues = band.getNoDataValues();
                 final NumberRange range = band.getValidRange();
                 double minimum, maximum;
@@ -550,10 +575,7 @@ public abstract class GeographicImageReader extends ImageReader {
                     minimum = Double.NaN;
                     maximum = Double.NaN;
                 }
-                // Converts the band index from 'source' space to 'destination' space.
-                if (targetBands != null && bandIndex < targetBands.length) {
-                    bandIndex = targetBands[bandIndex];
-                }
+                final int targetBand = (targetBands != null) ? targetBands[i] : i;
                 /*
                  * For floating point types, replaces no-data values by NaN because the floating
                  * point numbers are typically used for geophysics data, so the raster is likely
@@ -579,7 +601,7 @@ public abstract class GeographicImageReader extends ImageReader {
                         int indexMax = sorted.length;
                         while (--indexMax!=0 && Double.isNaN(maxFill = sorted[indexMax]));
                         assert minFill <= maxFill || Double.isNaN(minFill) : maxFill;
-                        if (bandIndex == visibleBand && maxFill > maximumFillValue) {
+                        if (targetBand == visibleBand && maxFill > maximumFillValue) {
                             maximumFillValue = maxFill;
                         }
                         if (minFill < floor || maxFill > ceil) {
@@ -637,10 +659,10 @@ public abstract class GeographicImageReader extends ImageReader {
                         converter = SampleConverter.IDENTITY;
                     }
                 }
-                if (converters!=null && bandIndex>=0 && bandIndex<converters.length) {
-                    converters[bandIndex] = converter;
+                if (converters!=null && targetBand>=0 && targetBand<converters.length) {
+                    converters[targetBand] = converter;
                 }
-                if (bandIndex == visibleBand) {
+                if (targetBand == visibleBand) {
                     visibleConverter = converter;
                     visibleRange = range;
                 }

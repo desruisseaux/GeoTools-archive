@@ -28,7 +28,10 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -127,8 +130,12 @@ public final class FeatureUtilities {
 				final GeometryFactory gf = new GeometryFactory(pm, 0);
 				final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
 						.toRectangle2D();
-				final CoordinateReferenceSystem sourceCrs = CRSUtilities
-						.getCRS2D(gridCoverageReader.getCrs());
+				final CoordinateReferenceSystem sourceCrs = CRS
+					.getHorizontalCRS(gridCoverageReader.getCrs());
+				if(sourceCrs==null)
+					throw new UnsupportedOperationException(
+							Errors.format(
+				                    ErrorKeys.CANT_SEPARATE_CRS_$1,sourceCrs));
 
 				final Coordinate[] coord = new Coordinate[5];
 				coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
@@ -174,8 +181,13 @@ public final class FeatureUtilities {
 		final GeometryFactory gf = new GeometryFactory(pm, 0);
 		final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
 				.toRectangle2D();
-		final CoordinateReferenceSystem sourceCrs = CRSUtilities
-				.getCRS2D(gridCoverageReader.getCrs());
+		final CoordinateReferenceSystem sourceCrs = CRS
+			.getHorizontalCRS(gridCoverageReader.getCrs());
+		if(sourceCrs==null)
+			throw new UnsupportedOperationException(
+					Errors.format(
+		                    ErrorKeys.CANT_SEPARATE_CRS_$1,gridCoverageReader.getCrs()));
+
 
 		final Coordinate[] coord = new Coordinate[5];
 		coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());

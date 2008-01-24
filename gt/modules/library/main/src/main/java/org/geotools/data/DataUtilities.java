@@ -17,10 +17,12 @@ package org.geotools.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -231,17 +233,35 @@ public class DataUtilities {
      * @param url a URL object that uses protocol "file"
      * @return a File that corresponds to the URL's location
      */
-    public static File urlToFile (URL url) {
-    	String auth = url.getAuthority();
-    	String path = url.getPath();
-    	String path2 = path.replace("%20", " ");
-		File f = null;
-		if (auth != null && !auth.equals("")) {
-			f = new File("//"+auth+path2);
-		} else {
-			f = new File(path2);
-		}
-		return f;
+    public static File urlToFile(URL url) {
+        String string = url.toExternalForm();
+
+        try {
+            string = URLDecoder.decode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Shouldn't happen
+        }
+        
+        String path3;
+        String simplePrefix = "file:/";
+        String standardPrefix = simplePrefix+"/";
+        
+        if( string.startsWith(standardPrefix) ){
+            path3 = string.substring(standardPrefix.length());
+        } else if( string.startsWith(simplePrefix)){
+            path3 = string.substring(simplePrefix.length()-1);            
+        } else {
+        String auth = url.getAuthority();
+        String path2 = url.getPath().replace("%20", " ");
+        File f = null;
+        if (auth != null && !auth.equals("")) {
+            path3 = "//" + auth + path2;
+        } else {
+            path3 = path2;
+        }
+        }
+        
+        return new File(path3);
     }
 
 
@@ -1332,11 +1352,16 @@ public class DataUtilities {
      * </p>
      * 
      * <p>
-     * You may indicate the default Geometry with an astrix: "*geom:Geometry".
+     * You may indicate the default Geometry with an astrix: "*geom:Geometry". You
+     * may also indicate the srid (used to look up a EPSG code).
      * </p>
      * 
      * <p>
-     * Example:<code>name:"",age:0,geom:Geometry,centroid:Point,url:java.io.URL"</code>
+     * Examples:
+     * <ul>
+     * <li><code>name:"",age:0,geom:Geometry,centroid:Point,url:java.io.URL"</code>
+     * <li><code>id:String,polygonProperty:Polygon:srid=32615</code>
+     * </ul>
      * </p>
      *
      * @param identification identification of FeatureType:

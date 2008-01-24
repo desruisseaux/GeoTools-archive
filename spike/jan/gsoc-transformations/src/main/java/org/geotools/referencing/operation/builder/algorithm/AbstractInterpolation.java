@@ -143,7 +143,7 @@ public abstract class AbstractInterpolation {
         return gridValues;
     }
     
-    private Coverage buildCoverage() {
+    private void buildCoverage() {
         gridValues = new float[(xNumCells + 1) * (yNumCells + 1)];
 
         for (int i = 0; i <= yNumCells; i++) {
@@ -152,9 +152,7 @@ public abstract class AbstractInterpolation {
                                                                                          .getOrdinate(0)
                             + (j * dx), env.getLowerCorner().getOrdinate(1) + (i * dy)));
             }
-        }
-
-        return null;
+        }       
     }
 
 

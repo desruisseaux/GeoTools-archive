@@ -151,6 +151,7 @@ public class DemoGUI {
         projectButton.setMinimumSize(new Dimension(BUTTON_WIDTH,1));
         actionButtonPanel.add(projectButton);
         actionButtonPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+        /*
         filterButton = new JButton("5. Filter Features");
         filterButton.setEnabled(false);
         filterButton.setMinimumSize(new Dimension(BUTTON_WIDTH,1));
@@ -175,6 +176,7 @@ public class DemoGUI {
         analyzeButton.setEnabled(false);
         analyzeButton.setMinimumSize(new Dimension(BUTTON_WIDTH,1));
         actionButtonPanel.add(analyzeButton);
+        */
         
         /* The button Panel */
         BoxLayout buttonPanelBoxLayout = new BoxLayout(buttonPanel,BoxLayout.Y_AXIS);
@@ -235,6 +237,7 @@ public class DemoGUI {
                 
               }
           });
+/*
         filterButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
@@ -276,7 +279,7 @@ public class DemoGUI {
                 
               }
           });
-
+*/
         
         /* The info Text Area */
         textArea = new JTextArea();

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,12 +17,10 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -32,7 +30,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.Matrix3;
@@ -64,24 +61,24 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * Small number for floating point comparaisons.
      */
     private static final double EPSILON = 1E-10;
-    
+
     /**
      * The first math transform.
      */
     public final MathTransform transform1;
-    
+
     /**
      * The second math transform.
      */
     public final MathTransform transform2;
-    
+
     /**
      * The inverse transform. This field will be computed only when needed.
      * But it is serialized in order to avoid rounding error if the inverse
      * transform is serialized instead of the original one.
      */
     private ConcatenatedTransform inverse;
-    
+
     /**
      * Constructs a concatenated transform. This constructor is for subclasses only. To
      * create a concatenated transform, use the factory method {@link #create} instead.
@@ -99,7 +96,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                                                getName(transform1), getName(transform2)));
         }
     }
-    
+
     /**
      * Returns the underlying matrix for the specified transform,
      * or {@code null} if the matrix is unavailable.
@@ -113,7 +110,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         return null;
     }
-    
+
     /**
      * Tests if one math transform is the inverse of the other. This implementation
      * can't detect every case. It just detect the case when {@code tr2} is an
@@ -275,7 +272,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             return new ConcatenatedTransform(tr1, tr2);
         }
     }
-    
+
     /**
      * Returns a name for the specified math transform.
      */
@@ -291,7 +288,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         return Classes.getShortClassName(transform);
     }
-    
+
     /**
      * Check if transforms are compatibles. The default
      * implementation check if transfert dimension match.
@@ -299,24 +296,25 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     boolean isValid() {
         return transform1.getTargetDimensions() == transform2.getSourceDimensions();
     }
-    
+
     /**
      * Gets the dimension of input points.
      */
     public final int getSourceDimensions() {
         return transform1.getSourceDimensions();
     }
-    
+
     /**
      * Gets the dimension of output points.
      */
     public final int getTargetDimensions() {
         return transform2.getTargetDimensions();
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
+    @Override
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
     {
@@ -326,7 +324,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //        point. This optimization is done in ConcatenatedTransformDirect.
         return transform2.transform(transform1.transform(ptSrc, null), ptDst);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -342,10 +340,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         transform1.transform(srcPts, srcOff, tmp, 0, numPts);
         transform2.transform(tmp, 0, dstPts, dstOff, numPts);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, final int srcOff,
                           final float[] dstPts, final int dstOff, final int numPts)
         throws TransformException
@@ -358,11 +357,12 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         transform1.transform(srcPts, srcOff, tmp, 0, numPts);
         transform2.transform(tmp, 0, dstPts, dstOff, numPts);
     }
-    
+
     /**
      * Creates the inverse transform of this object.
      */
-    public synchronized final MathTransform inverse() throws NoninvertibleTransformException {
+    @Override
+    public synchronized MathTransform inverse() throws NoninvertibleTransformException {
         assert isValid();
         if (inverse == null) {
             inverse = createConcatenatedTransform(transform2.inverse(), transform1.inverse());
@@ -370,7 +370,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         return inverse;
     }
-    
+
     /**
      * Gets the derivative of this transform at a point. This method delegates to the
      * {@link #derivative(DirectPosition)} method because the transformation steps
@@ -381,10 +381,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * @return The derivative at the specified point as a 2&times;2 matrix.
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
+    @Override
     public Matrix derivative(final Point2D point) throws TransformException {
         return derivative(new GeneralDirectPosition(point));
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      *
@@ -392,6 +393,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * @return The derivative at the specified point (never {@code null}).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
+    @Override
     public Matrix derivative(final DirectPosition point) throws TransformException {
         final Matrix matrix1 = transform1.derivative(point);
         final Matrix matrix2 = transform2.derivative(transform1.transform(point, null));
@@ -410,12 +412,13 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         return matrix;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      * Default implementation check if the two transforms are
-     * identity. 
+     * identity.
      */
+    @Override
     public final boolean isIdentity() {
         return transform1.isIdentity() && transform2.isIdentity();
     }
@@ -423,14 +426,16 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     /**
      * Returns a hash value for this transform.
      */
+    @Override
     public final int hashCode() {
         return transform1.hashCode() + 37*transform2.hashCode();
     }
-    
+
     /**
      * Compares the specified object with
      * this math transform for equality.
      */
+    @Override
     public final boolean equals(final Object object) {
         if (object==this) {
             // Slight optimization
@@ -443,7 +448,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         return false;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -452,12 +457,13 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         addWKT(formatter, transform1);
         addWKT(formatter, transform2);
         return "CONCAT_MT";
     }
-    
+
     /**
      * Append to a string buffer the WKT for the specified math transform.
      */

@@ -324,6 +324,13 @@
       <version>1.8</version>
     </dependency>
 
+    <!-- jts-wrapper -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-jts-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <!-- picocontainer-1.2.jar -->
     <dependency>
       <groupId>picocontainer</groupId>
@@ -359,9 +366,21 @@
       <version>2.2.2</version>
     </dependency>
 
+    <!-- WFS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-wfs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+      
+    <!-- WMS datastore -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-wms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-
-
+    
 
     <!-- swing-layout.jar -->
     <dependency>

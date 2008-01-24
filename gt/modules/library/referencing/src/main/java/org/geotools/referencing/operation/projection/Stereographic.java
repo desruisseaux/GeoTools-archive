@@ -23,10 +23,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
-import javax.units.NonSI;
-
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -35,7 +31,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.Utilities;
@@ -50,7 +45,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * for other areas having a circular form.
  * <p>
  *
- * This implementation, and its subclasses, provides transforms for six cases of the  
+ * This implementation, and its subclasses, provides transforms for six cases of the
  * stereographic projection:
  * <ul>
  *   <li>{@code "Oblique_Stereographic"} (EPSG code 9809), alias {@code "Double_Stereographic"}
@@ -61,13 +56,13 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *   <li>{@code "Polar_Stereographic (variant B)"} (EPSG code 9829, uses a series calculation
  *       for the inverse)</li>
  *   <li>{@code "Stereographic_North_Pole"} in ESRI software (uses iteration for the inverse)</li>
- *   <li>{@code "Stereographic_South_Pole"} in ESRI software (uses iteration for the inverse)</li>     
- * </ul>   
+ *   <li>{@code "Stereographic_South_Pole"} in ESRI software (uses iteration for the inverse)</li>
+ * </ul>
  *
  * Both the {@code "Oblique_Stereographic"} and {@code "Stereographic"}
  * projections are "double" projections involving two parts: 1) a conformal
  * transformation of the geographic coordinates to a sphere and 2) a spherical
- * Stereographic projection. The EPSG considers both methods to be valid, but 
+ * Stereographic projection. The EPSG considers both methods to be valid, but
  * considers them to be a different coordinate operation methods.
  * <p>
  *
@@ -91,7 +86,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <strong>WARNING:</strong> Tests points calculated with ArcGIS's {@code "Double_Stereographic"}
  * are not always equal to points calculated with the {@code "Oblique_Stereographic"}.
  * However, where there are differences, two different implementations of these equations
- * (EPSG guidence note 7 and {@code libproj}) calculate the same values as we do. Until these 
+ * (EPSG guidence note 7 and {@code libproj}) calculate the same values as we do. Until these
  * differences are resolved, please be careful when using this projection.
  * <p>
  *
@@ -104,7 +99,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <p>
  *
  * Polar projections that use the series equations for the inverse calculation will
- * be little bit faster, but may be a little bit less accurate. If a polar 
+ * be little bit faster, but may be a little bit less accurate. If a polar
  * {@link Stereographic.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} is used for
  * the {@code "Oblique_Stereographic"} or {@code "Stereographic"}, the iterative
  * equations will be used for inverse polar calculations.
@@ -127,11 +122,11 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *       EPSG Guidence Note Number 7, Version 19.</li>
  *   <li>Gerald Evenden. <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/sterea.pdf">
  *       "Supplementary PROJ.4 Notes - Oblique Stereographic Alternative"</A></li>
- *   <li>Krakiwsky, E.J., D.B. Thomson, and R.R. Steeves. 1977. A Manual 
- *       For Geodetic Coordinate Transformations in the Maritimes. 
+ *   <li>Krakiwsky, E.J., D.B. Thomson, and R.R. Steeves. 1977. A Manual
+ *       For Geodetic Coordinate Transformations in the Maritimes.
  *       Geodesy and Geomatics Engineering, UNB. Technical Report No. 48.</li>
- *   <li>Thomson, D.B., M.P. Mepham and R.R. Steeves. 1977. 
- *       The Stereographic Double Projection. 
+ *   <li>Thomson, D.B., M.P. Mepham and R.R. Steeves. 1977.
+ *       The Stereographic Double Projection.
  *       Geodesy and Geomatics Engineereng, UNB. Technical Report No. 46.</li>
  * </ul>
  *
@@ -169,7 +164,7 @@ public abstract class Stereographic extends MapProjection {
     Stereographic(final ParameterValueGroup parameters, final ParameterDescriptorGroup descriptor)
             throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters, descriptor.descriptors());
         this.descriptor = descriptor;
     }
@@ -184,6 +179,7 @@ public abstract class Stereographic extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         /*
          * Implementation note: usually, we define this method in the last subclass, which may
@@ -247,7 +243,7 @@ public abstract class Stereographic extends MapProjection {
             });
 
         /**
-         * Constructs a new provider with default parameters for EPSG stereographic oblique. 
+         * Constructs a new provider with default parameters for EPSG stereographic oblique.
          */
         public Provider() {
             this(PARAMETERS);
@@ -267,7 +263,8 @@ public abstract class Stereographic extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<PlanarProjection> getOperationType() {
             return PlanarProjection.class;
         }
 

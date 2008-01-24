@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.shape;
 
+import static org.geotools.data.shapefile.ShpFileType.*;
+
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -23,9 +25,7 @@ import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.media.jai.util.Range;
+import javax.xml.parsers.FactoryConfigurationError;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
@@ -51,21 +52,20 @@ import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
+import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
+import org.geotools.data.shapefile.indexed.IndexType;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterAttributeExtractor;
-import org.geotools.filter.Filters;
 import org.geotools.geometry.jts.Decimator;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -106,9 +106,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.TransformException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -185,7 +183,7 @@ public class ShapefileRenderer implements GTRenderer {
      */
     public static final DefaultRenderListener DEFAULT_LISTENER = new DefaultRenderListener();
 
-    private static final IndexInfo STREAMING_RENDERER_INFO = new IndexInfo((byte)0,null,null);
+    private static final IndexInfo STREAMING_RENDERER_INFO = new IndexInfo(IndexType.NONE,null);
     static int NUM_SAMPLES = 200;
     private RenderingHints hints;
 
@@ -390,9 +388,9 @@ public class ShapefileRenderer implements GTRenderer {
         Diff diff=null;
 
         try {
-			diff = state.diff(typename);
-			modified = diff.modified2;
-			added=diff.added;
+            diff = state.diff(typename);
+            modified = diff.modified2;
+            added = diff.added;
             fids = new HashSet();
         } catch (IOException e) {
             fids = Collections.EMPTY_SET;
@@ -683,7 +681,7 @@ public class ShapefileRenderer implements GTRenderer {
                         shpreader.close();
                     }
                 } finally {
-                    if (fidReader == null)
+                    if (fidReader != null)
                         fidReader.close();
                 }
             }
@@ -824,11 +822,16 @@ public class ShapefileRenderer implements GTRenderer {
         
         FilterAttributeExtractor qae = new FilterAttributeExtractor();
         query.getFilter().accept(qae,null);
-        Set ftsAttributes=new LinkedHashSet(sae.getAttributeNameSet());
+        Set ftsAttributes = new LinkedHashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
         if (sae.getDefaultGeometryUsed()
 				&& (!ftsAttributes.contains(schema.getDefaultGeometry().getLocalName()))) {
         	ftsAttributes.add(schema.getDefaultGeometry().getLocalName());
+		} else {
+	        // the code following assumes the geometry column is the last one
+		    // make sure it's the last for good
+	        ftsAttributes.remove(schema.getDefaultGeometry().getLocalName());
+	        ftsAttributes.add(schema.getDefaultGeometry().getLocalName());
 		}
         return (String[]) ftsAttributes.toArray(new String[0]);
     }
@@ -1139,44 +1142,26 @@ public class ShapefileRenderer implements GTRenderer {
 
     public IndexInfo useIndex( ShapefileDataStore ds ) throws IOException, StoreException {
         IndexInfo info;
-        String filename = null;
-        URL url = ShapefileRendererUtil.getshpURL(ds);
 
-        if (url == null) {
-            throw new NullPointerException("Null URL for ShapefileDataSource");
-        }
-
-        try {
-            filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
-        } catch (java.io.UnsupportedEncodingException use) {
-            throw new java.net.MalformedURLException("Unable to decode " + url + " cause "
-                    + use.getMessage());
-        }
-
-        filename = filename.substring(0, filename.length() - 4);
-
-        String grxext = ".grx";
-        String qixext = ".qix";
-
+        ShpFiles shpFiles = ShapefileRendererUtil.getShpFiles(ds);
         if (ds.isLocal()) {
-            File grxTree = new File(new URL(filename + grxext).getPath());
-            File qixTree = new File(new URL(filename + qixext).getPath());
-            URL shx = new URL(filename + ".shx");
 
-            if (!new File(shx.getPath()).exists()) {
-                info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
-            } else if (qixTree.exists()) {
-                info = new IndexInfo(IndexInfo.QUAD_TREE, new URL(filename + qixext), shx);
+            if (!shpFiles.exists(SHX)) {
+                info = new IndexInfo(IndexType.NONE, shpFiles);
+                LOGGER.fine("No indexing");
+            } else if (shpFiles.exists(QIX)) {
+                info = new IndexInfo(IndexType.QIX, shpFiles);
                 LOGGER.fine("Using quad tree");
-            } else if (grxTree.exists()) {
-                info = new IndexInfo(IndexInfo.R_TREE, new URL(filename + grxext), shx);
+            } else if (shpFiles.exists(GRX)) {
+                info = new IndexInfo(IndexType.EXPERIMENTAL_UNSUPPORTED_GRX, shpFiles);
                 LOGGER.fine("Using r-tree");
             } else {
-                info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+                info = new IndexInfo(IndexType.NONE, shpFiles);
                 LOGGER.fine("No indexing");
             }
         } else {
-            info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+            info = new IndexInfo(IndexType.NONE, shpFiles);
+            LOGGER.fine("No indexing");
         }
 
         return info;
@@ -1244,7 +1229,7 @@ public class ShapefileRenderer implements GTRenderer {
 	            try {
 	                layerIndexInfo[i] = useIndex(sds);
 	            } catch (Exception e) {
-	                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+	                layerIndexInfo[i] = new IndexInfo(IndexType.NONE, ShapefileRendererUtil.getShpFiles(sds));
 	                LOGGER.fine("Exception while trying to use index" + e.getLocalizedMessage());
 	            }
 	        }else{
@@ -1457,14 +1442,20 @@ public class ShapefileRenderer implements GTRenderer {
     }
     
     private void renderWithStreamingRenderer(MapLayer layer, Graphics2D graphics, Rectangle paintArea, ReferencedEnvelope envelope, AffineTransform transform) {
-		MapContext context=new DefaultMapContext(new MapLayer[]{layer}, envelope.getCoordinateReferenceSystem());
-		StreamingRenderer renderer=new StreamingRenderer();
-		renderer.setContext(context);
-		renderer.setJava2DHints(getJava2DHints());
-		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
-		rendererHints2.put(LABEL_CACHE_KEY, new IntegratingLabelCache(labelCache));
-		renderer.setRendererHints(rendererHints2);
-		renderer.paint(graphics, paintArea, envelope, transform);
+		MapContext context = null;
+		try {
+		    context = new DefaultMapContext(new MapLayer[]{layer}, envelope.getCoordinateReferenceSystem());
+    		StreamingRenderer renderer=new StreamingRenderer();
+    		renderer.setContext(context);
+    		renderer.setJava2DHints(getJava2DHints());
+    		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
+    		rendererHints2.put(LABEL_CACHE_KEY, new IntegratingLabelCache(labelCache));
+    		renderer.setRendererHints(rendererHints2);
+    		renderer.paint(graphics, paintArea, envelope, transform);
+		} finally {
+		    if(context != null)
+		        context.clearLayerList();
+		}
 	}
 
 	/**

@@ -18,12 +18,14 @@ package org.geotools.data.shapefile.indexed;
 import java.io.IOException;
 
 /**
- * A simple interface so that the current feature's record number can be retrieved by the IndexedFidReader
+ * A simple interface so that the current feature's record number can be
+ * retrieved by the IndexedFidReader
  * 
  * @author Jesse
  * @since 1.1.0
  */
 public interface RecordNumberTracker {
     public int getRecordNumber();
+
     public void close() throws IOException;
 }

@@ -1,9 +1,9 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,13 +16,12 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies and extensions
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import javax.units.SI;
 
-// OpenGIS dependencies
+import org.opengis.util.GenericName;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -30,10 +29,8 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
@@ -61,13 +58,13 @@ import org.geotools.resources.i18n.Errors;
  *
  * <strong>References:</strong><ul>
  *   <li> Defense Mapping Agency (DMA), Datums, Ellipsoids, Grids and Grid Reference Systems,
- *        Technical Manual 8358.1. 
+ *        Technical Manual 8358.1.
  *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
- *   <li> Defense Mapping Agency (DMA), The Universal Grids: Universal Transverse 
- *        Mercator (UTM) and Universal Polar Stereographic (UPS), Fairfax VA, Technical Manual 8358.2. 
+ *   <li> Defense Mapping Agency (DMA), The Universal Grids: Universal Transverse
+ *        Mercator (UTM) and Universal Polar Stereographic (UPS), Fairfax VA, Technical Manual 8358.2.
  *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
- *   <li> National Imagery and Mapping Agency (NIMA), Department of Defense World 
- *        Geodetic System 1984, Technical Report 8350.2. 
+ *   <li> National Imagery and Mapping Agency (NIMA), Department of Defense World
+ *        Geodetic System 1984, Technical Report 8350.2.
  *        Available from <a href="http://earth-info.nga.mil/GandG/pubs.html">http://earth-info.nga.mil/GandG/pubs.html</a></li>
  *   <li> "Coordinate Conversions and Transformations including Formulas",
  *        EPSG Guidence Note Number 7, Version 19.</li>
@@ -100,47 +97,47 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * {@code false} for a 2D transformation.
      */
     private final boolean source3D, target3D;
-    
+
     /**
      * X,Y,Z shift in meters.
      */
     private final double dx, dy, dz;
-    
+
     /**
      * Semi-major (<var>a</var>) semi-minor (<var>b/<var>) radius in meters.
      */
     private final double a, b;
-    
+
     /**
      * Difference in the semi-major ({@code da = target a - source a}) and semi-minor
      * ({@code db = target b - source b}) axes of the target and source ellipsoids.
      */
     private final double da, db;
-    
+
     /**
      * Difference between the flattenings ({@code df = target f - source f})
      * of the target and source ellipsoids.
      */
     private final double df;
-    
+
     /**
-     * Ratio of the Semi-major (<var>a</var>) semi-minor (<var>b/<var>) axis 
+     * Ratio of the Semi-major (<var>a</var>) semi-minor (<var>b/<var>) axis
      * values ({@code a_b = a/b} and {@code b_a = b/a}).
      */
     private final double b_a, a_b;
-    
+
     /**
      * Some more constants (<code>daa = da*a</code> and {@code da_a = da/a}).
      */
     private final double daa, da_a;
-    
+
     /**
      * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */
     private final double e2;
-    
+
     /**
      * Defined as <code>(a*df) + (f*da)</code>.
      */
@@ -150,10 +147,10 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * The inverse of this transform. Will be created only when first needed.
      */
     private transient MolodenskiTransform inverse;
-    
+
     /**
      * Constructs a Molodenski transform from the specified parameters.
-     * 
+     *
      * @param abridged {@code true} for the abridged formula, or {@code false} for the complete one.
      * @param a        The source semi-major axis length in meters.
      * @param b        The source semi-minor axis length in meters.
@@ -193,15 +190,17 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return abridged ? ProviderAbridged.PARAMETERS : Provider.PARAMETERS;
     }
-    
+
     /**
      * Returns the parameters for this math transform.
      *
      * @return The parameters for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValue dim = new Parameter(Provider.DIM);
         dim.setValue(getSourceDimensions());
@@ -217,14 +216,14 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                    new FloatParameter(Provider.TGT_SEMI_MINOR, b+db)
                });
     }
-    
+
     /**
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
         return source3D ? 3 : 2;
     }
-    
+
     /**
      * Gets the dimension of output points.
      */
@@ -252,7 +251,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      *               transformed point that is stored in the
      *               destination array.
      * @param numPts the number of point objects to be transformed.
-     */    
+     */
     public void transform(double[] srcPts, int srcOff,
                           double[] dstPts, int dstOff, int numPts)
     {
@@ -291,7 +290,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      *               transformed point that is stored in the
      *               destination array.
      * @param numPts the number of point objects to be transformed.
-     */    
+     */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
@@ -351,7 +351,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
             final double sin2Y = sinY*sinY;
             final double Rn = a / Math.sqrt(1 - e2*sin2Y);
             final double Rm = Rn * (1 - e2) / (1 - e2*sin2Y);
-            
+
             // Note: Computation of 'x' and 'y' ommit the division by sin(1"), because
             //       1/sin(1") / (60*60*180/PI) = 1.0000000000039174050898603898692...
             //       (60*60 is for converting the final result from seconds to degrees,
@@ -361,7 +361,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 y += (dz*cosY - sinY*(dy*sinX + dx*cosX) + adf*Math.sin(2*y)) / Rm;
                 x += (dy*cosX - dx*sinX) / (Rn*cosY);
             } else {
-                y += (dz*cosY - sinY*(dy*sinX + dx*cosX) + da_a*(Rn*e2*sinY*cosY) + 
+                y += (dz*cosY - sinY*(dy*sinX + dx*cosX) + da_a*(Rn*e2*sinY*cosY) +
                       df*(Rm*(a_b) + Rn*(b_a))*sinY*cosY) / (Rm + z);
                 x += (dy*cosX - dx*sinX) / ((Rn + z)*cosY);
             }
@@ -437,6 +437,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     /**
      * Creates the inverse transform of this object.
      */
+    @Override
     public MathTransform inverse() {
         if (inverse == null) {
             inverse = new MolodenskiTransform(abridged,
@@ -445,10 +446,11 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         }
         return inverse;
     }
-    
+
     /**
      * Returns a hash value for this transform.
      */
+    @Override
     public final int hashCode() {
         final long code = Double.doubleToLongBits(dx) +
                       37*(Double.doubleToLongBits(dy) +
@@ -461,10 +463,11 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         if (abridged) c = ~c;
         return c;
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      */
+    @Override
     public final boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -504,14 +507,15 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         }
 
         /** Creates the inverse transform of this object. */
-        public MathTransform inverse() {
+        @Override
+        public MathTransform2D inverse() {
             if (super.inverse == null) {
                 super.inverse = new As2D(super.abridged,
                         super.a + super.da, super.b + super.db,
                         super.a, super.b, -super.dx, -super.dy, -super.dz);
                 super.inverse.inverse = this;
             }
-            return super.inverse;
+            return (MathTransform2D) super.inverse;
         }
     }
 
@@ -522,7 +526,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * reference systems.
      * <p>
      * <strong>Note:</strong>
-     * The EPSG does not use src_semi_major, etc. parameters and instead uses 
+     * The EPSG does not use src_semi_major, etc. parameters and instead uses
      * "Semi-major axis length difference" and "Flattening difference".
      *
      * @version $Id$
@@ -618,8 +622,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /** Helper method for parameter descriptor creation. */
         private static final NamedIdentifier[] identifiers(final ParameterDescriptor parameter) {
-            final Collection id = parameter.getAlias();
-            return (NamedIdentifier[]) id.toArray(new NamedIdentifier[id.size()]);
+            final Collection<GenericName> id = parameter.getAlias();
+            return id.toArray(new NamedIdentifier[id.size()]);
         }
 
         /**
@@ -667,10 +671,11 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Transformation> getOperationType() {
             return Transformation.class;
         }
-        
+
         /**
          * Creates a math transform from the specified group of parameter values.
          *
@@ -678,8 +683,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values) 
-                throws ParameterNotFoundException 
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
         {
             final boolean hasHeight;
             final int dim = intValue(DIM, values);
@@ -738,10 +743,10 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * The provider for abridged {@link MolodenskiTransform}. This provider will construct
      * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic}
      * to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} coordinate
-     * reference systems. 
+     * reference systems.
      * <p>
      * <strong>Note:</strong>
-     * The EPSG does not use src_semi_major, etc. parameters and instead uses 
+     * The EPSG does not use src_semi_major, etc. parameters and instead uses
      * "Semi-major axis length difference" and "Flattening difference".
      *
      * @version $Id$
@@ -775,7 +780,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         public ProviderAbridged() {
             super(DEFAULT_DIMENSION, DEFAULT_DIMENSION, PARAMETERS);
         }
-        
+
         /**
          * Constructs a provider from a set of parameters.
          *
@@ -793,6 +798,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * Creates the 3D-version of this provider.
          */
+        @Override
         Provider create3D() {
             return new ProviderAbridged(3, 3, PARAMETERS);
         }
@@ -800,6 +806,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * Returns {@code true} for the abridged formulas.
          */
+        @Override
         boolean isAbridged() {
             return true;
         }

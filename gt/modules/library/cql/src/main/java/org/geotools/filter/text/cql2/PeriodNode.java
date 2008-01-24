@@ -22,7 +22,7 @@ import org.opengis.filter.expression.Literal;
 
 
 /**
- * Period is consturcted in the parseing process. this has convenient method to
+ * Period is constructed in the parsing process. this has convenient method to
  * deliver begin and end date of period. a period can be created from
  * date-time/date-time or date-time/duration or duration/date-time
  *

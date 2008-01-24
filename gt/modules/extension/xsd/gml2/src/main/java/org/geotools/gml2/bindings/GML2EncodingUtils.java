@@ -16,6 +16,8 @@
 package org.geotools.gml2.bindings;
 
 import java.util.Iterator;
+import java.util.Map;
+import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -54,7 +56,20 @@ public class GML2EncodingUtils {
         return null;
     }
 
+    /**
+     * @deprecated use {@link #toURI(CoordinateReferenceSystem)}.
+     */
     public static String crs(CoordinateReferenceSystem crs) {
+        return toURI(crs);
+    }
+
+    /**
+     * Encodes the crs object as a uri.
+     * <p>
+     * The axis order of the crs determines which form of uri is used.
+     * </p>
+     */
+    public static String toURI(CoordinateReferenceSystem crs) {
         String code = epsgCode(crs);
         int axisOrder = axisOrder(crs);
 
@@ -116,5 +131,72 @@ public class GML2EncodingUtils {
         }
 
         return INAPPLICABLE;
+    }
+
+    /**
+     * Determines the crs of the geometry by checking {@link Geometry#getUserData()}.
+     * <p>
+     * This method returns <code>null</code> when no crs can be found.
+     * </p>
+     */
+    public static CoordinateReferenceSystem getCRS(Geometry g) {
+        if (g.getUserData() == null) {
+            return null;
+        }
+
+        if (g.getUserData() instanceof CoordinateReferenceSystem) {
+            return (CoordinateReferenceSystem) g.getUserData();
+        }
+
+        if (g.getUserData() instanceof Map) {
+            Map userData = (Map) g.getUserData();
+
+            return (CoordinateReferenceSystem) userData.get(CoordinateReferenceSystem.class);
+        }
+
+        return null;
+    }
+
+    /**
+     * Determines the identifier (gml:id) of the geometry by checking
+     * {@link Geometry#getUserData()}.
+     * <p>
+     * This method returns <code>null</code> when no id can be found.
+     * </p>
+     */
+    public static String getID(Geometry g) {
+        return getMetadata( g, "gml:id" );
+    }
+    
+    /**
+     * Determines the description (gml:description) of the geometry by checking
+     * {@link Geometry#getUserData()}.
+     * <p>
+     * This method returns <code>null</code> when no name can be found.
+     * </p>
+     */
+    public static String getName(Geometry g) {
+        return getMetadata( g, "gml:name" );
+    }
+    
+    /**
+     * Determines the name (gml:name) of the geometry by checking
+     * {@link Geometry#getUserData()}.
+     * <p>
+     * This method returns <code>null</code> when no description can be found.
+     * </p>
+     */
+    public static String getDescription(Geometry g) {
+        return getMetadata( g, "gml:description" );
+    }
+    
+    static String getMetadata(Geometry g, String metadata) {
+        if (g.getUserData() instanceof Map) {
+            Map userData = (Map) g.getUserData();
+
+            return (String) userData.get(metadata);
+        }
+
+        return null;
     }
 }

@@ -55,10 +55,10 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.EDIT_STATE;
+import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
-import org.geotools.gui.swing.map.map2d.overLayer.MapDecoration;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -243,6 +243,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private void editAddGeometry(Geometry[] geoms) {
 
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null && editionLayer != null) {
 
             for (Geometry geom : geoms) {
@@ -265,7 +267,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                     }
                 }
 
-                //featureType.
                 SimpleFeature sf = SimpleFeatureBuilder.build(featureType, values, null);
                 collection.add(sf);
 
@@ -375,6 +376,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private void setMemoryLayerGeometry(List<Geometry> geoms) {
 
+        Envelope mapArea = renderingStrategy.getMapArea();
+        
         if (mapArea != null && memoryLayer != null) {
 
             for (Geometry geom : geoms) {
@@ -459,26 +462,26 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     //---------------------MAP 2D-----------------------------------------------
-    @Override
-    public void setMapArea(Envelope mapArea) {
-        super.setMapArea(mapArea);
-
-        repaintMemoryLayer();
-    }
-
-    @Override
-    public void setContext(MapContext newcontext) {
-
-        if (this.context != null) {
-            this.context.removeMapLayerListListener(mapLayerListlistener);
-        }
-
-        if (newcontext != null) {
-            newcontext.addMapLayerListListener(mapLayerListlistener);
-        }
-
-        super.setContext(newcontext);
-    }
+//    @Override
+//    public void setMapArea(Envelope mapArea) {
+//        super.setMapArea(mapArea);
+//
+//        repaintMemoryLayer();
+//    }
+//
+//    @Override
+//    public void setContext(MapContext newcontext) {
+//
+//        if (this.context != null) {
+//            this.context.removeMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        if (newcontext != null) {
+//            newcontext.addMapLayerListListener(mapLayerListlistener);
+//        }
+//
+//        super.setContext(newcontext);
+//    }
 
     //--------------------EDITABLE MAP2D----------------------------------------
     public void setEditedMapLayer(MapLayer layer) {

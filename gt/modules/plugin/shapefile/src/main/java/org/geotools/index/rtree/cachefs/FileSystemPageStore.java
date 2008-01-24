@@ -35,16 +35,16 @@ import org.geotools.index.rtree.PageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/cachefs/FileSystemPageStore.java $
  */
 public class FileSystemPageStore extends PageStore {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.index.rtree");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.rtree");
     protected static final byte B_SHORT = (byte) 1;
     protected static final byte B_INTEGER = (byte) 2;
     protected static final byte B_LONG = (byte) 3;
@@ -63,9 +63,10 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * Loads an index from the specified <code>File</code>
-     *
-     * @param file The file that stores the index
-     *
+     * 
+     * @param file
+     *                The file that stores the index
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file) throws TreeException {
@@ -89,72 +90,78 @@ public class FileSystemPageStore extends PageStore {
     /**
      * Create and index with default values, if the file exists then a
      * <code>TreeException</code> will be thrown.
-     *
+     * 
      * @param file
      * @param def
-     *
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def)
-        throws TreeException {
+            throws TreeException {
         this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT, -1);
     }
 
     /**
      * Create and index with default values, if the file exists then a
      * <code>TreeException</code> will be thrown.
-     *
+     * 
      * @param file
      * @param def
-     * @param cacheSize the size of the cache
-     *
+     * @param cacheSize
+     *                the size of the cache
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def, int cacheSize)
-        throws TreeException {
+            throws TreeException {
         this(file, def, DEF_MAX, DEF_MIN, DEF_SPLIT, cacheSize);
     }
 
     /**
      * Create and index with the specified values, if the file exists then a
      * <code>TreeException</code> will be thrown.
-     *
-     * @param file The file to store the index
-     * @param def DOCUMENT ME!
+     * 
+     * @param file
+     *                The file to store the index
+     * @param def
+     *                DOCUMENT ME!
      * @param maxNodeEntries
      * @param minNodeEntries
      * @param splitAlg
-     *
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def,
-        int maxNodeEntries, int minNodeEntries, short splitAlg)
-        throws TreeException {
+            int maxNodeEntries, int minNodeEntries, short splitAlg)
+            throws TreeException {
         this(file, def, maxNodeEntries, minNodeEntries, splitAlg, -1);
     }
 
     /**
      * Create and index with the specified values, if the file exists then a
      * <code>TreeException</code> will be thrown.
-     *
-     * @param file The file to store the index
-     * @param def DOCUMENT ME!
+     * 
+     * @param file
+     *                The file to store the index
+     * @param def
+     *                DOCUMENT ME!
      * @param maxNodeEntries
      * @param minNodeEntries
      * @param splitAlg
-     * @param cacheSize the size of the cache
-     *
+     * @param cacheSize
+     *                the size of the cache
+     * 
      * @throws TreeException
      */
     public FileSystemPageStore(File file, DataDefinition def,
-        int maxNodeEntries, int minNodeEntries, short splitAlg, int cacheSize)
-        throws TreeException {
+            int maxNodeEntries, int minNodeEntries, short splitAlg,
+            int cacheSize) throws TreeException {
         super(def, maxNodeEntries, minNodeEntries, splitAlg);
 
         if (file.exists() && (file.length() != 0)) {
             throw new TreeException("Cannot set dataDefinition, "
-                + "maxNodesEntries and "
-                + "minNodeEntries to an existing index " + file);
+                    + "maxNodesEntries and "
+                    + "minNodeEntries to an existing index " + file);
         }
 
         if (file.isDirectory()) {
@@ -179,9 +186,9 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param file
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
@@ -206,7 +213,7 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
@@ -219,7 +226,7 @@ public class FileSystemPageStore extends PageStore {
 
         if (buf.getInt() != FILE_VERSION) {
             throw new TreeException("Wrong file version, shoud be "
-                + FILE_VERSION);
+                    + FILE_VERSION);
         }
 
         // Get the header size
@@ -279,23 +286,23 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @throws IOException
      * @throws TreeException
      */
     private void prepareIndex() throws IOException, TreeException {
         if (this.params.getDataDef() == null) {
             throw new TreeException("Data definition cannot be null "
-                + "when creating a new index.");
+                    + "when creating a new index.");
         }
 
         Charset charset = Charset.forName("US-ASCII");
         ByteBuffer chBuf = charset.encode(this.params.getDataDef().getCharset()
-                                                     .name());
+                .name());
         chBuf.position(0);
 
         int headerSize = 22 + chBuf.capacity()
-            + (5 * this.params.getDataDef().getFieldsCount()) + 8;
+                + (5 * this.params.getDataDef().getFieldsCount()) + 8;
 
         this.header = ByteBuffer.allocate(headerSize);
 
@@ -371,7 +378,7 @@ public class FileSystemPageStore extends PageStore {
 
         return ret;
 
-        //return this.root; 
+        // return this.root;
     }
 
     /**
@@ -415,8 +422,7 @@ public class FileSystemPageStore extends PageStore {
      * @see org.geotools.index.rtree.PageStore#getNode(org.geotools.index.rtree.Entry,
      *      org.geotools.index.rtree.Node)
      */
-    public Node getNode(Entry parentEntry, Node parent)
-        throws TreeException {
+    public Node getNode(Entry parentEntry, Node parent) throws TreeException {
         Node node = null;
         long offset = ((Long) parentEntry.getData()).longValue();
 
@@ -501,10 +507,11 @@ public class FileSystemPageStore extends PageStore {
     }
 
     /**
-     * If this is set to <code>true</code>, then every write to the index will
-     * call a force() on the associated channel
-     *
-     * @param b true or false
+     * If this is set to <code>true</code>, then every write to the index
+     * will call a force() on the associated channel
+     * 
+     * @param b
+     *                true or false
      */
     public void setForceChannel(boolean b) {
         this.params.setForceChannel(b);
@@ -512,7 +519,7 @@ public class FileSystemPageStore extends PageStore {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return The state of Force channel parameter
      */
     public boolean getForceChannel() {

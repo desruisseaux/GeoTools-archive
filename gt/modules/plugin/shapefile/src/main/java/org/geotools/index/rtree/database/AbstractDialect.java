@@ -20,20 +20,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/rtree/database/AbstractDialect.java $
  */
 public abstract class AbstractDialect implements Dialect {
     protected static final String CAT_TABLE = "rtrees_cat";
     private static final String QUERY_CAT = "select * from " + CAT_TABLE
-        + " where rtree_name=?";
+            + " where rtree_name=?";
     private static final String INSERT_CAT = "insert into " + CAT_TABLE
-        + " (rtree_name, min_entries, max_entries, split_alg)"
-        + " values (?, ?, ?, ?)";
+            + " (rtree_name, min_entries, max_entries, split_alg)"
+            + " values (?, ?, ?, ?)";
     private int current = -1;
 
     /**
@@ -52,12 +52,12 @@ public abstract class AbstractDialect implements Dialect {
 
     /**
      * This implementation works only in one JVM
-     *
+     * 
      * @see org.geotools.index.rtree.database.Dialect#getNextPageId(java.sql.Connection,
      *      java.lang.String)
      */
     public synchronized int getNextPageId(Connection cnn, String tableName)
-        throws SQLException {
+            throws SQLException {
         if (current == -1) {
             PreparedStatement pst = null;
             ResultSet rs = null;
@@ -97,7 +97,7 @@ public abstract class AbstractDialect implements Dialect {
      */
     public String getInsertPage(String tableName) {
         return "insert into " + tableName + " (page_id, fl_leaf, blob_content)"
-        + " values (?,?,?)";
+                + " values (?,?,?)";
     }
 
     /**
@@ -105,6 +105,6 @@ public abstract class AbstractDialect implements Dialect {
      */
     public String getUpdatePage(String tableName) {
         return "update " + tableName
-        + " set fl_leaf=?, blob_content=? where page_id=?";
+                + " set fl_leaf=?, blob_content=? where page_id=?";
     }
 }

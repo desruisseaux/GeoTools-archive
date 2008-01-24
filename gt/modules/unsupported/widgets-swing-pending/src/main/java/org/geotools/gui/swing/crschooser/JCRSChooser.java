@@ -8,7 +8,6 @@ package org.geotools.gui.swing.crschooser;
 import java.awt.BorderLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
@@ -23,8 +22,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class JCRSChooser extends javax.swing.JDialog {
 
+    
     public static enum ACTION {
-
         APPROVE,
         CANCEL,
         CLOSE
@@ -109,7 +108,6 @@ public class JCRSChooser extends javax.swing.JDialog {
     public ACTION showDialog() {
         exitmode = ACTION.CLOSE;
         pack();
-        setTitle(TextBundle.getResource().getString("add_data_dialog"));
         setLocationRelativeTo(null);
         setVisible(true);
         return exitmode;
@@ -135,8 +133,10 @@ public class JCRSChooser extends javax.swing.JDialog {
         but_fermer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/crschooser/Bundle"); // NOI18N
+        setTitle(bundle.getString("title")); // NOI18N
 
-        jLabel1.setText("Coordinate Reference Systems :");
+        jLabel1.setText(bundle.getString("crs")); // NOI18N
 
         gui_jtf_crs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -158,8 +158,8 @@ public class JCRSChooser extends javax.swing.JDialog {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
-                    .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                    .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jLabel1)
                         .add(21, 21, 21)))
@@ -173,11 +173,11 @@ public class JCRSChooser extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("List", jPanel1);
+        jTabbedPane1.addTab(bundle.getString("list"), jPanel1); // NOI18N
 
         wktArea.setColumns(20);
         wktArea.setEditable(false);
@@ -190,27 +190,27 @@ public class JCRSChooser extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("WKT", jPanel2);
+        jTabbedPane1.addTab(bundle.getString("wkt"), jPanel2); // NOI18N
 
-        but_valider.setText(TextBundle.getResource().getString("apply"));
+        but_valider.setText(bundle.getString("apply")); // NOI18N
         but_valider.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 but_valideractionAjouter(evt);
             }
         });
 
-        but_fermer.setText(TextBundle.getResource().getString("cancel"));
+        but_fermer.setText(bundle.getString("cancel")); // NOI18N
         but_fermer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 but_fermeractionFermer(evt);
@@ -222,21 +222,21 @@ public class JCRSChooser extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(276, Short.MAX_VALUE)
+                .addContainerGap(348, Short.MAX_VALUE)
                 .add(but_valider)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_fermer)
                 .addContainerGap())
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(but_valider)
-                    .add(but_fermer))
+                    .add(but_fermer)
+                    .add(but_valider))
                 .addContainerGap())
         );
 

@@ -15,33 +15,24 @@
  */
 package org.geotools.coverage.processing.operation;
 
-import java.awt.geom.NoninvertibleTransformException;
+import java.awt.RenderingHints;
+import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.BorderExtenderCopy;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
 
-import org.geotools.coverage.processing.CannotScaleException;
-import org.geotools.coverage.processing.Operation2D;
-import org.geotools.factory.Hints;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.opengis.coverage.Coverage;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
+import org.geotools.coverage.processing.BaseScaleOperationJAI;
+import org.geotools.coverage.processing.OperationJAI;
+import org.geotools.image.jai.Registry;
 
 
 /**
  * This operation is simply a wrapper for the JAI scale operation which allows
  * me to arbitrarly scale and translate a rendered image.
- *
- * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
- *       {@code ScaledGridCoverage2D} class. The main feature to add is the
- *       copy of interpolation and border extender parameters to the hints.
  *
  * @source $URL$
  * @version $Id$
@@ -50,118 +41,76 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @see javax.media.jai.operator.ScaleDescriptor
  */
-public class Scale extends Operation2D {
+public class Scale extends BaseScaleOperationJAI {
+
+
 	/**
 	 * Serial number for cross-version compatibility.
 	 */
 	private static final long serialVersionUID = -3212656385631097713L;
 
-	/**
-	 * The X scale factor.
-	 */
-	public static final ParameterDescriptor xScale = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "xScale", Float.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			1f,   // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * The Y scale factor.
-	 */
-	public static final ParameterDescriptor yScale = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "yScale", Float.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			1f,   // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * The X translation.
-	 */
-	public static final ParameterDescriptor xTrans = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "xTrans", Float.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			0f,   // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * The Y translation.
-	 */
-	public static final ParameterDescriptor yTrans = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "yTrans", Float.class, // Value class
-			// (mandatory)
-			null, // Array of valid values
-			0f,   // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * The interpolation method for resampling.
-	 */
-	public static final ParameterDescriptor Interpolation = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "Interpolation", Interpolation.class, // Value
-			// class
-			// (mandatory)
-			null, // Array of valid values
-			new InterpolationNearest(), // Default value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
-
-	/**
-	 * The BorderExtender used wth high oerder interpolation methods.
-	 */
-	public static final ParameterDescriptor BorderExtender = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "BorderExtender", BorderExtender.class, // Value
-			// class
-			// (mandatory)
-			null, // Array of valid values
-			javax.media.jai.BorderExtender.createInstance(javax.media.jai.BorderExtender.BORDER_ZERO), // Default
-			// value
-			null, // Minimal value
-			null, // Maximal value
-			null, // Unit of measure
-			true); // Parameter is optional
+	/** Lock for unsetting native acceleration. */
+	private final static int[] lock = new int[1];
 
 	/**
 	 * Default constructor.
 	 */
 	public Scale() {
-		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS, "Scale",
-				new ParameterDescriptor[] { SOURCE_0, xScale, yScale, xTrans,
-						yTrans, Interpolation, BorderExtender }));
+		super("Scale");
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup,
-	 *      org.geotools.factory.Hints)
-	 */
-	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
-		try {
-			return ScaledGridCoverage2D
-					.create(parameters,
-							(hints instanceof Hints) ? (Hints) hints
-									: new Hints(hints));
-		} catch (NoninvertibleTransformException e) {
-			throw new CannotScaleException(Errors
-					.format(ErrorKeys.NONINVERTIBLE_SCALING_TRANSFORM), e);
-		}
+
+	@Override
+	protected RenderedImage createRenderedImage(ParameterBlockJAI parameters, RenderingHints hints) {
+		final RenderedImage source = (RenderedImage) parameters.getSource(0);
+		final Interpolation interpolation;
+		if(parameters.getObjectParameter("Interpolation")!=null)
+			interpolation=(Interpolation) parameters.getObjectParameter("Interpolation");
+		else
+			if(hints.get(JAI.KEY_INTERPOLATION)!=null)
+				interpolation=(Interpolation) hints.get(JAI.KEY_INTERPOLATION);
+			else
+			{
+				//I am pretty sure this should not happen. However I am not sure we should throw an error
+				interpolation=null;
+			}
+		final int transferType = source.getSampleModel().getDataType();
+		final JAI processor = OperationJAI.getJAI(hints);
+		PlanarImage image;
+		if (interpolation!=null&&!(interpolation instanceof InterpolationNearest)
+				&& (transferType == DataBuffer.TYPE_FLOAT || transferType == DataBuffer.TYPE_DOUBLE)) {
+
+			synchronized (lock) {
+
+				/**
+				 * Disables the native acceleration for the "Scale" operation.
+				 * In JAI 1.1.2, the "Scale" operation on TYPE_FLOAT datatype
+				 * with INTERP_BILINEAR interpolation cause an exception in the
+				 * native code of medialib, which halt the Java Virtual Machine.
+				 * Using the pure Java implementation instead resolve the
+				 * problem.
+				 * 
+				 * @todo Remove this hack when Sun will fix the medialib bug.
+				 *       See
+				 *       http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854
+				 */
+
+				Registry.setNativeAccelerationAllowed(getName(), false);
+				image = processor.createNS(getName(),
+						parameters, hints).getRendering();
+
+
+				/**
+				 * see above
+				 */
+				Registry.setNativeAccelerationAllowed(getName(), true);
+			}
+
+		} else
+			image = processor.createNS(getName(), parameters, hints);
+
+		return image;
 	}
+	
 }

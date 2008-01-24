@@ -18,7 +18,6 @@
 package org.geotools.gce.mrsid;
 
 import it.geosolutions.imageio.gdalframework.GDALCommonIIOImageMetadata;
-import it.geosolutions.imageio.gdalframework.GDALImageReader.GDALDatasetWrapper;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDIIOImageMetadata;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
@@ -49,6 +48,7 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -59,16 +59,17 @@ import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -91,7 +92,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			.getLogger("org.geotools.gce.mrsid");
 
 	/** Caches an {@code ImageReaderSpi} for a {@code MrSIDImageReader}. */
-	private final static ImageReaderSpi readerSPI = new MrSIDImageReaderSpi();
+	private final ImageReaderSpi readerSPI = new MrSIDImageReaderSpi();
 
 	/** Absolute path to the parent dir for this coverage. */
 	private String parentPath;
@@ -134,11 +135,17 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		try {
 			// //
 			//
-			// Hints
+			// managing hints
 			//
 			// //
-			if (hints != null)
+			if (this.hints == null)
+				this.hints = new Hints();
+			if (hints != null) {
+				// prevent the use from reordering axes
 				this.hints.add(hints);
+			}
+			this.coverageFactory = FactoryFinder
+					.getGridCoverageFactory(this.hints);
 
 			// //
 			//
@@ -170,6 +177,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 			// release the stream if we can.
 			finalStreamPreparation();
+			reader.dispose();
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -194,7 +202,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws MismatchedDimensionException
 	 */
 	private void setOriginalProperties(ImageReader reader) throws IOException,
-			IllegalStateException, TransformException, MismatchedDimensionException {
+			IllegalStateException, TransformException,
+			MismatchedDimensionException {
 
 		// //
 		//
@@ -239,8 +248,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Given a {@code IIOMetadata} metadata object, retrieves several
-	 * properties to properly set envelope, gridrange and crs.
+	 * Given a {@code IIOMetadata} metadata object, retrieves several properties
+	 * to properly set envelope, gridrange and crs.
 	 * 
 	 * @param metadata
 	 */
@@ -516,15 +525,17 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 */
 	public GridCoverage read(GeneralParameterValue[] params)
 			throws IllegalArgumentException, IOException {
-
 		GeneralEnvelope readEnvelope = null;
+		String overviewPolicy=null;
 		Rectangle requestedDim = null;
+		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
+		int iUseJAI = 0;
 		if (params != null) {
 
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				Parameter param = (Parameter) params[i];
-				String name = param.getDescriptor().getName().getCode();
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
 				if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
 						.getName().toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
@@ -533,16 +544,31 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
+					continue;
+				} 
+				if (name
+						.equalsIgnoreCase(AbstractGridFormat.USE_JAI_IMAGEREAD
+								.getName().toString())) {
+					iUseJAI = param.booleanValue() ? 1 : -1;
+					continue;
 				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
+					continue;
+				}		
 			}
 		}
-		return createCoverage(readEnvelope, requestedDim);
+		return createCoverage(readEnvelope, requestedDim, iUseJAI,
+				overviewPolicy);
 	}
 
 	/**
 	 * This method creates the GridCoverage2D from the underlying file.
 	 * 
 	 * @param requestedDim
+	 * @param iUseJAI
+	 * @param overviewPolicy 
 	 * @param readEnvelope
 	 * 
 	 * @return a GridCoverage
@@ -550,7 +576,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim) throws IOException {
+			Rectangle requestedDim, int iUseJAI, String overviewPolicy)
+			throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
@@ -572,11 +599,16 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, requestedDim);
 		} catch (IOException e) {
-			throw new DataSourceException(e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
 		} catch (TransformException e) {
-			throw new DataSourceException(e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -598,15 +630,13 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					// //
 					//
 					// transforming the envelope back to the dataset crs in
-					// order to interact with the original envelope for this
-					// coverage.
+					// order to interact with the original envelope
 					//
 					// //
-					final MathTransform transform = operationFactory
-							.createOperation(
-									requestedEnvelope
-											.getCoordinateReferenceSystem(),
-									crs).getMathTransform();
+					final MathTransform transform = CRS.findMathTransform(
+							CRSUtilities.getCRS2D(requestedEnvelope
+									.getCoordinateReferenceSystem()),
+							CRSUtilities.getCRS2D(crs), true);
 					if (!transform.isIdentity()) {
 						requestedEnvelope = CRS.transform(transform,
 								requestedEnvelope);
@@ -631,18 +661,19 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER
 							.warning("The requested envelope does not intersect the envelope of this coverage, we will return a null coverage.");
-				return null;
+				throw new DataSourceException(
+						"The requested envelope does not intersect the envelope of this coverage, we will return a null coverage.");
 			}
 			intersectionEnvelope = new GeneralEnvelope(requestedEnvelope);
 			// intersect the requested area with the bounds of this layer
 			intersectionEnvelope.intersect(originalEnvelope);
 			intersectionEnvelope.setCoordinateReferenceSystem(this.crs);
 
-			// ///
+			// //
 			//
 			// Crop the sourced region
 			//
-			// ///
+			// //
 			try {
 				final GeneralGridRange finalRange = new GeneralGridRange(CRS
 						.transform(this.raster2Model.inverse(),
@@ -679,51 +710,63 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		} else
 			throw new IllegalArgumentException();
 
+		final PlanarImage coverage;
 		if (sourceRegion != null)
 			readP.setSourceRegion(sourceRegion);
 
-		final PlanarImage mrsidCoverage;
 		// //
 		//
 		// image and metadata
 		//
 		// //
-		final ParameterBlock pbjImageRead = new ParameterBlock();
-		pbjImageRead.add(input);
-		pbjImageRead.add(imageChoice);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(Boolean.FALSE);
-		pbjImageRead.add(null);
-		pbjImageRead.add(null);
-		pbjImageRead.add(readP);
-		pbjImageRead.add(readerSPI.createReaderInstance());
-		mrsidCoverage = JAI.create("ImageRead", pbjImageRead, hints);
+		boolean useJAI = iUseJAI != 0 ? (iUseJAI > 0) : true;
+		if (iUseJAI == 0 && this.hints != null) {
+			Object o = this.hints.get(Hints.USE_JAI_IMAGEREAD);
+			if (o != null)
+				useJAI = ((Boolean) o).booleanValue();
+		}
+		if (useJAI) {
+			final ParameterBlock pbjImageRead = new ParameterBlock();
+			pbjImageRead.add(input);
+			pbjImageRead.add(imageChoice);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(null);
+			pbjImageRead.add(null);
+			pbjImageRead.add(readP);
+			pbjImageRead.add(readerSPI.createReaderInstance());
+			coverage = JAI.create("ImageRead", pbjImageRead, hints);
+		} else {
+			final ImageReader reader = readerSPI.createReaderInstance();
+			reader.setInput(input, true, true);
+			reader.read(imageChoice, readP);
+			coverage = PlanarImage.wrapRenderedImage(reader.read(imageChoice));
+		}
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Creating the coverage
 		//
 		// /////////////////////////////////////////////////////////////////////
 		try {
-
 			if (intersectionEnvelope != null) {
 				// I need to calculate a new transformation (raster2Model)
 				// between the cropped image and the required
 				// intersectionEnvelope
 				final GridToEnvelopeMapper gem = new GridToEnvelopeMapper();
 				gem.setEnvelope(intersectionEnvelope);
-				final int ssWidth = mrsidCoverage.getWidth();
-				final int ssHeight = mrsidCoverage.getHeight();
+				final int ssWidth = coverage.getWidth();
+				final int ssHeight = coverage.getHeight();
 				gem.setGridRange(new GeneralGridRange(new Rectangle(0, 0,
 						ssWidth, ssHeight)));
 				gem.setGridType(PixelInCell.CELL_CENTER);
-				return super.createImageCoverage(mrsidCoverage, gem
+				return super.createImageCoverage(coverage, gem
 						.createTransform());
 			} else {
 				// In case of not intersectionEnvelope (As an instance, when
 				// reading the whole image), I can use the originalEnvelope. So,
 				// no need to specify a raster2model parameter
-				return super.createImageCoverage(mrsidCoverage);
+				return super.createImageCoverage(coverage);
 			}
 		} catch (NoSuchElementException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))

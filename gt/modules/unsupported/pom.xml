@@ -65,11 +65,11 @@
        <modules>
          <module>community-schemas</module>
          <module>coveragetools</module>
-         <module>hsql</module>
          <module>geometryless</module>
          <module>notifying-collections</module>
          <module>ogr</module>
          <module>gml3</module>
+         <module>tile</module>
        </modules>
      </profile>
 
@@ -89,24 +89,24 @@
   <modules>
     <module>coverageio</module>
     <module>coverageio-netcdf</module>
+    <module>coveragetools</module>
     <module>directory</module>
     <module>epsg-oracle</module>
     <module>gml</module>
     <module>go</module>
+    <module>gpx</module>
     <module>h2</module>
     <module>jts-wrapper</module>
+    <module>mappane</module>
     <module>mif</module>
     <module>mysql</module>
     <module>oracle-spatial</module>
     <module>postgis-versioned</module>
+    <module>repository</module>
     <module>tiger</module>
-    <module>tile</module>
-    <module>mappane</module>
-    <module>coveragetools</module>
-    <module>xml-gpx</module>
-    <module>gpx</module>
     <module>vpf</module>
     <module>widgets-swing-pending</module>
+    <module>xml-gpx</module>
   </modules>
 
 </project>

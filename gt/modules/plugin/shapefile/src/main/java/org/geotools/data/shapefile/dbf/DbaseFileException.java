@@ -16,22 +16,22 @@
 package org.geotools.data.shapefile.dbf;
 
 import org.geotools.data.DataSourceException;
+
 /**
- * Thrown when an error relating to the shapefile
- * occurs.
- * @source $URL$
+ * Thrown when an error relating to the shapefile occurs.
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/dbf/DbaseFileException.java $
  */
 public class DbaseFileException extends DataSourceException {
 
-	private static final long serialVersionUID = -6890880438911014652L;
-	public DbaseFileException(String s){
+    private static final long serialVersionUID = -6890880438911014652L;
+
+    public DbaseFileException(String s) {
         super(s);
     }
-    public DbaseFileException(String s,Throwable cause){
-        super(s,cause);
+
+    public DbaseFileException(String s, Throwable cause) {
+        super(s, cause);
     }
 }
-
-
-
-

@@ -3,7 +3,6 @@ package org.geotools.maven.xmlcodegen;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +17,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.geotools.xml.XSD;
 
 /**
  * Generates the bindings and utility classes used to parse xml documents 
@@ -38,6 +37,13 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * @parameter expression="true"
      */
     boolean generateConfiguration;
+    
+    /**
+     * Flag controlling wether an xsd ({@link XSD} subclass should be generated.
+     * 
+     * @parameter expression="true"
+     */
+    boolean generateXsd;
     
     /**
      * Flag controlling wether bindings for attributes should be generated, default is
@@ -112,6 +118,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		generator.setGenerateElements( generateElementBindings );
 		generator.setGenerateTypes( generateTypeBindings );
 		generator.setGenerateConfiguration( generateConfiguration );
+                generator.setGenerateXsd(generateXsd);
 		generator.setGenerateTests(generateTests);
 		generator.setOverwriting( overwriteExistingFiles );
 		//generator.setLocation( outputDirectory.getAbsolutePath() );

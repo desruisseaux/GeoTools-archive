@@ -20,16 +20,22 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DecoratingComponentAdapter;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
+import org.picocontainer.defaults.InstanceComponentAdapter;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import javax.xml.namespace.QName;
 import org.geotools.resources.Utilities;
+import org.geotools.xml.impl.PicoMap;
 import org.geotools.xs.XSConfiguration;
 
 
@@ -394,6 +400,7 @@ public abstract class Configuration {
      * Configures a container which houses all the bindings used during a parse.
      *
      * @param container The container housing the binding objects.
+     * @deprecated use {@link #setupBindings()}.
      */
     public final MutablePicoContainer setupBindings(MutablePicoContainer container) {
         //configure bindings of all dependencies
@@ -409,6 +416,37 @@ public abstract class Configuration {
         return container;
     }
 
+   /**
+    * Creates the map of QName to Binding which is used during parsing to attach
+    * bindinds to an element,attribute, or type.
+    *
+    * @return A map of Qname,[Class|Object] 
+    */
+    public final Map setupBindings() {
+        HashMap bindings = new HashMap();
+        
+        //wrap the binding map up in a pico container for backwards compatability
+        // with old api which registered bindings in a pico container
+        PicoMap container = new PicoMap(bindings);
+        
+        //configure bindings of all dependencies
+        for (Iterator d = allDependencies().iterator(); d.hasNext();) {
+            Configuration dependency = (Configuration) d.next();
+            dependency.registerBindings(bindings);
+       
+            //call old api
+            dependency.registerBindings((MutablePicoContainer)container);
+        }
+
+        //call template method, create a new container to allow subclass to override bindings
+        configureBindings(bindings);
+        
+        //call old api
+        configureBindings((MutablePicoContainer)container);
+        
+        return bindings;
+    }
+    
     /**
      * Registers the bindings for the configuration.
      * <p>
@@ -420,18 +458,53 @@ public abstract class Configuration {
      * </p>
      *
      * @param container Container containing all bindings, keyed by {@link QName}.
+     * 
+     * @deprecated use {@link #registerBindings(Map)}.
      */
-    protected abstract void registerBindings(MutablePicoContainer container);
+    protected void registerBindings(MutablePicoContainer container) {
+        //do nothing, in the case where the subclass has overridden the config 
+        // will recognize and apapt this method to #registerBindings(Map)
+        // accordingly (see #setupBindings()}
+    }
 
+    /**
+     * Registers the bindings for the configuration.
+     * <p>
+     * This method is intended to provide the "default" bindings for a configuration
+     * and is not intended to be subclassed by client code. Client code should use
+     * {@link #configureBindings(MutablePicoContainer)} to override/remove/add new 
+     * bindings on teh fly.
+     * </p>
+     * <p>
+     * The key of the <tt>bindings</tt> map is of type {@link QName}. The value 
+     * can be class, or an instance. In the case of a class, the binding will be 
+     * instantiated by the parser at runtime. In the instance case the binding 
+     * will be used as is.   
+     * </p>
+     */
+    protected void registerBindings(Map/*<QName,Object>*/ bindings) {
+        
+    }
+    
     /**
      * Template method allowing subclass to override any bindings.
      *
      * @param container Container containing all bindings, keyed by {@link QName}.
+     * @deprecated use {@link #configureBindings(Map)}.
      */
     protected void configureBindings(MutablePicoContainer container) {
         //do nothing
     }
 
+    /**
+     * Template method allowing subclass to override any bindings.
+     *
+     * @param bindings Map containing all bindings, keyed by {@link QName}.
+     */
+    protected void configureBindings(Map bindings) {
+        //do nothing
+    }
+    
     /**
      * Configures the root context to be used when parsing elements.
      *

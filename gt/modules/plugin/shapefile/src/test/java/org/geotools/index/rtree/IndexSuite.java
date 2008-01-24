@@ -20,12 +20,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.index.rtree.memory.MemoryPageStoreTest;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/index/rtree/IndexSuite.java $
  */
 public class IndexSuite extends TestCase {
     public IndexSuite(String testName) {
@@ -39,8 +39,10 @@ public class IndexSuite extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite("All Index Tests");
 
-        suite.addTestSuite(org.geotools.index.rtree.fs.FileSystemPageStoreTest.class);
-        suite.addTestSuite(org.geotools.index.rtree.cachefs.FileSystemPageStoreTest.class);
+        suite
+                .addTestSuite(org.geotools.index.rtree.fs.FileSystemPageStoreTest.class);
+        suite
+                .addTestSuite(org.geotools.index.rtree.cachefs.FileSystemPageStoreTest.class);
         suite.addTestSuite(MemoryPageStoreTest.class);
 
         suite.addTestSuite(RTreeTest.class);

@@ -16,16 +16,19 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.data.ContentFeatureCollection;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
-import org.geotools.data.ReTypingFeatureCollection;
+import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
@@ -33,9 +36,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
-
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public abstract class ContentFeatureSource implements FeatureSource {
     /**
-     * The entry for the feautre source.
+     * The entry for the feature source.
      */
     protected ContentEntry entry;
     /**
@@ -76,12 +76,29 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * hints
      */
     protected Set<Hints.ClassKey> hints;
-    
     /**
-     * Creates the new feature source from an entry.
+     * The query defining the feature source
      */
-    public ContentFeatureSource(ContentEntry entry) {
+    protected Query query;
+    /**
+     * cached feature type (only set if this instance is a view)
+     */
+    protected SimpleFeatureType schema;
+    
+  
+    /**
+     * Creates the new feature source from a query.
+     * <p>
+     * The <tt>query</tt> is taken into account for any operations done against
+     * the feature source. For example, when getReader(Query) is called the 
+     * query specified is "joined" to the query specified in the constructor. 
+     * The <tt>query</tt> parameter may be <code>null</code> to specify that the 
+     * feature source represents the entire set of features. 
+     * </p>
+     */
+    public ContentFeatureSource(ContentEntry entry, Query query) {
         this.entry = entry;
+        this.query = query;
         
         //set up hints
         hints = new HashSet<Hints.ClassKey>();
@@ -93,9 +110,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
         
         //make hints unmodifiable
         hints = Collections.unmodifiableSet( hints );
-        
     }
-
     /**
      * The entry for the feature source.
      */
@@ -151,6 +166,13 @@ public abstract class ContentFeatureSource implements FeatureSource {
     }
 
     /**
+     * Indicates if this feature source is actually a view.
+     */
+    public final boolean isView() {
+        return query != null && query != Query.ALL;
+    }
+    
+    /**
      * Returns the feature type or the schema of the feature source.
      * <p>
      * This method delegates to {@link #buildFeatureType()}, which must be 
@@ -159,6 +181,35 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * </p>
      */
     public final SimpleFeatureType getSchema() {
+        
+        //check schema override 
+        if ( schema != null ) {
+            return schema;
+        }
+        
+        SimpleFeatureType featureType = getAbsoluteSchema();
+        
+        //this may be a view
+        if ( query != null && query.getPropertyNames() != Query.ALL_NAMES) {
+            synchronized ( this ) {
+                if ( schema == null ) {
+                    schema = SimpleFeatureTypeBuilder.retype(featureType, query.getPropertyNames() );
+                }
+            }
+            
+            return schema;
+        }
+        
+        return featureType;
+    }
+
+    /**
+     * Helper method for returning the underlying schema of the feature source.
+     * This is a non-view this is the same as calling getSchema(), but in the 
+     * view case the underlying "true" schema is returned. 
+     */
+    protected final SimpleFeatureType getAbsoluteSchema() {
+        //load the type from the state shared among feature sources
         ContentState state = entry.getState(transaction);
         SimpleFeatureType featureType = state.getFeatureType();
 
@@ -175,122 +226,408 @@ public abstract class ContentFeatureSource implements FeatureSource {
                 }
             }
         }
+        
         return featureType;
     }
-
+    
     /**
      * Returns the bounds of the entire feature source.
      * <p>
-     * This method delegates to the {@link FeatureCollection#getBounds()} method 
-     * of the feature collection created by {@link #all(ContentState)}.
+     * This method delegates to {@link #getBounds(Query)}:
+     * <pre>
+     *   <code>return getBounds(Query.ALL)</code>.
+     * </pre>
      * </p>
      */
     public final ReferencedEnvelope getBounds() throws IOException {
-        return all(entry.getState(transaction)).getBounds();
+        
+        //return all(entry.getState(transaction)).getBounds();
+        return getBounds(Query.ALL);
     }
 
     /**
      * Returns the bounds of the results of the specified query against the 
      * feature source.
      * <p>
-     * This method delegates to the {@link FeatureCollection#getBounds()} method 
-     * of the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * This method calls through to {@link #getBoundsInternal(Query)} which 
+     * subclasses must implement. It also contains optimizations which check 
+     * state for cached values.
      * </p>
      */
     public final ReferencedEnvelope getBounds(Query query) throws IOException {
-        return filtered(entry.getState(transaction), query.getFilter()).getBounds();
+        query = joinQuery( query );
+        
+        /*
+        if ( query == Query.ALL ) {
+            //check the cache
+            //TODO: there should be a check for a view here
+            if ( getState().getBounds() != null ) {
+                return getState().getBounds();
+            }
+        }
+        */
+        
+        //
+        //calculate the bounds
+        //
+        ReferencedEnvelope bounds = getBoundsInternal(query);
+        
+        /*
+        if ( query == Query.ALL ) {
+            //update the cache
+            synchronized (getState()) {
+                getState().setBounds(bounds);
+            }
+        }
+        */
+        return bounds;
     }
+    //    return filtered(entry.getState(transaction), query.getFilter()).getBounds();
+    //}
 
+    /**
+     * Calculates the bounds of a specified query. Subclasses must implement this
+     * method.
+     */
+    protected abstract ReferencedEnvelope getBoundsInternal(Query query) throws IOException;
+    
     /**
      * Returns the count of the number of features of the feature source.
      * <p>
-     * This method delegates to the {@link FeatureCollection#size()} method of 
-     * the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * This method calls through to {@link #getCount(Query)} which 
+     * subclasses must implement. It also contains optimizations which check 
+     * state for cached values.
      * </p>
      */
     public final int getCount(Query query) throws IOException {
-        return filtered(entry.getState(transaction), query.getFilter()).size();
+        query = joinQuery( query );
+        
+        /*
+        if ( query == Query.ALL ) {
+            //check the cache
+            if ( getState().getCount() != -1 ) {
+                return getState().getCount();
+            }
+        }
+        */
+        
+        //calculate the count
+        //TODO: figure out if we need to calculate manually based on canFilter
+        int count = getCountInternal( query );
+        
+        /*
+        if ( query == Query.ALL ) {
+            //update the cache
+            synchronized (getState()) {
+                getState().setCount( count );
+            }
+        }
+        */
+        
+        return count;
+    }
+    //    return filtered(entry.getState(transaction), query.getFilter()).size();
+    //}
+
+    /**
+     * Calculates the number of features of a specified query. Subclasses must 
+     * implement this method.
+     */
+    protected abstract int getCountInternal(Query query) throws IOException;
+    
+    /**
+     * Returns the feature collection of all the features of the feature source.
+     */
+    public final ContentFeatureCollection getFeatures() throws IOException {
+        Query query = joinQuery(Query.ALL);
+        return new ContentFeatureCollection( this, query );
+        //return getFeatures(Query.ALL);
     }
 
     /**
-     * Returns the feature collection of all the features of the feature source.
+     * Returns a feature reader for all features.
      * <p>
-     * This method delegates to {@link #all(ContentState)} which must be 
-     * implemented by subclasses.
+     * This method calls through to {@link #getReader(Query)}.
      * </p>
      */
-    public final ContentFeatureCollection getFeatures() throws IOException {
-        return getFeatures(Query.ALL);
+    public final FeatureReader getReader() throws IOException {
+        return getReader(Query.ALL);
     }
-
+    
     /**
      * Returns the feature collection if the features of the feature source which 
      * meet the specified query criteria.
      */
     public final ContentFeatureCollection getFeatures(Query query)
         throws IOException {
-        ContentFeatureCollection features = getFeatures(query.getFilter(),query.getSortBy());
-        features.setHints( query.getHints() );
-        
-        if (query.getCoordinateSystemReproject() != null) {
-            // features = features.reproject( query.getCoordinateSystemReproject() );
-        }
-
-        if (query.getCoordinateSystem() != null) {
-            // features = features.toCRS( query.getCoordinateSystem() );
-        }
-
-        if (query.getMaxFeatures() != Integer.MAX_VALUE) {
-            // features = (FeatureCollection) features.sort(
-            //		SortBy.NATURAL_ORDER).subList(0, query.getMaxFeatures());
-        }
-
-        if (query.getNamespace() != null) {
-            // features = features.toNamespace( query.getNamespace() );
-        }
-
-        if (query.getPropertyNames() != Query.ALL_NAMES) {
-            //do a check for the case were all the names are still specified, 
-            // manually
-            SimpleFeatureType schema = getSchema();
-            boolean same = schema.getAttributeCount() == query.getPropertyNames().length;
-            for ( int i = 0; i < schema.getAttributeCount() && same; i++ ) {
-                same = schema.getAttribute(i).getLocalName().equals( 
-                    query.getPropertyNames()[i]);
-            }
-            if ( !same ) {
-                SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
-                features = new ReTypingFeatureCollection( features, retyped );    
-            }
-        }
-        
-        return features;
+        query = joinQuery( query );
+        return new ContentFeatureCollection( this, query );
+    
+//        ContentFeatureCollection features = getFeatures(query.getFilter(),query.getSortBy());
+//        features.setHints( query.getHints() );
+//        
+//        if (query.getCoordinateSystemReproject() != null) {
+//            // features = features.reproject( query.getCoordinateSystemReproject() );
+//        }
+//
+//        if (query.getCoordinateSystem() != null) {
+//            // features = features.toCRS( query.getCoordinateSystem() );
+//        }
+//
+//        if (query.getMaxFeatures() != Integer.MAX_VALUE) {
+//            // features = (FeatureCollection) features.sort(
+//            //		SortBy.NATURAL_ORDER).subList(0, query.getMaxFeatures());
+//        }
+//
+//        if (query.getNamespace() != null) {
+//            // features = features.toNamespace( query.getNamespace() );
+//        }
+//
+//        if (query.getPropertyNames() != Query.ALL_NAMES) {
+//            //do a check for the case were all the names are still specified, 
+//            // manually
+//            SimpleFeatureType schema = getSchema();
+//            boolean same = schema.getAttributeCount() == query.getPropertyNames().length;
+//            for ( int i = 0; i < schema.getAttributeCount() && same; i++ ) {
+//                same = schema.getAttribute(i).getLocalName().equals( 
+//                    query.getPropertyNames()[i]);
+//            }
+//            if ( !same ) {
+//                SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
+//                features = new ReTypingFeatureCollection( features, retyped );    
+//            }
+//        }
+//        
+//        return features;
     }
 
     /**
-     * Returns the feature collection if the features of the feature source which 
-     * meet the specified filter criteria.
+     * Returns a reader for the features specified by a query.
+     * 
+     */
+    public final FeatureReader getReader(Query query) throws IOException {
+        query = joinQuery( query );
+        
+        FeatureReader reader = getReaderInternal( query );
+        
+        //
+        //apply wrappers based on subclass capabilities
+        //
+        //filtering
+        if ( !canFilter() ) {
+            if (query.getFilter() != null && query.getFilter() != Filter.INCLUDE ) {
+                reader = new FilteringFeatureReader( reader, query.getFilter() );
+            }    
+        }
+        
+        // reprojection
+        if ( !canReproject() ) {
+            if (query.getCoordinateSystemReproject() != null) {
+                
+            }    
+        }
+        
+        //max feature limit
+        if ( !canLimit() ) {
+            if (query.getMaxFeatures() != -1 && query.getMaxFeatures() < Integer.MAX_VALUE ) {
+                
+            }    
+        }
+        
+        //sorting
+        if ( !canSort() ) {
+            if ( query.getSortBy() != null && query.getSortBy().length != 0 ) {
+                throw new UnsupportedOperationException( "sorting unsupported" );
+            }
+        }
+        
+        //retyping
+        if ( !canRetype() ) {
+            if ( query.getPropertyNames() != Query.ALL_NAMES ) {
+                //rebuild the type and wrap the reader
+                SimpleFeatureType target = 
+                    SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
+                
+                //do an equals check because we may have needlessly retyped
+                //TODO: do this check before hand
+                if ( !target.equals( getSchema() ) ) {
+                    reader = new ReTypeFeatureReader( reader, target, false );    
+                }
+            }
+        }
+        
+        return reader;
+    }
+    
+    /**
+     * Subclass method for returning a native reader from the datastore.
      * <p>
-     * If <tt>filter</tt> is <code>null</code> or equal to {@link Filter#INCLUDE}
-     * this method is reduced to {@link #all(ContentState)}, otherwise it is 
-     * reduced to {@link #filtered(ContentState, Filter)}.
+     * It is important to note that if the native reader intends to handle any 
+     * of the following natively:
+     * <ul>
+     *   <li>reprojection</li>
+     *   <li>filtering</li>
+     *   <li>max feature limiting</li>
+     *   <li>sorting<li>
+     * </ul>
+     * Then it <b>*must*</b> set the corresonding flags to <code>true</code>:
+     * <ul>
+     *   <li>{@link #canReproject()}</li>
+     *   <li>{@link #canFilter()}</li>
+     *   <li>{@link #canLimit()}</li>
+     *   <li>{@link #canSort()}<li>
+     * </ul>
+     * </p>
+     * 
+     */
+    protected abstract FeatureReader getReaderInternal( Query query ) throws IOException;
+    
+    /**
+     * Determines if the datastore can natively perform reprojection..
+     * <p>
+     * If the subclass can handle reprojection natively then it should override
+     * this method to return <code>true</code>. In this case it <b>must</b> do 
+     * the reprojection or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will case the
+     * feature reader created by the subclass to be wrapped in a reprojecting 
+     * decorator when the query specifies a coordinate system reproject.
+     * </p>
+     * TODO: link to decorating feature reader
+     */
+    protected boolean canReproject() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datastore can natively limit the number of features 
+     * returned in a query.
+     * <p>
+     * If the subclass can handle a map feature cap natively then it should override
+     * this method to return <code>true</code>. In this case it <b>must</b> do 
+     * the cap or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will case the
+     * feature reader created by the subclass to be wrapped in a max feature capping 
+     * decorator when the query specifies a max feature cap. 
+     * </p>
+     * TODO: link to decorating feature reader
+     */
+    protected boolean canLimit() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datastore can natively perform a filtering.
+     * <p>
+     * If the subclass can handle filtering natively it should override this method 
+     * to return <code>true</code>. In this case it <b>must</b> do the filtering
+     * or throw an exception. This includes the case of partial native filtering
+     * where the datastore can only handle part of the filter natively. In these
+     * cases it is up to the subclass to apply a decorator to the reader it returns
+     * which will handle any part of the filter can was not applied natively. See
+     * {@link FilteringFeatureReader}. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will cause the
+     * feature reader created by the subclass to be wrapped in a filtering feature
+     * reader when the query specifies a filter. See {@link FilteringFeatureReader}.
+     * </p>
+     */
+    protected boolean canFilter() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datasatore can natively perform "retyping" which includes 
+     * limiting the number of attributes returned and reordering of those attributes
+     * <p>
+     * If the subclass can handle retyping natively it should override this method 
+     * to return <code>true</code>. In this case it <b>must</b> do the retyping
+     * or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will cause the
+     * feature reader created by the subclass to be wrapped in a retyping feature
+     * reader when the query specifies a retype.
+     * </p>
+     * TODO: link to feature decorator
+     */
+    protected boolean canRetype() {
+        return false;
+    }
+    
+    /**
+     * Determines if the datastore can natively perform sorting.
+     * <p>
+     * If the subclass can handle retyping natively it should override this method 
+     * to return <code>true</code>. In this case it <b>must</b> do the retyping
+     * or throw an exception. 
+     * </p>
+     * <p>
+     * Not overriding this method or returning <code>false</code> will cause an 
+     * exception to be thrown when the query specifies sorting.
+     */
+    protected boolean canSort() {
+        return false;
+    }
+    
+    /**
+     * Creates a new feature source for the specified query.
+     * <p>
+     * If the current feature source already has a defining query it is joined
+     * to the specified query.
+     * </p>
+     * @param query
+     * @return
+     * @throws IOException
+     */
+    public final ContentFeatureSource getView(Query query) throws IOException {
+        query = joinQuery(query);
+        
+        //reflectively create subclass
+        Class clazz = getClass();
+        
+        try {
+            Constructor c = clazz.getConstructor(ContentEntry.class,Query.class);
+            ContentFeatureSource source = (ContentFeatureSource) c.newInstance(getEntry(),query);
+            
+            //set the transaction
+            source.setTransaction( transaction );
+            return source;
+        } 
+        catch( Exception e ) {
+            String msg = "Subclass must implement Constructor(ContentEntry,Query)";
+            throw (IOException) new IOException( msg ).initCause(e);
+        }
+    }
+    
+    /**
+     * Returns the feature collection for the features which match the specified
+     * filter.
+     * <p>
+     * This method calls through to {@link #getFeatures(Query)}.
      * </p>
      */
     public final ContentFeatureCollection getFeatures(Filter filter)
         throws IOException {
-        return getFeatures( filter, (SortBy[]) null );
+        return getFeatures( new DefaultQuery( getSchema().getTypeName(), filter ) );
+    }
+    
+    /**
+     * Returns a reader for features specified by a particular filter.
+     * <p>
+     * This method calls through to {@link #getReader(Query)}.
+     * </p>
+     */
+    public final FeatureReader getReader(Filter filter) throws IOException {
+        return getReader( new DefaultQuery( getSchema().getTypeName(), filter ));
     }
 
-    public final ContentFeatureCollection getFeatures(Filter filter, SortBy[] sort) {
-        ContentState state = entry.getState(transaction);
-        boolean f = filter != null && filter != Filter.INCLUDE;
-        
-        if ( sort != null ) {
-            return f ? sorted( state, sort, filter ) : sorted( state, sort, null );
-        }
-        else {
-            return f ? filtered( state, filter ) : all( state );
-        }
+    public final ContentFeatureSource getView(Filter filter) throws IOException {
+        return getView( new DefaultQuery( getSchema().getTypeName(), filter ) );
     }
     
     /**
@@ -322,7 +659,9 @@ public abstract class ContentFeatureSource implements FeatureSource {
     public final Set getSupportedHints() {
         return hints;
     }
-    
+    //
+    // Internal API
+    //
     /**
      * Subclass hook too add additional hints.
      * <p>
@@ -338,9 +677,25 @@ public abstract class ContentFeatureSource implements FeatureSource {
     protected void addHints( Set<Hints.ClassKey> hints ) {
         
     }
-    //
-    // Internal API
-    //
+ 
+    /**
+     * Convenience method for joining a query with the definining query of the 
+     * feature source.
+     */
+    protected Query joinQuery( Query query ) {
+        // if the defining query is unset or ALL just return the query passed in
+        if ( this.query == null || this.query == Query.ALL ) {
+            return query;
+        }
+        
+        // if the query passed in is unset or ALL return the defining query
+        if ( query == null ) {
+            return this.query;
+        }
+        
+        // join the queries
+        return DataUtilities.mixQueries(this.query, query, null);
+    }
     /**
      * Creates the feature type or schema for the feature source.
      * <p>
@@ -369,7 +724,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      *
      * @param state The state the feature collection must work from.
      */
-    protected abstract ContentFeatureCollection all(ContentState state);
+    //protected abstract ContentFeatureCollection all(ContentState state);
 
     /**
      * Returns a new feature collection containing all the features of the 
@@ -382,7 +737,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * @param filter The constraint filtering the data to return.
      * 
      */
-    protected abstract ContentFeatureCollection filtered(ContentState state, Filter filter);
+    //protected abstract ContentFeatureCollection filtered(ContentState state, Filter filter);
 
     /**
      * Returns a new feautre collection containing all the features of the 
@@ -397,7 +752,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * @param filter A filter, possibly <code>null</code>
      * @return
      */
-    protected abstract ContentFeatureCollection sorted(ContentState state, SortBy[] sort, Filter filter);
+    //protected abstract ContentFeatureCollection sorted(ContentState state, SortBy[] sort, Filter filter);
     
     /**
      * FeatureList representing sorted content.

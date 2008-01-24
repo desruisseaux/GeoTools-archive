@@ -60,15 +60,16 @@ import com.vividsolutions.jts.io.WKTReader;
  * The "build..." methods implement that semantic actions making a filter for
  * each syntax rules recognized.
  * </p>
+ * 
  * TODO This module should use the new geometry API, more info in http://docs.codehaus.org/display/GEOTOOLS/GeomeryFactoryFinder+Proposal
  * 
  * 
- * @author Mauricio Pazos - Axios Engineering
+ * @author Mauricio Pazos (Axios Engineering)
  * 
  * @version $Id$
  * @since 2.5
  */
-final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
+public class CQLCompiler extends CQLParser {
     private static final String ATTRIBUTE_PATH_SEPARATOR = "/";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
@@ -83,7 +84,12 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
     private FilterFactory filterFactory;
 
-    CQLCompiler(final String cqlSource, final FilterFactory filterFactory) {
+    /**
+     * new instance of CQL Compiler
+     * @param cqlSource 
+     * @param filterFactory
+     */
+    public CQLCompiler(final String cqlSource, final FilterFactory filterFactory) {
         
         super(new StringReader(cqlSource));
         this.cqlSource = cqlSource;
@@ -95,21 +101,28 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
 
     /**
-     * @return either an Expression or a Filter, depending on what the product
-     *         of the compilation unit was
+     * Return the filter resultant of compiling process
+     * @return Filter
+     * @throws CQLException 
      */
-    public final Object getResult() {
-        Result item = resultStack.peek();
-        Object result = item.getBuilt();
+    public final Filter getFilter() throws CQLException {
+        return resultStack.popFilter();
+    }
+    /**
+     * Return the expression resultant of compiling process
+     * @return Expression
+     * @throws CQLException 
+     */
+    public final Expression getExpression() throws CQLException {
 
-        return result;
+        return resultStack.popExpression();
     }
 
     /**
      * Returns the list of Filters built as the result of calling
      * {@link #MultipleCompilationUnit()}
      * 
-     * @return
+     * @return List<Filter> 
      * @throws CQLException
      *             if a ClassCastException occurs while casting a built item to
      *             a Filter.
@@ -325,8 +338,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
      * This method is called when the parser close a node. Here is built the
      * filters an expressions recognized in the parsing process.
      * 
-     * @param n
-     *            a Node instance
+     * @param n a Node instance
      * @return Filter or Expression
      * @throws CQLException
      */
@@ -336,23 +348,19 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
         // note, these should never throw because the parser grammar
         // constrains input before we ever reach here!
         case JJTINTEGERNODE:
-            return filterFactory.literal(Integer.parseInt(getToken(0).image));
+            return buildLiteralInteger(getToken(0).image);
 
         case JJTFLOATINGNODE:
-            return filterFactory.literal(Double.parseDouble(getToken(0).image));
+            return  buildLiteralDouble(getToken(0).image);
 
         case JJTSTRINGNODE:
-        case JJTCHARACTERPATTERNNODE:
-        	String strLiteral = removeQuotes(n.getToken().image);
-        	return filterFactory.literal(strLiteral);
-            
+            return buildLiteralString(getToken(0).image);
             // ----------------------------------------
             // Identifier
             // ----------------------------------------
         case JJTIDENTIFIER_NODE:
             return buildIdentifier();
 
-        case JJTIDENTIFIER_START_NODE:
         case JJTIDENTIFIER_PART_NODE:
             return buildIdentifierPart();
 
@@ -547,8 +555,27 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
         return null;
     }
 
+    private Literal buildLiteralInteger(final String image) {
+        
+        return filterFactory.literal(Integer.parseInt(image));
+    }
+
+
+    private Literal buildLiteralDouble(final String tokenImage) {
+       
+        return filterFactory.literal(Double.parseDouble(tokenImage));    
+    }
+
+
+    private Literal buildLiteralString(final String tokenImage) {
+
+        String strLiteral = removeQuotes(tokenImage);
+        return filterFactory.literal(strLiteral);
+    }
+
+
     private PropertyName buildCompoundAttribute() throws CQLException {
-        ArrayList arrayIdentifiers = new ArrayList();
+        ArrayList<String> arrayIdentifiers = new ArrayList<String>();
 
         // precondition: stack has one or more simple attributes
         while (resultStack.size() > 0) {
@@ -580,23 +607,24 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
     }
 
     private String buildIdentifier() throws CQLException {
-        // precondition: the stack have one or more parts (string type)
-        // retrieve all part of identifier from result stack
+
+        // precondition: the stack have one or more identifier part parts
         try {
-            ArrayList arrayParts = new ArrayList();
+            
+            // retrieves all part of identifier from result stack
+            ArrayList<String> arrayParts = new ArrayList<String>();
 
             while (resultStack.size() > 0) {
                 Result r = resultStack.peek();
-
-                if (!((r.getNodeType() == JJTIDENTIFIER_START_NODE) || (r
-                        .getNodeType() == JJTIDENTIFIER_PART_NODE))) {
-                    break;
+                
+                if (r.getNodeType() != JJTIDENTIFIER_PART_NODE) {
+                    break; 
                 }
-
                 String part = resultStack.popIdentifierPart();
                 arrayParts.add(part);
             }
-
+            assert arrayParts.size() >= 1 : "postcondition: the list of identifier part must have one or more elements ";
+            
             // makes the identifier
             StringBuffer identifier = new StringBuffer(100);
             String part;
@@ -608,10 +636,11 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
                 identifier.append(part).append(":");
             } // postcondition i=0
 
-            part = (String) arrayParts.get(i);
+            part = arrayParts.get(i);
             identifier.append(part);
 
             return identifier.toString();
+
         } catch (CQLException e) {
             throw new CQLException("Fail builing identifier: " + e.getMessage());
         }
@@ -621,7 +650,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
      * Creates the identifier part. An identifier like "idpart1:idpart2:idpart3:
      * ... idpartN" has N part.
      * 
-     * @return Name
+     * @return identifier part
      */
     private String buildIdentifierPart() {
         String part = getToken(0).image;
@@ -1179,39 +1208,6 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         default:
             throw new CQLException("unexpeted filter type.");
-        }
-    }
-
-    /**
-     * makes Binary Comparasion filter
-     * 
-     * @param filterType
-     * @param right
-     * @param left
-     * @return buildBinaryComparasionOperator
-     */
-    private BinaryComparisonOperator buildBinaryComparasion(
-            final int filterType,
-            final org.opengis.filter.expression.Expression right,
-            final org.opengis.filter.expression.Expression left) {
-        switch (filterType) {
-        case LTE:
-            return filterFactory.lessOrEqual(left, right);
-
-        case LT:
-            return filterFactory.less(left, right);
-
-        case GTE:
-            return filterFactory.greaterOrEqual(left, right);
-
-        case GT:
-            return filterFactory.greater(left, right);
-
-        case EQ:
-            return filterFactory.equals(left, right);
-
-        default:
-            return null;
         }
     }
 

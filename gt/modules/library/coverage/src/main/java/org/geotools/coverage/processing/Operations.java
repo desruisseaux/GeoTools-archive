@@ -485,7 +485,8 @@ public class Operations {
                               final double xTrans, final double yTrans)
             throws CoverageProcessingException
     {
-        return scale(source, xScale, yScale, xTrans, yTrans, null, null);
+        return scale(source, xScale, yScale, xTrans, yTrans,
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
     }
 
     /**
@@ -501,9 +502,6 @@ public class Operations {
      *
      * @see org.geotools.coverage.processing.operation.Scale
      *
-     * @deprecated Replaced by {@link #scale(GridCoverage,double,double,double,double,
-     *             Interpolation,BorderExtender} with a {@code null} border extender.
-     *
      * @since 2.3
      */
     public GridCoverage scale(final GridCoverage source,
@@ -512,7 +510,12 @@ public class Operations {
                               final Interpolation interpolation)
             throws CoverageProcessingException
     {
-        return scale(source, xScale, yScale, xTrans, yTrans, interpolation, null);
+        return (GridCoverage) doOperation("Scale", source,
+                "xScale", Float.valueOf((float) xScale),
+                "yScale", Float.valueOf((float) yScale),
+                "xTrans", Float.valueOf((float) xTrans),
+                "yTrans", Float.valueOf((float) yTrans),
+                "Interpolation", interpolation);
     }
 
     /**
@@ -531,7 +534,8 @@ public class Operations {
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Scale
-     *
+     * @deprecated Replaced by {@link #scale(GridCoverage,double,double,double,double,
+     *             Interpolation}.
      * @since 2.3
      */
     public GridCoverage scale(final GridCoverage source,
@@ -546,8 +550,7 @@ public class Operations {
                                           "yScale", Float.valueOf((float) yScale),
                                           "xTrans", Float.valueOf((float) xTrans),
                                           "yTrans", Float.valueOf((float) yTrans),
-                                          "Interpolation", interpolation,
-                                          "BorderExtender", extender);
+                                          "Interpolation", interpolation);
     }
 
 
@@ -587,7 +590,7 @@ public class Operations {
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SubsampleAverage
-     *
+     * @deprecated use {@link #subsampleAverage(GridCoverage, double, double)} instead.
      * @since 2.3
      */
     public GridCoverage subsampleAverage(final GridCoverage   source,
@@ -597,13 +600,30 @@ public class Operations {
                                          final BorderExtender be)
             throws CoverageProcessingException
     {
-        return (GridCoverage) doOperation("SubsampleAverage", source,
-                                          "scaleX",           Double.valueOf(scaleX),
-                                          "scaleY",           Double.valueOf(scaleY),
-                                          "Interpolation",    interpolation,
-                                          "BorderExtender",   be);
+        return subsampleAverage(source, scaleX, scaleY);
     }
 
+    /**
+     * Subsamples an image by averaging over a moving window
+     *
+     * @param source   The source coverage.
+     * @param scaleX   The scale factor along the <var>x</var> axis.
+     * @param scaleY   The scale factor along the <var>y</var> axis.
+     * @throws CoverageProcessingException if the operation can't be applied.
+     *
+     * @see org.geotools.coverage.processing.operation.SubsampleAverage
+     *
+     * @since 2.3
+     */
+    public GridCoverage subsampleAverage(final GridCoverage   source,
+                                         final double         scaleX,
+                                         final double         scaleY)
+            throws CoverageProcessingException
+    {
+        return (GridCoverage) doOperation("SubsampleAverage", source,
+                                          "scaleX",           Double.valueOf(scaleX),
+                                          "scaleY",           Double.valueOf(scaleY));
+    }
     /**
      * Subsamples an image using the default values. The scale factor is 2 and the
      * filter is a quadrant symmetric filter generated from a Gaussian kernel.
@@ -641,7 +661,8 @@ public class Operations {
                                           final float[]      qsFilter)
             throws CoverageProcessingException
     {
-        return filteredSubsample(source, scaleX, scaleY, qsFilter, null, null);
+        return filteredSubsample(source, scaleX, scaleY, qsFilter,
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST));
     }
 
     /**
@@ -659,8 +680,6 @@ public class Operations {
      *
      * @since 2.3
      *
-     * @deprecated Replaced by {@link #filteredSubsample(GridCoverage,int,int,float[],
-     *             Interpolation,BorderExtender} with a {@code null} border extender.
      */
     public GridCoverage filteredSubsample(final GridCoverage source,
                                           final int scaleX, final int scaleY,
@@ -668,7 +687,11 @@ public class Operations {
                                           final Interpolation interpolation)
             throws CoverageProcessingException
     {
-        return filteredSubsample(source, scaleX, scaleY, qsFilter, interpolation, null);
+        return (GridCoverage) doOperation("FilteredSubsample", source,
+                "scaleX",            Integer.valueOf(scaleX),
+                "scaleY",            Integer.valueOf(scaleY),
+                "qsFilterArray",     qsFilter,
+                "Interpolation",     interpolation);
     }
 
     /**
@@ -687,7 +710,7 @@ public class Operations {
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.FilteredSubsample
-     *
+     * @deprecated use {@link #filteredSubsample(GridCoverage, int, int, float[], Interpolation)}
      * @since 2.3
      */
     public GridCoverage filteredSubsample(final GridCoverage   source,
@@ -698,12 +721,7 @@ public class Operations {
                                           final BorderExtender be)
             throws CoverageProcessingException
     {
-        return (GridCoverage) doOperation("FilteredSubsample", source,
-                                          "scaleX",            Integer.valueOf(scaleX),
-                                          "scaleY",            Integer.valueOf(scaleY),
-                                          "qsFilterArray",     qsFilter,
-                                          "Interpolation",     interpolation,
-                                          "BorderExtender",    be);
+        return filteredSubsample(source, scaleX, scaleY, qsFilter, interpolation);
     }
 
     /**

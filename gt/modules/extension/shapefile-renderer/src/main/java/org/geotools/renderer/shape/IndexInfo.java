@@ -16,85 +16,49 @@
  */
 package org.geotools.renderer.shape;
 
+import static org.geotools.data.shapefile.ShpFileType.*;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.shapefile.FileReader;
+import org.geotools.data.shapefile.ShpFiles;
+import org.geotools.data.shapefile.indexed.IndexType;
 import org.geotools.data.shapefile.indexed.RecordNumberTracker;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.index.Data;
-import org.geotools.index.LockTimeoutException;
 import org.geotools.index.TreeException;
 import org.geotools.index.quadtree.QuadTree;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
-import org.geotools.index.rtree.RTree;
-import org.geotools.index.rtree.fs.FileSystemPageStore;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Encapsulates index information for a layer in the MapContext. The associated layer can be
- * obtained by
+ * Encapsulates index information for a layer in the MapContext. The associated
+ * layer can be obtained by
  * 
  * @author jones
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/IndexInfo.java $
  */
-public class IndexInfo {
-    static final byte TREE_NONE = 0;
-    static final byte R_TREE = 1;
-    static final byte QUAD_TREE = 2;
-    final byte treeType;
-    final URL treeURL;
-    final URL shxURL;
-    private RTree rtree;
+public class IndexInfo implements FileReader {
+    final IndexType treeType;
     private QuadTree qtree;
+    private ShpFiles shpFiles;
 
-    public IndexInfo( byte treeType, URL treeURL, URL shxURL ) {
+    public IndexInfo(IndexType treeType, ShpFiles shpFiles) {
         this.treeType = treeType;
-        this.treeURL = treeURL;
-        this.shxURL = shxURL;
+        this.shpFiles = shpFiles;
     }
 
-    /**
-     * RTree query
-     * 
-     * @param bbox
-     * @return
-     * @throws DataSourceException
-     * @throws IOException
-     */
-    List queryRTree( Envelope bbox ) throws DataSourceException, IOException {
-        List goodRecs = null;
-
-        try {
-            if ((rtree != null) && !bbox.contains(rtree.getBounds())) {
-                goodRecs = rtree.search(bbox);
-            }
-        } catch (LockTimeoutException le) {
-            throw new DataSourceException("Error querying RTree", le);
-        } catch (TreeException re) {
-            throw new DataSourceException("Error querying RTree", re);
-        } finally {
-            try {
-                rtree.close();
-            } catch (Exception ee) {
-            }
-        }
-
-        return goodRecs;
-    }
 
     /**
      * QuadTree Query
@@ -103,46 +67,28 @@ public class IndexInfo {
      * @return
      * @throws DataSourceException
      * @throws IOException
-     * @throws TreeException DOCUMENT ME!
+     * @throws TreeException
+     *                 DOCUMENT ME!
      */
-    Collection queryQuadTree( Envelope bbox ) throws DataSourceException, IOException, TreeException {
-        Collection tmp = null;
-
+    Collection queryQuadTree(Envelope bbox) throws DataSourceException,
+            IOException, TreeException {
         try {
-            // old code was checking the resulting collection wasn't empty and it that
-            // case it closed the qtree straight away. qtree gets closed anyways with
-            // this code path, but it's quite a bit faster because it avoid one disk access
+            // old code was checking the resulting collection wasn't empty and
+            // it that
+            // case it closed the qtree straight away. qtree gets closed anyways
+            // with
+            // this code path, but it's quite a bit faster because it avoid one
+            // disk access
             // just to check the collection is not empty
             if ((qtree != null) && !bbox.contains(qtree.getRoot().getBounds()))
                 return qtree.search(bbox);
-        }catch (Exception e) {
-        	ShapefileRenderer.LOGGER.warning(e.getLocalizedMessage());
-		}
-
-    	return null;
-    }
-
-    /**
-     * Convenience method for opening an RTree index.
-     * 
-     * @return A new RTree.
-     * @throws IOException If an error occurs during creation.
-     * @throws DataSourceException DOCUMENT ME!
-     */
-    RTree openRTree() throws IOException {
-        File file = new File(treeURL.getPath());
-
-        RTree ret = null;
-
-        try {
-            FileSystemPageStore fps = new FileSystemPageStore(file);
-            ret = new RTree(fps);
-        } catch (TreeException re) {
-            throw new DataSourceException("Error opening RTree", re);
+        } catch (Exception e) {
+            ShapefileRenderer.LOGGER.warning(e.getLocalizedMessage());
         }
 
-        return ret;
+        return null;
     }
+
 
     /**
      * Convenience method for opening a QuadTree index.
@@ -151,14 +97,19 @@ public class IndexInfo {
      * @throws StoreException
      */
     QuadTree openQuadTree() throws StoreException {
-        File file = new File(treeURL.getPath());
-        FileSystemIndexStore store = new FileSystemIndexStore(file);
-
+        URL url = shpFiles.acquireRead(QIX, this);
         try {
-			return store.load(openIndexFile());
-		}  catch (IOException e) {
-			throw new StoreException(e);
-		}
+            File file = DataUtilities.urlToFile(url);
+            FileSystemIndexStore store = new FileSystemIndexStore(file);
+
+            try {
+                return store.load(openIndexFile());
+            } catch (IOException e) {
+                throw new StoreException(e);
+            }
+        } finally {
+            shpFiles.unlockRead(url, this);
+        }
     }
 
     /**
@@ -168,65 +119,20 @@ public class IndexInfo {
      * @throws IOException
      */
     IndexFile openIndexFile() throws IOException {
-        ReadableByteChannel rbc = getReadChannel(shxURL);
 
-        if (rbc == null) {
+        if (shpFiles.get(SHX) == null || (shpFiles.isLocal() && !shpFiles.exists(SHX))) {
             return null;
         }
-
-        // return new IndexFile(rbc, this.useMemoryMappedBuffer);
-        return new IndexFile(rbc, false);
-    }
-
-    /**
-     * Obtain a ReadableByteChannel from the given URL. If the url protocol is file, a FileChannel
-     * will be returned. Otherwise a generic channel will be obtained from the urls input stream.
-     * 
-     * @param url DOCUMENT ME!
-     * @return DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     */
-    private ReadableByteChannel getReadChannel( URL url ) throws IOException {
-        ReadableByteChannel channel = null;
-
-        if (url.getProtocol().equals("file")) {
-            File file = new File(url.getFile());
-
-            if (!file.exists() || !file.canRead()) {
-                throw new IOException("File either doesn't exist or is unreadable : " + file);
-            }
-
-            FileInputStream in = new FileInputStream(file);
-            channel = in.getChannel();
-        } else {
-            InputStream in = url.openConnection().getInputStream();
-            channel = Channels.newChannel(in);
+        try{
+            return new IndexFile(shpFiles, false);
+        }catch (Exception e) {
+            return null;
         }
-
-        return channel;
     }
 
-    //
-    // public ShapefileReader.Record getNextRecord(ShapefileReader shpreader, Envelope bbox) throws
-    // Exception {
-    // if( treeType== IndexInfo.TREE_GRX || treeType== TREE_QIX){
-    //
-    // List goodRecs = null;
-    // try {
-    // goodRecs = queryTree(bbox);
-    // } catch (TreeException e) {
-    // throw new IOException("Error querying index: " +
-    // e.getMessage());
-    // }
-    // }
-    // ShapefileReader.Record record = shpreader
-    // .nextRecord();
-    // return record;
-    // }
-    private Collection queryTree( Envelope bbox ) throws IOException, TreeException {
-        if (treeType == IndexInfo.R_TREE) {
-            return queryRTree(bbox);
-        } else if (treeType == IndexInfo.QUAD_TREE) {
+    private Collection queryTree(Envelope bbox) throws IOException,
+            TreeException {
+        if (treeType == IndexType.QIX) {
             return queryQuadTree(bbox);
         }
 
@@ -238,42 +144,42 @@ public class IndexInfo {
         private ShapefileReader shp;
         Iterator goodRecs;
         private int recno = 1;
-		private Data next;
-		private IndexInfo info;
+        private Data next;
+        private IndexInfo info;
 
-        public Reader( IndexInfo info, ShapefileReader reader, Envelope bbox ) throws IOException {
+        public Reader(IndexInfo info, ShapefileReader reader, Envelope bbox)
+                throws IOException {
             shp = reader;
 
             try {
-            	
-                if (info.treeType == R_TREE) {
-                    info.rtree = info.openRTree();
-                } else if (info.treeType == QUAD_TREE) {
+
+                if (info.treeType == IndexType.QIX) {
                     info.qtree = info.openQuadTree();
                 }
 
                 Collection queryTree = info.queryTree(bbox);
-                if( queryTree!=null )
-                	goodRecs = queryTree.iterator();
+                if (queryTree != null)
+                    goodRecs = queryTree.iterator();
             } catch (Exception e) {
                 ShapefileRenderer.LOGGER.log(Level.FINE,
                         "Exception occured attempting to use indexing:", e);
                 goodRecs = null;
             }
 
-            this.info=info;
+            this.info = info;
         }
 
         public int getRecordNumber() {
             return this.recno;
         }
+
         public boolean hasNext() throws IOException {
             if (this.goodRecs != null) {
-            	if( next!=null )
-            		return true;
+                if (next != null)
+                    return true;
                 if (this.goodRecs.hasNext()) {
-                	
-                    next=(Data)goodRecs.next();
+
+                    next = (Data) goodRecs.next();
                     this.recno = ((Integer) next.getValue(0)).intValue();
                     return true;
                 }
@@ -284,13 +190,14 @@ public class IndexInfo {
         }
 
         public ShapefileReader.Record next() throws IOException {
-        	if( !hasNext() )
-        		throw new IndexOutOfBoundsException("No more features in reader");
+            if (!hasNext())
+                throw new IndexOutOfBoundsException(
+                        "No more features in reader");
             if (this.goodRecs != null) {
 
                 Long l = (Long) next.getValue(1);
                 ShapefileReader.Record record = shp.recordAt(l.intValue());
-                next=null;
+                next = null;
                 return record;
             }
             recno++;
@@ -300,14 +207,18 @@ public class IndexInfo {
         public void close() throws IOException {
             shp.close();
             try {
-            	if( info.qtree!=null ){
-					info.qtree.close(goodRecs);
-					info.qtree.close();
-            	}
-			} catch (StoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                if (info.qtree != null) {
+                    info.qtree.close(goodRecs);
+                    info.qtree.close();
+                }
+            } catch (StoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
+    }
+
+    public String id() {
+        return getClass().getName();
     }
 }

@@ -16,26 +16,23 @@
 
 package org.geotools.gui.swing.map.map2d.listener;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import java.util.EventListener;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 /**
- * Map2DListener used to listen to Map2D events 
+ * EditableMap2DListener used to listen to Map2D edition events
  * @author Johann Sorel
  */
 public interface Map2DListener extends EventListener{
 
     /**
-     * called when Map2d MapArea changed
-     * @param event : Map2DMapAreaEvent
+     * called when Rendering strategy change
+     * @param oldStrategy 
+     * @param newStrategy 
      */
-    public void mapAreaChanged(Map2DMapAreaEvent event);
+    public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy);
     
-    /**
-     * called when MapContext changed
-     * @param event : Map2DContextEvent
-     */
-    public void mapContextChanged(Map2DContextEvent event);
     
 }

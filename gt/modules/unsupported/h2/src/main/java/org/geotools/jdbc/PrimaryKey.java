@@ -18,6 +18,7 @@ package org.geotools.jdbc;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 /**
@@ -27,11 +28,11 @@ import java.sql.ResultSet;
  *
  */
 public abstract class PrimaryKey {
-    
     /**
      * Table name
      */
     String tableName;
+
     /**
      * the column name
      */
@@ -41,25 +42,25 @@ public abstract class PrimaryKey {
      * the column type.
      */
     Class type;
-    
-    protected PrimaryKey( String tableName, String columnName, Class type ) {
+
+    protected PrimaryKey(String tableName, String columnName, Class type) {
         this.tableName = tableName;
         this.columnName = columnName;
         this.type = type;
     }
-    
+
     public String getTableName() {
         return tableName;
     }
-    
+
     public String getColumnName() {
         return columnName;
     }
-    
+
     public Class getType() {
         return type;
     }
-    
+
     /**
      * Decodes a featureId into an array of objects which map to the columns
      * of the primary key.
@@ -85,18 +86,18 @@ public abstract class PrimaryKey {
      *
      * @throws Exception
      */
-    public String encode(ResultSet rs) throws Exception {
+    public String encode(ResultSet rs) throws SQLException {
         Object value = rs.getObject(columnName);
-        
+
         //TODO: run column[i].type through converter to string
         //return tableName + "." + value.toString();
         return value.toString();
     }
 
     /**
-     * Generates a new value for the primary key. 
-     * 
+     * Generates a new value for the primary key.
+     *
      */
-    public abstract String generate(Connection cx, SQLDialect dialect) throws Exception;
-    
+    public abstract String generate(Connection cx, SQLDialect dialect)
+        throws Exception;
 }

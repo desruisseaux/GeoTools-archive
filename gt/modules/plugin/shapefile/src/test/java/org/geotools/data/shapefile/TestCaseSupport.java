@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -36,30 +37,30 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-
 /**
  * Base class for test suite. This class is not abstract for the purpose of
- * {@link TestCaseSupportTest}, but should not be instantiated otherwise.
- * It should be extented (which is why the constructor is protected).
+ * {@link TestCaseSupportTest}, but should not be instantiated otherwise. It
+ * should be extented (which is why the constructor is protected).
  * <p>
- * Note: a nearly identical copy of this file exists in the {@code ext/shape} module.
- *
- * @source $URL$
+ * Note: a nearly identical copy of this file exists in the {@code ext/shape}
+ * module.
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/TestCaseSupport.java $
  * @version $Id$
- * @author  Ian Schneider
- * @author  Martin Desruisseaux
+ * @author Ian Schneider
+ * @author Martin Desruisseaux
  */
 public class TestCaseSupport extends TestCase {
     /**
-     * Set to {@code true} if {@code println} are wanted during normal execution.
-     * It doesn't apply to message displayed in case of errors.
+     * Set to {@code true} if {@code println} are wanted during normal
+     * execution. It doesn't apply to message displayed in case of errors.
      */
-    //protected static boolean verbose = false;
-
+    // protected static boolean verbose = false;
     /**
      * Stores all temporary files here - delete on tear down.
      */
-    private final List tmpFiles = new ArrayList();
+    private final List<File> tmpFiles = new ArrayList<File>();
 
     /**
      * Creates a new instance of {@code TestCaseSupport} with the given name.
@@ -69,48 +70,52 @@ public class TestCaseSupport extends TestCase {
     }
 
     /**
-     * Deletes all temporary files created by {@link #getTempFile}.
-     * This method is automatically run after each test.
+     * Deletes all temporary files created by {@link #getTempFile}. This method
+     * is automatically run after each test.
      */
     protected void tearDown() throws Exception {
+        
+        Runtime.getRuntime().runFinalization();
         // it seems that not all files marked as temp will get erased, perhaps
         // this is because they have been rewritten? Don't know, don't _really_
         // care, so I'll just delete everything
-        final Iterator f = tmpFiles.iterator();
+        final Iterator<File> f = tmpFiles.iterator();
         while (f.hasNext()) {
             File targetFile = (File) f.next();
-            
-            targetFile.deleteOnExit();
-            dieDieDIE( sibling(targetFile, "dbf") );
-            dieDieDIE( sibling(targetFile, "shx") );
-            dieDieDIE( sibling(targetFile, "qix") );
-            dieDieDIE( sibling(targetFile, "fix") );
-            dieDieDIE( sibling(targetFile, "grx") );
-            // TODDO: r i tree must die
-            dieDieDIE( sibling(targetFile, "prj") );
-            dieDieDIE( sibling(targetFile, "shp.xml") );
-                        
+
+            dieDieDIE(targetFile);
+            dieDieDIE(sibling(targetFile, "dbf"));
+            dieDieDIE(sibling(targetFile, "shx"));
+            // Quad tree index
+            dieDieDIE(sibling(targetFile, "qix"));
+            // Feature ID index
+            dieDieDIE(sibling(targetFile, "fix"));
+            // R-Tree index
+            dieDieDIE(sibling(targetFile, "grx"));
+            dieDieDIE(sibling(targetFile, "prj"));
+            dieDieDIE(sibling(targetFile, "shp.xml"));
+
             f.remove();
         }
         super.tearDown();
     }
-    
-    private void dieDieDIE( File file ){
-        if( file.exists() ){
-            if( file.delete() ){
+
+    private void dieDieDIE(File file) {
+        if (file.exists()) {
+            if (file.delete()) {
                 // dead
-            }
-            else {
+            } else {
+                System.out.println("Couldn't delete "+file);
                 file.deleteOnExit(); // dead later
             }
         }
     }
-    
+
     /**
      * Helper method for {@link #tearDown}.
      */
-    private static File sibling(final File f, final String ext) {
-    	return new File(f.getParent(), sibling(f.getName(), ext));
+    protected static File sibling(final File f, final String ext) {
+        return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
     /**
@@ -126,19 +131,25 @@ public class TestCaseSupport extends TestCase {
 
     /**
      * Read a geometry of the given name.
-     *
-     * @param  wktResource The resource name to load, without its {@code .wkt} extension.
+     * 
+     * @param wktResource
+     *                The resource name to load, without its {@code .wkt}
+     *                extension.
      * @return The geometry.
-     * @throws IOException if reading failed.
+     * @throws IOException
+     *                 if reading failed.
      */
-    protected Geometry readGeometry(final String wktResource) throws IOException {
-        final BufferedReader stream = TestData.openReader("wkt/" + wktResource + ".wkt");
+    protected Geometry readGeometry(final String wktResource)
+            throws IOException {
+        final BufferedReader stream = TestData.openReader("wkt/" + wktResource
+                + ".wkt");
         final WKTReader reader = new WKTReader();
         final Geometry geom;
         try {
             geom = reader.read(stream);
         } catch (ParseException pe) {
-            IOException e = new IOException("parsing error in resource " + wktResource);
+            IOException e = new IOException("parsing error in resource "
+                    + wktResource);
             e.initCause(pe);
             throw e;
         }
@@ -150,50 +161,79 @@ public class TestCaseSupport extends TestCase {
      * Returns the first feature in the given feature collection.
      */
     protected SimpleFeature firstFeature(FeatureCollection fc) {
-        return fc.features().next();
+        FeatureIterator features = fc.features();
+        SimpleFeature next = features.next();
+        features.close();
+        return next;
     }
 
     /**
-     * Creates a temporary file, to be automatically deleted at the end of the test suite.
+     * Creates a temporary file, to be automatically deleted at the end of the
+     * test suite.
      */
     protected File getTempFile() throws IOException {
         File tmpFile = File.createTempFile("test-shp", ".shp");
+        tmpFile.deleteOnExit();
         assertTrue(tmpFile.isFile());
-        
+
         // keep track of all temp files so we can delete them
         markTempFile(tmpFile);
-        
+
         return tmpFile;
     }
 
-    private void markTempFile( File tmpFile ) {
-        tmpFiles.add(tmpFile);        
+    private void markTempFile(File tmpFile) {
+        tmpFiles.add(tmpFile);
     }
 
     /**
-     * Copies the specified shape file into the {@code test-data} directory, together with its
-     * sibling ({@code .dbf}, {@code .shp}, {@code .shx} and {@code .prj} files).
+     * Copies the specified shape file into the {@code test-data} directory,
+     * together with its sibling ({@code .dbf}, {@code .shp}, {@code .shx}
+     * and {@code .prj} files).
      */
     protected File copyShapefiles(final String name) throws IOException {
-        assertTrue(TestData.copy(this, sibling(name, "dbf")).canRead());
-        assertTrue(TestData.copy(this, sibling(name, "shp")).canRead());
+        assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "dbf")).canRead());
+        assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shp")).canRead());
         try {
-            assertTrue(TestData.copy(this, sibling(name, "shx")).canRead());
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shx")).canRead());
         } catch (FileNotFoundException e) {
             // Ignore: this file is optional.
         }
         try {
-            assertTrue(TestData.copy(this, sibling(name, "prj")).canRead());
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "prj")).canRead());
         } catch (FileNotFoundException e) {
             // Ignore: this file is optional.
         }
-        return TestData.copy(this, name);
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "fix")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "qix")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "grx")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        try {
+            assertTrue(TestData.copy(TestCaseSupport.class, sibling(name, "shp.xml")).canRead());
+        } catch (FileNotFoundException e) {
+            // Ignore: this file is optional.
+        }
+        File copy = TestData.copy(TestCaseSupport.class, name);
+        markTempFile(copy);
+        
+        return copy;
     }
 
     /**
      * Returns the test suite for the given class.
      */
-    public static Test suite(Class c) {
+    public static Test suite(Class<?> c) {
         return new TestSuite(c);
     }
 }

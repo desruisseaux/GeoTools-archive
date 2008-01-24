@@ -1,55 +1,78 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.jdbc;
 
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+
 /**
  * Extension of JDBCTestSetup which is used by {@link JDBCDataStoreAPITest}.
- * 
+ *
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
 public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
-
     JDBCTestSetup delegate;
-    
-    protected JDBCDataStoreAPITestSetup( JDBCTestSetup delegate ) {
+
+    protected JDBCDataStoreAPITestSetup(JDBCTestSetup delegate) {
         this.delegate = delegate;
+    }
+    
+    public void setUp() throws Exception {
+        super.setUp();
+        
+        delegate.setUp();
     }
     
     protected final void initializeDatabase() throws Exception {
         delegate.initializeDatabase();
     }
-    
+
     protected final DataSource createDataSource() {
         return delegate.createDataSource();
     }
 
-    protected final SQLDialect createSQLDialect() {
-        return delegate.createSQLDialect();
+    protected final SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return delegate.createSQLDialect(dataStore);
     }
-    
+
     protected final void setUpData() throws Exception {
         //kill all the data
         try {
             dropRoadTable();
+        } catch (SQLException e) {
         }
-        catch( SQLException e ) {}
+
         try {
             dropRiverTable();
+        } catch (SQLException e) {
         }
-        catch( SQLException e ) {}
+
         try {
             dropLakeTable();
+        } catch (SQLException e) {
         }
-        catch( SQLException e ) {}
-        
+
         try {
             dropBuildingTable();
+        } catch (SQLException e) {
         }
-        catch( SQLException e ) {}
-        
+
         //create all the data
         createRoadTable();
         createRiverTable();
@@ -62,7 +85,7 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
     protected int getInitialPrimaryKeyValue() {
         return 0;
     }
-    
+
     /**
      * Drops the "road" table.
      */
@@ -72,21 +95,21 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
      * Drops the "river" table.
      */
     protected abstract void dropRiverTable() throws Exception;
-    
+
     /**
      * Drops the "lake" table.
      */
     protected abstract void dropLakeTable() throws Exception;
-    
+
     /**
      * Drops the "building" table.
      * <p>
-     * This feature type / table is created by one of the tests in teh suite, 
+     * This feature type / table is created by one of the tests in teh suite,
      * and not by this test harness.
      * </p>
      */
     protected abstract void dropBuildingTable() throws Exception;
-    
+
     /**
      * Creates a table with the following schema:
      * <p>
@@ -100,8 +123,7 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
      * </p>
      */
     protected abstract void createRoadTable() throws Exception;
-    
-    
+
     /**
      * Creates a table with the following schema:
      * <p>
@@ -114,7 +136,6 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
      * </p>
      */
     protected abstract void createRiverTable() throws Exception;
-    
 
     /**
      * Creates a table with the following schema:
@@ -127,5 +148,4 @@ public abstract class JDBCDataStoreAPITestSetup extends JDBCTestSetup {
      * </p>
      */
     protected abstract void createLakeTable() throws Exception;
-
 }

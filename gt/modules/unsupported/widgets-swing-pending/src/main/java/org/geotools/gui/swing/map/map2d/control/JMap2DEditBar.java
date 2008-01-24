@@ -39,7 +39,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
@@ -51,6 +50,8 @@ import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
@@ -62,7 +63,7 @@ import org.geotools.map.event.MapLayerListListener;
  * 
  * @author johann sorel
  */
-public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap2DListener, EditableMap2DListener {
+public class JMap2DEditBar extends JPanel implements Map2DListener,StrategyListener, NavigableMap2DListener, EditableMap2DListener {
 
     private final ContextListener contextListener = new ContextListener();
     private EditableMap2D map = null;
@@ -356,7 +357,7 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
 
         if (map2d instanceof EditableMap2D) {
             map = (EditableMap2D) map2d;
-            editionContext = map.getContext();
+            editionContext = map.getRenderingStrategy().getContext();
             editionLayer = map.getEditedMapLayer();
             map.addMap2DListener(this);
             map.addNavigableMap2DListener(this);
@@ -486,5 +487,13 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
 
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }
+    }
+
+    public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
+        oldStrategy.removeStrategyListener(this);
+        newStrategy.addStrategyListener(this);
+    }
+
+    public void setRendering(boolean rendering) {
     }
 }

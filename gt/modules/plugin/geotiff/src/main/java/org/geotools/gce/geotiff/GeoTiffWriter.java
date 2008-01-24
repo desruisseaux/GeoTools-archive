@@ -15,6 +15,7 @@
  */
 package org.geotools.gce.geotiff;
 
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -34,7 +35,10 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -77,7 +81,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/**
 	 * Constructor for a {@link GeoTiffWriter}.
-	 *
+	 * 
 	 * @param destination
 	 * @throws IOException
 	 */
@@ -88,7 +92,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/**
 	 * Constructor for a {@link GeoTiffWriter}.
-	 *
+	 * 
 	 * @param destination
 	 * @param hints
 	 * @throws IOException
@@ -108,8 +112,8 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 		} else if (destination instanceof OutputStream) {
 
-			this.outStream = ImageIO.createImageOutputStream(
-					(OutputStream) destination);
+			this.outStream = ImageIO
+					.createImageOutputStream((OutputStream) destination);
 
 		} else if (destination instanceof ImageOutputStream)
 			this.outStream = (ImageOutputStream) destination;
@@ -121,17 +125,22 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// managing hints
 		//
 		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
 		if (hints != null) {
-			if (super.hints == null)
-				this.hints = new Hints();
-			hints.add(hints);
+			// prevent the use from reordering axes
+			hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+			this.hints.add(hints);
+			this.hints.add(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+				Boolean.TRUE));
+			
 		}
 
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
 	public Format getFormat() {
@@ -140,7 +149,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
 	 *      org.opengis.parameter.GeneralParameterValue[])
 	 */
@@ -177,7 +186,14 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// getting the coordinate reference system
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
+		final GridGeometry2D gg = (GridGeometry2D) gc.getGridGeometry();
+		GridRange range = gg.getGridRange2D();
+		final Rectangle sourceRegion = gtParams.getSourceRegion();
+		if (sourceRegion != null)
+			range = new GeneralGridRange(sourceRegion);
+		final AffineTransform tr = (AffineTransform) gg.getGridToCRS2D();
+		final CoordinateReferenceSystem crs = gg
+				.getCoordinateReferenceSystem2D();
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -193,9 +209,6 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 					.parseCoordinateReferenceSystem();
 
 			// setting georeferencing
-			final GridGeometry gg = gc.getGridGeometry();
-			final GridRange range = gg.getGridRange();
-			final AffineTransform tr = (AffineTransform) gg.getGridToCRS();
 			setGeoReference(crs, metadata, tr, range);
 
 			// writing ALWAYS the geophysics vew of the data
@@ -214,12 +227,12 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * GeoTiff file we are writing or the ModelTransformation in case a more
 	 * general {@link AffineTransform} is needed to represent the raster space
 	 * to model space transform.
-	 *
+	 * 
 	 * <p>
 	 * This method works regardles of the nature fo the crs without making any
 	 * assumptions on the order or the direction of the axes, but checking them
 	 * from the supplied CRS.
-	 *
+	 * 
 	 * @see {@link http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html}
 	 * @see {@http://lists.maptools.org/pipermail/geotiff/2006-January/000212.html}
 	 * @param crs
@@ -232,7 +245,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * @param rasterToModel
 	 *            describes the {@link AffineTransform} between raster space and
 	 *            model space.
-	 *
+	 * 
 	 * @throws IndexOutOfBoundsException
 	 * @throws IOException
 	 * @throws TransformException
@@ -248,7 +261,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// since we support baseline GeoTiff.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		AffineTransform modifiedRasterToModel;
+		final AffineTransform modifiedRasterToModel;
 		int minx = range.getLower(0), miny = range.getLower(1);
 		if (minx != 0 || miny != 0) {
 			// //
@@ -284,7 +297,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// axis.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		boolean lonFirst = XAffineTransform.getSwapXY(rasterToModel) != -1;
+		boolean lonFirst = XAffineTransform.getSwapXY(modifiedRasterToModel) != -1;
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -294,7 +307,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// scale and translate hence we can simply set the tie points.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		double rotation = XAffineTransform.getRotation(rasterToModel);
+		double rotation = XAffineTransform.getRotation(modifiedRasterToModel);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -304,28 +317,26 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// tie points
 		if (!(Double.isInfinite(rotation) || Double.isNaN(rotation) || Math
 				.abs(rotation) > 1E-6)) {
-			final double tiePointLongitude = (lonFirst) ? rasterToModel
-					.getTranslateX() : rasterToModel.getTranslateY();
-			final double tiePointLatitude = (lonFirst) ? rasterToModel
-					.getTranslateY() : rasterToModel.getTranslateX();
+			final double tiePointLongitude = (lonFirst) ? modifiedRasterToModel
+					.getTranslateX() : modifiedRasterToModel.getTranslateY();
+			final double tiePointLatitude = (lonFirst) ? modifiedRasterToModel
+					.getTranslateY() : modifiedRasterToModel.getTranslateX();
 			metadata.setModelTiePoint(0, 0, 0, tiePointLongitude,
 					tiePointLatitude, 0);
 			// scale
 			final double scaleModelToRasterLongitude = (lonFirst) ? Math
-					.abs(rasterToModel.getScaleX()) : Math.abs(rasterToModel
+					.abs(modifiedRasterToModel.getScaleX()) : Math.abs(modifiedRasterToModel
 					.getShearY());
 			final double scaleModelToRasterLatitude = (lonFirst) ? Math
-					.abs(rasterToModel.getScaleY()) : Math.abs(rasterToModel
+					.abs(modifiedRasterToModel.getScaleY()) : Math.abs(modifiedRasterToModel
 					.getShearX());
 			metadata.setModelPixelScale(scaleModelToRasterLongitude,
 					scaleModelToRasterLatitude, 0);
 			// Alternative code, not yet enabled in order to avoid breaking
 			// code.
 			// The following code is insensitive to axis order and rotations in
-			// the
-			// 'coord' space (not in the 'grid' space, otherwise we would not
-			// take
-			// the inverse of the matrix).
+			// the 'coord' space (not in the 'grid' space, otherwise we would
+			// not take the inverse of the matrix).
 			/*
 			 * final AffineTransform coordToGrid = gridToCoord.createInverse();
 			 * final double scaleModelToRasterLongitude = 1 /
@@ -343,7 +354,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	/**
 	 * Writes the provided rendered image to the provided image output stream
 	 * using the supplied geotiff metadata.
-	 *
+	 * 
 	 * @param gtParams
 	 */
 	private boolean writeImage(final RenderedImage image,
@@ -390,7 +401,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * Creates image metadata which complies to the GeoTIFFWritingUtilities
 	 * specification for the given image writer, image type and
 	 * GeoTIFFWritingUtilities metadata.
-	 *
+	 * 
 	 * @param writer
 	 *            the image writer, must not be null
 	 * @param type
@@ -424,12 +435,6 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		try {
 			final org.w3c.dom.Document w3cDoc = new DOMOutputter()
 					.output(document);
-
-			/*
-			 * DOMSerializerImpl domSerializer = new DOMSerializerImpl();
-			 * System.out.println(domSerializer.writeToString(w3cDoc.getFirstChild()));
-			 */
-
 			final IIOMetadata iioMetadata = new TIFFImageMetadata(
 					TIFFImageMetadata.parseIFD(w3cDoc.getDocumentElement()
 							.getFirstChild()));

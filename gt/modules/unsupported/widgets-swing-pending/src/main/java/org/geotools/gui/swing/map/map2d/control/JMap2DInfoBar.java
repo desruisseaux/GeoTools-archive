@@ -36,6 +36,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
 
         if (map instanceof Map2D) {
             this.map = (Map2D) map;
+            m_coord.setMap(map);
         }
 
         if (map instanceof JDefaultMap2D) {
@@ -58,10 +59,9 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         gui_config = new javax.swing.JButton();
+        m_coord = new org.geotools.gui.swing.map.map2d.control.JMap2DMouseCoordPanel();
 
         gui_config.setIcon(IconBundle.getResource().getIcon("16_map2d_optimize"));
-        gui_config.setBorderPainted(false);
-        gui_config.setContentAreaFilled(false);
         gui_config.setEnabled(false);
         gui_config.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gui_config.addActionListener(new java.awt.event.ActionListener() {
@@ -74,11 +74,15 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(gui_config)
+            .add(layout.createSequentialGroup()
+                .add(gui_config, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(m_coord, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(gui_config)
+            .add(gui_config, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
+            .add(m_coord, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -103,5 +107,6 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton gui_config;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DMouseCoordPanel m_coord;
     // End of variables declaration//GEN-END:variables
 }

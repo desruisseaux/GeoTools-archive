@@ -23,7 +23,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Collection;
@@ -31,19 +30,16 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.metadata.iso.citation.Citations;
@@ -203,7 +199,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * The inverse of this map projection. Will be created only when needed.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform2D inverse;
 
     /**
      * Constructs a new map projection from the suplied parameters.
@@ -443,6 +439,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * This is used for a providing a default implementation of
      * {@link #getParameterValues}, as well as arguments checking.
      */
+    @Override
     public abstract ParameterDescriptorGroup getParameterDescriptors();
 
     /**
@@ -450,11 +447,12 @@ public abstract class MapProjection extends AbstractMathTransform
      *
      * @return A copy of the parameter values for this map projection.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterDescriptorGroup descriptor = getParameterDescriptors();
         final Collection expected = descriptor.descriptors();
         // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
-        final ParameterValueGroup values = (ParameterValueGroup) descriptor.createValue();
+        final ParameterValueGroup values = descriptor.createValue();
         set(expected, AbstractProvider.SEMI_MAJOR,         values, semiMajor       );
         set(expected, AbstractProvider.SEMI_MINOR,         values, semiMinor       );
         set(expected, AbstractProvider.CENTRAL_MERIDIAN,   values, centralMeridian );
@@ -535,7 +533,7 @@ public abstract class MapProjection extends AbstractMathTransform
             final double distance;
             if (inverse) {
                 // Computes orthodromic distance (spherical model) in metres.
-                point = ((MathTransform2D)inverse()).transform(point, point);
+                point = inverse().transform(point, point);
                 distance  = orthodromicDistance(point, target);
                 longitude = point.getX();
                 latitude  = point.getY();
@@ -560,6 +558,8 @@ public abstract class MapProjection extends AbstractMathTransform
                           new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin)),
                           getParameterDescriptors().getName().getCode()));
             }
+        } catch (ProjectionException exception) {
+            throw exception;
         } catch (TransformException exception) {
             final ProjectionException error = new ProjectionException(exception.getLocalizedMessage());
             error.initCause(exception);
@@ -647,11 +647,11 @@ public abstract class MapProjection extends AbstractMathTransform
      * checked by the caller, so this method doesn't need to performs this check.
      * <p>
      *
-     * Input coordinates are also guarenteed to have the {@link #falseEasting} 
+     * Input coordinates are also guarenteed to have the {@link #falseEasting}
      * and {@link #falseNorthing} removed and be divided by {@link #globalScale}
-     * before this method is invoked. After this method is invoked, the 
-     * {@link #centralMeridian} is added to the {@code x} results 
-     * in {@code ptDst}. This means that projections that implement this method 
+     * before this method is invoked. After this method is invoked, the
+     * {@link #centralMeridian} is added to the {@code x} results
+     * in {@code ptDst}. This means that projections that implement this method
      * are performed on an ellipse (or sphere) with a semiMajor axis of 1.0.
      * <p>
      *
@@ -670,7 +670,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @param ptDst the specified coordinate point that stores the result of transforming
      *              {@code ptSrc}, or {@code null}. Ordinates will be in
      *              <strong>radians</strong>.
-     * @return      the coordinate point after transforming {@code x}, {@code y} 
+     * @return      the coordinate point after transforming {@code x}, {@code y}
      *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      *
@@ -686,13 +686,13 @@ public abstract class MapProjection extends AbstractMathTransform
      * This method is guaranteed to be invoked with values of <var>x</var> in the range
      * {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
      * <p>
-     * 
-     * Coordinates are also guaranteed to have the {@link #centralMeridian} 
-     * removed from <var>x</var> before this method is invoked. After this method 
+     *
+     * Coordinates are also guaranteed to have the {@link #centralMeridian}
+     * removed from <var>x</var> before this method is invoked. After this method
      * is invoked, the results in {@code ptDst} are multiplied by {@link #globalScale},
      * and the {@link #falseEasting} and {@link #falseNorthing} are added.
      * This means that projections that implement this method are performed on an
-     * ellipse (or sphere) with a semiMajor axis of 1.0. 
+     * ellipse (or sphere) with a semiMajor axis of 1.0.
      * <p>
      *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
@@ -739,6 +739,7 @@ public abstract class MapProjection extends AbstractMathTransform
      *              the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      */
+    @Override
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
@@ -763,7 +764,7 @@ public abstract class MapProjection extends AbstractMathTransform
         ptDst = transformNormalized(centralMeridian!=0 ?
                                     rollLongitude(Math.toRadians(x) - centralMeridian) :
                                     Math.toRadians(x), Math.toRadians(y), ptDst);
-        ptDst.setLocation(globalScale*ptDst.getX() + falseEasting, 
+        ptDst.setLocation(globalScale*ptDst.getX() + falseEasting,
                           globalScale*ptDst.getY() + falseNorthing);
 
         assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x,y), true);
@@ -831,6 +832,7 @@ public abstract class MapProjection extends AbstractMathTransform
      *         than one point can't be transformed, then this exception may be about
      *         an arbitrary point.
      */
+    @Override
     public final void transform(final float[] src,  int srcOffset,
                                 final float[] dest, int dstOffset, int numPts)
         throws ProjectionException
@@ -889,9 +891,9 @@ public abstract class MapProjection extends AbstractMathTransform
          * Inverse transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
          * <p>
          *
-         * This method standardizes the {@code ptSrc} by removing the 
-         * {@link #falseEasting} and {@link #falseNorthing} and dividing by 
-         * {@link #globalScale} before invoking 
+         * This method standardizes the {@code ptSrc} by removing the
+         * {@link #falseEasting} and {@link #falseNorthing} and dividing by
+         * {@link #globalScale} before invoking
          * <code>{@link #inverseTransformNormalized inverseTransformNormalized}(x, y, ptDst)</code>.
          * It then adds the {@link #centralMeridian} to the {@code x} of the
          * point returned by the {@code inverseTransformNormalized} call.
@@ -904,6 +906,7 @@ public abstract class MapProjection extends AbstractMathTransform
          *         and stroring the result in {@code ptDst}.
          * @throws ProjectionException if the point can't be transformed.
          */
+        @Override
         public final Point2D transform(final Point2D ptSrc, Point2D ptDst)
                 throws ProjectionException
         {
@@ -999,6 +1002,7 @@ public abstract class MapProjection extends AbstractMathTransform
          *         than one point can't be transformed, then this exception may be about
          *         an arbitrary point.
          */
+        @Override
         public final void transform(final float[] src,  int srcOffset,
                                     final float[] dest, int dstOffset, int numPts)
                 throws ProjectionException
@@ -1034,12 +1038,21 @@ public abstract class MapProjection extends AbstractMathTransform
                 throw firstException;
             }
         }
+
+        /**
+         * Returns the original map projection.
+         */
+        @Override
+        public MathTransform2D inverse() {
+            return (MathTransform2D) super.inverse();
+        }
     }
 
     /**
      * Returns the inverse of this map projection.
      */
-    public final MathTransform inverse() {
+    @Override
+    public final MathTransform2D inverse() {
         // No synchronization. Not a big deal if this method is invoked in
         // the same time by two threads resulting in two instances created.
         if (inverse == null) {
@@ -1067,7 +1080,7 @@ public abstract class MapProjection extends AbstractMathTransform
             return 1;
         }
         // Be less strict when the point is near an edge.
-        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : EPSILON;
+        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : 1E-5;
     }
 
 
@@ -1082,6 +1095,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Returns a hash value for this map projection.
      */
+    @Override
     public int hashCode() {
         long code =      Double.doubleToLongBits(semiMajor);
         code = code*37 + Double.doubleToLongBits(semiMinor);
@@ -1093,6 +1107,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         // Do not check 'object==this' here, since this
         // optimization is usually done in subclasses.
@@ -1345,7 +1360,8 @@ public abstract class MapProjection extends AbstractMathTransform
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<? extends Projection> getOperationType() {
             return Projection.class;
         }
 

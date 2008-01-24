@@ -500,11 +500,11 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * @throws NoninvertibleTransformException if no inverse warp were specified at construction time.
      */
     @Override
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
         if (inverse != null) {
             return inverse;
         } else {
-            return super.inverse();
+            return (MathTransform2D) super.inverse();
         }
     }
 
@@ -533,6 +533,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * This trick is used for avoiding the creation of thousands of temporary objects
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
+    @SuppressWarnings("serial")
     private static final class PointFloat extends Point2D.Float {
         @Override
         public PointFloat clone() {
@@ -545,6 +546,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * This trick is used for avoiding the creation of thousands of temporary objects
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
+    @SuppressWarnings("serial")
     private static final class PointDouble extends Point2D.Double {
         public PointDouble() {
             super();

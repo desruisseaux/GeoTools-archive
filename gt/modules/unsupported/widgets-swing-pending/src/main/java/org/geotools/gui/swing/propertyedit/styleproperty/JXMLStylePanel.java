@@ -38,7 +38,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.xml.transform.TransformerException;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.filtre.FiltreSLD;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
@@ -63,10 +62,10 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
     /** Creates new form XMLStylePanel */
     public JXMLStylePanel() {
         initComponents();
-        lbl_check.setText(TextBundle.getResource().getString("checkstyle"));
-        but_check.setText(TextBundle.getResource().getString("check"));
-        but_import.setText(TextBundle.getResource().getString("import"));
-        but_export.setText(TextBundle.getResource().getString("export"));
+        lbl_check.setText(BUNDLE.getString("checkstyle"));
+        but_check.setText(BUNDLE.getString("check"));
+        but_import.setText(BUNDLE.getString("import"));
+        but_export.setText(BUNDLE.getString("export"));
         
     }
 
@@ -167,7 +166,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
                 
                 //layer.setStyle(sld);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, TextBundle.getResource().getString("sld_verification_error"), "", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "", "", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_actionImport
@@ -210,7 +209,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
             //parse
             StyledLayerDescriptor sld = (StyledLayerDescriptor) parser.parse( xml );
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, TextBundle.getResource().getString("sld_verification_error"), "", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "", "", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -219,7 +218,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("xml");
+        return BUNDLE.getString("xml");
     }
 
     public void setTarget(Object layer) {

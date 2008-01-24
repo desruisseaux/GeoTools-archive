@@ -208,7 +208,7 @@ public class DemoExplorer extends JFrame {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Explore-Context");
             tree.addContext(context);
-            map.setContext(context);
+            map.getRenderingStrategy().setContext(context);
         } catch (Exception e) {
         }
 

@@ -56,6 +56,18 @@ public abstract class XAffineTransform extends AffineTransform {
     }
 
     /**
+     * Constructs a new {@code XAffineTransform} from 6 values representing the 6 specifiable
+     * entries of the 3&times;3 transformation matrix. Those values are given unchanged to the
+     * {@link AffineTransform#AffineTransform(double,double,double,double,double,double) super
+     * class constructor}.
+     *
+     * @since 2.5
+     */
+    public XAffineTransform(double m00, double m10, double m01, double m11, double m02, double m12) {
+        super(m00, m10, m01, m11, m02, m12);
+    }
+
+    /**
      * Checks if the caller is allowed to change this {@code XAffineTransform} state.
      * If this method is defined to thrown an exception in all case, then this
      * {@code XAffineTransform} is immutable.
@@ -460,7 +472,11 @@ public abstract class XAffineTransform extends AffineTransform {
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleX0.png">.
      */
     public static double getScaleX0(final AffineTransform tr) {
-        return Math.hypot(tr.getScaleX(), tr.getShearX());
+        final double scale = tr.getScaleX();
+        final double shear = tr.getShearX();
+        if (shear == 0) return Math.abs(scale);  // Optimization for a very common case.
+        if (scale == 0) return Math.abs(shear);  // Not as common as above, but still common enough.
+        return Math.hypot(scale, shear);
     }
 
     /**
@@ -469,7 +485,11 @@ public abstract class XAffineTransform extends AffineTransform {
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleY0.png">.
      */
     public static double getScaleY0(final AffineTransform tr) {
-        return Math.hypot(tr.getScaleY(), tr.getShearY());
+        final double scale = tr.getScaleY();
+        final double shear = tr.getShearY();
+        if (shear == 0) return Math.abs(scale);  // Optimization for a very common case.
+        if (scale == 0) return Math.abs(shear);  // Not as common as above, but still common enough.
+        return Math.hypot(scale, shear);
     }
 
     /**

@@ -33,7 +33,6 @@ import java.util.Locale;
 import javax.units.Unit;
 import javax.media.jai.iterator.WritableRectIter;
 
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
@@ -59,7 +58,7 @@ import org.geotools.util.NumberRange;
  * Overlapping ranges of sample values are not allowed. A {@code CategoryList} can
  * contains a mix of qualitative and quantitative categories.  The {@link #getCategory}
  * method is responsible for finding the right category for an arbitrary sample value.
- *
+ * <p>
  * Instances of {@link CategoryList} are immutable and thread-safe.
  *
  * @since 2.1
@@ -156,7 +155,7 @@ class CategoryList extends AbstractList<Category>
     private transient InternationalString name;
 
     /**
-     * Construct a category list using the specified array of categories.
+     * Constructs a category list using the specified array of categories.
      *
      * @param  categories The list of categories.
      * @param  units The geophysics unit, or {@code null} if none.
@@ -167,15 +166,15 @@ class CategoryList extends AbstractList<Category>
             throws IllegalArgumentException
     {
         this(categories, units, false, null);
-        assert isScaled(false);
+        assert isGeophysics(false);
     }
 
     /**
-     * Construct a category list using the specified array of categories.
+     * Constructs a category list using the specified array of categories.
      *
      *         <STRONG>This constructor is for internal use only</STRONG>
      *
-     * It is not private only because {@link GeophysicsCategoryList} need this constructor.
+     * It is not private only because {@link GeophysicsCategoryList} needs this constructor.
      *
      * @param  categories The list of categories.
      * @param  units The geophysics unit, or {@code null} if none.
@@ -192,22 +191,22 @@ class CategoryList extends AbstractList<Category>
             throws IllegalArgumentException
     {
         /*
-         * Check if we are constructing a geophysics category list,  then rescale all cagegories
+         * Checks if we are constructing a geophysics category list, then rescale all cagegories
          * according. We may loose the user intend by doing so (he may have specified explicitly
          * a list of GeophysicsCategory), but this is the SampleDimension's job to keep trace of
          * it.
          */
-        final boolean isGeophysics = (this instanceof GeophysicsCategoryList);
-        assert (inverse != null) == isGeophysics;
+        final boolean geophysics = (inverse != null);
+        assert geophysics == (this instanceof GeophysicsCategoryList) : geophysics;
         this.categories = categories = categories.clone();
         for (int i=0; i<categories.length; i++) {
-            categories[i] = categories[i].geophysics(isGeophysics);
+            categories[i] = categories[i].geophysics(geophysics);
         }
         Arrays.sort(categories, this);
         assert isSorted(categories);
-        assert isScaled(isGeophysics);
+        assert isGeophysics(geophysics);
         /*
-         * Construct the array of Category.minimum values. During
+         * Constructs the array of Category.minimum values. During
          * the loop, we make sure there is no overlapping ranges.
          */
         boolean hasGaps = false;
@@ -219,7 +218,7 @@ class CategoryList extends AbstractList<Category>
                 final Category previous = categories[i-1];
                 if (compare(minimum, previous.maximum) <= 0) {
                     // Two categories have overlapping range;
-                    // Format an error message...............
+                    // Formats an error message.
                     final NumberRange range1 = categories[i-1].getRange();
                     final NumberRange range2 = categories[i-0].getRange();
                     final Comparable[] args = new Comparable[] {
@@ -237,7 +236,7 @@ class CategoryList extends AbstractList<Category>
                     }
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.RANGE_OVERLAP_$4, args));
                 }
-                // Check if there is a gap between this category and the previous one.
+                // Checks if there is a gap between this category and the previous one.
                 if (!Double.isNaN(minimum) && minimum!=previous.getRange().getMaximum(false)) {
                     hasGaps = true;
                 }
@@ -336,9 +335,8 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
-     * La comparaison ne tient pas compte des valeurs {@code NaN}. Cette
-     * méthode n'est utilisée que pour les {@code assert}.
+     * Returns {@code true} if the specified categories are sorted. This method
+     * ignores {@code NaN} values. This method is used for assertions only.
      */
     static boolean isSorted(final Category[] categories) {
         for (int i=1; i<categories.length; i++) {
@@ -413,39 +411,44 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * If {@code toGeophysics} is {@code true}, returns a list of categories scaled
-     * to geophysics values. This method always returns a list of categories in which
-     * <code>{@link Category#geophysics(boolean) Category.geophysics}(toGeophysics)</code>
+     * If {@code geo} is {@code true}, returns a list of categories scaled to
+     * geophysics values. This method always returns a list of categories in which
+     * <code>{@linkplain Category#geophysics(boolean) Category.geophysics}(geo)</code>
      * has been invoked for each category.
      */
-    public CategoryList geophysics(final boolean toGeophysics) {
-        final CategoryList scaled = toGeophysics ? inverse : this;
-        assert scaled.isScaled(toGeophysics);
+    public CategoryList geophysics(final boolean geo) {
+        final CategoryList scaled = geo ? inverse : this;
+        assert scaled.isGeophysics(geo);
         return scaled;
     }
 
     /**
-     * Verify if all categories are scaled to the specified state.
-     * This is used mostly in assertion statements.
+     * Verifies if all categories are of the specified type. {@code true} is for
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} and {@code false} is
+     * for {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} data. This method is used
+     * mostly in assertion statements.
      *
-     * @param  toGeophysics The state to test.
-     * @return {@code true} if all categories are in the specified state.
+     * @param  geo The desired type for every categories.
+     * @return {@code true} if all categories are in the specified type.
      */
-    final boolean isScaled(final boolean toGeophysics) {
-        return isScaled(categories, toGeophysics);
+    final boolean isGeophysics(final boolean geo) {
+        return isGeophysics(categories, geo);
     }
 
     /**
-     * Verify if all categories are scaled to the specified state.
+     * Verifies if all categories are of the specified type. {@code true} is for
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} and {@code false} is
+     * for {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} data. This method is used
+     * mostly in assertion statements.
      *
      * @param  categories The categories to test.
-     * @param  toGeophysics The state to test.
-     * @return {@code true} if all categories are in the specified state.
+     * @param  geo The desired type for every categories.
+     * @return {@code true} if all categories are in the specified type.
      */
-    static boolean isScaled(final Category[] categories, final boolean toGeophysics) {
+    static boolean isGeophysics(final Category[] categories, final boolean geo) {
         for (int i=0; i<categories.length; i++) {
-            final Category c = categories[i];
-            if (c.geophysics(toGeophysics) != c) {
+            final Category category = categories[i];
+            if (category.geophysics(geo) != category) {
                 return false;
             }
         }
@@ -514,6 +517,8 @@ class CategoryList extends AbstractList<Category>
      *         quantitative category.
      *
      * @see Category#getRange
+     *
+     * @todo Returns an instance of {@link MeasurementRange} if we are a geophysics category list.
      */
     public final NumberRange getRange() {
         if (range == null) {
@@ -587,7 +592,7 @@ class CategoryList extends AbstractList<Category>
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range.
+     *         in the <code>{@linkplain #getRange}</code> range.
      */
     public final ColorModel getColorModel(final int visibleBand, final int numBands) {
         int type = DataBuffer.TYPE_FLOAT;
@@ -841,7 +846,7 @@ class CategoryList extends AbstractList<Category>
     /**
      * Returns the inverse transform of this object.
      */
-    public final MathTransform inverse() {
+    public final MathTransform1D inverse() {
         return inverse;
     }
 
@@ -1085,7 +1090,7 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * Transform a raster. Only the current band in {@code iterator} will be transformed.
+     * Transforms a raster. Only the current band in {@code iterator} will be transformed.
      * The transformed value are write back in the {@code iterator}. If a different
      * destination raster is wanted, a {@link org.geotools.image.TransfertRectIter}
      * may be used.

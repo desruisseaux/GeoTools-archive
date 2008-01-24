@@ -22,7 +22,6 @@ package org.geotools.referencing;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,11 +41,12 @@ import static org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.WeakValueHashMap;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -345,8 +345,8 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
             if (remarks == null) {
                 remarks = growable;
             } else {
-                org.geotools.util.logging.Logging.getLogger("org.geotools.referencing").log(
-                                 Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
+                Logging.getLogger(NamedIdentifier.class).log(
+                        Loggings.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
         /*

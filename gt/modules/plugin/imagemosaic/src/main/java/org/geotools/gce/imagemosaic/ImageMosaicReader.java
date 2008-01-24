@@ -25,7 +25,6 @@ import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
@@ -41,11 +40,9 @@ import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -60,9 +57,10 @@ import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.TileCache;
+import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
-import javax.media.jai.operator.PatternDescriptor;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -85,6 +83,8 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -151,15 +151,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * order to NOT remove them from {@link JAI} {@link TileCache};
 	 * 
 	 * <p>
-	 * Note: we don't keep around any hard references TODO we miight want two
-	 * things:
+	 * Note: we don't keep around any hard references
+	 * 
+	 * <p>
+	 * TODO we might want two things:
 	 * <ol>
 	 * <li>The possibility to actually flush these cache</li>
 	 * <li>The possibility to specify a {@link JAI} {@link TileCache} to use
 	 * for all the various operations</li>
 	 * </ol>
 	 */
-	private final SoftValueHashMap<String, Map<Integer,Map<Long, RenderedImage>>> tileCache = new SoftValueHashMap<String,  Map<Integer,Map<Long, RenderedImage>>>(
+	private final SoftValueHashMap<String, Map<Integer, Map<Long, RenderedImage>>> tileCache = new SoftValueHashMap<String, Map<Integer, Map<Long, RenderedImage>>>(
 			0);
 
 	/**
@@ -182,24 +184,26 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	/** {@link FeatureSource} for the shape index. */
 	private final FeatureSource featureSource;
 
-	/**
-	 * This {@link BufferedImage} is cached in memory since it is used whenever
-	 * I need to build up a fake mosaic. TODO should be parametric and probably
-	 * somehow static
-	 */
-	private final BufferedImage unavailableImage;
-
 	private boolean expandMe;
+
+	/**
+	 * I <code>true</code> it tells us if the mosaic points to absolute paths
+	 * or to relative ones. (in case of <code>false</code>).
+	 */
+	private boolean absolutePath;
+
 
 	/**
 	 * Max number of tiles that this plugin will load.
 	 * 
 	 * If this number is exceeded, i.e. we request an area which is too large
-	 * instead of getting stuck ith opening thousands of files I give you back a
-	 * fake coverage. TODO should be parametric
+	 * instead of getting stuck with opening thousands of files I give you back a
+	 * fake coverage. 
 	 */
-	public static final int MAX_TILES = 1000000;
+	private int maxAllowedTiles = ((Integer) ImageMosaicFormat.MAX_ALLOWED_TILES
+			.getDefaultValue()).intValue();
 
+	private String locationAttributeName;
 	/**
 	 * COnstructor.
 	 * 
@@ -210,16 +214,29 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * 
 	 */
 	public ImageMosaicReader(Object source, Hints uHints) throws IOException {
-		// /////////////////////////////////////////////////////////////////////
-		// 
-		// Forcing longitude first since the geotiff specification seems to
-		// assume that we have first longitude the latitude.
+		// //
 		//
-		// /////////////////////////////////////////////////////////////////////
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
 		if (uHints != null) {
-			// prevent the use from reordering axes
 			this.hints.add(uHints);
 		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		//set the maximum number of tile to load
+		if(this.hints.containsKey(Hints.MAX_ALLOWED_TILES))
+			this.maxAllowedTiles=((Integer)this.hints.get(Hints.MAX_ALLOWED_TILES)).intValue();
+		if(this.hints.containsKey(Hints.MOSAIC_LOCATION_ATTRIBUTE))
+			this.locationAttributeName=((String)this.hints.get(Hints.MOSAIC_LOCATION_ATTRIBUTE));
+		
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Check source
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (source == null) {
 
 			final IOException ex = new IOException(
@@ -228,13 +245,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
-		this.source = source;
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Check source
-		//
-		// /////////////////////////////////////////////////////////////////////
+		this.source = source;		
 		if (source instanceof File)
 			this.sourceURL = ((File) source).toURL();
 		else if (source instanceof URL)
@@ -287,6 +298,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		typeName = typeNames[0];
 		featureSource = tileIndexStore.getFeatureSource(typeName);
+		final SimpleFeatureType schema = featureSource.getSchema();
+		if(this.locationAttributeName==null)
+		{
+			//get the first string
+			for(AttributeDescriptor attribute: schema.getAttributes()){
+				if(attribute.getType().getBinding().equals(String.class))
+					this.locationAttributeName=attribute.getName().toString();
+			}
+		}
+		if(schema.getAttribute(this.locationAttributeName)==null)
+			throw new DataSourceException("The provided name for the location attribute is invalid.");
 
 		// //
 		//
@@ -335,9 +357,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// property file
 		loadProperties();
 
-		// load the unavailaible pattern
-		unavailableImage = ImageIO
-				.read(this.getClass().getResource("unav.png"));
 	}
 
 	/**
@@ -414,6 +433,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						/ highestRes[0]), (int) Math.round(originalEnvelope
 						.getLength(1)
 						/ highestRes[1])));
+
+		// absolute or relative path
+		absolutePath = Boolean
+				.parseBoolean(properties.getProperty("", "False"));
 	}
 
 	/**
@@ -463,42 +486,63 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				.getDefaultValue();
 		double inputImageThreshold = ((Double) ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
 				.getDefaultValue()).doubleValue();
-		ParameterValue param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 		boolean blend = false;
+		int maxNumTiles=this.maxAllowedTiles;
+		String overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				param = (ParameterValue) params[i];
-
-				if (param.getDescriptor().getName().getCode().equals(
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
+				if (name.equals(
 						ImageMosaicFormat.READ_GRIDGEOMETRY2D.getName()
 								.toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
 					requestedEnvelope = (GeneralEnvelope) gg.getEnvelope();
 					dim = gg.getGridRange2D().getBounds();
-				} else if (param.getDescriptor().getName().getCode().equals(
+					continue;
+				} 
+				if (name.equals(
 						ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName()
 								.toString())) {
 					inputTransparentColor = (Color) param.getValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE.getName()
 								.toString())) {
 					inputImageThreshold = ((Double) param.getValue())
 							.doubleValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.FADING.getName().toString())) {
 					blend = ((Boolean) param.getValue()).booleanValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName()
 								.toString())) {
 					outputTransparentColor = (Color) param.getValue();
+					continue;
 
 				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
+					continue;
+				}	
+				if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES
+						.getName().toString())) {
+					maxNumTiles=param.intValue();
+					continue;
+				}	
+				
 			}
 		}
 		// /////////////////////////////////////////////////////////////////////
@@ -507,7 +551,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		return loadTiles(requestedEnvelope, inputTransparentColor,
-				outputTransparentColor, inputImageThreshold, dim, blend);
+				outputTransparentColor, inputImageThreshold, dim, blend,
+				overviewPolicy,maxNumTiles);
 	}
 
 	/**
@@ -532,6 +577,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 *            tells to ask for {@link MosaicDescriptor#MOSAIC_TYPE_BLEND}
 	 *            instead of the classic
 	 *            {@link MosaicDescriptor#MOSAIC_TYPE_OVERLAY}.
+	 * @param overviewPolicy 
+	 * @param maxNumTiles 
 	 * @return a {@link GridCoverage2D} matching as close as possible the
 	 *         requested {@link GeneralEnvelope} and <code>pixelDimension</code>,
 	 *         or null in case nothing existed in the requested area.
@@ -540,7 +587,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private GridCoverage loadTiles(GeneralEnvelope requestedOriginalEnvelope,
 			Color transparentColor, Color outputTransparentColor,
 			double inputImageThresholdValue, Rectangle pixelDimension,
-			boolean fading) throws IOException {
+			boolean fading, String overviewPolicy, int maxNumTiles) throws IOException {
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER
@@ -574,7 +621,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					// mosaic.
 					final MathTransform transform = CRS.findMathTransform(
 							requestedOriginalEnvelope
-									.getCoordinateReferenceSystem(), crs);
+									.getCoordinateReferenceSystem(), crs, true);
 					if (!transform.isIdentity()) {
 						requestedOriginalEnvelope = CRS.transform(transform,
 								requestedOriginalEnvelope);
@@ -637,24 +684,24 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			LOGGER.fine("loading tile for envelope "
 					+ intersectionJTSEnvelope.toString());
 		final List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
-		if (features == null) {
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+		if (features == null || features.size() == 0) {
+			return background(requestedOriginalEnvelope, pixelDimension, outputTransparentColor);
 		}
 		// do we have any feature to load
 		final Iterator<SimpleFeature> it = features.iterator();
 		if (!it.hasNext())
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+			throw new DataSourceException("No data was found to match the actual request");
 		final int size = features.size();
-		if (size > MAX_TILES) {
+		if (size > maxNumTiles) {
 			LOGGER
 					.warning(new StringBuffer("We can load at most ")
-							.append(MAX_TILES)
+							.append(maxNumTiles)
 							.append(" tiles while there were requested ")
-							.append(features)
+							.append(size)
 							.append(
 									"\nI am going to print out a fake coverage, sorry about it!")
 							.toString());
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+			throw new DataSourceException("The maximum allowed number of tiles to be loaded was exceeded.");
 		}
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + size + " tiles to load");
@@ -662,38 +709,25 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			return loadRequestedTiles(requestedOriginalEnvelope,
 					intersectionEnvelope, transparentColor,
 					outputTransparentColor, intersectionJTSEnvelope, features,
-					it, inputImageThresholdValue, pixelDimension, size, fading);
+					it, inputImageThresholdValue, pixelDimension, size, fading,
+					overviewPolicy);
 		} catch (TransformException e) {
 			throw new DataSourceException(e);
 		}
 
 	}
 
-	/**
-	 * Builds up a fake mosaic that consists of a transparent image with a red
-	 * cross.
-	 * 
-	 * <p>
-	 * The purpose of the fake mosaic
-	 * 
-	 * @param requestedEnvelope
-	 *            is the envelope requested by the user.
-	 * @param dim
-	 *            indicates the requested dimension for this
-	 *            {@link GridCoverage2D} in terms of pixels.
-	 * @param features
-	 *            is the number of features touching the requsted envelope.
-	 * @return a {@link GridCoverage2D}. TODO this could be static or somehow
-	 *         cached since {@link GridCoverage}s are read only
-	 */
-	private GridCoverage fakeMosaic(GeneralEnvelope requestedEnvelope,
-			Rectangle dim) {
-
-		return coverageFactory.create(coverageName, PatternDescriptor.create(
-				unavailableImage, new Integer(dim.width), new Integer(
-						dim.height), ImageUtilities.NOCACHE_HINT),
-				requestedEnvelope);
-
+	private GridCoverage background(GeneralEnvelope requestedEnvelope, Rectangle dim, Color 
+	        outputTransparentColor) {
+	    if(outputTransparentColor == null)
+	        outputTransparentColor = Color.BLACK; 
+	    Byte[] values = new Byte[] {new Byte((byte) outputTransparentColor.getRed()),
+	            new Byte((byte) outputTransparentColor.getGreen()),
+	            new Byte((byte) outputTransparentColor.getBlue()),
+	            new Byte((byte) outputTransparentColor.getAlpha())};
+	    RenderedImage constant = ConstantDescriptor.create(new Float(dim.width), new Float(dim.height), 
+	            values, ImageUtilities.NOCACHE_HINT);
+	    return coverageFactory.create(coverageName, constant, requestedEnvelope);
 	}
 
 	/**
@@ -712,6 +746,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param dim
 	 * @param numImages
 	 * @param blend
+	 * @param overviewPolicy 
 	 * @return
 	 * @throws DataSourceException
 	 * @throws TransformException
@@ -722,7 +757,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Color outputTransparentColor, final Envelope requestedJTSEnvelope,
 			final List<SimpleFeature> features,
 			final Iterator<SimpleFeature> it, double inputImageThresholdValue,
-			Rectangle dim, int numImages, boolean blend)
+			Rectangle dim, int numImages, boolean blend, String overviewPolicy)
 			throws DataSourceException, TransformException {
 
 		try {
@@ -745,8 +780,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			final ImageReadParam readP = new ImageReadParam();
 			final Integer imageChoice;
 			if (dim != null)
-				imageChoice = setReadParams(readP, requestedOriginalEnvelope,
-						dim);
+				imageChoice = setReadParams(overviewPolicy, readP,
+						requestedOriginalEnvelope, dim);
 			else
 				imageChoice = new Integer(0);
 			if (LOGGER.isLoggable(Level.FINE))
@@ -825,6 +860,21 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			ColorModel model = null;
 			RenderedImage loadedImage = null;
 			String location = null;
+			// //
+			//
+			// 0==relative, 1==absolute, -1==uninitialized
+			//
+			// //
+			//
+			// In case we set the absolute path we used it here, if not we do
+			// not make any assumption and we check what we can do so that we
+			// are back compatible.
+			//
+			// //
+			int relativePath = -1;
+			if (absolutePath)
+				relativePath = 1;
+
 			do {
 
 				// /////////////////////////////////////////////////////////////////////
@@ -833,7 +883,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				//
 				// /////////////////////////////////////////////////////////////////////
 				final SimpleFeature feature = (SimpleFeature) it.next();
-				location = (String) feature.getAttribute("location");
+				location = (String) feature.getAttribute(this.locationAttributeName);
 				final ReferencedEnvelope bound = ReferencedEnvelope
 						.reference(feature.getBounds());
 
@@ -844,8 +894,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// /////////////////////////////////////////////////////////////////////
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("About to read image number " + i);
-				final File imageFile = new File(
-						new StringBuffer(parentLocation).append(
+				File imageFile = new File(relativePath == 1 ? location
+						: new StringBuffer(parentLocation).append(
 								File.separatorChar).append(location).toString());
 
 				// //
@@ -855,14 +905,32 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// //
 				if (!imageFile.exists() || !imageFile.canRead()
 						|| !imageFile.isFile()) {
-					if (LOGGER.isLoggable(Level.INFO))
-						LOGGER.info("Unable to read image for file "
-								+ imageFile.getAbsolutePath());
-					i++;
-					continue;
+
+					// check if we need to switch to absolute path
+					if (relativePath == -1) {
+						// create an absolute path
+						imageFile = new File(location);
+						if (!imageFile.exists() || !imageFile.canRead()
+								|| !imageFile.isFile()) {
+							// file does not exist this way either, let's bypass
+							// it WITHOUT setting relativePath
+							if (LOGGER.isLoggable(Level.INFO))
+								LOGGER.info("Unable to read image for file "
+										+ imageFile.getAbsolutePath());
+							i++;
+							continue;
+						} else
+							relativePath = 1;
+					} else {
+						if (LOGGER.isLoggable(Level.INFO))
+							LOGGER.info("Unable to read image for file "
+									+ imageFile.getAbsolutePath());
+						i++;
+						continue;
+					}
 				}
 				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine("Cache hit");
+					LOGGER.fine("File found");
 				// //
 				//
 				// Check in the cache
@@ -880,13 +948,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					final String filePath = imageFile.getAbsolutePath();
 					final long key = readP.getSourceXSubsampling()
 							+ (readP.getSourceYSubsampling() << 32);
-					Map<Integer,Map<Long, RenderedImage>> overviewsMap = null;
+					Map<Integer, Map<Long, RenderedImage>> overviewsMap = null;
 					Map<Long, RenderedImage> subsamplingsMap = null;
 					if (tileCache.containsKey(filePath)) {
 						overviewsMap = tileCache.get(filePath);
 
 					} else {
-						overviewsMap = new HashMap<Integer,Map<Long, RenderedImage>>(this.numOverviews);
+						overviewsMap = new HashMap<Integer, Map<Long, RenderedImage>>(
+								this.numOverviews);
 						tileCache.put(filePath, overviewsMap);
 					}
 
@@ -917,7 +986,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 							loadedImage = JAI.create("ImageRead", pbjImageRead);
 							// add to cache
 							subsamplingsMap.put(key, loadedImage);
-							
 
 						}
 
@@ -1584,6 +1652,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		}
 		xTrans = (bound.getMinX() - ulc.getX()) / res[0];
 		yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
+		// build an image layout that will make the tiles match exactly the transformed image
+		ImageLayout layout = new ImageLayout();
+        layout.setTileGridXOffset((int) Math.round(xTrans));
+        layout.setTileGridYOffset((int) Math.round(yTrans));
 		//
 		// Optimising scale and translate.
 		//
@@ -1614,22 +1686,22 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					ImageUtilities.NN_INTERPOLATION_HINT
 							.get(JAI.KEY_INTERPOLATION));
 			// avoid doing the color expansion now since it might not be needed
-			return JAI.create("Translate", pbjAffine,
-					ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
+			final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
+            .clone();
+            hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
+			return JAI.create("Translate", pbjAffine, hints);
 
 		}
 		// translation and scaling
-		pbjAffine.addSource(image).add(
-				new AffineTransform(scaleX, 0, 0, scaleY, xTrans, yTrans))
-				.add(
-						ImageUtilities.NN_INTERPOLATION_HINT
+		final AffineTransform tx = new AffineTransform(scaleX, 0, 0, scaleY, xTrans, yTrans);
+        pbjAffine.addSource(image).add(tx).add(ImageUtilities.NN_INTERPOLATION_HINT
 								.get(JAI.KEY_INTERPOLATION));
 		// avoid doing the color expansion now since it might not be needed
 		final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
 				.clone();
-		// adding the capability to do a border extension which is great when
-		// doing
+		// adding the capability to do a border extension which is great when doing
 		hints.add(ImageUtilities.EXTEND_BORDER_BY_COPYING);
+		hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
 		return JAI.create("Affine", pbjAffine, hints);
 
 	}

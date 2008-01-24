@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.geotools.TestData;
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -60,24 +59,26 @@ public class JTSMultiPointHandlerTest extends TestCase {
         MathTransform mt = CRS.findMathTransform(crs,
                 DefaultGeographicCRS.WGS84);
 
-        Rectangle rectangle = new Rectangle(300,0,300, 300);
+        Rectangle rectangle = new Rectangle(300, 0, 300, 300);
         AffineTransform transform = RendererUtilities.worldToScreenTransform(
                 env, rectangle);
         GeneralMatrix matrix = new GeneralMatrix(transform);
-        MathTransform at = ReferencingFactoryFinder.getMathTransformFactory(null)
-                .createAffineTransform(matrix);
+        MathTransform at = ReferencingFactoryFinder.getMathTransformFactory(
+                null).createAffineTransform(matrix);
         mt = ReferencingFactoryFinder.getMathTransformFactory(null)
                 .createConcatenatedTransform(mt, at);
 
         ShapefileReader reader = new ShapefileReader(ShapefileRendererUtil
-                .getShpReadChannel(ds), new Lock());
-        reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiPointHandler(reader.getHeader()
-                .getShapeType(), env, rectangle, mt, false));
+                .getShpFiles(ds), false, false);
+        reader
+                .setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiPointHandler(
+                        reader.getHeader().getShapeType(), env, rectangle, mt,
+                        false));
         ds.getSchema();
         Object shape = reader.nextRecord().shape();
         assertNotNull(shape);
         assertTrue(shape instanceof Geometry);
-        Coordinate[] coords = ((Geometry)shape).getCoordinates();
+        Coordinate[] coords = ((Geometry) shape).getCoordinates();
         for (int i = 0; i < coords.length; i++) {
             Coordinate coordinate = coords[i];
             assertNotNull(coordinate);

@@ -111,11 +111,17 @@
     <!-- Adrian's Demos -->
     <module>introduction</module>
     <module>libraryJTS</module>
+
     <!--module>metadata</module-->
     <!-- Unvetted. -->
     <module>mappane</module>
+
+    <!-- From the DataStore Tutorial -->
     <module>property</module>
+
+    <!-- Sample code from the User Guide -->
     <module>example</module>
+
     <module>svgsupport</module>
     <!--module>xml-po</module-->
   </modules>

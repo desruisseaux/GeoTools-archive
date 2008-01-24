@@ -15,9 +15,9 @@
  */
 package org.geotools.gui.swing.contexttree;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
-import org.geotools.gui.swing.contexttree.*;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
@@ -80,14 +80,13 @@ final class DADContextTreeTransferHandler extends TransferHandler {
                 metaTransfers.add(mt);
             }
 
-
             if (metaTransfers.size() > 0) {
 
                 for (DADMetaTransfer mt : metaTransfers) {
                     mt.draggedNode = (ContextTreeNode) mt.dragPath.getLastPathComponent();
                     ContextTreeNode parent = (ContextTreeNode) mt.draggedNode.getParent();
                     mt.origine = parent.getIndex(mt.draggedNode);
-                    mt.origine_parent = (MapContext) parent.getUserObject();
+                    mt.origine_parent = parent.getUserObject();
                 }
             }
 

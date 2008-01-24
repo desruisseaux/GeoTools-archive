@@ -33,7 +33,6 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -235,8 +234,7 @@ public final class CRSUtilities {
                 final List<CoordinateReferenceSystem> c = getComponents(crs);
                 if (c == null) {
                     throw new TransformException(Errors.format(
-                              ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
-                              crs.getName().toString()));
+                              ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1, crs.getName()));
                 }
                 crs = c.get(0);
             }
@@ -264,8 +262,7 @@ public final class CRSUtilities {
             }
             crs = c.get(0);
         }
-        // Remove first cast when covariance will be allowed (J2SE 1.5).
-        return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
+        return ((GeographicCRS) crs).getDatum().getEllipsoid();
     }
 
     /**
@@ -356,11 +353,14 @@ public final class CRSUtilities {
     public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
         Exception exception;
         final StringBuffer buffer = new StringBuffer();
-        try {
-            crs = getCRS2D(crs);
-            if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
+        final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(crs);
+        if (crs2D == null) {
+            exception = new UnsupportedOperationException(Errors.format(
+                    ErrorKeys.CANT_SEPARATE_CRS_$1, crs.getName()));
+        } else try {
+            if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs2D)) {
                 final CoordinateOperation op = ReferencingFactoryFinder.getCoordinateOperationFactory(null)
-                        .createOperation(crs, DefaultGeographicCRS.WGS84);
+                        .createOperation(crs2D, DefaultGeographicCRS.WGS84);
                 bounds = CRS.transform(op, bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");

@@ -16,12 +16,10 @@
  */
 package org.geotools.coverage.processing;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.io.Serializable;
 import java.util.Iterator;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.parameter.ParameterValueGroup;
@@ -30,7 +28,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
@@ -143,7 +140,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
      * Returns an initially empty set of parameters.
      */
     public ParameterValueGroup getParameters() {
-        return (ParameterValueGroup) descriptor.createValue(); // TODO: remove cast with J2SE 1.5.
+        return descriptor.createValue();
     }
 
     /**
@@ -198,6 +195,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
      * Returns a hash value for this operation. This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         // Since we should have only one operation registered for each name,
         // the descriptors hash code should be enough.
@@ -217,7 +215,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
     }
 
     /**
-     * Returns a string représentation of this operation. The returned string is
+     * Returns a string representation of this operation. The returned string is
      * implementation dependent. It is usually provided for debugging purposes only.
      */
     @Override

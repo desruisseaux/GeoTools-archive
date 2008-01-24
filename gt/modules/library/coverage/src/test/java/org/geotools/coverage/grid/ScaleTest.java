@@ -175,6 +175,11 @@ public class ScaleTest extends GridCoverageTest {
         // view before being applied
         scale(floatCoverage.geophysics(false), new InterpolationNearest(),
                 new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+        
+        
+        //play with a rotated coverage
+        scale(rotateCoverage(GridCoverageExamples.getExample(4).geophysics(true),Math.PI/4),
+               null);
     }
 
     public void scale(GridCoverage2D coverage, Interpolation interp) {
@@ -201,6 +206,7 @@ public class ScaleTest extends GridCoverageTest {
                 BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
         // doing a first scale
         GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
+        checkEnvelopes(coverage, scaled);
         RenderedImage scaledImage = scaled.getRenderedImage();
         assertTrue(scaledImage.getWidth() == w / 2.0f);
         assertTrue(scaledImage.getHeight() == h / 2.0f);
@@ -218,6 +224,7 @@ public class ScaleTest extends GridCoverageTest {
         scaled = (GridCoverage2D) Operations.DEFAULT.scale(scaled, 3, 3, 0.0,
                 0.0, interp, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
         scaledImage = scaled.getRenderedImage();
+        checkEnvelopes(coverage, scaled);
         assertTrue(scaledImage.getWidth()  == 3 * w / 2.0f);
         assertTrue(scaledImage.getHeight() == 3 * h / 2.0f);
 

@@ -31,39 +31,38 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.shapefile.TestCaseSupport;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-
 /**
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/indexed/ShapefileQuadTreeReadWriteTest.java $
  * @version $Id$
  * @author Ian Schneider
  */
 public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
-    final String[] files = {
-        "shapes/statepop.shp",
-        "shapes/polygontest.shp",
-        "shapes/pointtest.shp",
-        "shapes/holeTouchEdge.shp",
-        "shapes/stream.shp"
-    };
+    final String[] files = {"shapes/statepop.shp", "shapes/polygontest.shp",
+            "shapes/pointtest.shp", "shapes/holeTouchEdge.shp", "shapes/stream.shp"};
     boolean readStarted = false;
     Exception exception = null;
 
     /**
      * Creates a new instance of ShapefileReadWriteTest
      */
-    public ShapefileQuadTreeReadWriteTest(String name) throws IOException {
+    public ShapefileQuadTreeReadWriteTest( String name ) throws IOException {
         super(name);
     }
 
@@ -71,9 +70,10 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         StringBuffer errors = new StringBuffer();
         Exception bad = null;
 
-        for (int i = 0, ii = files.length; i < ii; i++) {
+        for( int i = 0, ii = files.length; i < ii; i++ ) {
             try {
                 test(files[i]);
+                break;
             } catch (Exception e) {
                 e.printStackTrace();
                 errors.append("\nFile " + files[i] + " : " + e.getMessage());
@@ -86,116 +86,108 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         }
     }
 
-    public void fail(String message, Throwable cause) throws Throwable {
+    public void fail( String message, Throwable cause ) throws Throwable {
         Throwable fail = new AssertionFailedError(message);
         fail.initCause(cause);
         throw fail;
     }
 
-    
     public void testWriteTwice() throws Exception {
         copyShapefiles("shapes/stream.shp");
-		IndexedShapefileDataStoreFactory fac=new IndexedShapefileDataStoreFactory();
-    	DataStore s1 = createDataStore(fac, TestData.url(this, "shapes/stream.shp"), true);
+        ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+        DataStore s1 = createDataStore(fac, TestData.url(TestCaseSupport.class, "shapes/stream.shp"), true);
         String typeName = s1.getTypeNames()[0];
         FeatureSource source = s1.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
-        IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
+        ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
 
-        doubleWrite(type, one, getTempFile(), maker, false);
-        doubleWrite(type, one, getTempFile(), maker, true);
-	}
+         doubleWrite(type, one, getTempFile(), maker, false);
+         doubleWrite(type, one, getTempFile(), maker, true);
+    }
 
-	private DataStore createDataStore(IndexedShapefileDataStoreFactory fac, URL url, boolean memoryMapped) throws IOException {
-		Map params=new HashMap();
-		params.put( IndexedShapefileDataStoreFactory.URLP.key, url);
-		params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
-		DataStore createDataStore = fac.createDataStore(params);
-		return createDataStore;
-	}
+    private DataStore createDataStore( ShapefileDataStoreFactory fac, URL url, boolean memoryMapped )
+            throws IOException {
+        Map params = new HashMap();
+        params.put(ShapefileDataStoreFactory.URLP.key, url);
+        params.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
+        DataStore createDataStore = fac.createDataStore(params);
+        return createDataStore;
+    }
 
-	private void doubleWrite(SimpleFeatureType type, FeatureCollection one, File tmp,
-                             IndexedShapefileDataStoreFactory maker, boolean memorymapped)
-            throws IOException, MalformedURLException {
-		DataStore s;
-		s =  createDataStore(maker, tmp.toURL(),
-		        memorymapped);
+    private void doubleWrite( SimpleFeatureType type, FeatureCollection one, File tmp,
+            ShapefileDataStoreFactory maker, boolean memorymapped ) throws IOException,
+            MalformedURLException {
+        DataStore s;
+        s = createDataStore(maker, tmp.toURL(), memorymapped);
 
-		s.createSchema(type);
-		FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-		
-		store.addFeatures( one );		
-		store.addFeatures( one );
+        s.createSchema(type);
+        FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
 
-		s = createDataStore(maker,tmp.toURL(), true);
-		assertEquals(one.size()*2, store.getCount(Query.ALL));
-	}
-   
-    void test(String f) throws Exception {
-        File file=copyShapefiles(f); // Work on File rather than URL from JAR.
-        DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(),file.toURL(), true);
+        store.addFeatures(one);
+        store.addFeatures(one);
+
+        s = createDataStore(maker, tmp.toURL(), true);
+        assertEquals(one.size() * 2, store.getCount(Query.ALL));
+    }
+
+    void test( String f ) throws Exception {
+        File file = copyShapefiles(f); // Work on File rather than URL from
+        // JAR.
+        DataStore s = createDataStore(new ShapefileDataStoreFactory(), file.toURL(), true);
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
-        IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
+        ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
         test(type, one, getTempFile(), maker, false);
         test(type, one, getTempFile(), maker, true);
     }
 
-    private void test(SimpleFeatureType type, FeatureCollection one, File tmp,
-        IndexedShapefileDataStoreFactory maker, boolean memorymapped)
-        throws IOException, MalformedURLException, Exception {
+    private void test( SimpleFeatureType type, FeatureCollection one, File tmp,
+            ShapefileDataStoreFactory maker, boolean memorymapped ) throws IOException,
+            MalformedURLException, Exception {
         DataStore s;
         String typeName;
-        s = createDataStore(maker, tmp.toURL(),
-                memorymapped);
+        s = createDataStore(maker, tmp.toURL(), memorymapped);
 
-
-        
         s.createSchema(type);
 
-        
         FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-        
-        store.addFeatures( one );
 
-        s = createDataStore(new IndexedShapefileDataStoreFactory(), tmp.toURL(), true);
+        store.addFeatures(one);
+
+        s = createDataStore(new ShapefileDataStoreFactory(), tmp.toURL(), true);
         typeName = s.getTypeNames()[0];
 
         FeatureCollection two = s.getFeatureSource(typeName).getFeatures();
-        
-        compare(one.features(), two.features() );
+
+        compare(one.features(), two.features());
     }
 
-    static void compare(FeatureIterator fs1, FeatureIterator fs2)
-        throws Exception {
+    static void compare( FeatureIterator fs1, FeatureIterator fs2 ) throws Exception {
+        try {
+            while( fs1.hasNext() ) {
+                SimpleFeature f1 = fs1.next();
+                SimpleFeature f2 = fs2.next();
 
-        int i = 0;
-
-        while (fs1.hasNext()) {
-            SimpleFeature f1 = fs1.next();
-            SimpleFeature f2 = fs2.next();
-
-            if ((i++ % 50) == 0) {
-                if (verbose) {
-                    System.out.print("*");
-                }
+                compare(f1, f2);
             }
 
-            compare(f1, f2);
+        } finally {
+            fs1.close();
+            fs2.close();
         }
     }
 
-    static void compare(SimpleFeature f1, SimpleFeature f2) throws Exception {
+    static void compare( SimpleFeature f1, SimpleFeature f2 ) throws Exception {
         if (f1.getAttributeCount() != f2.getAttributeCount()) {
             throw new Exception("Unequal number of attributes");
         }
 
-        for (int i = 0; i < f1.getAttributeCount(); i++) {
+        for( int i = 0; i < f1.getAttributeCount(); i++ ) {
             Object att1 = f1.getAttribute(i);
             Object att2 = f2.getAttribute(i);
 
@@ -206,61 +198,58 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
                 g2.normalize();
 
                 if (!g1.equalsExact(g2)) {
-                    throw new Exception("Different geometries (" + i + "):\n"
-                        + g1 + "\n" + g2);
+                    throw new Exception("Different geometries (" + i + "):\n" + g1 + "\n" + g2);
                 }
             } else {
                 if (!att1.equals(att2)) {
-                    throw new Exception("Different attribute (" + i + "): ["
-                        + att1 + "] - [" + att2 + "]");
+                    throw new Exception("Different attribute (" + i + "): [" + att1 + "] - ["
+                            + att2 + "]");
                 }
             }
         }
     }
-    
-    
+
     /**
-     * Test optimized getBounds().
-     * 
-     * Testing when filter is a bbox filter and a fidfilter
+     * Test optimized getBounds(). Testing when filter is a bbox filter and a fidfilter
      * 
      * @throws Exception
      */
     public void testGetBoundsQuery() throws Exception {
         File file = copyShapefiles("shapes/streams.shp");
 
-        IndexedShapefileDataStoreFactory fac=new IndexedShapefileDataStoreFactory();
-        
-        Map params=new HashMap();
-        params.put( IndexedShapefileDataStoreFactory.URLP.key,  file.toURL());
-        params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
-        IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
-        
-        org.geotools.filter.FilterFactory ff=FilterFactoryFinder.createFilterFactory();
+        ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 
-        FeatureCollection features = ds.getFeatureSource().getFeatures(ff.createFidFilter("streams.84"));
+        Map params = new HashMap();
+        params.put(ShapefileDataStoreFactory.URLP.key, file.toURL());
+        params.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
+        IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
+
+        FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(GeoTools
+                .getDefaultHints());
+
+        FeatureId featureId = ff.featureId("streams.84");
+        Id filter = ff.id(Collections.singleton(featureId));
+        FeatureCollection features = ds.getFeatureSource().getFeatures(filter);
+
         FeatureIterator iter = features.features();
         ReferencedEnvelope bounds;
-        try{
+        try {
             bounds = new ReferencedEnvelope(iter.next().getBounds());
-        }finally{
+        } finally {
             iter.close();
         }
-        
-        //FidFilter filter = ff.createFidFilter();
-        FeatureId id = ff.featureId( "streams.84" );
-        Id filter = ff.id( Collections.singleton( id ));
-        
-        Query query=new DefaultQuery(ds.getCurrentTypeName(), filter);
-        
+
+        FeatureId id = featureId;
+        filter = ff.id(Collections.singleton(id));
+
+        Query query = new DefaultQuery(ds.getTypeNames()[0], filter);
+
         Envelope result = ds.getFeatureSource().getBounds(query);
-        
-        //assertEquals(bounds, result);
+
         assertTrue(result.equals(bounds));
     }
 
-    public static final void main(String[] args) throws Exception {
-        verbose = true;
+    public static final void main( String[] args ) throws Exception {
         junit.textui.TestRunner.run(suite(ShapefileQuadTreeReadWriteTest.class));
     }
 }

@@ -409,7 +409,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public Envelope getEnvelope() throws InvalidGridGeometryException {
         if (envelope!=null && !envelope.isNull()) {
             assert isDefined(ENVELOPE);
-            return (Envelope) envelope.clone();
+            return envelope.clone();
         }
         assert !isDefined(ENVELOPE);
         throw new InvalidGridGeometryException(Errors.format(gridToCRS == null ?

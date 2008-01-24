@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import javax.swing.JMenuItem;
 
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.ContextGeneralPanel;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
@@ -44,7 +43,7 @@ public class ContextPropertyItem extends JMenuItem implements TreePopupItem{
      * Creates a new instance of DefaultContextPropertyPop 
      */
     public ContextPropertyItem() {
-        super( TextBundle.getResource().getString("properties")  );
+        super( BUNDLE.getString("properties")  );
         init();
     }
     
@@ -62,13 +61,13 @@ public class ContextPropertyItem extends JMenuItem implements TreePopupItem{
     
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer == null) ;
+            return (selection[0].getLayer() == null && selection[0].getSubObject() == null) ;
         }
         return false;
     }
 
     public Component getComponent(SelectionData[] selection) {
-        context = selection[0].context;
+        context = selection[0].getContext();
         return this;
     }
     

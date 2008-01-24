@@ -18,13 +18,10 @@ package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
 
-import javax.swing.Icon;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import org.geotools.gui.swing.contexttree.SelectionData;
-import org.geotools.gui.swing.icon.IconBundle;
-import org.jdesktop.swingx.JXTitledSeparator;
 
 /**
  * Default popup control separator, use for JContextTreePopup

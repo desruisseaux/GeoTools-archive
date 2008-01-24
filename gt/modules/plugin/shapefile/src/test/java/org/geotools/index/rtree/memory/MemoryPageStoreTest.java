@@ -20,17 +20,17 @@ import org.geotools.index.DataDefinition;
 import org.geotools.index.TreeException;
 import org.geotools.index.rtree.PageStore;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/index/rtree/memory/MemoryPageStoreTest.java $
  */
 public class MemoryPageStoreTest extends TestCase {
     /**
      * Constructor for MemoryPageStoreTest.
-     *
+     * 
      * @param arg0
      */
     public MemoryPageStoreTest(String arg0) {
@@ -40,12 +40,11 @@ public class MemoryPageStoreTest extends TestCase {
     /*
      * Test for void MemoryPageStoreTest(DataDefinition)
      */
-    public void testMemoryPageStoreTestDataDefinition()
-        throws Exception {
+    public void testMemoryPageStoreTestDataDefinition() throws Exception {
         DataDefinition dd = new DataDefinition("US-ASCII");
 
         try {
-            MemoryPageStore ps = new MemoryPageStore(dd);
+            new MemoryPageStore(dd);
             fail("Cannot use an empty DataDefinition");
         } catch (TreeException e) {
             // OK
@@ -60,8 +59,7 @@ public class MemoryPageStoreTest extends TestCase {
     /*
      * Test for void MemoryPageStore(DataDefinition, int, int, short)
      */
-    public void testMemoryPageStoreDataDefinitionintintshort()
-        throws Exception {
+    public void testMemoryPageStoreDataDefinitionintintshort() throws Exception {
         DataDefinition dd = new DataDefinition("US-ASCII");
         dd.addField(Integer.class);
 

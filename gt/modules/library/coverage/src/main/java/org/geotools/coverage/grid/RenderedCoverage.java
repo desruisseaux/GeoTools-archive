@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.grid;
 
-// Dependencies
 import java.awt.image.RenderedImage;
 import javax.media.jai.PropertySource;
 import org.opengis.coverage.grid.GridCoverage;

@@ -48,9 +48,18 @@ public class DeleteElementTypeBindingTest extends WFSTestSupport {
     }
 
     @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        //additional namespace
+        registerNamespaceMapping("topp", "http://www.openplans.org/topp");
+    }
+    
+    @Override
     public void testEncode() throws Exception {
+        
         final DeleteElementType delete = factory.createDeleteElementType();
-        final QName typeName = new QName("http://www.openplans.org/topp", "TestType");
+        final QName typeName = new QName("http://www.openplans.org/topp", "TestType", "topp");
         {
             delete.setHandle("testHandle");
             delete.setTypeName(typeName);
@@ -60,8 +69,8 @@ public class DeleteElementTypeBindingTest extends WFSTestSupport {
         final Document dom = encode(delete, WFS.Delete);
         final Element root = dom.getDocumentElement();
         assertName(WFS.Delete, root);
-        // TODO: revisit, the encoder is not setting the ns prefix
-        assertEquals(typeName.getLocalPart(), root.getAttribute("typeName"));
+        
+        assertEquals(typeName.getPrefix() + ":" + typeName.getLocalPart(), root.getAttribute("typeName"));
     }
 
     @Override

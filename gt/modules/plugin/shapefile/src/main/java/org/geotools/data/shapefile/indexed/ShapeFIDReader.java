@@ -20,23 +20,23 @@ import java.io.IOException;
 import org.geotools.data.FIDReader;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-
 /**
  * Reader that returns FeatureIds in a quick fashion.
  * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/indexed/ShapeFIDReader.java $
  */
 public class ShapeFIDReader implements FIDReader {
     protected static final String CLOSE_MESG = "Close has already been called"
-        + " on this FIDReader";
+            + " on this FIDReader";
     private boolean opened;
-    private IndexedShapefileDataStore.Reader reader;
+    private IndexedShapefileAttributeReader reader;
     private int len;
     protected StringBuffer buffer;
 
     public ShapeFIDReader(String typeName,
-        IndexedShapefileDataStore.Reader reader) {
+            IndexedShapefileAttributeReader reader) {
         buffer = new StringBuffer(typeName);
         buffer.append('.');
         len = typeName.length() + 1;
@@ -45,7 +45,7 @@ public class ShapeFIDReader implements FIDReader {
     }
 
     public ShapeFIDReader(SimpleFeatureType featureType,
-        IndexedShapefileDataStore.Reader reader) {
+            IndexedShapefileAttributeReader reader) {
         this(featureType.getTypeName(), reader);
     }
 
@@ -60,29 +60,32 @@ public class ShapeFIDReader implements FIDReader {
      * This method always returns true, since it is built with a
      * <code>ShapefileDataStore.Reader</code> you have to call
      * <code>ShapefileDataStore.Reader.hasNext()</code>
-     *
+     * 
      * @return always return <code>true</code>
-     *
-     * @throws IOException If closed
+     * 
+     * @throws IOException
+     *                 If closed
      */
     public boolean hasNext() throws IOException {
         if (!this.opened) {
             throw new IOException(CLOSE_MESG);
         }
 
-        /* In DefaultFIDReader this is always called after
-         * atttributesReader.hasNext so, as we use the same
-         * attributeReader, we'll return true
+        /*
+         * In DefaultFIDReader this is always called after
+         * atttributesReader.hasNext so, as we use the same attributeReader,
+         * we'll return true
          */
         return true;
     }
 
     /**
      * Read the feature id.
-     *
+     * 
      * @return the Feature Id
-     *
-     * @throws IOException If closed
+     * 
+     * @throws IOException
+     *                 If closed
      */
     public String next() throws IOException {
         if (!this.opened) {
@@ -90,7 +93,7 @@ public class ShapeFIDReader implements FIDReader {
         }
 
         buffer.delete(len, buffer.length());
-        buffer.append(reader.getRecordNumber()-1);
+        buffer.append(reader.getRecordNumber() - 1);
 
         return buffer.toString();
     }

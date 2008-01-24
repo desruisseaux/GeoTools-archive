@@ -19,25 +19,27 @@ import org.geotools.data.shapefile.shp.IndexFile;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/IndexStore.java $
  */
 public interface IndexStore {
     /**
      * Stores a <code>QuadTree</code>
-     *
-     * @param tree the <code>QuadTree</code> to store
-     *
+     * 
+     * @param tree
+     *                the <code>QuadTree</code> to store
+     * 
      * @throws StoreException
      */
     public void store(QuadTree tree) throws StoreException;
 
     /**
      * Loads a <code>QuadTree</code>
-     *
+     * 
      * @return the loaded <code>QuadTree</code>
-     *
+     * 
      * @throws StoreException
      */
     public QuadTree load(IndexFile indexfile) throws StoreException;

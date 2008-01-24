@@ -31,16 +31,15 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 
 /**
  * @author johann sorel
  */
 public class JPropertyDialog extends JDialog{
     
-    private JButton apply = new JButton(TextBundle.getResource().getString("apply"));
-    private JButton revert = new JButton(TextBundle.getResource().getString("revert"));
-    private JButton close = new JButton(TextBundle.getResource().getString("close"));
+    private JButton apply = new JButton(BUNDLE.getString("apply"));
+    private JButton revert = new JButton(BUNDLE.getString("revert"));
+    private JButton close = new JButton(BUNDLE.getString("close"));
     
     private JTabbedPane tabs = new JTabbedPane();    
     private PropertyPanel activePanel = null;    
@@ -50,7 +49,7 @@ public class JPropertyDialog extends JDialog{
     private JPropertyDialog() {
         super();
         setModal(true);
-        setTitle(TextBundle.getResource().getString("properties"));
+        setTitle(BUNDLE.getString("properties"));
         //setIconImage(IconBundle.getResource().getIcon("16_jpropertydialog").getImage());
         
         JPanel bas = new JPanel(new FlowLayout(FlowLayout.RIGHT));

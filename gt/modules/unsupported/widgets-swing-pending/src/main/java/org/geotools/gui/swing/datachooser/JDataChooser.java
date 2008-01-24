@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JTabbedPane;
 import org.geotools.gui.swing.datachooser.model.DataModel;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
 /**
@@ -98,7 +97,6 @@ public class JDataChooser extends javax.swing.JDialog implements DataListener {
     public ACTION showDialog() {
         exitmode = ACTION.CLOSE;
         pack();
-        setTitle(TextBundle.getResource().getString("add_data_dialog"));
         setLocationRelativeTo(null);
         setVisible(true);
         return exitmode;
@@ -125,22 +123,24 @@ public class JDataChooser extends javax.swing.JDialog implements DataListener {
         jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle"); // NOI18N
+        setTitle(bundle.getString("add_data_dialog")); // NOI18N
 
-        but_remove.setText(TextBundle.getResource().getString("remove"));
+        but_remove.setText(bundle.getString("remove")); // NOI18N
         but_remove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 but_removeactionRemove(evt);
             }
         });
 
-        but_valider.setText(TextBundle.getResource().getString("apply"));
+        but_valider.setText(bundle.getString("apply")); // NOI18N
         but_valider.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 but_valideractionAjouter(evt);
             }
         });
 
-        but_fermer.setText(TextBundle.getResource().getString("cancel"));
+        but_fermer.setText(bundle.getString("cancel")); // NOI18N
         but_fermer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 but_fermeractionFermer(evt);
@@ -162,7 +162,7 @@ public class JDataChooser extends javax.swing.JDialog implements DataListener {
         ));
         jScrollPane1.setViewportView(tab_data);
 
-        txt_datas.setTitle(TextBundle.getResource().getString("layers"));
+        txt_datas.setTitle(bundle.getString("layers")); // NOI18N
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -170,7 +170,7 @@ public class JDataChooser extends javax.swing.JDialog implements DataListener {
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .add(but_remove)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
                 .add(but_valider)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_fermer))

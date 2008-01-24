@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -33,7 +32,6 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CSAuthorityFactory;
@@ -41,7 +39,6 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
@@ -53,7 +50,7 @@ import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -110,13 +107,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      *       case, this field and the {@link #registerInto} field would be removed.
      */
     private static final boolean ALLOW_REGISTRATION = false;
-
-    /**
-     * The factory registry for EPSG data sources. Will be created only when first needed.
-     *
-     * @deprecated To remove when other deprecated methods will have been removed.
-     */
-    private static FactoryRegistry datasources;
 
     /**
      * The default priority level for this factory.
@@ -179,33 +169,26 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
     public ThreadedEpsgFactory(final Hints userHints, final int priority) {
         super(userHints, priority);
 
-        Object hint = userHints == null ? null : userHints.get( Hints.EPSG_DATA_SOURCE );
+        Object hint = (userHints == null) ? null : userHints.get(Hints.EPSG_DATA_SOURCE);
 
-        if( hint == null ){
+        if (hint == null) {
           datasourceName = DATASOURCE_NAME;
-          //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
-
+          //datasourceName = GeoTools.fixName(DATASOURCE_NAME);
           hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
-        }
-        else if( hint instanceof String ){
+        } else if (hint instanceof String) {
             datasourceName = (String) hint;
-            //datasourceName = GeoTools.fixName( datasourceName );
-
+            //datasourceName = GeoTools.fixName(datasourceName);
             hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
-        }
-        else if (hint instanceof Name ){
+        } else if (hint instanceof Name) {
             Name name = (Name) hint;
-            hints.put( Hints.EPSG_DATA_SOURCE, name );
-
+            hints.put(Hints.EPSG_DATA_SOURCE, name);
             datasourceName = name.toString();
-            //datasourceName = GeoTools.fixName( name.toString() );
-        }
-        else if ( hint instanceof DataSource ){
+            //datasourceName = GeoTools.fixName(name.toString());
+        } else if (hint instanceof DataSource) {
             datasource = (DataSource) hint;
-            hints.put( Hints.EPSG_DATA_SOURCE, datasource );
-
+            hints.put(Hints.EPSG_DATA_SOURCE, datasource);
             datasourceName = DATASOURCE_NAME;
-            //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
+            //datasourceName = GeoTools.fixName(DATASOURCE_NAME);
         }
         factories = ReferencingFactoryContainer.instance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
@@ -216,6 +199,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * This authority will contains the database version in the {@linkplain Citation#getEdition
      * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
      */
+    @Override
     public Citation getAuthority() {
         final Citation authority = super.getAuthority();
         return (authority!=null) ? authority : Citations.EPSG;
@@ -276,31 +260,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
     }
 
     /**
-     * Returns a data source from the factory registry. This method is invoked by
-     * {@link #createBackingStore()} only if no EPSG data source was found in the
-     * JNDI (Java Naming and Directory). This method scans for plugins the first
-     * time it is invoked.
-     *
-     * @return All registered data sources.
-     *
-     * @deprecated To be deleted after we removed the {@code org.geotools...DataSource} interface.
-     */
-    private static synchronized Iterator getDataSources() {
-        final Class<?> category = org.geotools.referencing.factory.epsg.DataSource.class;
-        if (datasources == null) {
-            datasources = new FactoryRegistry((java.util.Collection) Collections.singleton(category));
-            datasources.scanForPlugins();
-            datasources.setOrdering(category, new Comparator() {
-                public int compare(final Object f1, final Object f2) {
-                    return ((org.geotools.referencing.factory.epsg.DataSource) f1).getPriority() -
-                           ((org.geotools.referencing.factory.epsg.DataSource) f2).getPriority();
-                }
-            });
-        }
-        return datasources.getServiceProviders(category, true);
-    }
-
-    /**
      * Setup a data source for a connection to the EPSG database. This method is invoked by
      * {@link #getDataSource()} when no data source has been {@linkplain #setDataSource
      * explicitly set}. The default implementation searchs for a {@link DataSource} instance
@@ -344,8 +303,8 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             registerInto = context;
             // Fall back on 'return null' below.
         } catch (NamingException exception) {
-            SQLException e = new SQLException(Errors.format(ErrorKeys.CANT_GET_DATASOURCE_$1,
-                                              datasourceName));
+            SQLException e = new SQLException(Errors.format(
+                    ErrorKeys.CANT_GET_DATASOURCE_$1, datasourceName));
             e.initCause(exception);
             throw e;
         }
@@ -372,10 +331,6 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final DataSource source = getDataSource();
-        // The next two lines will be removed after org.geotools...DataSource interface removal.
-        if (source instanceof org.geotools.referencing.factory.epsg.DataSource) {
-            return ((org.geotools.referencing.factory.epsg.DataSource) source).createFactory(hints);
-        }
         final Connection connection = source.getConnection();
         final String quote = connection.getMetaData().getIdentifierQuoteString();
         if (quote.equals("\"")) {
@@ -420,60 +375,16 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         } finally {
             registerInto = null;
         }
-        /*
-         * Iterate through all DataSources, begining with the one found in JNDI (if any).
-         * We will retain the first successfull connection. If all DataSource fails, the
-         * exception thrown by the first DataSource will be retrown, since it is usually
-         * the main DataSource.
-         */
-        if (false) {
-            /*
-             * TODO: All the block after // --- Begin deprecated code ----
-             *       should be replaced by this code after we deleted the
-             *       deprecated org.geotools...DataSource interface:
-             */
-            if (source == null) {
-                throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
-            }
-            final AbstractAuthorityFactory factory;
-            try {
-                datasource = source;
-                factory = createBackingStore(sourceHints);
-            } finally {
-                datasource = null;
-            }
+        if (source == null) {
+            throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
         }
-        // ---- Begin deprecated code to delete (up to the next block comment) --------------------
-        Iterator                 sources = null;
-        AbstractAuthorityFactory factory = null;
-        SQLException             failure = null;
-        while (true) {
-            if (source != null) try {
-                try {
-                    datasource = source;
-                    factory = createBackingStore(sourceHints);
-                } finally {
-                    datasource = null;
-                }
-                break; // Found a successfull connection: stop the loop.
-            } catch (SQLException exception) {
-                // Keep only the exception from the first data source.
-                if (failure == null) {
-                    failure = exception;
-                }
-            }
-            // Setup the iterator (if not already done) and test next DataSources.
-            if (sources == null) {
-                sources = getDataSources();
-            }
-            if (!sources.hasNext()) {
-                if (failure != null) {
-                    throw failure;
-                }
-                throw new FactoryNotFoundException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
-            }
-            source = (DataSource) sources.next();
-        };
+        final AbstractAuthorityFactory factory;
+        try {
+            datasource = source;
+            factory = createBackingStore(sourceHints);
+        } finally {
+            datasource = null;
+        }
         /*
          * We now have a working connection. If a naming directory is running but didn't contains
          * the "jdbc/EPSG" entry, add it now. In such case, a message is prepared and logged.
@@ -482,11 +393,11 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
         if (ALLOW_REGISTRATION && context != null) {
             try {
                 context.bind(datasourceName, source);
-                record = Logging.format(Level.INFO, LoggingKeys.CREATED_DATASOURCE_ENTRY_$1,
-                                        datasourceName);
+                record = Loggings.format(Level.INFO,
+                        LoggingKeys.CREATED_DATASOURCE_ENTRY_$1, datasourceName);
             } catch (NamingException exception) {
-                record = Logging.format(Level.WARNING, LoggingKeys.CANT_BIND_DATASOURCE_$1,
-                                        datasourceName);
+                record = Loggings.format(Level.WARNING,
+                        LoggingKeys.CANT_BIND_DATASOURCE_$1, datasourceName);
                 record.setThrown(exception);
             }
             log(record);
@@ -505,7 +416,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         final AbstractAuthorityFactory factory;
         String product = '<' + Vocabulary.format(VocabularyKeys.UNKNOW) + '>';
-        String url     = product;
+        String url = product;
         try {
             factory = createBackingStore0();
             if (factory instanceof DirectEpsgFactory) {
@@ -517,7 +428,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             throw new FactoryException(Errors.format(ErrorKeys.CANT_CONNECT_DATABASE_$1, "EPSG"),
                                        exception);
         }
-        log(Logging.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
+        log(Loggings.format(Level.CONFIG, LoggingKeys.CONNECTED_EPSG_DATABASE_$2, url, product));
         if (factory instanceof DirectEpsgFactory) {
             ((DirectEpsgFactory) factory).buffered = this;
         }
@@ -540,6 +451,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      *
      * @param backingStore The backing store in process of being disposed.
      */
+    @Override
     protected boolean canDisposeBackingStore(final AbstractAuthorityFactory backingStore) {
         if (backingStore instanceof DirectEpsgFactory) {
             return ((DirectEpsgFactory) backingStore).canDispose();
@@ -558,6 +470,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             super(DirectEpsgFactory.SHUTDOWN_THREAD);
         }
 
+        @Override
         public void run() {
             synchronized (ThreadedEpsgFactory.this) {
                 try {
@@ -574,6 +487,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The object may already be registered under another category.
      */
+    @Override
     public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
         super.onRegistration(registry, category);
         if (shutdown == null) {
@@ -586,6 +500,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * Called when this factory is removed from the given {@code category} of the given
      * {@code registry}.  The object may still be registered under another category.
      */
+    @Override
     public synchronized void onDeregistration(final ServiceRegistry registry, final Class category) {
         if (shutdown != null) {
             if (registry.getServiceProviderByClass(getClass()) == null) {
@@ -596,18 +511,5 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             }
         }
         super.onDeregistration(registry, category);
-    }
-
-    /**
-     * Constructs an object from the EPSG database and print its WKT (Well Know Text) to
-     * the {@linkplain System#out standard output stream}.
-     *
-     * @deprecated Replaced in a more generic way by {@link org.geotools.referencing.CRS#main}
-     *             with a {@code "-authority=EPSG"} optional argument.
-     */
-    public static void main(String[] args) {
-        args = (String[]) org.geotools.resources.XArray.insert(args, 0, 1);
-        args[0] = "-authority=EPSG";
-        org.geotools.referencing.CRS.main(args);
     }
 }

@@ -32,8 +32,10 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -220,17 +222,12 @@ public class ParserHandler extends DefaultHandler {
             //TODO: this processing is too loose, do some validation will ya!
             String[] locations = null;
 
-            //            if ( context.getComponentInstance( Parser.Properties.IGNORE_SCHEMA_LOCATION ) != null ) {
-            //            	//use the configuration
-            //            	locations = new String[] {
-            //            		config.getNamespaceURI(), config.getSchemaFileURL()	
-            //            	};
-            //            }
-            //            else {
             for (int i = 0; i < attributes.getLength(); i++) {
                 String name = attributes.getQName(i);
 
                 if (name.endsWith("schemaLocation")) {
+                    logger.finer( "schemaLocation found: " + attributes.getValue( i ) );
+                    
                     //create an array of alternating namespace, location pairs
                     locations = attributes.getValue(i).split(" +");
 
@@ -241,6 +238,7 @@ public class ParserHandler extends DefaultHandler {
             //            }
             if (!isStrict() && (locations == null)) {
                 //use the configuration
+                logger.finer( "No schemaLocation found, using '" + config.getNamespaceURI() + " " + config.getSchemaFileURL()  );
                 locations = new String[] { config.getNamespaceURI(), config.getSchemaFileURL() };
             }
 
@@ -260,8 +258,11 @@ public class ParserHandler extends DefaultHandler {
                     for (int j = 0; j < resolvers.length; j++) {
                         String override = resolvers[j].resolveSchemaLocation(null, namespace,
                                 location);
-
                         if (override != null) {
+                            //ensure that override has no spaces
+                            override = override.replaceAll( " ", "%20" ); 
+                            logger.finer( "Found override for " + namespace  + 
+                                ": " + location + " ==> " + override );
                             location = override;
 
                             break;
@@ -281,6 +282,17 @@ public class ParserHandler extends DefaultHandler {
 
                     //if no schema override was found, parse location directly
                     if (schemas[i / 2] == null) {
+                        //validate the schema location
+                        if ( isValidating() ) {
+                            try {
+                                Schemas.validateImportsIncludes(location,locators,resolvers);
+                            } 
+                            catch (IOException e) {
+                                throw (SAXException) new SAXException( "error validating" ).initCause(e);
+                            }    
+                        }
+                        
+                        //parse the document
                         try {
                             schemas[i / 2] = Schemas.parse(location, locators, resolvers);
                         } catch (Exception e) {
@@ -353,8 +365,13 @@ public class ParserHandler extends DefaultHandler {
             //check to make sure that the schemas that were created include
             // the schema for the parser configuration
             boolean found = false;
-O: 
-            for (int i = 0; i < schemas.length; i++) {
+
+O:          for (int i = 0; i < schemas.length; i++) {
+                if ( config.getNamespaceURI().equals( schemas[i].getTargetNamespace()) ) {
+                    found = true;
+                    break O;
+                }
+                
                 List imports = Schemas.getImports(schemas[i]);
 
                 for (Iterator im = imports.iterator(); im.hasNext();) {
@@ -582,14 +599,12 @@ O:
     }
 
     protected void configure(Configuration config) {
-        handlerFactory = new HandlerFactoryImpl();
-        bindingLoader = new BindingLoader();
-        bindingWalker = new BindingWalker(bindingLoader);
-
         //configure the bindings
-        MutablePicoContainer container = bindingLoader.getContainer();
-        container = config.setupBindings(container);
-        bindingLoader.setContainer(container);
+        Map bindings = config.setupBindings();
+        
+        handlerFactory = new HandlerFactoryImpl();
+        bindingLoader = new BindingLoader(bindings);
+        bindingWalker = new BindingWalker(bindingLoader);
     }
 
     protected XSDSchemaLocator[] findSchemaLocators() {

@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.sql.Driver;
 
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -65,8 +65,8 @@ public final class JDBC {
                 if (!DRIVERS.contains(driver)) {
                     try {
                         final Driver d = (Driver) Class.forName(driver).newInstance();
-                        log = Logging.format(Level.CONFIG, LoggingKeys.LOADED_JDBC_DRIVER_$3,
-                                             driver, d.getMajorVersion(), d.getMinorVersion());
+                        log = Loggings.format(Level.CONFIG, LoggingKeys.LOADED_JDBC_DRIVER_$3,
+                                              driver, d.getMajorVersion(), d.getMinorVersion());
                         DRIVERS.add(driver);
                     } catch (Exception exception) {
                         log = new LogRecord(Level.WARNING, exception.toString());

@@ -16,18 +16,13 @@
  */
 package org.geotools.coverage;
 
-// J2SE and JAI dependencies
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -35,62 +30,74 @@ import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
 import javax.media.jai.InterpolationNearest;
-import java.lang.reflect.Array;
 import java.lang.reflect.UndeclaredThrowableException;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
+import org.geotools.util.NumberRange;
+import org.geotools.util.FrequencySortedSet;
 import org.geotools.util.logging.Logging;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Classes;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Loggings;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.NumberRange;
+
+import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.POSITIVE_INFINITY;
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
 
 
 /**
  * Wraps a stack of {@linkplain Coverage coverages} as an extra dimension. For example this class
  * can wraps an array of {@link org.geotools.coverage.grid.GridCoverage2D} on the same geographic
  * area, but where each {@code GridCoverage2D} is for a different date. This {@code CoverageStack}
- * manages the two-dimensional coverages as if the whole set was a huge three-dimensional coverage.
+ * manages the two-dimensional coverages as if the whole set was a three-dimensional coverage.
  * <p>
  * Each {@linkplain Element coverage element} in the stack usually covers the same
- * {@linkplain Coverage#getEnvelope geographic area}, but this is not a requirement. However,
- * they must use the same {@linkplain CoordinateReferenceSystem coordinate reference system}.
- * For performance reason, the later condition will not be checked except at construction time
- * if the CRS is provided in the envelope, and at evaluation time if Java assertion are enabled.
- * If the CRS of coverage elements is uncertain, consider wrapping them in a
- * {@link TransformedCoverage} object.
+ * {@linkplain Coverage#getEnvelope geographic area}, but this is not a requirement. As of GeoTools
+ * 2.5, elements are not required to have the same {@linkplain CoordinateReferenceSystem coordinate
+ * reference system} neither, but they are required to handle the transformation from this coverage
+ * CRS to their CRS.
  * <p>
  * Coverage elements are often two-dimensional, but this is not a requirement. This stack will
- * simply append one more dimension to the coverage element's CRS dimensions. Coverage elements
- * may be other {@code CoverateStack} objects, thus allowing construction of coverages with four
- * or more dimensions.
+ * simply append one dimension to the element CRS. Coverage elements may be themself backed by
+ * instances of {@code CoverateStack}, thus allowing construction of coverages with four or more
+ * dimensions.
+ * <p>
+ * For documentation purpose, the new dimension added by {@code CoverageStack} is called
+ * <var>z</var>. But this is only a naming convention - the new dimension can really be
+ * anything, including time.
  * <p>
  * {@code GridCoverage2D} objects tend to be big. In order to keep memory usage raisonable, this
  * implementation doesn't requires all {@code GridCoverage} objects at once. Instead, it requires
@@ -102,12 +109,11 @@ import org.geotools.util.NumberRange;
  * caching mechanism is suffisient if {@code evaluate(...)} methods are invoked with increasing
  * <var>z</var> values.
  * <p>
- * Each coverage element is expected to extends over a range of <var>z</var> values (the new
- * dimensions appended by this {@code CoverageStack}). If an {@code evaluate(...)} method is
- * invoked with a <var>z</var> value not falling in the middle of a coverage element, a linear
- * interpolation is applied.
+ * Each coverage element is expected to extends over a range of <var>z</var> values. If an
+ * {@code evaluate(...)} method is invoked with a <var>z</var> value not falling in the middle
+ * of a coverage element, a linear interpolation is applied.
  * <p>
- * <strong>Note:</strong> This implementation is thread-safe.
+ * {@code CoverageStack} implementation is thread-safe.
  *
  * @since 2.1
  * @source $URL$
@@ -116,9 +122,14 @@ import org.geotools.util.NumberRange;
  */
 public class CoverageStack extends AbstractCoverage {
     /**
+     * For compatibility during cross-version serialization.
+     */
+    private static final long serialVersionUID = -7100201963376146053L;
+
+    /**
      * An element in a {@linkplain CoverageStack coverage stack}. Each element is expected to
      * extents over a range of <var>z</var> values (the new dimensions appended by the
-     * {@code CoverageStack} container). Implementations should be capable to returns coverage's
+     * {@link CoverageStack} container). Implementations should be capable to returns coverage's
      * {@linkplain #getZRange range of z-values} without loading the coverage's data. If an
      * expensive loading is required, it should be delayed until the {@link #getCoverage} method
      * is invoked. If {@code getCoverage} is invoked more than once, caching (if desirable) is
@@ -126,7 +137,7 @@ public class CoverageStack extends AbstractCoverage {
      * <p>
      * All methods declares {@link IOException} in their throws cause in case I/O operations are
      * required. Subclasses of {@code IOException} include {@link javax.imageio.IIOException} for
-     * image I/O operations, or {@link java.rmi.RemoteOperation} for remote method invocation
+     * image I/O operations, or {@link java.rmi.RemoteException} for remote method invocations
      * (which may be useful for large images database backed by a distant server).
      *
      * @since 2.1
@@ -137,12 +148,14 @@ public class CoverageStack extends AbstractCoverage {
         /**
          * Returns a name for the coverage. This method should not load a large amount of data,
          * since it may be invoked soon. This method is invoked just before {@link #getCoverage}
-         * in order to log a "Loading data..." message.
+         * in order to log a "<cite>Loading data...</cite>" message.
+         *
+         * @throws IOException if an I/O operation was required but failed.
          */
         String getName() throws IOException;
-        
+
         /**
-         * Returns the minimum and maximum <var>z</var> value for the coverage.
+         * Returns the minimum and maximum <var>z</var> values for the coverage.
          * This information is mandatory. This method should not load a large
          * amount of data, since it may be invoked soon. Note that this method
          * may be invoked often, so it should be efficient.
@@ -184,7 +197,7 @@ public class CoverageStack extends AbstractCoverage {
          * Returns the coverage, loading the data if needed. Implementations should invokes the
          * {@link IIOListeners#addListenersTo(ImageReader)} method if they use an image reader
          * for loading data. Caching (if desired) is implementor's responsability. The default
-         * {@link CoverageStack} implementation caches only the last coverage used.
+         * {@link CoverageStack} implementation caches only the last coverages used.
          *
          * @param  listeners Listeners to register to the {@linkplain ImageReader image I/O reader},
          *         if such a reader is going to be used.
@@ -231,8 +244,8 @@ public class CoverageStack extends AbstractCoverage {
             this.range    = range;
             if (getClass() == Adapter.class) {
                 if (coverage == null) {
-                    // TODO: provides a localized message.
-                    throw new IllegalArgumentException("coverage");
+                    throw new IllegalArgumentException(
+                            Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "coverage"));
                 }
             }
         }
@@ -249,7 +262,7 @@ public class CoverageStack extends AbstractCoverage {
             }
             return coverage.toString();
         }
-        
+
         /**
          * Returns the minimum and maximum <var>z</var> values for the coverage. If the range was
          * not explicitly specified to the constructor, then the default implementation infers it
@@ -307,13 +320,13 @@ public class CoverageStack extends AbstractCoverage {
             return coverage;
         }
     }
-    
+
     /**
      * Coverage elements in this stack. Elements may be shared by more than one
      * instances of {@code CoverageStack}.
      */
     private final Element[] elements;
-    
+
     /**
      * The sample dimensions for this coverage, or {@code null} if unknown.
      */
@@ -321,10 +334,10 @@ public class CoverageStack extends AbstractCoverage {
 
     /**
      * The number of sample dimensions for this coverage, or 0 is unknow.
-     * Note: this attribute may be non-null even if {@link #sampleDimensions} is null.
+     * Note: this attribute may be different than zero even if {@link #sampleDimensions} is null.
      */
     private final int numSampleDimensions;
-    
+
     /**
      * The envelope for this coverage. This is the union of all elements envelopes.
      *
@@ -352,48 +365,48 @@ public class CoverageStack extends AbstractCoverage {
      * or {@code null} if unknown.
      */
     private final CoordinateReferenceSystem zCRS;
-    
+
     /**
      * {@code true} if interpolations are allowed.
      */
     private boolean interpolationEnabled = true;
-    
+
     /**
      * Maximal interval between the upper z-value of a coverage and the lower z-value of the next
      * one. If a greater difference is found, we will consider that there is a hole in the data
      * and {@code evaluate(...)} methods will returns NaN for <var>z</var> values in this hole.
      */
     private final double lagTolerance = 0;
-    
+
     /**
      * List of objects to inform when image loading are trigged.
      */
     private final IIOListeners listeners = new IIOListeners();
-    
+
     /**
      * Internal listener for logging image loading.
      */
     private transient Listeners readListener;
-    
+
     /**
      * Coverage with a minimum z-value lower than or equals to the requested <var>z</var> value.
      * If possible, this class will tries to select a coverage with a middle value (not just the
      * minimum value) lower than the requested <var>z</var> value.
      */
     private transient Coverage lower;
-    
+
     /**
      * Coverage with a maximum z-value higher than or equals to the requested <var>z</var> value.
      * If possible, this class will tries to select a coverage with a middle value (not just the
      * maximum value) higher than the requested <var>z</var> value.
      */
     private transient Coverage upper;
-    
+
     /**
      * <var>Z</var> values in the middle of {@link #lower} and {@link #upper} envelope.
      */
-    private transient double lowerZ=Double.POSITIVE_INFINITY, upperZ=Double.NEGATIVE_INFINITY;
-    
+    private transient double lowerZ = POSITIVE_INFINITY, upperZ = NEGATIVE_INFINITY;
+
     /**
      * Range for {@link #lower} and {@link #upper}.
      */
@@ -422,22 +435,24 @@ public class CoverageStack extends AbstractCoverage {
      * thel again everytime an {@code evaluate(...)} method is invoked.
      */
     private transient double[] doubleBuffer;
-    
+
     /**
-     * Initialize fields after deserialization.
+     * Initializes fields after deserialization.
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        lowerZ = Double.POSITIVE_INFINITY;
-        upperZ = Double.NEGATIVE_INFINITY;
+        lowerZ = POSITIVE_INFINITY;
+        upperZ = NEGATIVE_INFINITY;
     }
 
     /**
-     * Constructs a new coverage stack with all the supplied elements. All coverages must uses the
-     * same coordinate reference system. Additionnaly, all coverages must specify their <var>z</var>
-     * value in the last dimension of their envelope. The example below constructs two dimensional
-     * grid coverages (to be given as the {@code coverages} argument) for the same area, but at
-     * different times:
+     * Constructs a new coverage stack with all the supplied elements. Every coverages
+     * <strong>must</strong> specify their <var>z</var> range in the last dimension of
+     * their {@linkplain Coverage#getEnvelope envelope}, and at least one of those envelopes
+     * shall be {@linkplain Envelope#getCoordinateReferenceSystem associated with a CRS}
+     * (the later is always the case with GeoTools implementations of {@link Coverage}).
+     * The example below constructs two dimensional grid coverages (to be given as the
+     * {@code coverages} argument) for the same geographic area, but at different elevations:
      *
      * <blockquote><pre>
      * GridCoverageFactory     factory = ...;
@@ -446,15 +461,16 @@ public class CoverageStack extends AbstractCoverage {
      * CoordinateReferenceSystem crs3D = new CompoundCRS(crs3D, timeCRS);
      *
      * List&lt;Coverage&gt; coverages = new ArrayList&lt;Coverage&gt;();
-     * GeneralEnvelope envelope = new GeneralEnvelope(3); // A <strong>3-dimensional</strong> envelope.
-     * envelope.setRange(...);                            // Set the horizontal part.
-     * for (int i=0; i<...; i++) {
-     *     envelope.setRange(2, startTime, endTime);
+     * GeneralEnvelope envelope = new GeneralEnvelope(DefaultGeographicCRS.WGS84_3D);
+     * envelope.setRange(0, westLongitudeBound, eastLongitudeBound);
+     * envelope.setRange(1, southLatitudeBound, northLatitudeBound);
+     * for (int i=0; i&lt;...; i++) {
+     *     envelope.setRange(2, minElevation, maxElevation);
      *     coverages.add(factory.create(..., crs, envelope, ...);
      * }
      * </pre></blockquote>
-     * 
-     * This convenience constructor wraps all coverage intos a {@link Adapter Adapter} object.
+     *
+     * This convenience constructor wraps all coverage intos an {@link Adapter Adapter} object.
      * Users with a significant amount of data are encouraged to uses the constructor expecting
      * {@link Element Element} objects instead, in order to provides their own implementation
      * loading data only when needed.
@@ -463,154 +479,106 @@ public class CoverageStack extends AbstractCoverage {
      * @param  coverages All {@link Coverage} elements for this stack.
      * @throws IOException if an I/O operation was required and failed.
      */
-    public CoverageStack(final CharSequence name,
-                         final Collection/*<Coverage>*/ coverages) throws IOException
+    public CoverageStack(final CharSequence name, final Collection<? extends Coverage> coverages)
+            throws IOException
     {
-        this(name, getCoordinateReferenceSystem(coverages), toElements(coverages));
+        this(name, (CoordinateReferenceSystem) null, toElements(coverages));
     }
 
     /**
      * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
      * call in constructors").
      */
-    private static CoordinateReferenceSystem getCoordinateReferenceSystem(final Collection coverages) {
-        CoordinateReferenceSystem crs = null;
-        for (final Iterator it=coverages.iterator(); it.hasNext();) {
-            final CoordinateReferenceSystem candidate = ((Coverage) it.next()).getCoordinateReferenceSystem();
-            if (crs == null) {
-                crs = candidate;
-            } else if (!crs.equals(candidate)) {
-                // TODO: localize
-                throw new IllegalArgumentException("Inconsistent coordinate reference system");
-            }
-        }
-        return crs;
-    }
-
-    /**
-     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
-     * call in constructors").
-     */
-    private static Collection/*<Element>*/ toElements(final Collection/*<Coverage>*/ coverages) {
-        final List elements = new ArrayList(coverages.size());
-        for (final Iterator it=coverages.iterator(); it.hasNext();) {
-            elements.add(new Adapter((Coverage) it.next(), null));
+    private static Element[] toElements(final Collection<? extends Coverage> coverages) {
+        final Element[] elements = new Element[coverages.size()];
+        int count = 0;
+        for (final Coverage coverage : coverages) {
+            elements[count++] = new Adapter(coverage, null);
         }
         return elements;
     }
 
     /**
+     * Constructs a new coverage stack with all the supplied elements. Each element can specify
+     * its <var>z</var> range either in the last dimension of its {@linkplain Element#getEnvelope
+     * envelope}, or as a separated {@linkplain Element#getZRange range}.
+     * <p>
+     * If {@code crs} is {@code null}, this constructor will try to infer the CRS from the
+     * {@linkplain Element#getEnvelope element envelope} but at least one of those must be
+     * associated with a full CRS (including the <var>z</var> dimension).
+     *
+     * @param  name     The name for this coverage.
+     * @param  crs      The coordinate reference system for this coverage, or {@code null}.
+     * @param  elements All coverage {@link Element Element}s for this stack.
+     * @throws IOException if an I/O operation was required and failed.
+     */
+    public CoverageStack(final CharSequence name,
+                         final CoordinateReferenceSystem crs,
+                         final Collection<? extends Element> elements) throws IOException
+    {
+        this(name, crs, elements.toArray(new Element[elements.size()]));
+    }
+
+    /**
      * Constructs a new coverage stack with all the supplied elements.
+     * The {@code elements} array will be modified, so it should never be a direct reference
+     * to a user argument. This constructor should stay private for that reason.
      *
      * @param  name     The name for this coverage.
      * @param  crs      The coordinate reference system for this coverage.
      * @param  elements All coverage {@link Element Element}s for this stack.
      * @throws IOException if an I/O operation was required and failed.
      */
-    public CoverageStack(final CharSequence             name,
-                         final CoordinateReferenceSystem crs,
-                         final Collection/*<Element>*/ elements) throws IOException
+    private CoverageStack(final CharSequence name,
+                          final CoordinateReferenceSystem crs,
+                          final Element[] elements) throws IOException
     {
-        super(name, crs, null, null);
-        this.elements = (Element[]) elements.toArray(new Element[elements.size()]);
-        try {
-            Arrays.sort(this.elements, COMPARATOR);
-        } catch (UndeclaredThrowableException exception) {
-            throw rethrow(exception);
-        }
-        zDimension = crs.getCoordinateSystem().getDimension() - 1;
-        boolean      sampleDimensionMismatch = false;
-        SampleDimension[]   sampleDimensions = null;
-        GeneralEnvelope            envelope  = null;
-        for (int j=0; j<this.elements.length; j++) {
-            final Element element = this.elements[j];
-            if (true) {
-                /*
-                 * Ensures that all coverages uses the same number of sample dimension.
-                 * To be strict, we should ensure that all sample dimensions are identical.
-                 * However, this is not needed for proper working of this class, so we will
-                 * ensure this condition only in 'getSampleDimension' method.
-                 */
-                final SampleDimension[] candidate = element.getSampleDimensions();
-                if (candidate != null) {
-                    if (sampleDimensions == null) {
-                        sampleDimensions = candidate;
-                    } else {
-                        if (sampleDimensions.length != candidate.length) {
-                            throw new IllegalArgumentException( // TODO: localize
-                                        "Inconsistent number of sample dimensions.");
-                        }
-                        if (!Arrays.equals(sampleDimensions, candidate)) {
-                            sampleDimensionMismatch = true;
-                        }
+        this(name, getEnvelope(crs, elements), elements); // 'elements' must be after 'getEnvelope'
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private CoverageStack(final CharSequence name,
+                          final GeneralEnvelope envelope,
+                          final Element[] elements) throws IOException
+    {
+        super(name, envelope.getCoordinateReferenceSystem(), null, null);
+        assert XArray.isSorted(elements, COMPARATOR);
+        this.elements = elements;
+        this.envelope = envelope;
+        zDimension = envelope.getDimension() - 1;
+        boolean sampleDimensionMismatch = false;
+        SampleDimension[] sampleDimensions = null;
+        for (int j=0; j<elements.length; j++) {
+            final Element element = elements[j];
+            /*
+             * Ensures that all coverages uses the same number of sample dimension.
+             * To be strict, we should ensure that all sample dimensions are identical.
+             * However, this is not needed for proper working of this class, so we will
+             * ensure this condition only in 'getSampleDimension' method.
+             */
+            final SampleDimension[] candidate = element.getSampleDimensions();
+            if (candidate != null) {
+                if (sampleDimensions == null) {
+                    sampleDimensions = candidate;
+                } else {
+                    if (sampleDimensions.length != candidate.length) {
+                        throw new IllegalArgumentException( // TODO: localize
+                                    "Inconsistent number of sample dimensions.");
+                    }
+                    if (!Arrays.equals(sampleDimensions, candidate)) {
+                        sampleDimensionMismatch = true;
                     }
                 }
             }
-            /*
-             * Computes an envelope for all coverage elements. If a coordinate reference system
-             * information is bundled with the envelope, it will be used in order to reproject
-             * the envelope on the fly (if needed). Otherwise, CRS are assumed the same than the
-             * one specified at construction time.
-             */
-            final Envelope candidate = element.getEnvelope();
-            if (candidate == null) {
-                continue;
-            }
-            final CoordinateReferenceSystem sourceCRS;
-            sourceCRS = candidate.getCoordinateReferenceSystem();
-            if (sourceCRS != null) {
-                final int dim = sourceCRS.getCoordinateSystem().getDimension();
-                if (dim<zDimension || dim>zDimension+1) {
-                    // TODO: localize
-                    throw new MismatchedDimensionException("An element uses an incompatible CRS");
-                }
-                final CoordinateReferenceSystem targetCRS = CRSUtilities.getSubCRS(crs, 0, dim);
-                if (!CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-                    // TODO: localize
-                    throw new IllegalArgumentException("An element uses an incompatible CRS");
-                }
-            }
-            /*
-             * Increase the envelope in order to contains 'candidate'.
-             * The range of z-values will be included in the envelope.
-             */
-            final boolean set = (envelope == null);
-            if (set) {
-                envelope = new GeneralEnvelope(zDimension + 1);
-            }
-            final int dim = candidate.getDimension();
-            for (int i=0; i<=zDimension; i++) {
-                double min = envelope.getMinimum(i);
-                double max = envelope.getMaximum(i);
-                final double minimum, maximum;
-                if (i < dim) {
-                    minimum = candidate.getMinimum(i);
-                    maximum = candidate.getMaximum(i);
-                } else if (i == zDimension) {
-                    final NumberRange range = element.getZRange();
-                    minimum = range.getMinimum();
-                    maximum = range.getMaximum();
-                } else {
-                    minimum = Double.NEGATIVE_INFINITY;
-                    maximum = Double.POSITIVE_INFINITY;
-                }
-                if (set || minimum<min) min=minimum;
-                if (set || maximum>max) max=maximum;
-                envelope.setRange(i, min, max);
-            }
         }
-        this.numSampleDimensions = (sampleDimensions!=null) ? sampleDimensions.length : 0;
+        this.numSampleDimensions = (sampleDimensions != null) ? sampleDimensions.length : 0;
         this.sampleDimensions = sampleDimensionMismatch ? null : sampleDimensions;
-        if (envelope != null) {
-            this.envelope = envelope;
-            envelope.setCoordinateReferenceSystem(crs);
-        } else {
-            assert this.elements.length == 0;
-            this.envelope = new GeneralEnvelope(CRS.getEnvelope(crs));
-        }
         zCRS = CRSUtilities.getSubCRS(crs, zDimension, zDimension+1);
     }
-    
+
     /**
      * Constructs a new coverage using the same elements than the specified coverage stack.
      */
@@ -624,7 +592,182 @@ public class CoverageStack extends AbstractCoverage {
         zCRS                 = source.zCRS;
         interpolationEnabled = source.interpolationEnabled;
     }
-    
+
+    /**
+     * Returns the envelope for the given elements. If {@code crs} is {@code null},
+     * then the most frequently used CRS will be selected.
+     * <p>
+     * The {@code elements} array will be modified, so it should never be a direct reference
+     * to a user argument. This method should stay private for that reason.
+     *
+     * @param  crs The coordinate reference system for the coverage, or {@code null}.
+     * @param  elements All coverage {@link Element Element}s for the coverage stack.
+     * @return The envelope in the CRS to be used for the coverage stack (never {@code null}).
+     * @throws IOException if an I/O operation was required and failed.
+     */
+    @SuppressWarnings("fallthrough")
+    private static GeneralEnvelope getEnvelope(CoordinateReferenceSystem crs, final Element[] elements)
+            throws IOException
+    {
+        try {
+            Arrays.sort(elements, COMPARATOR);
+        } catch (UndeclaredThrowableException exception) {
+            throw rethrow(exception);
+        }
+        /*
+         * If no CRS was specified, selects the most frequently used one. The loop below memorizes
+         * the envelopes in order to avoid asking them a second time in the loop after.
+         */
+        Envelope[] envelopes = null;
+        int zDimension = 0;
+        int errorCode = ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM; // In case of error
+        if (crs == null) {
+            errorCode = ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM;
+            FrequencySortedSet<CoordinateReferenceSystem> frequency = null;
+            for (int i=0; i<elements.length; i++) {
+                final Envelope envelope = elements[i].getEnvelope();
+                if (envelope != null) {
+                    if (envelopes == null) {
+                        envelopes = new Envelope[elements.length];
+                    }
+                    envelopes[i] = envelope;
+                    final CoordinateReferenceSystem candidate = envelope.getCoordinateReferenceSystem();
+                    if (candidate != null) {
+                        if (frequency == null) {
+                            frequency = new FrequencySortedSet<CoordinateReferenceSystem>(true);
+                        }
+                        frequency.add(candidate);
+                    }
+                    final int dimension = envelope.getDimension();
+                    if (dimension > zDimension) {
+                        zDimension = dimension - 1;
+                    }
+                }
+            }
+            /*
+             * At this point, all CRS have been added in the frequency set. Now inspect the result.
+             * If there is more than one CRS, logs a warning and selects the most frequently used.
+             */
+            if (frequency != null) {
+                final int size = frequency.size();
+                switch (size) {
+                    default: {
+                        final int[] f = frequency.frequencies();
+                        final LogRecord record = Loggings.format(Level.WARNING, LoggingKeys.
+                                FOUND_MISMATCHED_CRS_$4, size, elements.length, f[0], f[size-1]);
+                        record.setSourceClassName(CoverageStack.class.getName());
+                        record.setSourceMethodName("<init>"); // This is the public method invoked.
+                        Logging.getLogger(CoverageStack.class).log(record);
+                        // Fall through
+                    }
+                    case 1: {
+                        crs = frequency.first();
+                        // Fall through
+                    }
+                    case 0: break;
+                }
+            }
+        }
+        /*
+         * Now we should know the CRS. Discarts the old 'zDimension', which was only a fallback.
+         * If we don't know the CRS, keep the 'zDimension' fallback which should be inferred from
+         * the envelope with the greatest amount of dimensions.
+         */
+        if (crs != null) {
+            zDimension = crs.getCoordinateSystem().getDimension() - 1;
+        }
+        if (zDimension <= 0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_CRS_$1,
+                    (crs == null) ? "null" : crs.getName().getCode()));
+        }
+        /*
+         * Prepares the envelope, to be computed in the loop later and returned by this method.
+         * Ordinates are initialized to NaN. They will stay NaN if none of the supplied elements
+         * can provide an envelope.
+         */
+        final GeneralEnvelope envelope;
+        if (crs != null) {
+            envelope = new GeneralEnvelope(crs);
+        } else {
+            envelope = new GeneralEnvelope(zDimension + 1);
+        }
+        envelope.setToNull();
+        /*
+         * Computes a CRS without the z dimension (which is assumed to be the last one, as
+         * specified in the javadoc). A coordinate operation is cached during the loop for
+         * transforming envelopes, if needed.
+         */
+        final CoordinateReferenceSystem reducedCRS = CRSUtilities.getSubCRS(crs, 0, zDimension);
+        CoordinateOperation operation = null;
+        for (int j=0; j<elements.length; j++) {
+            final Element element = elements[j];
+            Envelope candidate = (envelopes != null) ? envelopes[j] : element.getEnvelope();
+            if (candidate == null) {
+                continue;
+            }
+            /*
+             * Computes an envelope for all coverage elements. If a coordinate reference system
+             * information is bundled with the envelope, it will be used in order to reproject
+             * the envelope on the fly (if needed). Otherwise, CRS are assumed the same than the
+             * one specified at construction time.
+             */
+            final CoordinateReferenceSystem sourceCRS = candidate.getCoordinateReferenceSystem();
+            if (sourceCRS != null && !equalsIgnoreMetadata(sourceCRS, crs)
+                                  && !equalsIgnoreMetadata(sourceCRS, reducedCRS))
+            {
+                // A transformation is required. Reuse the previous operation if possible.
+                if (operation==null || !equalsIgnoreMetadata(sourceCRS, operation.getSourceCRS())) {
+                    CoordinateOperationFactory factory = CRS.getCoordinateOperationFactory(true);
+                    try {
+                        try {
+                            // Try a transformation to the full target CRS including z dimension.
+                            operation = factory.createOperation(sourceCRS, crs);
+                        } catch (OperationNotFoundException e) {
+                            // Try a transformation to the target CRS without z dimension.
+                            assert !equalsIgnoreMetadata(reducedCRS, crs) : reducedCRS;
+                            operation = factory.createOperation(sourceCRS, reducedCRS);
+                        }
+                    } catch (FactoryException e) {
+                        throw new MismatchedReferenceSystemException(Errors.format(errorCode, e));
+                    }
+                }
+                try {
+                    candidate = CRS.transform(operation, candidate);
+                } catch (TransformException exception) {
+                    throw new MismatchedReferenceSystemException(Errors.format(errorCode, exception));
+                }
+            }
+            /*
+             * Increase the envelope in order to contains 'candidate'.
+             * The range of z-values will be included in the envelope.
+             */
+            final int dim = candidate.getDimension();
+            for (int i=0; i<=zDimension; i++) {
+                double min = envelope.getMinimum(i);
+                double max = envelope.getMaximum(i);
+                final double minimum, maximum;
+                if (i < dim) {
+                    minimum = candidate.getMinimum(i);
+                    maximum = candidate.getMaximum(i);
+                } else if (i == zDimension) {
+                    final NumberRange range = element.getZRange();
+                    minimum = range.getMinimum();
+                    maximum = range.getMaximum();
+                } else {
+                    minimum = NEGATIVE_INFINITY;
+                    maximum = POSITIVE_INFINITY;
+                }
+                boolean changed = false;
+                if (Double.isNaN(min) || minimum < min) {min = minimum; changed = true;}
+                if (Double.isNaN(max) || maximum > max) {max = maximum; changed = true;}
+                if (changed) {
+                    envelope.setRange(i, min, max);
+                }
+            }
+        }
+        return envelope;
+    }
+
     /**
      * Rethrows the exception in {@link #COMPARATOR} as a {@link RuntimeException}.
      * It gives an opportunity for implementations of {@link Element} to uses some
@@ -640,17 +783,16 @@ public class CoverageStack extends AbstractCoverage {
         }
         throw exception;
     }
-    
+
     /**
      * A comparator for {@link Element} sorting and binary search. This comparator uses the
      * middle <var>z</var> value as criterion. It must accepts {@link Double} objects as well
      * as {@link Element}, because binary search will mix those two kinds of object.
      */
-    private static final Comparator COMPARATOR = new Comparator() {
+    private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
         public int compare(final Object entry1, final Object entry2) {
             try {
-                return Double.compare(zFromObject(entry1),
-                                      zFromObject(entry2));
+                return Double.compare(zFromObject(entry1), zFromObject(entry2));
             } catch (IOException exception) {
                 throw new UndeclaredThrowableException(exception);
                 // Will be catch and rethrown as IOException
@@ -658,7 +800,7 @@ public class CoverageStack extends AbstractCoverage {
             }
         }
     };
-    
+
     /**
      * Returns the <var>z</var> value of the specified object. The specified
      * object may be a {@link Double} or an {@link Element} instance.
@@ -675,7 +817,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return getZ((Element) object);
     }
-    
+
     /**
      * Returns the middle <var>z</var> value. If the element has no <var>z</var> value
      * (for example if the <var>z</var> value is the time and the coverage is constant
@@ -684,7 +826,7 @@ public class CoverageStack extends AbstractCoverage {
     private static double getZ(final Element entry) throws IOException {
         return getZ(entry.getZRange());
     }
-    
+
     /**
      * Returns the <var>z</var> value in the middle of the specified range.
      * If the range is null, then this method returns {@link Double#NaN}.
@@ -703,7 +845,7 @@ public class CoverageStack extends AbstractCoverage {
                 return upper.doubleValue();
             }
         }
-        return Double.NaN;
+        return NaN;
     }
 
     /**
@@ -712,14 +854,15 @@ public class CoverageStack extends AbstractCoverage {
     private static boolean contains(final NumberRange range, final double z) {
         return z>=range.getMinimum() && z<=range.getMaximum();
     }
-    
+
     /**
      * Returns the bounding box for the coverage domain in coordinate system coordinates.
      */
+    @Override
     public Envelope getEnvelope() {
-        return (Envelope) envelope.clone();
+        return envelope.clone();
     }
-    
+
     /**
      * Returns the number of sample dimension in this coverage.
      */
@@ -731,7 +874,7 @@ public class CoverageStack extends AbstractCoverage {
             throw new IllegalStateException("Sample dimensions are undetermined.");
         }
     }
-    
+
     /**
      * Retrieve sample dimension information for the coverage.
      * For a grid coverage, a sample dimension is a band. The sample dimension information
@@ -747,7 +890,7 @@ public class CoverageStack extends AbstractCoverage {
             throw new IllegalStateException("Sample dimensions are undetermined.");
         }
     }
-    
+
     /**
      * Snaps the specified coordinate point to the coordinate of the nearest voxel available in
      * this coverage. First, this method locate the {@linkplain Element coverage element} at or
@@ -786,7 +929,7 @@ public class CoverageStack extends AbstractCoverage {
                 final double lowerZ = getZ(elements[index-1]);
                 final double upperZ = getZ(elements[index  ]);
                 assert !(z<=lowerZ || z>=upperZ) : z; // Use !(...) in order to accept NaN values.
-                if (Double.isNaN(upperZ) || z-lowerZ < upperZ-z) {
+                if (isNaN(upperZ) || z-lowerZ < upperZ-z) {
                     index--;
                     z = lowerZ;
                 } else {
@@ -827,7 +970,7 @@ public class CoverageStack extends AbstractCoverage {
             }
         }
     }
-    
+
     /**
      * Returns a message for exception.
      *
@@ -836,7 +979,7 @@ public class CoverageStack extends AbstractCoverage {
     private static String cannotEvaluate(final DirectPosition point) {
         return Errors.format(ErrorKeys.CANT_EVALUATE_$1, point);
     }
-    
+
     /**
      * Loads a single coverage for the specified element. All {@code evaluate(...)} methods
      * ultimately loads their coverages through this method. It provides a single place where
@@ -860,13 +1003,13 @@ public class CoverageStack extends AbstractCoverage {
          * CRS assertions (for debugging purpose).
          */
         final CoordinateReferenceSystem sourceCRS;
-        assert CRS.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
+        assert equalsIgnoreMetadata((sourceCRS = coverage.getCoordinateReferenceSystem()),
                CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) :
                sourceCRS + "\n\n" + crs;
         assert coverage.getNumSampleDimensions() == numSampleDimensions : coverage;
         return coverage;
     }
-    
+
     /**
      * Loads a single image at the given index.
      *
@@ -881,7 +1024,7 @@ public class CoverageStack extends AbstractCoverage {
         lowerZ     = upperZ     = getZ(zRange);
         lowerRange = upperRange = zRange;
     }
-    
+
     /**
      * Loads images for the given elements.
      *
@@ -894,7 +1037,7 @@ public class CoverageStack extends AbstractCoverage {
         final NumberRange upperRange = upperElement.getZRange();
         final Coverage lower = load(lowerElement);
         final Coverage upper = load(upperElement);
-        
+
         this.lower      = lower; // Set only when BOTH images are OK.
         this.upper      = upper;
         this.lowerZ     = getZ(lowerRange);
@@ -902,7 +1045,7 @@ public class CoverageStack extends AbstractCoverage {
         this.lowerRange = lowerRange;
         this.upperRange = upperRange;
     }
-    
+
     /**
      * Loads coverages required for a linear interpolation at the specified <var>z</var> value.
      * The loaded coverages will be stored in {@link #lower} and {@link #upper} fields. It is
@@ -920,7 +1063,7 @@ public class CoverageStack extends AbstractCoverage {
          * Check if currently loaded coverages
          * are valid for the requested z value.
          */
-        if ((z>=lowerZ && z<=upperZ) || (Double.isNaN(z) && Double.isNaN(lowerZ) && Double.isNaN(upperZ))) {
+        if ((z>=lowerZ && z<=upperZ) || (isNaN(z) && isNaN(lowerZ) && isNaN(upperZ))) {
             return true;
         }
         /*
@@ -1015,7 +1158,7 @@ public class CoverageStack extends AbstractCoverage {
         throw new OrdinateOutsideCoverageException(Errors.format(
                   ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$2, getName(), Zp), zDimension, getEnvelope());
     }
-    
+
     /**
      * Returns a point with the same number of dimensions than the specified coverage.
      * The number of dimensions must be {@link #zDimensions} or {@code zDimensions+1}.
@@ -1032,11 +1175,11 @@ public class CoverageStack extends AbstractCoverage {
             }
             coord = reducedPosition;
         } else {
-            assert CRS.equalsIgnoreMetadata(crs, targetCRS) : targetCRS;
+            assert equalsIgnoreMetadata(crs, targetCRS) : targetCRS;
         }
         return coord;
     }
-    
+
     /**
      * Returns a sequence of values for a given point in the coverage. The default implementation
      * delegates to the {@link #evaluate(DirectPosition, double[])} method.
@@ -1051,7 +1194,7 @@ public class CoverageStack extends AbstractCoverage {
     {
         return evaluate(coord, (double[]) null);
     }
-    
+
     /**
      * Returns a sequence of boolean values for a given point in the coverage.
      *
@@ -1061,6 +1204,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
+    @Override
     public synchronized boolean[] evaluate(final DirectPosition coord, boolean[] dest)
             throws CannotEvaluateException
     {
@@ -1081,7 +1225,7 @@ public class CoverageStack extends AbstractCoverage {
         final Coverage coverage = (z >= 0.5*(lowerZ+upperZ)) ? upper : lower;
         return coverage.evaluate(reduce(coord, coverage), dest);
     }
-    
+
     /**
      * Returns a sequence of byte values for a given point in the coverage.
      *
@@ -1091,6 +1235,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
+    @Override
     public synchronized byte[] evaluate(final DirectPosition coord, byte[] dest)
             throws CannotEvaluateException
     {
@@ -1116,7 +1261,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of integer values for a given point in the coverage.
      *
@@ -1126,6 +1271,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
+    @Override
     public synchronized int[] evaluate(final DirectPosition coord, int[] dest)
             throws CannotEvaluateException
     {
@@ -1151,7 +1297,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of float values for a given point in the coverage.
      *
@@ -1161,6 +1307,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
+    @Override
     public synchronized float[] evaluate(final DirectPosition coord, float[] dest)
             throws CannotEvaluateException
     {
@@ -1201,7 +1348,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of double values for a given point in the coverage.
      *
@@ -1211,6 +1358,7 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
+    @Override
     public synchronized double[] evaluate(final DirectPosition coord, double[] dest)
             throws CannotEvaluateException
     {
@@ -1220,7 +1368,7 @@ public class CoverageStack extends AbstractCoverage {
             if (dest == null) {
                 dest = new double[numSampleDimensions];
             }
-            Arrays.fill(dest, 0, numSampleDimensions, Double.NaN);
+            Arrays.fill(dest, 0, numSampleDimensions, NaN);
             return dest;
         }
         if (lower == upper) {
@@ -1234,14 +1382,14 @@ public class CoverageStack extends AbstractCoverage {
             final double lower = dest[i];
             final double upper = doubleBuffer[i];
             double value = lower + ratio*(upper-lower);
-            if (Double.isNaN(value)) {
-                if (!Double.isNaN(lower)) {
-                    assert Double.isNaN(upper) : upper;
+            if (isNaN(value)) {
+                if (!isNaN(lower)) {
+                    assert isNaN(upper) : upper;
                     if (contains(lowerRange, z)) {
                         value = lower;
                     }
-                } else if (!Double.isNaN(upper)) {
-                    assert Double.isNaN(lower) : lower;
+                } else if (!isNaN(upper)) {
+                    assert isNaN(lower) : lower;
                     if (contains(upperRange, z)) {
                         value = upper;
                     }
@@ -1251,7 +1399,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns the coverages to be used for the specified <var>z</var> value. Special cases:
      * <p>
@@ -1272,16 +1420,16 @@ public class CoverageStack extends AbstractCoverage {
      *
      * @since 2.3
      */
-    public synchronized List/*<Coverage>*/ coveragesAt(final double z) {
+    public synchronized List<Coverage> coveragesAt(final double z) {
         if (!seek(z)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         if (lower == upper) {
             return Collections.singletonList(lower);
         }
         return Arrays.asList(new Coverage[] {lower, upper});
     }
-    
+
     /**
      * Returns {@code true} if interpolation are enabled in the <var>z</var> value dimension.
      * Interpolations are enabled by default.
@@ -1289,46 +1437,46 @@ public class CoverageStack extends AbstractCoverage {
     public boolean isInterpolationEnabled() {
         return interpolationEnabled;
     }
-    
+
     /**
      * Enable or disable interpolations in the <var>z</var> value dimension.
      */
     public synchronized void setInterpolationEnabled(final boolean flag) {
         lower                = null;
         upper                = null;
-        lowerZ               = Double.POSITIVE_INFINITY;
-        upperZ               = Double.NEGATIVE_INFINITY;
+        lowerZ               = POSITIVE_INFINITY;
+        upperZ               = NEGATIVE_INFINITY;
         interpolationEnabled = flag;
     }
-    
+
     /**
      * Adds an {@link IIOReadWarningListener} to the list of registered warning listeners.
      */
     public void addIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.addIIOReadWarningListener(listener);
     }
-    
+
     /**
      * Removes an {@link IIOReadWarningListener} from the list of registered warning listeners.
      */
     public void removeIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.removeIIOReadWarningListener(listener);
     }
-    
+
     /**
      * Adds an {@link IIOReadProgressListener} to the list of registered progress listeners.
      */
     public void addIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.addIIOReadProgressListener(listener);
     }
-    
+
     /**
      * Removes an {@link IIOReadProgressListener} from the list of registered progress listeners.
      */
     public void removeIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.removeIIOReadProgressListener(listener);
     }
-    
+
     /**
      * Invoked automatically when an image is about to be loaded. The default implementation
      * logs the message in the {@code "org.geotools.coverage"} logger. Subclasses can override
@@ -1337,7 +1485,7 @@ public class CoverageStack extends AbstractCoverage {
      * @param record The log record. The message contains information about the images to load.
      */
     protected void logLoading(final LogRecord record) {
-        Logging.getLogger("org.geotools.coverage").log(record);
+        Logging.getLogger(CoverageStack.class).log(record);
     }
 
     /**
@@ -1369,10 +1517,11 @@ public class CoverageStack extends AbstractCoverage {
          * The record to log.
          */
         public LogRecord record;
-        
+
         /**
          * Reports that an image read operation is beginning.
          */
+        @Override
         public void imageStarted(ImageReader source, int imageIndex) {
             if (record != null) {
                 logLoading(record);

@@ -15,7 +15,9 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.event.ComponentEvent;
 import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,31 +25,50 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.event.EventListenerList;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.ShapefileRenderer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Not optimize Strategy, use a single bufferedImage. slow.
  * Must repaint everything each time.
  * @author Johann Sorel
  */
-public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
+public class SingleBufferedImageStrategy implements RenderingStrategy {
 
-    private Thread thread = null;
-    private BufferComponent comp = new BufferComponent();
+    private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
+    private final EventListenerList listeners = new EventListenerList();
+    private MapContext context = null;
+    private GTRenderer renderer = null;
+    private Envelope compMapArea = null;
+    private ReferencedEnvelope oldAreaOfInterest = null;
+    private Rectangle oldRect = null;
+    private final DrawingThread thread = new DrawingThread();
+    private final BufferComponent comp = new BufferComponent();
     private final MapContext buffercontext = new OneLayerContext();
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
-    private Envelope oldMapArea = null;
-    private Rectangle oldRect = null;
-    private int nbthread = 0;
+    
+    private double rotation = 0d;
 
     /**
      * create a default SingleBufferedImageStrategy
@@ -63,6 +84,29 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     public SingleBufferedImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();
+
+
+        comp.addComponentListener(new ComponentListener() {
+
+            public void componentResized(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentMoved(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentShown(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentHidden(ComponentEvent arg0) {
+                fit();
+            }
+        });
+
+        thread.start();
+
     }
 
     private void opimizeRenderer() {
@@ -88,53 +132,106 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     }
 
-    private void fit() {
-        if (thread != null && thread.isAlive()) {
-            mustupdate = true;
+    private Envelope fixAspectRatio(Rectangle rect, Envelope area, MapContext context) {
+
+        if (area == null && context != null) {
+            try {
+                area = context.getLayerBounds();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        if (area == null) {
+            return null;
+        }
+
+        double mapWidth = area.getWidth(); /* get the extent of the map */
+        double mapHeight = area.getHeight();
+        double scaleX = rect.getWidth() / area.getWidth(); /*
+         * calculate the new
+         * scale
+         */
+
+        double scaleY = rect.getHeight() / area.getHeight();
+        double scale = 1.0; // stupid compiler!
+
+        if (scaleX < scaleY) { /* pick the smaller scale */
+            scale = scaleX;
         } else {
-            mustupdate = true;
-            thread = new DrawingThread();
-            thread.start();
+            scale = scaleY;
         }
+
+        /* calculate the difference in width and height of the new extent */
+        double deltaX = /* Math.abs */ ((rect.getWidth() / scale) - mapWidth);
+        double deltaY = /* Math.abs */ ((rect.getHeight() / scale) - mapHeight);
+
+
+        /* create the new extent */
+        Coordinate ll = new Coordinate(area.getMinX() - (deltaX / 2.0), area.getMinY() - (deltaY / 2.0));
+        Coordinate ur = new Coordinate(area.getMaxX() + (deltaX / 2.0), area.getMaxY() + (deltaY / 2.0));
+
+        return new Envelope(ll, ur);
+    }
+
+    private void fit() {
+
+        if (checkAspect() && context != null) {
+            reset();
+        }
+
 
     }
 
-    private void raiseNB() {
-        nbthread++;
-        if (nbthread == 1) {
-            fireRenderingEvent(true);
-        }
-    }
-
-    private void lowerNB() {
-        nbthread--;
-        if (nbthread == 0) {
-            fireRenderingEvent(false);
-        }
-    }
-
-    private void checkAspect(boolean changed) {
+    private boolean checkAspect() {
+        boolean changed = false;
 
         Rectangle newRect = comp.getBounds();
 
-        if (!newRect.equals(oldRect)) {
-            changed = true;
-            oldRect = newRect;
-        }
+        ReferencedEnvelope newAreaOfInterest = null;
+        if (context != null) {
+            newAreaOfInterest = context.getAreaOfInterest();
 
-        if (mapArea != null) {
-
-            if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
+            if (newAreaOfInterest != null && (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest))) {
                 changed = true;
-                oldMapArea = mapArea;
-                context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
-            }
-
-            if (changed) {
-                changed = false;
-                fit();
+                oldRect = newRect;
+                oldAreaOfInterest = newAreaOfInterest;
             }
         }
+
+        return changed;
+    }
+
+    //------------------TRIGGERS------------------------------------------------
+    private void fireRenderingEvent(boolean isRendering) {
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.setRendering(isRendering);
+        }
+    }
+
+    private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
+        Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.mapAreaChanged(mce);
+        }
+
+    }
+
+    private void fireMapContextChanged(MapContext oldcontext, MapContext newContext) {
+        Map2DContextEvent mce = new Map2DContextEvent(this, oldcontext, newContext);
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.mapContextChanged(mce);
+        }
+
     }
 
     //-----------------------RenderingStrategy----------------------------------
@@ -161,7 +258,7 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
             //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
@@ -169,8 +266,25 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
             BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
 
+            
+            AffineTransform transform = null;
+            try{
+               AffineTransform  t1 = RendererUtilities.worldToScreenTransform(compMapArea, newRect, context.getCoordinateReferenceSystem());
+               transform = new AffineTransform(t1);
+                transform.rotate(rotation);
+            }catch (TransformException e){
+                e.printStackTrace();
+            }
+            
             renderer.setContext(context);
-            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            
+            if(transform != null){
+                renderer.paint((Graphics2D)ig, newRect, transform);
+            }else{                
+                renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
+            }
+            
+            
             return buf;
         } else {
             return null;
@@ -182,60 +296,156 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         return comp.getBuffer();
     }
 
-    public void reset() {
-        fit();
-    }
-
     public JComponent getComponent() {
         return comp;
     }
 
-    //------------------Abstract RenderingStrategy------------------------------
-    @Override
+    public void reset() {
+        compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+            mustupdate = true;
+            thread.wake();
+    }
+
+    public void setRenderer(GTRenderer renderer) {
+        this.renderer = renderer;
+    }
+
+    public GTRenderer getRenderer() {
+        return renderer;
+    }
+
+    public void setContext(MapContext context) {
+        if (this.context != null) {
+            this.context.removeMapLayerListListener(mapLayerListlistener);
+        }
+
+        this.context = context;
+
+        if (context != null) {
+            this.context.addMapLayerListListener(mapLayerListlistener);
+        }
+
+        fit();
+    }
+
+    public MapContext getContext() {
+        return context;
+    }
+
     public void setMapArea(Envelope area) {
-        super.setMapArea(area);
-        checkAspect(false);
+
+        if (context != null) {
+            Envelope env = fixAspectRatio(comp.getBounds(), area, context);
+            CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
+            if (env != null && crs != null) {
+                context.setAreaOfInterest(env, crs);
+            }
+            fit();
+        }
     }
 
-    protected void changedLayer(MapLayerListEvent event) {
-        fit();
+    public Envelope getMapArea() {
+        if (context == null) {
+            return null;
+        }
+        return context.getAreaOfInterest();
     }
 
-    protected void deletedLayer(MapLayerListEvent event) {
-        fit();
+    public void addStrategyListener(StrategyListener listener) {
+        listeners.add(StrategyListener.class, listener);
     }
 
-    protected void addedLayer(MapLayerListEvent event) {
-        fit();
+    public void removeStrategyListener(StrategyListener listener) {
+        listeners.remove(StrategyListener.class, listener);
     }
 
-    protected void movedLayer(MapLayerListEvent event) {
-        fit();
+    public StrategyListener[] getStrategyListeners() {
+        return listeners.getListeners(StrategyListener.class);
+    }
+    
+     public void setRotation(double d) {
+        rotation = d;
+        reset();
+    }
+
+    public double getRotation() {
+        return rotation;
     }
 
     //------------------------PRIVATES CLASSES----------------------------------
+    private class MapLayerListListen implements MapLayerListListener {
+
+        public void layerAdded(MapLayerListEvent event) {
+
+            if (context.getLayers().length == 1) {
+                try {
+                    setMapArea(context.getLayerBounds());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                reset();
+            }
+        }
+
+        public void layerRemoved(MapLayerListEvent event) {
+            reset();
+        }
+
+        public void layerChanged(MapLayerListEvent event) {
+            reset();
+        }
+
+        public void layerMoved(MapLayerListEvent event) {
+            reset();
+        }
+    }
+
     private class DrawingThread extends Thread {
 
         @Override
         public void run() {
-            raiseNB();
-            while (mustupdate) {
-                mustupdate = false;
-                if (context != null && mapArea != null) {
-                    comp.setBuffer(createBufferImage(context));
+
+            while (true) {
+                if (mustupdate) {
+                    mustupdate = false;
+                    fireRenderingEvent(true);
+                    if (context != null && compMapArea != null) {
+                        comp.setBuffer(createBufferImage(context));
+                    }
+                    fireRenderingEvent(false);
                 }
+
+                block();
             }
-            lowerNB();
+        }
+
+        public synchronized void wake() {
+            notifyAll();
+        }
+
+        private synchronized void block() {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     private class BufferComponent extends JComponent {
 
-        private BufferedImage img;
+        private BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
         public void setBuffer(BufferedImage buf) {
             img = buf;
-            repaint();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    repaint();
+                }
+            });
+
         }
 
         public BufferedImage getBuffer() {
@@ -249,6 +459,8 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
             }
         }
         }
+
+   
 }
     
     

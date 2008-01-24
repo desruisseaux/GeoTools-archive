@@ -16,6 +16,9 @@
  */
 package org.geotools.gce.arcgrid;
 
+import it.geosolutions.imageio.plugins.arcgrid.AsciiGridsImageMetadata;
+import it.geosolutions.imageio.plugins.arcgrid.spi.AsciiGridsImageReaderSpi;
+
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.renderable.ParameterBlock;
@@ -47,6 +50,7 @@ import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -56,8 +60,6 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.factory.Hints;
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
-import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.i18n.Vocabulary;
@@ -69,6 +71,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -81,8 +84,8 @@ import com.vividsolutions.jts.io.InStream;
  * This class can read an arc grid data source (ArcGrid or GRASS ASCII) and
  * create a {@link GridCoverage2D} from the data.
  * 
- * @author Daniele Romagnoli
- * @author Simone Giannecchini (simboss)
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini, GeoSolutions
  * @since 2.3.x
  */
 public final class ArcGridReader extends AbstractGridCoverage2DReader implements
@@ -138,7 +141,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Source management
 			//
 			// /////////////////////////////////////////////////////////////////////
-			checkSource(input, hints);
+			checkSource(input,hints);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -225,13 +228,14 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Checks the input prvided to this {@link ArcGridReader} and sets all the
+	 * Checks the input provided to this {@link ArcGridReader} and sets all the
 	 * other objects and flags accordingly.
 	 * 
 	 * @param input
-	 *            provied to this {@link ArcGridReader}.
+	 *            provided to this {@link ArcGridReader}.
 	 * @param hints
 	 *            Hints to be used by this reader throughout his life.
+	 * 
 	 * @throws UnsupportedEncodingException
 	 * @throws DataSourceException
 	 * @throws IOException
@@ -240,6 +244,22 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private void checkSource(Object input, final Hints hints)
 			throws UnsupportedEncodingException, DataSourceException,
 			IOException, FileNotFoundException {
+		
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		
+		
+		
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(
 					"No source set to read this coverage.");
@@ -402,23 +422,27 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
+		String overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
-			Parameter param;
-			String name;
 			for (int i = 0; i < length; i++) {
-				param = (Parameter) params[i];
-				name = param.getDescriptor().getName().getCode();
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
 				if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
 						.getName().toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
+					continue;
+				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
 				}
 			}
 		}
-		return createCoverage(readEnvelope, requestedDim);
+		return createCoverage(readEnvelope, requestedDim, overviewPolicy);
 	}
 
 	/**
@@ -433,9 +457,10 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim) throws IOException {
+			Rectangle requestedDim, String overviewPolicy) throws IOException {
 
 		if (!closeMe) {
+
 			inStream.reset();
 			inStream.mark();
 		}
@@ -455,7 +480,8 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, requestedDim);
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -583,7 +609,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 		// getting metadata
 		final Node root = gridMetadata
-				.getAsTree("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata_1.0");
+				.getAsTree("it.geosolutions.imageio.plugins.arcgrid.AsciiGridsImageMetadata_1.0");
 
 		// getting Grid Properties
 		Node child = root.getFirstChild();
@@ -621,7 +647,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Geotiff specification says that PixelIsArea map a pixel to the corner
+		// OGC specifications says that PixelIsArea map a pixel to the corner
 		// of the grid while PixelIsPoint map a pixel to the centre of the grid.
 		//
 		// /////////////////////////////////////////////////////////////////////
@@ -708,7 +734,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 											e);
 						}
 				}
-
 			}
 		}
 		if (crs == null) {
@@ -717,7 +742,5 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 					"Unable to find crs, continuing with default WGS4 CRS")
 					.append("\n").append(crs.toWKT()).toString());
 		}
-
 	}
-
 }

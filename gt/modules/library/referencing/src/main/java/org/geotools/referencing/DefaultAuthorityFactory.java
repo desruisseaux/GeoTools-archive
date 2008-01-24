@@ -16,16 +16,19 @@
 package org.geotools.referencing;
 
 import java.util.Set;
-import java.util.Collections;
+import java.util.List;
 import java.util.LinkedHashSet;
 
 import org.opengis.metadata.Identifier;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.ManyAuthoritiesFactory;
 import org.geotools.referencing.factory.ThreadedAuthorityFactory;
+import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
@@ -45,6 +48,14 @@ import org.geotools.referencing.factory.ThreadedAuthorityFactory;
  */
 final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements CRSAuthorityFactory {
     /**
+     * List of codes without authority space. We can not defines them in an ordinary
+     * authority factory.
+     */
+    private static List<String> AUTHORITY_LESS = UnmodifiableArrayList.wrap(new String[] {
+        "WGS84(DD)"  // (longitude,latitude) with decimal degrees.
+    });
+
+    /**
      * Creates a new authority factory with the specified hints.
      */
     DefaultAuthorityFactory(final Hints hints) {
@@ -56,8 +67,7 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
     static Set<String> getSupportedCodes(final String authority) {
-        Set<String> result = Collections.emptySet();
-        boolean isSetCopied = false;
+        final Set<String> result = new LinkedHashSet<String>(AUTHORITY_LESS);
         for (final CRSAuthorityFactory factory : ReferencingFactoryFinder.getCRSAuthorityFactories(null)) {
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 final Set<String> codes;
@@ -73,16 +83,8 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
                     CRS.unexpectedException("getSupportedCodes", exception);
                     continue;
                 }
-                if (codes!=null && !codes.isEmpty()) {
-                    if (result.isEmpty()) {
-                        result = codes;
-                    } else {
-                        if (!isSetCopied) {
-                            result = new LinkedHashSet<String>(result);
-                            isSetCopied = true;
-                        }
-                        result.addAll(codes);
-                    }
+                if (codes != null) {
+                    result.addAll(codes);
                 }
             }
         }
@@ -104,5 +106,22 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns the coordinate reference system for the given code.
+     */
+    @Override
+    public CoordinateReferenceSystem createCoordinateReferenceSystem(String code)
+            throws FactoryException
+    {
+        if (code != null) {
+            code = code.trim();
+            if (code.equalsIgnoreCase("WGS84(DD)")) {
+                return DefaultGeographicCRS.WGS84;
+            }
+        }
+        assert !AUTHORITY_LESS.contains(code) : code;
+        return super.createCoordinateReferenceSystem(code);
     }
 }

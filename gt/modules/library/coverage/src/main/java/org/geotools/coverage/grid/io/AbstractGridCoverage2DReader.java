@@ -25,7 +25,9 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,17 +40,19 @@ import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
@@ -58,7 +62,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -78,24 +82,16 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @since 2.3
- * @version 0.2
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
-
+    
 	/** The {@link Logger} for this {@link AbstractGridCoverage2DReader}. */
-	private final static Logger LOGGER = Logging.getLogger("org.geotools.data.coverage.grid");
-
-	/** Caches a default GridCoverageFactory for usage in plugins. */
-	protected final static GridCoverageFactory coverageFactory = CoverageFactoryFinder
-			.getGridCoverageFactory(null);
+	private final static Logger LOGGER = Logging
+			.getLogger("org.geotools.data.coverage.grid");
 
 	protected static final double EPS = 1E-6;
 
-	   /** Buffered factory for coordinate operations. */
-    protected final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
-            new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
-    
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
 	 * data
@@ -107,11 +103,10 @@ public abstract class AbstractGridCoverage2DReader implements
 			Color.WHITE };
 
 	/**
-	 * This contains the maximum number of grid coverages in the file/stream.
-	 * Until multi-image files are supported, this is going to be 0 or 1.
+	 * This contains the  number of overviews.aaa
 	 */
-	protected volatile int numOverviews = 0;
-
+	protected int numOverviews = 0;
+	
 	/** 2DGridToWorld math transform. */
 	protected MathTransform raster2Model = null;
 
@@ -128,7 +123,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected Object source = null;
 
 	/** Hints used by the {@link AbstractGridCoverage2DReader} subclasses. */
-	protected Hints hints = new Hints(new HashMap(5,1.0f));
+	protected Hints hints = GeoTools.getDefaultHints();
 
 	/**
 	 * Highest resolution availaible for this reader.
@@ -159,11 +154,155 @@ public abstract class AbstractGridCoverage2DReader implements
 	/** Resolutions avialaible through an overviews based mechanism. */
 	protected double[][] overViewResolutions = null;
 
+	/**
+	 * {@link GridCoverageFactory} instance.
+	 */
+	protected GridCoverageFactory coverageFactory;
+
 	// -------------------------------------------------------------------------
 	//
 	// old support methods
 	//
 	// -------------------------------------------------------------------------
+	
+	/**
+	 * This method is responsible for preparing the read param for doing an
+	 * {@link ImageReader#read(int, ImageReadParam)}.
+	 * 
+	 * 
+	 * <p>
+	 * This method is responsible for preparing the read param for doing an
+	 * {@link ImageReader#read(int, ImageReadParam)}. It sets the passed
+	 * {@link ImageReadParam} in terms of decimation on reading using the
+	 * provided requestedEnvelope and requestedDim to evaluate the needed
+	 * resolution. It also returns and {@link Integer} representing the index of
+	 * the raster to be read when dealing with multipage raster.
+	 * 
+	 * @param overviewPolicy
+	 *            it can be one of {@link Hints#VALUE_OVERVIEW_POLICY_IGNORE},
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST},
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_QUALITY} or
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_SPEED}. It specifies the
+	 *            policy to compute the overviews level upon request.
+	 * @param readP
+	 *            an instance of {@link ImageReadParam} for setting the
+	 *            subsampling factors.
+	 * @param requestedEnvelope
+	 *            the {@link GeneralEnvelope} we are requesting.
+	 * @param requestedDim
+	 *            the requested dimensions.
+	 * @return the index of the raster to read in the underlying data source.
+	 * @throws IOException
+	 * @throws TransformException
+	 */
+	protected Integer setReadParams(String overviewPolicy,ImageReadParam readP,
+			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
+			throws IOException, TransformException {
+		
+		// //
+		//
+		// Default image index 0
+		//
+		// //
+		Integer imageChoice = new Integer(0);
+		
+		// we are able to handle overviews properly only if the transformation
+		// is  an affine transform with pure scale and translation, no rotational
+		// components
+		if (raster2Model != null && !isScaleTranslate(raster2Model))
+			return imageChoice;
+		
+		// //
+		//
+		// Init overview policy
+		//
+		// //
+		// when policy is explictly provided it overrides the policy provided
+		// using hints.
+		if(overviewPolicy==null||overviewPolicy.length()<=0)
+		overviewPolicy = extractOverviewPolicy();
+		
+		
+		// //
+		//
+		// default values for subsampling
+		//
+		// //
+		readP.setSourceSubsampling(1, 1, 0, 0);
+
+		// //
+		//
+		// requested to ignore overviews
+		//
+		// //
+		if (overviewPolicy.equalsIgnoreCase(Hints.VALUE_OVERVIEW_POLICY_IGNORE))
+			return imageChoice;
+
+		// //
+		//
+		// Am I going to decimate or to use overviews? If this file has only
+		// one page we use decimation, otherwise we use the best page available.
+		// Future versions should use both.
+		//
+		// //
+		final boolean useOverviews = (numOverviews >0) ? true : false;
+
+		// //
+		//
+		// Resolution requested. I am here computing the resolution required by
+		// the user.
+		//
+		// //
+		double[] requestedRes = getResolution(requestedEnvelope, requestedDim,
+				crs);
+		if (requestedRes == null)
+			return imageChoice;
+
+		// //
+		//
+		// overviews or decimation
+		//
+		// //
+		if (useOverviews) 
+			imageChoice= getOverviewImage(overviewPolicy, requestedRes);
+		
+		// /////////////////////////////////////////////////////////////////////
+		// DECIMATION ON READING
+		// /////////////////////////////////////////////////////////////////////
+		decimationOnReadingControl(imageChoice, readP, requestedRes);
+		return imageChoice;
+
+	}
+
+	/**
+	 * This method is responsible for checking the overview policy as defined by
+	 * the provided {@link Hints}.
+	 * 
+	 * @return the overview policy which can be one of
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_IGNORE},
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST},
+	 *         {@link Hints#VALUE_OVERVIEW_POLICY_SPEED}, {@link Hints#VALUE_OVERVIEW_POLICY_QUALITY}.
+	 *         Default is {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST}.
+	 */
+	private String extractOverviewPolicy() {
+		String overviewPolicy=null;
+		// check if a policy was provided using hints (check even the
+		// deprecated one)
+		if (this.hints != null)
+			if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
+				overviewPolicy = (String) this.hints.get(Hints.OVERVIEW_POLICY);
+			else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
+				overviewPolicy = ((Boolean) this.hints
+						.get(Hints.IGNORE_COVERAGE_OVERVIEW)).booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
+						: hints.VALUE_OVERVIEW_POLICY_QUALITY;
+
+		// use default if not provided. Default is nearest
+		if (overviewPolicy == null || overviewPolicy.length() == 0)
+			overviewPolicy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
+		assert overviewPolicy!=null&&overviewPolicy.length()>0;
+		return overviewPolicy;
+	}
+	
 	/**
 	 * This method is responsible for preparing the read param for doing an
 	 * {@link ImageReader#read(int, ImageReadParam)}.
@@ -187,24 +326,13 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return the index of the raster to read in the underlying data source.
 	 * @throws IOException
 	 * @throws TransformException
+	 * @deprecated use
+	 *             {@link #setReadParams(String, ImageReadParam, GeneralEnvelope, Rectangle)}
+	 *             instead and set the policy for overviews.
 	 */
 	protected Integer setReadParams(ImageReadParam readP,
 			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
 			throws IOException, TransformException {
-
-		readP.setSourceSubsampling(1, 1, 0, 0);// default values for
-		// subsampling
-		// //
-		//
-		// Default image index 0
-		//
-		// //
-		Integer imageChoice = new Integer(0);
-        
-		// we are able to handle overviews properly only if the transformation is
-        // an affine transform with pure scale and translation, no rotational components
-        if(raster2Model != null && !isScaleTranslate(raster2Model))
-            return imageChoice;
 
 		// //
 		//
@@ -213,99 +341,118 @@ public abstract class AbstractGridCoverage2DReader implements
 		// //
 		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
 		if (o != null && ((Boolean) o).booleanValue()) {
-			return imageChoice;
+			return setReadParams(Hints.VALUE_OVERVIEW_POLICY_IGNORE, readP, requestedEnvelope, requestedDim);
 
 		}
-
-		// //
-		//
-		// Am I going to decimate or to use overviews? If this geotiff has only
-		// one page we use decimation, otherwise we use the best page avalabile.
-		// Future versions should use both.
-		//
-		// //
-		final boolean decimate = (numOverviews <= 0) ? true : false;
-
-		// //
-		//
-		// Resolution requested. I am here computing the resolution required by
-		// the user.
-		//
-		// //
-		double[] requestedRes = getResolution(requestedEnvelope, requestedDim,
-				crs);
-		if (requestedRes == null)
-			return imageChoice;
-
-		// //
-		//
-		// overviews or decimation
-		//
-		// //
-		if (!decimate) {
-			// /////////////////////////////////////////////////////////////////////
-			// OVERVIEWS
-			// /////////////////////////////////////////////////////////////////////
-			// Should we leave now? In case the resolution of the first level is
-			// already lower than the requested one we should use the first
-			// level and leave.
-			if (highestRes[0] - requestedRes[0] > EPS
-					&& highestRes[1] - requestedRes[1] > EPS)
-				return imageChoice;
-
-			// Should we leave now? In case the resolution of the first level is
-			// already lower than the requested one we should use the first
-			// level and leave.
-			int axis = 0;
-			if (requestedRes[0] - requestedRes[1] > EPS)
-				axis = 1;
-
-			// //
-			//
-			// looking for the overview with the highest lower resolution
-			// compared
-			// to the requested one.
-			// This ensure more speed but less quality. In the future we should
-			// provide a hint to control this behaviour.
-			//
-			// //
-			double actRes;
-			int i = 0;
-			for (; i < numOverviews; i++) {
-				actRes = (axis == 0) ? overViewResolutions[i][0]
-						: overViewResolutions[i][1];
-				// is actual resolution lower than the requested resolution?
-				if (actRes - requestedRes[axis] > EPS) {
-
-					i--;
-					break;
-
-				}
-
-			}
-			// checking that we did not exceeded the maximum number of pages.
-			if (i == numOverviews) {
-				// int subsamplingFactor=
-				imageChoice = new Integer(numOverviews);
-			} else
-				// keeping the first image at highest resolution into account in
-				// order to get the overview wit
-				imageChoice = new Integer(i + 1);
-		}
-		// /////////////////////////////////////////////////////////////////////
-		// DECIMATION ON READING
-		// /////////////////////////////////////////////////////////////////////
-		decimationOnReadingControl(imageChoice, readP, requestedRes);
-		return imageChoice;
+		return setReadParams(Hints.VALUE_OVERVIEW_POLICY_QUALITY, readP, requestedEnvelope, requestedDim);
+		
 	}
+
+	private Integer getOverviewImage(String policy, double[] requestedRes) {
+	    // setup policy
+        if(policy == null||policy.length()<=0)
+        	policy=extractOverviewPolicy();
+        
+        // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
+        // keeping a reference to the original image choice
+        final List<Resolution> resolutions = new ArrayList<Resolution>();
+        resolutions.add(new Resolution(highestRes[0], highestRes[1], 0));
+        for (int i = 0; i < overViewResolutions.length; i++) {
+            resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i+1));
+        }
+        Collections.sort(resolutions);
+
+        // Now search for the best matching resolution. 
+        // Check also for the "perfect match"... unlikely in practice unless someone
+        // tunes the clients to request exactly the resolution embedded in
+        // the overviews, something a perf sensitive person might do in fact
+        
+        // the requested resolutions
+        final double reqx = requestedRes[0];
+        final double reqy = requestedRes[1];
+        
+        // are we looking for a resolution even higher than the native one?
+        Resolution max = (Resolution) resolutions.get(0);
+        if(reqx < max.x && reqy < max.y ||
+               (Math.abs(reqx - max.x) < EPS && Math.abs(reqy - max.y) < EPS))
+            return max.imageChoice;
+        // are we looking for a resolution even lower than the smallest overview?
+        Resolution min = (Resolution) resolutions.get(resolutions.size() - 1);
+        if(reqx > min.x && reqy > min.y ||
+                (Math.abs(reqx - min.x) < EPS && Math.abs(reqy - min.y) < EPS))
+            return min.imageChoice;
+        // Ok, so we know the overview is between min and max, skip the first
+        // and search for an overview with a resolution lower than the one requested,
+        // that one and the one from the previous step will bound the searched resolution
+        Resolution prev = max;
+        for (int i = 1; i < resolutions.size(); i++) {
+            Resolution curr = (Resolution) resolutions.get(i);
+            // perfect match check
+            if((Math.abs(reqx - curr.x) < EPS && Math.abs(reqy - curr.y) < EPS)) {
+                return curr.imageChoice;
+            }
+            
+            // middle check. The first part of the condition should be sufficient, but
+            // there are cases where the x resolution is satisfied by the lowest resolution, 
+            // the y by the one before the lowest (so the aspect ratio of the request is 
+            // different than the one of the overviews), and we would end up going out of the loop
+            // since not even the lowest can "top" the request for one axis 
+            if(curr.x > reqx && curr.y > reqy || i == resolutions.size() - 1) {
+                if(policy == Hints.VALUE_OVERVIEW_POLICY_QUALITY)
+                    return prev.imageChoice;
+                else if(policy == Hints.VALUE_OVERVIEW_POLICY_SPEED)
+                    return curr.imageChoice;
+                else if(reqx - prev.x < curr.x - reqx)
+                    return prev.imageChoice;
+                else
+                    return curr.imageChoice;
+            }
+            prev = curr;
+        }
+        throw new RuntimeException("There is an error in the resolution lookup code");
+    }
+	
+	/**
+	 * Simple support class for sorting overview resolutions
+	 * @author Andrea Aime
+	 * @since 2.5
+	 */
+	private static class Resolution implements Comparable<Resolution> {
+	    double x;
+	    double y;
+	    int imageChoice;
+	    
+        public Resolution(double x, double y, int imageChoice) {
+            super();
+            this.x = x;
+            this.y = y;
+            this.imageChoice = imageChoice;
+        }
+	    
+	    public int compareTo(Resolution other) {
+	        if(x > other.x)
+	            return 1;
+	        else if(x < other.x)
+	            return -1;
+	        else if(y > other.y)
+                return 1;
+            else
+                return -1;
+	    }
+	    
+	    public String toString() {
+	        return "Resolution[Choice=" + imageChoice + ",x=" + x + ",y=" + y + "]";
+	    }
+	}
+	
 
 	/**
 	 * This method is responsible for evaluating possible subsampling factors
 	 * once the best resolution level has been found, in case we have support
 	 * for overviews, or starting from the original coverage in case there are
-	 * no overviews availaible.
+	 * no overviews available.
 	 * 
-	 * Anyhow this methof should not be called directly but subclasses should
+	 * Anyhow this method should not be called directly but subclasses should
 	 * make use of the setReadParams method instead in order to transparently
 	 * look for overviews.
 	 * 
@@ -378,7 +525,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
 	 * the {@link #originalEnvelope} that was provided for this coverage.
 	 * 
-	 * @param image contains the data for the coverage to create.
+	 * @param image
+	 *            contains the data for the coverage to create.
 	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
@@ -387,23 +535,25 @@ public abstract class AbstractGridCoverage2DReader implements
 		return createImageCoverage(image, null);
 
 	}
-	
+
 	/**
 	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
 	 * the {@link #raster2Model} that was provided for this coverage.
 	 * 
 	 * <p>
-	 * This method is vital when working with coverages that have a raster to model transformation
-	 * that is not a simple scale and translate.
+	 * This method is vital when working with coverages that have a raster to
+	 * model transformation that is not a simple scale and translate.
 	 * 
-	 * @param image contains the data for the coverage to create.
-	 * @param raster2Model is the {@link MathTransform} that maps from the 
-	 * 		  raster space to the model space.
+	 * @param image
+	 *            contains the data for the coverage to create.
+	 * @param raster2Model
+	 *            is the {@link MathTransform} that maps from the raster space
+	 *            to the model space.
 	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
-	protected final GridCoverage createImageCoverage(PlanarImage image, MathTransform raster2Model)
-			throws IOException {
+	protected final GridCoverage createImageCoverage(PlanarImage image,
+			MathTransform raster2Model) throws IOException {
 
 		// deciding the number range
 		NumberRange geophysicRange = null;
@@ -513,16 +663,17 @@ public abstract class AbstractGridCoverage2DReader implements
 			bands[i] = new GridSampleDimension(names[i],
 					new Category[] { values }, null).geophysics(true);
 		}
-		
+
 		// creating coverage
 		if (raster2Model != null) {
-		        return coverageFactory.create(coverageName, image, crs,
-		                        raster2Model, bands, null, null);
+			return coverageFactory.create(coverageName, image, crs,
+					raster2Model, bands, null, null);
 		}
 		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
 				originalEnvelope), bands, null, null);
 
 	}
+
 	/**
 	 * Creates a {@link GridCoverage} for a coverage that is not a simple image
 	 * but that contains complex dadta from measurements.
@@ -589,20 +740,17 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param crs
 	 * @throws DataSourceException
 	 */
-	protected final double[] getResolution(GeneralEnvelope envelope,
+	protected final static double[] getResolution(GeneralEnvelope envelope,
 			Rectangle2D dim, CoordinateReferenceSystem crs)
 			throws DataSourceException {
 		double[] requestedRes = null;
 		try {
-			if (dim != null && envelope != null) {
+			if (dim != null && envelope != null&&crs!=null) {
 				// do we need to transform the originalEnvelope?
-				final CoordinateReferenceSystem crs2D = CRSUtilities
-						.getCRS2D(envelope.getCoordinateReferenceSystem());
-
-				if (crs != null
-						&& !CRS.equalsIgnoreMetadata(crs, crs2D)) {
-					final MathTransform tr = CRS.findMathTransform(
-							crs2D, crs);
+				final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(
+						envelope.getCoordinateReferenceSystem());
+				if (crs2D != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
+					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
 					if (!tr.isIdentity())
 						envelope = CRS.transform(tr, envelope);
 				}
@@ -612,9 +760,9 @@ public abstract class AbstractGridCoverage2DReader implements
 			}
 			return requestedRes;
 		} catch (TransformException e) {
-			throw new DataSourceException("Unable to get the resolution", e);
+			throw new DataSourceException("Unable to get resolution", e);
 		} catch (FactoryException e) {
-			throw new DataSourceException("Unable to get the resolution", e);
+			throw new DataSourceException("Unable to get resolution", e);
 		}
 	}
 
@@ -649,6 +797,42 @@ public abstract class AbstractGridCoverage2DReader implements
 	 */
 	public final GeneralEnvelope getOriginalEnvelope() {
 		return originalEnvelope;
+	}
+	
+	/**
+	 * Retrieves the original grid to world transformation for this
+	 * {@link AbstractGridCoverage2DReader}.
+	 * 
+	 * @param pixInCell specifies the datum of the transformation we want.
+	 * @return the original grid to world transformation for this
+	 *         {@link AbstractGridCoverage2DReader}.
+	 */
+	public final MathTransform getOriginalGridToWorld(final PixelInCell pixInCell) {
+	    synchronized (this) {
+	        if(raster2Model==null){
+	            final GridToEnvelopeMapper geMapper= new GridToEnvelopeMapper(this.originalGridRange,this.originalEnvelope);
+	            geMapper.setGridType(PixelInCell.CELL_CENTER);
+	            raster2Model=geMapper.createTransform();
+	        }
+	    }
+
+	    //we do not have to change the pixel datum
+	    if( pixInCell==PixelInCell.CELL_CENTER)
+	        return raster2Model;
+
+	    //we do have to change the pixel datum
+	    if(raster2Model instanceof AffineTransform){
+	        final AffineTransform tr= new AffineTransform((AffineTransform) raster2Model);
+	        tr.concatenate(AffineTransform.getTranslateInstance(-0.5,-0.5));
+	        return ProjectiveTransform.create(tr);
+	    }
+	    if(raster2Model instanceof IdentityTransform){
+	        final AffineTransform tr= new AffineTransform(1,0,0,1,0,0);
+	        tr.concatenate(AffineTransform.getTranslateInstance(-0.5,-0.5));
+	        return ProjectiveTransform.create(tr);
+	    }
+	    throw new IllegalStateException("This reader's grid to world transform is invalud!");
+
 	}
 
 	/**
@@ -727,16 +911,18 @@ public abstract class AbstractGridCoverage2DReader implements
 	public int getGridCoverageCount() {
 		throw new UnsupportedOperationException("Unsupported opertion.");
 	}
-    
-    /**
-     * Checks the transformation is a pure scale/translate instance (using a tolerance)
-     * @param transform
-     * @return
-     */
-    protected final boolean isScaleTranslate(MathTransform transform) {
-        if(!(transform instanceof AffineTransform))
-            return false;
-        AffineTransform at = (AffineTransform) transform;
-        return at.getShearX() < EPS && at.getShearY() < EPS;
-    }
+
+	/**
+	 * Checks the transformation is a pure scale/translate instance (using a
+	 * tolerance)
+	 * 
+	 * @param transform
+	 * @return
+	 */
+	protected final static boolean isScaleTranslate(MathTransform transform) {
+		if (!(transform instanceof AffineTransform))
+			return false;
+		AffineTransform at = (AffineTransform) transform;
+		return at.getShearX() < EPS && at.getShearY() < EPS;
+	}
 }

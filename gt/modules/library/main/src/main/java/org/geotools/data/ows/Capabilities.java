@@ -25,6 +25,7 @@ import java.util.List;
 public class Capabilities {
     private Service service;
 	private String version;
+	private String updateSequence;
     /**
      * The Service contains metadata about the OWS.
      * 
@@ -56,4 +57,19 @@ public class Capabilities {
 	public void setVersion(String version) {
 	    this.version = version;
 	}
+	
+	/**
+	 * @return the updateSequence
+	 */
+	public String getUpdateSequence() {
+		return updateSequence;
+	}
+
+	/**
+	 * @param updateSequence the updateSequence to set
+	 */
+	public void setUpdateSequence(String updateSequence) {
+		this.updateSequence = updateSequence;
+	}
+	
 }

@@ -15,56 +15,101 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.event.ComponentEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
-import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import javax.swing.event.EventListenerList;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * optimized strategy using a Volatile image stored on graphic card memory
- * fast rendering. must redraw everything each time.
+ * Not optimize Strategy, use a single bufferedImage. slow.
+ * Must repaint everything each time.
  * @author Johann Sorel
  */
-public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
+public class SingleVolatileImageStrategy implements RenderingStrategy {
 
-    
-    private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    private final MapContext buffercontext = new OneLayerContext();
-    private final BufferComponent comp = new BufferComponent(this);        
-    private Envelope oldMapArea = null;
+    private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
+    private final EventListenerList listeners = new EventListenerList();
+    private MapContext context = null;
+    private GTRenderer renderer = null;
+    private Envelope compMapArea = null;
+    private ReferencedEnvelope oldAreaOfInterest = null;
     private Rectangle oldRect = null;
-    private int nbthread = 0;
+    private final DrawingThread drawingThread = new DrawingThread();
+    private final RepaintingThread paintingThread = new RepaintingThread();
+    private final BufferComponent comp = new BufferComponent();
+    private final MapContext buffercontext = new OneLayerContext();
+    private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    private boolean mustupdate = false;
+    private boolean isDrawing = false;
+    
+    private double rotation = 0d;
 
     /**
-     * create a default SingleVolatileImageStrategy
+     * create a default SingleBufferedImageStrategy
      */
     public SingleVolatileImageStrategy() {
         this(new ShapefileRenderer());
     }
 
     /**
-     * create a default SingleVolatileImageStrategy with a specific GTRenderer
+     * create a default SingleBufferedImageStrategy with a specific GTRenderer
      * @param renderer
      */
     public SingleVolatileImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();
+
+
+        comp.addComponentListener(new ComponentListener() {
+
+            public void componentResized(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentMoved(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentShown(ComponentEvent arg0) {
+                fit();
+            }
+
+            public void componentHidden(ComponentEvent arg0) {
+                fit();
+            }
+        });
+
+        drawingThread.start();
+        paintingThread.start();
+
     }
 
     private void opimizeRenderer() {
@@ -90,15 +135,88 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
     }
 
+    private Envelope fixAspectRatio(Rectangle rect, Envelope area, MapContext context) {
+
+        if (area == null && context != null) {
+            try {
+                area = context.getLayerBounds();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        if (area == null) {
+            return null;
+        }
+
+        double mapWidth = area.getWidth(); /* get the extent of the map */
+        double mapHeight = area.getHeight();
+        double scaleX = rect.getWidth() / area.getWidth(); /*
+         * calculate the new
+         * scale
+         */
+
+        double scaleY = rect.getHeight() / area.getHeight();
+        double scale = 1.0; // stupid compiler!
+
+        if (scaleX < scaleY) { /* pick the smaller scale */
+            scale = scaleX;
+        } else {
+            scale = scaleY;
+        }
+
+        /* calculate the difference in width and height of the new extent */
+        double deltaX = /* Math.abs */ ((rect.getWidth() / scale) - mapWidth);
+        double deltaY = /* Math.abs */ ((rect.getHeight() / scale) - mapHeight);
+
+
+        /* create the new extent */
+        Coordinate ll = new Coordinate(area.getMinX() - (deltaX / 2.0), area.getMinY() - (deltaY / 2.0));
+        Coordinate ur = new Coordinate(area.getMaxX() + (deltaX / 2.0), area.getMaxY() + (deltaY / 2.0));
+
+        return new Envelope(ll, ur);
+    }
+
+    private void fit() {
+
+        if (checkAspect() && context != null) {
+            compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+            mustupdate = true;
+            drawingThread.wake();
+            paintingThread.wake();
+        }
+
+
+    }
+
+    private boolean checkAspect() {
+        boolean changed = false;
+
+        Rectangle newRect = comp.getBounds();
+
+        ReferencedEnvelope newAreaOfInterest = null;
+        if (context != null) {
+            newAreaOfInterest = context.getAreaOfInterest();
+
+            if (newAreaOfInterest != null && (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest))) {
+                changed = true;
+                oldRect = newRect;
+                oldAreaOfInterest = newAreaOfInterest;
+            }
+        }
+
+        return changed;
+    }
+
     private synchronized void renderOn(Graphics2D ig) {
 
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
             getRenderer().setContext(context);
             try {
-                getRenderer().paint((Graphics2D) ig, mapRectangle, mapArea);
+                getRenderer().paint((Graphics2D) ig, mapRectangle, context.getAreaOfInterest());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,61 +229,49 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
 
-        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
             return GC.createCompatibleVolatileImage(mapRectangle.width, mapRectangle.height, VolatileImage.TRANSLUCENT);
         } else {
             return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
         }
     }
 
-    private void fit() {
-        if (context != null && mapArea != null) {
-            comp.refresh();
+
+    //------------------TRIGGERS------------------------------------------------
+    private void fireRenderingEvent(boolean isRendering) {
+
+        isDrawing = isRendering;
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.setRendering(isRendering);
         }
     }
-    
-    
-    private synchronized void raiseNB() {
-        nbthread++;
-        if (nbthread == 1) {
-            fireRenderingEvent(true);
+
+    private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
+        Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.mapAreaChanged(mce);
         }
+
     }
 
-    private synchronized void lowerNB() {
-        nbthread--;
-        if (nbthread == 0) {
-            fireRenderingEvent(false);
+    private void fireMapContextChanged(MapContext oldcontext, MapContext newContext) {
+        Map2DContextEvent mce = new Map2DContextEvent(this, oldcontext, newContext);
+
+        StrategyListener[] lst = getStrategyListeners();
+
+        for (StrategyListener l : lst) {
+            l.mapContextChanged(mce);
         }
+
     }
-    
-    private void checkAspect(boolean changed){
-                
-        Rectangle newRect = comp.getBounds();
 
-        if (!newRect.equals(oldRect)) {
-            changed = true;
-            oldRect = newRect;
-        }
-
-        if ( mapArea != null ) {
-
-            if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
-                changed = true;
-                oldMapArea = mapArea;
-                context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
-            }
-
-            if (changed) {
-                changed = false;
-                fit();
-            }
-        }
-    }
-    
-    
-
-    //--------------------RenderingStrategy-------------------------------------
+    //-----------------------RenderingStrategy----------------------------------
     public synchronized BufferedImage createBufferImage(MapLayer layer) {
 
         if (context != null) {
@@ -189,7 +295,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
             //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
@@ -198,190 +304,215 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             Graphics2D ig = buf.createGraphics();
 
             renderer.setContext(context);
-            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
             return buf;
         } else {
             return null;
         }
 
     }
-    
-    public BufferedImage getBufferImage() {
-        return comp.getSnapShot();
-    }
 
-    public void reset() {
-       checkAspect(true);
+    public BufferedImage getBufferImage() {
+        return comp.getBuffer();
     }
 
     public JComponent getComponent() {
         return comp;
     }
 
-    
+    public void reset() {
+        fit();
+    }
 
-    //------------------Abstract RenderingStrategy------------------------------    
-    
-    @Override
+    public void setRenderer(GTRenderer renderer) {
+        this.renderer = renderer;
+    }
+
+    public GTRenderer getRenderer() {
+        return renderer;
+    }
+
+    public void setContext(MapContext context) {
+        if (this.context != null) {
+            this.context.removeMapLayerListListener(mapLayerListlistener);
+        }
+
+        this.context = context;
+
+        if (context != null) {
+            this.context.addMapLayerListListener(mapLayerListlistener);
+        }
+
+        fit();
+    }
+
+    public MapContext getContext() {
+        return context;
+    }
+
     public void setMapArea(Envelope area) {
-        super.setMapArea(area);
-        checkAspect(false);
-    }
-    
-    protected void deletedLayer(MapLayerListEvent event) {
-        fit();
+
+        if (context != null) {
+            Envelope env = fixAspectRatio(comp.getBounds(), area, context);
+            CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
+            if (env != null && crs != null) {
+                context.setAreaOfInterest(env, crs);
+            }
+            fit();
+        }
     }
 
-    protected void changedLayer(MapLayerListEvent event) {
-        fit();
+    public Envelope getMapArea() {
+        if (context == null) {
+            return null;
+        }
+        return context.getAreaOfInterest();
     }
 
-    protected void addedLayer(MapLayerListEvent event) {
-        fit();
+    public void addStrategyListener(StrategyListener listener) {
+        listeners.add(StrategyListener.class, listener);
     }
 
-    protected void movedLayer(MapLayerListEvent event) {
-        fit();
+    public void removeStrategyListener(StrategyListener listener) {
+        listeners.remove(StrategyListener.class, listener);
+    }
+
+    public StrategyListener[] getStrategyListeners() {
+        return listeners.getListeners(StrategyListener.class);
+    }
+
+     public void setRotation(double d) {
+        rotation = d;
+    }
+
+    public double getRotation() {
+        return rotation;
     }
     
     //------------------------PRIVATES CLASSES----------------------------------
+    private class MapLayerListListen implements MapLayerListListener {
+
+        public void layerAdded(MapLayerListEvent event) {
+
+            if (context.getLayers().length == 1) {
+                try {
+                    setMapArea(context.getLayerBounds());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                reset();
+            }
+        }
+
+        public void layerRemoved(MapLayerListEvent event) {
+            reset();
+        }
+
+        public void layerChanged(MapLayerListEvent event) {
+            reset();
+        }
+
+        public void layerMoved(MapLayerListEvent event) {
+            reset();
+        }
+    }
+
+    private class DrawingThread extends Thread {
+
+        @Override
+        public void run() {
+
+            while (true) {
+                if (mustupdate) {
+                    mustupdate = false;
+                    fireRenderingEvent(true);
+                    if (context != null && compMapArea != null) {
+                        VolatileImage img = createBackBuffer();
+                        comp.setBuffer(img);
+                        renderOn(img.createGraphics());
+                    }
+                    fireRenderingEvent(false);
+                }
+
+                block();
+            }
+        }
+
+        public synchronized void wake() {
+            notifyAll();
+        }
+
+        private synchronized void block() {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private class RepaintingThread extends Thread {
+
+        @Override
+        public void run() {
+
+            while (true) {
+
+                comp.repaint();
+
+                while (isDrawing) {
+                    try {
+                        sleep(300);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    comp.repaint();
+                }
+
+                block();
+            }
+        }
+
+        public synchronized void wake() {
+            notifyAll();
+        }
+
+        private synchronized void block() {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private class BufferComponent extends JComponent {
 
-        public Boolean ACTIF = false;
-        private GraphicsConfiguration GC;
-        private SingleVolatileImageStrategy pane;
-        private VolatileImage buffer;
-        private RepaintingThread repainter;
-        private RerenderingThread rerenderer;
-        private boolean update = true;
+        private VolatileImage img = null;
 
-        BufferComponent(SingleVolatileImageStrategy bufpane) {
-            this.pane = bufpane;
-            RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
-            setDoubleBuffered(true);
+        public void setBuffer(VolatileImage buf) {
+            img = buf;
+            SwingUtilities.invokeLater(new Runnable() {
 
-            GC = this.getGraphicsConfiguration();
+                public void run() {
+                    repaint();
+                }
+            });
+
         }
 
-        public BufferedImage getSnapShot(){
-            if(buffer != null){
-                return buffer.getSnapshot();
-            }
-            return null;
-        }
-        
-        public void refresh() {
-            update = true;
-            repaint();
-        }
-
-        private void startRender(Graphics g) {
-
-            if (repainter != null && repainter.isAlive()) {
-                repainter.setActive(true);
-            } else {
-                repainter = new RepaintingThread(this);
-                repainter.setActive(true);
-                repainter.start();
-            }
-
-            rerenderer = new RerenderingThread(this);
-            rerenderer.setGraphics(g);
-            rerenderer.start();
-
+        public BufferedImage getBuffer() {
+            return img.getSnapshot();
         }
 
         @Override
         public void paintComponent(Graphics g) {
-            checkAspect(false);
-
-            if (update || buffer == null || buffer.validate(GC) == VolatileImage.IMAGE_INCOMPATIBLE) {
-                update = false;
-
-                buffer = pane.createBackBuffer();
-
-                do {
-                    int valCode = buffer.validate(GC);
-                    if (valCode == VolatileImage.IMAGE_INCOMPATIBLE) {
-                        buffer = pane.createBackBuffer(); // recreate the hardware accelerated image.
-                    }
-
-                    final Graphics offscreenGraphics = buffer.getGraphics();
-                    startRender(offscreenGraphics);
-
-                    g.drawImage(buffer, 0, 0, this);
-
-                } while (buffer.contentsLost());
-
-            } else {
-                g.drawImage(buffer, 0, 0, this);
-            }
-
-        }
-
-        private class RerenderingThread extends Thread {
-
-            private BufferComponent comp = null;
-            private Graphics g;
-
-            RerenderingThread(BufferComponent comp) {
-                this.comp = comp;
-                setOpaque(false);
-            }
-
-            public void setGraphics(Graphics g) {
-                this.g = g;
-            }
-
-            public void run() {
-                pane.renderOn((Graphics2D) g);
-
-                if (repainter != null) {
-                    repainter.setActive(false);
-                }
+            if (img != null) {
+                g.drawImage(img, 0, 0, this);
             }
         }
-
-        private class RepaintingThread extends Thread {
-
-            private BufferComponent comp = null;
-            private boolean marche = false;
-
-            RepaintingThread(BufferComponent comp) {
-                this.comp = comp;
-            }
-
-            public void setActive(boolean val) {
-                marche = val;
-
-                if (!val) {
-                    comp.repaint();
-                }
-            }
-
-            @Override
-            public void run() {
-
-                raiseNB();
-                while (marche) {
-                    try {
-                        sleep(300);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(SingleVolatileImageStrategy.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    comp.repaint();
-                }
-                lowerNB();
-            }
         }
-    }
-
-    
-    
-    
 }
-
-
-
-
-
+    
+    

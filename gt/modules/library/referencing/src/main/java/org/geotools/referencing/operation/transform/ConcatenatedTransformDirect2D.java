@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,16 +17,14 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.matrix.XMatrix;
 
 
@@ -45,21 +43,21 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6009454091075588885L;
-    
+
     /**
      * The first math transform. This field is identical
      * to {@link ConcatenatedTransform#transform1}. Only
      * the type is different.
      */
     private final MathTransform2D transform1;
-    
+
     /**
      * The second math transform. This field is identical
      * to {@link ConcatenatedTransform#transform1}. Only
      * the type is different.
      */
     private final MathTransform2D transform2;
-    
+
     /**
      * Constructs a concatenated transform.
      */
@@ -70,32 +68,35 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
         this.transform1 = transform1;
         this.transform2 = transform2;
     }
-    
+
     /**
-     * Check if transforms are compatibles with this implementation.
+     * Checks if transforms are compatibles with this implementation.
      */
+    @Override
     boolean isValid() {
         return super.isValid() && getSourceDimensions()==2 && getTargetDimensions()==2;
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc}
      * and stores the result in {@code ptDst}.
      */
+    @Override
     public Point2D transform(final Point2D ptSrc, Point2D ptDst) throws TransformException {
         assert isValid();
         ptDst = transform1.transform(ptSrc, ptDst);
         return  transform2.transform(ptDst, ptDst);
     }
-    
+
     /**
      * Transforms the specified shape.
      */
+    @Override
     public Shape createTransformedShape(final Shape shape) throws TransformException {
         assert isValid();
         return transform2.createTransformedShape(transform1.createTransformedShape(shape));
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      *
@@ -103,10 +104,19 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * @return The derivative at the specified point (never {@code null}).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
+    @Override
     public Matrix derivative(final Point2D point) throws TransformException {
         final XMatrix matrix1 = toXMatrix(transform1.derivative(point));
         final XMatrix matrix2 = toXMatrix(transform2.derivative(transform1.transform(point,null)));
         matrix2.multiply(matrix1);
         return matrix2;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
     }
 }

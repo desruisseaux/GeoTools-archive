@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
@@ -36,7 +35,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
-// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -49,7 +47,6 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.Parameter;
@@ -78,9 +75,9 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <p>
  *
  * Some of the NADCON grids, their areas of use, and source datums are shown
- * in the following table. 
+ * in the following table.
  * <p>
- * 
+ *
  * <table>
  *   <tr><th>Shift File Name</td><th>Area</td><th>Source Datum</td><th>Accuracy at 67% confidence (m)</td></tr>
  *   <tr><td>CONUS</td><td>Conterminous U S (lower 48 states)</td><td>NAD27</td><td>0.15</td></tr>
@@ -97,7 +94,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * binary and have {@code .las} (latitude shift) and {@code .los} (longitude shift)
  * extentions. Text grids may be created with the <cite>NGS nadgrd</cite> program and have
  * {@code .laa} (latitude shift) and {@code .loa} (longitude shift) file extentions.
- * Both types of  files may be used here. 
+ * Both types of  files may be used here.
  * <p>
  *
  * The grid names to use for transforming are parameters of this
@@ -110,7 +107,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Transformations here have been tested to be within 0.00001 seconds of
  * values given by the <cite>NGS ndcon210</cite> program for NADCON grids. American Samoa
  * and HARN shifts have not yet been tested.  <strong>References:</strong>
- * 
+ *
  * <ul>
  *   <li><a href="http://www.ngs.noaa.gov/PC_PROD/NADCON/Readme.htm">NADCONreadme</a></li>
  *   <li>American Samoa Grids for NADCON - Samoa_Readme.txt</li>
@@ -124,14 +121,14 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *       formats</li>
  *   <li>EPSG Geodesy Parameters database version 6.5</li>
  * </ul>
- * 
+ *
  * @see <a href="http://www.ngs.noaa.gov/TOOLS/Nadcon/Nadcon.html"> NADCON -
  *      North American Datum Conversion Utility</a>
  *
  * @since 2.1
  * @source $URL$
  * @version $Id$
- * @author Rueben Schulz 
+ * @author Rueben Schulz
  *
  * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
  */
@@ -223,7 +220,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
     /**
      * The inverse of this transform. Will be created only when needed.
      */
-    private transient MathTransform inverse;
+    private transient MathTransform2D inverse;
 
     /**
      * Constructs a {@code NADCONTransform} from the specified grid shift files.
@@ -241,7 +238,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      *          grid files)
      */
     public NADCONTransform(final String latGridName, final String longGridName)
-            throws ParameterNotFoundException, FactoryException 
+            throws ParameterNotFoundException, FactoryException
     {
         this.latGridName  = latGridName;
         this.longGridName = longGridName;
@@ -251,7 +248,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
             final URL latGridURL  = makeURL(latGridName);
             final URL longGridURL = makeURL(longGridName);
 
-            if ((latGridName.endsWith(".las") && longGridName.endsWith(".los")) 
+            if ((latGridName.endsWith(".las") && longGridName.endsWith(".los"))
                     || (latGridName.endsWith(".LAS") && longGridName.endsWith(".LOS"))) {
                 loadBinaryGrid(latGridURL, longGridURL);
             } else if ((latGridName.endsWith(".laa") && longGridName.endsWith(".loa"))
@@ -288,6 +285,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      *
      * @return A copy of the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValue lat_diff_file = new Parameter(Provider.LAT_DIFF_FILE);
         lat_diff_file.setValue(latGridName);
@@ -375,7 +373,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * @throws FactoryException if there is an inconsistency in the data
      */
     private void loadBinaryGrid(final URL latGridUrl, final URL longGridUrl)
-            throws IOException, FactoryException 
+            throws IOException, FactoryException
     {
         final int HEADER_BYTES = 96;
         final int SEPARATOR_BYTES = 4;
@@ -413,7 +411,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         xmax = xmin + ((nc - 1) * dx);
         ymax = ymin + ((nr - 1) * dy);
 
-        //skip the longitude header description 
+        //skip the longitude header description
         longBuffer.position(longBuffer.position() + DESCRIPTION_LENGTH);
 
         //check that latitude grid header is the same as for latitude grid
@@ -573,7 +571,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         ////////////////////////
         //read header info
         ////////////////////////
-        latLine = latBr.readLine(); //skip header description        
+        latLine = latBr.readLine(); //skip header description
         latLine = latBr.readLine();
         latSt = new StringTokenizer(latLine, " ");
 
@@ -619,7 +617,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
 
         ////////////////////////
         //read grid shift data into LocalizationGrid
-        ////////////////////////    
+        ////////////////////////
         gridShift = new LocalizationGrid(nc, nr);
 
         int i = 0;
@@ -651,7 +649,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * the source dimension is 3, then the ordinals will be packed in this
      * order:
      * (<var>x<sub>0</sub></var>,<var>y<sub>0</sub></var>,<var>z<sub>0</sub></var>,
-     * 
+     *
      * <var>x<sub>1</sub></var>,<var>y<sub>1</sub></var>,<var>z<sub>1</sub></var>
      * ...).  All input and output values are in decimal degrees.
      *
@@ -775,12 +773,12 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      *
      * @return the inverse of this transform
      */
-    public MathTransform inverse() {
+    @Override
+    public MathTransform2D inverse() {
         if (inverse == null) {
             // No need to synchronize; this is not a big deal if this object is created twice.
             inverse = new Inverse();
         }
-
         return inverse;
     }
 
@@ -790,6 +788,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      *
      * @return a hash value for this transform.
      */
+    @Override
     public final int hashCode() {
         final long code = Double.doubleToLongBits(xmin)
             + (37 * (Double.doubleToLongBits(ymin)
@@ -807,6 +806,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * @param object the object to compare to
      * @return {@code true} if the objects are equal.
      */
+    @Override
     public final boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -834,7 +834,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
      * full path. This needs to be done only once, by the user.
      * Path values may be simple file system paths or more complex
      * text representations of a url. A value of "default" resets this
-     * preference to its default value. 
+     * preference to its default value.
      * <p>
      *
      * Example:
@@ -873,14 +873,16 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
             return;
         }
     }
-    
+
     /**
      * Inverse of a {@link NADCONTransform}.
      *
      * @version $Id$
      * @author Rueben Schulz
      */
-    private final class Inverse extends AbstractMathTransform.Inverse implements Serializable {
+    private final class Inverse extends AbstractMathTransform.Inverse
+            implements MathTransform2D, Serializable
+    {
         /** Serial number for interoperability with different versions. */
         private static final long serialVersionUID = -4707304160205218546L;
 
@@ -896,6 +898,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          *
          * @return A copy of the parameter values for this math transform.
          */
+        @Override
         public ParameterValueGroup getParameterValues() {
             return null;
         }
@@ -907,7 +910,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          * @param srcOffset
          * @param dest
          * @param dstOffset
-         * @param length 
+         * @param length
          *
          * @throws TransformException if the input point is outside the area
          *         covered by this grid.
@@ -917,6 +920,14 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
             throws TransformException {
             NADCONTransform.this.inverseTransform(source, srcOffset, dest,
                 dstOffset, length);
+        }
+
+        /**
+         * Returns the original transform.
+         */
+        @Override
+        public MathTransform2D inverse() {
+            return (MathTransform2D) super.inverse();
         }
 
         /**
@@ -945,16 +956,16 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
     public static class Provider extends MathTransformProvider {
         /** Serial number for interoperability with different versions. */
         private static final long serialVersionUID = -4707304160205218546L;
-        
+
         /**
-         * The operation parameter descriptor for the "Latitude_difference_file" 
+         * The operation parameter descriptor for the "Latitude_difference_file"
          * parameter value. The default value is "conus.las".
          */
         public static final ParameterDescriptor LAT_DIFF_FILE = new DefaultParameterDescriptor(
                 "Latitude_difference_file", String.class, null, "conus.las");
 
         /**
-         * The operation parameter descriptor for the "Longitude_difference_file" 
+         * The operation parameter descriptor for the "Longitude_difference_file"
          * parameter value. The default value is "conus.los".
          */
         public static final ParameterDescriptor LONG_DIFF_FILE = new DefaultParameterDescriptor(
@@ -984,7 +995,8 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Transformation> getOperationType() {
             return Transformation.class;
         }
 
@@ -996,7 +1008,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not
          *         found.
-         * @throws FactoryException if there is a problem creating this 
+         * @throws FactoryException if there is a problem creating this
          *         math transform.
          */
         protected MathTransform createMathTransform(final ParameterValueGroup values)

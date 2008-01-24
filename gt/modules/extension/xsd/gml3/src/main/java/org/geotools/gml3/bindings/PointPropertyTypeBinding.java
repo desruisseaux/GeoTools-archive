@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.gml3.GML;
@@ -85,11 +87,10 @@ public class PointPropertyTypeBinding extends AbstractComplexBinding {
     }
 
     public Object getProperty(Object object, QName name) {
-        if (GML.Point.equals(name)) {
-            //return the point, which is the object passed in
-            return object;
-        }
-
-        return null;
+        return GML3EncodingUtils.getProperty((Point)object, name);
+    }
+    
+    public List getProperties(Object object) throws Exception {
+        return GML3EncodingUtils.getProperties((Point)object);
     }
 }

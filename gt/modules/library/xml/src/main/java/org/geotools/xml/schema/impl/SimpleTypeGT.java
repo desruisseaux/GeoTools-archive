@@ -264,8 +264,9 @@ public class SimpleTypeGT implements SimpleType {
         for (int i = 0; i < constraints.length; i++) {
             switch (constraints[i].getFacetType()) {
             case Facet.ENUMERATION:
-                throw new SAXException(
-                    "cannot have enumerations mixed with other facets.");
+                /*throw new SAXException(
+                    "cannot have enumerations mixed with other facets.");*/
+            	break;
 
             case Facet.FRACTIONDIGITS:
 

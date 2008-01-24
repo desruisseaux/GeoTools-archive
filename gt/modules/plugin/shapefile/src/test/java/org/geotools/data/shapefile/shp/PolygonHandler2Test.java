@@ -18,26 +18,25 @@ package org.geotools.data.shapefile.shp;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
-import org.geotools.data.shapefile.indexed.TestCaseSupport;
-
 
 /**
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/test/java/org/geotools/data/shapefile/shp/PolygonHandler2Test.java $
  * @version $Id$
  * @author Ian Schneider
  */
-public class PolygonHandler2Test extends TestCaseSupport {
+public class PolygonHandler2Test extends org.geotools.data.shapefile.TestCaseSupport {
     public PolygonHandler2Test(String testName) throws IOException {
         super(testName);
     }
 
     public static void main(String[] args) {
-        verbose = true;
         junit.textui.TestRunner.run(suite(PolygonHandlerTest.class));
     }
 
@@ -98,7 +97,7 @@ public class PolygonHandler2Test extends TestCaseSupport {
     }
 
     public static Geometry copyTo(double x, double y, double w, double h,
-        Geometry g) {
+            Geometry g) {
         if (g.getNumPoints() != 5) {
             throw new IllegalArgumentException("Geometry must have 5 points");
         }

@@ -40,6 +40,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 final class WarpAdapter extends Warp {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8679060848877065181L;
+
+    /**
      * The coverage name. Used for formatting error message.
      */
     private final CharSequence name;
@@ -138,7 +143,7 @@ final class WarpAdapter extends Warp {
     public Point2D mapSourcePoint(final Point2D sourcePt) {
         Point2D result = new Point2D.Double(sourcePt.getX()+0.5, sourcePt.getY()+0.5);
         try {
-            result = ((MathTransform2D)inverse.inverse()).transform(result, result);
+            result = inverse.inverse().transform(result, result);
         } catch (TransformException exception) {
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.BAD_PARAMETER_$2, "sourcePt", sourcePt), exception);

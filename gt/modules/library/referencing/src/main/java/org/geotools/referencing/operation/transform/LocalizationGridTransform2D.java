@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
@@ -27,8 +26,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -40,10 +37,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.matrix.Matrix2;
@@ -138,12 +132,12 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * Number of grid's columns.
      */
     private final int width;
-    
+
     /**
      * Number of grid's rows.
      */
     private final int height;
-               
+
     /**
      * Grid of coordinate points.
      * Points are stored as {@code (x,y)} pairs.
@@ -158,8 +152,8 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     /**
      * The inverse math transform. Will be constructed only when first requested.
      */
-    private transient MathTransform inverse;
-    
+    private transient MathTransform2D inverse;
+
     /**
      * Constructs a localization grid using the specified data.
      *
@@ -179,31 +173,33 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         this.grid   = grid;
         this.global = global;
     }
-    
+
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
 
     /**
      * Returns the dimension of input points.
-     */    
+     */
     public int getSourceDimensions() {
         return 2;
     }
-    
+
     /**
      * Returns the dimension of output points.
-     */    
+     */
     public int getTargetDimensions() {
         return 2;
     }
-    
+
     /**
      * Tests if this transform is the identity transform.
-     */    
+     */
+    @Override
     public boolean isIdentity() {
         return false;
     }
@@ -211,6 +207,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     /**
      * Gets the derivative of this transform at a point.
      */
+    @Override
     public Matrix derivative(final Point2D point) {
         final AffineTransform tr = new AffineTransform();
         getAffineTransform(point.getX(), point.getY(), tr);
@@ -218,7 +215,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
                            tr.getShearY(), tr.getScaleY());
     }
 
-    /** 
+    /**
      * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
      * destinations (généralement des degrés de longitude et latitude). Les transformations
      * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
@@ -229,14 +226,15 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
      * @param  numPts  Nombre de points à transformer.
-     */    
+     */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
         transform(srcPts, null, srcOff, dstPts, null, dstOff, numPts);
     }
 
-    /** 
+    /**
      * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
      * destinations (généralement des degrés de longitude et latitude). Les transformations
      * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
@@ -247,7 +245,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
      * @param  numPts  Nombre de points à transformer.
-     */    
+     */
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
     {
@@ -541,7 +539,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
              * know if this point is valid. Otherwise, an exception is thrown.
              */
             if (MASK_NON_CONVERGENCE) {
-                Logging.getLogger("org.geotools.gc").fine("No convergence");
+                Logging.getLogger(LocalizationGridTransform2D.class).fine("No convergence");
                 if (bestX>=0 && bestX<width && bestY>=0 && bestY<height) {
                     target.x = bestX;
                     target.y = bestY;
@@ -591,10 +589,11 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         }
     }
 
-    /** 
+    /**
      * Returns the inverse transform.
      */
-    public MathTransform inverse() {
+    @Override
+    public MathTransform2D inverse() {
         if (inverse == null) {
             inverse = new Inverse();
         }
@@ -625,6 +624,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         /**
          * Transform a "real world" coordinate into a grid coordinate.
          */
+        @Override
         public Point2D transform(final Point2D ptSrc, final Point2D ptDst) throws TransformException {
             final AffineTransform tr = new AffineTransform(global);
             if (ptDst == null) {
@@ -656,6 +656,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * @param numPts the number of point objects to be transformed.
          * @throws TransformException if a point can't be transformed.
          */
+        @Override
         public void transform(final float[] srcPts, int srcOff,
                               final float[] dstPts, int dstOff, int numPts)
             throws TransformException
@@ -719,6 +720,14 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         }
 
         /**
+         * Returns the original localization grid transform.
+         */
+        @Override
+        public MathTransform2D inverse() {
+            return (MathTransform2D) super.inverse();
+        }
+
+        /**
          * Restore reference to this object after deserialization.
          */
         private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -727,10 +736,11 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         }
     }
 
-    
+
     /**
      * Returns a hash value for this transform.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode() ^ global.hashCode();
     }
@@ -738,6 +748,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     /**
      * Compare this transform with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final LocalizationGridTransform2D that = (LocalizationGridTransform2D) object;
@@ -779,7 +790,8 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Transformation> getOperationType() {
             return Transformation.class;
         }
 

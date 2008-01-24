@@ -68,7 +68,7 @@ public class IDWInterpolation extends AbstractInterpolation {
      * @param maxDist max distance 
      */
     public void setMaxDist(double maxDist) {
-        this.maxDist = maxDist;
+        this.maxDist = 10000;
     }
 
     public float getValue(DirectPosition p) {

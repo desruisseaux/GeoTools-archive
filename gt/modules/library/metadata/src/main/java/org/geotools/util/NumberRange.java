@@ -209,8 +209,11 @@ public class NumberRange extends Range {
      *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
+     * @throws ClassCastException if some elements are not instances of the specified class.
      */
-    public <N extends Number> NumberRange(final Class<N> type, final N minimum, final N maximum) {
+    public <N extends Number> NumberRange(final Class<? extends N> type, final N minimum, final N maximum)
+            throws ClassCastException
+    {
         super(type, (Comparable) minimum, (Comparable) maximum);
     }
 
@@ -223,10 +226,12 @@ public class NumberRange extends Range {
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
      * @param maximum The maximum value.
      * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * @throws ClassCastException if some elements are not instances of the specified class.
      */
-    public <N extends Number> NumberRange(final Class<N> type,
+    public <N extends Number> NumberRange(final Class<? extends N> type,
                                           final N minimum, final boolean isMinIncluded,
                                           final N maximum, final boolean isMaxIncluded)
+            throws ClassCastException
     {
         super(type, (Comparable)minimum, isMinIncluded, (Comparable)maximum, isMaxIncluded);
     }
@@ -238,10 +243,12 @@ public class NumberRange extends Range {
      * @param type The element class, usually one of {@link Byte}, {@link Short},
      *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param range The range to copy. The elements must be {@link Number} instances.
-     * @throws ClassCastException if some elements are not instances of {@link Number}.
+     * @throws ClassCastException if some elements are not instances of the specified class.
      */
     @SuppressWarnings("unchecked")  // Check will be performed by super-class constructor
-    <N extends Number> NumberRange(final Class<N> type, final Range range) throws ClassCastException {
+    <N extends Number> NumberRange(final Class<? extends N> type, final Range range)
+            throws ClassCastException
+    {
         this(type, ClassChanger.cast((N) range.getMinValue(), type), range.isMinIncluded(),
                    ClassChanger.cast((N) range.getMaxValue(), type), range.isMaxIncluded());
     }
@@ -255,9 +262,8 @@ public class NumberRange extends Range {
      *
      * @since 2.4
      */
-    @SuppressWarnings("unchecked")  // Check will be performed by super-class constructor
     public NumberRange(final Range range) throws ClassCastException {
-        this((Class) getElementClass(range),
+        this(getElementClass(range),
              (Number) range.getMinValue(), range.isMinIncluded(),
              (Number) range.getMaxValue(), range.isMaxIncluded());
     }
@@ -331,6 +337,22 @@ public class NumberRange extends Range {
     }
 
     /**
+     * Casts the given range to an instance of this class.
+     * To be overriden by {@link MeasurementRange} only.
+     */
+    NumberRange cast(final Range range) {
+        return new NumberRange(range);
+    }
+
+    /**
+     * Returns an initially empty array of the given length.
+     * To be overriden by {@link MeasurementRange} only.
+     */
+    NumberRange[] newArray(final int length) {
+        return new NumberRange[length];
+    }
+
+    /**
      * Returns {@code true} if the specified value is within this range.
      */
     @Override
@@ -396,7 +418,7 @@ public class NumberRange extends Range {
     public NumberRange union(final Range range) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        return wrap(castTo(type).unionImpl(convertAndCast(range, type)));
+        return cast(castTo(type).unionImpl(convertAndCast(range, type)));
     }
 
     /**
@@ -445,9 +467,9 @@ public class NumberRange extends Range {
         final Range[] result = castTo(type).subtractImpl(convertAndCast(range, type));
         final NumberRange[] casted;
         if (result != null) {
-            casted = new NumberRange[result.length];
+            casted = newArray(result.length);
             for (int i=0; i<result.length; i++) {
-                casted[i] = wrap(result[i]);
+                casted[i] = cast(result[i]);
             }
         } else {
             casted = null;

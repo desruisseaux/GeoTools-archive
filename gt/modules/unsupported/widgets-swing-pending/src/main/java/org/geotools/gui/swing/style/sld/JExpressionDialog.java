@@ -22,7 +22,6 @@ import java.util.Vector;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.FilterFactory2;
@@ -208,7 +207,8 @@ public class JExpressionDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton6.setText(TextBundle.getResource().getString("apply"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
+        jButton6.setText(bundle.getString("apply")); // NOI18N
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionClose(evt);

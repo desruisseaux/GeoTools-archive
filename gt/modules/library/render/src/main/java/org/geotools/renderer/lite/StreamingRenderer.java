@@ -2037,7 +2037,7 @@ public final class StreamingRenderer implements GTRenderer {
                 return geom.getType().getCRS();
             }
         } else if ( currLayer.getSource() != null ) {
-        	return currLayer.getSource().getInfo().getCRS();
+        	return currLayer.getSource().getCRS();
         }
         
         return null;
@@ -2244,19 +2244,6 @@ public final class StreamingRenderer implements GTRenderer {
 		return canTransform;
 	}
 
-	public static MathTransform getMathTransform(
-			CoordinateReferenceSystem sourceCRS,
-			CoordinateReferenceSystem destCRS) {
-		try {
-			return CRS.findMathTransform(sourceCRS, destCRS, true);
-		} catch (OperationNotFoundException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-
-		} catch (FactoryException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-		}
-		return null;
-	}
 	
 	private class RenderableFeature {
 		Object content;
@@ -2300,8 +2287,7 @@ public final class StreamingRenderer implements GTRenderer {
 							destinationCrs))
 						transform = null;
 					else
-						transform = (MathTransform2D) StreamingRenderer
-								.getMathTransform(sa.crs, destinationCrs);
+						transform = (MathTransform2D) CRS.findMathTransform(sa.crs, destinationCrs);
 					if (transform != null && !transform.isIdentity()) {
 						transform = (MathTransform2D) ConcatenatedTransform
 								.create(transform, ProjectiveTransform

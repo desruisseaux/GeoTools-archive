@@ -25,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -42,7 +41,7 @@ public class GeometryCellEditor extends AbstractCellEditor implements TableCellE
      */
     public GeometryCellEditor(){
         super();
-        button.setText( TextBundle.getResource().getString("edit"));
+        //button.setText( TextBundle.getResource().getString("edit"));
         
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

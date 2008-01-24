@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -99,16 +100,26 @@ public class AbstractGeometryTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        if ("srsName".equals(name.getLocalPart())) {
-            Geometry geometry = (Geometry) object;
+        Geometry geometry = (Geometry) object;
+        if ("srsName".equals( name.getLocalPart() ) ) {
+            CoordinateReferenceSystem crs = GML3EncodingUtils.getCRS(geometry);
 
-            if (geometry.getUserData() instanceof CoordinateReferenceSystem) {
-                CoordinateReferenceSystem crs = (CoordinateReferenceSystem) geometry.getUserData();
-
+            if (crs != null) {
                 return GML3EncodingUtils.crs(crs);
             }
         }
 
+        if (GML.id.equals(name)) {
+            return GML3EncodingUtils.getID(geometry);
+        }
+
+        if (GML.name.equals(name)) {
+            return GML3EncodingUtils.getName(geometry);
+        }
+        
+        if (GML.description.equals(name)) {
+            return GML3EncodingUtils.getDescription(geometry);
+        }
         return null;
     }
 }

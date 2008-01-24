@@ -15,10 +15,12 @@
  */
 package org.geotools.gui.swing.contexttree;
 
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Component;
 import java.awt.Point;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
 import org.geotools.map.MapContext;
@@ -49,8 +51,7 @@ final class TreePopup extends JPopupMenu {
         if (view) {
             removeAll();
 
-            SelectionData[] selection = 
-               {};
+            SelectionData[] selection = {};
 
             if (treetable != null) {
 
@@ -67,30 +68,32 @@ final class TreePopup extends JPopupMenu {
                     treetable.getTreeSelectionModel().clearSelection();
                 }
 
-                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
-
-                if (paths != null) {
-
-                    selection = new SelectionData[paths.length];
-
-                    for (int i = 0; i < paths.length; i++) {
-
-                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
-                        Object last = lastnode.getUserObject();
-
-                        if (last instanceof MapLayer) {
-                            MapLayer layer = (MapLayer) last;
-                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-                            SelectionData data = new SelectionData(context, layer);
-                            selection[i] = data;
-                        } else {
-                            MapContext context = (MapContext) last;
-                            SelectionData data = new SelectionData(context, null);
-                            selection[i] = data;
-                        }
-
-                    }
-                }
+                selection = manager.getTree().getSelection();
+                
+//                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
+//
+//                if (paths != null) {
+//
+//                    selection = new SelectionData[paths.length];
+//
+//                    for (int i = 0; i < paths.length; i++) {
+//
+//                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
+//                        Object last = lastnode.getUserObject();
+//
+//                        if (last instanceof MapLayer) {
+//                            MapLayer layer = (MapLayer) last;
+//                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
+//                            SelectionData data = new SelectionData(context, layer);
+//                            selection[i] = data;
+//                        } else if (last instanceof MapContext) {
+//                            MapContext context = (MapContext) last;
+//                            SelectionData data = new SelectionData(context, null);
+//                            selection[i] = data;
+//                        }
+//
+//                    }
+//                }
 
             }
 
@@ -123,7 +126,9 @@ final class TreePopup extends JPopupMenu {
     public Component add(Component menuItem) {
 
         if (getComponentCount() > 0) {
-            if (!(getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem && menuItem instanceof TitledSeparatorItem)) {
+            if( getComponent(getComponentCount() - 1) instanceof SeparatorItem && menuItem instanceof SeparatorItem){
+                return menuItem;
+            } else if (!(getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem && menuItem instanceof TitledSeparatorItem)) {
                 return super.add(menuItem);
             } else {
                 remove(getComponentCount() - 1);

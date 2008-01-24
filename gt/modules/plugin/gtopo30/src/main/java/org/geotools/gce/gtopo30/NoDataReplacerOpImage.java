@@ -56,7 +56,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.AbstractGridCoverage;
 import org.geotools.image.TransfertRectIter;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
 
@@ -64,9 +64,9 @@ import org.geotools.resources.image.ImageUtilities;
 /**
  * An image that contains transformed samples, specifically this method will transform the NoData value
  * using a new supplied one. A new layout is used in order to convert to the required image layout. Default
- * values for this operation can be used to set the NoData and the layout to the values needed for 
+ * values for this operation can be used to set the NoData and the layout to the values needed for
  * the GTOPO30 writer.
- *   
+ *
  * Images are created using the
  * {@code NoDataReplacerOpImage.NoDataReplacerCRIF} inner class, where "CRIF" stands for
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
@@ -81,22 +81,22 @@ import org.geotools.resources.image.ImageUtilities;
 public final class NoDataReplacerOpImage extends PointOpImage {
     /**The operation name.*/
     public static final String OPERATION_NAME = "org.geotools.gce.gtopo30.NoDataReplacer";
-    
+
     /**Constant that tell me the margin when checking for equality with floating point values*/
 	private double EPS;
-	
+
 	/**Old no data value.*/
 	private Number oldNoData;
-	
+
 	/**New no data value.*/
 	private int newNoData;
-	
+
 	/**It tells me whether or not the old no data is NaN.*/
 	private boolean oldNoDataIsNaN;
 
 
 
-    
+
     /**
      * Constructs a new {@code NoDataReplacerOpImage}.
      *
@@ -120,14 +120,14 @@ public final class NoDataReplacerOpImage extends PointOpImage {
 
         permitInPlaceOperation();
     }
-    
+
     /**
      * @todo Creation of non banded sample models
 	 * @param image Image to work on.
 	 * @return New Image Layout.
 	 */
 	private static ImageLayout getRightLayout(RenderedImage image) {
-		
+
 		final SampleModel sm=image.getSampleModel();
 		final int dataType=DataBuffer.TYPE_SHORT;
 		if(sm.getDataType()==dataType)
@@ -150,7 +150,7 @@ public final class NoDataReplacerOpImage extends PointOpImage {
 	        		((ComponentSampleModel)sm).getBankIndices(),
 	        		((ComponentSampleModel)sm).getBandOffsets()
 	        		);
-		
+
 		   final        ImageLayout layout = ImageUtilities.getImageLayout(image);
 		   layout.setColorModel(newCm);
 		   layout.setSampleModel(newSm);
@@ -158,7 +158,7 @@ public final class NoDataReplacerOpImage extends PointOpImage {
 		}
 		else
 			;//do nothing for the moment
-		
+
 		return null;
 	}
 
@@ -209,18 +209,18 @@ public final class NoDataReplacerOpImage extends PointOpImage {
      */
 	private void formatRect(WritableRectIter iterator) {
 
-	      
+
 		double actualValue=0.0;
         iterator.startLines();
-        if (!iterator.finishedLines()) 
+        if (!iterator.finishedLines())
         	do {
         		iterator.startPixels();
         		if (!iterator.finishedPixels())
         			do {
-            	
+
 		            	//get the actual value
 		                actualValue = iterator.getSampleDouble();
-	                    
+
 		                //substituting a NaN
 		                if(oldNoDataIsNaN)
 		                	if(Double.isNaN(actualValue))
@@ -230,14 +230,14 @@ public final class NoDataReplacerOpImage extends PointOpImage {
 		                		iterator.setSample(newNoData);
 		                	else
 		                		iterator.setSample(actualValue);
-		                		
+
         			}
 	                while (!iterator.nextPixelDone());
             }
             while (!iterator.nextLineDone());
-	
 
-		
+
+
 	}
 
 
@@ -254,7 +254,7 @@ public final class NoDataReplacerOpImage extends PointOpImage {
      * one as requested. The difference between this method and the usual format operation presents
      * in JAI is the possibility to replace the NoData value directly when it is like Double.NaN or
      * Float.NaN.
-     * 
+     *
      */
     private static final class NoDataReplacerDescriptor extends OperationDescriptorImpl {
 		/**
@@ -323,7 +323,7 @@ public final class NoDataReplacerOpImage extends PointOpImage {
                                     final RenderingHints hints)
         {
             final RenderedImage source = (RenderedImage) param.getSource(0);
-            
+
             final Number  oldNoData= (Number) param.getObjectParameter(0);
             final Short  newNoData= (Short) param.getObjectParameter(1);
             final Double  EPS=  (Double) param.getObjectParameter(2);
@@ -345,7 +345,7 @@ public final class NoDataReplacerOpImage extends PointOpImage {
             registry.registerFactory(RenderedRegistryMode.MODE_NAME, OPERATION_NAME,
                                      "gce.geotools.org", new NoDataReplacerCRIF());
         } catch (IllegalArgumentException exception) {
-            final LogRecord record = Logging.format(Level.SEVERE,
+            final LogRecord record = Loggings.format(Level.SEVERE,
                    LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
             record.setSourceClassName("GridSampleDimension");
             record.setSourceMethodName("<classinit>");

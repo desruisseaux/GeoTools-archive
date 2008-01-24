@@ -88,7 +88,7 @@ public class Band extends MetadataAccessor {
         } finally {
             setWarningsEnabled(enabled);
         }
-        final Class type;
+        final Class<? extends Number> type;
         if (minimum == null || maximum == null) {
             minimum = getDouble("minValue");
             maximum = getDouble("maxValue");

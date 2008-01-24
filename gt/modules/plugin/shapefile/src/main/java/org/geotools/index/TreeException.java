@@ -16,23 +16,26 @@
  */
 package org.geotools.index;
 
+import java.io.IOException;
+
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/TreeException.java $
  */
-public class TreeException extends Exception {
-    /**
-     *
-     */
+public class TreeException extends IOException {
+
+    private static final long serialVersionUID = 1988241322009839486L;
+
     public TreeException() {
         super();
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param message
      */
     public TreeException(String message) {
@@ -41,20 +44,22 @@ public class TreeException extends Exception {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param message
      * @param cause
      */
     public TreeException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param cause
      */
     public TreeException(Throwable cause) {
-        super(cause);
+        super();
+        initCause(cause);
     }
 }

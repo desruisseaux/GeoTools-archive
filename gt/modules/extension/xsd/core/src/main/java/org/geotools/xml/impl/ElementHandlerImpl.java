@@ -210,9 +210,8 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         //                    handler.getValue()));
         //        }
 
-        //get the containing type
+       //get the containing type (we do this for anonymous complex types)
         XSDTypeDefinition container = null;
-
         if (getParentHandler().getComponent() != null) {
             container = getParentHandler().getComponent().getTypeDefinition();
         }
@@ -299,10 +298,16 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
         //initialize the context for the handler
         if (child instanceof ElementHandler) {
+            //get the containing type (we do this for anonymous complex types)
+            XSDTypeDefinition container = null;
+            if (getParentHandler().getComponent() != null) {
+                container = getParentHandler().getComponent().getTypeDefinition();
+            }
+
             ElementInstance childInstance = (ElementInstance) child.getComponent();
             ContextInitializer initer = new ContextInitializer(childInstance, node,
                     child.getContext());
-            parser.getBindingWalker().walk(element.getElementDeclaration(), initer, getContext());
+            parser.getBindingWalker().walk(element.getElementDeclaration(), initer, container, getContext());
         }
     }
 

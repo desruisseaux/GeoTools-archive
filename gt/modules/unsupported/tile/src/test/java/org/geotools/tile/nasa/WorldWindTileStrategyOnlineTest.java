@@ -13,11 +13,9 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.media.jai.widget.ScrollingImagePanel;
 
 import junit.framework.TestCase;
 
-import org.geotools.catalog.GeoResource;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;

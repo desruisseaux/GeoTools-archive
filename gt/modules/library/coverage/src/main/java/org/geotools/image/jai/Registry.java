@@ -16,22 +16,18 @@
  */
 package org.geotools.image.jai;
 
-// J2SE dependencies
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.awt.image.renderable.RenderedImageFactory;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.registry.RIFRegistry;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.util.logging.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
 
@@ -79,7 +75,7 @@ public final class Registry {
             registry.registerDescriptor(new NodataFilterDescriptor());
             RIFRegistry.register(registry, op, "org.geotools", new NodataFilterCRIF());
 
-            record  = Logging.format(Level.CONFIG, LoggingKeys.REGISTERED_JAI_OPERATIONS);
+            record  = Loggings.format(Level.CONFIG, LoggingKeys.REGISTERED_JAI_OPERATIONS);
             op = null;
         } catch (IllegalArgumentException exception) {
             /*
@@ -87,7 +83,7 @@ public final class Registry {
              * is likely to fails (since it tries to load operations declared in META-INF/services,
              * and some of them depend on JAI operations).
              */
-            record = Logging.getResources(null).getLogRecord(Level.WARNING,
+            record = Loggings.getResources(null).getLogRecord(Level.WARNING,
                      LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, op);
             record.setThrown(exception);
         }
@@ -96,13 +92,13 @@ public final class Registry {
     }
 
     /**
-     * Allows or disallow native acceleration for the specified JAI operation. By default, JAI uses
-     * hardware accelerated methods when available. For example, it make use of MMX instructions on
-     * Intel processors. Unfortunatly, some native method crash the Java Virtual Machine under some
-     * circonstances.  For example on JAI 1.1.2, the "Affine" operation on an image with float data
-     * type, bilinear interpolation and an {@link javax.media.jai.ImageLayout} rendering hint cause
-     * an exception in medialib native code.  Disabling the native acceleration (i.e using the pure
-     * Java version) is a convenient workaround until Sun fix the bug.
+     * Allows or disallow native acceleration for the specified operation on the given JAI instance.
+     * By default, JAI uses hardware accelerated methods when available. For example, it make use of
+     * MMX instructions on Intel processors. Unfortunatly, some native method crash the Java Virtual
+     * Machine under some circonstances. For example on JAI 1.1.2, the {@code "Affine"} operation on
+     * an image with float data type, bilinear interpolation and an {@link javax.media.jai.ImageLayout}
+     * rendering hint cause an exception in medialib native code. Disabling the native acceleration
+     * (i.e using the pure Java version) is a convenient workaround until Sun fix the bug.
      * <p>
      * <strong>Implementation note:</strong> the current implementation assumes that factories for
      * native implementations are declared in the {@code com.sun.media.jai.mlib} package, while
@@ -110,24 +106,31 @@ public final class Registry {
      * package. It work for Sun's 1.1.2 implementation, but may change in future versions. If this
      * method doesn't recognize the package, it does nothing.
      *
-     * @param operation The operation name (e.g. "Affine").
+     * @param operation The operation name (e.g. {@code "Affine"}).
      * @param allowed {@code false} to disallow native acceleration.
+     * @param jai The instance of {@link JAI} we are going to work on. This argument can be
+     *        omitted for the {@linkplain JAI#getDefaultInstance default JAI instance}.
      *
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854">JAI bug report 4906854</a>
+     *
+     * @since 2.5
      */
     public synchronized static void setNativeAccelerationAllowed(final String operation,
-                                                                 final boolean  allowed)
+                                                                 final boolean  allowed,
+                                                                 final JAI jai)
     {
-        final String             product = "com.sun.media.jai";
-        final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
-        final List             factories = registry.getOrderedFactoryList(
-                                           RenderedRegistryMode.MODE_NAME, operation, product);
+        final String product = "com.sun.media.jai";
+        final OperationRegistry registry = jai.getOperationRegistry();
+
+        // TODO: Check if we can remove SuppressWarnings with a future JAI version.
+        @SuppressWarnings("unchecked")
+        final List<RenderedImageFactory> factories = registry.getOrderedFactoryList(
+                RenderedRegistryMode.MODE_NAME, operation, product);
         if (factories != null) {
             RenderedImageFactory   javaFactory = null;
             RenderedImageFactory nativeFactory = null;
             Boolean               currentState = null;
-            for (final Iterator it=factories.iterator(); it.hasNext();) {
-                final RenderedImageFactory factory = (RenderedImageFactory) it.next();
+            for (final RenderedImageFactory factory : factories) {
                 final String pack = factory.getClass().getPackage().getName();
                 if (pack.equals("com.sun.media.jai.mlib")) {
                     nativeFactory = factory;
@@ -149,7 +152,7 @@ public final class Registry {
                 RIFRegistry.setPreference(registry, operation, product,
                                           allowed ? nativeFactory : javaFactory,
                                           allowed ? javaFactory : nativeFactory);
-                final LogRecord record = Logging.format(Level.CONFIG,
+                final LogRecord record = Loggings.format(Level.CONFIG,
                                                  LoggingKeys.NATIVE_ACCELERATION_STATE_$2,
                                                  operation, Integer.valueOf(allowed ? 1 : 0));
                 log("setNativeAccelerationAllowed", record);
@@ -158,11 +161,23 @@ public final class Registry {
     }
 
     /**
-     * Log the specified record.
+     * Allows or disallow native acceleration for the specified operation on the
+     * {@linkplain JAI#getDefaultInstance default JAI instance}. This method is
+     * a shortcut for <code>{@linkplain #setNativeAccelerationAllowed(String,boolean,JAI)
+     * setNativeAccelerationAllowed}(operation, allowed, JAI.getDefaultInstance())</code>.
+     *
+     * @see #setNativeAccelerationAllowed(String, boolean, JAI)
+     */
+    public static void setNativeAccelerationAllowed(final String operation, final boolean allowed) {
+    	setNativeAccelerationAllowed(operation, allowed, JAI.getDefaultInstance());
+    }
+
+    /**
+     * Logs the specified record.
      */
     private static void log(final String method, final LogRecord record) {
         record.setSourceClassName(Registry.class.getName());
         record.setSourceMethodName(method);
-        org.geotools.util.logging.Logging.getLogger("org.geotools.image").log(record);
+        Logging.getLogger(Registry.class).log(record);
     }
 }

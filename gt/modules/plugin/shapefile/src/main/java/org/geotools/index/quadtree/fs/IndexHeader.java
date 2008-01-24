@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 
 import org.geotools.index.quadtree.StoreException;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Tommaso Nolli
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/index/quadtree/fs/IndexHeader.java $
  */
 public class IndexHeader {
     public static final byte LSB_ORDER = -1;
@@ -39,8 +39,8 @@ public class IndexHeader {
     private static final String SIGNATURE = "SQT";
     private static final byte VERSION = 1;
     private static final byte[] RESERVED = { 0, 0, 0 };
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.index.quadtree");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.quadtree");
     private byte byteOrder;
 
     public IndexHeader(byte byteOrder) {
@@ -49,14 +49,14 @@ public class IndexHeader {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param channel
-     *
+     * 
      * @throws IOException
      * @throws StoreException
      */
-    public IndexHeader(ReadableByteChannel channel)
-        throws IOException, StoreException {
+    public IndexHeader(ReadableByteChannel channel) throws IOException,
+            StoreException {
         ByteBuffer buf = ByteBuffer.allocate(8);
 
         channel.read(buf);
@@ -70,8 +70,8 @@ public class IndexHeader {
         if (!s.equals(SIGNATURE)) {
             // Old file format
             LOGGER.warning("Old qix file format; this file format "
-                + "is deprecated; It is strongly recommended "
-                + "to regenerate it in new format.");
+                    + "is deprecated; It is strongly recommended "
+                    + "to regenerate it in new format.");
 
             buf.position(0);
             tmp = buf.array();
@@ -104,7 +104,7 @@ public class IndexHeader {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return Returns the byteOrder.
      */
     public byte getByteOrder() {

@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.jdbc;
 
 import org.geotools.data.DefaultQuery;
@@ -10,65 +25,63 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
-public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
 
+public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
     protected void setUp() throws Exception {
         super.setUp();
-        
-        dataStore.setForeignKeyAware(true);
+
+        dataStore.setAssociations(true);
     }
-    
+
     public void testGetSchema() throws Exception {
         SimpleFeatureType featureType = dataStore.getSchema("fk");
-        
-        assertNotNull( featureType );
-        
+
+        assertNotNull(featureType);
+
         AttributeDescriptor att = featureType.getAttribute("ft1");
-        assertNotNull( att );
-        
-        assertEquals( Association.class, att.getType().getBinding() );
+        assertNotNull(att);
+
+        assertEquals(Association.class, att.getType().getBinding());
     }
 
     public void testGetFeatures() throws Exception {
-        Hints hints = new Hints( Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer( 1 ) );
-        
+        Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer(1));
+
         DefaultQuery query = new DefaultQuery();
-        query.setTypeName( "fk" );
-        query.setHints( hints );
-        
-        FeatureReader reader = 
-            dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        assertTrue( reader.hasNext() );
-        
+        query.setTypeName("fk");
+        query.setHints(hints);
+
+        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        assertTrue(reader.hasNext());
+
         SimpleFeature feature = reader.next();
-        Association association = (Association) feature.getAttribute( "ft1" );
-        assertEquals( "0", association.getUserData().get( "gml:id") );
-        
+        Association association = (Association) feature.getAttribute("ft1");
+        assertEquals("ft1.0", association.getUserData().get("gml:id"));
+
         SimpleFeature associated = (SimpleFeature) association.getValue();
-        assertNotNull( associated );
-        
-        assertEquals( "zero", associated.getAttribute("stringProperty"));
-        
+        assertNotNull(associated);
+
+        assertEquals("zero", associated.getAttribute("stringProperty"));
+
         Property attribute = feature.getProperty("ft1");
-        assertEquals( "0", attribute.getUserData().get( "gml:id") );
+        assertEquals("ft1.0", attribute.getUserData().get("gml:id"));
     }
-    
+
     public void testGetFeaturesWithZeroDepth() throws Exception {
-        Hints hints = new Hints( Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer( 0 ) );
-        
+        Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer(0));
+
         DefaultQuery query = new DefaultQuery();
-        query.setTypeName( "fk" );
-        query.setHints( hints );
-        
-        FeatureReader reader = 
-            dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        assertTrue( reader.hasNext() );
-        
+        query.setTypeName("fk");
+        query.setHints(hints);
+
+        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        assertTrue(reader.hasNext());
+
         SimpleFeature feature = reader.next();
-        Association association = (Association) feature.getAttribute( "ft1" );
-        assertNull( association.getValue() );
-        
+        Association association = (Association) feature.getAttribute("ft1");
+        assertNull(association.getValue());
+
         Property attribute = feature.getProperty("ft1");
-        assertEquals( "0", attribute.getUserData().get( "gml:id") );
+        assertEquals("ft1.0", attribute.getUserData().get("gml:id"));
     }
 }

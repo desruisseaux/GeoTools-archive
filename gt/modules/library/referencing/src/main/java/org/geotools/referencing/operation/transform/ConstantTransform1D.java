@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.util.Arrays;
 
 
@@ -46,26 +45,29 @@ final class ConstantTransform1D extends LinearTransform1D {
     protected ConstantTransform1D(final double offset) {
         super(0, offset);
     }
-    
+
     /**
      * Transforms the specified value.
      */
+    @Override
     public double transform(double value) {
         return offset;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
         Arrays.fill(dstPts, dstOff, dstOff+numPts, (float)offset);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
     {

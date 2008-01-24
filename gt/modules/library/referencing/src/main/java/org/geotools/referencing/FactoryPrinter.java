@@ -96,7 +96,7 @@ final class FactoryPrinter implements Comparator<Class<?>> {
          * Prints the table header.
          */
         final Vocabulary resources = Vocabulary.getResources(locale);
-        final TableWriter table  = new TableWriter(out, " \u2502 ");
+        final TableWriter table  = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
         table.write(resources.getString(VocabularyKeys.FACTORY));
@@ -107,7 +107,7 @@ final class FactoryPrinter implements Comparator<Class<?>> {
         table.nextColumn();
         table.write(resources.getString(VocabularyKeys.IMPLEMENTATIONS));
         table.nextLine();
-        table.nextLine('\u2550');
+        table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
         final StringBuilder vendors         = new StringBuilder();
         final StringBuilder implementations = new StringBuilder();
         for (final Iterator<Class<?>> it=categories.iterator(); it.hasNext();) {

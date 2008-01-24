@@ -16,7 +16,6 @@
 
 package org.geotools.gui.swing.style.sld;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
@@ -144,7 +143,8 @@ public class JLinejoinPanel extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText(TextBundle.getResource().getString("shortexpression"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
+        jButton1.setText(bundle.getString("shortexpression")); // NOI18N
         jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

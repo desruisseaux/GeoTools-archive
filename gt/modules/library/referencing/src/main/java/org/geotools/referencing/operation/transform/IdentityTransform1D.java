@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -44,26 +44,29 @@ final class IdentityTransform1D extends LinearTransform1D {
     private IdentityTransform1D() {
         super(1, 0);
     }
-    
+
     /**
      * Transforms the specified value.
      */
+    @Override
     public double transform(double value) {
         return value;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
         System.arraycopy(srcPts, srcOff, dstPts, dstOff, numPts);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
     {

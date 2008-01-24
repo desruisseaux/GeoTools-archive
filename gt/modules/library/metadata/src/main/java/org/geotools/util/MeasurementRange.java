@@ -112,7 +112,7 @@ public class MeasurementRange extends NumberRange {
      * @param isMaxIncluded Defines whether the maximum value is included in the Range.
      * @param units   The units of measurement, or {@code null} if unknown.
      */
-    public <N extends Number> MeasurementRange(final Class<N> type,
+    public <N extends Number> MeasurementRange(final Class<? extends N> type,
                                                final N minimum, final boolean isMinIncluded,
                                                final N maximum, final boolean isMaxIncluded,
                                                final Unit units)
@@ -172,6 +172,18 @@ public class MeasurementRange extends NumberRange {
     }
 
     /**
+     * Casts this range to the specified type.
+     *
+     * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
+     *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * @return The casted range, or {@code this} if this range already uses the specified type.
+     */
+    @Override
+    public MeasurementRange castTo(final Class<? extends Number> type) {
+        return convertAndCast(this, type);
+    }
+
+    /**
      * Casts the specified range to the specified type. If this class is associated to a unit of
      * measurement, then this method convert the {@code range} units to the same units than this
      * instance.
@@ -181,12 +193,11 @@ public class MeasurementRange extends NumberRange {
      * @return The casted range, or {@code range} if no cast is needed.
      */
     @Override
-    NumberRange convertAndCast(final Range range, final Class<? extends Number> type) {
+    MeasurementRange convertAndCast(final Range range, final Class<? extends Number> type) {
         if (range instanceof MeasurementRange) {
             return ((MeasurementRange) range).convertAndCast(type, units);
-        } else {
-            return super.convertAndCast(range, type);
         }
+        return new MeasurementRange(type, range, units);
     }
 
     /**
@@ -231,6 +242,53 @@ public class MeasurementRange extends NumberRange {
         return new MeasurementRange(type,
                 ClassChanger.cast(minimum, type), isMinIncluded,
                 ClassChanger.cast(maximum, type), isMaxIncluded, targetUnits);
+    }
+
+    /**
+     * Casts the given range to an instance of this class.
+     */
+    @Override
+    MeasurementRange cast(final Range range) {
+        return new MeasurementRange(range, units);
+    }
+
+    /**
+     * Returns an initially empty array of the given length.
+     */
+    @Override
+    MeasurementRange[] newArray(final int length) {
+        return new MeasurementRange[length];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MeasurementRange union(final Range range) {
+        return (MeasurementRange) super.union(range);
+        // Should never throw ClassCastException because super.union(Range) invokes cast(Range),
+        // which is overriden in this class with MeasurementRange return type.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MeasurementRange intersect(final Range range) {
+        return (MeasurementRange) super.intersect(range);
+        // Should never throw ClassCastException because super.intersect(Range) invokes
+        // convertAndCast(...),  which is overriden in this class with MeasurementRange
+        // return type.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MeasurementRange[] subtract(final Range range) {
+        return (MeasurementRange[]) super.subtract(range);
+        // Should never throw ClassCastException because super.subtract(Range) invokes newArray(int)
+        // and cast(Range), which are overriden in this class with MeasurementRange return type.
     }
 
     /**

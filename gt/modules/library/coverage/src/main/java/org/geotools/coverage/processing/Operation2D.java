@@ -160,7 +160,7 @@ public abstract class Operation2D extends AbstractOperation {
                 final GridCoverage2D old = source;
                 source = source.geophysics(true);
                 if (i == PRIMARY_SOURCE_INDEX) {
-                    type = (old == source) ? ViewType.GEOPHYSICS : ViewType.DISPLAYABLE;
+                    type = (old == source) ? ViewType.GEOPHYSICS : ViewType.PACKED;
                 }
             }
             sources[i] = source;

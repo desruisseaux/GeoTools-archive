@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.contexttree;
 
 import org.geotools.map.MapContext;
@@ -24,14 +23,28 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  */
 public final class SelectionData {
-
-public final MapContext context;
-public final MapLayer layer;
     
-    SelectionData(MapContext context, MapLayer layer){
+    private final MapContext context;
+    private final MapLayer layer;
+    private final Object sub;
+
+    SelectionData(MapContext context, MapLayer layer, Object obj) {
         this.context = context;
         this.layer = layer;
+        this.sub = obj;
     }
-
+    
+    public MapContext getContext(){
+        return context;
+    }
+    
+    public MapLayer getLayer(){
+        return layer;
+    }
+    
+    public Object getSubObject(){
+        return sub;
+    }
+    
 }
 

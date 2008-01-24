@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage.io;
 
-// J2SE dependencies
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.*;
@@ -33,19 +32,15 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Extensions
 import javax.units.Unit;
 import javax.units.SI;
 import javax.units.NonSI;
 
-// JAI dependencies
 import javax.imageio.IIOException;
 import javax.media.jai.DeferredData;
 import javax.media.jai.DeferredProperty;
-import javax.media.jai.ParameterList;
 import javax.media.jai.PropertySource;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -61,7 +56,6 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
@@ -69,7 +63,6 @@ import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.OperationMethod;
@@ -78,7 +71,6 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.Cloneable;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
@@ -92,7 +84,7 @@ import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
-import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -180,8 +172,11 @@ public class MetadataBuilder {
      * @see #DATUM
      * @see #PROJECTION
      */
-    public static final Key COORDINATE_REFERENCE_SYSTEM = new Key("CoordinateReferenceSystem") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<CoordinateReferenceSystem> COORDINATE_REFERENCE_SYSTEM =
+            new Key<CoordinateReferenceSystem>("CoordinateReferenceSystem")
+    {
+        @Override
+        public CoordinateReferenceSystem getValue(final GridCoverage coverage) {
             return coverage.getCoordinateReferenceSystem();
         }
     };
@@ -203,8 +198,9 @@ public class MetadataBuilder {
      * @see #PROJECTION
      * @see #COORDINATE_REFERENCE_SYSTEM
      */
-    public static final Key UNITS = new Key("Unit") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<Unit> UNITS = new Key<Unit>("Unit") {
+        @Override
+        public Unit getValue(final GridCoverage coverage) {
             Unit unit = null;
             final CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
             if (crs != null) {
@@ -235,8 +231,9 @@ public class MetadataBuilder {
      * @see #PROJECTION
      * @see #COORDINATE_REFERENCE_SYSTEM
      */
-    public static final Key DATUM = new Key("Datum") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<Datum> DATUM = new Key<Datum>("Datum") {
+        @Override
+        public Datum getValue(final GridCoverage coverage) {
             return CRSUtilities.getDatum(coverage.getCoordinateReferenceSystem());
         }
     };
@@ -250,8 +247,9 @@ public class MetadataBuilder {
      * @see #PROJECTION
      * @see #COORDINATE_REFERENCE_SYSTEM
      */
-    public static final Key ELLIPSOID = new Key("Ellipsoid") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<Ellipsoid> ELLIPSOID = new Key<Ellipsoid>("Ellipsoid") {
+        @Override
+        public Ellipsoid getValue(final GridCoverage coverage) {
             return CRS.getEllipsoid(coverage.getCoordinateReferenceSystem());
         }
     };
@@ -268,8 +266,9 @@ public class MetadataBuilder {
      * @see #PROJECTION
      * @see #COORDINATE_REFERENCE_SYSTEM
      */
-    public static final Key OPERATION_METHOD = new Key("OperationMethod") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<String> OPERATION_METHOD = new Key<String>("OperationMethod") {
+        @Override
+        public String getValue(final GridCoverage coverage) {
             final Projection projection = (Projection) PROJECTION.getValue(coverage);
             return (projection!=null) ? projection.getName().getCode() : null;
         }
@@ -287,8 +286,9 @@ public class MetadataBuilder {
      * @see #FALSE_EASTING
      * @see #FALSE_NORTHING
      */
-    public static final Key PROJECTION = new Key("Projection") {
-        public Object getValue(final GridCoverage coverage) {
+    public static final Key<Projection> PROJECTION = new Key<Projection>("Projection") {
+        @Override
+        public Projection getValue(final GridCoverage coverage) {
             final ProjectedCRS crs;
             crs = CRS.getProjectedCRS(coverage.getCoordinateReferenceSystem());
             return (crs!=null) ? crs.getConversionFromBase() : null;
@@ -306,7 +306,7 @@ public class MetadataBuilder {
      * @see #FALSE_NORTHING
      * @see #PROJECTION
      */
-    public static final Key SEMI_MAJOR = new ProjectionKey("semi_major");
+    public static final Key<Number> SEMI_MAJOR = new ProjectionKey("semi_major");
 
     /**
      * Key for the {@code "semi_minor"} projection parameter. There is no specific method
@@ -319,7 +319,7 @@ public class MetadataBuilder {
      * @see #FALSE_NORTHING
      * @see #PROJECTION
      */
-    public static final Key SEMI_MINOR = new ProjectionKey("semi_minor");
+    public static final Key<Number> SEMI_MINOR = new ProjectionKey("semi_minor");
 
     /**
      * Key for the {@code "latitude_of_origin"} projection parameter. There is no specific method
@@ -332,7 +332,7 @@ public class MetadataBuilder {
      * @see #FALSE_NORTHING
      * @see #PROJECTION
      */
-    public static final Key LATITUDE_OF_ORIGIN = new ProjectionKey("latitude_of_origin");
+    public static final Key<Number> LATITUDE_OF_ORIGIN = new ProjectionKey("latitude_of_origin");
 
     /**
      * Key for the {@code "central_meridian"} projection parameter. There is no specific method
@@ -345,7 +345,7 @@ public class MetadataBuilder {
      * @see #FALSE_NORTHING
      * @see #PROJECTION
      */
-    public static final Key CENTRAL_MERIDIAN = new ProjectionKey("central_meridian");
+    public static final Key<Number> CENTRAL_MERIDIAN = new ProjectionKey("central_meridian");
 
     /**
      * Key for the {@code "false_easting"} projection parameter. There is no specific method
@@ -358,7 +358,7 @@ public class MetadataBuilder {
      * @see #FALSE_NORTHING
      * @see #PROJECTION
      */
-    public static final Key FALSE_EASTING = new ProjectionKey("false_easting");
+    public static final Key<Number> FALSE_EASTING = new ProjectionKey("false_easting");
 
     /**
      * Key for the {@code "false_northing"} projection parameter. There is no specific method
@@ -371,7 +371,7 @@ public class MetadataBuilder {
      * @see #FALSE_EASTING
      * @see #PROJECTION
      */
-    public static final Key FALSE_NORTHING = new ProjectionKey("false_northing");
+    public static final Key<Number> FALSE_NORTHING = new ProjectionKey("false_northing");
 
     /**
      * Key for the minimal <var>x</var> value (western limit).
@@ -385,7 +385,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key X_MINIMUM = new EnvelopeKey("XMinimum", (byte)0, EnvelopeKey.MINIMUM);
+    public static final Key<Comparable<?>> X_MINIMUM = new EnvelopeKey("XMinimum",
+            (byte)0, EnvelopeKey.MINIMUM);
 
     /**
      * Key for the minimal <var>y</var> value (southern limit).
@@ -399,7 +400,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key Y_MINIMUM = new EnvelopeKey("YMinimum", (byte)1, EnvelopeKey.MINIMUM);
+    public static final Key<Comparable<?>> Y_MINIMUM = new EnvelopeKey("YMinimum",
+            (byte)1, EnvelopeKey.MINIMUM);
 
     /**
      * Key for the minimal <var>z</var> value. This is usually the minimal altitude.
@@ -410,7 +412,8 @@ public class MetadataBuilder {
      * @see #Z_RESOLUTION
      * @see #DEPTH
      */
-    public static final Key Z_MINIMUM = new EnvelopeKey("ZMinimum", (byte)2, EnvelopeKey.MINIMUM);
+    public static final Key<Comparable<?>> Z_MINIMUM = new EnvelopeKey("ZMinimum",
+            (byte)2, EnvelopeKey.MINIMUM);
 
     /**
      * Key for the maximal <var>x</var> value (eastern limit).
@@ -424,7 +427,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key X_MAXIMUM = new EnvelopeKey("XMaximum", (byte)0, EnvelopeKey.MAXIMUM);
+    public static final Key<Comparable<?>> X_MAXIMUM = new EnvelopeKey("XMaximum",
+            (byte)0, EnvelopeKey.MAXIMUM);
 
     /**
      * Key for the maximal <var>y</var> value (northern limit).
@@ -438,7 +442,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key Y_MAXIMUM = new EnvelopeKey("YMaximum", (byte)1, EnvelopeKey.MAXIMUM);
+    public static final Key<Comparable<?>> Y_MAXIMUM = new EnvelopeKey("YMaximum",
+            (byte)1, EnvelopeKey.MAXIMUM);
 
     /**
      * Key for the maximal <var>z</var> value. This is usually the maximal altitude.
@@ -449,7 +454,8 @@ public class MetadataBuilder {
      * @see #Z_RESOLUTION
      * @see #DEPTH
      */
-    public static final Key Z_MAXIMUM = new EnvelopeKey("ZMaximum", (byte)2, EnvelopeKey.MAXIMUM);
+    public static final Key<Comparable<?>> Z_MAXIMUM = new EnvelopeKey("ZMaximum", (byte)2,
+            EnvelopeKey.MAXIMUM);
 
     /**
      * Key for the resolution among the <var>x</var> axis. The {@link #getEnvelope} method looks
@@ -461,8 +467,8 @@ public class MetadataBuilder {
      * @see #Y_MAXIMUM
      * @see #Y_RESOLUTION
      */
-    public static final Key X_RESOLUTION = new EnvelopeKey("XResolution", (byte)0,
-                                                           EnvelopeKey.RESOLUTION);
+    public static final Key<Comparable<?>> X_RESOLUTION = new EnvelopeKey("XResolution",
+            (byte)0, EnvelopeKey.RESOLUTION);
 
     /**
      * Key for the resolution among the <var>y</var> axis. The {@link #getEnvelope} method looks
@@ -476,8 +482,8 @@ public class MetadataBuilder {
      * @see #WIDTH
      * @see #HEIGHT
      */
-    public static final Key Y_RESOLUTION = new EnvelopeKey("YResolution", (byte)1,
-                                                           EnvelopeKey.RESOLUTION);
+    public static final Key<Comparable<?>> Y_RESOLUTION = new EnvelopeKey("YResolution",
+            (byte)1, EnvelopeKey.RESOLUTION);
 
     /**
      * Key for the resolution among the <var>z</var> axis. The {@link #getEnvelope} method looks
@@ -487,8 +493,8 @@ public class MetadataBuilder {
      * @see #Z_MAXIMUM
      * @see #DEPTH
      */
-    public static final Key Z_RESOLUTION = new EnvelopeKey("ZResolution", (byte)2,
-                                                           EnvelopeKey.RESOLUTION);
+    public static final Key<Comparable<?>> Z_RESOLUTION = new EnvelopeKey("ZResolution",
+            (byte)2, EnvelopeKey.RESOLUTION);
 
     /**
      * Key for the image's width in pixels. The {@link #getGridRange} method looks for this
@@ -499,7 +505,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key WIDTH = new EnvelopeKey("Width", (byte)0, EnvelopeKey.SIZE);
+    public static final Key<Comparable<?>> WIDTH = new EnvelopeKey("Width",
+            (byte)0, EnvelopeKey.SIZE);
 
     /**
      * Key for the image's height in pixels. The {@link #getGridRange} method looks for this
@@ -510,7 +517,8 @@ public class MetadataBuilder {
      * @see #X_RESOLUTION
      * @see #Y_RESOLUTION
      */
-    public static final Key HEIGHT = new EnvelopeKey("Height", (byte)1, EnvelopeKey.SIZE);
+    public static final Key<Comparable<?>> HEIGHT = new EnvelopeKey("Height",
+            (byte)1, EnvelopeKey.SIZE);
 
     /**
      * Key for the image's "depth" in pixels. This metadata may exists for 3D images,
@@ -522,7 +530,8 @@ public class MetadataBuilder {
      * @see #Z_MAXIMUM
      * @see #Z_RESOLUTION
      */
-    public static final Key DEPTH = new EnvelopeKey("Depth", (byte)2, EnvelopeKey.SIZE);
+    public static final Key<Comparable<?>> DEPTH = new EnvelopeKey("Depth",
+            (byte)2, EnvelopeKey.SIZE);
 
     /**
      * The source (the file path or the URL) specified during the last call to a {@code load(...)}
@@ -552,14 +561,13 @@ public class MetadataBuilder {
 
     /**
      * The metadata, or {@code null} if none. Keys are the caseless metadata names
-     * as {@link Key} objects, and values are arbitrary objects (usually {@link String}s).
-     * This map will be constructed only when first needed.
+     * and values are arbitrary objects (usually {@link String}s). This map will be
+     * constructed only when first needed.
      */
-    private Map metadata;
+    private Map<Key<?>,Object> metadata;
 
     /**
      * The mapping between keys and alias, or {@code null} if there is no alias.
-     * Keys are {@link Key} objects and values are {@link Set} of {@link Key} objects.
      * This mapping is used for two purpose:
      * <ul>
      *   <li>If the key is a {@link Key} object, then the value is the set of alias (as
@@ -570,7 +578,7 @@ public class MetadataBuilder {
      *       for ambiguity when adding a new metadata.</li>
      * </ul>
      */
-    private Map naming;
+    private Map<Key<?>, Set<Key<?>>> naming;
 
     /**
      * The alias used in the last {@link #getOptional} invocation. This field is for information
@@ -585,7 +593,7 @@ public class MetadataBuilder {
      * execution. Keys are object names (e.g. "CoordinateReferenceSystem"), and value are the
      * actual objects.
      */
-    private transient Map cache;
+    private transient Map<String,Object> cache;
 
     /**
      * The factories to use for constructing ellipsoids, projections, coordinate reference systems...
@@ -767,9 +775,9 @@ public class MetadataBuilder {
      */
     protected void load(final BufferedReader in) throws IOException {
         assert Thread.holdsLock(this);
-        final Set   previousComments = new HashSet();
+        final Set<String> previousComments = new HashSet<String>();
         final StringBuilder comments = new StringBuilder();
-        final String   lineSeparator = System.getProperty("line.separator", "\n");
+        final String lineSeparator = System.getProperty("line.separator", "\n");
         String line; while ((line=in.readLine())!=null) {
             if (line.trim().length()!=0) {
                 if (!parseLine(line)) {
@@ -854,13 +862,12 @@ public class MetadataBuilder {
         if (naming == null) {
             return;
         }
-        for (final Iterator it=naming.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
-            final Key key = (Key) entry.getKey();
+        for (final Map.Entry<Key<?>, Set<Key<?>>> entry : naming.entrySet()) {
+            final Key<?> key = entry.getKey();
             if (key instanceof AliasKey) {
                 continue;
             }
-            final Set alias = (Set) entry.getValue();
+            final Set<Key<?>> alias = entry.getValue();
             if (alias==null || alias.isEmpty()) {
                 continue;
             }
@@ -889,7 +896,7 @@ public class MetadataBuilder {
             add((PropertySource) image, null);
         } else {
             final String[] names = image.getPropertyNames();
-            if (names!=null) {
+            if (names != null) {
                 for (int i=0; i<names.length; i++) {
                     final String name = names[i];
                     add(name, image.getProperty(name));
@@ -919,7 +926,7 @@ public class MetadataBuilder {
         if (names != null) {
             for (int i=0; i<names.length; i++) {
                 final String  name = names[i];
-                final Class classe = properties.getPropertyClass(name);
+                final Class<?> classe = properties.getPropertyClass(name);
                 add(name, new DeferredProperty(properties, name, classe));
             }
         }
@@ -973,7 +980,7 @@ public class MetadataBuilder {
             value = text;
         }
         if (metadata == null) {
-            metadata = new LinkedHashMap();
+            metadata = new LinkedHashMap<Key<?>,Object>();
         }
         /*
          * Consistency check:
@@ -984,9 +991,9 @@ public class MetadataBuilder {
          *      alias bound to the same key. Those values are fetched in a loop
          *      with 'getOptional'.
          */
-        Object   oldValue = getMetadata(aliasAsKey);
-        Key      checkKey = null;
-        Iterator iterator = null;
+        Object           oldValue = getMetadata(aliasAsKey);
+        Key<?>           checkKey = null;
+        Iterator<Key<?>> iterator = null;
         while (true) {
             if (oldValue!=null && !oldValue.equals(value)) {
                 final String alias = aliasAsKey.toString();
@@ -995,12 +1002,12 @@ public class MetadataBuilder {
             }
             if (iterator == null) {
                 if (naming == null) break;
-                final Set keySet = (Set) naming.get(aliasAsKey);
+                final Set<Key<?>> keySet = naming.get(aliasAsKey);
                 if (keySet == null) break;
                 iterator = keySet.iterator();
             }
             if (!iterator.hasNext()) break;
-            checkKey = (Key) iterator.next();
+            checkKey = iterator.next();
             oldValue = getOptional(checkKey);
         }
         /*
@@ -1050,7 +1057,8 @@ public class MetadataBuilder {
      * @see #contains
      * @see #get
      */
-    public synchronized void addAlias(final Key key, String alias) throws AmbiguousMetadataException
+    public synchronized void addAlias(final Key<?> key, String alias)
+            throws AmbiguousMetadataException
     {
         alias = trim(alias.trim(), " ");
         final AliasKey aliasAsKey = new AliasKey(alias);
@@ -1063,23 +1071,23 @@ public class MetadataBuilder {
             }
         }
         if (naming == null) {
-            naming = new LinkedHashMap();
+            naming = new LinkedHashMap<Key<?>,Set<Key<?>>>();
         }
         cache = null;
         // Add the alias for the specified key. This is the information
         // used by 'get' methods for fetching a metadata from a key.
-        Set set = (Set) naming.get(key);
+        Set<Key<?>> set = naming.get(key);
         if (set == null) {
-            set = new LinkedHashSet(4);
+            set = new LinkedHashSet<Key<?>>(4);
             naming.put(key, set);
         }
         set.add(aliasAsKey);
         // Add the key for the specified alias. This is the information used by
         // 'add' to check against ambiguities. Set's order doesn't matter here,
         // but we use LinkedHashSet anyway for faster iteration in key set.
-        set = (Set) naming.get(aliasAsKey);
+        set = naming.get(aliasAsKey);
         if (set == null) {
-            set = new LinkedHashSet(4);
+            set = new LinkedHashSet<Key<?>>(4);
             naming.put(aliasAsKey, set);
         }
         set.add(key);
@@ -1093,8 +1101,8 @@ public class MetadataBuilder {
     private boolean isValid() {
         assert Thread.holdsLock(this);
         if (naming != null) {
-            for (final Iterator it=naming.values().iterator(); it.hasNext();) {
-                if (!naming.keySet().containsAll((Set) it.next())) {
+            for (final Set<Key<?>> keys : naming.values()) {
+                if (!naming.keySet().containsAll(keys)) {
                     return false;
                 }
             }
@@ -1111,7 +1119,7 @@ public class MetadataBuilder {
      * @return The value as a string.
      * @throws MetadataException if the value can't be cast to a string.
      */
-    private String toString(final Object value, final Key key, final String alias)
+    private String toString(final Object value, final Key<?> key, final String alias)
             throws MetadataException
     {
         if (value == null) {
@@ -1161,15 +1169,14 @@ public class MetadataBuilder {
      *         can be any of the alias defined with {@link #addAlias}.
      * @return The metadata for the specified key, or {@code null} if none.
      */
-    private Object getOptional(final Key key) {
+    private Object getOptional(final Key<?> key) {
         assert Thread.holdsLock(this);
         lastAlias = null;
         if (naming != null) {
-            final Set alias = (Set) naming.get(key);
+            final Set<Key<?>> alias = naming.get(key);
             if (alias != null) {
-                for (final Iterator it=alias.iterator(); it.hasNext();) {
-                    final AliasKey aliasAsKey = (AliasKey) it.next();
-                    final Object value = getMetadata(aliasAsKey);
+                for (final Key<?> aliasAsKey : alias) {
+                    final Object value = getMetadata((AliasKey) aliasAsKey);
                     if (value != null) {
                         lastAlias = aliasAsKey.toString();
                         return value;
@@ -1191,7 +1198,7 @@ public class MetadataBuilder {
      * @see #get
      * @see #addAlias
      */
-    public synchronized boolean contains(final Key key) {
+    public synchronized boolean contains(final Key<?> key) {
         return getOptional(key) != null;
     }
 
@@ -1210,7 +1217,7 @@ public class MetadataBuilder {
      * @see #contains
      * @see #addAlias
      */
-    public synchronized Object get(final Key key) throws MissingMetadataException {
+    public synchronized Object get(final Key<?> key) throws MissingMetadataException {
         final Object value = getOptional(key);
         if (value!=null && value!=Image.UndefinedProperty) {
             return value;
@@ -1232,7 +1239,7 @@ public class MetadataBuilder {
      * @throws MissingMetadataException if no value exists for the specified key.
      * @throws MetadataException if the value can't be parsed as a {@code double}.
      */
-    private double getAsDouble(final Key key, final CoordinateReferenceSystem crs)
+    private double getAsDouble(final Key<?> key, final CoordinateReferenceSystem crs)
             throws MetadataException
     {
         if (crs instanceof TemporalCRS) {
@@ -1257,7 +1264,7 @@ public class MetadataBuilder {
      * @see #contains
      * @see #addAlias
      */
-    public synchronized double getAsDouble(final Key key) throws MetadataException {
+    public synchronized double getAsDouble(final Key<?> key) throws MetadataException {
         final Object value = get(key);
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
@@ -1284,7 +1291,7 @@ public class MetadataBuilder {
      * @see #contains
      * @see #addAlias
      */
-    public synchronized int getAsInt(final Key key) throws MetadataException {
+    public synchronized int getAsInt(final Key<?> key) throws MetadataException {
         final double value = getAsDouble(key);
         final int  integer = (int) value;
         if (value != integer) {
@@ -1304,7 +1311,7 @@ public class MetadataBuilder {
      * @throws MissingMetadataException if no value exists for the specified key.
      * @throws MetadataException if the value can't be parsed as a date.
      */
-    public synchronized Date getAsDate(final Key key) throws MetadataException {
+    public synchronized Date getAsDate(final Key<?> key) throws MetadataException {
         final Object value = get(key);
         if (value instanceof Date) {
             return (Date) (((Date) value).clone());
@@ -1363,7 +1370,7 @@ public class MetadataBuilder {
     private void cache(final String key, final Object object) {
         assert Thread.holdsLock(this);
         if (cache == null) {
-            cache = new HashMap();
+            cache = new HashMap<String,Object>();
         }
         cache.put(key, object);
     }
@@ -1378,15 +1385,15 @@ public class MetadataBuilder {
      *
      * @see #addAlias
      */
-    public synchronized String[] getAlias(final Key key) {
+    public synchronized String[] getAlias(final Key<?> key) {
         assert isValid();
         if (naming != null) {
-            final Set alias = (Set) naming.get(key);
+            final Set<Key<?>> alias = naming.get(key);
             if (alias != null) {
                 int index = 0;
                 final String[] list = new String[alias.size()];
-                for (final Iterator it=alias.iterator(); it.hasNext();) {
-                    list[index++] = it.next().toString();
+                for (final Key<?> aliasAsKey : alias) {
+                    list[index++] = aliasAsKey.toString();
                 }
                 assert index == list.length;
                 return list;
@@ -1498,7 +1505,7 @@ public class MetadataBuilder {
          * TODO: parse 'text' when DatumAuthorityFactory will be fully implemented.
          */
         checkEllipsoid(text, "getGeodeticDatum");
-        return org.geotools.referencing.datum.DefaultGeodeticDatum.WGS84;
+        return DefaultGeodeticDatum.WGS84;
     }
 
     /**
@@ -1561,8 +1568,7 @@ public class MetadataBuilder {
      */
     private static void setValue(final ParameterValue parameter, final double value, final Unit unit) {
         if (unit != null) {
-            // TODO: Remove cast when we will be allowed to compile for J2SE 1.5.
-            final Unit expected = ((ParameterDescriptor) parameter.getDescriptor()).getUnit();
+            final Unit expected = parameter.getDescriptor().getUnit();
             if (expected!=null && unit.isCompatible(expected)) {
                 parameter.setValue(value, unit);
                 return;
@@ -1670,16 +1676,13 @@ public class MetadataBuilder {
             throw new MetadataException(exception, OPERATION_METHOD, lastAlias);
         }
         final Unit unit = getUnit(null);
-        // TODO: Remove the cast when we will be allowed to compile for J2SE 1.5.
-        for (final Iterator it=((org.opengis.parameter.ParameterDescriptorGroup)
-                parameters.getDescriptor()).descriptors().iterator(); it.hasNext();) {
-            final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
+        for (final GeneralParameterDescriptor descriptor : parameters.getDescriptor().descriptors()) {
             if (descriptor instanceof ParameterDescriptor) {
                 final String          name = descriptor.getName().getCode();
                 final ParameterValue param = parameters.parameter(name);
                 final double paramValue;
                 try {
-                    paramValue = getAsDouble(new Key(name));
+                    paramValue = getAsDouble(new Key<Number>(name));
                 } catch (MissingMetadataException exception) {
                     // Parameter is not defined. Lets it to
                     // its default value and continue...
@@ -1710,7 +1713,7 @@ public class MetadataBuilder {
             parameters.parameter("semi_minor").setValue(semiMinor, axisUnit);
         }
         final Conversion defining = new DefiningConversion(toString(
-                                    projection, PROJECTION, projectionAlias), parameters);
+                projection, PROJECTION, projectionAlias), parameters);
         cache(CACHE_KEY, defining);
         return defining;
     }
@@ -1762,7 +1765,8 @@ public class MetadataBuilder {
         final Unit       angularUnit = isGeographic ? unit : NonSI.DEGREE_ANGLE;
         final Unit        linearUnit = SI.METER.isCompatible(unit) ? unit : SI.METER;
         final EllipsoidalCS    geoCS = DefaultEllipsoidalCS.GEODETIC_2D.usingUnit(angularUnit);
-        final Map         properties = Collections.singletonMap(IdentifiedObject.NAME_KEY, crsName);
+        final Map<String,String> properties =
+                Collections.singletonMap(IdentifiedObject.NAME_KEY, crsName);
         final GeographicCRS   geographicCRS;
         final CoordinateReferenceSystem crs;
         try {
@@ -1808,13 +1812,13 @@ public class MetadataBuilder {
          * No bounding box is available in the cache.
          * Computes it now and cache it for future use.
          */
-        final GeographicBoundingBox box;
+        final GeographicBoundingBoxImpl box;
         try {
-            box = (GeographicBoundingBox) // TODO: remove cast with J2SE 1.5
-                    new GeographicBoundingBoxImpl(getEnvelope()).unmodifiable();
+            box = new GeographicBoundingBoxImpl(getEnvelope());
         } catch (TransformException exception) {
             throw new MetadataException(exception, null, null);
         }
+        box.freeze();
         cache(CACHE_KEY, box);
         return box;
     }
@@ -1837,6 +1841,7 @@ public class MetadataBuilder {
      * @see #getGridRange
      * @see #getGeographicBoundingBox
      */
+    @SuppressWarnings("fallthrough")
     public synchronized Envelope getEnvelope() throws MetadataException {
         /*
          * First, checks if an Envelope object has already been constructed.
@@ -1867,11 +1872,11 @@ public class MetadataBuilder {
             case 0: break;
         }
         cache(CACHE_KEY, envelope);
-        return (Envelope) envelope.clone();
+        return envelope.clone();
     }
 
     /**
-     * Set the range for the specified dimension of an example. The range will be computed
+     * Set the range for the specified dimension of an envelope. The range will be computed
      * from the "?Minimum" and "?Maximum" metadata, if presents. If only one of those
      * metadata is present, the "?Resolution" metadata will be used.
      *
@@ -1884,8 +1889,8 @@ public class MetadataBuilder {
      * @param crs       The coordinate reference system
      * @throws MetadataException if a metadata can't be set, or if an ambiguity has been found.
      */
-    private void setRange(final Key minKey, final Key maxKey, final Key resKey,
-                          final GeneralEnvelope envelope,     final int dimension,
+    private void setRange(final Key<?> minKey, final Key<?> maxKey, final Key<?> resKey,
+                          final GeneralEnvelope envelope, final int dimension,
                           final GridRange gridRange, CoordinateReferenceSystem crs)
             throws MetadataException
     {
@@ -1928,6 +1933,7 @@ public class MetadataBuilder {
      * @see #getEnvelope
      * @see #getGeographicBoundingBox
      */
+    @SuppressWarnings("fallthrough")
     public synchronized GridRange getGridRange() throws MetadataException {
         /*
          * First, checks if a GridRange object has already been constructed. Since
@@ -2009,16 +2015,14 @@ public class MetadataBuilder {
         }
         if (metadata != null) {
             int maxLength = 1;
-            for (final Iterator it=metadata.keySet().iterator(); it.hasNext();) {
-                final Object key = it.next();
+            for (final Object key : metadata.keySet()) {
                 if (key != null) {
                     final int length = key.toString().length();
                     if (length > maxLength) maxLength = length;
                 }
             }
-            for (final Iterator it=metadata.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
-                final Key key = (Key) entry.getKey();
+            for (final Map.Entry<Key<?>,?> entry : metadata.entrySet()) {
+                final Key<?> key = entry.getKey();
                 if (key != null) {
                     Object value = entry.getValue();
                     if (value instanceof Number) {
@@ -2049,6 +2053,7 @@ public class MetadataBuilder {
      * {@link #getGeographicBoundingBox}. Then, it append the list of all metadata as
      * formatted by {@link #listMetadata}.
      */
+    @Override
     public String toString() {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringWriter  buffer = new StringWriter();
@@ -2132,7 +2137,7 @@ public class MetadataBuilder {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Key implements Serializable {
+    public static class Key<T> implements Serializable {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -2168,7 +2173,7 @@ public class MetadataBuilder {
          * @param coverage The grid coverage from which to fetch the value.
          * @return The value, or {@code null} if none.
          */
-        public Object getValue(final GridCoverage coverage) {
+        public T getValue(final GridCoverage coverage) {
             return null;
         }
 
@@ -2176,6 +2181,7 @@ public class MetadataBuilder {
          * Returns the name for this key. This is the name supplied to the constructor
          * (i.e. case and whitespaces are preserved).
          */
+        @Override
         public String toString() {
             return name;
         }
@@ -2183,6 +2189,7 @@ public class MetadataBuilder {
         /**
          * Returns a hash code value.
          */
+        @Override
         public int hashCode() {
             return key.hashCode();
         }
@@ -2192,6 +2199,7 @@ public class MetadataBuilder {
          * and considere any sequence of whitespaces as a single <code>'_'</code> character, as
          * specified in this class documentation.
          */
+        @Override
         public boolean equals(final Object object) {
             return (object!=null) && object.getClass().equals(getClass()) &&
                     key.equals(((Key) object).key);
@@ -2204,7 +2212,7 @@ public class MetadataBuilder {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private static final class EnvelopeKey extends Key {
+    private static final class EnvelopeKey extends Key<Comparable<?>> {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -2247,7 +2255,8 @@ public class MetadataBuilder {
         /**
          * Returns the value for this key from the specified grid coverage.
          */
-        public Object getValue(final GridCoverage coverage) {
+        @Override
+        public Comparable<?> getValue(final GridCoverage coverage) {
             Envelope envelope = null;
             GridRange   range = null;
             if ((method & 4) != 0) {
@@ -2280,7 +2289,7 @@ public class MetadataBuilder {
          * Returns the specified value as a {@link Double} or {@link Date} object
          * according the coverage's coordinate system.
          */
-        private Object getValue(final GridCoverage coverage, final double value) {
+        private Comparable<?> getValue(final GridCoverage coverage, final double value) {
             CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
             if (crs != null) {
                 crs = CRSUtilities.getSubCRS(crs, dimension, dimension+1);
@@ -2294,6 +2303,7 @@ public class MetadataBuilder {
         /**
          * Compares this key with the supplied key for equality.
          */
+        @Override
         public boolean equals(final Object object) {
             if (super.equals(object)) {
                 final EnvelopeKey that = (EnvelopeKey) object;
@@ -2311,7 +2321,7 @@ public class MetadataBuilder {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private static final class ProjectionKey extends Key {
+    private static final class ProjectionKey extends Key<Number> {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -2327,12 +2337,13 @@ public class MetadataBuilder {
         /**
          * Returns the value for this key from the specified grid coverage.
          */
-        public Object getValue(final GridCoverage coverage) {
+        @Override
+        public Number getValue(final GridCoverage coverage) {
             final ProjectedCRS crs = CRS.getProjectedCRS(coverage.getCoordinateReferenceSystem());
             if (crs != null) {
                 final ParameterValueGroup parameters = crs.getConversionFromBase().getParameterValues();
                 try {
-                    return parameters.parameter(toString()).getValue();
+                    return (Number) parameters.parameter(toString()).getValue();
                 } catch (ParameterNotFoundException exception) {
                     // No value set for the specified parameter.
                     // This is not an error. Just ignore...
@@ -2343,15 +2354,14 @@ public class MetadataBuilder {
     }
 
     /**
-     * A case-insensitive key for alias name. We use a different class because the
-     * <code>equals</code> method must returns {@code false} when comparing
-     * <code>AliasKey</code> with ordinary <code>Key</code>s. This kind of key is
-     * for internal use only.
+     * A case-insensitive key for alias name. We use a different class because the {@code equals}
+     * method must returns {@code false} when comparing {@code AliasKey} with ordinary {@code Key}s.
+     * This kind of key is for internal use only.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private static final class AliasKey extends Key {
+    private static final class AliasKey extends Key<Object> {
         /**
          * Serial number for interoperability with different versions.
          */
@@ -2367,6 +2377,7 @@ public class MetadataBuilder {
         /**
          * Returns a hash code value.
          */
+        @Override
         public int hashCode() {
             return ~super.hashCode();
         }

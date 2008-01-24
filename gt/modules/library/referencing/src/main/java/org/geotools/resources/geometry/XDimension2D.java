@@ -16,7 +16,6 @@
  */
 package org.geotools.resources.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Dimension2D;
 import java.io.Serializable;
 
@@ -102,8 +101,9 @@ public final class XDimension2D {
         /**
          * Returns a string representation of this dimension.
          */
+        @Override
         public String toString() {
-            return "Dimension2D["+width+','+height+']';
+            return "Dimension2D[" + width + ',' + height + ']';
         }
     }
 
@@ -171,8 +171,9 @@ public final class XDimension2D {
         /**
          * Returns a string representation of this dimension.
          */
+        @Override
         public String toString() {
-            return "Dimension2D["+width+','+height+']';
+            return "Dimension2D[" + width + ',' + height + ']';
         }
     }
 }

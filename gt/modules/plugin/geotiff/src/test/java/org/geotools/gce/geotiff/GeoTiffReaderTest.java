@@ -112,8 +112,8 @@ public class GeoTiffReaderTest extends TestCase {
 						buffer.append("CRS: ").append(
 								coverage.getCoordinateReferenceSystem2D()
 										.toWKT()).append("\n");
-						buffer.append("Envelope: ").append(
-								coverage.getEnvelope().toString()).append("\n");
+						buffer.append("GG: ").append(
+								coverage.getGridGeometry().toString()).append("\n");
 					}
 					// display metadata
 					if (org.geotools.TestData.isExtensiveTest()) {

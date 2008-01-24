@@ -17,11 +17,12 @@
 package org.geotools.image.io.mosaic;
 
 import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.resources.Utilities;
 
 
 /**
- * A pair of {@link ImageReader} with its {@link Input}. Only used as keys in hash map.
+ * A pair of {@link ImageReader} with its input. Only used as keys in hash map.
  *
  * @since 2.5
  * @source $URL$
@@ -30,9 +31,9 @@ import org.geotools.resources.Utilities;
  */
 final class ReaderInputPair {
     /**
-     * The image reader.
+     * The image reader, or the provider if none.
      */
-    final ImageReader reader;
+    private final Object reader;
 
     /**
      * The input to be given to the image reader.
@@ -40,11 +41,19 @@ final class ReaderInputPair {
     private final Object input;
 
     /**
-     * Creates a reader/input pair for the given tile.
+     * Creates a provider/input pair.
      */
-    ReaderInputPair(final Tile tile) {
-        reader = tile.getReader();
-        input  = tile.getInput();
+    ReaderInputPair(final ImageReaderSpi provider, final Object input) {
+        this.reader = provider;
+        this.input  = input;
+    }
+
+    /**
+     * Creates a reader/input pair.
+     */
+    ReaderInputPair(final ImageReader reader, final Object input) {
+        this.reader = reader;
+        this.input  = input;
     }
 
     /**
@@ -62,10 +71,9 @@ final class ReaderInputPair {
     public boolean equals(final Object object) {
         if (object instanceof ReaderInputPair) {
             final ReaderInputPair that = (ReaderInputPair) object;
-            return this.reader == that.reader && // We really want the same instance.
-                    Utilities.deepEquals(this.input, that.input);
+            return Utilities.equals(this.reader, that.reader) &&
+                   Utilities.deepEquals(this.input, that.input);
         }
         return false;
     }
-
 }

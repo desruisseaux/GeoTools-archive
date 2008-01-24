@@ -69,12 +69,6 @@ public class FilterBuilderTest extends TestCase {
         super(testName);
     }
 
-    public static junit.framework.Test suite() {
-        junit.framework.TestSuite suite = new junit.framework.TestSuite(FilterBuilderTest.class);
-
-        return suite;
-    }
-
     /**
      * Verify the parser uses the provided FilterFactory implementation
      * @throws ParseException
@@ -1215,7 +1209,7 @@ public class FilterBuilderTest extends TestCase {
         Expression expression = FilterBuilder.parseExpression(cqlExpression);
 
         // Test 2
-        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
+        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, '.')))";
         expression = FilterBuilder.parseExpression(cqlExpression);
         assertNotNull(expression);
         assertTrue(expression instanceof Function);

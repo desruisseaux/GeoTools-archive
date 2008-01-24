@@ -361,6 +361,16 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
+     * Returns {@code true} if this bounding box is empty.
+     *
+     * @since 2.5
+     */
+    public boolean isEmpty() {
+        // Use '!' in order to catch NaN values.
+        return !(eastBoundLongitude > westBoundLongitude && northBoundLatitude > southBoundLatitude);
+    }
+
+    /**
      * Compares this geographic bounding box with the specified object for equality.
      */
     @Override

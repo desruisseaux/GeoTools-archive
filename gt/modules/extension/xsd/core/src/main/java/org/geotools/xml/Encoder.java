@@ -189,9 +189,7 @@ public class Encoder {
 
         index = new SchemaIndexImpl(new XSDSchema[] { schema });
 
-        bindingLoader = new BindingLoader();
-        bindingLoader.setContainer(configuration.setupBindings(bindingLoader.getContainer()));
-
+        bindingLoader = new BindingLoader(configuration.setupBindings());
         bindingWalker = new BindingWalker(bindingLoader);
 
         //create the context
@@ -254,6 +252,29 @@ public class Encoder {
         this.namespaceAware = namespaceAware;
     }
 
+    /**
+     * Returns the namespace mappings maintained by the encoder.
+     * <p>
+     * Clients may register additional namespace mappings. This is useful when
+     * an application whishes to provide some "default" namespace mappings.
+     * </p>
+     * <p>
+     * Clients should register namespace mappings in the current "context", ie
+     * do not call {@link NamespaceSupport#pushContext()}. Example:
+     * <code>
+     * Encoder parser = new Encoder( ... );
+     * encoder.getNamespaces().declarePrefix( "foo", "http://www.foo.com" );
+     * ...
+     * </code>
+     * </p>
+     *
+     * @return The namespace support containing prefix to uri mappings.
+     * @since 2.5
+     */
+    public NamespaceSupport getNamespaces() {
+        return namespaces;
+    }
+    
     /**
      * True if we are encoding a full document, false if the xml headers should be omitted
      * (the encoder is used to generate part of a large document)
@@ -334,10 +355,9 @@ public class Encoder {
      * @param out The output stream.
      *
      * @throws IOException
-     * @throws SAXException
      */
     public void encode(Object object, QName name, OutputStream out)
-        throws IOException, SAXException {
+        throws IOException {
         //create the document seriaizer
         XMLSerializer xmls = null;
 
@@ -348,7 +368,17 @@ public class Encoder {
         }
 
         xmls.setNamespaces(namespaceAware);
-        encode(object, name, xmls);
+        try {
+            encode(object, name, xmls);
+        } 
+        catch (SAXException e) {
+            // SAXException does not sets initCause(). Instead, it holds its own
+            // "exception" field.
+            if (e.getException() != null && e.getCause() == null) {
+                e.initCause(e.getException());
+            }
+            throw (IOException) new IOException().initCause(e); 
+        }
     }
 
     public void encode(Object object, QName name, ContentHandler handler)

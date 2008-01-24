@@ -9,9 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.catalog.AbstractService;
-import org.geotools.catalog.Catalog;
-import org.geotools.catalog.ServiceInfo;
+import org.geotools.data.ServiceInfo;
 import org.geotools.tile.nasa.WorldWindTileStrategy;
 import org.geotools.util.ProgressListener;
 

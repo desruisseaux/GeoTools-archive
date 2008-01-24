@@ -24,7 +24,6 @@ import javax.swing.SwingUtilities;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.model.FeatureSourceModel;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellEditor;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellRenderer;
@@ -74,8 +73,8 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
                 });
 
 
-        jcb_collection.addItem(TextBundle.getResource().getString("filter"));
-        jcb_collection.addItem(TextBundle.getResource().getString("all"));
+        jcb_collection.addItem(BUNDLE.getString("filter"));
+        jcb_collection.addItem(BUNDLE.getString("all"));
     }
 
     /** This method is called from within the constructor to
@@ -104,7 +103,8 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         ));
         jScrollPane1.setViewportView(tab_data);
 
-        jcb_edit.setText("Editer");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/Bundle"); // NOI18N
+        jcb_edit.setText(bundle.getString("edit")); // NOI18N
         jcb_edit.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jcb_edit.setEnabled(false);
         jcb_edit.setMargin(new java.awt.Insets(0, 0, 0, 0));
@@ -114,7 +114,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
             }
         });
 
-        jbu_action.setText("Action");
+        jbu_action.setText(bundle.getString("action")); // NOI18N
         jbu_action.setEnabled(false);
         jbu_action.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -137,7 +137,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
                 .add(jcb_collection, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jcb_edit)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 208, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 218, Short.MAX_VALUE)
                 .add(jbu_action)
                 .addContainerGap())
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
@@ -214,7 +214,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     public String getTitle() {
-        return TextBundle.getResource().getString("featuretable");
+        return BUNDLE.getString("feature_table");
     }
 
     public ImageIcon getIcon() {

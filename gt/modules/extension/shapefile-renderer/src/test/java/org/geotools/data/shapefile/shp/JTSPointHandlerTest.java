@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.geotools.TestData;
 import org.geotools.data.Query;
-import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -69,8 +68,7 @@ public class JTSPointHandlerTest extends TestCase {
         mt = ReferencingFactoryFinder.getMathTransformFactory(null)
                 .createConcatenatedTransform(mt, at);
 
-        ShapefileReader reader = new ShapefileReader(ShapefileRendererUtil
-                .getShpReadChannel(ds), new Lock());
+        ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpFiles(ds), false, false);
         reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.PointHandler(reader.getHeader().getShapeType(),
                 env, rectangle, mt, false));
 

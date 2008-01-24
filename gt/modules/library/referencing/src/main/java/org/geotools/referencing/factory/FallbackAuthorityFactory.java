@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
 
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.factory.FactoryNotFoundException;
 
@@ -907,7 +907,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     private static void notifyFailure(final String method, final FactoryException exception) {
         failureCount++;
         if (LOGGER.isLoggable(Level.FINE)) {
-            final LogRecord record = Logging.format(Level.FINE,
+            final LogRecord record = Loggings.format(Level.FINE,
                     LoggingKeys.FALLBACK_FACTORY_$1, exception);
             record.setSourceClassName(FallbackAuthorityFactory.class.getName());
             record.setSourceMethodName(method);

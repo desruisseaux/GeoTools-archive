@@ -15,11 +15,11 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE and JAI dependencies
-import java.io.Serializable;
+import java.awt.RenderingHints;
 import java.awt.image.ColorModel;                // For javadoc
 import java.awt.image.IndexColorModel;           // For javadoc
-import javax.media.jai.JAI;                      // For javadoc
+import javax.media.jai.JAI;
+import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;     // For javadoc
 import javax.media.jai.InterpolationBilinear;    // For javadoc
 import javax.media.jai.InterpolationBicubic;     // For javadoc
@@ -31,46 +31,20 @@ import javax.media.jai.operator.ScaleDescriptor; // For javadoc
  * in different ways. Some views are more appropriate than others depending of the kind of work
  * to be performed. For example numerical computations on meteorological or oceanographical data
  * should be performed on the {@linkplain #GEOPHYSICS geophysics} view, while renderings are
- * better performed with the {@linkplain #DISPLAYABLE displayable} view.
+ * better performed with the {@linkplain #RENDERED rendered} view.
  * <p>
  * Different views are sometime synonymous for a given coverage. For example the
- * {@linkplain #NATIVE native} and {@linkplain #DISPLAYABLE displayable} views are identical
+ * {@linkplain #NATIVE native} and {@linkplain #RENDERED rendered} views are identical
  * when the coverage values are unsigned 8 or 16 bits integers, but distincts if the native
- * values are <em>signed</em> integers. This is because in the later case, the negative values
+ * values are 32 bits integers. This is because in the later case, the 32 bits integer values
  * can not be processed directly by an {@linkplain IndexColorModel index color model}.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Should be an enum when we will be allowed to compile for J2SE 1.5.
  */
-public final class ViewType implements Serializable {
-    /**
-     * For cross-version compatibility.
-     */
-    private static final long serialVersionUID = -1926667155583006688L;
-
-    /**
-     * The name for this enum.
-     */
-    private final String name;
-
-    /**
-     * {@code true} if interpolations other than {@linkplain InterpolationNearest
-     * nearest neighbor} are allowed.
-     */
-    private final boolean interpolationAllowed;
-
-    /**
-     * {@code true} if the replacement of {@linkplain IndexColorModel index color model}
-     * is allowed.
-     *
-     * @see JAI#KEY_REPLACE_INDEX_COLOR_MODEL
-     */
-    private final boolean colorSpaceConversionAllowed;
-
+public enum ViewType {
     /**
      * Coverage data come directly from some source (typically a file) and are unprocessed.
      * This view doesn't have any of the restrictions imposed by other views: values may be
@@ -81,8 +55,8 @@ public final class ViewType implements Serializable {
      * their conditions):
      * <p>
      * <ul>
-     *   <li>If the values are stored as unsigned integers, then the native view may
-     *       be identical to the {@linkplain #DISPLAYABLE displayable} view.</li>
+     *   <li>If the values are stored as unsigned integers not greater than 16 bits, then the
+     *       native view may be identical to the {@linkplain #RENDERED rendered} view.</li>
      *   <li>If all missing values are represented by {@linkplain Float#isNaN some kind of
      *       NaN values}, then the native view may be identical to the
      *       {@linkplain #GEOPHYSICS geophysics} view.</li>
@@ -90,9 +64,22 @@ public final class ViewType implements Serializable {
      * <p>
      * Interpolations other than {@linkplain InterpolationNearest nearest neighbor} are
      * not allowed. Conversions to the RGB color space are not allowed neither, for the
-     * same reasons than the {@linkplain #DISPLAYABLE displayable} view.
+     * same reasons than the {@linkplain #RENDERED rendered} view.
      */
-    public static final ViewType NATIVE = new ViewType("NATIVE", false, false);
+    NATIVE(false, false, false),
+
+    /**
+     * Coverage data are packed, usually as integers convertible to geophysics values. The conversion
+     * is performed by the {@linkplain org.geotools.coverage.GridSampleDimension#getSampleToGeophysics
+     * sample to geophysics} transform.
+     * <p>
+     * This view is often synonymous to {@link #RENDERED}, but may be different for some data types
+     * that are incompatible with {@linkplain IndexColorModel index color model} (e.g. 32 bits
+     * integer). This view is always exclusive with {@link #GEOPHYSICS}.
+     *
+     * @since 2.5
+     */
+    PACKED(false, false, false),
 
     /**
      * Coverage data are compatible with common Java2D {@linkplain ColorModel color models}.
@@ -113,7 +100,7 @@ public final class ViewType implements Serializable {
      * interpolation between a "real" value (for example a value convertible to the above-cited
      * SST) and "pad" value would produce a wrong result.
      */
-    public static final ViewType DISPLAYABLE = new ViewType("DISPLAYABLE", false, false);
+    RENDERED(false, false, false),
 
     /**
      * Coverage data are the values of some geophysics phenomenon, for example an elevation
@@ -121,10 +108,10 @@ public final class ViewType implements Serializable {
      * numbers ({@code float} or {@code double} primitive type), but this is not mandatory
      * if there is never fractional parts or missing values in a particular coverage.
      * <p>
-     * If the coverage contains some "no data" values, then those missing values
+     * If the coverage contains some "<cite>no data</cite>" values, then those missing values
      * <strong>must</strong> be represented by {@link Float#NaN} or {@link Double#NaN}
      * constant, or any other value in the NaN range as {@linkplain Float#intBitsToFloat
-     * explained there}. Real numbers used as "pad values" like {@code -9999} are
+     * explained there}. Real numbers used as "<cite>pad values</cite>" like {@code -9999} are
      * <strong>not</strong> allowed.
      * <p>
      * Interpolations ({@linkplain InterpolationBilinear bilinear},
@@ -135,7 +122,7 @@ public final class ViewType implements Serializable {
      * Conversions to RGB color space is not allowed. All computations (including
      * interpolations) must be performed in this geophysics space.
      */
-    public static final ViewType GEOPHYSICS = new ViewType("GEOPHYSICS", true, false);
+    GEOPHYSICS(true, false, false),
 
     /**
      * Coverage data have no meaning other than visual color. It is not an elevation map for
@@ -149,18 +136,47 @@ public final class ViewType implements Serializable {
      * Interpolation are not allowed on indexed values. They must be performed on the RGB
      * or similar color space instead.
      */
-    public static final ViewType PHOTOGRAPHIC = new ViewType("PHOTOGRAPHIC", false, true);
+    PHOTOGRAPHIC(true, true, true);
+
+    /**
+     * @deprecated Renamed as {@link #RENDERED}.
+     */
+    @Deprecated
+    public static final ViewType DISPLAYABLE = RENDERED;
+
+    /**
+     * {@code true} if interpolations other than {@linkplain InterpolationNearest
+     * nearest neighbor} are allowed.
+     *
+     * @see JAI#KEY_INTERPOLATION
+     */
+    private final boolean interpolationAllowed;
+
+    /**
+     * {@code true} if operations can be performed on the colormap rather than the values.
+     *
+     * @see JAI#KEY_TRANSFORM_ON_COLORMAP
+     */
+    private final boolean transformOnColormapAllowed;
+
+    /**
+     * {@code true} if the replacement of {@linkplain IndexColorModel index color model}
+     * is allowed. This allows the replacement of indexed values by RGB values.
+     *
+     * @see JAI#KEY_REPLACE_INDEX_COLOR_MODEL
+     */
+    private final boolean replaceIndexColorModelAllowed;
 
     /**
      * Creates a new instance of {@code ViewType}.
      */
-    private ViewType(final String  name,
-                     final boolean interpolationAllowed,
-                     final boolean colorSpaceConversionAllowed)
+    private ViewType(final boolean interpolationAllowed,
+                     final boolean transformOnColormapAllowed,
+                     final boolean replaceIndexColorModelAllowed)
     {
-        this.name                        = name;
-        this.interpolationAllowed        = interpolationAllowed;
-        this.colorSpaceConversionAllowed = colorSpaceConversionAllowed;
+        this.interpolationAllowed          = interpolationAllowed;
+        this.transformOnColormapAllowed    = transformOnColormapAllowed;
+        this.replaceIndexColorModelAllowed = replaceIndexColorModelAllowed;
     }
 
     /**
@@ -184,9 +200,19 @@ public final class ViewType implements Serializable {
      * lose all geophysical meaning. If the color space conversion is not allowed, then
      * then users should stick with {@linkplain InterpolationNearest nearest neighbor}
      * interpolation.
+     *
+     * @see JAI#KEY_INTERPOLATION
      */
     public boolean isInterpolationAllowed() {
         return interpolationAllowed;
+    }
+
+    /**
+     * @deprecated Renamed {@link #isReplaceIndexColorModelAllowed}.
+     */
+    @Deprecated
+    public boolean isColorSpaceConversionAllowed() {
+        return replaceIndexColorModelAllowed;
     }
 
     /**
@@ -199,29 +225,43 @@ public final class ViewType implements Serializable {
      * photographic} images.
      *
      * @see JAI#KEY_REPLACE_INDEX_COLOR_MODEL
+     *
+     * @since 2.5
      */
-    public boolean isColorSpaceConversionAllowed() {
-        return colorSpaceConversionAllowed;
+    public boolean isReplaceIndexColorModelAllowed() {
+        return replaceIndexColorModelAllowed;
     }
 
     /**
-     * Returns a hash value for this enum.
+     * Returns {@code true} if operations can be performed on the colormap rather than the values.
+     *
+     * @see JAI#KEY_TRANSFORM_ON_COLORMAP
+     *
+     * @since 2.5
      */
-    public int hashCode() {
-        return (int)serialVersionUID ^ name.hashCode();
+    public boolean isTransformOnColormapAllowed() {
+        return transformOnColormapAllowed;
     }
 
     /**
-     * Compares this enum with the specified object for equality.
+     * Sets some hints in the specified rendering hints map.
+     * <p>
+     * <ul>
+     *   <li>{@link JAI#KEY_INTERPOLATION} is sets to "<cite>nearest neighbor</cite>" if
+     *   {@link #isInterpolationAllowed} returns {@code false}, and left unchanged otherwise.</li>
+     *   <li>{@link JAI#KEY_REPLACE_INDEX_COLOR_MODEL} is sets to the value returned by
+     *       {@link #isReplaceIndexColorModelAllowed}.</li>
+     *   <li>{@link JAI#KEY_TRANSFORM_ON_COLORMAP} is sets to the value returned by
+     *       {@link #isTransformOnColormapAllowed}.</li>
+     * </ul>
+     *
+     * @since 2.5
      */
-    public boolean equals(final Object object) {
-        return (object instanceof ViewType) && name.equals(((ViewType) object).name);
-    }
-
-    /**
-     * Returns a string representation of this enum.
-     */
-    public String toString() {
-        return name;
+    public void configure(final RenderingHints hints) {
+        if (!isInterpolationAllowed()) {
+            hints.put(JAI.KEY_INTERPOLATION, Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+        }
+        hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.valueOf(isReplaceIndexColorModelAllowed()));
+        hints.put(JAI.KEY_TRANSFORM_ON_COLORMAP,     Boolean.valueOf(isTransformOnColormapAllowed()));
     }
 }

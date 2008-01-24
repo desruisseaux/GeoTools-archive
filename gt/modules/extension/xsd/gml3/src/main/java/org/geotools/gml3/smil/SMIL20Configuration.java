@@ -15,13 +15,8 @@
  */
 package org.geotools.gml3.smil;
 
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.eclipse.xsd.util.XSDSchemaLocator;
-import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
-import org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver;
 import org.geotools.xml.Configuration;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**

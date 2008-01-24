@@ -21,7 +21,6 @@ import java.awt.ComponentOrientation;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
@@ -39,6 +38,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
+import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapContext;
@@ -68,8 +68,17 @@ public class JContextTree extends JComponent{
         return treetable.getPopupMenu();
     }
     
+    
     public SelectionData[] getSelection(){
-        return treetable.getSelection();
+        return treetable.getSelectionArray();
+    }
+    
+    public boolean containOnlyLayers(SelectionData[] datas){
+        return treetable.onlyMapLayers(datas);
+    }
+    
+    public boolean containOnlyContexts(SelectionData[] datas){
+        return treetable.onlyMapContexts(datas);
     }
     
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +324,60 @@ public class JContextTree extends JComponent{
         return treetable.getColumnModels();
     }
 
+////////////////////////////////////////////////////////////////////////////////
+// SUBNODES MANAGEMENT /////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * add a SubNodeGroup
+     * @param group
+     */
+    public void addSubNodeGroup(SubNodeGroup group){
+        treetable.addSubNodeGroup(group);
+    }
+    
+    /**
+     * remove SubNodeGroup
+     * @param group : SubNodeGroup
+     */
+    public void removeSubNodeGroup(SubNodeGroup group){
+        treetable.removeSubNodeGroup(group);
+    }
+    
+    /**
+     * remove SubNodeGroup at index 
+     * @param index
+     */
+    public void removeSubNodeGroup(int index){
+       treetable.removeSubNodeGroup(index);
+    }
+    
+    /**
+     * 
+     * @return number of SubNodeGroup
+     */
+    public int getSubNodeGroupCount(){
+       return treetable.getSubNodeGroupCount();
+    }
+    
+    /**
+     * 
+     * @param group
+     * @return index of SubNodeGroup
+     */
+    public int getSubNodeGroupIndex(SubNodeGroup group){
+        return treetable.getSubNodeGroupIndex(group);
+    }
+    
+    /**
+     * get the list of SubNodeGroup
+     * @return list of SubNodeGroup
+     */
+    public SubNodeGroup[] getSubNodeGroups() {
+        return treetable.getSubNodeGroups();
+    }
+    
+    
 ////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

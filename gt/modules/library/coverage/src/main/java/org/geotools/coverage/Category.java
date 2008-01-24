@@ -22,11 +22,8 @@ package org.geotools.coverage;
 import java.awt.Color;
 import java.util.Arrays;
 import java.io.Serializable;
-import javax.media.jai.operator.PiecewiseDescriptor;
 
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
@@ -74,7 +71,7 @@ import org.geotools.util.NumberRange;
  * {@link MathTransform1D} object. In the special case where the transformation
  * is a linear one (as in the formula above), then a {@code Category} object
  * may be understood as the interval between two breakpoints in the JAI's
- * {@linkplain PiecewiseDescriptor piecewise} operation.
+ * {@linkplain javax.media.jai.operator.PiecewiseDescriptor piecewise} operation.
  * <p>
  * All {@code Category} objects are immutable and thread-safe.
  *
@@ -84,7 +81,7 @@ import org.geotools.util.NumberRange;
  * @author Martin Desruisseaux
  *
  * @see GridSampleDimension
- * @see PiecewiseDescriptor
+ * @see javax.media.jai.operator.PiecewiseDescriptor
  */
 public class Category implements Serializable {
     /**
@@ -174,11 +171,10 @@ public class Category implements Serializable {
 
     /**
      * The math transform from sample to geophysics values (never {@code null}).
-     *
-     * If this category is an instance of {@code GeophysicsCategory}, then this transform
-     * is the inverse (as computed by {@link MathTransform#inverse()}), except for qualitative
-     * categories. Since {@link #getSampleToGeophysics} returns {@code null} for
-     * qualitative categories, this difference is not visible to the user.
+     * If this category is an instance of {@code GeophysicsCategory}, then this transform is
+     * the inverse (as computed by {@link MathTransform1D#inverse()}), except for qualitative
+     * categories. Since {@link #getSampleToGeophysics} returns {@code null} for qualitative
+     * categories, this difference is not visible to the user.
      *
      * @see GridSampleDimension#getScale()
      * @see GridSampleDimension#getOffset()
@@ -261,12 +257,11 @@ public class Category implements Serializable {
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      */
-    @SuppressWarnings("unchecked")
     private Category(final CharSequence name,
                      final int[]        ARGB,
                      final Number       sample)
     {
-        this(name, ARGB, new NumberRange((Class) sample.getClass(), sample, sample), null);
+        this(name, ARGB, new NumberRange(sample.getClass(), sample, sample), null);
         assert Double.isNaN(inverse.minimum) : inverse.minimum;
         assert Double.isNaN(inverse.maximum) : inverse.maximum;
     }
@@ -319,9 +314,7 @@ public class Category implements Serializable {
                     final double       scale,
                     final double       offset) throws IllegalArgumentException
     {
-        this(name, colors,
-             new NumberRange(Integer.class, Integer.valueOf(lower), true,
-                    Integer.valueOf(upper), false), scale, offset);
+        this(name, colors, new NumberRange(Integer.class, lower, true, upper, false), scale, offset);
     }
 
     /**
@@ -535,7 +528,7 @@ public class Category implements Serializable {
          * minimum and maximum are always at the bounding input values, so we are using a very
          * simple algorithm for now.
          */
-        transform = (MathTransform1D) inverse.transform.inverse();
+        transform = inverse.transform.inverse();
         final double min = inverse.transform.transform(inverse.minimum);
         final double max = inverse.transform.transform(inverse.maximum);
         if (min > max) {
@@ -777,9 +770,9 @@ public class Category implements Serializable {
      * when applied on non-geophysics category, but this method can be invoked on geophysics
      * category (as returned by <code>{@linkplain #geophysics geophysics}(true)</code>) as well.
      * Since geophysics categories are already the result of some "sample to geophysics"
-     * transformation, invoking this method on those is equivalent to
-     * {@linkplain MathTransformFactory#createConcatenatedTransform concatenate}
-     * this "sample to geophysics" transform with the specified one.
+     * transformation, invoking this method on those is equivalent to {@linkplain
+     * org.opengis.referencing.operation.MathTransformFactory#createConcatenatedTransform
+     * concatenate} this "sample to geophysics" transform with the specified one.
      *
      * @param  sampleToGeophysics The new {@linkplain #getSampleToGeophysics sample to geophysics}
      *         transform.
@@ -796,31 +789,38 @@ public class Category implements Serializable {
     }
 
     /**
-     * If {@code true}, returns the geophysics companion of this category.   By definition, a
-     * <cite>geophysics category</cite> is a category with a {@linkplain #getRange range of sample
-     * values} transformed in such a way that the {@link #getSampleToGeophysics sampleToGeophysics}
-     * transform is always the identity transform, or {@code null} if no such transform existed
-     * in the first place. In other words, the range of sample values in a geophysics category maps
-     * directly the "real world" values without the need for any transformation.
+     * Returns the {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} or
+     * {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} of this category.
+     * By definition, a <cite>geophysics category</cite> is a category with a
+     * {@linkplain #getRange range of sample values} transformed in such a way that the
+     * {@linkplain #getSampleToGeophysics sample to geophysics} transform is always the
+     * {@linkplain MathTransform1D#isIdentity identity} transform, or {@code null} if no
+     * such transform existed in the first place. In other words, the range of sample values
+     * in a geophysics category maps directly the "<cite>real world</cite>" values without the
+     * need for any transformation.
      * <p>
-     * {@code Category} objects live by pair: a <cite>geophysics</cite> one (used for
-     * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
-     * integers). The {@code geo} argument specifies which object from the pair is wanted,
-     * regardless if this method is invoked on the geophysics or non-geophysics instance of the
-     * pair. In other words, the result of {@code geophysics(b1).geophysics(b2).geophysics(b3)}
-     * depends only on the value in the last call ({@code b3}).
+     * {@code Category} objects live by pair: a
+     * {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} one (used for
+     * computation) and a {@linkplain org.geotools.coverage.grid.ViewType#PACKED packed} one
+     * (used for storing data, usually as integers). The {@code geo} argument specifies which
+     * object from the pair is wanted, regardless if this method is invoked on the geophysics or
+     * packed instance of the pair.
      * <p>
-     * Newly constructed categories are non-geophysics (i.e. a {@linkplain #getSampleToGeophysics
-     * sample to geophysics} transform must be applied in order to gets geophysics values).
+     * Newly constructed categories are {@linkplain org.geotools.coverage.grid.ViewType#PACKED
+     * packed} (i.e. a {@linkplain #getSampleToGeophysics sample to geophysics} transform must
+     * be applied in order to gets {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     * geophysics} values).
      *
      * @param  geo {@code true} to get a category with an identity
-     *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or {@code false} to get back the
-     *         original category (the one constructed with {@code new Category(...)}).
+     *         {@linkplain #getSampleToGeophysics transform} and a
+     *         {@linkplain #getRange range of values} matching the
+     *         {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics} values, or
+     *         {@code false} to get the {@linkplain org.geotools.coverage.grid.ViewType#PACKED
+     *         packed} category (the one constructed with {@code new Category(...)}).
      * @return The category. Never {@code null}, but may be {@code this}.
      *
      * @see GridSampleDimension#geophysics
-     * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
+     * @see org.geotools.coverage.grid.GridCoverage2D#view
      */
     public Category geophysics(final boolean geo) {
         return geo ? inverse : this;

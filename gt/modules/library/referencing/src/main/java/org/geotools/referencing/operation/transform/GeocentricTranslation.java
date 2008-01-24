@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2005, Institut de Recherche pour le Développement
  *
@@ -17,12 +17,10 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import javax.units.NonSI;
 import javax.units.SI;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -31,7 +29,6 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Transformation;
 
-// Geotools dependencies
 import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
@@ -119,6 +116,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return descriptor;
     }
@@ -126,6 +124,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
     /**
      * Returns the parameters for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final BursaWolfParameters parameters = new BursaWolfParameters(null);
         parameters.setAffineTransform(getMatrix(), Double.POSITIVE_INFINITY);
@@ -151,6 +150,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
     /**
      * Creates an inverse transform using the specified matrix.
      */
+    @Override
     MathTransform createInverse(final Matrix matrix) {
         return new GeocentricTranslation(matrix, descriptor);
     }
@@ -160,13 +160,15 @@ public class GeocentricTranslation extends ProjectiveTransform {
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ descriptor.hashCode();
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final GeocentricTranslation that = (GeocentricTranslation) object;
@@ -334,7 +336,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
         public Class getOperationType() {
             return Transformation.class;
         }
-        
+
         /**
          * Creates a math transform from the specified group of parameter values.
          *
@@ -342,8 +344,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values) 
-                throws ParameterNotFoundException 
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
         {
             final BursaWolfParameters parameters = new BursaWolfParameters(null);
             fill(parameters, values);
@@ -508,8 +510,9 @@ public class GeocentricTranslation extends ProjectiveTransform {
         }
 
         /**
-         * Fill the specified Bursa-Wolf parameters according the specified values.
+         * Fills the specified Bursa-Wolf parameters according the specified values.
          */
+        @Override
         protected void fill(final BursaWolfParameters parameters, final ParameterValueGroup values) {
             super.fill(parameters, values);
             parameters.ppm = doubleValue(PPM, values);
@@ -548,8 +551,9 @@ public class GeocentricTranslation extends ProjectiveTransform {
         }
 
         /**
-         * Fill the specified Bursa-Wolf parameters according the specified values.
+         * Fills the specified Bursa-Wolf parameters according the specified values.
          */
+        @Override
         protected void fill(final BursaWolfParameters parameters, final ParameterValueGroup values) {
             super.fill(parameters, values);
             parameters.ex = -parameters.ex;

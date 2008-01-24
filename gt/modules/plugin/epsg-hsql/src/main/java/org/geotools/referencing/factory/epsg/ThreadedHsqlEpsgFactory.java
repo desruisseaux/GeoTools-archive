@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,16 +31,15 @@ import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.logging.Level;
 
-// Geotools dependencies
 import org.geotools.util.Version;
+import org.geotools.util.logging.Logging;
 import org.geotools.factory.Hints;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
-// HSQL dependencies
 import org.hsqldb.jdbc.jdbcDataSource;
 
 
@@ -274,7 +272,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * we will attempt to rebuild the whole database. Note: "createBackingStore" is the
              * public method that invoked this method, so we use it for the logging message.
              */
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER,
+            Logging.unexpectedException(LOGGER,
                     ThreadedHsqlEpsgFactory.class, "createBackingStore", exception);
         }
         delete(directory);
@@ -317,7 +315,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * a full SQL statement. For this plugin however, we have compressed "INSERT
              * INTO" statements using Compactor class in this package.
              */
-            org.geotools.util.logging.Logging.getLogger(LOGGER).log(Logging.format(Level.INFO,
+            Logging.getLogger(LOGGER).log(Loggings.format(Level.INFO,
                     LoggingKeys.CREATING_CACHED_EPSG_DATABASE_$1, VERSION));
             final Statement statement = connection.createStatement();
             try {
@@ -373,7 +371,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
                     final OutputStream out = new FileOutputStream(propertyFile);
                     properties.store(out, "EPSG database on HSQL");
                     out.close();
-                    
+
                     final File backup = new File(directory, DATABASE_NAME + ".backup");
                     if (backup.exists()) {
                         backup.delete();

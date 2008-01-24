@@ -160,6 +160,10 @@ public abstract class XMLTestSupport extends TestCase {
     protected Document document;
 
     /**
+     * additional namespace mappings
+     */
+    protected HashMap namespaceMappings;
+    /**
      * Creates an empty xml document.
      */
     protected void setUp() throws Exception {
@@ -167,6 +171,7 @@ public abstract class XMLTestSupport extends TestCase {
         docFactory.setNamespaceAware(true);
 
         document = docFactory.newDocumentBuilder().newDocument();
+        namespaceMappings = new HashMap();
     }
 
     /**
@@ -190,12 +195,26 @@ public abstract class XMLTestSupport extends TestCase {
      * namespace.
      * </p>
      * @param root The root node of the instance document.
+     * @deprecated use {@link #registerNamespaceMapping(String, String)}
      *
      */
     protected void registerNamespaces(Element root) {
         root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
     }
 
+    /**
+     * Registers a namespace mapping.
+     * <p>
+     * This mapping will be included in the "namespace context" of both the 
+     * parser and the encoder.
+     * </p>
+     * @param prefix The prefix of the namespace, not <code>null</code>.
+     * @param uri The uri of the namespace, not <code>null</code>.
+     */
+    protected void registerNamespaceMapping( String prefix, String uri ) {
+        namespaceMappings.put( prefix, uri );
+    }
+    
     /**
      * Tempalte method for subclasses to create the configuration to be used by
      * the parser.
@@ -225,8 +244,16 @@ public abstract class XMLTestSupport extends TestCase {
             config.getContext().registerComponentInstance("http://geotools.org/typeDefinition", type);
         }
 
+        //register additional namespaces
         registerNamespaces(root);
-
+        for ( Iterator e = namespaceMappings.entrySet().iterator(); e.hasNext(); ) {
+            Map.Entry mapping = (Map.Entry) e.next();
+            String prefix = (String) mapping.getKey();
+            String uri = (String) mapping.getValue();
+            
+            root.setAttribute("xmlns:" + prefix, uri );
+        }
+        
         //default
         root.setAttribute("xsi:schemaLocation",
             config.getNamespaceURI() + " " + config.getSchemaFileURL());
@@ -270,6 +297,16 @@ public abstract class XMLTestSupport extends TestCase {
         XSDSchema schema = configuration.getXSD().getSchema();
 
         Encoder encoder = new Encoder(configuration, schema);
+        
+        //additional namespaces
+        for ( Iterator e = namespaceMappings.entrySet().iterator(); e.hasNext(); ) {
+            Map.Entry mapping = (Map.Entry) e.next();
+            String prefix = (String) mapping.getKey();
+            String uri = (String) mapping.getValue();
+            
+            encoder.getNamespaces().declarePrefix( prefix, uri );
+        }
+        
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         encoder.write(object, element, output);
 
@@ -322,10 +359,11 @@ public abstract class XMLTestSupport extends TestCase {
         context = configuration.setupContext(context);
 
         //create the binding container
-        BindingLoader bindingLoader = new BindingLoader();
-        MutablePicoContainer container = bindingLoader.getContainer();
-        container = configuration.setupBindings(container);
-        bindingLoader.setContainer(container);
+        Map bindings = configuration.setupBindings();
+        BindingLoader bindingLoader = new BindingLoader(bindings);
+//        MutablePicoContainer container = bindingLoader.getContainer();
+//        container = configuration.setupBindings(container);
+//        bindingLoader.setContainer(container);
 
         //register cmponents available to bindings at runtime
         context.registerComponentInstance(new BindingFactoryImpl(bindingLoader));

@@ -50,10 +50,11 @@ import org.geotools.io.IndentedLineWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -242,9 +243,9 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
                 }
             }
         } catch (SecurityException exception) {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER, exception);
+            Logging.unexpectedException(LOGGER, exception);
         } catch (MalformedURLException exception) {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER, exception);
+            Logging.unexpectedException(LOGGER, exception);
         }
         return FactoryUsingWKT.class.getResource(FILENAME);
     }
@@ -266,8 +267,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
             }
             final Iterator<? extends Identifier> ids = getAuthority().getIdentifiers().iterator();
             final String authority = ids.hasNext() ? ids.next().getCode() : "EPSG";
-            LOGGER.log(Logging.format(Level.CONFIG, LoggingKeys.USING_FILE_AS_FACTORY_$2,
-                                      url.getPath(), authority));
+            LOGGER.log(Loggings.format(Level.CONFIG, LoggingKeys.USING_FILE_AS_FACTORY_$2,
+                                       url.getPath(), authority));
             return new PropertyAuthorityFactory(factories, getAuthorities(), url);
         } catch (IOException exception) {
             throw new FactoryException(Errors.format(ErrorKeys.CANT_READ_$1, FILENAME), exception);

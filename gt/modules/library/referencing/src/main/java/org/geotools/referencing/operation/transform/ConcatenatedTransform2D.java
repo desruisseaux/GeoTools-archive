@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,9 +17,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**
@@ -35,7 +35,7 @@ final class ConcatenatedTransform2D extends ConcatenatedTransform implements Mat
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7307709788564866500L;
-    
+
     /**
      * Constructs a concatenated transform.
      */
@@ -44,11 +44,20 @@ final class ConcatenatedTransform2D extends ConcatenatedTransform implements Mat
     {
         super(transform1, transform2);
     }
-    
+
     /**
-     * Check if transforms are compatibles with this implementation.
+     * Checks if transforms are compatibles with this implementation.
      */
+    @Override
     boolean isValid() {
         return super.isValid() && getSourceDimensions()==2 && getTargetDimensions()==2;
+    }
+
+    /**
+     * Creates the inverse transform of this object.
+     */
+    @Override
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
+        return (MathTransform2D) super.inverse();
     }
 }

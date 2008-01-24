@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
@@ -38,7 +37,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -3568975979013908920L;
-    
+
     /**
      * Constructs a concatenated transform.
      */
@@ -47,19 +46,21 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     {
         super(transform1, transform2);
     }
-    
+
     /**
-     * Check if transforms are compatibles with this implementation.
+     * Checks if transforms are compatibles with this implementation.
      */
+    @Override
     boolean isValid() {
         return super.isValid() &&
                transform1.getSourceDimensions() == transform1.getTargetDimensions() &&
                transform2.getSourceDimensions() == transform2.getTargetDimensions();
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
+    @Override
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
     {
@@ -67,10 +68,11 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
         ptDst = transform1.transform(ptSrc, ptDst);
         return  transform2.transform(ptDst, ptDst);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final double[] srcPts, final int srcOff,
                           final double[] dstPts, final int dstOff, final int numPts)
             throws TransformException
@@ -79,10 +81,11 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
         transform1.transform(srcPts, srcOff, dstPts, dstOff, numPts);
         transform2.transform(dstPts, dstOff, dstPts, dstOff, numPts);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, final int srcOff,
                           final float[] dstPts, final int dstOff, final int numPts)
             throws TransformException

@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies and extensions
 import java.io.File;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -81,7 +80,7 @@ import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -90,6 +89,7 @@ import org.geotools.util.ObjectCache;
 import org.geotools.util.ScopedName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.Version;
+import org.geotools.util.logging.Logging;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.extent.Extent;
@@ -379,8 +379,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             result.close();
             statement.close();
         } catch (SQLException exception) {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER,
-                    AbstractEpsgFactory.class, "getAuthority", exception);
+            Logging.unexpectedException(LOGGER, AbstractEpsgFactory.class, "getAuthority", exception);
             return Citations.EPSG;
         }
         return authority;
@@ -1019,7 +1018,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                     if (semiMinorAxis != 0) {
                         // Both 'inverseFlattening' and 'semiMinorAxis' are defined.
                         // Log a warning and create the ellipsoid using the inverse flattening.
-                        LOGGER.log(Logging.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID,code));
+                        LOGGER.log(Loggings.format(Level.WARNING, LoggingKeys.AMBIGUOUS_ELLIPSOID,code));
                     }
                     ellipsoid = factories.getDatumFactory().createFlattenedSphere(
                                 properties, semiMajorAxis, inverseFlattening, unit);
@@ -1331,8 +1330,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                     properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
                 } catch (NumberFormatException exception) {
                     // Not a fatal error...
-                    org.geotools.util.logging.Logging.unexpectedException(LOGGER,
-                            AbstractEpsgFactory.class, "createDatum", exception);
+                    Logging.unexpectedException(LOGGER, AbstractEpsgFactory.class, "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -2758,7 +2756,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                  * was already closed. However we will log a message only if we actually closed
                  * the connection, otherwise the log records are a little bit misleading.
                  */
-                LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+                LOGGER.log(Loggings.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
             }
             connection = null;
         }
@@ -3273,7 +3271,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                                         final String       method,
                                         final SQLException exception)
         {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER, classe, method, exception);
+            Logging.unexpectedException(LOGGER, classe, method, exception);
         }
 
         /**
@@ -3281,7 +3279,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
          */
         private void recoverableException(final String method, final SQLException exception) {
             // Uses the FINE level instead of WARNING because it may be a recoverable error.
-            LogRecord record = Logging.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
+            LogRecord record = Loggings.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
             record.setSourceClassName(AuthorityCodes.class.getName());
             record.setSourceMethodName(method);
             record.setThrown(exception);

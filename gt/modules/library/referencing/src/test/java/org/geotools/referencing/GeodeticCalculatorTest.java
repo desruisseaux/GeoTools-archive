@@ -15,25 +15,21 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies and extensions
 import java.awt.Shape;
 import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import javax.units.SI;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -89,6 +85,7 @@ public final class GeodeticCalculatorTest extends TestCase {
      * <A HREF="http://www.univ-lemans.fr/~hainry/articles/loxonavi.html">Orthodromie et
      * loxodromie</A> page.
      */
+    @SuppressWarnings("fallthrough")
     public void testParallel45() {
         // Column 1: Longitude difference in degrees.
         // Column 2: Orthodromic distance in kilometers
@@ -177,5 +174,51 @@ public final class GeodeticCalculatorTest extends TestCase {
         point = calculator.getDestinationGeographicPoint();
         assertEquals(point.getX(), position.getOrdinate(1), 1E-5);
         assertEquals(point.getY(), position.getOrdinate(0), 1E-5);
+    }
+
+    /**
+     * Tests orthrodromic distance on the equator. The main purpose of this method is actually
+     * to get Java assertions to be run, which will compare the Geodetic Calculator results with
+     * the Default Ellipsoid computations.
+     */
+    public void testEquator() {
+        assertTrue(GeodeticCalculator.class.desiredAssertionStatus());
+        final GeodeticCalculator calculator = new GeodeticCalculator();
+        calculator.setStartingGeographicPoint(0, 0);
+        double last = Double.NaN;
+        for (double x=0; x<=180; x+=0.125) {
+            calculator.setDestinationGeographicPoint(x, 0);
+            final double distance = calculator.getOrthodromicDistance() / 1000; // In kilometers
+            /*
+             * Checks that the increment is constant. It is not for x>179 unless
+             * GeodeticCalculator switch to DefaultEllipsoid algorithm, which is
+             * what we want to ensure with this test.
+             */
+            assertFalse(Math.abs(Math.abs(distance - last) - 13.914935) > 2E-6);
+            last = distance;
+        }
+    }
+
+    /**
+     * Tests the points reported in
+     * <a href="http://jira.codehaus.org/browse/GEOT-1535">GEOT-1535</a>.
+     *
+     * Disabled for now, because the error still presents.
+     */
+    public void testGEOT1535() {
+        if (true) {
+            return;
+        }
+        final GeodeticCalculator calculator = new GeodeticCalculator();
+
+        calculator.setStartingGeographicPoint(10, 40);
+        calculator.setDestinationGeographicPoint(-175, -30);
+        System.out.println(calculator.getOrthodromicDistance());
+        System.out.println(calculator.getAzimuth());
+
+        calculator.setStartingGeographicPoint(180, 40);
+        calculator.setDestinationGeographicPoint(-5, -30);
+        System.out.println(calculator.getOrthodromicDistance());
+        System.out.println(calculator.getAzimuth());
     }
 }

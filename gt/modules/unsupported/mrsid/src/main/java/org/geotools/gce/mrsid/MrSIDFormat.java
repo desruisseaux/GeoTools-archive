@@ -20,6 +20,7 @@ package org.geotools.gce.mrsid;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,23 +63,22 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 	 * Sets the metadata information.
 	 */
 	private void setInfo() {
-		HashMap info = new HashMap();
-
+		final HashMap<String, String> info = new HashMap<String, String>();
 		info.put("name", "MrSID");
 		info.put("description", "MrSID Coverage Format");
 		info.put("vendor", "Geotools");
 		info.put("docURL", "");// TODO: set something
 		info.put("version", "1.0");
-		mInfo = info;
+		mInfo = Collections.unmodifiableMap(info);
 
 		// writing parameters
 		writeParameters = null;
 
 		// reading parameters
 		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(
-						mInfo,
-						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
+				new DefaultParameterDescriptorGroup(mInfo,
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D,
+								USE_JAI_IMAGEREAD }));
 	}
 
 	/**

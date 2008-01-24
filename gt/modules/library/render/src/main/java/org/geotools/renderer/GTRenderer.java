@@ -60,8 +60,8 @@ public interface GTRenderer {
     public void setJava2DHints(RenderingHints hints);
     public RenderingHints getJava2DHints();
     
-    public void setRendererHints(Map hints);
-    public Map getRendererHints();
+    public void setRendererHints(Map<Object,Object> hints);
+    public Map<Object,Object> getRendererHints();
     
     public void setContext( MapContext context );
     public  MapContext getContext(  );

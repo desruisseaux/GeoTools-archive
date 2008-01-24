@@ -1,8 +1,10 @@
 package org.geotools.referencing.factory.epsg;
 
-import java.sql.Connection;
 import java.util.Set;
+import javax.sql.DataSource;
+import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -15,19 +17,17 @@ import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import javax.sql.DataSource;
-import junit.framework.TestCase;
-
 public class HsqlDialectEpsgFactoryTest extends TestCase {
-    
+
     private static HsqlDialectEpsgFactory factory;
     private static IdentifiedObjectFinder finder;
-    
+
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if( factory == null ){
             DataSource datasource = HsqlEpsgDatabase.createDataSource();
-            
+
             Hints hints = new Hints(Hints.CACHE_POLICY, "weak");
             factory = new HsqlDialectEpsgFactory(hints, datasource);
         }
@@ -44,6 +44,7 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         assertEquals("4326 equals EPSG:4326", code4326, epsg4326);
         assertSame("4326 == EPSG:4326", code4326, epsg4326);
     }
+
     public void testFunctionality() throws Exception {
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
         CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("3005");
@@ -51,8 +52,9 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         // reproject
         MathTransform transform = CRS.findMathTransform(crs1, crs2,true);
         DirectPosition pos = new DirectPosition2D(48.417, 123.35);
-        transform.transform(pos, null);        
+        transform.transform(pos, null);
     }
+
     public void testAuthorityCodes() throws Exception {
         Set authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertNotNull(authorityCodes);
@@ -68,19 +70,19 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
               "  UNIT[\"degree\", 0.017453292519943295],\n"             +
               "  AXIS[\"Geodetic latitude\", NORTH],\n"                 +
               "  AXIS[\"Geodetic longitude\", EAST]]";
-        
+
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         finder.setFullScanAllowed(false);
-        
+
         assertNull("Should not find without a full scan, because the WKT contains no identifier " +
                    "and the CRS name is ambiguous (more than one EPSG object have this name).",
                    finder.find(crs));
 
         finder.setFullScanAllowed(true);
         IdentifiedObject find = finder.find(crs);
-        
+
         assertNotNull("With full scan allowed, the CRS should be found.", find);
-        
+
         assertTrue("Should found an object equals (ignoring metadata) to the requested one.",CRS.equalsIgnoreMetadata(crs, find));
         ReferenceIdentifier found = AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority());
 		//assertEquals("4326",found.getCode());
@@ -89,7 +91,11 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
         String id = finder.findIdentifier(crs);
         assertEquals("The CRS should still be in the cache.","EPSG:4326", id);
     }
+
     public void testFindBeijing1954() throws FactoryException {
+        if (!TestData.isExtensiveTest()) {
+            return;
+        }
         /*
          * The PROJCS below intentionally uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
@@ -113,17 +119,17 @@ public class HsqlDialectEpsgFactoryTest extends TestCase {
               "   AXIS[\"Northing\", NORTH],\n"                            +
               "   AXIS[\"Easting\", EAST]]";
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
-        
+
         finder.setFullScanAllowed(false);
         assertNull("Should not find the CRS without a full scan.", finder.find(crs));
-        
+
         finder.setFullScanAllowed(true);
-        IdentifiedObject find = finder.find(crs);        
+        IdentifiedObject find = finder.find(crs);
         assertNotNull("With full scan allowed, the CRS should be found.", find);
-        
+
         assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
                    CRS.equalsIgnoreMetadata(crs, find));
-        
+
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         finder.setFullScanAllowed(false);
         String id = finder.findIdentifier(crs);

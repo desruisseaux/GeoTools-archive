@@ -58,8 +58,9 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -78,6 +79,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class ColorRamp extends JComponent {
     /**
      * Margin (in pixel) on each sides: top, left, right and bottom of the color ramp.
@@ -285,6 +287,7 @@ public class ColorRamp extends JComponent {
      * @see #getColors()
      * @see #getGraduation()
      */
+    @SuppressWarnings("fallthrough")
     public boolean setColors(SampleDimension band) {
         Color[] colors = EMPTY;
         Graduation graduation = null;
@@ -651,7 +654,7 @@ public class ColorRamp extends JComponent {
              * We look at the derivative, which should be constant everywhere for a linear
              * scale and be proportional to the inverse of 'x' for a logarithmic one.
              */
-            tr = (MathTransform1D) tr.inverse();
+            tr = tr.inverse();
             final double EPS   = 1E-6; // For rounding error.
             final double ratio = tr.derivative(minimum) / tr.derivative(maximum);
             if (Math.abs(ratio-1) <= EPS) {
@@ -676,9 +679,8 @@ public class ColorRamp extends JComponent {
                 graduation = new LogarithmicNumberGraduation(units);
             }
         } else {
-            org.geotools.util.logging.Logging.getLogger("org.geotools.gui.swing").
-                    log(Logging.format(Level.WARNING, LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1,
-                        Classes.getShortClassName(tr)));
+            Logging.getLogger(ColorRamp.class).log(Loggings.format(Level.WARNING,
+                    LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1, Classes.getShortClassName(tr)));
             graduation = new NumberGraduation(units);
         }
         if (graduation == reuse) {

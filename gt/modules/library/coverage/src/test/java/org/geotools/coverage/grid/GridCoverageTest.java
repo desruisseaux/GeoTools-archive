@@ -17,23 +17,32 @@
 package org.geotools.coverage.grid;
 
 // J2SE dependencies
+import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-// JUnit dependencies
+import javax.media.jai.RenderedOp;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
+import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.coverage.processing.DefaultProcessor;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.util.logging.Logging;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.Classes;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -114,20 +123,12 @@ public class GridCoverageTest extends TestCase {
             return;
         }
         out.close();
-        /*
-         * Deserialization requires J2SE 1.5 or above.
-         */
-        if (System.getProperty("java.version").compareTo("1.5") >= 0) {
-            final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-            GridCoverage2D read;
-            read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
-//          read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
-//          assertNotSame(read, read.geophysics(true));
-            in.close();
-        } else {
-            Logging.getLogger("org.geotools.coverage.grid")
-                  .fine("Deserialization test skipped for pre-1.5 Java version.");
-        }
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        GridCoverage2D read;
+        read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
+//      read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
+//      assertNotSame(read, read.geophysics(true));
+        in.close();
     }
 
     /**
@@ -179,4 +180,199 @@ public class GridCoverageTest extends TestCase {
         assertTrue(geophysics.getSampleDimension(0).getSampleToGeophysics().isIdentity());
         return coverage;
     }
+    
+    /**
+	 * Checks the envelopes of this two {@link GridCoverage2D} for equality
+	 * using the smallest scale factor of their grid to world transformation as
+	 * the tolerance.
+	 * 
+	 * @param a
+	 *            the first {@link GridCoverage2D}.
+	 * @param b
+	 *            the second {@link GridCoverage2D}.
+	 */
+	public static boolean checkEnvelopes(GridCoverage2D a,
+			GridCoverage2D b) {
+
+		// tolerance
+		final double scaleA = XAffineTransform
+				.getScale((AffineTransform) ((GridGeometry2D) a
+						.getGridGeometry()).getGridToCRS2D());
+		final double scaleB = XAffineTransform
+				.getScale((AffineTransform) ((GridGeometry2D) b
+						.getGridGeometry()).getGridToCRS2D());
+		final double tolerance = Math.min(scaleA, scaleB) / 2.0;
+
+		// actual check
+		return ((GeneralEnvelope) a.getEnvelope()).equals(b.getEnvelope(),
+				tolerance, false);
+
+	}
+	
+	/**
+	 * Returns the "Sample to geophysics" transform as an affine transform.
+	 */
+	public static AffineTransform getAffineTransform(
+			final GridCoverage2D coverage) {
+		AffineTransform tr;
+		tr = (AffineTransform) ((GridGeometry2D) coverage.getGridGeometry())
+				.getGridToCRS2D();
+		tr = new AffineTransform(tr); // Change the type to the default Java2D
+		// implementation.
+		return tr;
+	}
+	
+    /**
+	 * Checks the envelopes of this two {@link GridCoverage2D} for equality
+	 * using the smallest scale factor of their grid to world transformation as
+	 * the tolerance.
+	 * 
+	 * @param a
+	 *            the {@link GridCoverage2D} to rotate.
+	 * @param angle
+	 *            the angle to use.
+	 */
+	public static GridCoverage2D rotateCoverage(GridCoverage2D a,
+			double angle) {
+
+		// tolerance
+		final AffineTransform atr = getAffineTransform(a);
+		atr.preConcatenate(AffineTransform.getRotateInstance(angle));
+		final MathTransform tr = ProjectiveTransform.create(atr);
+		CoordinateReferenceSystem crs = a.getCoordinateReferenceSystem();
+		crs = new DefaultDerivedCRS("F2", crs, tr, crs.getCoordinateSystem());
+		return projectTo(a, crs, null, null, true);		
+
+
+
+	}
+	
+    /**
+     * Projects the specified image to the specified CRS using the specified hints.
+     * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
+     *
+     * @return The operation name which was applied on the image, or {@code null} if none.
+     */
+	public static String projectTo(final GridCoverage2D            coverage,
+                                    final CoordinateReferenceSystem targetCRS,
+                                    final GridGeometry2D            geometry,
+                                    final Hints                     hints,
+                                    final boolean                   useGeophysics,
+                                    final boolean 					show)
+    {
+    	
+        GridCoverage2D projected = projectTo(coverage, targetCRS, geometry, hints, useGeophysics);
+        final RenderedImage image = projected.getRenderedImage();
+        projected = projected.geophysics(false);
+        String operation = null;
+        if (image instanceof RenderedOp) {
+            operation = ((RenderedOp) image).getOperationName();
+            AbstractProcessor.LOGGER.fine("Applied \"" + operation + "\" JAI operation.");
+        }
+        if (show) {
+            Viewer.show(projected, operation);
+        } else {
+            // Force computation
+            assertNotNull(projected.getRenderedImage().getData());
+        }
+        return operation;
+    }
+    
+	/**
+	 * Projects the specified image to the specified CRS using the specified
+	 * hints. The result will be displayed in a window if {@link #SHOW} is set
+	 * to {@code true}.
+	 * @param show whether or not we should show this coverage in a viewer.
+	 * 
+	 * @return The operation name which was applied on the image, or
+	 *         {@code null} if none.
+	 */
+	public static GridCoverage2D projectTo(final GridCoverage2D coverage,
+			final CoordinateReferenceSystem targetCRS,
+			final GridGeometry2D geometry, final Hints hints,
+			final boolean useGeophysics) {
+		final AbstractProcessor processor = (hints != null) ? new DefaultProcessor(
+				hints)
+				: AbstractProcessor.getInstance();
+		final String arg1;
+		final Object value1;
+		final String arg2;
+		final Object value2;
+		if (targetCRS != null) {
+			arg1 = "CoordinateReferenceSystem";
+			value1 = targetCRS;
+			if (geometry != null) {
+				arg2 = "GridGeometry";
+				value2 = geometry;
+			} else {
+				arg2 = "InterpolationType";
+				value2 = "bilinear";
+			}
+		} else {
+			arg1 = "GridGeometry";
+			value1 = geometry;
+			arg2 = "InterpolationType";
+			value2 = "bilinear";
+		}
+		GridCoverage2D projected = coverage.geophysics(useGeophysics);
+		final ParameterValueGroup param = processor.getOperation("Resample")
+				.getParameters();
+		param.parameter("Source").setValue(projected);
+		param.parameter(arg1).setValue(value1);
+		param.parameter(arg2).setValue(value2);
+		projected = (GridCoverage2D) processor.doOperation(param);
+		final RenderedImage image = projected.getRenderedImage();
+		if (image instanceof RenderedOp) {
+			String operation = ((RenderedOp) image).getOperationName();
+			AbstractProcessor.LOGGER.fine("Applied \"" + operation
+					+ "\" JAI operation.");
+		}
+		return projected;
+	}
+
+	/**
+	 * Compares two affine transforms.
+	 * @param eps tolerance
+	 */
+	public static void assertEquals(final AffineTransform expected, final AffineTransform actual, double eps) {
+	    assertEquals("scaleX",     expected.getScaleX(),     actual.getScaleX(),     eps);
+	    assertEquals("scaleY",     expected.getScaleY(),     actual.getScaleY(),     eps);
+	    assertEquals("shearX",     expected.getShearX(),     actual.getShearX(),     eps);
+	    assertEquals("shearY",     expected.getShearY(),     actual.getShearY(),     eps);
+	    assertEquals("translateX", expected.getTranslateX(), actual.getTranslateX(), eps);
+	    assertEquals("translateY", expected.getTranslateY(), actual.getTranslateY(), eps);
+	}
+
+	/**
+	 * Performs an Affine transformation on the provided {@link GridCoverage2D} using the
+	 * Resample operation.
+	 *
+	 * @param coverage the {@link GridCoverage2D} to apply the operation on.
+	 * @param show whether or not we should show this coverage in a viewer.
+	 */
+	public static void performAffine(final GridCoverage2D coverage, final Hints          hints, final boolean        useGeophysics,
+			final String         testString1, final String         testString2, boolean show) {
+			    final AffineTransform atr = getAffineTransform(coverage);
+			    atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
+			    final MathTransform tr = ProjectiveTransform.create(atr);
+			    CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
+			    crs = new DefaultDerivedCRS("F2", crs, tr, crs.getCoordinateSystem());
+			    /*
+			     * Note: In current Resample implementation, the affine transform effect tested
+			     *       on the first line below will not be visible with the simple viewer used
+			     *       here.  It would be visible however with more elaborated viewer like the
+			     *       one provided in the {@code org.geotools.renderer} package.
+			     */
+			    String operation = projectTo(coverage, crs, null,hints, useGeophysics,show);
+			    if (operation != null) {
+			        if (false) // TODO
+			            assertEquals(testString1, operation);
+			    }
+			    operation = projectTo(coverage, null, new GridGeometry2D(null, tr, null), hints, useGeophysics,show);
+			    if (operation != null) {
+			        if (false) // TODO
+			            assertEquals(testString2, operation);
+			    }
+			}	
+	
 }

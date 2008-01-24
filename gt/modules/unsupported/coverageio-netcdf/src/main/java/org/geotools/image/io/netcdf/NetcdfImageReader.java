@@ -275,6 +275,38 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
 
     /**
+     * Returns the number of bands available for the specified image.
+     *
+     * @param  imageIndex  The image index.
+     * @throws IOException if an error occurs reading the information from the input source.
+     */
+    @Override
+    public int getNumBands(final int imageIndex) throws IOException {
+        prepareVariable(imageIndex);
+        final int rank = variable.getRank();
+        final int bandDimension = rank - Z_DIMENSION;
+        if (bandDimension >= 0 && bandDimension < rank) {
+            return variable.getDimension(bandDimension).getLength();
+        }
+        return super.getNumBands(imageIndex);
+    }
+
+    /**
+     * Returns the number of dimension of the image at the given index.
+     *
+     * @param  imageIndex The image index.
+     * @return The number of dimension for the image at the given index.
+     * @throws IOException if an error occurs reading the information from the input source.
+     *
+     * @since 2.5
+     */
+    @Override
+    public int getDimension(final int imageIndex) throws IOException {
+        prepareVariable(imageIndex);
+        return variable.getRank();
+    }
+
+    /**
      * Convenience method returning the first (and only) sample converter in the specified
      * array, or a default converter if the specified array contains a null element.
      */
@@ -688,7 +720,7 @@ scan:       while (it.hasNext()) {
         int bandDimension = rank - Z_DIMENSION;
         if (param instanceof NetcdfReadParam) {
             final NetcdfReadParam p = (NetcdfReadParam) param;
-            if (variable instanceof VariableEnhanced) {
+            if (p.isBandDimensionSet() && variable instanceof VariableEnhanced) {
                 ensureMetadataLoaded(); // Build the CoordinateSystems
                 bandDimension = p.getBandDimension((VariableEnhanced) variable);
                 final int relative = rank - bandDimension;
@@ -761,7 +793,7 @@ scan:       while (it.hasNext()) {
                 throw netcdfFailure(e);
             }
         }
-        final List sections = Range.toList(ranges);
+        final List<Range> sections = Range.toList(ranges);
         /*
          * Reads the requested sub-region only.
          */

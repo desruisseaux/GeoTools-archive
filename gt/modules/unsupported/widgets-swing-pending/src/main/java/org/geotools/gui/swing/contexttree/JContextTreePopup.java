@@ -69,6 +69,9 @@ public final class JContextTreePopup {
         return popup;
     }
        
+    JContextTree getTree(){
+        return frame;
+    }
     
     public void setMap(Map map){
         this.map = map;

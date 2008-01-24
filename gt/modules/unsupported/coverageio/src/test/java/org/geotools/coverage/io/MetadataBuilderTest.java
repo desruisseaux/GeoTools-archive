@@ -16,23 +16,19 @@
  */
 package org.geotools.coverage.io;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
 
@@ -186,7 +182,7 @@ public class MetadataBuilderTest extends TestCase {
         parser.addAlias(MetadataBuilder.Y_RESOLUTION,  "Resolution Y");
         parser.addAlias(MetadataBuilder.WIDTH,         "Width"       );
         parser.addAlias(MetadataBuilder.HEIGHT,        "Height"      );
-        
+
         final GridCoverage coverage = GridCoverageExamples.getExample(0);
         parser.add(coverage);
         if (out != null) {
@@ -199,18 +195,18 @@ public class MetadataBuilderTest extends TestCase {
         assertEquals( 0.1, parser.getAsDouble(MetadataBuilder.Y_RESOLUTION), 1E-8);
         assertEquals( 450, parser.getAsInt   (MetadataBuilder.WIDTH));
         assertEquals( 460, parser.getAsInt   (MetadataBuilder.HEIGHT));
-        
+
         final GridRange range = parser.getGridRange();
         assertEquals("Width",  450, range.getLength(0));
         assertEquals("Height", 460, range.getLength(1));
-        
+
         final CoordinateReferenceSystem expectedCRS = coverage.getCoordinateReferenceSystem();
         final CoordinateReferenceSystem  createdCRS =   parser.getCoordinateReferenceSystem();
         assertTrue   ("The test data changed!", expectedCRS instanceof GeographicCRS);
         assertTrue   ("Created wrong CRS type.", createdCRS instanceof GeographicCRS);
         assertNotSame("Not testing creation.",  expectedCRS, createdCRS);
         assertTrue   ("Created incompatible CRS.", CRS.equalsIgnoreMetadata(expectedCRS, createdCRS));
-        
+
         parser.addAlias(MetadataBuilder.COORDINATE_REFERENCE_SYSTEM, "CRS");
         parser.add(coverage);
         assertSame("Should not create CRS anymore.", expectedCRS, parser.getCoordinateReferenceSystem());

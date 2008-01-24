@@ -16,30 +16,11 @@
 
 package org.geotools.gui.swing.toolbox;
 
-import javax.swing.JComponent;
+import org.geotools.gui.swing.toolbox.tooltree.*;
 
 /**
  * @author johann sorel
  */
 public interface Tool {
 
-    /**
-     * 
-     * @return name of the tool
-     */
-    public String getTitle();
-    
-    /**
-     * 
-     * @return String Path ex: {utilities;convert}
-     */
-    public String[] getPath();
-    
-    /**
-     * 
-     * @return the panel of the tool
-     */
-    public JComponent getComponent();
-    
-    
 }

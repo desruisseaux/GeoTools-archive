@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,13 +16,12 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 
 
 /**
  * Base class for EPSG factories to be registered in {@link GeometryFactoryFinder}.
- * 
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -47,7 +46,7 @@ public class DefaultFactory extends ThreadedEpsgFactory {
 
     /**
      * Constructs an authority factory using a set of factories created from the specified hints.
-     * 
+     *
      * @since 2.4
      */
     public DefaultFactory(final Hints userHints, final int priority) {

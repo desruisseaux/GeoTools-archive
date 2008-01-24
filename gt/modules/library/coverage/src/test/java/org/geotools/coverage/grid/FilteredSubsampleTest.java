@@ -41,6 +41,7 @@ import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.processing.operation.FilteredSubsample;
 import org.geotools.factory.Hints;
 import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.coverage.OperationStrategy;
 
 
 /**
@@ -108,32 +109,32 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         // on this one the Subsample average should do an RGB expansion
         filteredSubsample(indexedCoverage.geophysics(true),
                         new InterpolationNearest(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
         // on this one the Subsample average should do an RGB expansion
         // preserving alpha
         filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
                         new InterpolationNearest(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
         // on this one the subsample average should go back to the geophysiscs
         // view before being applied
         filteredSubsample(originallyIndexedCoverage.geophysics(false),
                         new InterpolationNearest(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
 
         // on this one the Subsample average should do an RGB expansion
         filteredSubsample(indexedCoverage.geophysics(true),
                         new InterpolationBilinear(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
         // on this one the Subsample average should do an RGB expansion
         // preserving alpha
         filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
                         new InterpolationBilinear(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
         // on this one the subsample average should go back to the geophysiscs
         // view before being applied
         filteredSubsample(originallyIndexedCoverage.geophysics(false),
                         new InterpolationBilinear(),
-                        (float[]) FilteredSubsample.qsFilter.getDefaultValue());
+                        new float[]{1});
 
         // on this one the Subsample average should do an RGB expansion
         filteredSubsample(indexedCoverage.geophysics(true),
@@ -170,8 +171,15 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         // view before being applied
         filteredSubsample(GridCoverageExamples.getExample(4).geophysics(false),
                 new InterpolationBilinear(),
-                (float[]) FilteredSubsample.qsFilter.getDefaultValue(),
+                new float[]{1},
                 new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+        
+        
+        
+        //play with a rotated coverage
+        filteredSubsample(rotateCoverage(GridCoverageExamples.getExample(4).geophysics(true),Math.PI/4),
+        		new InterpolationBilinear(), new float[] { 0.5F,  1.0F /  3.0F,
+            0.0F, -1.0F / 12.0F }, null);
     }
 
     public void filteredSubsample(GridCoverage2D coverage, Interpolation interp, float[] filter) {
@@ -199,8 +207,6 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         param.parameter("scaleY").setValue(Integer.valueOf(2));
         param.parameter("qsFilterArray").setValue(filter);
         param.parameter("Interpolation").setValue(interp);
-        param.parameter("BorderExtender").setValue(
-                BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
         // scale a first time by 2
         GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
         RenderedImage scaledImage = scaled.getRenderedImage();
@@ -209,10 +215,11 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         assertTrue(!isIndexed
                 || (interp instanceof InterpolationNearest)
                 || !(scaledImage.getColorModel() instanceof IndexColorModel)
-                || CoverageUtilities.prepareSourcesForGCOperation(coverage, interp, false, null) == 2);
+                || CoverageUtilities.prepareSourceForOperation(coverage, interp, false, null) == OperationStrategy.USE_GEOPHYSICS_VIEW);
         isIndexed = scaledImage.getColorModel() instanceof IndexColorModel;
         w = scaledImage.getWidth();
         h = scaledImage.getHeight();
+        checkEnvelopes(coverage, scaled);
 
         if (SHOW) {
             Viewer.show(coverage, coverage.getName().toString());
@@ -225,15 +232,15 @@ public class FilteredSubsampleTest extends GridCoverageTest {
 
         // scale a second time by 3
         scaled = (GridCoverage2D) Operations.DEFAULT.filteredSubsample(scaled,
-                3, 3, filter, interp, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                3, 3, filter, interp);
         scaledImage = scaled.getRenderedImage();
         assertTrue(scaledImage.getWidth() == Math.round(w / 3.0f));
         assertTrue(scaledImage.getHeight() == Math.round(h / 3.0f));
         assertTrue(!isIndexed
                 || (interp instanceof InterpolationNearest)
                 || !(scaledImage.getColorModel() instanceof IndexColorModel)
-                || CoverageUtilities.prepareSourcesForGCOperation(coverage, interp, false, null) == 2);
-
+                ||CoverageUtilities.prepareSourceForOperation(coverage, interp, false, null) == OperationStrategy.USE_GEOPHYSICS_VIEW);
+        checkEnvelopes(coverage, scaled);
         if (SHOW) {
             Viewer.show(scaled, scaled.getName().toString());
         } else {

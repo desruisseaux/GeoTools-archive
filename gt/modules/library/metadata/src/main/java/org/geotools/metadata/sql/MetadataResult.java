@@ -99,8 +99,7 @@ final class MetadataResult {
             }
             if (results.next()) {
                 // TODO: Localize
-                Logging.getLogger("org.geotools.metadata.sql")
-                      .warning("Duplicate identifier: "+identifier);
+                Logging.getLogger(MetadataResult.class).warning("Duplicate identifier: "+identifier);
             }
             results.close();
             results = null; // In case the 'results = ...' below will fails.

@@ -2,13 +2,8 @@ package org.geotools.catalog.property;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
 
-import org.geotools.catalog.AbstractFileGeoResource;
-import org.geotools.catalog.FeatureSourceGeoResource;
-
-import org.geotools.data.property.PropertyDataStore;
-import org.geotools.data.property.PropertyFeatureSource;
+import org.geotools.repository.FeatureSourceGeoResource;
 import org.geotools.util.ProgressListener;
 
 public class PropertyGeoResource extends FeatureSourceGeoResource {
