@@ -20,9 +20,9 @@ public class StorageFileTest extends TestCase implements FileReader {
     protected void setUp() throws Exception {
         super.setUp();
         Map<ShpFileType, File> files1 = ShpFilesTest.createFiles("Files1",
-                ShpFileType.values(), false);
+                ShpFileType.values());
         Map<ShpFileType, File> files2 = ShpFilesTest.createFiles("Files2",
-                ShpFileType.values(), false);
+                ShpFileType.values());
 
         shpFiles1 = new ShpFiles(files1.get(SHP));
         shpFiles2 = new ShpFiles(files2.get(SHP));

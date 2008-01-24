@@ -255,7 +255,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
             } catch (Throwable t) {
             }
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (LOGGER.isLoggable(Level.FINE))
                 LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
             return false;

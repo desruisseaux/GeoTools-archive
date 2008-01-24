@@ -25,10 +25,6 @@ import org.geotools.data.Transaction.State;
 
 public final class JDBCTransactionState implements State {
     /**
-     * the datastore
-     */
-    JDBCDataStore dataStore;
-    /**
      * the current transaction
      */
     Transaction tx;
@@ -37,9 +33,8 @@ public final class JDBCTransactionState implements State {
      */
     Connection cx;
     
-    public JDBCTransactionState(Connection cx, JDBCDataStore dataStore) {
+    public JDBCTransactionState(Connection cx) {
         this.cx = cx;
-        this.dataStore = dataStore;
     }
 
     public void setTransaction(Transaction tx) {
@@ -58,7 +53,7 @@ public final class JDBCTransactionState implements State {
                 }
             }
             else {
-                dataStore.getLogger().warning("Transaction is attempting to " +
+                JDBCDataStore.LOGGER.warning("Transaction is attempting to " +
                     "close an already closed connection");
             }
             cx = null;

@@ -226,8 +226,6 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *         including failure to use the provided math transform.
      *
      * @since 2.3
-     *
-     * @see org.geotools.coverage.grid.GeneralGridRange#GeneralGridRange(Envelope,PixelInCell)
      */
     public GeneralEnvelope(final GridRange           gridRange,
                            final PixelInCell         gridType,

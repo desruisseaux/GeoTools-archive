@@ -29,8 +29,8 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
         ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
 
         try{
-            shpFiles.acquireReadFile(DBF, this);
-            fail("Not a file should send exception");
+        shpFiles.acquireReadFile(DBF, this);
+        fail("Not a file should send exception");
         }catch(IllegalStateException e ){
             // good
         }
@@ -49,10 +49,10 @@ public class ShpFilesLockingTest extends TestCase implements FileWriter {
     public void testAcquireWriteFile() throws Throwable {
         ShpFiles shpFiles = new ShpFiles("http://somefile.com/shp.shp");
 
-        try {
-            shpFiles.acquireWriteFile(DBF, this);
-            fail("Not a file should send exception");
-        } catch (IllegalStateException e) {
+        try{
+        shpFiles.acquireWriteFile(DBF, this);
+        fail("Not a file should send exception");
+        }catch(IllegalStateException e ){
             // good
         }
         

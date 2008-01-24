@@ -922,48 +922,6 @@ public final class CRS {
     }
 
     /**
-     * Transforms the given envelope to the specified CRS. If the given envelope is null, or the
-     * {@linkplain Envelope#getCoordinateReferenceSystem envelope CRS} is null, or the given
-     * target CRS is null, or the transform {@linkplain MathTransform#isIdentity is identity},
-     * then the envelope is returned unchanged. Otherwise a new transformed envelope is returned.
-     * <p>
-     * <strong>Don't use this method if there is many envelopes to transform.</strong>
-     * This method is provided as a convenience when there is only one envelope to transform
-     * between CRS that can't be known in advance. If there is many of them or if the CRS are
-     * restricted to known values, get the {@linkplain CoordinateOperation coordinate operation}
-     * or {@linkplain MathTransform math transform} once for ever and invoke one of the methods
-     * below instead (unless if performance is not a concern).
-     *
-     * @param  envelope The envelope to transform (may be {@code null}).
-     * @param  targetCRS The target CRS (may be {@code null}).
-     * @return A new transformed envelope, or directly {@code envelope}
-     *         if no transformation was required.
-     * @throws TransformException If a transformation was required and failed.
-     *
-     * @since 2.5
-     */
-    public static Envelope transform(Envelope envelope, final CoordinateReferenceSystem targetCRS)
-            throws TransformException
-    {
-        if (envelope != null && targetCRS != null) {
-            final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
-            if (sourceCRS != null && !equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-                final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
-                final CoordinateOperation operation;
-                try {
-                    operation = factory.createOperation(targetCRS, targetCRS);
-                } catch (FactoryException exception) {
-                    throw new TransformException(Errors.format(ErrorKeys.CANT_TRANSFORM_ENVELOPE), exception);
-                }
-                if (!operation.getMathTransform().isIdentity()) {
-                    envelope = transform(operation, envelope);
-                }
-            }
-        }
-        return envelope;
-    }
-
-    /**
      * Transforms an envelope using the given {@linkplain MathTransform math transform}.
      * The transformation is only approximative. Note that the returned envelope may not
      * have the same number of dimensions than the original envelope.

@@ -111,7 +111,6 @@ public final class ColorUtilities {
      * @param lower  Index (inclusive) of the first element of {@code ARGB} to change.
      * @param upper  Index (exclusive) of the last  element of {@code ARGB} to change.
      */
-    @SuppressWarnings("fallthrough")
     public static void expand(final Color[] colors, final int[] ARGB,
                               final int lower, final int upper)
     {
@@ -135,10 +134,10 @@ public final class ColorUtilities {
             int R = C0.getRed  ();
             int G = C0.getGreen();
             int B = C0.getBlue ();
-            ARGB[i] = (roundByte(A + delta*(C1.getAlpha() - A)) << 24) |
-                      (roundByte(R + delta*(C1.getRed  () - R)) << 16) |
-                      (roundByte(G + delta*(C1.getGreen() - G)) <<  8) |
-                      (roundByte(B + delta*(C1.getBlue () - B)) <<  0);
+            ARGB[i] = (roundByte(A+delta*(C1.getAlpha()-A)) << 24) |
+                      (roundByte(R+delta*(C1.getRed  ()-R)) << 16) |
+                      (roundByte(G+delta*(C1.getGreen()-G)) <<  8) |
+                      (roundByte(B+delta*(C1.getBlue ()-B)) <<  0);
         }
     }
 
@@ -404,14 +403,18 @@ public final class ColorUtilities {
             if (ignoreTransparents) {
                 // If this entry is transparent and we were asked
                 // to check transparents pixels, let's leave.
-                if (icm.getAlpha(i) == 0) {
+                final int a = icm.getAlpha(i);
+                if (a == 0) {
                     continue;
                 }
             }
-            // Get the color for this pixel only if it is requested.
+            // get the color for this pixel including the
+            // alpha information only if it is requested.
+            final int r = icm.getRed  (i);
+            final int g = icm.getGreen(i);
+            final int b = icm.getBlue (i);
             // If gray, all components are the same.
-            final int green = icm.getGreen(i);
-            if (green != icm.getRed(i) || green != icm.getBlue(i)) {
+            if (r != g || g != b) {
                 return false;
             }
         }

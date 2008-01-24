@@ -805,10 +805,10 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (bounds!=null && gridFromCRS2D!=null) {
             try {
                 bounds = org.geotools.referencing.CRS.transform(gridFromCRS2D, bounds, null);
-                final int xmin = (int) Math.floor(bounds.getMinX() - 0.5);
-                final int ymin = (int) Math.floor(bounds.getMinY() - 0.5);
-                final int xmax = (int) Math.ceil (bounds.getMaxX() - 0.5);
-                final int ymax = (int) Math.ceil (bounds.getMaxY() - 0.5);
+                final int xmin = (int)Math.floor(bounds.getMinX() - 0.5);
+                final int ymin = (int)Math.floor(bounds.getMinY() - 0.5);
+                final int xmax = (int)Math.ceil (bounds.getMaxX() - 0.5);
+                final int ymax = (int)Math.ceil (bounds.getMaxY() - 0.5);
                 return new Rectangle(xmin, ymin, xmax-xmin, ymax-ymin);
             } catch (TransformException exception) {
                 // Ignore, since this method is invoked from 'GridCoverage.prefetch' only.

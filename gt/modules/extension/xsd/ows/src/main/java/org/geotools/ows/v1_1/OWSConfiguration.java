@@ -4,7 +4,6 @@ import java.util.Map;
 
 import net.opengis.ows.v1_1_0.Ows11Factory;
 
-import org.eclipse.emf.ecore.EFactory;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.ComplexEMFBinding;
 import org.geotools.xml.Configuration;
@@ -44,8 +43,6 @@ public class OWSConfiguration extends Configuration {
         bindings.put(OWS.GetCapabilitiesType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.GetCapabilitiesType));
         bindings.put(OWS.SectionsType ,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.SectionsType));
         bindings.put(OWS.AcceptFormatsType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.AcceptFormatsType));
-        bindings.put(OWS.BoundingBoxType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.BoundingBoxType));
-        bindings.put(OWS.CodeType,new ComplexEMFBinding(Ows11Factory.eINSTANCE, OWS.CodeType));
 
     }
 }

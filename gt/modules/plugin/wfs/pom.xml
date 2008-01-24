@@ -96,12 +96,6 @@
       <artifactId>wfs</artifactId>
       <version>1.1.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -114,8 +108,7 @@
             <!-- The following tests are skipped because they do not extend OnlineTestCase -->
             <exclude>**/WFSDataStoreTest.java</exclude>
             <exclude>**/WFSFeatureSourceTest.java</exclude>
-			<exclude>**/StreamingParserFeatureReaderTest.java</exclude>
-			
+
             <exclude>**/CubewerksOnlineTest.java</exclude>
             <exclude>**/DMSolutionOnlineTest.java</exclude>
             <exclude>**/GeoServerOnlineTest.java</exclude>

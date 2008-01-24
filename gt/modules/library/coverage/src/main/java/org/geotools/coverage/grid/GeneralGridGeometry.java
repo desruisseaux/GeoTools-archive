@@ -16,6 +16,8 @@
  */
 package org.geotools.coverage.grid;
 
+import java.awt.geom.AffineTransform;  // For javadoc
+import java.awt.image.BufferedImage;   // For javadoc
 import java.awt.image.RenderedImage;   // For javadoc
 import java.io.Serializable;
 
@@ -118,9 +120,9 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
 
     /**
      * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest valid
-     * grid coordinate is zero for {@link java.awt.image.BufferedImage}, but may be non-zero for
-     * arbitrary {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0
-     * and maximum of 512, with 511 as the highest valid index.
+     * grid coordinate is zero for {@link BufferedImage}, but may be non-zero for arbitrary
+     * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and
+     * maximum of 512, with 511 as the highest valid index.
      *
      * @see RenderedImage#getMinX
      * @see RenderedImage#getMinY
@@ -174,20 +176,15 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * @since 2.5
      */
     public GeneralGridGeometry(final GridGeometry other) {
+        gridRange = other.getGridRange();
+        gridToCRS = other.getGridToCRS();
         if (other instanceof GeneralGridGeometry) {
-            // Uses this path when possible in order to accept null values.
-            final GeneralGridGeometry general = (GeneralGridGeometry) other;
-            gridRange = general.gridRange;
-            gridToCRS = general.gridToCRS;
-            envelope  = general.envelope;
+            final GeneralGridGeometry gg = (GeneralGridGeometry) other;
+            envelope = gg.envelope;
+        } else if (gridRange!=null && gridToCRS!=null) {
+            envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, null);
         } else {
-            gridRange = other.getGridRange();
-            gridToCRS = other.getGridToCRS();
-            if (gridRange!=null && gridToCRS!=null) {
-                envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, null);
-            } else {
-                envelope = null;
-            }
+            envelope = null;
         }
     }
 
@@ -265,15 +262,19 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                     Classes.getClass(gridToCRS)), exception);
         }
-        // According OpenGIS specification, GridGeometry maps pixel's center. We must
-        // be consistent with the GeneralEnvelope(GridRange, ...) constructor here.
-        gridRange = new GeneralGridRange(transformed, PixelInCell.CELL_CENTER);
+        for (int i=transformed.getDimension(); --i>=0;) {
+            // According OpenGIS specification, GridGeometry maps pixel's center. We must
+            // be consistent with the GeneralEnvelope(GridRange, ...) constructor here.
+            transformed.setRange(i, transformed.getMinimum(i) + 0.5,
+                                    transformed.getMaximum(i) + 0.5);
+        }
+        gridRange = new GeneralGridRange(transformed);
     }
 
     /**
      * Constructs a new grid geometry from an {@linkplain Envelope envelope}. An {@linkplain
-     * java.awt.geom.AffineTransform affine transform} will be computed automatically from the
-     * specified envelope using heuristic rules described in {@link GridToEnvelopeMapper} javadoc.
+     * AffineTransform affine transform} will be computed automatically from the specified
+     * envelope using heuristic rules described in {@link GridToEnvelopeMapper} javadoc.
      * More specifically, heuristic rules are applied for:
      * <p>
      * <ul>
@@ -416,10 +417,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Returns the valid coordinate range of a grid coverage. The lowest valid grid coordinate
-     * is zero for {@link java.awt.image.BufferedImage}, but may be non-zero for arbitrary
-     * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and
-     * maximum of 512, with 511 as the highest valid index.
+     * Returns the valid coordinate range of a grid coverage. The lowest valid grid coordinate is
+     * zero for {@link BufferedImage}, but may be non-zero for arbitrary {@link RenderedImage}. A
+     * grid with 512 cells can have a minimum coordinate of 0 and maximum of 512, with 511 as the
+     * highest valid index.
      *
      * @return The grid range (never {@code null}).
      * @throws InvalidGridGeometryException if this grid geometry has no grid range (i.e.
@@ -435,6 +436,13 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         }
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
+    }
+
+    /**
+     * @deprecated Renamed as {@link #getGridToCRS()}.
+     */
+    public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
+        return getGridToCRS();
     }
 
     /**
@@ -528,8 +536,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         masks.
      *
      * @since 2.2
-     *
-     * @see javax.media.jai.ImageLayout#isValid
      */
     public boolean isDefined(final int bitmask) throws IllegalArgumentException {
         if ((bitmask & ~(CRS | ENVELOPE | GRID_RANGE | GRID_TO_CRS)) != 0) {
@@ -548,7 +554,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      */
     @Override
     public int hashCode() {
-        int code = (int) serialVersionUID;
+        int code = (int)serialVersionUID;
         if (gridToCRS != null) {
             code += gridToCRS.hashCode();
         }

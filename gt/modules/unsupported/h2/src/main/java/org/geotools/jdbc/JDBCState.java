@@ -109,7 +109,7 @@ public final class JDBCState extends ContentState {
      * {@link JDBCDataStore#closeSafe(Connection)}.
      */
     public void close() {
-        ((JDBCDataStore)entry.getDataStore()).closeSafe(connection);
+        JDBCDataStore.closeSafe(connection);
         super.close();
     }
 }

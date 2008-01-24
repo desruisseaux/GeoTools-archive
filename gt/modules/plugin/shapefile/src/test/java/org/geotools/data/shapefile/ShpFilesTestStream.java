@@ -30,7 +30,7 @@ public class ShpFilesTestStream extends TestCase implements
 
     @Override
     protected void setUp() throws Exception {
-        map = ShpFilesTest.createFiles("shpFiles", ShpFileType.values(), false);
+        map = ShpFilesTest.createFiles("shpFiles", ShpFileType.values());
 
         typeName = map.get(SHP).getName();
         typeName = typeName.substring(0, typeName.lastIndexOf("."));

@@ -502,22 +502,7 @@ public abstract class SQLDialect {
      */
     public abstract Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
         String column, GeometryFactory factory) throws IOException, SQLException;
-    /**
-     * Decodes a geometry value from the result of a query specifying the column 
-     * as an index.
-     * <p>
-     * See {@link #decodeGeometryValue(GeometryDescriptor, ResultSet, String, GeometryFactory)} 
-     * for a more in depth description.
-     * </p>
-     * @see {@link #decodeGeometryValue(GeometryDescriptor, ResultSet, String, GeometryFactory)}.
-     */
-    public final Geometry decodeGeometryValue(GeometryDescriptor descriptor, ResultSet rs,
-        int column, GeometryFactory factory) throws IOException, SQLException {
-        
-        String columnName = rs.getMetaData().getColumnName( column );
-        return decodeGeometryValue(descriptor, rs, columnName, factory);
-    }
-    
+
     /**
      * Encodes the primary key definition in a CREATE TABLE statement.
      * <p>

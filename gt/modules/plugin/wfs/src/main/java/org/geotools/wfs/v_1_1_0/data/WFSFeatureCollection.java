@@ -10,7 +10,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.DataFeatureCollection;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -81,9 +80,6 @@ class WFSFeatureCollection extends DataFeatureCollection {
         return bounds;
     }
 
-    /**
-     * @see DataFeatureCollection#getCount()
-     */
     @Override
     public int getCount() throws IOException {
         return protocolHandler.getCount(query);

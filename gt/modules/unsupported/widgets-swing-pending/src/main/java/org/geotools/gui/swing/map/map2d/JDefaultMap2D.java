@@ -15,11 +15,9 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
-import java.beans.PropertyChangeEvent;
 import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLayeredPane;
@@ -48,16 +46,17 @@ public class JDefaultMap2D extends JPanel implements Map2D {
      * Map2D reference , same as "this" but needed to explicitly point to the 
      * map2d object when coding a private class
      */
-    protected final JDefaultMap2D THIS_MAP;
+    protected final Map2D THIS_MAP;
     /**
      * Rendering Strategy of the map2d widget, should never be null
      */
     protected RenderingStrategy renderingStrategy;
+    
+    
     private static final MapDecoration[] EMPTY_OVERLAYER_ARRAY = {};
     private final InformationDecoration informationDecoration = new InformationDecoration();
     private final List<MapDecoration> userDecorations = new ArrayList<MapDecoration>();
     private final StrategyListener strategylisten = new StrategyListen();
-    private final PropertyChangeListener crslisten = new CRSLsiten();
     private final JLayeredPane mapDecorationPane = new JLayeredPane();
     private final JLayeredPane userDecorationPane = new JLayeredPane();
     private final JLayeredPane mainDecorationPane = new JLayeredPane();
@@ -85,9 +84,13 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
         setOpaque(false);
     }
+    
+    
+
+        
 
     private void fireStrategyChanged(RenderingStrategy oldOne, RenderingStrategy newOne) {
-
+        
         Map2DListener[] lst = getMap2DListeners();
 
         for (Map2DListener l : lst) {
@@ -96,35 +99,9 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
     }
 
-    //----------------------Use as extend for subclasses------------------------
-
-    protected void mapAreaChanged(Map2DMapAreaEvent event) {
-
-    }
-
-    protected void mapContextChanged(Map2DContextEvent event) {
-
-        if (event.getPreviousContext() != null) {
-            event.getPreviousContext().removePropertyChangeListener(crslisten);
-        }
-
-        if (event.getNewContext() != null) {
-            event.getNewContext().addPropertyChangeListener(crslisten);
-        }
-
-    }
-
-    protected void crsChanged(PropertyChangeEvent arg0) {
-
-
-    }
-
-    protected void setRendering(boolean render) {
-        informationDecoration.setDrawing(render);
-    }
+   
 
     //----------------------Over/Sub/information layers-------------------------
-
     /**
      * get the top InformationDecoration of the map2d widget
      * @return InformationDecoration
@@ -234,8 +211,10 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         nextMapDecorationIndex++;
     }
 
+    
+    
     //-----------------------------MAP2D----------------------------------------
-
+    
     public void setRenderingStrategy(RenderingStrategy stratege) {
 
         if (stratege == null) {
@@ -244,20 +223,14 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
         if (stratege != null) {
 
-
             fireStrategyChanged(renderingStrategy, stratege);
-
+            
             GTRenderer ren = null;
             MapContext context = null;
 
             if (renderingStrategy != null) {
                 ren = renderingStrategy.getRenderer();
                 context = renderingStrategy.getContext();
-
-                if (context != null) {
-                    context.removePropertyChangeListener(crslisten);
-                }
-
                 renderingStrategy.setContext(null);
                 mapDecorationPane.remove(renderingStrategy.getComponent());
                 renderingStrategy.removeStrategyListener(strategylisten);
@@ -269,14 +242,9 @@ public class JDefaultMap2D extends JPanel implements Map2D {
                 renderingStrategy.setRenderer(ren);
             }
             renderingStrategy.setContext(context);
-
-            if (context != null) {
-                context.addPropertyChangeListener(crslisten);
-            }
-
             mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
             mapDecorationPane.revalidate();
-            
+
         }
     }
 
@@ -305,27 +273,18 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //---------------------- PRIVATE CLASSES------------------------------------    
-
-
-    private class CRSLsiten implements PropertyChangeListener {
-
-        public void propertyChange(PropertyChangeEvent arg0) {
-            THIS_MAP.crsChanged(arg0);
-        }
-    }
+    
 
     private class StrategyListen implements StrategyListener {
 
         public void setRendering(boolean rendering) {
-            THIS_MAP.setRendering(rendering);
+            informationDecoration.setDrawing(rendering);
         }
 
         public void mapAreaChanged(Map2DMapAreaEvent event) {
-            THIS_MAP.mapAreaChanged(event);
         }
 
         public void mapContextChanged(Map2DContextEvent event) {
-            THIS_MAP.mapContextChanged(event);
         }
     }
 }

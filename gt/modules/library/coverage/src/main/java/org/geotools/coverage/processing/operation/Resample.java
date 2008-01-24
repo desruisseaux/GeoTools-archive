@@ -224,19 +224,19 @@ public class Resample extends Operation2D {
      * in which case a reprojection will be performed.
      *
      * @param source The source coverage.
-     * @param target The target envelope, including a possibly different coordinate reference system.
+     * @param envelope The target envelope, including a possibly different coordinate reference system.
      * @return A grid geometry inferred from the target envelope.
      * @throws TransformException If a transformation was required and failed.
      *
      * @since 2.5
      */
-    public static GridGeometry computeGridGeometry(final GridCoverage source, final Envelope target)
+    public static GridGeometry computeGridGeometry(final GridCoverage source, final Envelope envelope)
             throws TransformException
     {
-        final CoordinateReferenceSystem targetCRS = target.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem sourceCRS = source.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem sourceCRS =   source.getCoordinateReferenceSystem();
         final CoordinateReferenceSystem reducedCRS;
-        if (target.getDimension() == 2 && sourceCRS.getCoordinateSystem().getDimension() != 2) {
+        if (envelope.getDimension() == 2 && sourceCRS.getCoordinateSystem().getDimension() != 2) {
             reducedCRS = CoverageUtilities.getCRS2D(source);
         } else {
             reducedCRS = sourceCRS;
@@ -254,7 +254,7 @@ public class Resample extends Operation2D {
             } else {
                 gridToCRS = GridGeometry2D.wrap(gridGeometry).getGridToCRS2D();
             }
-            gridGeometry = new GridGeometry2D(gridToCRS, target);
+            gridGeometry = new GridGeometry2D(gridToCRS, envelope);
         } else {
             /*
              * Different CRS. We need to infer an image size, which may be the same than the
@@ -269,7 +269,7 @@ public class Resample extends Operation2D {
             try {
                 final GeneralEnvelope transformed;
                 transformed = CRS.transform(CRS.getCoordinateOperationFactory(true)
-                        .createOperation(targetCRS, reducedCRS), target);
+                        .createOperation(targetCRS, reducedCRS), envelope);
                 final Envelope reduced;
                 final MathTransform gridToCRS;
                 if (reducedCRS == sourceCRS) {
@@ -289,7 +289,7 @@ public class Resample extends Operation2D {
                 // which will result in keeping the same image size.
             }
             gridRange = gridGeometry.getGridRange();
-            gridGeometry = new GridGeometry2D(gridRange, target);
+            gridGeometry = new GridGeometry2D(gridRange, envelope);
         }
         return gridGeometry;
     }

@@ -117,6 +117,24 @@ public class GridRange2D extends Rectangle implements GridRange, Cloneable {
         return new GridCoordinates2D(x + width, y + height);
     }
 
+    /**
+     * Returns the valid minimum inclusive grid coordinates along all dimensions.
+     *
+     * @deprecated Replaced by {@link #getLower}.
+     */
+    public int[] getLowers() {
+        return new int[] {x, y};
+    }
+
+    /**
+     * Returns the valid maximum exclusive grid coordinates along all dimensions.
+     *
+     * @deprecated Replaced by {@link #getUpper}.
+     */
+    public int[] getUppers() {
+        return new int[] {x + width, y + height};
+    }
+
     // Inherit 'hashCode()' and 'equals' from Rectangle2D, which provides an implementation
     // aimed to be common for every Rectangle2D subclasses (not just the Java2D ones) -  we
     // don't want to change this behavior in order to stay consistent with Java2D.

@@ -106,6 +106,12 @@ public final class JDBCDataStore extends ContentDataStore
     implements GmlObjectStore {
     
     /**
+     * logging instance
+     */
+    public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
+            "org.geotools.data.jdbc");
+
+    /**
      * name of table to use to store geometries when {@link #associations}
      * is set.
      */
@@ -462,11 +468,11 @@ public final class JDBCDataStore extends ContentDataStore
                             }
                         }
                         finally {
-                            closeSafe( rs );
+                            JDBCDataStore.closeSafe( rs );
                         }
                     }
                     finally {
-                        closeSafe( st );
+                        JDBCDataStore.closeSafe( st );
                     }
                 }
                 catch( SQLException e ) {
@@ -474,7 +480,7 @@ public final class JDBCDataStore extends ContentDataStore
                 }
             }
             finally {
-                closeSafe( cx );
+                JDBCDataStore.closeSafe( cx );
             }
         }
         
@@ -965,7 +971,7 @@ public final class JDBCDataStore extends ContentDataStore
                     //TODO: what abotu when it is auto commmit... i beleive this
                     // is leaking connection
                     //add connection state to the transaction
-                    state.getTransaction().putState(state, new JDBCTransactionState( cx, this ) );    
+                    state.getTransaction().putState(state, new JDBCTransactionState( cx ) );    
                 }
 }
         }
@@ -1044,11 +1050,11 @@ public final class JDBCDataStore extends ContentDataStore
                 try {
                     st.execute(sql);
                 } finally {
-                    closeSafe(st);
+                    JDBCDataStore.closeSafe(st);
                 }
             }
         } finally {
-            closeSafe(tables);
+            JDBCDataStore.closeSafe(tables);
         }
 
         // look for feature association table
@@ -1065,11 +1071,11 @@ public final class JDBCDataStore extends ContentDataStore
                 try {
                     st.execute(sql);
                 } finally {
-                    closeSafe(st);
+                    JDBCDataStore.closeSafe(st);
                 }
             }
         } finally {
-            closeSafe(tables);
+            JDBCDataStore.closeSafe(tables);
         }
 
         // look up for geometry table
@@ -1086,11 +1092,11 @@ public final class JDBCDataStore extends ContentDataStore
                 try {
                     st.execute(sql);
                 } finally {
-                    closeSafe(st);
+                    JDBCDataStore.closeSafe(st);
                 }
             }
         } finally {
-            closeSafe(tables);
+            JDBCDataStore.closeSafe(tables);
         }
 
         // look up for multi geometry table
@@ -1107,11 +1113,11 @@ public final class JDBCDataStore extends ContentDataStore
                 try {
                     st.execute(sql);
                 } finally {
-                    closeSafe(st);
+                    JDBCDataStore.closeSafe(st);
                 }
             }
         } finally {
-            closeSafe(tables);
+            JDBCDataStore.closeSafe(tables);
         }
 
         // look up for metadata for geometry association table
@@ -1128,11 +1134,11 @@ public final class JDBCDataStore extends ContentDataStore
                 try {
                     st.execute(sql);
                 } finally {
-                    closeSafe(st);
+                    JDBCDataStore.closeSafe(st);
                 }
             }
         } finally {
-            closeSafe(tables);
+            JDBCDataStore.closeSafe(tables);
         }
     }
 
@@ -2060,7 +2066,7 @@ public final class JDBCDataStore extends ContentDataStore
      * </p>
      * @param rs The result set to close.
      */
-    public void closeSafe(ResultSet rs) {
+    public static void closeSafe(ResultSet rs) {
         if (rs == null) {
             return;
         }
@@ -2085,7 +2091,7 @@ public final class JDBCDataStore extends ContentDataStore
      * </p>
      * @param st The statement to close.
      */
-    public void closeSafe(Statement st) {
+    public static void closeSafe(Statement st) {
         if (st == null) {
             return;
         }
@@ -2110,7 +2116,7 @@ public final class JDBCDataStore extends ContentDataStore
      * </p>
      * @param cx The connection to close.
      */
-    public void closeSafe(Connection cx) {
+    public static void closeSafe(Connection cx) {
         if (cx == null) {
             return;
         }

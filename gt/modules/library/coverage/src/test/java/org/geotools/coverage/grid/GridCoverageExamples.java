@@ -16,6 +16,7 @@
  */
 package org.geotools.coverage.grid;
 
+// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -30,7 +31,10 @@ import javax.imageio.ImageIO;
 import javax.units.SI;
 import junit.framework.Assert;
 
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
@@ -41,6 +45,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
 import org.geotools.util.NumberRange;
 
+// Sun implementation of JAI
 import com.sun.media.jai.codecimpl.util.RasterFactory;
 
 
@@ -133,7 +138,8 @@ public final class GridCoverageExamples extends Assert {
         }
         final Hints                 hints = new Hints(Hints.TILE_ENCODING, "raw");
         final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(hints);
-        coverage = factory.create("Test", image, envelope, new GridSampleDimension[]{band}, null, null);
+        coverage = (GridCoverage2D)factory.create("Test", image, envelope,
+                new GridSampleDimension[]{band}, null, null);
         assertEquals("raw", coverage.tileEncoding);
         /*
          * Grid coverage construction finished. Now test it. Some tests will not be applicable
@@ -242,7 +248,7 @@ public final class GridCoverageExamples extends Assert {
                 bands = new GridSampleDimension[] {
                         new GridSampleDimension("Measure", categories, null).geophysics(false)
                     };
-
+                
                 break;
             }
             case 2: {
@@ -298,13 +304,13 @@ public final class GridCoverageExamples extends Assert {
                 return factory.create("My colored coverage", raster,
                         new Envelope2D(DefaultGeographicCRS.WGS84, 35, -41, 35+45, -41+46),
                                     null, null, null, new Color[][] {colors}, null);
-
+                
             }
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(bounds);
         final RenderedImage      image = ImageIO.read(TestData.getResource(GridCoverageExamples.class, path));
         final String          filename = new File(path).getName();
         envelope.setCoordinateReferenceSystem(crs);
-        return factory.create(filename, image, envelope, bands, null, null);
+        return (GridCoverage2D) factory.create(filename, image, envelope, bands, null, null);
     }
 }

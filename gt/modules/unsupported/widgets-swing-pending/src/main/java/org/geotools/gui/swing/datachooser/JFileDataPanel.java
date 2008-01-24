@@ -53,6 +53,7 @@ import org.opengis.referencing.operation.TransformException;
 public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
+    
     private static File LASTPATH = null;
     private EventListenerList listeners = new EventListenerList();
 
@@ -125,7 +126,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         RandomStyleFactory rsf = new RandomStyleFactory();
 
         String errorStr = BUNDLE.getString("DefaultFileTypeChooser_error");
-
+        
         File[] files = gui_choose.getSelectedFiles();
         for (File f : files) {
             LASTPATH = f;
@@ -195,16 +196,32 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
         DataStore dataStore = null;
 
+        //try using a simple shapefileDatastore, wich as no edition problems
         try {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("url", f.toURI().toURL());
-            dataStore = DataStoreFinder.getDataStore(map);
+            dataStore = new ShapefileDataStore(f.toURI().toURL());
         } catch (MalformedURLException ex) {
+            dataStore = null;
             ex.printStackTrace();
             return null;
         } catch (IOException ex) {
+            dataStore = null;
             ex.printStackTrace();
             return null;
+        }
+
+        //
+        if (dataStore == null) {
+            try {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("url", f.toURI().toURL());
+                dataStore = DataStoreFinder.getDataStore(map);
+            } catch (MalformedURLException ex) {
+                ex.printStackTrace();
+                return null;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
         }
 
         return dataStore;

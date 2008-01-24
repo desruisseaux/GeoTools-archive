@@ -229,7 +229,6 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, StrategyL
 
         if (map != null) {
             map.removeMap2DListener(this);
-            map.getRenderingStrategy().removeStrategyListener(this);
 
             if (map instanceof NavigableMap2D) {
                 ((NavigableMap2D) map).removeNavigableMap2DListener(this);
@@ -240,7 +239,6 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, StrategyL
         if (map2d instanceof Map2D) {
             map = (Map2D) map2d;
             map.addMap2DListener(this);
-            map.getRenderingStrategy().addStrategyListener(this);
             gui_refresh.setEnabled(true);
 
             if (map2d instanceof NavigableMap2D) {

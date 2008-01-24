@@ -27,10 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.FilterFactory2;
-
-
+import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Graphic;
 
@@ -48,21 +47,19 @@ public class CustomGlyphRenderer implements GlyphRenderer {
     
     /** Creates a new instance of CustomGlyphRenderer */
     public CustomGlyphRenderer() {
-    	 FilterFactory2 factory = (FilterFactory2) org.geotools.factory.CommonFactoryFinder
-         .getFilterFactory(null);
-        
-        list.addProperty("radius", Expression.class, factory.literal(50));
-        list.addProperty("circle color", Expression.class, factory.literal("#000066"));
-        list.addProperty("bar height", Expression.class, factory.literal(150));
-        list.addProperty("bar color", Expression.class, factory.literal("#000000"));
-        list.addProperty("bar uncertainty", Expression.class, factory.literal(50));
-        list.addProperty("bar uncertainty width", Expression.class, factory.literal(5));
-        list.addProperty("bar uncertainty color", Expression.class, factory.literal("#999999"));
-        list.addProperty("pointer length", Expression.class, factory.literal(100));
-        list.addProperty("pointer color", Expression.class, factory.literal("#FF0000"));
-        list.addProperty("pointer direction", Expression.class, factory.literal(21));
-        list.addProperty("wedge width", Expression.class, factory.literal(25));
-        list.addProperty("wedge color", Expression.class, factory.literal("#9999FF"));
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        list.addProperty("radius", Expression.class, factory.createLiteralExpression(50));
+        list.addProperty("circle color", Expression.class, factory.createLiteralExpression("#000066"));
+        list.addProperty("bar height", Expression.class, factory.createLiteralExpression(150));
+        list.addProperty("bar color", Expression.class, factory.createLiteralExpression("#000000"));
+        list.addProperty("bar uncertainty", Expression.class, factory.createLiteralExpression(50));
+        list.addProperty("bar uncertainty width", Expression.class, factory.createLiteralExpression(5));
+        list.addProperty("bar uncertainty color", Expression.class, factory.createLiteralExpression("#999999"));
+        list.addProperty("pointer length", Expression.class, factory.createLiteralExpression(100));
+        list.addProperty("pointer color", Expression.class, factory.createLiteralExpression("#FF0000"));
+        list.addProperty("pointer direction", Expression.class, factory.createLiteralExpression(21));
+        list.addProperty("wedge width", Expression.class, factory.createLiteralExpression(25));
+        list.addProperty("wedge color", Expression.class, factory.createLiteralExpression("#9999FF"));
     }
     
     public boolean canRender(String format) {

@@ -249,7 +249,6 @@ public class JMap2DEditBar extends JPanel implements Map2DListener,StrategyListe
     }
 
     private void initComboBox() {
-        
         gui_layers.removeItemListener(listen);
         
         gui_layers.removeAllItems();
@@ -351,7 +350,6 @@ public class JMap2DEditBar extends JPanel implements Map2DListener,StrategyListe
     public void setMap(Map2D map2d) {
 
         if (map != null) {
-            map.getRenderingStrategy().removeStrategyListener(this);
             map.removeMap2DListener(this);
             map.removeNavigableMap2DListener(this);
             map.removeEditableMap2DListener(this);
@@ -364,8 +362,6 @@ public class JMap2DEditBar extends JPanel implements Map2DListener,StrategyListe
             map.addMap2DListener(this);
             map.addNavigableMap2DListener(this);
             map.addEditableMap2DListener(this);
-            map.getRenderingStrategy().addStrategyListener(this);
-            
             gui_layers.setEnabled(true);
 
         } else {
@@ -395,7 +391,7 @@ public class JMap2DEditBar extends JPanel implements Map2DListener,StrategyListe
         if (editionContext != null) {
             editionContext.addMapLayerListListener(contextListener);
         }
-        
+
         initComboBox();
     }
 
