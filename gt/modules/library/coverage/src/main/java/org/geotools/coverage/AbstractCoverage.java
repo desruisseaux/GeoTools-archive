@@ -1210,14 +1210,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *   <li><p>If {@code force} is {@code false} (the recommanded value), this method may process
      *   only under some conditions. For example a grid coverage may dispose its planar image only
      *   if it has no {@linkplain PlanarImage#getSinks sinks}. This method returns {@code true} if
-     *   it disposed at least some resources, or {@code false} if this method vetoed against the
-     *   disposal. In the later case, no resources were disposed and this coverage can still be
-     *   used.</p></li>
+     *   it disposed all resources, or {@code false} if this method vetoed against the disposal.
+     *   In the later case, this coverage can still be used.</p></li>
      *
      *   <li><p>If {@code force} is {@code true}, then this method processes inconditionnally and
      *   returns always {@code true}. This is a more risky behavior.</p></li>
      * </ul>
-     *
+     * <p>
      * The conservative mode ({@code force = false}) performs its safety checks on a
      * <cite>best-effort</cite> basis, with no guarantees. Therefore, it would be wrong to write
      * a program that depended on the safety checks for its correctness. In case of doubt about

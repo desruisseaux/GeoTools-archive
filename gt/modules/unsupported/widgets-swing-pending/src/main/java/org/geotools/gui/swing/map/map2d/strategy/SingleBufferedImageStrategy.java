@@ -67,7 +67,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private final MapContext buffercontext = new OneLayerContext();
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
-    
     private double rotation = 0d;
 
     /**
@@ -88,25 +87,33 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
         comp.addComponentListener(new ComponentListener() {
 
-            public void componentResized(ComponentEvent arg0) {
-                fit();
+            public void componentResized(ComponentEvent arg0) {                
+                fitMapArea();
             }
 
             public void componentMoved(ComponentEvent arg0) {
-                fit();
+                fitMapArea();
             }
 
             public void componentShown(ComponentEvent arg0) {
-                fit();
+                fitMapArea();
             }
 
             public void componentHidden(ComponentEvent arg0) {
-                fit();
+                fitMapArea();
             }
         });
 
         thread.start();
 
+    }
+    
+    private void fitMapArea(){
+        try{
+        if(context != null && context.getAreaOfInterest() != null){
+            setMapArea(context.getAreaOfInterest());
+        }
+        }catch(Exception e){}
     }
 
     private void opimizeRenderer() {
@@ -190,13 +197,16 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
         ReferencedEnvelope newAreaOfInterest = null;
         if (context != null) {
+            try{
             newAreaOfInterest = context.getAreaOfInterest();
+            }catch(Exception e){}
 
             if (newAreaOfInterest != null && (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest))) {
                 changed = true;
                 oldRect = newRect;
                 oldAreaOfInterest = newAreaOfInterest;
             }
+            
         }
 
         return changed;
@@ -266,25 +276,25 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
 
-            
+
             AffineTransform transform = null;
-            try{
-               AffineTransform  t1 = RendererUtilities.worldToScreenTransform(compMapArea, newRect, context.getCoordinateReferenceSystem());
-               transform = new AffineTransform(t1);
+            try {
+                AffineTransform t1 = RendererUtilities.worldToScreenTransform(compMapArea, newRect, context.getCoordinateReferenceSystem());
+                transform = new AffineTransform(t1);
                 transform.rotate(rotation);
-            }catch (TransformException e){
+            } catch (TransformException e) {
                 e.printStackTrace();
             }
-            
+
             renderer.setContext(context);
-            
-            if(transform != null){
-                renderer.paint((Graphics2D)ig, newRect, transform);
-            }else{                
+
+            if (transform != null && newRect != null) {
+                renderer.paint((Graphics2D) ig, newRect, transform);
+            } else {
                 renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
             }
-            
-            
+
+
             return buf;
         } else {
             return null;
@@ -302,8 +312,8 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     public void reset() {
         compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
-            mustupdate = true;
-            thread.wake();
+        mustupdate = true;
+        thread.wake();
     }
 
     public void setRenderer(GTRenderer renderer) {
@@ -315,17 +325,22 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     }
 
     public void setContext(MapContext context) {
-        if (this.context != null) {
-            this.context.removeMapLayerListListener(mapLayerListlistener);
+
+        if (this.context != context) {
+            if (this.context != null) {
+                this.context.removeMapLayerListListener(mapLayerListlistener);
+            }
+
+            MapContext oldContext = this.context;
+            this.context = context;
+            fireMapContextChanged(oldContext, this.context);
+
+            if (context != null) {
+                this.context.addMapLayerListListener(mapLayerListlistener);
+            }
+
+            fit();
         }
-
-        this.context = context;
-
-        if (context != null) {
-            this.context.addMapLayerListListener(mapLayerListlistener);
-        }
-
-        fit();
     }
 
     public MapContext getContext() {
@@ -335,12 +350,14 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     public void setMapArea(Envelope area) {
 
         if (context != null) {
+            Envelope oldenv = context.getAreaOfInterest();
             Envelope env = fixAspectRatio(comp.getBounds(), area, context);
             CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
-            if (env != null && crs != null) {
-                context.setAreaOfInterest(env, crs);
+            if (env != null && crs != null) {                
+                context.setAreaOfInterest(env, crs);                
             }
             fit();
+            fireMapAreaChanged(oldenv, env);
         }
     }
 
@@ -362,8 +379,8 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     public StrategyListener[] getStrategyListeners() {
         return listeners.getListeners(StrategyListener.class);
     }
-    
-     public void setRotation(double d) {
+
+    public void setRotation(double d) {
         rotation = d;
         reset();
     }
@@ -459,8 +476,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
         }
         }
-
-   
 }
     
     

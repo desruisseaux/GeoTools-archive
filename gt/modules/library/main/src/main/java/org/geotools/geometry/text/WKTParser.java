@@ -84,8 +84,8 @@ import java.util.Set;
  * 
  * @author Jody Garnett
  * @author Joel Skelton
- * @since 2.5
- * @version $Id$
+ * @since 2.4
+ * @version 2.4
  */
 public class WKTParser {
 

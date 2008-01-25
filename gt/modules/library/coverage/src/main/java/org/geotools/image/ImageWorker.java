@@ -1004,8 +1004,6 @@ public class ImageWorker {
      *
      * @return this {@link ImageWorker}.
      *
-     * @todo Make this function work on 16 bits indexed images which means
-     *       changing the lookup code.
      * @see FormatDescriptor
      */
     public final ImageWorker forceComponentColorModel(boolean checkTransparent) {
@@ -1017,10 +1015,10 @@ public class ImageWorker {
         // shortcut for index color model
         if (cm instanceof IndexColorModel) {
             final IndexColorModel icm = (IndexColorModel) cm;
-            boolean gray = ColorUtilities.isGrayPalette(icm, checkTransparent);
-            boolean alpha = icm.hasAlpha();
-            final int numBands = icm.getNumComponents();
-            byte data[][] = new byte[cm.getNumComponents()][icm.getMapSize()];
+            final boolean gray     = ColorUtilities.isGrayPalette(icm, checkTransparent);
+            final boolean alpha    = icm.hasAlpha();
+            final int     numBands = icm.getNumComponents();
+            final byte    data[][] = new byte[cm.getNumComponents()][icm.getMapSize()];
             icm.getReds  (data[0]);
             icm.getGreens(data[1]);
             icm.getBlues (data[2]);
@@ -1034,14 +1032,19 @@ public class ImageWorker {
              * explict color model, keep the user's choice.
              */
             final RenderingHints hints = getRenderingHints();
-            image = JAI.create("Lookup", image, lut, hints);
+            image = LookupDescriptor.create(image, lut, hints);
             /*
              * If the image is grayscale, retain only the first band.
+             *
+             * TODO: it would be better to merge this work with the previous "Lookup" so only
+             *       one image operation is performed instead of two.
              */
-            if (gray && !alpha) {
-                retainBands(1);
-            } else if (gray && alpha) {
-                retainBands(new int[] {0, 3});
+            if (gray) {
+                if (alpha) {
+                    retainBands(new int[] {0, 3});
+                } else {
+                    retainBands(1);
+                }
             }
         } else {
             // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.

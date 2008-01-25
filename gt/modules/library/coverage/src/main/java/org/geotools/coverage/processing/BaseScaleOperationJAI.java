@@ -15,15 +15,14 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.OperationDescriptor;
-import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
-import org.geotools.resources.coverage.OperationStrategy;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.metadata.spatial.PixelOrientation;
@@ -134,10 +133,10 @@ public class BaseScaleOperationJAI extends OperationJAI {
 		// Do we need to explode the Palette to RGB(A)?
 		//
 		// /////////////////////////////////////////////////////////////////////
-		OperationStrategy strategy = CoverageUtilities.prepareSourceForOperation(
+		ViewType strategy = CoverageUtilities.preferredViewForOperation(
 				sourceCoverage, interpolation, false, parameters.hints);
 		switch (strategy) {
-		case APPLY_COLOR_EXPANSION:
+		case PHOTOGRAPHIC:
 			// //
 			//
 			// In this case I do not require an explicit color expansion since I
@@ -147,17 +146,15 @@ public class BaseScaleOperationJAI extends OperationJAI {
 			//
 			// //
 			break;
-		case USE_GEOPHYSICS_VIEW:
+		case GEOPHYSICS:
 			// in this case we need to go back the geophysics view of the
 			// source coverage
-			sourceCoverage = sourceCoverage.geophysics(true);
-			sourceImage = sourceCoverage.getRenderedImage();
-			break;
-		case USE_NATIVE_VIEW:
+                        // fallthrough same code than PACKED.
+		case PACKED:
 			// in this case we work on the non geophysics version because it
 			// should be faster than working on the geophysics one. We are going
 			// to work on a single band indexed image.
-			sourceCoverage = sourceCoverage.geophysics(false);
+			sourceCoverage = sourceCoverage.view(strategy);
 			sourceImage = sourceCoverage.getRenderedImage();
 			break;
 		}
@@ -211,7 +208,7 @@ public class BaseScaleOperationJAI extends OperationJAI {
 		// If we explicitly provide an ImageLayout built with the source image
 		// where the CM and the SM are valid. those will be employed overriding
 		// a the possibility to expand the color model.
-		if (strategy != OperationStrategy.APPLY_COLOR_EXPANSION)
+		if (strategy != ViewType.PHOTOGRAPHIC)
 			targetHints.add(ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
 		else {
 			targetHints.add(ImageUtilities.REPLACE_INDEX_COLOR_MODEL);
@@ -279,17 +276,17 @@ public class BaseScaleOperationJAI extends OperationJAI {
 	                    image,        // The underlying data
 	                    parameters.crs,         // The coordinate system (may not be 2D).
 	                    finalTransform,       // The grid transform (may not be 2D).
-	                    (GridSampleDimension[]) (strategy == OperationStrategy.APPLY_COLOR_EXPANSION ? null
+	                    (GridSampleDimension[]) (strategy == ViewType.PHOTOGRAPHIC ? null
 	    						: sourceCoverage.getSampleDimensions().clone()),  // The sample dimensions
 	                    sources,     // The source grid coverage.
 	                    properties); // Properties
 	
 		
 		// now let's see what we need to do in order to clean things up
-		if (strategy ==OperationStrategy.USE_GEOPHYSICS_VIEW)
-			return result.geophysics(false);
-		if (strategy ==OperationStrategy.USE_NATIVE_VIEW)
-			return result.geophysics(true);
+		if (strategy == ViewType.GEOPHYSICS)
+			return result.view(ViewType.PACKED);
+		if (strategy == ViewType.PACKED)
+			return result.view(ViewType.GEOPHYSICS);
 		return result;		
 	}
 

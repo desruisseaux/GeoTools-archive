@@ -20,10 +20,13 @@
 package org.geotools.coverage.grid;
 
 import java.awt.RenderingHints;
+import java.awt.color.ColorSpace;
 import java.awt.image.*; // Numerous imports here.
 import java.awt.image.renderable.ParameterBlock;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +38,8 @@ import javax.media.jai.NullOpImage;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.FormatDescriptor;
+import javax.media.jai.operator.LookupDescriptor;
 
 import org.opengis.util.InternationalString;
 import org.opengis.coverage.grid.GridCoverage;
@@ -47,8 +52,11 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
@@ -78,22 +86,17 @@ final class GridCoverageViews {
     private static final boolean CONSERVATIVE_PIECEWISE = true;
 
     /**
-     * The coverage that created this {@code GridCoverageViews}.
-     */
-    private final GridCoverage2D original;
-
-    /**
-     * The views. At least one value must be the {@link #original} instance.
+     * The views. The coverage that created this {@code GridCoverageViews} must be stored under
+     * the {@link ViewType#NATIVE} key.
      */
     private final Map<ViewType,GridCoverage2D> views;
 
     /**
-     * Constructs a initially empty map of views.
+     * Constructs a map of views.
      *
      * @param coverage The coverage that created this {@code GridCoverageViews}.
      */
     public GridCoverageViews(final GridCoverage2D coverage) {
-        original = coverage;
         views = new EnumMap<ViewType,GridCoverage2D>(ViewType.class);
         boolean geophysics   = true; // 'true' only if all bands are geophysics.
         boolean photographic = true; // 'true' only if no band have category.
@@ -107,20 +110,22 @@ final class GridCoverageViews {
                     continue;
                 }
                 photographic = false;
-                if (band != band.geophysics(true)) {
+                if (band == band.geophysics(false)) {
                     geophysics = false;
                 }
             }
         }
         final ViewType type;
-        if (geophysics) {
-            type = ViewType.GEOPHYSICS;
-        } else if (photographic) {
+        if (photographic) {
+            // Must be tested first because 'geophysics' it 'true' as well in this case.
             type = ViewType.PHOTOGRAPHIC;
+        } else if (geophysics) {
+            type = ViewType.GEOPHYSICS;
         } else {
             type = ViewType.PACKED;
         }
         views.put(type, coverage);
+        views.put(ViewType.NATIVE, coverage);
     }
 
     /**
@@ -131,13 +136,135 @@ final class GridCoverageViews {
         if (coverage != null) {
             return coverage;
         }
-        coverage = create(original, type);
+        coverage = views.get(ViewType.NATIVE);
+        if (coverage == null) {
+            // TODO: localize.
+            throw new IllegalStateException("This coverage has been disposed.");
+        }
+        coverage = coverage.createView(type);
+        coverage.setViews(this);
         views.put(type, coverage);
         return coverage;
     }
 
     /**
-     * Invoked by {@link #get} when a view needs to be created.
+     * Invoked by {@link GridCoverage2D#createView} when a view needs to be created.
+     */
+    @SuppressWarnings("fallthrough")
+    static GridCoverage2D create(final GridCoverage2D coverage, final ViewType type) {
+        switch (type) {
+            case SAME:         return coverage;
+            case RENDERED:     // TODO (fallthrough for now).
+            case PACKED:       return geophysics(coverage, false);
+            case GEOPHYSICS:   return geophysics(coverage, true);
+            case PHOTOGRAPHIC: return photographic(coverage);
+            case NATIVE: {
+                // Should be handled by "get" so if we get there, it is an error.
+                // Fallthrough so the exception is thrown.
+            }
+            default: {
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
+            }
+        }
+    }
+
+    /**
+     * Invoked by {@link #create} when a photographic view needs to be created. This method
+     * reformats the {@linkplain ColorModel color model} to a {@linkplain ComponentColorModel
+     * component color model} preserving transparency. The new color model is typically backed
+     * by an RGB {@linkplain ColorSpace color space}, but not necessarly. It could be YMCB as well.
+     */
+    @SuppressWarnings("fallthrough")
+    private static GridCoverage2D photographic(final GridCoverage2D coverage) {
+        final RenderedImage image = coverage.getRenderedImage();
+        final ColorModel cm = image.getColorModel();
+        /*
+         * If the image already use a component color model (not necessarly backed by
+         * RGB color space - it could be CYMB as well), then there is nothing to do.
+         */
+        if (cm instanceof ComponentColorModel) {
+            return coverage;
+        }
+        final int dataType;
+        final ColorSpace cs;
+        final LookupTableJAI lookup;
+        /*
+         * If the color model is indexed. Converts to RGB or gray scale using a single "Lookup"
+         * operation. Color space will be RGB or GRAY, and type will be DataBuffer.TYPE_BYTE.
+         */
+        if (cm instanceof IndexColorModel) {
+            final IndexColorModel icm = (IndexColorModel) cm;
+            final int mapSize = icm.getMapSize();
+            final byte data[][];
+            if (ColorUtilities.isGrayPalette(icm, false)) {
+                final byte[] gray = new byte[mapSize];
+                icm.getGreens(gray);
+                if (icm.hasAlpha()) {
+                    final byte[] alpha = new byte[mapSize];
+                    icm.getAlphas(alpha);
+                    data = new byte[][] { gray, alpha };
+                } else {
+                    data = new byte[][] { gray };
+                }
+                cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+            } else {
+                data = new byte[cm.getNumComponents()][mapSize];
+                switch (data.length) {
+                    default: // Should not occurs, but keep as a paranoiac check.
+                    case 4:  icm.getAlphas(data[3]);
+                    case 3:  icm.getBlues (data[2]);
+                    case 2:  icm.getGreens(data[1]);
+                    case 1:  icm.getReds  (data[0]);
+                    case 0:  break;
+                }
+                cs = icm.getColorSpace();
+            }
+            dataType = DataBuffer.TYPE_BYTE;
+            lookup = new LookupTableJAI(data);
+        } else {
+            lookup = null;
+            cs = cm.getColorSpace();
+            dataType = (cm instanceof DirectColorModel) ? DataBuffer.TYPE_BYTE :
+                        image.getSampleModel().getTransferType();
+        }
+        /*
+         * Gets the rendering hints to be given to the image operation.
+         */
+        final ColorModel  targetCM;
+        final SampleModel targetSM;
+        targetCM = new ComponentColorModel(cs,
+                cm.hasAlpha(),               // If true, supports transparency.
+                cm.isAlphaPremultiplied(),   // If true, alpha is premultiplied.
+                cm.getTransparency(),        // What alpha values can be represented.
+                dataType);                   // Type of primitive array used to represent pixel.
+        targetSM = targetCM.createCompatibleSampleModel(image.getWidth(), image.getHeight());
+        RenderingHints hints = ImageUtilities.getRenderingHints(image);
+        if (hints == null) {
+            hints = new RenderingHints(null);
+        }
+        ImageLayout layout = (ImageLayout) hints.get(JAI.KEY_IMAGE_LAYOUT);
+        if (layout == null) {
+            layout = new ImageLayout();
+        }
+        layout.setColorModel (targetCM);
+        layout.setSampleModel(targetSM);
+        hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
+        /*
+         * Creates the image, than the coverage.
+         */
+        final RenderedOp view;
+        if (lookup != null) {
+            view = LookupDescriptor.create(image, lookup, hints);
+        } else {
+            view = FormatDescriptor.create(image, dataType, hints);
+        }
+        assert view.getColorModel() instanceof ComponentColorModel;
+        return create(coverage, view, null, 2);
+    }
+
+    /**
+     * Invoked by {@link #create} when a geophysics or packed view needs to be created.
      *
      * @todo IndexColorModel seems to badly choose its sample model. As of JDK 1.4-rc1, it
      *       construct a ComponentSampleModel, which is drawn very slowly to the screen. A
@@ -149,13 +276,13 @@ final class GridCoverageViews {
      *       bytecode. This bug is fixed in javac 1.4.2-beta. However, we still have an
      *       ArrayIndexOutOfBoundsException in JAI code...
      */
-    static GridCoverage2D create(final GridCoverage2D coverage, final ViewType type) {
+    private static GridCoverage2D geophysics(final GridCoverage2D coverage, final boolean toGeo) {
         /*
          * STEP 1 - Gets the source image and prepare the target bands (sample dimensions).
          *          As a slight optimisation, we skip the "Null" operation since such image
          *          may be the result of some operation (e.g. "Colormap").
          */
-        RenderedImage image = coverage.getRenderedImage();
+        RenderedImage image = coverage.image;
         while (image instanceof NullOpImage) {
             final NullOpImage op = (NullOpImage) image;
             if (op.getNumSources() != 1) {
@@ -163,14 +290,13 @@ final class GridCoverageViews {
             }
             image = op.getSourceImage(0);
         }
-        final boolean                geophysics = ViewType.GEOPHYSICS.equals(type);
         final SampleModel           sourceModel = image.getSampleModel();
         final int                      numBands = sourceModel.getNumBands();
-        final GridSampleDimension[] sourceBands = coverage.getSampleDimensions();
+        final GridSampleDimension[] sourceBands = coverage.sampleDimensions;
         final GridSampleDimension[] targetBands = sourceBands.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {
-            targetBands[i] = targetBands[i].geophysics(geophysics);
+            targetBands[i] = targetBands[i].geophysics(toGeo);
         }
         /*
          * If the target bands are equal to the source bands, then there is nothing to do.
@@ -181,8 +307,7 @@ final class GridCoverageViews {
             return coverage;
         }
         final int visibleBand = CoverageUtilities.getVisibleBand(image);
-        final boolean toGeophysics = type.equals(ViewType.GEOPHYSICS);
-        final GridSampleDimension[] nativeBands = toGeophysics ? sourceBands : targetBands;
+        final GridSampleDimension[] nativeBands = toGeo ? sourceBands : targetBands;
         /*
          * Computes immediately the "geophysics to native" transforms.  If all transforms are the
          * identity one, then we will return the coverage unchanged. The transforms that can't be
@@ -193,7 +318,7 @@ final class GridCoverageViews {
         MathTransform1D[] transforms = new MathTransform1D[numBands];
         for (int i=0; i<numBands; i++) {
             MathTransform1D transform = nativeBands[i].getSampleToGeophysics();
-            if (transform!=null && !toGeophysics) try {
+            if (transform!=null && !toGeo) try {
                 transform = transform.inverse(); // We want the geophysics to native transform.
             } catch (NoninvertibleTransformException e) {
                 transform = null;
@@ -265,7 +390,6 @@ final class GridCoverageViews {
             float[][][] breakpoints  = null; // The only   argument for "Piecewise".
 testLinear: for (int i=0; i<numBands; i++) {
                 final List<Category> sources = sourceBands[i].getCategories();
-                final List<Category> natives = nativeBands[i].getCategories();
                 final int      numCategories = sources.size();
                 float[]    sourceBreakpoints = null;
                 float[]    targetBreakpoints = null;
@@ -274,8 +398,8 @@ testLinear: for (int i=0; i<numBands; i++) {
                 int jbp = 0; // Break point index (vary with j)
                 for (int j=0; j<numCategories; j++) {
                     final Category sourceCategory = sources.get(j);
-                    final Category nativeCategory = natives.get(j);
-                    MathTransform1D transform = nativeCategory.getSampleToGeophysics();
+                    final Category packedCategory = sourceCategory.geophysics(false);
+                    MathTransform1D transform = packedCategory.getSampleToGeophysics();
                     if (transform == null) {
                         /*
                          * A qualitative category was found. Those categories maps NaN values,
@@ -284,9 +408,9 @@ testLinear: for (int i=0; i<numBands; i++) {
                          * "Rescale" operation could continue to work if the NaN value maps to 0.
                          */
                         canPiecewise = false;
-                        if (!toGeophysics) {
-                            assert !nativeCategory.equals(sourceCategory) : nativeCategory;
-                            final NumberRange range = nativeCategory.getRange();
+                        if (!toGeo) {
+                            assert !packedCategory.equals(sourceCategory) : packedCategory;
+                            final NumberRange range = packedCategory.getRange();
                             if (range.getMinimum(true) == 0 && range.getMaximum(true) == 0) {
                                 assert Double.isNaN(sourceCategory.getRange().getMinimum()) : sourceCategory;
                                 conditional = true;
@@ -296,7 +420,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                         canRescale = false;
                         break testLinear;
                     }
-                    if (!toGeophysics) {
+                    if (!toGeo) {
                         // We are going to convert geophysics values to native one.
                         transform = transform.inverse();
                     }
@@ -404,20 +528,30 @@ testLinear: for (int i=0; i<numBands; i++) {
             param = param.add(sourceBands);
             operation = "org.geotools.SampleTranscode";
         }
+        final RenderedOp view = JAI.create(operation, param, hints);
+        return create(coverage, view, targetBands, toGeo ? 1 : 0);
+    }
+
+    /**
+     * Creates the view and logs a record.
+     */
+    private static GridCoverage2D create(final GridCoverage2D coverage, final RenderedOp view,
+            final GridSampleDimension[] targetBands, final int code)
+    {
         final InternationalString name = coverage.getName();
         if (GridCoverage2D.LOGGER.isLoggable(AbstractProcessor.OPERATION)) {
             // Logs a message using the same level than grid coverage processor.
+            final String operation = view.getOperationName();
             final String shortName = operation.substring(operation.lastIndexOf('.') + 1);
             final Locale    locale = coverage.getLocale();
             final LogRecord record = Loggings.getResources(locale).getLogRecord(
                     AbstractProcessor.OPERATION, LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
-                        name.toString(locale), Integer.valueOf(toGeophysics ? 1 : 0), shortName
+                        name.toString(locale), Integer.valueOf(code), shortName
                     });
             record.setSourceClassName(GridCoverage2D.class.getName());
             record.setSourceMethodName("geophysics");
             GridCoverage2D.LOGGER.log(record);
         }
-        final PlanarImage    view    = JAI.create(operation, param, hints);
         final GridCoverage[] sources = new GridCoverage[] {coverage};
         return new GridCoverage2D(name, view, coverage.gridGeometry, targetBands, sources, null);
     }
@@ -501,5 +635,32 @@ testLinear: for (int i=0; i<numBands; i++) {
             }
         }
         return true;
+    }
+
+    /**
+     * Disposes all views and returns the remaining ones. Disposed views are removed from
+     * this {@code GridCoverageViews}, but may be recreated if the user asks them again.
+     * <p>
+     * This method is invoked by {@link GridCoverage2D#dispose} method only.
+     */
+    public synchronized Collection<GridCoverage2D> dispose(final boolean force) {
+        /*
+         * Following loop will be executed as long as we have been able to dispose at least one
+         * view. This is because some coverages can be disposed only after their dependency have
+         * been disposed first. Since we don't know the dependency order, we just try the loop
+         * again and again. The amount of values (5) is small enough to keep the cost small.
+         */
+        int disposed;
+        do {
+            disposed = 0;
+            for (final Iterator<GridCoverage2D> it=views.values().iterator(); it.hasNext();) {
+                final GridCoverage2D coverage = it.next();
+                if (coverage.disposeImage(force)) {
+                    it.remove();
+                    disposed++;
+                }
+            }
+        } while (disposed != 0);
+        return views.values();
     }
 }

@@ -22,7 +22,7 @@
               <Component id="but_nouveau" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="gui_choose" alignment="0" pref="367" max="32767" attributes="0"/>
+          <Component id="gui_choose" alignment="0" pref="376" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

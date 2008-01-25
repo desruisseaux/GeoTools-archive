@@ -169,7 +169,7 @@ public final class PredefinedObjectsTest extends TestCase {
         assertEquals("WGS84 3D", 3, DefaultGeographicCRS.WGS84_3D.getCoordinateSystem().getDimension());
 
         // Test WKT
-        assertEquals("WGS84", "GEOGCS[\"WGS84\", " +
+        assertEquals("WGS84", "GEOGCS[\"WGS84(DD)\", " +
                                 "DATUM[\"WGS84\", "+
                                 "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "+
                                 "PRIMEM[\"Greenwich\", 0.0], "+

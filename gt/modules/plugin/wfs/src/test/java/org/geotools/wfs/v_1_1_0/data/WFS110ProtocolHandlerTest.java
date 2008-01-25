@@ -16,8 +16,10 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.*;
-import static org.geotools.wfs.protocol.WFSOperationType.*;
+import static org.geotools.wfs.protocol.HttpMethod.GET;
+import static org.geotools.wfs.protocol.HttpMethod.POST;
+import static org.geotools.wfs.protocol.WFSOperationType.DESCRIBE_FEATURETYPE;
+import static org.geotools.wfs.protocol.WFSOperationType.GET_CAPABILITIES;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,16 +29,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.test.TestData;
-import org.geotools.wfs.WFSConfiguration;
-import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import junit.framework.TestCase;
 
 /**
  * @author Gabriel Roldan

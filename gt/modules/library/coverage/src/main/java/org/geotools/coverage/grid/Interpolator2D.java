@@ -251,17 +251,16 @@ public final class Interpolator2D extends GridCoverage2D {
     }
 
     /**
-     * Invoked by {@link #geophysics(boolean)} when the packed or geophysics companion of this
-     * grid coverage need to be created. This method apply to the new grid coverage the same
-     * interpolation than this grid coverage.
+     * Invoked by {@link #view} when the packed or geophysics view of this grid coverage needs to
+     * be created. This method applies to the new grid coverage the same interpolation than this
+     * grid coverage.
      *
-     * @param  geo {@code true} to get a grid coverage with sample values equals to
-     *         geophysics values, or {@code false} to get the packed version.
-     * @return The newly created grid coverage.
+     * @param  type The kind of view wanted.
+     * @return The grid coverage. Never {@code null}, but may be {@code this}.
      */
     @Override
-    protected GridCoverage2D createGeophysics(final boolean geo) {
-        return create(getSource().geophysics(geo), getInterpolations());
+    GridCoverage2D createView(final ViewType type) {
+        return create(getSource().view(type), getInterpolations());
     }
 
     /**

@@ -16,25 +16,20 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
 import java.util.Map;
-
-// JAI dependencies
 import javax.media.jai.LookupTableJAI;
+import static java.lang.Math.*;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.util.WeakValueHashMap;
 
 
 /**
  * A factory for {@link LookupTableJAI} objects built from an array of {@link MathTransform1D}.
- * This factory is used internally by {@link GridCoverage#createGeophysics}.
+ * This factory is used internally by {@link GridCoverageViews#create}.
  *
  * @since 2.1
  * @source $URL$
@@ -45,7 +40,8 @@ final class LookupTableFactory {
     /**
      * The pool of {@link LookupTableJAI} objects already created.
      */
-    private static final Map pool = new WeakValueHashMap();
+    private static final Map<LookupTableFactory,LookupTableJAI> pool =
+            new WeakValueHashMap<LookupTableFactory,LookupTableJAI>();
 
     /**
      * The source data type. Should be one of {@link DataBuffer} constants.
@@ -104,16 +100,16 @@ final class LookupTableFactory {
         }
         synchronized (pool) {
             /*
-             * Check if a table is already available in the cache. Since tables may be 64 ko big,
+             * Checks if a table is already available in the cache. Since tables may be 64 kb big,
              * sharing tables may save a significant amount of memory if there is many images.
              */
-            final LookupTableFactory key=new LookupTableFactory(sourceType, targetType, transforms);
-            LookupTableJAI table = (LookupTableJAI) pool.get(key);
+            final LookupTableFactory key = new LookupTableFactory(sourceType, targetType, transforms);
+            LookupTableJAI table = pool.get(key);
             if (table != null) {
                 return table;
             }
             /*
-             * Compute the table's size according the source datatype.  For datatype 'short' (signed
+             * Computes the table's size according the source datatype. For datatype 'short' (signed
              * or unsigned), we will create the table only if the target datatype is 'byte' in order
              * to avoid to use too much memory for the table. The memory consumed for a table from
              * source datatype 'short' to target datatype 'byte' is 64 ko.
@@ -136,18 +132,17 @@ final class LookupTableFactory {
                         return null;
                     }
                     length = 0x10000;
-                    offset = (sourceType==DataBuffer.TYPE_SHORT) ? Short.MIN_VALUE : 0;
+                    offset = (sourceType == DataBuffer.TYPE_SHORT) ? Short.MIN_VALUE : 0;
                     break;
                 }
             }
             /*
-             * Build the table according the target datatype.
+             * Builds the table according the target datatype.
              */
             switch (targetType) {
                 default: {
                     return null;
                 }
-
                 case DataBuffer.TYPE_DOUBLE: {
                     final double[][]  data = new double[nbands][];
                     final double[]  buffer = new double[length];
@@ -155,14 +150,13 @@ final class LookupTableFactory {
                         buffer[i] = i;
                     }
                     for (int i=nbands; --i>=0;) {
-                        final double[] array = (i==0) ? buffer : (double[])buffer.clone();
+                        final double[] array = (i==0) ? buffer : buffer.clone();
                         transforms[i].transform(array, 0, array, 0, array.length);
                         data[i] = array;
                     }
                     table = new LookupTableJAI(data, offset);
                     break;
                 }
-
                 case DataBuffer.TYPE_FLOAT: {
                     final float[][]  data = new float[nbands][];
                     final float[]  buffer = new float[length];
@@ -170,29 +164,27 @@ final class LookupTableFactory {
                         buffer[i] = i;
                     }
                     for (int i=transforms.length; --i>=0;) {
-                        final float[] array = (i==0) ? buffer : (float[])buffer.clone();
+                        final float[] array = (i == 0) ? buffer : buffer.clone();
                         transforms[i].transform(array, 0, array, 0, length);
                         data[i] = array;
                     }
                     table = new LookupTableJAI(data, offset);
                     break;
                 }
-
                 case DataBuffer.TYPE_INT: {
                     final int[][] data = new int[nbands][];
                     for (int i=nbands; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final int[] array = new int[length];
                         for (int j=length; --j>=0;) {
-                            array[j] = (int)Math.min(Math.max(Math.round(tr.transform(j+offset)),
-                                                             Integer.MIN_VALUE), Integer.MAX_VALUE);
+                            array[j] = (int) min(max(round(tr.transform(j+offset)),
+                                    Integer.MIN_VALUE), Integer.MAX_VALUE);
                         }
                         data[i] = array;
                     }
                     table = new LookupTableJAI(data, offset);
                     break;
                 }
-
                 case DataBuffer.TYPE_SHORT:
                 case DataBuffer.TYPE_USHORT: {
                     final int minimum, maximum;
@@ -208,23 +200,20 @@ final class LookupTableFactory {
                         final MathTransform1D tr = transforms[i];
                         final short[] array = new short[length];
                         for (int j=length; --j>=0;) {
-                            array[j] = (short)Math.min(Math.max(Math.round(tr.transform(j+offset)),
-                                                                minimum), maximum);
+                            array[j] = (short) min(max(round(tr.transform(j+offset)), minimum), maximum);
                         }
                         data[i] = array;
                     }
                     table = new LookupTableJAI(data, offset, minimum!=0);
                     break;
                 }
-
                 case DataBuffer.TYPE_BYTE: {
                     final byte[][] data = new byte[nbands][];
                     for (int i=nbands; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final byte[] array = new byte[length];
                         for (int j=length; --j>=0;) {
-                            array[j] = (byte)Math.min(Math.max(Math.round(tr.transform(j+offset)),
-                                                               0), 0xFF);
+                            array[j] = (byte) min(max(round(tr.transform(j+offset)), 0), 0xFF);
                         }
                         data[i] = array;
                     }
@@ -241,19 +230,18 @@ final class LookupTableFactory {
      * Returns a hash code value for this key. This is for internal use by
      * {@code LookupTableFactory} and is public only as an implementation side effect.
      */
+    @Override
     public int hashCode() {
         int code = sourceType + 37*targetType;
-        final int length = transforms.length;
-        for (int i=0; i<length; i++) {
-            code = code*37 + transforms[i].hashCode();
-        }
+        code += Arrays.hashCode(transforms);
         return code;
     }
 
     /**
-     * Compare the specified object with this key for equality. This is for internal use by
+     * Compares the specified object with this key for equality. This is for internal use by
      * {@code LookupTableFactory} and is public only as an implementation side effect.
      */
+    @Override
     public boolean equals(final Object other) {
         if (other instanceof LookupTableFactory) {
             final LookupTableFactory that = (LookupTableFactory) other;

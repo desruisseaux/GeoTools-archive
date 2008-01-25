@@ -616,6 +616,7 @@ public final class XArray {
      *                method can directly return {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
+    @SuppressWarnings("unchecked")
     public static <E> E[] insert(final E[] src, final int src_pos,
                                  final E[] dst, final int dst_pos, final int length)
     {
@@ -930,16 +931,45 @@ public final class XArray {
     }
 
     /**
-     * Returns {@code true} if the specified array contains at least one
-     * {@link Double#NaN NaN} value.
+     * Returns {@code true} if all values in the specified array are equals to the specified
+     * value, which may be {@link Float#NaN}.
      */
-    public static boolean hasNaN(final double[] array) {
-        for (int i=0; i<array.length; i++) {
-            if (Double.isNaN(array[i])) {
-                return true;
+    public static boolean allEquals(final float[] array, final float value) {
+        if (Float.isNaN(value)) {
+            for (int i=0; i<array.length; i++) {
+                if (!Float.isNaN(array[i])) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i=0; i<array.length; i++) {
+                if (array[i] != value) {
+                    return false;
+                }
             }
         }
-        return false;
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if all values in the specified array are equals to the specified
+     * value, which may be {@link Double#NaN}.
+     */
+    public static boolean allEquals(final double[] array, final double value) {
+        if (Double.isNaN(value)) {
+            for (int i=0; i<array.length; i++) {
+                if (!Double.isNaN(array[i])) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i=0; i<array.length; i++) {
+                if (array[i] != value) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -949,6 +979,19 @@ public final class XArray {
     public static boolean hasNaN(final float[] array) {
         for (int i=0; i<array.length; i++) {
             if (Float.isNaN(array[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if the specified array contains at least one
+     * {@link Double#NaN NaN} value.
+     */
+    public static boolean hasNaN(final double[] array) {
+        for (int i=0; i<array.length; i++) {
+            if (Double.isNaN(array[i])) {
                 return true;
             }
         }

@@ -43,6 +43,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.CRS;
@@ -97,7 +98,7 @@ public final class CoverageUtilities {
         }
         return CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
     }
-    
+
     /**
      * Returns a two-dimensional horizontal CRS for the given coverage. This method performs a
      * <cite>best effort</cite>; the returned CRS is not garanteed to succed.
@@ -287,16 +288,26 @@ public final class CoverageUtilities {
     }
 
     /**
-     * @deprecated Use {@link #prepareSourceForOperation} instead.
+     * @deprecated Use {@link #preferredViewForOperation} instead.
      *
      * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to be
      *         provided, 2 if we need to employ the geophysics vew of the provided coverage,
-     *         3 if we suggest to  employ the non-geophysics vew of the provided coverage.
+     *         3 if we suggest to employ the non-geophysics vew of the provided coverage.
+     *
+     * @since 2.3.1
      */
+    @Deprecated
     public static int prepareSourcesForGCOperation(final GridCoverage2D coverage,
             final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
     {
-        return prepareSourceForOperation(coverage, interpolation, hasFilter, hints).ordinal();
+        final ViewType type = preferredViewForOperation(coverage, interpolation, hasFilter, hints);
+        switch (type) {
+            case SAME:         return 0;
+            case PHOTOGRAPHIC: return 1;
+            case GEOPHYSICS:   return 2;
+            case PACKED:       return 3;
+            default: throw new AssertionError(type);
+        }
     }
 
     /**
@@ -346,26 +357,21 @@ public final class CoverageUtilities {
      * @param interpolation to use for the action to take.
      * @param hasFilter if the operation we will apply is going to use a filter.
      * @param hints to use when applying a certain operation.
-     * @return {@link OperationStrategy#USE_AS_IS USE_AS_IS}
-     *         if nothing has to be done on the provided coverage,
-     *         {@link OperationStrategy#APPLY_COLOR_EXPANSION APPLY_COLOR_EXPANSION}
-     *         if a color expansion has to be provided,
-     *         {@link OperationStrategy#USE_GEOPHYSICS_VIEW USE_GEOPHYSICS_VIEW}
-     *         if we need to employ the geophysics vew of the provided coverage,
-     *         {@link OperationStrategy#USE_NATIVE_VIEW USE_NATIVE_VIEW}
-     *         if we suggest to  employ the non-geophysics vew of the provided coverage.
+     * @return {@link ViewType#SAME} if nothing has to be done on the provided coverage,
+     *         {@link ViewType.PHOTOGRAPHIC} if a color expansion has to be provided,
+     *         {@link ViewType#GEOPHYSICS} if we need to employ the geophysics vew of
+     *         the provided coverage,
+     *         {@link ViewType#PACKED} if we suggest to employ the non-geophysics vew
+     *         of the provided coverage.
      *
-     * @since 2.3.1
-     *
-     * @todo Consider refactoring this method into {@link org.geotools.coverage.grid.ViewType},
-     *       or in some utility class related to it.
+     * @since 2.5
      */
-    public static OperationStrategy prepareSourceForOperation(final GridCoverage2D coverage,
+    public static ViewType preferredViewForOperation(final GridCoverage2D coverage,
             final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
     {
         final RenderedImage sourceImage = coverage.getRenderedImage();
         if (!(sourceImage.getColorModel() instanceof IndexColorModel)) {
-            return OperationStrategy.USE_AS_IS; // optimization
+            return ViewType.SAME;
         }
         /*
          * The operations are usually applied on floating-point values, in order
@@ -380,16 +386,16 @@ public final class CoverageUtilities {
          * converse).
          */
         if (!hasFilter && (interpolation instanceof InterpolationNearest)) {
-            final GridCoverage2D candidate = coverage.geophysics(false);
+            final GridCoverage2D candidate = coverage.view(ViewType.PACKED);
             if (candidate != coverage) {
                 final List<RenderedImage> sources = coverage.getRenderedImage().getSources();
                 if (sources != null) {
                     if (sources.contains(candidate.getRenderedImage())) {
-                        return OperationStrategy.USE_NATIVE_VIEW;
+                        return ViewType.PACKED;
                     }
                 }
             }
-            return OperationStrategy.USE_AS_IS;
+            return ViewType.SAME;
         } else if (hasRenderingCategories(coverage)) {
             /*
              * Do we need to explode the Palette to RGB(A)? This is needed only when we have
@@ -405,9 +411,9 @@ public final class CoverageUtilities {
             }
             if (!useNonGeoView) {
                 // in this case we need to go back the geophysics view of the source coverage.
-                return OperationStrategy.USE_GEOPHYSICS_VIEW;
+                return ViewType.GEOPHYSICS;
             }
         }
-        return OperationStrategy.APPLY_COLOR_EXPANSION;
+        return ViewType.PHOTOGRAPHIC;
     }
 }

@@ -244,7 +244,7 @@ public class JDBCFeatureReader implements FeatureReader {
 
                             String sql = dataStore.selectGeometryAssociationSQL(fid, null,
                                     gatt.getLocalName());
-                            dataStore.LOGGER.fine(sql);
+                            dataStore.getLogger().fine(sql);
 
                             Statement select = st.getConnection().createStatement();
 
@@ -270,7 +270,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                         } else {
                                             // read the geometry
                                             sql = dataStore.selectGeometrySQL(gid);
-                                            dataStore.LOGGER.fine(sql);
+                                            dataStore.getLogger().fine(sql);
 
                                             ResultSet grs = select.executeQuery(sql);
 
@@ -297,7 +297,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                                             || "MULTILINESTRING".equals(gtype)
                                                             || "MULTIPOLYGON".equals(gtype)) {
                                                         sql = dataStore.selectMultiGeometrySQL(gid);
-                                                        dataStore.LOGGER.fine(sql);
+                                                        dataStore.getLogger().fine(sql);
 
                                                         ResultSet mg = select.executeQuery(sql);
 
@@ -311,7 +311,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                                                 Geometry member = null;
                                                                 if ( !mref || resolve ) {
                                                                     sql = dataStore.selectGeometrySQL(mgid);
-                                                                    dataStore.LOGGER.fine(sql);
+                                                                    dataStore.getLogger().fine(sql);
     
                                                                     Statement select2 = st.getConnection()
                                                                                           .createStatement();
@@ -334,8 +334,8 @@ public class JDBCFeatureReader implements FeatureReader {
                                                                             mname, mdesc);
                                                                         
                                                                     } finally {
-                                                                        JDBCDataStore.closeSafe(mgg);
-                                                                        JDBCDataStore.closeSafe(select2);
+                                                                        dataStore.closeSafe(mgg);
+                                                                        dataStore.closeSafe(select2);
                                                                     }
                                                                 }
                                                                 else {
@@ -371,7 +371,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                                                             .size()]));
                                                             }
                                                         } finally {
-                                                            JDBCDataStore.closeSafe(mg);
+                                                            dataStore.closeSafe(mg);
                                                         }
                                                     }
                                                 }
@@ -380,17 +380,17 @@ public class JDBCFeatureReader implements FeatureReader {
                                             } catch (IOException e) {
                                                 throw new RuntimeException(e);
                                             } finally {
-                                                JDBCDataStore.closeSafe(grs);
+                                                dataStore.closeSafe(grs);
                                             }
                                         }
 
                                         value = g;
                                     }
                                 } finally {
-                                    JDBCDataStore.closeSafe(gas);
+                                    dataStore.closeSafe(gas);
                                 }
                             } finally {
-                                JDBCDataStore.closeSafe(select);
+                                dataStore.closeSafe(select);
                             }
                         }
                     }
@@ -403,7 +403,7 @@ public class JDBCFeatureReader implements FeatureReader {
 
                     try {
                         String sql = dataStore.selectAssociationSQL(fid);
-                        JDBCDataStore.LOGGER.fine(sql);
+                        dataStore.getLogger().fine(sql);
 
                         ResultSet associations = select.executeQuery(sql);
 
@@ -422,7 +422,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                     // handle, and fail only when and if we actually
                                     // resolve the link
                                     String msg = "Could not load schema: " + rtable;
-                                    JDBCDataStore.LOGGER.log(Level.WARNING, msg, e);
+                                    dataStore.getLogger().log(Level.WARNING, msg, e);
                                 }
 
                                 // set the referenced id + typeName as user data
@@ -489,10 +489,10 @@ public class JDBCFeatureReader implements FeatureReader {
                                 value = association;
                             }
                         } finally {
-                            JDBCDataStore.closeSafe(associations);
+                            dataStore.closeSafe(associations);
                         }
                     } finally {
-                        JDBCDataStore.closeSafe(select);
+                        dataStore.closeSafe(select);
                     }
                 }
 
@@ -501,10 +501,10 @@ public class JDBCFeatureReader implements FeatureReader {
                 Class binding = type.getType().getBinding();
 
                 if ((value != null) && !(type.getType().getBinding().isAssignableFrom(binding))) {
-                    if (JDBCDataStore.LOGGER.isLoggable(Level.FINER)) {
+                    if (dataStore.getLogger().isLoggable(Level.FINER)) {
                         String msg = value + " is not of type " + binding.getName()
                             + ", attempting conversion";
-                        JDBCDataStore.LOGGER.finer(msg);
+                        dataStore.getLogger().finer(msg);
                     }
 
                     Object converted = Converters.convert(value, binding);
@@ -532,9 +532,15 @@ public class JDBCFeatureReader implements FeatureReader {
     }
 
     public void close() throws IOException {
-        //clean up
-        JDBCDataStore.closeSafe( rs );
-        JDBCDataStore.closeSafe( st );
+        if ( dataStore != null ) {
+            //clean up
+            dataStore.closeSafe( rs );
+            dataStore.closeSafe( st );    
+        }
+        else {
+            //means we are already closed... should we throw an exception?
+        }
+        
         
         //throw away state
         rs = null;
@@ -558,6 +564,11 @@ public class JDBCFeatureReader implements FeatureReader {
          */
         ResultSet rs;
 
+        /**
+         * primary key
+         */
+        PrimaryKey key;
+        
         /**
          * updated values
          * */
@@ -588,7 +599,7 @@ public class JDBCFeatureReader implements FeatureReader {
             ResultSetMetaData md = rs.getMetaData();
 
             //get the primary key, ensure its not contained in the values
-            PrimaryKey key = dataStore.getPrimaryKey(featureType);
+            key = dataStore.getPrimaryKey(featureType);
             int count = md.getColumnCount();
 
             for (int i = 0; i < md.getColumnCount(); i++) {
@@ -629,10 +640,10 @@ public class JDBCFeatureReader implements FeatureReader {
 
         public void init() throws SQLException, IOException {
             //get fid
-            PrimaryKey pkey = dataStore.getPrimaryKey(featureType);
+            //PrimaryKey pkey = dataStore.getPrimaryKey(featureType);
 
             //TODO: factory fid prefixing out
-            init(featureType.getTypeName() + "." + pkey.encode(rs));
+            init(featureType.getTypeName() + "." + key.encode(rs));
         }
 
         public SimpleFeatureType getFeatureType() {
@@ -652,7 +663,7 @@ public class JDBCFeatureReader implements FeatureReader {
         }
         
         public Object getAttribute(String name) {
-            return values[index.get(name)];
+            return getAttribute(index.get(name));
         }
 
         public Object getAttribute(Name name) {
@@ -660,11 +671,66 @@ public class JDBCFeatureReader implements FeatureReader {
         }
 
         public Object getAttribute(int index) throws IndexOutOfBoundsException {
-            return values[index];
+            return getAttributeInternal( index, mapToResultSetIndex(index) );
         }
 
+        private int mapToResultSetIndex( int index ) {
+            //map the index to result set
+            int rsindex = index;
+            try {
+                ResultSetMetaData md = rs.getMetaData();
+                for ( int i = 0; i <= index; i++ ) {
+                    if ( key.getColumnName().equals( md.getColumnName( i + 1) ) ) {
+                        rsindex = index + 1;
+                        break;
+                    }
+                }
+            } 
+            catch (SQLException e) {
+                throw new RuntimeException( e );
+            }
+            
+            rsindex++;
+            return rsindex;
+        }
+        
+        private Object getAttributeInternal( int index, int rsindex ) {
+            if ( values[index] == null && !dirty[index]) {
+                synchronized (this) {
+                    if ( values[index] == null && !dirty[index]) {
+                        //load the value from the result set, check the case 
+                        // in which its a geometry, this case the dialect needs
+                        // to read it
+                        try {
+                            AttributeDescriptor att = featureType.getAttribute(index);
+                            if ( att instanceof GeometryDescriptor ) {
+                                GeometryDescriptor gatt = (GeometryDescriptor) att;
+                                values[index] = dataStore.getSQLDialect()
+                                    .decodeGeometryValue( gatt, rs, rsindex, dataStore.getGeometryFactory() );
+                            }
+                            else {
+                                values[index] = rs.getObject( rsindex );    
+                            }
+                            
+                        } 
+                        catch (IOException e ) {
+                            throw new RuntimeException( e );
+                        }
+                        catch (SQLException e) {
+                            //do not throw exception because of insert mode
+                            //TODO: set a flag for insert vs update
+                            //throw new RuntimeException( e );
+                            values[index] = null;
+                        }        
+                    }
+                               
+                }
+            }
+            return values[index];
+        }
+        
         public void setAttribute(String name, Object value) {
-            JDBCDataStore.LOGGER.fine("Setting " + name + " to " + value);
+            dataStore.getLogger().fine("Setting " + name + " to " + value);
 
             int i = index.get(name);
             setAttribute(i, value);
@@ -676,7 +742,7 @@ public class JDBCFeatureReader implements FeatureReader {
 
         public void setAttribute(int index, Object value)
             throws IndexOutOfBoundsException {
-            JDBCDataStore.LOGGER.fine("Setting " + index + " to " + value);
+            dataStore.getLogger().fine("Setting " + index + " to " + value);
             values[index] = value;
             dirty[index] = true;
         }

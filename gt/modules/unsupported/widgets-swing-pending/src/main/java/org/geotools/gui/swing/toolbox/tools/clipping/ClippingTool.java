@@ -293,8 +293,8 @@ public class ClippingTool extends AbstractWidgetTool {
         } else {
 
             try {
-                transformToClipCRS = CRS.findMathTransform(inCRS, clipCRS);
-                transformToInCRS = CRS.findMathTransform(clipCRS, inCRS);
+                transformToClipCRS = CRS.findMathTransform(inCRS, clipCRS, true);
+                transformToInCRS = CRS.findMathTransform(clipCRS, inCRS, true);
             } catch (FactoryException ex) {
                 throw new IllegalArgumentException();
             }

@@ -881,7 +881,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         return visit((BinaryExpression)expression, "+", extraData);
     }
     public Object visit(Divide expression, Object extraData) {
-        return visit((BinaryExpression)expression, "%", extraData);
+        return visit((BinaryExpression)expression, "/", extraData);
     }
     public Object visit(Multiply expression, Object extraData) {
         return visit((BinaryExpression)expression, "*", extraData);

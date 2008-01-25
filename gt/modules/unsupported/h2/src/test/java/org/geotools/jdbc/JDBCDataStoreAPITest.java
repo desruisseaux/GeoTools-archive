@@ -25,12 +25,16 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockException;
+import org.geotools.data.FeatureLockFactory;
+import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.FilteringFeatureReader;
+import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
@@ -62,6 +66,7 @@ import com.vividsolutions.jts.geom.Point;
 
 
 public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
+    private static final int LOCK_DURATION = 3600 * 1000; // one hour
     TestData td;
 
     protected void setUp() throws Exception {
@@ -1002,6 +1007,126 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         assertEquals(1, count("road"));
     }
 
+    boolean isLocked(String typeName, String fid) {
+        InProcessLockingManager lockingManager = (InProcessLockingManager) dataStore.getLockingManager();
+
+        return lockingManager.isLocked(typeName, fid);
+    }
+
+    //
+    // FeatureLocking Testing
+    //
+
+    /*
+     * Test for void lockFeatures()
+     */
+    public void testLockFeatures() throws IOException {
+        FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
+        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        road.setFeatureLock(lock);
+
+        assertFalse(isLocked("road", "road.1"));
+        assertTrue( road.lockFeatures() > 0 );
+        assertTrue(isLocked("road", "road.1"));
+    }
+
+    public void testUnLockFeatures() throws IOException {
+        FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
+        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        road.setFeatureLock(lock);
+        road.lockFeatures();
+
+        try {
+            road.unLockFeatures();
+            fail("unlock should fail due on AUTO_COMMIT");
+        } catch (IOException expected) {
+        }
+
+        Transaction t = new DefaultTransaction();
+        road.setTransaction(t);
+
+        try {
+            road.unLockFeatures();
+            fail("unlock should fail due lack of authorization");
+        } catch (IOException expected) {
+        }
+
+        t.addAuthorization(lock.getAuthorization());
+        road.unLockFeatures();
+        t.close();
+    }
+
+    public void testLockFeatureInteraction() throws IOException {
+        FeatureLock lockA = FeatureLockFactory.generate("LockA", LOCK_DURATION);
+        FeatureLock lockB = FeatureLockFactory.generate("LockB", LOCK_DURATION);
+        Transaction t1 = new DefaultTransaction();
+        Transaction t2 = new DefaultTransaction();
+        FeatureLocking road1 = (FeatureLocking) dataStore.getFeatureSource("road");
+        FeatureLocking road2 = (FeatureLocking) dataStore.getFeatureSource("road");
+        road1.setTransaction(t1);
+        road2.setTransaction(t2);
+        road1.setFeatureLock(lockA);
+        road2.setFeatureLock(lockB);
+
+        assertFalse(isLocked("road", "road.0"));
+        assertFalse(isLocked("road", "road.1"));
+        assertFalse(isLocked("road", "road.2"));
+
+        assertEquals( 1, road1.lockFeatures(td.rd1Filter) );
+        assertTrue(isLocked("road", "road.0"));
+        assertFalse(isLocked("road", "road.1"));
+        assertFalse(isLocked("road", "road.2"));
+
+        road2.lockFeatures(td.rd2Filter);
+        assertTrue(isLocked("road", "road.0"));
+        assertTrue(isLocked("road", "road.1"));
+        assertFalse(isLocked("road", "road.2"));
+
+        try {
+            road1.unLockFeatures(td.rd1Filter);
+            fail("need authorization");
+        } catch (IOException expected) {
+        }
+
+        t1.addAuthorization(lockA.getAuthorization());
+
+        try {
+            road1.unLockFeatures(td.rd2Filter);
+            fail("need correct authorization");
+        } catch (IOException expected) {
+        }
+
+        road1.unLockFeatures(td.rd1Filter);
+        assertFalse(isLocked("road", "road.0"));
+        assertTrue(isLocked("road", "road.1"));
+        assertFalse(isLocked("road", "road.2"));
+
+        t2.addAuthorization(lockB.getAuthorization());
+        road2.unLockFeatures(td.rd2Filter);
+        assertFalse(isLocked("road", "road.0"));
+        assertFalse(isLocked("road", "road.1"));
+        assertFalse(isLocked("road", "road.2"));
+
+        t1.close();
+        t2.close();
+    }
+
+    public void testGetFeatureLockingExpire() throws Exception {
+        FeatureLock lock = FeatureLockFactory.generate("Timed", 1000);
+
+        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        road.setFeatureLock(lock);
+        assertFalse(isLocked("road", "road.0"));
+
+        road.lockFeatures(td.rd1Filter);
+        assertTrue(isLocked("road", "road.0"));
+        long then = System.currentTimeMillis();
+        do {
+            Thread.sleep( 1000 );
+        } while ( System.currentTimeMillis() - then < 1000 ); 
+        assertFalse(isLocked("road", "road.0"));
+    }
+    
     int count(String typeName) throws IOException {
         // return count(reader(typeName));
         // makes use of optimization if any

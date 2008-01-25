@@ -93,8 +93,7 @@ public class H2Dialect extends SQLDialect {
         encodeColumnName(columnName, sql);
         sql.append(" is not null LIMIT 1");
 
-        JDBCDataStore.LOGGER.fine(sql.toString());
-
+        dataStore.getLogger().fine(sql.toString());
         Statement st = cx.createStatement();
 
         try {
@@ -108,10 +107,10 @@ public class H2Dialect extends SQLDialect {
                     return null;
                 }
             } finally {
-                JDBCDataStore.closeSafe(rs);
+                dataStore.closeSafe(rs);
             }
         } finally {
-            JDBCDataStore.closeSafe(st);
+            dataStore.closeSafe(st);
         }
     }
 
@@ -180,7 +179,7 @@ public class H2Dialect extends SQLDialect {
                 String string = rs.getString(1);
                 sequence = string.substring(string.indexOf("SYSTEM_SEQUENCE"), string.length() - 1);
             } finally {
-                JDBCDataStore.closeSafe(rs);
+                dataStore.closeSafe(rs);
             }
 
             try {
@@ -196,10 +195,10 @@ public class H2Dialect extends SQLDialect {
 
                 return new Integer(value + 1);
             } finally {
-                JDBCDataStore.closeSafe(rs);
+                dataStore.closeSafe(rs);
             }
         } finally {
-            JDBCDataStore.closeSafe(st);
+            dataStore.closeSafe(st);
         }
     }
 }

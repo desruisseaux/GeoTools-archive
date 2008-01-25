@@ -19,11 +19,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -98,6 +100,11 @@ public abstract class ContentDataStore implements DataStore {
     final protected Map<Name,ContentEntry> entries;
 
     /**
+     * logger
+     */
+    final protected Logger LOGGER; 
+    
+    /**
      * Factory used to create feature types
      */
     protected FeatureTypeFactory typeFactory;
@@ -125,10 +132,13 @@ public abstract class ContentDataStore implements DataStore {
     /**
      * locking manager
      */
-    protected LockingManager lockingManager;
+    protected LockingManager lockingManager = new InProcessLockingManager();
     
     public ContentDataStore() {
         this.entries = new HashMap<Name,ContentEntry>();
+        this.LOGGER = org.geotools.util.logging.Logging.getLogger(
+            getClass().getPackage().getName()
+        );
     }
 
     //
@@ -214,6 +224,12 @@ public abstract class ContentDataStore implements DataStore {
         this.namespaceURI = namespaceURI;
     }
 
+    /**
+     * The logger for the datastore.
+     */
+    public Logger getLogger() {
+        return LOGGER;
+    }
     
     //
     // DataStore API

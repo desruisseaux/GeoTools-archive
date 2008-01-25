@@ -26,23 +26,31 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.SelectionDecoration;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapContext;
@@ -64,10 +72,13 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Default implementation of navigableMap2D
@@ -87,7 +98,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * Style builder for sld style creation
      */
     protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
-    
+    private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
@@ -95,7 +106,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private final BufferComponent selectedPane = new BufferComponent();
     private final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
-    private Style selectionStyle = null;
+    private Color selectionStyleColor = Color.GREEN;
+    private Geometry selectionGeometrie = null;
+    protected Cursor CUR_SELECT;
 
     /**
      * create a default JDefaultSelectableMap2D
@@ -107,10 +120,24 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
 
+        selectionStrategy.setContext(selectionMapContext);
+
+
         addMapDecoration(selectedPane);
         addMapDecoration(selectionPane);
 
-        buildSelectionStyle();
+        buildCursors();
+    }
+
+    private void buildCursors() {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        ImageIcon ico_select = IconBundle.getResource().getIcon("16_select");
+
+
+        BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+        img.getGraphics().drawImage(ico_select.getImage(), 0, 0, null);
+        CUR_SELECT = tk.createCustomCursor(img, new java.awt.Point(1, 1), "select");
+
     }
 
     /**
@@ -121,13 +148,13 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      */
     protected Coordinate toMapCoord(int mx, int my) {
         Envelope mapArea = renderingStrategy.getMapArea();
-        
+
         Rectangle bounds = getBounds();
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
         return toMapCoord(mx, my, width, height, bounds);
     }
-    
+
     /**
      *  transform a mouse coordinate in JTS Geometry using the CRS of the mapcontext
      * @param mx : x coordinate of the mouse on the map (in pixel)
@@ -136,7 +163,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      */
     protected Geometry mousePositionToGeometry(double mx, double my) {
         Envelope mapArea = renderingStrategy.getMapArea();
-        
+
         if (mapArea != null) {
             Rectangle bounds = getBounds();
             double width = mapArea.getWidth();
@@ -167,23 +194,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
         Filter f = null;
 
-//        MathTransform transform = null;
-//        
-//        try {
-//                transform = CRS.findMathTransform(, clipCRS);
-//            } catch (FactoryException ex) {
-//                throw new IllegalArgumentException();
-//            }
-//
-//            try {
-//                inGeom = JTS.transform((Geometry) inSF.getDefaultGeometry(), transformToClipCRS);
-//            } catch (MismatchedDimensionException ex) {
-//                throw new IllegalArgumentException();
-//            } catch (TransformException ex) {
-//                throw new IllegalArgumentException();
-//            }
-        
-        
+        geom = projectGeometry(geom, layer);
+
         try {
             String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
             if (name.equals("")) {
@@ -195,11 +207,80 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
         return f;
     }
-    
-    private void buildSelectionStyle() {
 
-        Fill fill = STYLE_BUILDER.createFill(Color.GREEN, 0.4f);
-        Stroke stroke = STYLE_BUILDER.createStroke(Color.GREEN, 2);
+    private Style createStyle(MapLayer layer) {
+
+
+        Class jtsClass = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
+
+        if (jtsClass.equals(Point.class) || jtsClass.equals(MultiPoint.class)) {
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+
+            Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
+            Graphic gra = STYLE_BUILDER.createGraphic();
+            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setMarks(new Mark[]{mark});
+            gra.setSize(STYLE_BUILDER.literalExpression(14));
+
+            PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
+
+            Style pointSelectionStyle = STYLE_BUILDER.createStyle();
+            pointSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(ps));
+
+            return pointSelectionStyle;
+
+        } else if (jtsClass.equals(LineString.class) || jtsClass.equals(MultiLineString.class)) {
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+
+            Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
+            Graphic gra = STYLE_BUILDER.createGraphic();
+            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setMarks(new Mark[]{mark});
+            gra.setSize(STYLE_BUILDER.literalExpression(14));
+
+            PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
+            LineSymbolizer ls = STYLE_BUILDER.createLineSymbolizer(stroke);
+
+            Rule r1 = STYLE_BUILDER.createRule(new Symbolizer[]{ps});
+            Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ls});
+
+            Style lineSelectionStyle = STYLE_BUILDER.createStyle();
+            lineSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r2}));
+
+            return lineSelectionStyle;
+
+        } else if (jtsClass.equals(Polygon.class) || jtsClass.equals(MultiPolygon.class)) {
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+
+            PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
+
+            Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
+            Graphic gra = STYLE_BUILDER.createGraphic();
+            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setMarks(new Mark[]{mark});
+            gra.setSize(STYLE_BUILDER.literalExpression(14));
+            PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
+
+
+            Rule r1 = STYLE_BUILDER.createRule(new Symbolizer[]{ps});
+            Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{pls});
+
+            Style polySelectionStyle = STYLE_BUILDER.createStyle();
+            polySelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r3}));
+
+            return polySelectionStyle;
+
+        }
+
+
+        Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+        Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
         stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
 
         PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
@@ -221,15 +302,15 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
 
-        selectionStyle = STYLE_BUILDER.createStyle();
-        selectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
+        Style LineSelectionStyle = STYLE_BUILDER.createStyle();
+        LineSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
 
-
+        return LineSelectionStyle;
     }
 
-    private void applyStyleFilter(Filter f) {
+    private void applyStyleFilter(Style style, Filter f) {
 
-        for (FeatureTypeStyle fts : selectionStyle.getFeatureTypeStyles()) {
+        for (FeatureTypeStyle fts : style.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
 
                 Filter nf = STYLE_BUILDER.getFilterFactory().and(r.getFilter(), f);
@@ -238,16 +319,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
         }
 
-        updateOverLayer();
-    }
-
-    private void updateOverLayer() {
-        selectedPane.setBuffer(getRenderingStrategy().createBufferImage(selectionMapContext));
     }
 
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
         Envelope mapArea = renderingStrategy.getMapArea();
-        
+
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
@@ -263,7 +339,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     private void doMouseSelection(double mx, double my, double ex, double ey) {
         Envelope mapArea = renderingStrategy.getMapArea();
-        
+
         if (mapArea != null) {
             Rectangle bounds = getBounds();
             double width = mapArea.getWidth();
@@ -282,7 +358,107 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             doSelection(geometry);
         }
     }
-    
+
+    protected Geometry projectGeometry(Geometry geom, MapLayer layer) {
+        MathTransform transform = null;
+
+        MapContext context = getRenderingStrategy().getContext();
+        CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
+        CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
+
+        if (layerCRS == null) {
+            layerCRS = contextCRS;
+        }
+
+
+
+        if (!contextCRS.equals(layerCRS)) {
+            try {
+                transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                geom = JTS.transform(geom, transform);
+            } catch (Exception ex) {
+                System.out.println("Error using default layer CRS, searching for a close CRS");
+
+                try {
+                    Integer epsgId = CRS.lookupEpsgCode(layerCRS, true);
+                    if (epsgId != null) {
+                        System.out.println("Close CRS found, will replace original CRS for convertion");
+                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
+                        layerCRS = newCRS;
+                        transform = CRS.findMathTransform(contextCRS, layerCRS);
+                    } else {
+                        System.out.println("No close CRS found, will force convert");
+                        try {
+                            transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Search Error, no close CRS found, will force convertion");
+
+                    try {
+                        transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
+                ex.printStackTrace();
+            }
+        }
+
+        return geom;
+    }
+
+    protected Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
+        MathTransform transform = null;
+
+        MapContext context = getRenderingStrategy().getContext();
+
+        if (outCRS == null) {
+            outCRS = inCRS;
+        }
+
+
+
+        if (!inCRS.equals(outCRS)) {
+            try {
+                transform = CRS.findMathTransform(inCRS, outCRS, true);
+                geom = JTS.transform(geom, transform);
+            } catch (Exception ex) {
+                System.out.println("Error using default layer CRS, searching for a close CRS");
+
+                try {
+                    Integer epsgId = CRS.lookupEpsgCode(outCRS, true);
+                    if (epsgId != null) {
+                        System.out.println("Close CRS found, will replace original CRS for convertion");
+                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
+                        outCRS = newCRS;
+                        transform = CRS.findMathTransform(inCRS, outCRS);
+                    } else {
+                        System.out.println("No close CRS found, will force convert");
+                        try {
+                            transform = CRS.findMathTransform(inCRS, outCRS, true);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Search Error, no close CRS found, will force convertion");
+
+                    try {
+                        transform = CRS.findMathTransform(inCRS, outCRS, true);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
+                ex.printStackTrace();
+            }
+        }
+
+        return geom;
+    }
+
     private void fireSelectionChanged(Geometry geo) {
         Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo);
 
@@ -294,49 +470,142 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     }
 
-    //-------------------MAP2D--------------------------------------------------
-//    @Override
-//    public void setContext(MapContext context) {
-//        selectionMapContext.clearLayerList();
-//        copies.clear();
-//
-//        if (this.context != null) {
-//            this.context.removeMapLayerListListener(mapLayerListlistener);
-//        }
-//
-//        if (context != null) {
-//            context.addMapLayerListListener(mapLayerListlistener);
-//        }
-//
-//        super.setContext(context);
-//    }
-//
-//    @Override
-//    public void setMapArea(Envelope mapArea) {
-//        super.setMapArea(mapArea);
-//
-//        updateOverLayer();
-//    }
+    @Override
+    protected void setRendering(boolean render) {
+        super.setRendering(render);
+
+        MapContext context = getRenderingStrategy().getContext();
+
+        if (context != null && context.getCoordinateReferenceSystem() != null) {
+            try {
+                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        if (context != null && context.getAreaOfInterest() != null) {
+            selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
+        }
+        
+        selectionStrategy.reset();
+
+    }
+
+    //---------------------JDefaultMap2D override-------------------------------    
+
+
+
+    @Override
+    protected void mapAreaChanged(Map2DMapAreaEvent event) {
+        super.mapAreaChanged(event);
+
+        MapContext context = getRenderingStrategy().getContext();
+
+        if (context != null && context.getCoordinateReferenceSystem() != null) {
+
+            try {
+                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
+        selectionStrategy.setMapArea(event.getNewMapArea());
+    }
+
+    @Override
+    protected void crsChanged(PropertyChangeEvent arg0) {
+
+        MapContext context = getRenderingStrategy().getContext();
+
+        if (context != null && context.getCoordinateReferenceSystem() != null) {
+            try {
+                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void mapContextChanged(Map2DContextEvent event) {
+        selectionMapContext.clearLayerList();
+        copies.clear();
+
+        MapContext context = event.getNewContext();
+
+        if (context != null && context.getCoordinateReferenceSystem() != null) {
+            try {
+                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+                if (context.getAreaOfInterest() != null) {
+                    selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
+                }
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        if (event.getPreviousContext() != null) {
+            event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
+        }
+
+        if (event.getNewContext() != null) {
+            event.getNewContext().addMapLayerListListener(mapLayerListlistener);
+        }
+
+        super.mapContextChanged(event);
+    }
 
     //----------------------SELECTABLE MAP2D------------------------------------
-    public void addSelectableLayer(MapLayer layer) {
+
+    private void addSelectableLayerNU(MapLayer layer) {
         if (layer != null) {
             MapLayer copy = FACILITIES_FACTORY.duplicateLayer(layer);
-            copy.setStyle(selectionStyle);
+
+            copy.setStyle(createStyle(layer));
+
+            if (selectionGeometrie != null) {
+                try {
+                    Filter f = getFeatureInGeometry(selectionGeometrie, copy);
+                    applyStyleFilter(copy.getStyle(), f);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                applyStyleFilter(copy.getStyle(), Filter.EXCLUDE);
+            }
+
             selectionMapContext.addLayer(copy);
+
+            if (selectionMapContext.getLayerCount() == 1) {
+                selectionStrategy.setMapArea(renderingStrategy.getMapArea());
+            }
+
             copies.put(layer, copy);
         }
     }
 
+    public void addSelectableLayer(MapLayer layer) {
+        addSelectableLayerNU(layer);
+        selectionStrategy.reset();
+    }
+
     public void addSelectableLayer(MapLayer[] layers) {
         if (layers != null) {
-
             for (MapLayer layer : layers) {
-                MapLayer copy = FACILITIES_FACTORY.duplicateLayer(layer);
-                copy.setStyle(selectionStyle);
-                selectionMapContext.addLayer(copy);
-                copies.put(layer, copy);
+                addSelectableLayerNU(layer);
             }
+            selectionStrategy.reset();
         }
     }
 
@@ -365,53 +634,56 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         doSelection(geometry);
     }
 
-    protected SimpleFeature findFeature(Geometry geom, MapLayer layer) {
-        
-        MapContext context = renderingStrategy.getContext();
-        Filter f = null;
-
-        if ((context == null) || (selectionMapContext.getLayerCount() == 0) || (layer == null)) {
-            return null;
-        }
-
-        try {
-            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
-
-            if (name.equals("")) {
-                name = "the_geom";
-            }
-
-            try {
-                f = ff.intersects(ff.property(name), ff.literal(geom));
-                applyStyleFilter(f);
-                FeatureCollection col = layer.getFeatureSource().getFeatures(f);
-                FeatureIterator fi = col.features();
-
-                while (fi.hasNext()) {
-                    SimpleFeature sf = fi.next();
-
-                    for (Object obj : sf.getAttributes()) {
-                        System.out.print(obj);
-                    }
-                    System.out.println("");
-                }
-                fi.close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-
-
-        } catch (IllegalFilterException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+//    protected SimpleFeature findFeature(Geometry geom, MapLayer layer) {
+//
+//        MapContext context = renderingStrategy.getContext();
+//        Filter f = null;
+//
+//        if ((context == null) || (selectionMapContext.getLayerCount() == 0) || (layer == null)) {
+//            return null;
+//        }
+//
+//        try {
+//            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
+//
+//            if (name.equals("")) {
+//                name = "the_geom";
+//            }
+//
+//            geom = projectGeometry(geom, layer);
+//
+//            try {
+//                f = ff.intersects(ff.property(name), ff.literal(geom));
+//                applyStyleFilter(f);
+//                FeatureCollection col = layer.getFeatureSource().getFeatures(f);
+//                FeatureIterator fi = col.features();
+//
+//                while (fi.hasNext()) {
+//                    SimpleFeature sf = fi.next();
+//
+//                    for (Object obj : sf.getAttributes()) {
+//                        System.out.print(obj);
+//                    }
+//                    System.out.println("");
+//                }
+//                fi.close();
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//
+//
+//
+//        } catch (IllegalFilterException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
     public void doSelection(Geometry geometry) {
-        
+
+        selectionGeometrie = geometry;
+
         MapContext context = renderingStrategy.getContext();
         Filter f = null;
 
@@ -420,31 +692,22 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
 
         fireSelectionChanged(geometry);
-        
-        try {
 
-            for (MapLayer layer : selectionMapContext.getLayers()) {
-                String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
 
-                if (name.equals("")) {
-                    name = "the_geom";
-                }
 
-                try {
-                    f = ff.intersects(ff.property(name), ff.literal(geometry));
-                    applyStyleFilter(f);
+        for (MapLayer layer : selectionMapContext.getLayers()) {
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                f = getFeatureInGeometry(geometry, layer);
+                applyStyleFilter(layer.getStyle(), f);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-
-
-        } catch (IllegalFilterException e) {
-            e.printStackTrace();
         }
-        return;
+
+        selectionStrategy.reset();
+
     }
 
     public void addSelectableMap2DListener(SelectableMap2DListener listener) {
@@ -458,8 +721,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     public SelectableMap2DListener[] getSelectableMap2DListeners() {
         return MAP2DLISTENERS.getListeners(SelectableMap2DListener.class);
     }
-    
+
     //---------------------PRIVATE CLASSES--------------------------------------        
+
     private class MouseListen implements MouseInputListener {
 
         int startX = 0;
@@ -511,6 +775,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
 
         public void mouseEntered(MouseEvent e) {
+            switch (actionState) {
+                case SELECT:
+                    setCursor(CUR_SELECT);
+                    break;
+            }
         }
 
         public void mouseExited(MouseEvent e) {
@@ -554,24 +823,24 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         private Rectangle oldone = null;
         private Rectangle newone = null;
 
-        public void setBuffer(BufferedImage buf) {
-            img = buf;
-            repaint();
+        public BufferComponent() {
+            setLayout(new BorderLayout());
+            add(selectionStrategy.getComponent());
         }
 
-        @Override
-        public void paintComponent(Graphics g) {
-            newone = getBounds();
+//        public void setBuffer(BufferedImage buf) {
+//            img = buf;
+//            repaint();
+//        }
 
-            if (!newone.equals(oldone)) {
-                oldone = newone;
-                updateOverLayer();
-            } else if (img != null) {
-                g.drawImage(img, 0, 0, this);
-            }
-
-        }
-
+//        @Override
+//        public void paintComponent(Graphics g) {
+//            newone = getBounds();
+//            if (img != null) {
+//                g.drawImage(img, 0, 0, this);
+//            }
+//
+//        }
         public void refresh() {
         }
 
@@ -587,8 +856,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             return null;
         }
         }
-
-    
 }
 
 
