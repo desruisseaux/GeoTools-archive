@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
 
-import org.geotools.test.TestData;
-
 import junit.framework.TestCase;
+
+import org.geotools.test.TestData;
 
 public abstract class DataTestSupport extends TestCase {
     protected WFS110ProtocolHandler protocolHandler;

@@ -16,29 +16,20 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.GET;
-
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.opengis.wfs.FeatureTypeType;
-import net.opengis.wfs.WFSCapabilitiesType;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
-import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.data.wfs.WFSDataStore;
+import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFSConfiguration;
@@ -79,7 +70,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
         }
     }
 
-    public ServiceInfo getInfo() {
+    public WFSServiceInfo getInfo() {
         return new CapabilitiesServiceInfo(protocolHandler);
     }
 

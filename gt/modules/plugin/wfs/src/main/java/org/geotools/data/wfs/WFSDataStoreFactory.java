@@ -470,6 +470,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      */
     public static URL createGetCapabilitiesRequest(URL host, Version version) {
+        if(host == null){
+            throw new NullPointerException("null url");
+        }
+        if(version == null){
+            throw new NullPointerException("version");
+        }
         String protocol = host.getProtocol();
         String hostname = host.getHost();
         int port = host.getPort();
@@ -528,6 +534,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             String version = params.get("VERSION");
             if (version != null) {
                 requestVersion = Version.find(version);
+                if(requestVersion == null){
+                    //default to 1.0.0
+                    requestVersion = Version.v1_0_0;
+                }
             }
             return createGetCapabilitiesRequest(host, requestVersion);
         }

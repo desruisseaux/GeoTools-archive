@@ -1,8 +1,5 @@
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.*;
-import static org.geotools.wfs.protocol.WFSOperationType.*;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -10,11 +7,9 @@ import java.util.Set;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
-import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;

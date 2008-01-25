@@ -19,7 +19,6 @@ package org.geotools.wfs.v_1_1_0.data;
 import java.io.IOException;
 
 import org.geotools.data.ResourceInfo;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author Gabriel Roldan

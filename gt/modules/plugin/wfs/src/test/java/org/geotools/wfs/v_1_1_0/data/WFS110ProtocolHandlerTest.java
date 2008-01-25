@@ -83,7 +83,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      */
     public void testWFS110ProtocolHandler() throws IOException {
         try {
-            createProtocolHandler("DescribeFeatureType_States.xml", false, null);
+            createProtocolHandler("schemas/geoserver/DescribeFeatureType_States.xsd", false, null);
             fail("Excpected DataSourceException as a capabilities document was not provided");
         } catch (DataSourceException e) {
             assertTrue(true);
@@ -159,7 +159,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
             @Override
             public URL getDescribeFeatureTypeURLGet(final String typeName)
                     throws MalformedURLException {
-                return TestData.getResource(this, "DescribeFeatureType_States.xml");
+                return TestData.getResource(this, "schemas/geoserver/DescribeFeatureType_States.xsd");
             }
         };
 

@@ -18,7 +18,6 @@ package org.geotools.data.wfs;
 import java.io.IOException;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.ServiceInfo;
 
 /**
  * {@link DataStore} extension interface to provide WFS specific extra
@@ -33,8 +32,9 @@ import org.geotools.data.ServiceInfo;
 public interface WFSDataStore extends DataStore {
     /**
      * @return service information
+     * @see DataStore#getInfo()
      */
-    ServiceInfo getInfo();
+    WFSServiceInfo getInfo();
 
     /**
      * Overrides getFeatureSource to return WFSFeatureSource while the standard

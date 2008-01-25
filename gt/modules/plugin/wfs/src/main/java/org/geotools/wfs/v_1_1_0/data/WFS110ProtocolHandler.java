@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -67,6 +68,7 @@ import net.opengis.wfs.WfsFactory;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -303,7 +305,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
         final SimpleFeatureType featureType;
         CoordinateReferenceSystem crs = getFeatureTypeCRS(typeName);
-        featureType = EmfAppSchemaParser.parse(featureDescriptorName, describeUrl, crs);
+        featureType = EmfAppSchemaParser.parse(configuration, featureDescriptorName, describeUrl, crs);
 
         // adapt the feature type name
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
@@ -317,6 +319,29 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         }
         final SimpleFeatureType adaptedFeatureType = builder.buildFeatureType();
         return adaptedFeatureType;
+    }
+
+    @Override
+    public URL getDescribeFeatureTypeURLGet(final String typeName) throws MalformedURLException {
+        URL v100StyleUrl = super.getDescribeFeatureTypeURLGet(typeName);
+        FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
+        QName name = typeInfo.getName();
+        if (XMLConstants.DEFAULT_NS_PREFIX.equals(name.getPrefix())) {
+            return v100StyleUrl;
+        }
+        String raw = v100StyleUrl.toExternalForm();
+        String nsUri;
+        String outputFormat;
+        try {
+            nsUri = URLEncoder.encode(name.getNamespaceURI(), "UTF-8");
+            outputFormat = URLEncoder.encode("text/xml; subtype=gml/3.1.1", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        raw += "&NAMESPACE=xmlns(" + name.getPrefix() + "=" + nsUri + ")";
+        raw += "&OUTPUTFORMAT=" + outputFormat;
+        URL v110StyleUrl = new URL(raw);
+        return v110StyleUrl;
     }
 
     private Object parse(final URL url, final HttpMethod method) throws IOException {
@@ -392,14 +417,14 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             LOGGER.info("Authority not found for " + typeName + " CRS: " + defaultSRS);
             // HACK HACK HACK!: remove when
             // http://jira.codehaus.org/browse/GEOT-1659 is fixed
-            if(defaultSRS.toUpperCase().startsWith("URN")){
+            if (defaultSRS.toUpperCase().startsWith("URN")) {
                 String code = defaultSRS.substring(defaultSRS.lastIndexOf(":") + 1);
                 try {
                     return CRS.decode("EPSG:" + code);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     return null;
-                } 
+                }
             }
         } catch (FactoryException e) {
             LOGGER.log(Level.INFO, "Error creating CRS " + typeName + ": " + defaultSRS, e);
@@ -441,6 +466,10 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         final FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
 
         Filter filter = query.getFilter();
+        if (Filter.EXCLUDE.equals(filter)) {
+            return new EmptyFeatureReader(contentType);
+        }
+
         final InputStream responseStream;
         // TODO: enable POST
         if (false && supports(GET_FEATURE, POST)) {
@@ -476,6 +505,8 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      * @param typeName
      * @param propertyNames
      * @param filter
+     *            the filter to apply to the request, shall not be
+     *            {@code Filter.EXCLUDE}
      * @param maxFeatures
      * @param sortBy
      * @return

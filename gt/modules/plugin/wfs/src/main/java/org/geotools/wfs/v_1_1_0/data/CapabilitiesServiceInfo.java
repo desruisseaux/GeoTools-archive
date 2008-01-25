@@ -16,31 +16,22 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.protocol.HttpMethod.*;
-import static org.geotools.wfs.protocol.WFSOperationType.*;
+import static org.geotools.wfs.protocol.HttpMethod.GET;
+import static org.geotools.wfs.protocol.HttpMethod.POST;
+import static org.geotools.wfs.protocol.WFSOperationType.GET_CAPABILITIES;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
 
-import net.opengis.ows.KeywordsType;
-import net.opengis.ows.OnlineResourceType;
-import net.opengis.ows.OperationsMetadataType;
-import net.opengis.ows.ServiceProviderType;
-import net.opengis.wfs.WFSCapabilitiesType;
-
 import org.geotools.data.ServiceInfo;
+import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.protocol.HttpMethod;
-import org.geotools.wfs.protocol.WFSOperationType;
 
 /**
  * Adapts a WFS capabilities document to {@link ServiceInfo}
@@ -48,11 +39,12 @@ import org.geotools.wfs.protocol.WFSOperationType;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/CapabilitiesServiceInfo.java $
  */
-final class CapabilitiesServiceInfo implements ServiceInfo {
+final class CapabilitiesServiceInfo implements WFSServiceInfo {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
-    
+
     private static URI WFS_1_1_0_SCHEMA_URI;
     static {
         try {
@@ -130,7 +122,17 @@ final class CapabilitiesServiceInfo implements ServiceInfo {
         }
     }
 
+    /**
+     * @see ServiceInfo#getTitle()
+     */
     public String getTitle() {
         return protocolHandler.getServiceTitle();
+    }
+
+    /**
+     * @see WFSServiceInfo#getVersion()
+     */
+    public String getVersion() {
+        return "1.1.0";
     }
 }

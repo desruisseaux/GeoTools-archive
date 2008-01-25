@@ -51,14 +51,13 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
-import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.wfs.WFSDataStore;
+import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
@@ -164,8 +163,8 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         determineCorrectStrategy();
     }
 
-    public ServiceInfo getInfo() {
-        return new ServiceInfo(){
+    public WFSServiceInfo getInfo() {
+        return new WFSServiceInfo(){
             public String getDescription() {
                 return capabilities.getService().get_abstract();
             }
@@ -203,6 +202,10 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
             public String getTitle() {
                 return capabilities.getService().getTitle();
+            }
+
+            public String getVersion() {
+                return "1.0.0";
             }            
         };
     }

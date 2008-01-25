@@ -7,7 +7,6 @@ import static org.geotools.wfs.protocol.WFSOperationType.DESCRIBE_FEATURETYPE;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;

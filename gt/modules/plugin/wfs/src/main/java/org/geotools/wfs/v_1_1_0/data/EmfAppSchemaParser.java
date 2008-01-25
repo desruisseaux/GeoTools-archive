@@ -1,31 +1,35 @@
 package org.geotools.wfs.v_1_1_0.data;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
-import org.geotools.gml3.GML;
+import org.geotools.gml3.bindings.GML3ParsingUtils;
 import org.geotools.util.logging.Logging;
-import org.geotools.xml.Binding;
+import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
+import org.geotools.xml.impl.BindingFactoryImpl;
+import org.geotools.xml.impl.BindingLoader;
+import org.geotools.xml.impl.BindingWalkerFactoryImpl;
+import org.geotools.xml.impl.NamespaceSupportWrapper;
+import org.geotools.xml.impl.ParserHandler;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.MutablePicoContainer;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.picocontainer.defaults.DefaultPicoContainer;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Utility class to parse FeatureType given by an XML schema location and the
@@ -41,21 +45,96 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParser.java $
  */
 class EmfAppSchemaParser {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
     /**
-     * Holds the mapping of xsd types to java types as needed by AttributeType
+     * Note: this code is borrowed and adapted from
+     * {@link ParserHandler#startDocument()}
      * 
-     * @see #findBinding(XSDElementDeclaration, Map)
+     * @param wfsConfiguration
+     * @param featureTypeName
+     * @param schemaLocation
+     * @param crs
+     * @return
+     * @throws IOException
      */
-    private static final Map<QName, Class> xsdTypeToJavaBindings = new HashMap<QName, Class>();
+    @SuppressWarnings("unchecked")
+    public static SimpleFeatureType parse(final Configuration wfsConfiguration,
+            final QName featureTypeName, final URL schemaLocation,
+            final CoordinateReferenceSystem crs) throws IOException {
 
-    public static SimpleFeatureType parse(final QName featureTypeName, final URL schemaLocation,
-            final CoordinateReferenceSystem crs) {
+        XSDElementDeclaration elementDecl = parseFeatureType(featureTypeName, schemaLocation);
+
+        Map bindings = wfsConfiguration.setupBindings();
+        BindingLoader bindingLoader = new BindingLoader(bindings);
+
+        // create the document handler + root context
+        // DocumentHandler docHandler =
+        // handlerFactory.createDocumentHandler(this);
+
+        MutablePicoContainer context = wfsConfiguration.setupContext(new DefaultPicoContainer());
+        NamespaceSupport namespaces = new NamespaceSupport();
+        // setup the namespace support
+        context.registerComponentInstance(namespaces);
+        context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
+
+        // binding factory support
+        BindingFactory bindingFactory = new BindingFactoryImpl(bindingLoader);
+        context.registerComponentInstance(bindingFactory);
+
+        // binding walker support
+        BindingWalkerFactoryImpl bwFactory = new BindingWalkerFactoryImpl(bindingLoader, context);
+        context.registerComponentInstance(bwFactory);
+
+        try {
+            SimpleFeatureType featureType = GML3ParsingUtils.featureType(elementDecl, bwFactory);
+            if (crs != null) {
+                SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+                builder.setName(featureType.getName());
+                builder.setAbstract(featureType.isAbstract());
+                builder.setDescription(featureType.getDescription());
+                if (featureType.getSuper() instanceof SimpleFeatureType) {
+                    builder.setSuperType((SimpleFeatureType) featureType.getSuper());
+                }
+                List<AttributeDescriptor> attributes = featureType.getAttributes();
+                final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+                for (AttributeDescriptor descriptor : attributes) {
+                    if (descriptor instanceof GeometryDescriptor) {
+                        String name = descriptor.getLocalName();
+                        Class binding = descriptor.getType().getBinding();
+                        builder.add(name, binding, crs);
+                    } else {
+                        builder.add(descriptor);
+                    }
+                }
+                if (defaultGeometry != null) {
+                    builder.setDefaultGeometry(defaultGeometry.getLocalName());
+                }
+                featureType = builder.buildFeatureType();
+            }
+            return featureType;
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw (IOException) new IOException().initCause(e);
+        }
+    }
+
+    /**
+     * TODO: add connectionfactory parameter to handle authentication, gzip, etc
+     * 
+     * @param featureTypeName
+     * @param schemaLocation
+     * @return
+     */
+    private static XSDElementDeclaration parseFeatureType(final QName featureTypeName,
+            final URL schemaLocation) {
         ApplicationSchemaConfiguration configuration;
         {
             String namespaceURI = featureTypeName.getNamespaceURI();
@@ -64,103 +143,8 @@ class EmfAppSchemaParser {
         }
         SchemaIndex schemaIndex = Schemas.findSchemas(configuration);
 
-        XSDComplexTypeDefinition typeDefinition = null;
-        {
-            XSDElementDeclaration elementDeclaration = null;
-            elementDeclaration = schemaIndex.getElementDeclaration(featureTypeName);
-
-            XSDTypeDefinition typeDef = elementDeclaration.getTypeDefinition();
-            typeDefinition = (XSDComplexTypeDefinition) typeDef;
-        }
-
-        SimpleFeatureType featureType = createFeatureType(typeDefinition, configuration, crs);
-        return featureType;
+        XSDElementDeclaration elementDeclaration;
+        elementDeclaration = schemaIndex.getElementDeclaration(featureTypeName);
+        return elementDeclaration;
     }
-
-    @SuppressWarnings("unchecked")
-    private static SimpleFeatureType createFeatureType(
-            final XSDComplexTypeDefinition typeDefinition, final Configuration configuration,
-            final CoordinateReferenceSystem crs) {
-        final List<XSDElementDeclaration> childElementDeclarations;
-        {
-            final boolean includeParents = true;
-            childElementDeclarations = Schemas.getChildElementDeclarations(typeDefinition,
-                    includeParents);
-        }
-
-        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-        {
-            final String typeNameNsUri = typeDefinition.getTargetNamespace();
-            final String typeName = typeDefinition.getName();
-            //set global state
-            builder.setNamespaceURI(typeNameNsUri);
-            builder.setName(typeName);
-            builder.setCRS(crs);
-        }
-
-        final Map<QName, Class<? extends Binding>> bindings = configuration.setupBindings();
-
-        String defaultGeometryName = null;
-        for (XSDElementDeclaration elemDecl : childElementDeclarations) {
-            String name = elemDecl.getName();
-            String uri = elemDecl.getTargetNamespace();
-            int maxOccurs = Schemas.getMaxOccurs(typeDefinition, elemDecl);
-            int minOccurs = Schemas.getMinOccurs(typeDefinition, elemDecl);
-            Class binding = findBinding(elemDecl, bindings);
-            if (Geometry.class.isAssignableFrom(binding)) {
-                if (!(GML.NAMESPACE.equals(uri)) && !(GML.location.getLocalPart().equals(name))) {
-                    defaultGeometryName = name;
-                }
-            }
-            builder.add(name, binding);
-        }
-        if (defaultGeometryName != null) {
-            builder.setDefaultGeometry(defaultGeometryName);
-        }
-
-        SimpleFeatureType type = builder.buildFeatureType();
-        return type;
-    }
-
-    private static Class findBinding(final XSDElementDeclaration elemDecl,
-            Map<QName, Class<? extends Binding>> bindings) {
-        final XSDTypeDefinition typeDefinition = elemDecl.getTypeDefinition();
-        final QName elementName;
-        final QName typeName;
-        elementName = new QName(elemDecl.getTargetNamespace(), elemDecl.getName());
-        typeName = new QName(typeDefinition.getTargetNamespace(), typeDefinition.getName());
-
-        if (xsdTypeToJavaBindings.containsKey(elementName)) {
-            return xsdTypeToJavaBindings.get(elementName);
-        }
-        if (xsdTypeToJavaBindings.containsKey(typeName)) {
-            return xsdTypeToJavaBindings.get(typeName);
-        }
-
-        Class<? extends Binding> typeBinding = bindings.get(elementName);
-        if (typeBinding == null) {
-            typeBinding = bindings.get(typeName);
-        }
-
-        final Class binding;
-        if (typeBinding == null) {
-            LOGGER.info("No binding found for " + elementName + " of type " + typeName
-                    + ", binding to String.class");
-            binding = String.class;
-        } else {
-            Binding bindingInstance = null;
-            try {
-                bindingInstance = typeBinding.newInstance();
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "Error instantiating binding " + typeBinding.getName(), e);
-            }
-            binding = bindingInstance == null ? String.class : bindingInstance.getType();
-        }
-
-        synchronized (xsdTypeToJavaBindings) {
-            xsdTypeToJavaBindings.put(typeName, binding);
-        }
-        return binding;
-    }
-
 }
