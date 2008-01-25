@@ -17,98 +17,17 @@
  */
 package org.geotools.geometry.coordinatesequence;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;
 
 /**
- * CSBuilder that generates DefaultCoordinateSequence objects, that is, 
- * coordinate sequences backed by Coordinate[]
+ * A CSBuilder that generates DefaultCoordinateSequence objects, that is, 
+ * coordinate sequences backed by a Coordinate[] array.
+ * 
  * @author wolf
+ * 
+ * @deprecated Moved to {@link org.geotools.geometry.jts.coordinatesequence.DefaultCSBuilder}
+ * 
  * @source $URL$
  */
-public class DefaultCSBuilder implements CSBuilder {
-
-	private Coordinate[] coordinateArray;
-	private CoordinateSequenceFactory factory = DefaultCoordinateSequenceFactory.instance();
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#start(int, int)
-	 */
-	public void start(int size, int dimensions) {
-		coordinateArray = new Coordinate[size];	
-		for(int i = 0; i < size; i++)
-			coordinateArray[i] = new Coordinate();
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#getCoordinateSequence()
-	 */
-	public CoordinateSequence end() {
-		CoordinateSequence cs = factory.create(coordinateArray);
-		coordinateArray = null;
-		return cs;
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#setOrdinate(double, int, int)
-	 */
-	public void setOrdinate(double value, int ordinateIndex, int coordinateIndex) {
-		Coordinate c = coordinateArray[coordinateIndex];
-		switch(ordinateIndex) {
-			case 0: c.x = value; break;
-			case 1: c.y = value; break;
-			case 2: c.z = value; break;
-		}
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#getOrdinate(int, int)
-	 */
-	public double getOrdinate(int ordinateIndex, int coordinateIndex) {
-		Coordinate c = coordinateArray[coordinateIndex];
-		switch(ordinateIndex) {
-			case 0: return c.x;
-			case 1: return c.y;
-			case 2: return c.z;
-			default: return 0.0;
-		}
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#getSize()
-	 */
-	public int getSize() {
-		if(coordinateArray != null) {
-			return coordinateArray.length;
-		} else {
-			return -1;
-		}
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#getDimension()
-	 */
-	public int getDimension() {
-		if(coordinateArray != null) {
-			return 2;
-		} else {
-			return -1;
-		}
-	}
-
-	/**
-	 * @see org.geotools.geometry.coordinatesequence.CSBuilder#setOrdinate(com.vividsolutions.jts.geom.CoordinateSequence, double, int, int)
-	 */
-	public void setOrdinate(CoordinateSequence sequence, double value, int ordinateIndex, int coordinateIndex) {
-		Coordinate c = sequence.getCoordinate(coordinateIndex);
-		switch(ordinateIndex) {
-			case 0: c.x = value; break;
-			case 1: c.y = value; break;
-			case 2: c.z = value; break;
-		}
-		
-	}
+public class DefaultCSBuilder extends org.geotools.geometry.jts.coordinatesequence.DefaultCSBuilder {
 
 }

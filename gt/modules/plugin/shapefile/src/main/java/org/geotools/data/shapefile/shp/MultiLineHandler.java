@@ -18,8 +18,8 @@ package org.geotools.data.shapefile.shp;
 
 import java.nio.ByteBuffer;
 
-import org.geotools.geometry.coordinatesequence.CSBuilder;
-import org.geotools.geometry.coordinatesequence.CSBuilderFactory;
+import org.geotools.geometry.jts.coordinatesequence.CSBuilder;
+import org.geotools.geometry.jts.coordinatesequence.CSBuilderFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
