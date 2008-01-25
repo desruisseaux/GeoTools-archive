@@ -231,8 +231,9 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 		//use extended classloader to load up configuration classes to load schema files
 		// with
 		final List xsds = new ArrayList();
-		xsds.add( "org.geotools.xlink.XLINK" );
-		xsds.add( "org.geotools.gml2.GML" );
+                xsds.add( "org.geotools.xml.XML" );
+                xsds.add( "org.geotools.xlink.XLINK" );
+                xsds.add( "org.geotools.gml2.GML" );
 		xsds.add( "org.geotools.gml3.GML" );
 		xsds.add( "org.geotools.filter.v1_0.OGC" );
 		xsds.add( "org.geotools.filter.v1_1.OGC" );
@@ -283,6 +284,11 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 				XSDSchema schema, String namespaceURI, String schemaLocation 
 			) {
 			
+                                if ( schemaLocation == null ) {
+                                   getLog().warn("Null location for " + namespaceURI );
+                                   return null;
+                                }
+                                
 				//check location directlry
 				File file = new File( schemaLocation );  
 				if ( file.exists() ) {
