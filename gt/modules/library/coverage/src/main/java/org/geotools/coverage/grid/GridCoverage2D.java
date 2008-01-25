@@ -105,7 +105,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * The views returned by {@link #views}. Constructed when first needed.
      * Note that some views may appear in the {@link #sources} list.
      */
-    private transient GridCoverageViews views;
+    private transient ViewsManager views;
 
     /**
      * The raster data.
@@ -853,7 +853,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         synchronized (this) {
             if (views == null) {
-                views = GridCoverageViews.create(this);
+                views = ViewsManager.create(this);
             }
         }
         // Do not synchronize past this point, because ViewsManager.get is already
@@ -907,11 +907,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Copies the views from this class into the specified coverage and returns them. The views
      * are actually shared, i.e. views created for one coverage can be used by the other. This
-     * method is for internal use by {@link GridCoverageViews} only.
+     * method is for internal use by {@link ViewsManager} only.
      */
-    final synchronized GridCoverageViews copyViewsTo(final GridCoverage2D target) {
+    final synchronized ViewsManager copyViewsTo(final GridCoverage2D target) {
         if (views == null) {
-            views = GridCoverageViews.create(this);
+            views = ViewsManager.create(this);
         }
         if (target.views == null) {
             target.views = views;
@@ -1012,7 +1012,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
 
     /**
      * Disposes only the {@linkplain #image}, not the views. This method is invoked by
-     * {@link GridCoverageViews#dispose}. This method checks the set of every sinks,
+     * {@link ViewsManager#dispose}. This method checks the set of every sinks,
      * which may or may not be {@link RenderedImage}s. If there is no sinks, we can process.
      */
     final synchronized boolean disposeImage(final boolean force) {

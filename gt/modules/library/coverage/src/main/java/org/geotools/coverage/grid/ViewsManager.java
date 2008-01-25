@@ -74,7 +74,7 @@ import org.geotools.util.logging.Logging;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class GridCoverageViews {
+final class ViewsManager {
     /**
      * Slight number for rounding errors in floating point comparaison.
      */
@@ -98,7 +98,7 @@ final class GridCoverageViews {
      *
      * @param coverage The coverage that created this {@code ViewsManager}.
      */
-    private GridCoverageViews(final GridCoverage2D coverage) {
+    private ViewsManager(final GridCoverage2D coverage) {
         views = new EnumMap<ViewType,GridCoverage2D>(ViewType.class);
         boolean geophysics   = true; // 'true' only if all bands are geophysics.
         boolean photographic = true; // 'true' only if no band have category.
@@ -138,7 +138,7 @@ final class GridCoverageViews {
      *
      * @param coverage The coverage that wants to create a {@code ViewsManager}.
      */
-    static GridCoverageViews create(final GridCoverage2D coverage) {
+    static ViewsManager create(final GridCoverage2D coverage) {
         final Class<? extends GridCoverage2D> viewClass = coverage.getViewClass();
         if (viewClass != null) {
             Collection<GridCoverage> sources = coverage.getSources();
@@ -168,7 +168,7 @@ final class GridCoverageViews {
                 sources = next;
             }
         }
-        return new GridCoverageViews(coverage);
+        return new ViewsManager(coverage);
     }
 
     /**
