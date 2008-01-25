@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +51,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -86,7 +88,7 @@ final class GridCoverageViews {
     private static final boolean CONSERVATIVE_PIECEWISE = true;
 
     /**
-     * The views. The coverage that created this {@code GridCoverageViews} must be stored under
+     * The views. The coverage that created this {@code ViewsManager} must be stored under
      * the {@link ViewType#NATIVE} key.
      */
     private final Map<ViewType,GridCoverage2D> views;
@@ -94,9 +96,9 @@ final class GridCoverageViews {
     /**
      * Constructs a map of views.
      *
-     * @param coverage The coverage that created this {@code GridCoverageViews}.
+     * @param coverage The coverage that created this {@code ViewsManager}.
      */
-    public GridCoverageViews(final GridCoverage2D coverage) {
+    private GridCoverageViews(final GridCoverage2D coverage) {
         views = new EnumMap<ViewType,GridCoverage2D>(ViewType.class);
         boolean geophysics   = true; // 'true' only if all bands are geophysics.
         boolean photographic = true; // 'true' only if no band have category.
@@ -125,13 +127,54 @@ final class GridCoverageViews {
             type = ViewType.PACKED;
         }
         views.put(type, coverage);
-        views.put(ViewType.NATIVE, coverage);
+        views.put(ViewType.NATIVE, coverage.getNativeView());
     }
 
     /**
-     * Returns the specified view.
+     * Returns a shared map of views <em>or</em> constructs a new one. In order to check if we can
+     * share the views with one of the sources, the source must have identical image, geometry and
+     * sample dimensions. As a safety, we do not allow views sharing for arbitrary classes of
+     * {@link Calculator2D} (this is checked by {@code viewClass}).
+     *
+     * @param coverage The coverage that wants to create a {@code ViewsManager}.
      */
-    public synchronized GridCoverage2D get(final ViewType type) {
+    static GridCoverageViews create(final GridCoverage2D coverage) {
+        final Class<? extends GridCoverage2D> viewClass = coverage.getViewClass();
+        if (viewClass != null) {
+            Collection<GridCoverage> sources = coverage.getSources();
+            while (sources != null) {
+                Collection<GridCoverage> next = null;
+                for (final GridCoverage source : sources) {
+                    if (source instanceof GridCoverage2D) {
+                        final GridCoverage2D candidate = (GridCoverage2D) source;
+                        if (Utilities.equals(coverage.image,            candidate.image)            &&
+                            Utilities.equals(coverage.gridGeometry,     candidate.gridGeometry)     &&
+                            Arrays   .equals(coverage.sampleDimensions, candidate.sampleDimensions) &&
+                            viewClass.equals(candidate.getViewClass()))
+                            // The CRS is checked with the GridGeometry2D.
+                        {
+                            return candidate.copyViewsTo(coverage);
+                        }
+                    }
+                    final Collection<GridCoverage> more = source.getSources();
+                    if (more != null && !more.isEmpty()) {
+                        if (next == null) {
+                            next = new LinkedHashSet<GridCoverage>(more);
+                        } else {
+                            next.addAll(more);
+                        }
+                    }
+                }
+                sources = next;
+            }
+        }
+        return new GridCoverageViews(coverage);
+    }
+
+    /**
+     * Invoked by {@linkplain GridCoverage2D#view} for getting a view.
+     */
+    public synchronized GridCoverage2D get(final GridCoverage2D caller, final ViewType type) {
         GridCoverage2D coverage = views.get(type);
         if (coverage != null) {
             return coverage;
@@ -141,32 +184,29 @@ final class GridCoverageViews {
             // TODO: localize.
             throw new IllegalStateException("This coverage has been disposed.");
         }
-        coverage = coverage.createView(type);
-        coverage.setViews(this);
-        views.put(type, coverage);
-        return coverage;
-    }
-
-    /**
-     * Invoked by {@link GridCoverage2D#createView} when a view needs to be created.
-     */
-    @SuppressWarnings("fallthrough")
-    static GridCoverage2D create(final GridCoverage2D coverage, final ViewType type) {
         switch (type) {
-            case SAME:         return coverage;
             case RENDERED:     // TODO (fallthrough for now).
-            case PACKED:       return geophysics(coverage, false);
-            case GEOPHYSICS:   return geophysics(coverage, true);
-            case PHOTOGRAPHIC: return photographic(coverage);
-            case NATIVE: {
-                // Should be handled by "get" so if we get there, it is an error.
-                // Fallthrough so the exception is thrown.
-            }
+            case PACKED:       coverage = geophysics(coverage, false); break;
+            case GEOPHYSICS:   coverage = geophysics(coverage, true);  break;
+            case PHOTOGRAPHIC: coverage = photographic(coverage);      break;
             default: {
+                /*
+                 * We don't want a case for:
+                 *  - SAME   because it should be handled by "GridCoverage2D.view(...)"
+                 *  - NATIVE because it should be handled by "views.get(type)".
+                 *
+                 * Getting there with one of the above type is an error.
+                 */
                 throw new IllegalArgumentException(Errors.format(
                         ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
             }
         }
+        coverage = caller.specialize(coverage);
+        if (caller.copyViewsTo(coverage) != this) {
+            throw new AssertionError(); // Should never happen.
+        }
+        views.put(type, coverage);
+        return coverage;
     }
 
     /**
@@ -260,7 +300,7 @@ final class GridCoverageViews {
             view = FormatDescriptor.create(image, dataType, hints);
         }
         assert view.getColorModel() instanceof ComponentColorModel;
-        return create(coverage, view, null, 2);
+        return createView(coverage, view, null, 2);
     }
 
     /**
@@ -529,13 +569,13 @@ testLinear: for (int i=0; i<numBands; i++) {
             operation = "org.geotools.SampleTranscode";
         }
         final RenderedOp view = JAI.create(operation, param, hints);
-        return create(coverage, view, targetBands, toGeo ? 1 : 0);
+        return createView(coverage, view, targetBands, toGeo ? 1 : 0);
     }
 
     /**
      * Creates the view and logs a record.
      */
-    private static GridCoverage2D create(final GridCoverage2D coverage, final RenderedOp view,
+    private static GridCoverage2D createView(final GridCoverage2D coverage, final RenderedOp view,
             final GridSampleDimension[] targetBands, final int code)
     {
         final InternationalString name = coverage.getName();
@@ -639,7 +679,7 @@ testLinear: for (int i=0; i<numBands; i++) {
 
     /**
      * Disposes all views and returns the remaining ones. Disposed views are removed from
-     * this {@code GridCoverageViews}, but may be recreated if the user asks them again.
+     * this {@code ViewsManager}, but may be recreated if the user asks them again.
      * <p>
      * This method is invoked by {@link GridCoverage2D#dispose} method only.
      */

@@ -144,22 +144,25 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Constructs a coverage using the specified coordinate reference system. If the coordinate
      * reference system is {@code null}, then the subclasses must override {@link #getDimension()}.
      *
-     * @param name   The coverage name.
-     * @param crs    The coordinate reference system. This specifies the CRS used when accessing
-     *               a coverage or grid coverage with the {@code evaluate(...)} methods.
-     * @param source The source for this coverage, or {@code null} if none. Source may be (but is
-     *               not limited to) a {@link PlanarImage} or an other {@code AbstractCoverage}
-     *               object.
-     * @param properties The set of properties for this coverage, or {@code null} if there is none.
-     *               Keys are {@link String} objects ({@link javax.media.jai.util.CaselessStringKey}
-     *               are accepted as well), while values may be any {@link Object}.
+     * @param name
+     *          The coverage name.
+     * @param crs
+     *          The coordinate reference system. This specifies the CRS used when accessing
+     *          a coverage or grid coverage with the {@code evaluate(...)} methods.
+     * @param propertySource
+     *          The source for this coverage, or {@code null} if none. Source may be (but is not
+     *          limited to) a {@link PlanarImage} or an other {@code AbstractCoverage} object.
+     * @param properties
+     *          The set of properties for this coverage, or {@code null} if there is none.
+     *          Keys are {@link String} objects ({@link javax.media.jai.util.CaselessStringKey}
+     *          are accepted as well), while values may be any {@link Object}.
      */
     protected AbstractCoverage(final CharSequence             name,
                                final CoordinateReferenceSystem crs,
-                               final PropertySource         source,
+                               final PropertySource propertySource,
                                final Map<?,?>           properties)
     {
-        super(properties, source);
+        super(properties, propertySource);
         this.name = SimpleInternationalString.wrap(name);
         this.crs  = crs;
     }
@@ -170,8 +173,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * <strong>Note:</strong> This constructor keeps a strong reference to the source
      * coverage (through {@link PropertySourceImpl}).
      *
-     * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
-     * @param coverage The source coverage.
+     * @param name
+     *          The name for this coverage, or {@code null} for the same than {@code coverage}.
+     * @param coverage
+     *          The source coverage.
      */
     protected AbstractCoverage(final CharSequence name, final Coverage coverage) {
         super(null, (coverage instanceof PropertySource) ? (PropertySource) coverage : null);

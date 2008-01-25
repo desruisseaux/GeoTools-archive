@@ -16,21 +16,15 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
 import javax.media.jai.Interpolation;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
-
-// Geotools dependencies
-import org.geotools.coverage.grid.Interpolator2D;
 
 
 /**

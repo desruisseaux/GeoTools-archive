@@ -33,7 +33,6 @@ import javax.units.Unit;
 import javax.media.jai.JAI;
 
 import org.opengis.coverage.ColorInterpretation;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.PaletteInterpretation;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.SampleDimensionType;
@@ -90,11 +89,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6026936545776852758L;
-
-    /**
-     * An empty array of metadata names.
-     */
-    private static final String[] EMPTY_METADATA = new String[0];
 
     /**
      * A sample dimension wrapping the list of categories {@code CategoryList.inverse}.
@@ -1372,37 +1366,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             }
         }
         return changed ? new GridSampleDimension(description, categories, getUnits()) : this;
-    }
-
-    /**
-     * The list of metadata keywords for a sample dimension.
-     * If no metadata is available, the sequence will be empty.
-     *
-     * @return The list of metadata keywords for a sample dimension.
-     *
-     * @see #getMetadataValue
-     * @see javax.media.jai.PropertySource#getPropertyNames
-     *
-     * @deprecated Not implemented.
-     */
-    public String[] getMetaDataNames() {
-        return EMPTY_METADATA;
-    }
-
-    /**
-     * Retrieve the metadata value for a given metadata name.
-     *
-     * @param  name Metadata keyword for which to retrieve metadata.
-     * @return The metadata value for a given metadata name.
-     * @throws MetadataNameNotFoundException if there is no value for the specified metadata name.
-     *
-     * @see #getMetaDataNames
-     * @see javax.media.jai.PropertySource#getProperty
-     *
-     * @deprecated Not implemented.
-     */
-    public String getMetadataValue(String name) throws MetadataNameNotFoundException {
-        throw new MetadataNameNotFoundException();
     }
 
     /**

@@ -357,8 +357,8 @@ public class TextMatrixImageReader extends TextImageReader {
      * public final class MyCustomSpi extends TextMatrixImageReader.Spi {
      *     public MyCustomSpi() {
      *         {@link #names      names}      = new String[] {"myformat"};
-     *         {@link #MIMETypes  MIMETypes}  = new String[] {"text/x-mytype"};
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
+     *         {@link #MIMETypes  MIMETypes}  = new String[] {"text/plain"};
+     *         {@link #vendorName vendorName} = "Foo inc.";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -381,12 +381,12 @@ public class TextMatrixImageReader extends TextImageReader {
         /**
          * The format names for the default {@link TextMatrixImageReader} configuration.
          */
-        private static final String[] NAMES = {"matrix"};
+        static final String[] NAMES = {"matrix"};
 
         /**
          * The mime types for the default {@link TextMatrixImageReader} configuration.
          */
-        private static final String[] MIME_TYPES = {"text/x-matrix"};
+        static final String[] MIME_TYPES = {"application/matrix", "text/plain"};
 
         /**
          * Constructs a default {@code TextMatrixImageReader.Spi}. This constructor

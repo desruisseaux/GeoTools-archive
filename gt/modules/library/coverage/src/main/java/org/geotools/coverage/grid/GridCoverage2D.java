@@ -136,6 +136,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
 
     /**
      * {@code true} is all sample in the image are geophysics values.
+     *
+     * @deprecated Not used at this time. Need to be replaced by an {@code EnumSet<ViewType>}.
      */
     private final boolean isGeophysics;
 
@@ -161,7 +163,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
      * @param coverage The source grid coverage.
+     *
+     * @deprecated Extends {@link Calculator2D} instead. This constructor will become
+     *             package-privated in a future GeoTools version.
      */
+    @Deprecated
     protected GridCoverage2D(final CharSequence   name,
                              final GridCoverage2D coverage)
     {
@@ -511,7 +517,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 try {
                     arbitraryToInternal.transform(point);
                 } catch (TransformException exception) {
-                    throw new CannotEvaluateException(pointOutsideCoverage(point), exception);
+                    throw new CannotEvaluateException(formatEvaluateError(point, false), exception);
                 }
                 return arbitraryToInternal.toPoint2D();
             }
@@ -557,7 +563,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**
@@ -583,7 +589,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**
@@ -609,7 +615,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 return image.getTile(image.XToTileX(x), image.YToTileY(y)).getPixel(x, y, dest);
             }
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**
@@ -695,7 +701,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     @Override
     public void show(String title, final int xAxis, final int yAxis) {
-        final GridCoverage2D displayable = geophysics(false);
+        final GridCoverage2D displayable = view(ViewType.RENDERED);
         if (displayable != this) {
             displayable.show(title, xAxis, yAxis);
             return;
@@ -847,34 +853,72 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         synchronized (this) {
             if (views == null) {
-                views = new GridCoverageViews(this);
+                views = GridCoverageViews.create(this);
             }
         }
-        return views.get(type);
+        // Do not synchronize past this point, because ViewsManager.get is already
+        // synchronized. We need to rely on ViewsManager locking because the views
+        // are shared among many GridCoverage2D instances.
+        return views.get(this, type);
     }
 
     /**
-     * Invoked by {@link #view} when the packed or geophysics view of this grid coverage needs to
-     * be created. Subclasses may override this method in order to modify the object to be created.
-     *
-     * @param  type The kind of view wanted.
-     * @return The grid coverage. Never {@code null}, but may be {@code this}.
+     * Returns the native view to be given to a newly created {@link ViewsManager}.  For
+     * {@link GridCoverage2D}, this is always {@code this} because the first coverage to
+     * instantiate a {@link ViewsManager} can not be anything else than native, since the
+     * views do not exist yet. For {@link Calculator2D} (which is a decorator around an
+     * other {@link GridCoverage2D}), we use the native view of its source.
      */
-    GridCoverage2D createView(final ViewType type) {
-        return GridCoverageViews.create(this, type);
+    GridCoverage2D getNativeView() {
+        return this;
     }
 
     /**
-     * Sets the view to the specified value. For internal use by {@link GridCoverageViews} only.
-     *
-     * @todo This information should be detected automatically at construction time instead.
+     * Invoked (indirectly) by <code>{@linkplain #view view}(type)</code> when the
+     * {@linkplain ViewType#PACKED packed}, {@linkplain ViewType#GEOPHYSICS geophysics} or
+     * {@linkplain ViewType#PHOTOGRAPHIC photographic} view of this grid coverage needs to
+     * be created.
+     * <p>
+     * This method is defined here for {@link ViewsManager} needs, which invokes it. But it
+     * make sense only for {@link Calculator2D}, which override it with protected access.
+     * For other subclasses, we do not allow overriding (i.e. we keep this method package-
+     * privated) on purpose. See {@link #getViewClass} for the reason.
      */
-    final synchronized void setViews(final GridCoverageViews views) {
-        if (this.views == null) {
-            this.views = views;
-        } else if (this.views != views) {
-            throw new IllegalStateException();
+    GridCoverage2D specialize(final GridCoverage2D view) {
+        return view;
+    }
+
+    /**
+     * Returns the base class of the view returned by {@link #specialize}, or {@code null} if
+     * unknown. This method is invoked by {@link ViewsManager#create} in order to determine
+     * if a given coverage can share its views with an other coverage. The condition tested
+     * by {@link ViewsManager} (namely: coverages have the same image, same grid geometry and
+     * same sample dimensions) are suffisient only if the coverages build the views in the same
+     * way. The last condition can be garantee only if we know how {@link #specialize} is
+     * implemented. It is safe for non-{@link Calculator2D} classes (because users can not
+     * override {@link #specialize} and for final classes like {@link Interpolator2D}, but
+     * the later must returns a different class in order to tells {@link ViewsManager} that
+     * it does not build the views in the same way.
+     */
+    Class<? extends GridCoverage2D> getViewClass() {
+        return GridCoverage2D.class;
+    }
+
+    /**
+     * Copies the views from this class into the specified coverage and returns them. The views
+     * are actually shared, i.e. views created for one coverage can be used by the other. This
+     * method is for internal use by {@link GridCoverageViews} only.
+     */
+    final synchronized GridCoverageViews copyViewsTo(final GridCoverage2D target) {
+        if (views == null) {
+            views = GridCoverageViews.create(this);
         }
+        if (target.views == null) {
+            target.views = views;
+        } else if (target.views != views) {
+            throw new IllegalStateException(); // As a safety, but should never happen.
+        }
+        return views;
     }
 
     /**

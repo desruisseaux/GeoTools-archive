@@ -39,13 +39,12 @@ import org.opengis.referencing.operation.TransformException;
  * (use the plain {@link GridCoverage2D} class for that). It should work for other kinds of
  * interpolation however.
  *
+ * @since 2.2
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.2
  */
-public final class Interpolator2D extends GridCoverage2D {
+public final class Interpolator2D extends Calculator2D {
     /**
      * For cross-version compatibility.
      */
@@ -152,8 +151,8 @@ public final class Interpolator2D extends GridCoverage2D {
      * @param  interpolations The interpolation to use and its fallback (if any).
      */
     public static GridCoverage2D create(GridCoverage2D coverage, final Interpolation[] interpolations) {
-        while (coverage instanceof Interpolator2D) {
-            coverage = ((Interpolator2D)coverage).getSource();
+        while (coverage instanceof Calculator2D) {
+            coverage = ((Calculator2D) coverage).source;
         }
         if (interpolations.length==0 || (interpolations[0] instanceof InterpolationNearest)) {
             return coverage;
@@ -242,25 +241,28 @@ public final class Interpolator2D extends GridCoverage2D {
     }
 
     /**
-     * Returns the source grid coverage.
+     * Invoked by <code>{@linkplain #view view}(type)</code> when the {@linkplain ViewType#PACKED
+     * packed}, {@linkplain ViewType#GEOPHYSICS geophysics} or {@linkplain ViewType#PHOTOGRAPHIC
+     * photographic} view of this grid coverage needs to be created. This method applies to the
+     * new grid coverage the same {@linkplain #getInterpolations interpolations} than this grid
+     * coverage.
+     *
+     * @param  view A view derived from the {@linkplain #source source} coverage.
+     * @return The grid coverage to be returned by {@link #view view}.
+     *
+     * @since 2.5
      */
-    private GridCoverage2D getSource() {
-        final List sources = getSources();
-        assert sources.size() == 1 : sources;
-        return (GridCoverage2D) sources.get(0);
+    @Override
+    protected GridCoverage2D specialize(final GridCoverage2D view) {
+        return create(view, getInterpolations());
     }
 
     /**
-     * Invoked by {@link #view} when the packed or geophysics view of this grid coverage needs to
-     * be created. This method applies to the new grid coverage the same interpolation than this
-     * grid coverage.
-     *
-     * @param  type The kind of view wanted.
-     * @return The grid coverage. Never {@code null}, but may be {@code this}.
+     * Returns the class of the view returned by {@link #specialize}.
      */
     @Override
-    GridCoverage2D createView(final ViewType type) {
-        return create(getSource().view(type), getInterpolations());
+    Class<Interpolator2D> getViewClass() {
+        return Interpolator2D.class;
     }
 
     /**
@@ -316,9 +318,9 @@ public final class Interpolator2D extends GridCoverage2D {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
+            throw new CannotEvaluateException(formatEvaluateError(coord, false), exception);
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**
@@ -347,9 +349,9 @@ public final class Interpolator2D extends GridCoverage2D {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
+            throw new CannotEvaluateException(formatEvaluateError(coord, false), exception);
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**
@@ -378,9 +380,9 @@ public final class Interpolator2D extends GridCoverage2D {
                 }
             }
         } catch (TransformException exception) {
-            throw new CannotEvaluateException(/*coord*/ null, exception); // TODO
+            throw new CannotEvaluateException(formatEvaluateError(coord, false), exception);
         }
-        throw new PointOutsideCoverageException(pointOutsideCoverage(coord));
+        throw new PointOutsideCoverageException(formatEvaluateError(coord, true));
     }
 
     /**

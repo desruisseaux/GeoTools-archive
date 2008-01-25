@@ -118,16 +118,6 @@ public class TextMatrixImageWriter extends TextImageWriter {
      */
     public static class Spi extends TextImageWriter.Spi {
         /**
-         * The format names for the default {@link TextMatrixImageWriter} configuration.
-         */
-        private static final String[] NAMES = {"matrix"};
-
-        /**
-         * The mime types for the default {@link TextMatrixImageWriter} configuration.
-         */
-        private static final String[] MIME_TYPES = {"text/x-matrix"};
-
-        /**
          * Constructs a default {@code TextMatrixImageWriter.Spi}. This constructor
          * provides the following defaults in addition to the defaults defined in the
          * {@linkplain TextImageWriter.Spi#Spi super-class constructor}:
@@ -143,8 +133,8 @@ public class TextMatrixImageWriter extends TextImageWriter {
          * can assign new arrays, but should not modify the default array content.
          */
         public Spi() {
-            names           = NAMES;
-            MIMETypes       = MIME_TYPES;
+            names           = TextMatrixImageReader.Spi.NAMES;
+            MIMETypes       = TextMatrixImageReader.Spi.MIME_TYPES;
             pluginClassName = "org.geotools.image.io.text.TextMatrixImageWriter";
             vendorName      = "Geotools";
             version         = "2.4";
