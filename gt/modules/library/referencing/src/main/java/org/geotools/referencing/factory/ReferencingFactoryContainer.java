@@ -583,8 +583,8 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
             if (candidate instanceof VerticalCRS) {
                 if (vertical == null) {
                     vertical = (VerticalCRS) candidate;
-                    if (VerticalDatumType.ELLIPSOIDAL.equals( // TODO: remove cast with J2SE 1.5.
-                        ((VerticalDatum) vertical.getDatum()).getVerticalDatumType()))
+                    if (VerticalDatumType.ELLIPSOIDAL.equals(
+                            vertical.getDatum().getVerticalDatumType()))
                     {
                         vi = i;
                         continue;
@@ -673,7 +673,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
              * Merges a 2D projected CRS with the vertical CRS.
              */
             final ProjectedCRS projected = (ProjectedCRS) horizontal;
-            GeographicCRS baseCRS = (GeographicCRS) projected.getBaseCRS();
+            GeographicCRS baseCRS = projected.getBaseCRS();
             baseCRS = (GeographicCRS) toGeodetic3D(null, baseCRS, vertical, classic);
             final Conversion projection  = projected.getConversionFromBase();
             single = createProjectedCRS(crsName, baseCRS, projection,

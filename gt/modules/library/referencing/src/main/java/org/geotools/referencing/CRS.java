@@ -172,19 +172,7 @@ public final class CRS {
     {
         CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
         if (factory == null) try {
-            final Hints hints = GeoTools.getDefaultHints();
-            if (longitudeFirst) {
-                hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-            } else {
-                /*
-                 * Do NOT set the hint to false. If 'longitudeFirst' is not set, this means
-                 * "use the system default", not "latitude first". The longitude may or may
-                 * not be first depending the value of "org.geotools.referencing.forcexy"
-                 * system property. This state is included in GeoTools.getDefaultHints().
-                 * If we don't behave that way, the 'decode(String)' method will fails.
-                 */
-            }
-            factory = new DefaultAuthorityFactory(hints);
+            factory = new DefaultAuthorityFactory(longitudeFirst);
             if (longitudeFirst) {
                 xyFactory = factory;
             } else {
@@ -354,17 +342,23 @@ public final class CRS {
     }
 
     /**
-     * Return a Coordinate Reference System for the specified code, maybe forcing the
-     * axis order to (<var>longitude</var>,<var>latitude</var>). This method is similar
-     * to <code>{@linkplain #decode(String) decode}(code)</code>, except that the
-     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER}
-     * hint is set to {@link Boolean#TRUE TRUE} if and only if the {@code longitudeFirst}
-     * argument value is {@code true}.
+     * Return a Coordinate Reference System for the specified code, maybe forcing the axis order
+     * to (<var>longitude</var>, <var>latitude</var>). The {@code code} argument value is parsed
+     * as in "<code>{@linkplain #decode(String) decode}(code)</code>". The {@code longitudeFirst}
+     * argument value controls the hints to be given to the {@linkplain ReferencingFactoryFinder
+     * factory finder} as in the following pseudo-code:
      * <p>
-     * If the {@code longitudeFirst} argument value is {@code false} (which is the default value),
-     * then the {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER}
-     * hint is left unset. This is <strong>not</strong> equivalent to setting the above-cited hint
-     * to {@link Boolean#FALSE FALSE}. The following table explain the different meanings:
+     * <blockquote><pre>
+     * if (longitudeFirst) {
+     *     hints.put({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, {@linkplain Boolean#TRUE});
+     * } else {
+     *     // Do not set the FORCE_LONGITUDE_FIRST_AXIS_ORDER hint to FALSE.
+     *     // Left it unset, which means "use system default".
+     * }
+     * </pre></blockquote>
+     *
+     * The following table compare this method {@code longitudeFirst} argument with the
+     * hint meaning:
      * <p>
      * <table border='1'>
      * <tr>
@@ -376,13 +370,13 @@ public final class CRS {
      *   <td>{@code true}</td>
      *   <td>{@link Boolean#TRUE TRUE}</td>
      *   <td>All coordinate reference systems are forced to
-     *       (<var>longitude</var>,<var>latitude</var>) axis order.</td>
+     *       (<var>longitude</var>, <var>latitude</var>) axis order.</td>
      * </tr>
      * <tr>
      *   <td>{@code false}</td>
      *   <td>{@code null}</td>
      *   <td>Coordinate reference systems may or may not be forced to
-     *       (<var>longitude</var>,<var>latitude</var>) axis order. The behavior depends on user
+     *       (<var>longitude</var>, <var>latitude</var>) axis order. The behavior depends on user
      *       setting, for example the value of the <code>{@value
      *       org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
      *       system property.</td>
@@ -390,7 +384,7 @@ public final class CRS {
      * <tr>
      *   <td></td>
      *   <td>{@link Boolean#FALSE FALSE}</td>
-     *   <td>Forcing (<var>longitude</var>,<var>latitude</var>) axis order is not allowed,
+     *   <td>Forcing (<var>longitude</var>, <var>latitude</var>) axis order is not allowed,
      *       no matter the value of the <code>{@value
      *       org.geotools.referencing.factory.epsg.LongitudeFirstFactory#SYSTEM_DEFAULT_KEY}</code>
      *       system property.</td>
@@ -399,7 +393,7 @@ public final class CRS {
      *
      * @param  code The Coordinate Reference System authority code.
      * @param  longitudeFirst {@code true} if axis order should be forced to
-     *         (<var>longitude</var>,<var>latitude</var>). Note that {@code false} means
+     *         (<var>longitude</var>, <var>latitude</var>). Note that {@code false} means
      *         "<cite>use default</cite>", <strong>not</strong> "<cite>latitude first</cite>".
      * @return The Coordinate Reference System for the provided code.
      * @throws NoSuchAuthorityCodeException If the code could not be understood.
@@ -800,7 +794,7 @@ public final class CRS {
             return id.getCode();
         }
         for (final CRSAuthorityFactory factory : ReferencingFactoryFinder
-                .getCRSAuthorityFactories(FORCE_LONGITUDE_FIRST_AXIS_ORDER))
+                    .getCRSAuthorityFactories(FORCE_LONGITUDE_FIRST_AXIS_ORDER))
         {
             if (!Citations.identifierMatches(factory.getAuthority(), authority)) {
                 continue;

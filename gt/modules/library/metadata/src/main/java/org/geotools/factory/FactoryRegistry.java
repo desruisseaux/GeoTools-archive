@@ -122,6 +122,29 @@ public class FactoryRegistry extends ServiceRegistry {
     private final Set<Factory> testingHints = new HashSet<Factory>();
 
     /**
+     * Constructs a new registry for the specified category.
+     *
+     * @param category The single category.
+     *
+     * @since 2.4
+     */
+    @SuppressWarnings("unchecked")
+    public FactoryRegistry(final Class<?> category) {
+        this((Collection) Collections.singleton(category));
+    }
+
+    /**
+     * Constructs a new registry for the specified categories.
+     *
+     * @param categories The categories.
+     *
+     * @since 2.4
+     */
+    public FactoryRegistry(final Class<?>[] categories) {
+        this(Arrays.asList(categories));
+    }
+
+    /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.

@@ -73,37 +73,28 @@ public final class HTTP_AuthorityFactoryTest extends TestCase {
         assertNull(Hints.getSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING));
 
         // Standard behavior should be to set FORCE_LONGITUDE_FIRST_AXIS_ORDER to false.
-        Hints hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-        assertNotNull(hints);
-        assertEquals(Boolean.FALSE, hints.get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+        assertFalse(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
 
         try {
             // The hints should be ignored.
             Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-            hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-            assertNotNull("The hint should be ignored.", hints);
-            assertEquals(Boolean.FALSE, hints.get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+            assertFalse(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
 
             // The hints should be honored.
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "http");
-            hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-            assertNull("The hint should be honored.", hints);
+            assertTrue(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
 
             // The hints should be ignored.
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "urn");
-            hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-            assertNotNull("The hint should be ignored.", hints);
-            assertEquals(Boolean.FALSE, hints.get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+            assertFalse(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
 
             // The hints should be honored.
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "http, urn");
-            hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-            assertNull("The hint should be honored.", hints);
+            assertTrue(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
 
             // The hints should be honored.
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "urn, http");
-            hints = HTTP_AuthorityFactory.defaultAxisOrderHints("http");
-            assertNull("The hint should be honored.", hints);
+            assertTrue(HTTP_AuthorityFactory.defaultAxisOrderHints(null, "http"));
         } finally {
             Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
             Hints.removeSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);

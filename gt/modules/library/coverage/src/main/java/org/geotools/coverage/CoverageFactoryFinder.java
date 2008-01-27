@@ -18,8 +18,8 @@ package org.geotools.coverage;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
@@ -36,7 +36,7 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CoverageFactoryFinder {
+public final class CoverageFactoryFinder extends FactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -79,9 +79,8 @@ public final class CoverageFactoryFinder {
     public static synchronized GridCoverageFactory getGridCoverageFactory(Hints hints)
             throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
-        return (GridCoverageFactory) getServiceRegistry().getServiceProvider(
-                GridCoverageFactory.class, null, hints, null);
+        hints = mergeSystemHints(hints);
+        return getServiceRegistry().getServiceProvider(GridCoverageFactory.class, null, hints, null);
     }
 
     /**
@@ -92,9 +91,9 @@ public final class CoverageFactoryFinder {
      *
      * @since 2.4
      */
-    public static synchronized Set getGridCoverageFactories(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
-        return new LazySet(getServiceRegistry().getServiceProviders(
+    public static synchronized Set<GridCoverageFactory> getGridCoverageFactories(Hints hints) {
+        hints = mergeSystemHints(hints);
+        return new LazySet<GridCoverageFactory>(getServiceRegistry().getServiceProviders(
                 GridCoverageFactory.class, null, hints));
     }
 

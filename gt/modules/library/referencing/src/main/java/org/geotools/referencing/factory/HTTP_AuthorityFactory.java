@@ -63,7 +63,7 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * Creates a default wrapper.
      */
     public HTTP_AuthorityFactory() {
-        this(defaultAxisOrderHints("http"));
+        this((Hints) null);
     }
 
     /**
@@ -75,7 +75,7 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * @param userHints The hints to be given to backing factories.
      */
     public HTTP_AuthorityFactory(final Hints userHints) {
-        this(getFactory(userHints));
+        this(getFactory(userHints, "http"));
     }
 
     /**
@@ -88,17 +88,23 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
     }
 
     /**
-     * Set {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} to {@code false}, unless system
-     * {@link Hints#FORCE_AXIS_ORDER_HONORING} is set to the specified authority. This method
-     * is invoked for factories that are usually not allowed to change the axis order.
+     * Returns {@code false} if {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} should be set to
+     * {@link Boolean#FALSE}. This method compares {@link Hints#FORCE_AXIS_ORDER_HONORING} with
+     * the specified authority.
      *
+     * @param  hints The hints to use (may be {@code null}).
      * @param  authority The authority factory under creation.
-     * @return The hints to use (may be {@code null}).
      *
-     * @deprecated Should not looks at system hints; this is {@link ReferencingFactoryFinder}'s job.
+     * @todo Should not looks at system hints; this is {@link ReferencingFactoryFinder}'s job.
      */
-    static Hints defaultAxisOrderHints(final String authority) {
-        final Object value = Hints.getSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);
+    static boolean defaultAxisOrderHints(final Hints hints, final String authority) {
+        Object value = null;
+        if (hints != null) {
+            value = hints.get(Hints.FORCE_AXIS_ORDER_HONORING);
+        }
+        if (value == null) {
+            value = Hints.getSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);
+        }
         if (value instanceof CharSequence) {
             final String list = value.toString();
             int i = 0;
@@ -107,27 +113,34 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
                     final int j = i + authority.length();
                     if (j==list.length() || !Character.isJavaIdentifierPart(list.charAt(j))) {
                         // Found the authority in the list: we need to use the global setting.
-                        return null;
+                        return true;
                     }
                 }
                 i++;
             }
         }
-        return new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        return false;
     }
 
     /**
      * Returns a factory from the specified hints. Used by {@link URN_AuthorityFactory}
      * constructor as well.
      */
-    static AllAuthoritiesFactory getFactory(final Hints hints) {
-        return (hints == null || hints.isEmpty()) ? AllAuthoritiesFactory.DEFAULT :
-            new AllAuthoritiesFactory(hints);
+    static AllAuthoritiesFactory getFactory(Hints hints, final String authority) {
+        if (hints == null || hints.isEmpty()) {
+            return AllAuthoritiesFactory.DEFAULT;
+        }
+        if (!defaultAxisOrderHints(hints, authority)) {
+            hints = new Hints(hints);
+            hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        }
+        return new AllAuthoritiesFactory(hints);
     }
 
     /**
      * Returns the authority, which contains the {@code "http://www.opengis.net"} identifier.
      */
+    @Override
     public Citation getAuthority() {
         return Citations.HTTP_OGC;
     }
@@ -140,6 +153,7 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * @return The code to give to the underlying factories.
      * @throws FactoryException if the code can't be converted.
      */
+    @Override
     protected String toBackingFactoryCode(String code) throws FactoryException {
         code = code.trim();
         final int length = BASE_URL.length();

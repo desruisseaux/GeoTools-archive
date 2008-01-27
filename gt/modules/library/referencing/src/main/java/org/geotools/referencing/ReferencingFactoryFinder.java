@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 import java.util.Locale;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import javax.imageio.spi.ServiceRegistry;
@@ -41,6 +40,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 
 import org.geotools.factory.Hints;
 import org.geotools.factory.GeoTools;
+import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
@@ -84,7 +84,7 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferencingFactoryFinder {
+public final class ReferencingFactoryFinder extends FactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -97,15 +97,9 @@ public class ReferencingFactoryFinder {
     private static Set<String> authorityNames;
 
     /**
-     * A special instance meaning "no hints", not even the
-     * {@linkplain GeoTools#getDefaultHints GeoTools default hints}.
-     */
-    private static final Hints NULL_HINTS = new Hints();
-
-    /**
      * Do not allows any instantiation of this class.
      */
-    ReferencingFactoryFinder() {
+    private ReferencingFactoryFinder() {
         // singleton
     }
 
@@ -116,7 +110,7 @@ public class ReferencingFactoryFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(ReferencingFactoryFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
+            registry = new FactoryCreator(new Class<?>[] {
                     DatumFactory.class,
                     CSFactory.class,
                     CRSFactory.class,
@@ -125,7 +119,7 @@ public class ReferencingFactoryFinder {
                     CRSAuthorityFactory.class,
                     MathTransformFactory.class,
                     CoordinateOperationFactory.class,
-                    CoordinateOperationAuthorityFactory.class}));
+                    CoordinateOperationAuthorityFactory.class});
         }
         return registry;
     }
@@ -144,7 +138,8 @@ public class ReferencingFactoryFinder {
          */
         if (authorityNames == null) {
             authorityNames = new LinkedHashSet<String>();
-            final Hints hints = NULL_HINTS;
+            final Hints hints = mergeSystemHints(null);
+            hints.clear(); // We want an empty StrictHints instance.
 loop:       for (int i=0; ; i++) {
                 final Set<? extends AuthorityFactory> factories;
                 switch (i) {
@@ -170,36 +165,34 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * Returns all providers of the specified type.
+     * Returns all providers of the specified category.
      *
-     * @param  type  The factory type.
+     * @param  category The factory category.
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available factory implementations.
      */
     private static synchronized <T extends Factory>
-            Set<T> getFactories(final Class<T> type, Hints hints)
+            Set<T> getFactories(final Class<T> category, Hints hints)
     {
-        if (hints != NULL_HINTS) {
-            hints = GeoTools.addDefaultHints(hints);
-        }
-        return new LazySet<T>(getServiceRegistry().getServiceProviders(type, null, hints));
+        hints = mergeSystemHints(hints);
+        return new LazySet<T>(getServiceRegistry().getServiceProviders(category, null, hints));
     }
 
     /**
-     * Returns a provider of the specified type.
+     * Returns a provider of the specified category.
      *
-     * @param  type  The factory type.
+     * @param  category The factory category.
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @param  key   The hint key to use for searching an implementation.
+     * @param  key The hint key to use for searching an implementation.
      * @return The first factory that matches the supplied hints.
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         specified interface.
      */
-    private static synchronized <T extends Factory> T getFactory(final Class<T> type,
+    private static synchronized <T extends Factory> T getFactory(final Class<T> category,
             Hints hints, final Hints.Key key) throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
-        return getServiceRegistry().getServiceProvider(type, null, hints, key);
+        hints = mergeSystemHints(hints);
+        return getServiceRegistry().getServiceProvider(category, null, hints, key);
     }
 
     /**
@@ -209,20 +202,20 @@ loop:       for (int i=0; ; i++) {
      * {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
      *
-     * @param  type      The authority factory type.
+     * @param  category  The authority factory type.
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints     An optional map of hints, or {@code null} if none.
-     * @param  key   The hint key to use for searching an implementation.
+     * @param  key       The hint key to use for searching an implementation.
      * @return The first authority factory that matches the supplied hints.
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         specfied interface.
      */
     private static synchronized <T extends AuthorityFactory> T getAuthorityFactory(
-            final Class<T> type, final String authority, Hints hints, final Hints.Key key)
+            final Class<T> category, final String authority, Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
-        return getServiceRegistry().getServiceProvider(type, new AuthorityFilter(authority), hints, key);
+        hints = mergeSystemHints(hints);
+        return getServiceRegistry().getServiceProvider(category, new AuthorityFilter(authority), hints, key);
     }
 
     /**
@@ -488,7 +481,9 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation authority factory implementations.
      */
-    public static Set<CoordinateOperationAuthorityFactory> getCoordinateOperationAuthorityFactories(final Hints hints) {
+    public static Set<CoordinateOperationAuthorityFactory> getCoordinateOperationAuthorityFactories(
+            final Hints hints)
+    {
         return getFactories(CoordinateOperationAuthorityFactory.class, hints);
     }
 
@@ -679,14 +674,12 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * Scans for factory plug-ins on the application class path. This method is
-     * needed because the application class path can theoretically change, or
-     * additional plug-ins may become available. Rather than re-scanning the
-     * classpath on every invocation of the API, the class path is scanned
-     * automatically only on the first invocation. Clients can call this
-     * method to prompt a re-scan. Thus this method need only be invoked by
-     * sophisticated applications which dynamically make new plug-ins
-     * available at runtime.
+     * Scans for factory plug-ins on the application class path. This method is needed because the
+     * application class path can theoretically change, or additional plug-ins may become available.
+     * Rather than re-scanning the classpath on every invocation of the API, the class path is
+     * scanned automatically only on the first invocation. Clients can call this method to prompt
+     * a re-scan. Thus this method need only be invoked by sophisticated applications which
+     * dynamically make new plug-ins available at runtime.
      */
     public static void scanForPlugins() {
         synchronized (ReferencingFactoryFinder.class) {

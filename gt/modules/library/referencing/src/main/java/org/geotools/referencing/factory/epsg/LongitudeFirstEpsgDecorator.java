@@ -139,6 +139,7 @@ public class LongitudeFirstEpsgDecorator extends DeferredAuthorityFactory
      * This authority will contains the database version in the {@linkplain Citation#getEdition
      * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
      */
+    @Override
     public Citation getAuthority() {
         return Citations.EPSG;
     }

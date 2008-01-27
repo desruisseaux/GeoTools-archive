@@ -91,16 +91,18 @@ public class DimensionFilter {
     private final MathTransformFactory factory;
 
     /**
-     * Constructs a dimension filter with the {@linkplain ReferencingFactoryFinder#getMathTransformFactory
-     * default math transform factory}.
+     * Constructs a dimension filter with the
+     * {@linkplain ReferencingFactoryFinder#getMathTransformFactory default math transform factory}.
      */
     public DimensionFilter() {
         this(ReferencingFactoryFinder.getMathTransformFactory(null));
     }
     
     /**
-     * Constructs a dimension filter with a {@linkplain ReferencingFactoryFinder#getMathTransformFactory
-     * math transform factory built using the provided hints}.
+     * Constructs a dimension filter with a
+     * {@linkplain ReferencingFactoryFinder#getMathTransformFactory math transform factory
+     * built using the provided hints}.
+     *
      * @param hints to control the creation of the {@link MathTransformFactory}.
      */
     public DimensionFilter(Hints hints) {

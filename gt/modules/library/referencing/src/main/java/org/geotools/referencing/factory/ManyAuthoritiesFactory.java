@@ -564,14 +564,16 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     /**
      * Returns the set of authority codes of the given type.
      *
-     * @param  type The spatial reference objects type (may be {@code Object.class}).
+     * @param  type The spatial reference objects type (may be {@code IdentifiedObject.class}).
      * @return The set of authority codes for spatial reference objects of the given type.
      *         If this factory doesn't contains any object of the given type, then this method
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
      */
     @Override
-    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class<? extends IdentifiedObject> type)
+            throws FactoryException
+    {
         if (Boolean.TRUE.equals(inProgress.get())) {
             /*
              * 'getAuthorityCodes' is invoking itself (indirectly). Returns an empty set in order

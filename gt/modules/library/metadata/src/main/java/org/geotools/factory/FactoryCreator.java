@@ -58,6 +58,28 @@ public class FactoryCreator extends FactoryRegistry {
     private final Set<Class<?>> underConstruction = new HashSet<Class<?>>();
 
     /**
+     * Constructs a new registry for the specified category.
+     *
+     * @param category The single category.
+     *
+     * @since 2.4
+     */
+    public FactoryCreator(final Class<?> category) {
+        super(category);
+    }
+
+    /**
+     * Constructs a new registry for the specified categories.
+     *
+     * @param categories The categories.
+     *
+     * @since 2.4
+     */
+    public FactoryCreator(final Class<?>[] categories) {
+        super(categories);
+    }
+
+    /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.

@@ -1,9 +1,8 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *    (C) 2008, GeoTools Project Managment Committee (PMC)
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -14,30 +13,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing;
+package org.geotools.factory;
 
 
 /**
- * Defines static methods used to access the application's default {@linkplain Factory
- * factory} implementation.
- * 
- * @since 2.0
+ * Hints which should not be merged with global hints, usually because the global hints have
+ * already been merged.
+ *
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Renamed as {@link ReferencingFactoryFinder}.
  */
-public final class FactoryFinder extends ReferencingFactoryFinder {
-    /*
-     * TODO: After we removed this class, make ReferencingFactoryFinder final
-     *       and its constructor private.
-     */
-
+final class StrictHints extends Hints {
     /**
-     * Do not allows any instantiation of this class.
+     * Creates a set of strict hints which is a copy of the specified hints.
      */
-    private FactoryFinder() {
-        // singleton
+    public StrictHints(final Hints hints) {
+        super(hints);
     }
 }

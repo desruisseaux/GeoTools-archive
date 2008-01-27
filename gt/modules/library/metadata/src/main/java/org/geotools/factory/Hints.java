@@ -63,7 +63,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public final class Hints extends RenderingHints {
+public class Hints extends RenderingHints {
     /**
      * A set of system-wide hints to use by default.
      */
@@ -972,12 +972,16 @@ public final class Hints extends RenderingHints {
      * Returns a copy of the system hints. This is for
      * {@link GeoTools#getDefaultHints} implementation only.
      */
-    static Hints getDefaults() {
+    static Hints getDefaults(final boolean strict) {
         final boolean changed;
         final Hints hints;
         synchronized (GLOBAL) {
             changed = ensureSystemDefaultLoaded();
-            hints = new Hints(GLOBAL);
+            if (strict) {
+                hints = new StrictHints(GLOBAL);
+            } else {
+                hints = new Hints(GLOBAL);
+            }
         }
         if (changed) {
             GeoTools.fireConfigurationChanged();

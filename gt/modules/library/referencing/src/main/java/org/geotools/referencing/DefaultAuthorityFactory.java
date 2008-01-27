@@ -17,15 +17,21 @@ package org.geotools.referencing;
 
 import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.geotools.factory.Hints;
+import org.geotools.factory.GeoTools;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.ManyAuthoritiesFactory;
 import org.geotools.referencing.factory.ThreadedAuthorityFactory;
 import org.geotools.resources.UnmodifiableArrayList;
@@ -56,10 +62,59 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
     });
 
     /**
-     * Creates a new authority factory with the specified hints.
+     * Creates a new authority factory.
      */
-    DefaultAuthorityFactory(final Hints hints) {
-        super(new ManyAuthoritiesFactory(ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
+    DefaultAuthorityFactory(final boolean longitudeFirst) {
+        super(getBackingFactory(longitudeFirst));
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static AbstractAuthorityFactory getBackingFactory(final boolean longitudeFirst) {
+        final Hints hints = GeoTools.getDefaultHints();
+        if (longitudeFirst) {
+            hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        } else {
+            /*
+             * Do NOT set the hint to false. If 'longitudeFirst' is false, this means
+             * "use the system default", not "latitude first". The longitude may or may
+             * not be first depending the value of "org.geotools.referencing.forcexy"
+             * system property. This state is included in GeoTools.getDefaultHints().
+             */
+        }
+        Collection<CRSAuthorityFactory> factories =
+                ReferencingFactoryFinder.getCRSAuthorityFactories(hints);
+        if (!longitudeFirst &&
+            Boolean.TRUE.equals(hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE)))
+        {
+            /*
+             * If the user didn't asked for longitude first but the global hints contain such
+             * requirement, then we may loose some authorities like "URN:OGC:...". Search again
+             * without such requirement and add any new authorities found.
+             */
+            factories = new ArrayList<CRSAuthorityFactory>(factories);
+            final Set<Citation> authorities = new LinkedHashSet<Citation>();
+            for (final CRSAuthorityFactory factory : factories) {
+                authorities.add(factory.getAuthority());
+            }
+searchNews: for (final CRSAuthorityFactory factory :
+                    ReferencingFactoryFinder.getCRSAuthorityFactories(hints))
+            {
+                final Citation authority = factory.getAuthority();
+                if (authorities.contains(authority)) {
+                    continue;
+                }
+                for (final Citation check : authorities) {
+                    if (Citations.identifierMatches(authority, check)) {
+                        continue searchNews;
+                    }
+                }
+                factories.add(factory);
+            }
+        }
+        return new ManyAuthoritiesFactory(factories);
     }
 
     /**
@@ -107,7 +162,7 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
         }
         return result;
     }
-    
+
     /**
      * Returns the coordinate reference system for the given code.
      */

@@ -365,30 +365,7 @@ public final class GeoTools {
      * @return A copy of the default hints. It is safe to add to it.
      */
     public static Hints getDefaultHints() {
-        return Hints.getDefaults();
-    }
-
-    /**
-     * Returns new hints that combine user supplied hints with the
-     * {@linkplain #getDefaultHints defaults hints}. If a hint is specified in both user
-     * and default hints, then user hints have precedence.
-     * <p>
-     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
-     * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} and synchronization
-     * issues.
-     *
-     * @param hints The user hints, or {@code null} if none.
-     * @return New hints (never {@code null}).
-     *
-     * @since 2.5
-     */
-    public static Hints addDefaultHints(final Hints hints) {
-        final Hints completed = getDefaultHints();
-        if (hints != null) {
-            completed.add(hints);
-        }
-        return completed;
+        return Hints.getDefaults(false);
     }
 
     /**

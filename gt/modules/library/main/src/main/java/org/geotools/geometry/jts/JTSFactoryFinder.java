@@ -15,19 +15,16 @@
  */
 package org.geotools.geometry.jts;
 
-// J2SE dependencies
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Set;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-// Geotools dependencies
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
@@ -43,7 +40,7 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class JTSFactoryFinder {
+public class JTSFactoryFinder extends FactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -85,7 +82,7 @@ public class JTSFactoryFinder {
      *         {@link GeometryFactory} category and the given hints.
      */
     public static synchronized GeometryFactory getGeometryFactory(Hints hints) throws FactoryRegistryException {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (GeometryFactory) getServiceRegistry().getServiceProvider(
                 GeometryFactory.class, null, hints, Hints.JTS_GEOMETRY_FACTORY);
     }
@@ -110,7 +107,7 @@ public class JTSFactoryFinder {
      *         {@link PrecisionModel} category and the given hints.
      */
     public static synchronized PrecisionModel getPrecisionModel(Hints hints) throws FactoryRegistryException {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (PrecisionModel) getServiceRegistry().getServiceProvider(
                 PrecisionModel.class, null, hints, Hints.JTS_PRECISION_MODEL);
     }
@@ -135,7 +132,7 @@ public class JTSFactoryFinder {
      *         {@link CoordinateSequenceFactory} interface and the given hints.
      */
     public static synchronized CoordinateSequenceFactory getCoordinateSequenceFactory(Hints hints) throws FactoryRegistryException {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (CoordinateSequenceFactory) getServiceRegistry().getServiceProvider(
                 CoordinateSequenceFactory.class, null, hints, Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
     }

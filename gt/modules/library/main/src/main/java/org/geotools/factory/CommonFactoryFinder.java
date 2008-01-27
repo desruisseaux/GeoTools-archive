@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.Set;
 
@@ -48,7 +47,7 @@ import org.opengis.filter.expression.Function;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public final class CommonFactoryFinder {
+public final class CommonFactoryFinder extends FactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -97,7 +96,7 @@ public final class CommonFactoryFinder {
     public static synchronized StyleFactory getStyleFactory(Hints hints)
             throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (StyleFactory) getServiceRegistry().getServiceProvider(
                 StyleFactory.class, null, hints, Hints.STYLE_FACTORY);
     }
@@ -109,7 +108,7 @@ public final class CommonFactoryFinder {
      * @return Set of available style factory implementations.
      */
     public static synchronized Set getStyleFactories(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 StyleFactory.class, null, hints));
     }
@@ -122,7 +121,7 @@ public final class CommonFactoryFinder {
      * @deprecated Use FunctionExpression is now @deprecated
      */
     public static synchronized Set getFunctionExpressions(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 Function.class, null, hints));
     }
@@ -135,7 +134,7 @@ public final class CommonFactoryFinder {
      * @return Set of available function expression implementations.
      */
     public static synchronized Set getFunctions(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FunctionImpl.class, null, hints));
     }    
@@ -153,7 +152,7 @@ public final class CommonFactoryFinder {
      * @see Hints#FEATURE_LOCK_FACTORY
      */
     public static synchronized FeatureLockFactory getFeatureLockFactory(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (FeatureLockFactory) getServiceRegistry().getServiceProvider(
                 FeatureLockFactory.class, null, hints, Hints.FEATURE_LOCK_FACTORY);
     }
@@ -165,7 +164,7 @@ public final class CommonFactoryFinder {
      * @return Set<FeatureLockFactory> of available style factory implementations.
      */
     public static synchronized Set getFeatureLockFactories(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureLockFactory.class, null, hints));
     }
@@ -177,7 +176,7 @@ public final class CommonFactoryFinder {
      * @return Set of available file data store factory implementations.
      */
     public static synchronized Set getFileDataStoreFactories(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FileDataStoreFactorySpi.class, null, hints));
     }
@@ -195,7 +194,7 @@ public final class CommonFactoryFinder {
      * @see Hints#FEATURE_COLLECTIONS
      */
     public static synchronized FeatureCollections getFeatureCollections(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (FeatureCollections) getServiceRegistry().getServiceProvider(
                 FeatureCollections.class, null, hints, Hints.FEATURE_COLLECTIONS);
     }
@@ -207,7 +206,7 @@ public final class CommonFactoryFinder {
      * @return Set of available feature collections implementations.
      */
     public static synchronized Set getFeatureCollectionsSet(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FeatureCollections.class, null, hints));
     }    
@@ -227,7 +226,7 @@ public final class CommonFactoryFinder {
     public static synchronized FilterFactory getFilterFactory(Hints hints)
             throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return (FilterFactory) getServiceRegistry().getServiceProvider(
                 FilterFactory.class, null, hints, Hints.FILTER_FACTORY);
     }
@@ -239,7 +238,7 @@ public final class CommonFactoryFinder {
      * @return Set of available filter factory implementations.
      */
     public static synchronized Set getFilterFactories(Hints hints) {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FilterFactory.class, null, hints));
     }
@@ -259,7 +258,7 @@ public final class CommonFactoryFinder {
     public static FilterFactory2 getFilterFactory2(Hints hints)
             throws FactoryRegistryException
     {
-        hints = GeoTools.addDefaultHints(hints);
+        hints = mergeSystemHints(hints);
         
         final Object h = hints.get(Hints.FILTER_FACTORY);
         if (!(h instanceof Class ? FilterFactory2.class.isAssignableFrom((Class) h)

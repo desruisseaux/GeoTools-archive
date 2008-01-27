@@ -39,7 +39,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * name space. An exemple of complete URN is {@code "urn:ogc:def:crs:EPSG:6.8:4326"}.
  * <p>
  * Users don't need to create an instance of this class, since one is automatically
- * registered for use in {@link org.opengis.referencing.GeometryFactoryFinder}.
+ * registered for use in {@link org.opengis.referencing.ReferencingFactoryFinder}.
  *
  * @since 2.4
  * @source $URL$
@@ -81,7 +81,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * Creates a default wrapper.
      */
     public URN_AuthorityFactory() {
-        this(HTTP_AuthorityFactory.defaultAxisOrderHints("urn"));
+        this((Hints) null);
     }
 
     /**
@@ -93,7 +93,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @param userHints The hints to be given to backing factories.
      */
     public URN_AuthorityFactory(final Hints userHints) {
-        this(HTTP_AuthorityFactory.getFactory(userHints));
+        this(HTTP_AuthorityFactory.getFactory(userHints, "urn"));
     }
 
     /**

@@ -54,7 +54,7 @@ import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -65,6 +65,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.image.ImageUtilities;
@@ -184,7 +185,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		if (hints != null) {
 			this.hints.add(hints);
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 		
 		
 		if (source == null) {
@@ -575,7 +576,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					// should check them again
 
 					final CartesianCS cartCS = org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
-					final MathTransformFactory mtFactory = org.geotools.referencing.FactoryFinder
+					final MathTransformFactory mtFactory = ReferencingFactoryFinder
 							.getMathTransformFactory(null);
 					final ParameterValueGroup parameters = mtFactory
 							.getDefaultParameters("Polar_Stereographic");

@@ -521,7 +521,9 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @todo We should returns the union of authority codes from all underlying factories.
      */
-    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class<? extends IdentifiedObject> type)
+            throws FactoryException
+    {
         return getAuthorityFactory(null).getAuthorityCodes(type);
     }
 
@@ -910,7 +912,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         /**
          * Creates a finder for the underlying backing store.
          */
-        protected Finder(final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException {
+        protected Finder(final Class<? extends IdentifiedObject> type) throws FactoryException {
             super(getGeotoolsFactory("getIdentifiedObjectFinder", null).getIdentifiedObjectFinder(type));
         }
 
