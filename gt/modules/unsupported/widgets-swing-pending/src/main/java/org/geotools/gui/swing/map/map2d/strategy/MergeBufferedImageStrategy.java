@@ -268,27 +268,27 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
     public synchronized BufferedImage createBufferImage(MapContext context) {
 
+        synchronized (renderer) {
+            Rectangle newRect = comp.getBounds();
+            Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        Rectangle newRect = comp.getBounds();
-        Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
-
-        if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
-            //NOT OPTIMIZED
+            if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+                //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
-            //GraphicsConfiguration ACCELERATION 
-            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
-            Graphics2D ig = buf.createGraphics();
+                //GraphicsConfiguration ACCELERATION 
+                BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
+                Graphics2D ig = buf.createGraphics();
 
+                renderer.stopRendering();
+                renderer.setContext(context);
+                renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
 
-            renderer.setContext(context);
-            renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
-
-            return buf;
-        } else {
-            return null;
+                return buf;
+            } else {
+                return null;
+            }
         }
-
     }
 
     public BufferedImage getBufferImage() {
@@ -411,11 +411,11 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
         MapLayer[] layers = context.getLayers();
 
-        for (int i= 0,max = layers.length; i<max; i++){
+        for (int i = 0,  max = layers.length; i < max; i++) {
 //        for (int i= layers.length-1; i>=0; i--){
             MapLayer layer = layers[i];
             BufferedImage img = stock.get(layer);
-            if(img != null){
+            if (img != null) {
                 g2d.drawImage(img, null, 0, 0);
             }
         }
@@ -431,7 +431,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
             MapLayer layer = event.getLayer();
             stock.put(layer, createBufferImage(layer));
-            
+
             if (context.getLayers().length == 1) {
                 try {
                     setMapArea(context.getLayerBounds());
@@ -439,7 +439,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
                     e.printStackTrace();
                 }
             }
-            
+
             mergeBuffers();
         }
 

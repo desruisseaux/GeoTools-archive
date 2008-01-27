@@ -269,7 +269,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     
     public synchronized BufferedImage createBufferImage(MapContext context) {
        
-        
+        synchronized (renderer) {
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
@@ -281,13 +281,14 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
 
-
+            renderer.stopRendering();
             renderer.setContext(context);
             renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
                 
             return buf;
         } else {
             return null;
+        }
         }
 
     }

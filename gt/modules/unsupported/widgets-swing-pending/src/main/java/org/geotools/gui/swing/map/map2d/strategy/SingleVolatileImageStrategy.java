@@ -75,9 +75,6 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         this(new ShapefileRenderer());
     }
 
-    
-        
-
     private void opimizeRenderer() {
 
         if (renderer != null) {
@@ -143,28 +140,28 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         return new Envelope(ll, ur);
     }
 
-    
-    private void fitMapArea(){
-        try{
-        if(context != null && context.getAreaOfInterest() != null){
-            setMapArea(context.getAreaOfInterest());
+    private void fitMapArea() {
+        try {
+            if (context != null && context.getAreaOfInterest() != null) {
+                setMapArea(context.getAreaOfInterest());
+            }
+        } catch (Exception e) {
         }
-        }catch(Exception e){}
     }
-        
+
     private void fit() {
 
-        if (checkAspect() ) {
+        if (checkAspect()) {
             testRefresh();
         }
     }
-    
-    private void testRefresh(){
-        if(autorefresh){            
+
+    private void testRefresh() {
+        if (autorefresh) {
             refresh();
         }
     }
-    
+
     private boolean checkAspect() {
         boolean changed = false;
 
@@ -172,23 +169,23 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
         ReferencedEnvelope newAreaOfInterest = null;
         if (context != null) {
-            try{
-            newAreaOfInterest = context.getAreaOfInterest();
-            }catch(Exception e){}
+            try {
+                newAreaOfInterest = context.getAreaOfInterest();
+            } catch (Exception e) {
+            }
 
             if (newAreaOfInterest != null && (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest))) {
                 changed = true;
                 oldRect = newRect;
                 oldAreaOfInterest = newAreaOfInterest;
             }
-            
+
         }
 
         return changed;
     }
 
     //------------------TRIGGERS------------------------------------------------
-    
     private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
         Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
 
@@ -229,27 +226,28 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         }
 
     }
-    
+
     public synchronized BufferedImage createBufferImage(MapContext context) {
+        synchronized (renderer) {
+            Rectangle newRect = comp.getBounds();
+            Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        Rectangle newRect = comp.getBounds();
-        Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
-
-        if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
-            //NOT OPTIMIZED
+            if (context != null && compMapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+                //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
-            //GC ACCELERATION 
-            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
-            Graphics2D ig = buf.createGraphics();
+                //GC ACCELERATION 
+                BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
+                Graphics2D ig = buf.createGraphics();
 
-            renderer.setContext(context);
-            renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
-            return buf;
-        } else {
-            return null;
+                renderer.stopRendering();
+                renderer.setContext(context);
+                renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
+                return buf;
+            } else {
+                return null;
+            }
         }
-
     }
 
     public BufferedImage getBufferImage() {
@@ -296,8 +294,8 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
             Envelope oldenv = context.getAreaOfInterest();
             Envelope env = fixAspectRatio(comp.getBounds(), area, context);
             CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
-            if (env != null && crs != null) {                
-                context.setAreaOfInterest(env, crs);                
+            if (env != null && crs != null) {
+                context.setAreaOfInterest(env, crs);
             }
             fit();
             fireMapAreaChanged(oldenv, env);
@@ -330,23 +328,20 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     public double getRotation() {
         return rotation;
     }
-        
-    public void setAutoRefreshEnabled(boolean ref) {        
-       autorefresh = ref;        
+
+    public void setAutoRefreshEnabled(boolean ref) {
+        autorefresh = ref;
     }
 
     public boolean isAutoRefresh() {
         return autorefresh;
     }
-
-    
     ////////////////////////////////////////////////////////////////////////////
     // ------------- different from SingleBufferedImageStrategy --------------//
     ////////////////////////////////////////////////////////////////////////////
-    
     private boolean isDrawing = false;
     private final RepaintingThread paintingThread = new RepaintingThread();
-    
+
     /**
      * create a default SingleBufferedImageStrategy with a specific GTRenderer
      * @param renderer
@@ -358,7 +353,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
         comp.addComponentListener(new ComponentListener() {
 
-            public void componentResized(ComponentEvent arg0) {                
+            public void componentResized(ComponentEvent arg0) {
                 fitMapArea();
             }
 
@@ -373,21 +368,21 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
             }
         });
 
-        thread.start();        
+        thread.start();
         paintingThread.start();
     }
-           
+
     private void fireRenderingEvent(boolean isRendering) {
 
         isDrawing = isRendering;
-        
+
         StrategyListener[] lst = getStrategyListeners();
 
         for (StrategyListener l : lst) {
             l.setRendering(isRendering);
         }
     }
-        
+
     private synchronized void renderOn(Graphics2D ig) {
 
         Rectangle newRect = comp.getBounds();
@@ -415,18 +410,18 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
             return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
         }
     }
-    
-    public void refresh() {        
-        try{
+
+    public void refresh() {
+        try {
             compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
-        }catch(Exception e){}
-        
+        } catch (Exception e) {
+        }
+
         mustupdate = true;
-        thread.wake();        
+        thread.wake();
         paintingThread.wake();
     }
-    
-    
+
     //------------------------PRIVATES CLASSES----------------------------------
     private class MapLayerListListen implements MapLayerListListener {
 
@@ -551,8 +546,6 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
             }
         }
         }
- 
-    
 }
     
 
