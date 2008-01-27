@@ -29,7 +29,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
@@ -74,7 +73,6 @@ import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -364,6 +362,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         MapContext context = getRenderingStrategy().getContext();
         CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
+        System.out.println(layer);
+        System.out.println(layer.getFeatureSource());
+        System.out.println(layer.getFeatureSource().getSchema());
         CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
 
         if (layerCRS == null) {
@@ -490,7 +491,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
         }
         
-        selectionStrategy.reset();
+        selectionStrategy.refresh();
 
     }
 
@@ -597,7 +598,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     public void addSelectableLayer(MapLayer layer) {
         addSelectableLayerNU(layer);
-        selectionStrategy.reset();
+        selectionStrategy.refresh();
     }
 
     public void addSelectableLayer(MapLayer[] layers) {
@@ -605,7 +606,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             for (MapLayer layer : layers) {
                 addSelectableLayerNU(layer);
             }
-            selectionStrategy.reset();
+            selectionStrategy.refresh();
         }
     }
 
@@ -706,7 +707,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
         }
 
-        selectionStrategy.reset();
+        selectionStrategy.refresh();
 
     }
 

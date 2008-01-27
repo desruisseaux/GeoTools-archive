@@ -89,7 +89,7 @@ public interface RenderingStrategy {
     /**
      * use for a complete reset of the strategy
      */
-    public void reset();
+    public void refresh();
         
     /**
      * get the visual component 
@@ -127,6 +127,18 @@ public interface RenderingStrategy {
      */
     public double getRotation();
     
+    /**
+     * to enable automatic refreshing of the map, if not you must call
+     * manualy the refresh method
+     * @param refresh 
+     */
+    public void setAutoRefreshEnabled(boolean refresh);
+    
+    /**
+     * to see if the strategy is in auto refresh mode
+     * @return boolean
+     */
+    public boolean isAutoRefresh();
     
         
 }

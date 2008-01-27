@@ -24,7 +24,9 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.icon.IconBundle;
@@ -32,6 +34,8 @@ import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.ZoomPanDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 
 /**
@@ -50,6 +54,8 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     private final MouseInputListener mouseInputListener;
     private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
+    private final List<Envelope> mapAreas = new ArrayList<Envelope>();
+    private Envelope lastMapArea = null;
 
     /**
      * create a default JDefaultNavigableMap2D
@@ -95,6 +101,63 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
     }
 
+    //----------------------defaultmap2d override-------------------------------
+    @Override
+    protected void mapContextChanged(Map2DContextEvent event) {
+        super.mapContextChanged(event);
+        mapAreas.clear();
+
+        lastMapArea = getRenderingStrategy().getMapArea();
+    }
+
+    @Override
+    protected void mapAreaChanged(Map2DMapAreaEvent event) {
+        super.mapAreaChanged(event);
+
+        while (mapAreas.size() > 10) {
+            mapAreas.remove(0);
+        }
+
+        Envelope newMapArea = event.getNewMapArea();
+        lastMapArea = newMapArea;
+
+        if (mapAreas.contains(newMapArea)) {
+
+//            if (mapAreas.size() > 1) {
+//
+//                int position = mapAreas.indexOf(newMapArea);
+//
+//                if (position == 0) {
+//                    gui_previousArea.setEnabled(false);
+//                    gui_nextArea.setEnabled(true);
+//                } else if (position == mapAreas.size() - 1) {
+//                    gui_previousArea.setEnabled(true);
+//                    gui_nextArea.setEnabled(false);
+//                } else {
+//                    gui_previousArea.setEnabled(true);
+//                    gui_nextArea.setEnabled(true);
+//                }
+//
+//            } else {
+//                gui_previousArea.setEnabled(false);
+//                gui_nextArea.setEnabled(false);
+//            }
+
+
+        } else {
+            mapAreas.add(newMapArea);
+
+//            if (mapAreas.size() > 1) {
+//                gui_previousArea.setEnabled(true);
+//                gui_nextArea.setEnabled(false);
+//            } else {
+//                gui_previousArea.setEnabled(false);
+//                gui_nextArea.setEnabled(false);
+//            }
+        }
+
+    }
+
     //-----------------------NAVIGABLEMAP2D-------------------------------------
     public void setActionState(ACTION_STATE state) {
 
@@ -115,6 +178,28 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
     public double getZoomFactor() {
         return zoomFactor;
+    }
+
+    public void previousMapArea() {
+        if (lastMapArea != null) {
+            int index = mapAreas.indexOf(lastMapArea);
+
+            index--;
+            if (index >= 0) {
+                getRenderingStrategy().setMapArea(mapAreas.get(index));
+            }
+        }
+    }
+
+    public void nextMapArea() {
+        if (lastMapArea != null) {
+            int index = mapAreas.indexOf(lastMapArea);
+
+            index++;
+            if (index < mapAreas.size()) {
+                getRenderingStrategy().setMapArea(mapAreas.get(index));
+            }
+        }
     }
 
     public void addNavigableMap2DListener(NavigableMap2DListener listener) {
@@ -153,7 +238,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         private void processDrag(int x1, int y1, int x2, int y2) {
 
             Envelope mapArea = renderingStrategy.getMapArea();
-            
+
             if (mapArea != null) {
 
                 if ((x1 == x2) && (y1 == y2)) {
@@ -197,7 +282,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         ll = new Coordinate(left, bottom);
                         ur = new Coordinate(right, top);
 
-                        renderingStrategy.setMapArea(  new Envelope(ll, ur) );
+                        renderingStrategy.setMapArea(new Envelope(ll, ur));
                         //mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
                         break;
 
@@ -210,7 +295,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         ll = new Coordinate(left, bottom);
                         ur = new Coordinate(right, top);
 
-                        renderingStrategy.setMapArea( new Envelope(ll, ur) );
+                        renderingStrategy.setMapArea(new Envelope(ll, ur));
 //                        mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
                         break;
 
@@ -233,7 +318,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         double nDeltaY2 = (deltaY2 * nHeight) / mapHeight;
                         ur = new Coordinate(mapArea.getMaxX() + nDeltaX2, mapArea.getMaxY() + nDeltaY2);
 
-                        renderingStrategy.setMapArea( new Envelope(ll, ur) );
+                        renderingStrategy.setMapArea(new Envelope(ll, ur));
                         break;
                 }
 
@@ -241,9 +326,9 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
         public void mouseClicked(MouseEvent e) {
-            
+
             Envelope mapArea = renderingStrategy.getMapArea();
-            
+
             if (mapArea != null) {
                 // TODO Auto-generated method stub
                 // System.out.println("before area "+mapArea+"\nw:"+mapArea.getWidth()+"

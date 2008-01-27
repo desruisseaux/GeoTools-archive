@@ -510,7 +510,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     private synchronized void repaintMemoryLayer() {
-        memoryStrategy.reset();
+        memoryStrategy.refresh();
     }
 
     private synchronized void reprojectEditionLayer() {
@@ -570,7 +570,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             memoryMapContext.setAreaOfInterest(context.getAreaOfInterest());
         }
 
-        memoryStrategy.reset();
+        memoryStrategy.refresh();
     }
 
     @Override

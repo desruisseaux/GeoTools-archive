@@ -26,7 +26,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,10 +42,8 @@ import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  * Not optimize Strategy, use a single bufferedImage. slow.
@@ -68,6 +65,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
     private double rotation = 0d;
+    private boolean autorefresh = true;
 
     /**
      * create a default SingleBufferedImageStrategy
@@ -92,7 +90,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
 
             public void componentMoved(ComponentEvent arg0) {
-                fitMapArea();
             }
 
             public void componentShown(ComponentEvent arg0) {
@@ -100,7 +97,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
 
             public void componentHidden(ComponentEvent arg0) {
-                fitMapArea();
             }
         });
 
@@ -108,13 +104,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     }
     
-    private void fitMapArea(){
-        try{
-        if(context != null && context.getAreaOfInterest() != null){
-            setMapArea(context.getAreaOfInterest());
-        }
-        }catch(Exception e){}
-    }
+    
 
     private void opimizeRenderer() {
 
@@ -181,15 +171,28 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         return new Envelope(ll, ur);
     }
 
+    
+    private void fitMapArea(){
+        try{
+        if(context != null && context.getAreaOfInterest() != null){
+            setMapArea(context.getAreaOfInterest());
+        }
+        }catch(Exception e){}
+    }
+        
     private void fit() {
 
-        if (checkAspect() && context != null) {
-            reset();
+        if (checkAspect() ) {
+            testRefresh();
         }
-
-
     }
-
+    
+    private void testRefresh(){
+        if(autorefresh){            
+            refresh();
+        }
+    }
+    
     private boolean checkAspect() {
         boolean changed = false;
 
@@ -263,8 +266,10 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     }
 
+    
     public synchronized BufferedImage createBufferImage(MapContext context) {
-
+       
+        
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
@@ -272,29 +277,14 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
-            //GC ACCELERATION 
+            //GraphicsConfiguration ACCELERATION 
             BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
 
 
-            AffineTransform transform = null;
-            try {
-                AffineTransform t1 = RendererUtilities.worldToScreenTransform(compMapArea, newRect, context.getCoordinateReferenceSystem());
-                transform = new AffineTransform(t1);
-                transform.rotate(rotation);
-            } catch (TransformException e) {
-                e.printStackTrace();
-            }
-
             renderer.setContext(context);
-
-            if (transform != null && newRect != null) {
-                renderer.paint((Graphics2D) ig, newRect, transform);
-            } else {
-                renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
-            }
-
-
+            renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
+                
             return buf;
         } else {
             return null;
@@ -310,8 +300,11 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         return comp;
     }
 
-    public void reset() {
-        compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+    public void refresh() {        
+        try{
+            compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+        }catch(Exception e){}
+        
         mustupdate = true;
         thread.wake();
     }
@@ -348,7 +341,6 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     }
 
     public void setMapArea(Envelope area) {
-
         if (context != null) {
             Envelope oldenv = context.getAreaOfInterest();
             Envelope env = fixAspectRatio(comp.getBounds(), area, context);
@@ -382,11 +374,18 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     public void setRotation(double d) {
         rotation = d;
-        reset();
     }
 
     public double getRotation() {
         return rotation;
+    }
+        
+    public void setAutoRefreshEnabled(boolean ref) {        
+       autorefresh = ref;        
+    }
+
+    public boolean isAutoRefresh() {
+        return autorefresh;
     }
 
     //------------------------PRIVATES CLASSES----------------------------------
@@ -401,20 +400,20 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
                     e.printStackTrace();
                 }
             } else {
-                reset();
+                testRefresh();
             }
         }
 
         public void layerRemoved(MapLayerListEvent event) {
-            reset();
+            testRefresh();
         }
 
         public void layerChanged(MapLayerListEvent event) {
-            reset();
+            testRefresh();
         }
 
         public void layerMoved(MapLayerListEvent event) {
-            reset();
+            testRefresh();
         }
     }
 
@@ -424,15 +423,14 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
         public void run() {
 
             while (true) {
-                if (mustupdate) {
-                    mustupdate = false;
-                    fireRenderingEvent(true);
+                if (mustupdate) {                    
                     if (context != null && compMapArea != null) {
-                        comp.setBuffer(createBufferImage(context));
-                    }
-                    fireRenderingEvent(false);
+                        fireRenderingEvent(true);
+                        comp.setBuffer(createBufferImage(context));                        
+                        mustupdate = false;
+                        fireRenderingEvent(false);
+                    }                    
                 }
-
                 block();
             }
         }
@@ -476,6 +474,9 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             }
         }
         }
+ 
+    
 }
     
+
     

@@ -18,14 +18,12 @@ package org.geotools.gui.swing.demo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import java.util.Map;
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -66,12 +64,12 @@ import org.geotools.gui.swing.datachooser.JWFSDataPanel;
 import org.geotools.gui.swing.datachooser.JWMSDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.JDefaultEditableMap2D;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.ImageDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
-import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.toolbox.WidgetTool;
 import org.geotools.gui.swing.toolbox.WidgetToolListener;
@@ -121,7 +119,6 @@ public class DemoAll extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         map = new JDefaultEditableMap2D();
-        map.setRenderingStrategy(new SingleBufferedImageStrategy());
 
         final MapContext context = buildContext();
         initTree(tree, map);
@@ -263,7 +260,7 @@ public class DemoAll extends javax.swing.JFrame {
         return context;
     }
 
-    private void initTree(JContextTree tree, SelectableMap2D map) {
+    private void initTree(JContextTree tree, Map2D map) {
         JContextTreePopup popup = tree.getPopupMenu();
 
         popup.addItem(new LayerVisibilityItem());           //layer         
@@ -287,7 +284,10 @@ public class DemoAll extends javax.swing.JFrame {
 
 
         popup.setMap(map);
-        colSelection.setMap(map);
+        if(map instanceof SelectableMap2D){
+            colSelection.setMap( (SelectableMap2D)map);
+        }
+        
 
         tree.addColumn(colVisible);
         tree.addColumn(colOpacity);
@@ -323,10 +323,11 @@ public class DemoAll extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
         pantoolbox = new javax.swing.JPanel();
-        gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
-        gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -424,6 +425,7 @@ public class DemoAll extends javax.swing.JFrame {
         jSplitPane1.setDividerLocation(300);
 
         jpanel8.setBackground(new java.awt.Color(102, 102, 102));
+        jpanel8.setLayout(new java.awt.BorderLayout());
 
         pan_mappane.setOpaque(false);
 
@@ -431,28 +433,17 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane.setLayout(pan_mappaneLayout);
         pan_mappaneLayout.setHorizontalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 544, Short.MAX_VALUE)
+            .add(0, 667, Short.MAX_VALUE)
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 486, Short.MAX_VALUE)
+            .add(0, 457, Short.MAX_VALUE)
         );
 
-        org.jdesktop.layout.GroupLayout jpanel8Layout = new org.jdesktop.layout.GroupLayout(jpanel8);
-        jpanel8.setLayout(jpanel8Layout);
-        jpanel8Layout.setHorizontalGroup(
-            jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(gui_map2dinfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
-            .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jpanel8Layout.setVerticalGroup(
-            jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jpanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(gui_map2dinfo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
+        jpanel8.add(pan_mappane, java.awt.BorderLayout.CENTER);
+
+        gui_map2dinfo.setFloatable(false);
+        jpanel8.add(gui_map2dinfo, java.awt.BorderLayout.SOUTH);
 
         jSplitPane1.setRightComponent(jpanel8);
 
@@ -465,16 +456,20 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
 
-        jButton1.setIcon(IconBundle.getResource().getIcon("16_new_context"));
+        getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/geotools/gui/swing/icon/defaultset/crystalproject/16x16/actions/folder_new.png"))); // NOI18N
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
         jButton1.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -483,8 +478,9 @@ public class DemoAll extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
+        jPanel2.add(jButton1);
 
-        jButton2.setIcon(IconBundle.getResource().getIcon("16_add_data"));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/geotools/gui/swing/icon/defaultset/crystalproject/16x16/actions/edit_add.png"))); // NOI18N
         jButton2.setBorderPainted(false);
         jButton2.setContentAreaFilled(false);
         jButton2.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -493,6 +489,15 @@ public class DemoAll extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
+        jPanel2.add(jButton2);
+
+        gui_map2dcontrol.setFloatable(false);
+        jPanel2.add(gui_map2dcontrol);
+
+        gui_map2dedit.setFloatable(false);
+        jPanel2.add(gui_map2dedit);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         jMenu1.setText("File");
 
@@ -727,35 +732,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenuBar1.add(jMenu3);
 
         setJMenuBar(jMenuBar1);
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jButton1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton2)
-                .add(16, 16, 16)
-                .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(312, Short.MAX_VALUE))
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jButton1)
-                        .add(jButton2)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
-        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1022,6 +998,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;

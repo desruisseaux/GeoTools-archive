@@ -31,6 +31,7 @@ import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.GTRenderer;
 
@@ -80,7 +81,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mainDecorationPane.add(mapDecorationPane, new Integer(1));
 
         add(BorderLayout.CENTER, mainDecorationPane);
-        setRenderingStrategy(new SingleVolatileImageStrategy());
+        setRenderingStrategy(new SingleBufferedImageStrategy());
 
 
         setOpaque(false);

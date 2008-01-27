@@ -48,6 +48,18 @@ public interface NavigableMap2D extends Map2D{
      * @return double value of the zoom factor
      */
     public double getZoomFactor();
+    
+    /**
+     * get to the previous maparea is there was one
+     */
+    public void previousMapArea();
+    
+    /**
+     * get to the next maparea is there is one
+     */
+    public void nextMapArea();
+    
+    
       
     /**
      * add a NavigableMap2DListener
