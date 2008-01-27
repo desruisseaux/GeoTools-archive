@@ -175,7 +175,7 @@ public class DemoExplorer extends JFrame {
 
     private void initGui() {
         setTitle("AlterSIG-Explorer");
-        setIconImage(new ImageIcon(DemoExplorer.class.getResource("/altersig/db_status.png")).getImage());
+        //setIconImage(new ImageIcon(DemoExplorer.class.getResource("/altersig/db_status.png")).getImage());
 
         //set the menubar
         JMenuBar bar = new JMenuBar();
