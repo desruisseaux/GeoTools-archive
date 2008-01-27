@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -32,7 +32,7 @@ import java.util.List;
  * @author Jan Jezek
  *
  */
-public class TINTriangle extends Polygon {
+class TINTriangle extends Polygon {
     /** The first vertex. */
     public DirectPosition p0;
 

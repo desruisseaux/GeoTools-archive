@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -44,7 +44,7 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
  * @todo Consider moving this class to the {@linkplain
  *       org.geotools.referencing.operation.transform} package.
  */
-public class RubberSheetTransform extends AbstractMathTransform implements MathTransform2D {
+class RubberSheetTransform extends AbstractMathTransform implements MathTransform2D {
     /**
      * Helper variable to hold triangle. It is use for optimalization of searching in TIN for
      * triangle containing points that are transformed.

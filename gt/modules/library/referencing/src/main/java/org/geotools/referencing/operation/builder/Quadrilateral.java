@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 import org.opengis.geometry.DirectPosition;
 import java.awt.geom.Line2D;
@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id$
  * @author Jan Jezek
  */
-public class Quadrilateral extends Polygon {
+class Quadrilateral extends Polygon {
     /** The first vertex. */
     public DirectPosition p0;
 

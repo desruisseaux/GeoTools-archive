@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 import org.opengis.geometry.DirectPosition;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.List;
  * @version $Id$
  * @author Jan Jezek
  */
-public class TriangulationFactory {
+class TriangulationFactory {
     /** The list of TINTrianlgles of TIN. */
     private List triangles;
 

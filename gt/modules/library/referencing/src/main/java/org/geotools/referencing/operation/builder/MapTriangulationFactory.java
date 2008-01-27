@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.builder.MappedPosition;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @version $Id$
  * @author Jan Jezek
  */
-public class MapTriangulationFactory {
+class MapTriangulationFactory {
     private final Quadrilateral quad;
     private final List /*<MappedPosition>*/ vectors;
 

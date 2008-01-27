@@ -23,11 +23,6 @@ import java.util.Map;
 
 import javax.vecmath.MismatchedSizeException;
 
-import org.geotools.referencing.operation.builder.algorithm.MapTriangulationFactory;
-import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
-import org.geotools.referencing.operation.builder.algorithm.RubberSheetTransform;
-import org.geotools.referencing.operation.builder.algorithm.TINTriangle;
-import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;

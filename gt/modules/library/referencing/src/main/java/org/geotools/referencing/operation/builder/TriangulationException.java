@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.builder.algorithm;
+package org.geotools.referencing.operation.builder;
 
 
 /**
@@ -24,7 +24,7 @@ package org.geotools.referencing.operation.builder.algorithm;
  * @version $Id$
  * @author Jan Jezek
  */
-public class TriangulationException extends Exception {
+class TriangulationException extends Exception {
     private static final long serialVersionUID = -3134565178815225915L;
 
     /**
