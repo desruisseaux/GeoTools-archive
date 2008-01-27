@@ -15,7 +15,6 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Point;

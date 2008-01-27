@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.tree.TreePath;
 
+import org.geotools.map.MapContext;
 import org.jdesktop.swingx.JXTreeTable;
 
 /**
@@ -208,7 +209,16 @@ final class DADContextTreeDrop extends DropTarget {
             }
             tree.setRowSelectionInterval(row, row);
             //tree.setSelectionPath(path);
-            tree.expandPath(path);
+            
+            
+            //only expand subnode if its a mapcontext node
+            Object node = path.getLastPathComponent();
+            if(node instanceof ContextTreeNode){
+                Object obj = ((ContextTreeNode)node).getUserObject();
+                if(obj instanceof MapContext){
+                    tree.expandPath(path);
+                }
+            }
         }
     }
 
