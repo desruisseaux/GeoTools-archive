@@ -143,24 +143,14 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                 eObject = (EObject) value;
             }
 
-            // reflectivley set the properties of it
-            for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
-                Node child = (Node) c.next();
-                String property = child.getComponent().getName();
-                setProperty(eObject, property, child.getValue());
-            }
-
-            for (Iterator a = node.getAttributes().iterator(); a.hasNext();) {
-                Node att = (Node) a.next();
-                String property = att.getComponent().getName();
-                setProperty(eObject, property, att.getValue());
-            }
-
+            setProperties( eObject, node, false );
+            setProperties( eObject, node, true );
+            
             //check for a complex type with simpleContent, in this case use 
             // the string value (if any) to set the value property
             if (instance.getElementDeclaration().getTypeDefinition().getBaseType() instanceof XSDTypeDefinition) {
                 if ((value != null) && EMFUtils.has(eObject, "value")) {
-                    setProperty(eObject, "value", value);
+                    setProperty(eObject, "value", value, false);
                 }
             }
 
@@ -172,16 +162,42 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
     }
 
     /**
+     * Helper method for settings properties of an eobject.
+     */
+    void setProperties(EObject eObject, Node node, boolean lax ) {
+        // reflectivley set the properties of it
+        for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
+            Node child = (Node) c.next();
+            String property = child.getComponent().getName();
+          
+            setProperty(eObject, property, child.getValue(), lax);
+        }
+
+        for (Iterator a = node.getAttributes().iterator(); a.hasNext();) {
+            Node att = (Node) a.next();
+            String property = att.getComponent().getName();
+            
+            setProperty(eObject, property, att.getValue(), lax);
+        }
+        
+    }
+    
+    /**
      * Internal method for reflectively setting the property of an eobject.
      * <p>
      * Subclasses may override.
      * </p>
      */
-    protected void setProperty(EObject eObject, String property, Object value) {
+    protected final void setProperty(EObject eObject, String property, Object value, boolean lax) {
         if (EMFUtils.has(eObject, property)) {
+            //dont do in lax mode since that means its a second pass
+            if ( lax && EMFUtils.isSet(eObject, property) ) {
+                return;
+            }
+    
             try {
                 if (EMFUtils.isCollection(eObject, property)) {
-                    EMFUtils.add(eObject, property, value);
+                        EMFUtils.add(eObject, property, value);    
                 } else {
                     EMFUtils.set(eObject, property, value);
                 }
@@ -201,15 +217,21 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                 }
                 EMFUtils.set(eObject, property, value);
             }
-        } else {
-            //search by type
-            if (value != null) {
+        } 
+        else {
+            //search by type, this is a bit of a hack so we only do it if the 
+            // lax flag is set
+            if (lax && value != null) {
                 List features = EMFUtils.features(eObject, value.getClass());
 
                 if (features.size() == 1) {
-                    //bango!!
                     EStructuralFeature feature = (EStructuralFeature) features.get(0);
-                    eObject.eSet(feature, value);
+                    
+                    //only set if not previous set
+                    if ( !eObject.eIsSet( feature ) ) {
+                        eObject.eSet(feature, value);    
+                    }
+                    
                 }
             }
         }
