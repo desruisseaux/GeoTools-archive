@@ -84,6 +84,48 @@ public class WFSParsingTest extends TestCase {
         assertFeatureTypeList(caps);
         assertFilterCapabilities(caps);
     }
+    
+    /**
+     * TODO: fix me
+     * @throws Exception
+     */
+    public void _testParseGetCapabilitiesDeegree() throws Exception {
+        Parser parser = new Parser(configuration);
+        WFSCapabilitiesType caps = (WFSCapabilitiesType) parser.parse(getClass()
+                .getResourceAsStream("deegree-GetCapabilities.xml"));
+
+        assertNotNull(caps);
+        assertEquals("1.1.0", caps.getVersion());
+
+        //assertServiceIdentification(caps);
+        assertOperationsMetadataDeeGree(caps);
+        //assertFeatureTypeList(caps);
+        //assertFilterCapabilities(caps);
+    }
+
+    private void assertOperationsMetadataDeeGree(WFSCapabilitiesType caps) {
+        OperationsMetadataType om = caps.getOperationsMetadata();
+        assertNotNull(om);
+
+        assertEquals(6, om.getOperation().size());
+        
+        OperationType getCapsOp = (OperationType) om.getOperation().get(2);
+        assertEquals("GetCapabilities", getCapsOp.getName());
+        assertEquals( 1, getCapsOp.getDCP().size());
+        
+        DCPType dcp = (DCPType) getCapsOp.getDCP().get(0);
+        assertEquals( 1, dcp.getHTTP().getGet().size() );
+        assertEquals( 1, dcp.getHTTP().getPost().size() );
+        
+        assertEquals( "http://demo.deegree.org/deegree-wfs/services?", ((RequestMethodType) dcp.getHTTP().getGet().get(0)).getHref() );
+        assertEquals( "http://demo.deegree.org/deegree-wfs/services", ((RequestMethodType) dcp.getHTTP().getPost().get(0)).getHref() );
+        
+        assertEquals("GetFeature", ((OperationType) om.getOperation().get(0)).getName());
+        assertEquals("DescribeFeatureType", ((OperationType) om.getOperation().get(1)).getName());
+        assertEquals("GetFeatureWithLock", ((OperationType) om.getOperation().get(3)).getName());
+        assertEquals("LockFeature", ((OperationType) om.getOperation().get(4)).getName());
+        assertEquals("Transaction", ((OperationType) om.getOperation().get(5)).getName());
+    }
 
     void assertServiceIdentification(WFSCapabilitiesType caps) {
         ServiceIdentificationType sa = caps.getServiceIdentification();
