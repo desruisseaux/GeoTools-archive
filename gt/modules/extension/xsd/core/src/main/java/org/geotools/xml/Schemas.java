@@ -1030,7 +1030,13 @@ public class Schemas {
                         imports.add(imprt);
                         added.add(imprt.getNamespace());
 
-                        queue.addLast(imprt.getResolvedSchema());
+                        XSDSchema resolvedSchema = imprt.getResolvedSchema();
+                        if(resolvedSchema == null){
+                            LOGGER.info("Schema import wasn't resolved: " + imprt.getNamespace()
+                                    + " declared location: " + imprt.getSchemaLocation());
+                        }else{
+                            queue.addLast(resolvedSchema);
+                        }
                     }
                 }
             }
