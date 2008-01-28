@@ -61,7 +61,7 @@ public class BursaWolfTransformBuilderTest extends TestCase {
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
 
-        List /*<MappedPosition>*/ vectors = new ArrayList();
+        List <MappedPosition> vectors = new ArrayList<MappedPosition>();
 
         vectors.add(new MappedPosition(
         		new GeneralDirectPosition(R, 0, 0),
@@ -114,7 +114,7 @@ public class BursaWolfTransformBuilderTest extends TestCase {
         
         DirectPosition ptSrc ;
         DirectPosition ptDst ;
-        List /*<MappedPosition>*/ vectors = new ArrayList();
+        List <MappedPosition> vectors = new ArrayList<MappedPosition>();
         
         BursaWolfParameters bwp = new BursaWolfParameters(null);
         bwp.dx = random.nextDouble() * 100;

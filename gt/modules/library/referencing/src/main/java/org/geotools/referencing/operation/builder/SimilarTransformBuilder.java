@@ -61,7 +61,7 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
      * @param vectors list of {@linkplain
      * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      */
-    public SimilarTransformBuilder(List vectors)
+    public SimilarTransformBuilder(List <MappedPosition> vectors)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException {
         super.setMappedPositions(vectors);

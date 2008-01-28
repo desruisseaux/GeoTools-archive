@@ -41,7 +41,7 @@ class TINTriangle extends Polygon {
 
     /** The third vertex. */
     public DirectPosition p2;
-    private final List /*<TINTriangle>*/ adjacentTriangles = new ArrayList();
+    private final List <TINTriangle> adjacentTriangles = new ArrayList <TINTriangle>();
 
     /**
      * Creates a Triangle.
@@ -64,7 +64,7 @@ class TINTriangle extends Polygon {
      */
     protected Circle getCircumCicle() {
         //DirectPosition center = new DirectPosition2D();
-        List reducedVertices = reduce();
+        List <DirectPosition> reducedVertices = reduce();
 
         CoordinateReferenceSystem crs = ((DirectPosition) reducedVertices
             .get(1)).getCoordinateReferenceSystem();
@@ -97,8 +97,8 @@ class TINTriangle extends Polygon {
      * @return three Triangles created by splitting this TINTriangle at a
      *         newVertex.
      */
-    public List subTriangles(DirectPosition newVertex) {
-        ArrayList triangles = new ArrayList();
+    public List <TINTriangle> subTriangles(DirectPosition newVertex) {
+        ArrayList <TINTriangle> triangles = new ArrayList<TINTriangle>();
         TINTriangle trigA = new TINTriangle(p0, p1, newVertex);
         TINTriangle trigB = new TINTriangle(p1, p2, newVertex);
         TINTriangle trigC = new TINTriangle(p2, p0, newVertex);
@@ -126,7 +126,7 @@ class TINTriangle extends Polygon {
         triangles.add(trigB);
         triangles.add(trigC);
 
-        Iterator i = this.getAdjacentTriangles().iterator();
+        Iterator <TINTriangle> i = this.getAdjacentTriangles().iterator();
 
         while (i.hasNext()) {
             TINTriangle trig = (TINTriangle) i.next();
@@ -142,8 +142,8 @@ class TINTriangle extends Polygon {
      * @param adjacents triangles to be added
      * @return number of successfully added triangles
      */
-    protected int tryToAddAdjacent(List adjacents) {
-        Iterator i = adjacents.iterator();
+    protected int tryToAddAdjacent(List <TINTriangle> adjacents) {
+        Iterator <TINTriangle> i = adjacents.iterator();
         int count = 0;
 
         while (i.hasNext()) {
@@ -223,7 +223,7 @@ class TINTriangle extends Polygon {
      * Returns adjacent triangles
      * @return adjacent triangles
      */
-    public List getAdjacentTriangles() {
+    public List <TINTriangle> getAdjacentTriangles() {
         return adjacentTriangles;
     }
 

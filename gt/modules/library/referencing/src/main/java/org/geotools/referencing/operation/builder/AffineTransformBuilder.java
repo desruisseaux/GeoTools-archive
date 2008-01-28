@@ -16,7 +16,6 @@
 package org.geotools.referencing.operation.builder;
 
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 
@@ -65,7 +64,7 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
      * @param vectors list of {@linkplain
      * MappedPosition MappedPosition}
      */
-    public AffineTransformBuilder(List vectors)
+    public AffineTransformBuilder(List <MappedPosition> vectors)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException {
         super.setMappedPositions(vectors);

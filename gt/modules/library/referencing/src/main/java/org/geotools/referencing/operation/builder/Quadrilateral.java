@@ -76,9 +76,9 @@ class Quadrilateral extends Polygon {
      *
      * @return two Triangles: p0-p1-p2 and p0-p3-p2
      */
-    public List getTriangles() {
+    public List <TINTriangle> getTriangles() {
         //Assert.isTrue(this.isValid());
-        ArrayList triangles = new ArrayList();
+        ArrayList <TINTriangle> triangles = new ArrayList<TINTriangle>();
         TINTriangle trigA = new TINTriangle(p0, p1, p2);
         TINTriangle trigB = new TINTriangle(p0, p3, p2);
 

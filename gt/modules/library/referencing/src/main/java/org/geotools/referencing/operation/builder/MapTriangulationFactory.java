@@ -35,7 +35,7 @@ import java.util.Map;
  */
 class MapTriangulationFactory {
     private final Quadrilateral quad;
-    private final List /*<MappedPosition>*/ vectors;
+    private final List <MappedPosition> vectors;
 
     /**
      *
@@ -44,7 +44,7 @@ class MapTriangulationFactory {
      * @throws TriangulationException thrown when the source points are outside the quad.
      */
     public MapTriangulationFactory(Quadrilateral quad,
-        List /*<MappedPosition>*/ vectors) throws TriangulationException {
+        List <MappedPosition> vectors) throws TriangulationException {
         this.quad = quad;
         this.vectors = vectors;
     }
@@ -95,7 +95,7 @@ class MapTriangulationFactory {
      *
      * @return destination quad
      */
-    private Quadrilateral mappedQuad(Quadrilateral sourceQuad, List vectors) {
+    private Quadrilateral mappedQuad(Quadrilateral sourceQuad, List<MappedPosition> vectors) {
         if (vectors.isEmpty()) {
             return (Quadrilateral) sourceQuad.clone();
         }
@@ -131,7 +131,7 @@ class MapTriangulationFactory {
      *         MappedPosition. It is used for calculating destination quad.
      */
     protected MappedPosition generateCoordFromNearestOne(DirectPosition x,
-        List /*<MappedPosition>*/ vertices) {
+        List <MappedPosition> vertices) {
         MappedPosition nearestOne = nearestMappedCoordinate(x, vertices);
 
         double dstX = x.getCoordinates()[0]
@@ -156,13 +156,13 @@ class MapTriangulationFactory {
      * @return the MappedPosition to the x Coordinate.
      */
     protected MappedPosition nearestMappedCoordinate(DirectPosition dp,
-        List /*<MappedPosition>*/ vertices) {
+        List <MappedPosition> vertices) {
         DirectPosition2D x = new DirectPosition2D(dp);
 
         // Assert.isTrue(vectors.size() > 0);
         MappedPosition nearestOne = (MappedPosition) vertices.get(0);
 
-        for (Iterator i = vertices.iterator(); i.hasNext();) {
+        for (Iterator <MappedPosition> i = vertices.iterator(); i.hasNext();) {
             MappedPosition candidate = (MappedPosition) i.next();
 
             if (((DirectPosition2D) candidate.getSource()).distance(

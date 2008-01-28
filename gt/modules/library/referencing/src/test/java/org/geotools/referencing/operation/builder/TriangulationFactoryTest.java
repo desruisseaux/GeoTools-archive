@@ -111,7 +111,7 @@ public class TriangulationFactoryTest extends TestCase {
         Quadrilateral quad = new Quadrilateral(leftDown, rightDown, rightTop,
                 leftTop);
 
-        List triangles = new ArrayList();
+        List<TINTriangle> triangles = new ArrayList<TINTriangle>();
 
         try {
             TriangulationFactory trigfac = new TriangulationFactory(quad,
@@ -123,7 +123,7 @@ public class TriangulationFactoryTest extends TestCase {
 
         int j = 1;
 
-        for (Iterator i = triangles.iterator(); i.hasNext();) {
+        for (Iterator<TINTriangle> i = triangles.iterator(); i.hasNext();) {
             TINTriangle triangle = (TINTriangle) i.next();            
 
             for (j = 0; j < vertices.length; j++) {

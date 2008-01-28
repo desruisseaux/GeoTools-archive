@@ -175,9 +175,9 @@ class Polygon {
      *
      * @return The List of reduced vertives
      */
-    protected List reduce() {
+    protected List <DirectPosition> reduce() {
         //Coordinate[] redCoords = new Coordinate[coordinates.length];
-        ArrayList redCoords = new ArrayList();
+        ArrayList <DirectPosition> redCoords = new ArrayList<DirectPosition>();
 
         for (int i = 0; i < vertices.length; i++) {
             redCoords.add(new DirectPosition2D(
@@ -199,8 +199,8 @@ class Polygon {
      *
      * @return whether this Polygon contains the all of the given coordinates
      */
-    protected boolean containsAll(List coordinate) {
-        for (Iterator i = coordinate.iterator(); i.hasNext();) {
+    protected boolean containsAll(List <DirectPosition> coordinate) {
+        for (Iterator <DirectPosition> i = coordinate.iterator(); i.hasNext();) {
             if (!this.containsOrIsVertex((DirectPosition) i.next())) {
                 return false;
             }

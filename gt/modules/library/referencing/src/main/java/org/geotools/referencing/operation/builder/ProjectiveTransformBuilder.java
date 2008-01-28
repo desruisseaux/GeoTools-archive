@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.operation.builder;
 
-import org.geotools.referencing.operation.builder.*;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.referencing.FactoryException;
@@ -85,7 +84,7 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      *                 -if there is mismatch in coordinate system in
      *                 {@linkplain MappedPosition MappedPosition}
      */
-    public ProjectiveTransformBuilder(List vectors)
+    public ProjectiveTransformBuilder(List <MappedPosition> vectors)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException {
         super.setMappedPositions(vectors);
@@ -109,7 +108,7 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      *
      * @return required coordinate system type
      */
-    public Class /* <? extends CartesianCS> */ getCoordinateSystemType() {
+    public Class <? extends CartesianCS> getCoordinateSystemType() {
         return CartesianCS.class;
     }
 

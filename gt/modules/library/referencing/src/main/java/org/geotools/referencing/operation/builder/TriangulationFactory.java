@@ -32,8 +32,8 @@ import java.util.List;
  * @author Jan Jezek
  */
 class TriangulationFactory {
-    /** The list of TINTrianlgles of TIN. */
-    private List triangles;
+    /** The list of TINTriangles in the TIN. */
+    private List <TINTriangle> triangles;
 
     /**
      * Constructs the TriangulationFactory.
@@ -44,7 +44,7 @@ class TriangulationFactory {
      */
     protected TriangulationFactory(Quadrilateral quad, DirectPosition[] pt)
         throws TriangulationException {
-        List vertices = new ArrayList();
+        List <DirectPosition> vertices = new ArrayList<DirectPosition>();
 
         for (int i = 0; i < pt.length; i++) {
             vertices.add(pt[i]);
@@ -56,7 +56,7 @@ class TriangulationFactory {
 
         this.triangles = quad.getTriangles();
 
-        for (Iterator i = vertices.iterator(); i.hasNext();) {
+        for (Iterator<DirectPosition> i = vertices.iterator(); i.hasNext();) {
             DirectPosition vertex = (DirectPosition) i.next();
             insertPoint(vertex);
         }
@@ -67,7 +67,7 @@ class TriangulationFactory {
      *
      * @return TIN as list of triangles.
      */
-    public List getTriangulation() {
+    public List <TINTriangle> getTriangulation() {
         return triangles;
     }
 

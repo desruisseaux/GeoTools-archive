@@ -24,7 +24,7 @@ package org.geotools.referencing.operation.builder;
  * @version $Id$
  * @author Jan Jezek
  */
-class TriangulationException extends Exception {
+public class TriangulationException extends RuntimeException {
     private static final long serialVersionUID = -3134565178815225915L;
 
     /**

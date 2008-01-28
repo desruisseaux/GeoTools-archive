@@ -90,7 +90,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      * @param vectors list of {@linkplain
      * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      */
-    public BursaWolfTransformBuilder(List /*<MappedPosition>*/ vectors)
+    public BursaWolfTransformBuilder(List <MappedPosition> vectors)
         throws MismatchedSizeException, MismatchedDimensionException,
             MismatchedReferenceSystemException {
         super.setMappedPositions(vectors);
@@ -130,7 +130,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      *
      * @return coordinate system type
      */
-    public Class /*<? extends CartesianCS>*/ getCoordinateSystemType() {
+    public Class <? extends CartesianCS> getCoordinateSystemType() {
         return CartesianCS.class;
     }
 

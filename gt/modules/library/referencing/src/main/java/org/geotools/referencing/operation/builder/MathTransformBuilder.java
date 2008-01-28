@@ -65,9 +65,12 @@ import org.geotools.resources.Classes;
 
 
 /**
- * Provides a basic implementation for {@linkplain MathTransform math transform} builders.
- * Math transform builders create {@link MathTransform} objects for transforming coordinates
- * from a source CRS ({@linkplain CoordinateReferenceSystem Coordinate Reference System}) to
+ * Provides a basic implementation for {@linkplain MathTransform math transform}
+ * builders.
+ * 
+ * Math transform builders create {@link MathTransform} objects for transforming 
+ * coordinates from a source CRS 
+ * ({@linkplain CoordinateReferenceSystem Coordinate Reference System}) to
  * a target CRS using empirical parameters. Usually, one of those CRS is a
  * {@linkplain GeographicCRS geographic} or {@linkplain ProjectedCRS projected}
  * one with a well known relationship to the earth. The other CRS is often an
@@ -189,7 +192,7 @@ public abstract class MathTransformBuilder {
     /**
      * Returns the list of mapped positions.
      */
-    public List/*<MappedPosition>*/ getMappedPositions() {
+    public List <MappedPosition> getMappedPositions() {
         return unmodifiablePositions;
     }
 
@@ -226,7 +229,7 @@ public abstract class MathTransformBuilder {
      * @param target {@code false} for extracting source points,
      *        or {@code true} for extracting target points.
      */
-    private static DirectPosition[] getPoints(List/*<MappedPosition>*/ positions, boolean target) {
+    private static DirectPosition[] getPoints(List <MappedPosition> positions, boolean target) {
         final DirectPosition[] points = new DirectPosition[positions.size()];
         for (int i=0; i<points.length; i++) {
             final MappedPosition mp = (MappedPosition) positions.get(i);
@@ -368,7 +371,7 @@ public abstract class MathTransformBuilder {
              */
         }
         table.setAlignment(TableWriter.ALIGN_RIGHT);
-        for (final Iterator it=getMappedPositions().iterator(); it.hasNext();) {
+        for (final Iterator <MappedPosition> it=getMappedPositions().iterator(); it.hasNext();) {
             final MappedPosition mp = (MappedPosition) it.next();
             DirectPosition point = mp.getSource();
             int dimension = point.getDimension();
@@ -503,7 +506,7 @@ public abstract class MathTransformBuilder {
     private GeneralEnvelope getEnvelope(final boolean target) {
         GeneralEnvelope envelope = null;
         CoordinateReferenceSystem crs = null;
-        for (final Iterator it=getMappedPositions().iterator(); it.hasNext();) {
+        for (final Iterator <MappedPosition> it=getMappedPositions().iterator(); it.hasNext();) {
             final MappedPosition mp = (MappedPosition) it.next();
             final DirectPosition point = target ? mp.getTarget() : mp.getSource();
             if (point != null) {
@@ -642,7 +645,7 @@ public abstract class MathTransformBuilder {
         final MathTransform  mt     = getMathTransform();
         final Statistics     stats  = new Statistics();
         final DirectPosition buffer = new GeneralDirectPosition(getDimension());
-        for (final Iterator it=getMappedPositions().iterator(); it.hasNext();) {
+        for (final Iterator <MappedPosition> it=getMappedPositions().iterator(); it.hasNext();) {
             final MappedPosition mp = (MappedPosition) it.next();
             /*
              * Transforms the source point using the math transform calculated by this class.
