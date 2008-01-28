@@ -50,7 +50,7 @@ import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -256,7 +256,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		if (hints != null) {
 			this.hints.add(hints);
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 		
 		
 		

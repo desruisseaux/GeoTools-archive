@@ -18,12 +18,14 @@ package org.geotools.coverage.grid;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;                // For javadoc
 import java.awt.image.IndexColorModel;           // For javadoc
+import java.awt.image.RenderedImage;
 import javax.media.jai.JAI;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;     // For javadoc
 import javax.media.jai.InterpolationBilinear;    // For javadoc
 import javax.media.jai.InterpolationBicubic;     // For javadoc
 import javax.media.jai.operator.ScaleDescriptor; // For javadoc
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**
@@ -254,11 +256,11 @@ public enum ViewType {
     }
 
     /**
-     * Sets some hints in the specified rendering hints map.
+     * Returns suggested rendering hints for a JAI operation on the given image.
      * <p>
      * <ul>
      *   <li>{@link JAI#KEY_INTERPOLATION} is sets to "<cite>nearest neighbor</cite>" if
-     *   {@link #isInterpolationAllowed} returns {@code false}, and left unchanged otherwise.</li>
+     *       {@link #isInterpolationAllowed} returns {@code false}, and left unchanged otherwise.</li>
      *   <li>{@link JAI#KEY_REPLACE_INDEX_COLOR_MODEL} is sets to the value returned by
      *       {@link #isReplaceIndexColorModelAllowed}.</li>
      *   <li>{@link JAI#KEY_TRANSFORM_ON_COLORMAP} is sets to the value returned by
@@ -267,11 +269,16 @@ public enum ViewType {
      *
      * @since 2.5
      */
-    public void configure(final RenderingHints hints) {
+    public RenderingHints getRenderingHints(final RenderedImage image) {
+        RenderingHints hints = ImageUtilities.getRenderingHints(image);
+        if (hints == null) {
+            hints = new RenderingHints(null);
+        }
         if (!isInterpolationAllowed()) {
             hints.put(JAI.KEY_INTERPOLATION, Interpolation.getInstance(Interpolation.INTERP_NEAREST));
         }
         hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.valueOf(isReplaceIndexColorModelAllowed()));
         hints.put(JAI.KEY_TRANSFORM_ON_COLORMAP,     Boolean.valueOf(isTransformOnColormapAllowed()));
+        return hints;
     }
 }

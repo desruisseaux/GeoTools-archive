@@ -41,7 +41,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -144,7 +144,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 			
 		coverageName = "image_coverage";
 		try {

@@ -51,7 +51,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class Grid2DSampleDimension extends GridSampleDimension {
+final class RenderedSampleDimension extends GridSampleDimension {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -79,7 +79,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      * @param image The image to be wrapped by {@link GridCoverage}.
      * @param bandNumber The band number.
      */
-    private Grid2DSampleDimension(final GridSampleDimension band,
+    private RenderedSampleDimension(final GridSampleDimension band,
                                   final RenderedImage      image,
                                   final int           bandNumber)
     {
@@ -140,7 +140,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
                 }
                 sd = defaultSD[i];
             }
-            sd = new Grid2DSampleDimension(sd, image, i);
+            sd = new RenderedSampleDimension(sd, image, i);
             dst[i] = sd;
             if (sd.geophysics(true ) == sd) countGeophysics++;
             if (sd.geophysics(false) == sd) countIndexed++;

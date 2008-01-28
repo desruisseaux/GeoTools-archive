@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -163,7 +163,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		if (uHints != null) {
 			this.hints.add(uHints);
 		}
-		this.coverageFactory = FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory = CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 
 		// /////////////////////////////////////////////////////////////////////
 		//

@@ -499,7 +499,6 @@ public class ColorMap implements Serializable {
             }
             if (ARGB != null) {
                 final NumberRange range = category.getRange();
-                // TODO: Remove casts when we will be allowed to compile for J2SE 1.5.
                 int lower = ((Number) range.getMinValue()).intValue();
                 int upper = ((Number) range.getMaxValue()).intValue();
                 if (!range.isMinIncluded()) lower++;

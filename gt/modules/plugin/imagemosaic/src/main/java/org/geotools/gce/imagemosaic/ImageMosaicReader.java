@@ -60,7 +60,7 @@ import javax.media.jai.TileCache;
 import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -224,7 +224,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (uHints != null) {
 			this.hints.add(uHints);
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 		//set the maximum number of tile to load
 		if(this.hints.containsKey(Hints.MAX_ALLOWED_TILES))
 			this.maxAllowedTiles=((Integer)this.hints.get(Hints.MAX_ALLOWED_TILES)).intValue();

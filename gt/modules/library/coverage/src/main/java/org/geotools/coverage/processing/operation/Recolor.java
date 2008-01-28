@@ -15,35 +15,25 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// J2SE and JAI dependencies
 import java.awt.Color;
-import java.util.Collections;
 import java.util.Map;
-import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.util.InternationalString;
 
-// Geotools dependencies
-import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.AbstractProcessor;
-import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.image.ColorUtilities;
 
 
 /**
- * Operation replacing the colors of a {@link GridCoverage}. This operation accepts
- * one argument, {@code ColorMaps}, which must be an instance of {@link ColorMap}.
- * 
+ * Operation replacing the colors of a {@link org.geotools.coverage.grid.GridCoverage}.
+ * This operation accepts one argument, {@code ColorMaps}, which must be an instance of
+ * {@link ColorMap}.
+ *
  * @since 2.3
  * @source $URL$
  * @version $Id$

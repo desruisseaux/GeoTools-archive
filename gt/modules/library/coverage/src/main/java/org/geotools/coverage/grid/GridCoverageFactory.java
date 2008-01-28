@@ -312,7 +312,7 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final RenderingHints            hints)
     {
         final GridSampleDimension[] bands =
-            Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
+            RenderedSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
         final ColorModel    model = bands[0].getColorModel(0, bands.length);
         final RenderedImage image = new BufferedImage(model, raster, false, null);
         return create(name, image, envelope, bands, null, null);
@@ -357,7 +357,7 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final RenderingHints            hints)
     {
         final GridSampleDimension[] bands =
-            Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
+            RenderedSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints);
         final ColorModel    model = bands[0].getColorModel(0, bands.length);
         final RenderedImage image = new BufferedImage(model, raster, false, null);
         return create(name, image, crs, gridToCRS, bands, null, null);

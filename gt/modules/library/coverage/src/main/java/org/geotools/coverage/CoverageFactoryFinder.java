@@ -31,7 +31,7 @@ import org.geotools.resources.LazySet;
  * Defines static methods used to access the application's default
  * {@linkplain GridCoverageFactory factory} implementation.
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux

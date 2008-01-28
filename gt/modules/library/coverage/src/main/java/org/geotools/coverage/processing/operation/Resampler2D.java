@@ -62,7 +62,6 @@ import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.CannotReprojectException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.AbstractCoordinateOperationFactory;
@@ -407,7 +406,10 @@ final class Resampler2D extends GridCoverage2D {
         ////                                                                                ////
         ////////////////////////////////////////////////////////////////////////////////////////
 
-        final RenderingHints targetHints = getRenderingHints(sourceImage, hints);
+        final RenderingHints targetHints = actionTaken.getRenderingHints(sourceImage);
+        if (hints != null) {
+            targetHints.add(hints);
+        }
         ImageLayout layout = (ImageLayout) targetHints.get(JAI.KEY_IMAGE_LAYOUT);
         if (layout != null) {
             layout = (ImageLayout) layout.clone();
@@ -456,16 +458,8 @@ final class Resampler2D extends GridCoverage2D {
          * provide an ImageLayout built with the source image where the CM and the SM are valid.
          * those will be employed overriding a the possibility to expand the color model.
          */
-        switch (actionTaken) {
-            case PHOTOGRAPHIC: {
-                targetHints.add(ImageUtilities.REPLACE_INDEX_COLOR_MODEL);
-                layout.unsetValid(ImageLayout.COLOR_MODEL_MASK | ImageLayout.SAMPLE_MODEL_MASK);
-                break;
-            }
-            default: {
-                targetHints.add(ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
-                break;
-            }
+        if (ViewType.PHOTOGRAPHIC.equals(actionTaken)) {
+            layout.unsetValid(ImageLayout.COLOR_MODEL_MASK | ImageLayout.SAMPLE_MODEL_MASK);
         }
         targetHints.put(JAI.KEY_IMAGE_LAYOUT, layout);
 
@@ -521,50 +515,57 @@ final class Resampler2D extends GridCoverage2D {
                 paramBlk.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY)
                         .add(null).add(null).add(null).add(background);
             }
-        }
-        /*
-         * Special case for the affine transform. Try to use the JAI "Affine" operation instead of
-         * the more general "Warp" one. JAI provides native acceleration for the affine operation.
-         * NOTE: "Affine", "Scale", "Translate", "Rotate" and similar operations ignore the 'xmin',
-         * 'ymin', 'width' and 'height' image layout. Consequently, we can't use this operation if
-         * the user provided explicitely a grid range.
-         *
-         * Note: if the user didn't specified any grid geometry, then a yet cheaper approach is to
-         *       just update the 'gridToCRS' value. We returns a grid coverage wrapping the SOURCE
-         *       image with the updated grid geometry.
-         */
-        else if (automaticGR && allSteps instanceof AffineTransform) {
-            if (automaticGG) {
-                // Cheapest approach: just update 'gridToCRS'.
-                MathTransform mtr;
-                mtr = sourceGG.getGridToCRS();
-                mtr = mtFactory.createConcatenatedTransform(mtr,  step2.inverse());
-                targetGG = new GridGeometry2D(sourceGG.getGridRange(), mtr, targetCRS);
-                /*
-                 * Note: do NOT use the "GridGeometry2D(sourceGridRange, targetEnvelope)"
-                 * constructor in the above line. We must give a MathTransform argument to
-                 * the constructor, not an Envelope, because the later infer a MathTransform
-                 * using heuristic rules. Only the constructor with a MathTransform argument
-                 * is fully accurate.
-                 */
-                return create(sourceCoverage, sourceImage, targetGG, actionTaken);
-            }
-            // More general approach: apply the affine transform.
-            operation = "Affine";
-            final AffineTransform affine = (AffineTransform) allSteps.inverse();
-            paramBlk.add(affine).add(interpolation).add(background);
         } else {
             /*
-             * General case: constructs the warp transform.
+             * Special case for the affine transform. Try to use the JAI "Affine" operation
+             * instead of the more general "Warp" one. JAI provides native acceleration for
+             * the affine operation.
+             *
+             * NOTE 1: There is no need to check for "Scale" and "Translate" as special cases
+             *         of "Affine" since JAI already does this check for us.
+             *
+             * NOTE 2: "Affine", "Scale", "Translate", "Rotate" and similar operations ignore
+             *         the 'xmin', 'ymin', 'width' and 'height' image layout. Consequently, we
+             *         can't use this operation if the user provided explicitely a grid range.
+             *
+             * NOTE 3: If the user didn't specified any grid geometry, then a yet cheaper approach
+             *         is to just update the 'gridToCRS' value. We returns a grid coverage wrapping
+             *         the SOURCE image with the updated grid geometry.
              */
-            operation = "Warp";
-            final Warp warp;
-            if (allSteps2D instanceof AffineTransform) {
-                warp = new WarpAffine((AffineTransform) allSteps2D);
+            if (automaticGR && allSteps instanceof AffineTransform) {
+                if (automaticGG) {
+                    // Cheapest approach: just update 'gridToCRS'.
+                    MathTransform mtr;
+                    mtr = sourceGG.getGridToCRS();
+                    mtr = mtFactory.createConcatenatedTransform(mtr,  step2.inverse());
+                    targetGG = new GridGeometry2D(sourceGG.getGridRange(), mtr, targetCRS);
+                    /*
+                     * Note: do NOT use the "GridGeometry2D(sourceGridRange, targetEnvelope)"
+                     * constructor in the above line. We must give a MathTransform argument to
+                     * the constructor, not an Envelope, because the later infer a MathTransform
+                     * using heuristic rules. Only the constructor with a MathTransform argument
+                     * is fully accurate.
+                     */
+                    return create(sourceCoverage, sourceImage, targetGG, actionTaken);
+                }
+                // More general approach: apply the affine transform.
+                operation = "Affine";
+                final AffineTransform affine = (AffineTransform) allSteps.inverse();
+                paramBlk.add(affine).add(interpolation).add(background);
             } else {
-                warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D) allSteps2D);
+                /*
+                 * General case: constructs the warp transform.
+                 * TODO: Move the check for AffineTransform into WarpTransform2D.
+                 */
+                operation = "Warp";
+                final Warp warp;
+                if (allSteps2D instanceof AffineTransform) {
+                    warp = new WarpAffine((AffineTransform) allSteps2D);
+                } else {
+                    warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D) allSteps2D);
+                }
+                paramBlk.add(warp).add(interpolation).add(background);
             }
-            paramBlk.add(warp).add(interpolation).add(background);
         }
         final RenderedOp targetImage = getJAI(hints).createNS(operation, paramBlk, targetHints);
         final Locale locale = sourceCoverage.getLocale();  // For logging purpose.
@@ -656,24 +657,6 @@ final class Resampler2D extends GridCoverage2D {
             }
         }
         return JAI.getDefaultInstance();
-    }
-
-    /**
-     * Returns proposed rendering hints for the given image, merged with the given hins (which
-     * may be {@code null}).
-     */
-    private static RenderingHints getRenderingHints(final RenderedImage sourceImage,
-            final RenderingHints hints)
-    {
-        RenderingHints targetHints = ImageUtilities.getRenderingHints(sourceImage);
-        if (targetHints == null) {
-            @SuppressWarnings("unchecked")
-            final Map<RenderingHints.Key,?> workaround = (Map) hints;
-            targetHints = new RenderingHints(workaround);
-        } else if (hints != null) {
-            targetHints.add(hints);
-        }
-        return targetHints;
     }
 
     /**

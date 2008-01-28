@@ -218,14 +218,14 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         super(name, gridGeometry.getCoordinateReferenceSystem(), sources, image, properties);
         this.image = image;
         /*
-         * Wraps the user-suplied sample dimensions into instances of Grid2DSampleDimension. This
+         * Wraps the user-suplied sample dimensions into instances of RenderedSampleDimension. This
          * process will creates default sample dimensions if the user supplied null values. Those
          * default will be inferred from image type (integers, floats...) and range of values. If
          * an inconsistency is found in user-supplied sample dimensions, an IllegalArgumentException
          * is thrown.
          */
         sampleDimensions = new GridSampleDimension[image.getNumBands()];
-        isGeophysics = Grid2DSampleDimension.create(name, image, bands, sampleDimensions);
+        isGeophysics = RenderedSampleDimension.create(name, image, bands, sampleDimensions);
         /*
          * Computes the grid range if it was not explicitly provided. The range will be inferred
          * from the image size, if needed. The envelope computation (if needed) requires a valid

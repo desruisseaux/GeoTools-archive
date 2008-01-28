@@ -53,7 +53,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -144,7 +144,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 				Boolean.TRUE));
 			
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		this.coverageFactory= CoverageFactoryFinder.getGridCoverageFactory(this.hints);
 		coverageName = "geotiff_coverage";
 
 		// /////////////////////////////////////////////////////////////////////

@@ -32,6 +32,7 @@ import org.geotools.factory.Hints;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.coverage.CoverageUtilities;
@@ -72,7 +73,7 @@ abstract class IndexColorOperation extends Operation2D {
      */
     public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
         final GridCoverage2D source = (GridCoverage2D) parameters.parameter("Source").getValue();
-        final GridCoverage2D visual = source.geophysics(false);
+        final GridCoverage2D visual = source.view(ViewType.RENDERED);
         final RenderedImage  image  = visual.getRenderedImage();
         final GridSampleDimension[] bands = visual.getSampleDimensions();
         final int visibleBand = CoverageUtilities.getVisibleBand(image);
@@ -138,6 +139,7 @@ abstract class IndexColorOperation extends Operation2D {
                     bands, new GridCoverage[] { visual }, null);
 
         if (source != visual) {
+            // TODO: needs to select the right type.
             return target.geophysics(true);
         }
         return target;

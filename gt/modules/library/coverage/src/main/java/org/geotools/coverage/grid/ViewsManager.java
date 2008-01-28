@@ -185,7 +185,7 @@ final class ViewsManager {
             throw new IllegalStateException("This coverage has been disposed.");
         }
         switch (type) {
-            case RENDERED:     // TODO (fallthrough for now).
+            case RENDERED:     coverage = rendered(caller);            break;
             case PACKED:       coverage = geophysics(coverage, false); break;
             case GEOPHYSICS:   coverage = geophysics(coverage, true);  break;
             case PHOTOGRAPHIC: coverage = photographic(coverage);      break;
@@ -570,6 +570,16 @@ testLinear: for (int i=0; i<numBands; i++) {
         }
         final RenderedOp view = JAI.create(operation, param, hints);
         return createView(coverage, view, targetBands, toGeo ? 1 : 0);
+    }
+
+    /**
+     * Invoked by {@link #create} when a rendered view needs to be created.
+     *
+     * @todo Not yet implemented. For now we use the packed view as a close match. Future version
+     *       will needs to make sure that we returns the same instance than PACKED when suitable.
+     */
+    private GridCoverage2D rendered(final GridCoverage2D coverage) {
+        return get(coverage, ViewType.PACKED);
     }
 
     /**
