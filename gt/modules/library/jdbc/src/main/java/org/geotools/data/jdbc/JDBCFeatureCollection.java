@@ -106,12 +106,10 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         int count = getFeatureSource().count(query, getTransaction());
 
         if (count != -1) {
-            int maxFeatures = query.getMaxFeatures();
-
-            return (count < maxFeatures) ? count : maxFeatures;
-
             // optimization worked, return maxFeatures if count is
             // greater.
+            int maxFeatures = query.getMaxFeatures();
+            return (count < maxFeatures) ? count : maxFeatures;
         }
 
         return super.getCount();
