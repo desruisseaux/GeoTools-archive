@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.geotools.data.DataSourceException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.gml3.bindings.GML3ParsingUtils;
@@ -45,8 +46,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParser.java $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParser.java $
  */
 class EmfAppSchemaParser {
 
@@ -122,7 +123,9 @@ class EmfAppSchemaParser {
             if (e instanceof IOException) {
                 throw (IOException) e;
             }
-            throw (IOException) new IOException().initCause(e);
+            String msg = "Error parsing feature type for " + featureTypeName + " from "
+                    + schemaLocation.toExternalForm();
+            throw (IOException) new IOException(msg).initCause(e);
         }
     }
 
@@ -134,14 +137,19 @@ class EmfAppSchemaParser {
      * @return
      */
     private static XSDElementDeclaration parseFeatureType(final QName featureTypeName,
-            final URL schemaLocation) {
+            final URL schemaLocation) throws DataSourceException {
         ApplicationSchemaConfiguration configuration;
         {
             String namespaceURI = featureTypeName.getNamespaceURI();
             String uri = schemaLocation.toExternalForm();
             configuration = new ApplicationSchemaConfiguration(namespaceURI, uri);
         }
-        SchemaIndex schemaIndex = Schemas.findSchemas(configuration);
+        SchemaIndex schemaIndex;
+        try {
+            schemaIndex = Schemas.findSchemas(configuration);
+        } catch (RuntimeException e) {
+            throw new DataSourceException("Error parsing feature type for " + featureTypeName, e);
+        }
 
         XSDElementDeclaration elementDeclaration;
         elementDeclaration = schemaIndex.getElementDeclaration(featureTypeName);

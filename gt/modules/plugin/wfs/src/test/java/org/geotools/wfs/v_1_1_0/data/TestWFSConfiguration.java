@@ -11,7 +11,7 @@ import org.geotools.xml.Configuration;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public class TestWFSConfiguration extends ApplicationSchemaConfiguration {
 

@@ -29,15 +29,25 @@ class WFSFeatureCollection extends DataFeatureCollection {
     private SimpleFeatureType contentType;
 
     /**
+     * Cached size so multiple calls to {@link #getCount()} does not require
+     * multiple server calls
+     */
+    private int cachedSize = -1;
+
+    /**
+     * Cached collection bounds
+     */
+    private ReferencedEnvelope cachedBounds = null;
+
+    /**
      * 
      * @param protocolHandler
      * @param query
      *            properly named query
      * @throws IOException
      */
-    public WFSFeatureCollection(SimpleFeatureType contentType,
-            WFS110ProtocolHandler protocolHandler, Query query) throws IOException {
-        this.contentType = contentType;
+    public WFSFeatureCollection(WFS110ProtocolHandler protocolHandler, Query query) throws IOException {
+        this.contentType = protocolHandler.getQueryType(query);
         this.protocolHandler = protocolHandler;
         this.query = query;
     }
@@ -47,8 +57,21 @@ class WFSFeatureCollection extends DataFeatureCollection {
         return contentType;
     }
 
+    /**
+     * Calculates and returns the aggregated bounds of the collection contents,
+     * potentially doing a full scan.
+     * <p>
+     * As a bonuns, if a full scan needs to be done updates the cached
+     * collection size so a future call to {@link #getCount()} does not require
+     * an extra server call.
+     * </p>
+     */
     @Override
     public ReferencedEnvelope getBounds() {
+        if (cachedBounds != null) {
+            return cachedBounds;
+        }
+
         ReferencedEnvelope bounds = null;
         try {
             bounds = protocolHandler.getBounds(query);
@@ -59,15 +82,20 @@ class WFSFeatureCollection extends DataFeatureCollection {
                 geomQuery.setPropertyNames(new String[] { defaultgeom.getLocalPart() });
 
                 FeatureReader reader;
-                reader = protocolHandler.getFeatureReader(contentType, geomQuery,
-                        Transaction.AUTO_COMMIT);
+                reader = protocolHandler.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
                 bounds = new ReferencedEnvelope(contentType.getCRS());
                 try {
                     BoundingBox featureBounds;
+                    // collect size to alleviate #getCount if needed
+                    int collectionSize = 0;
                     while (reader.hasNext()) {
                         featureBounds = reader.next().getBounds();
                         bounds.expandToInclude(featureBounds.getMinX(), featureBounds.getMinY());
                         bounds.expandToInclude(featureBounds.getMaxX(), featureBounds.getMaxY());
+                        collectionSize++;
+                    }
+                    if (this.cachedSize == -1) {
+                        this.cachedSize = collectionSize;
                     }
                 } finally {
                     reader.close();
@@ -81,18 +109,31 @@ class WFSFeatureCollection extends DataFeatureCollection {
     }
 
     /**
+     * Calculates the feature collection size, doing a full scan if needed.
+     * <p>
+     * <b>WARN</b>: this method could be very inefficient if the size cannot be
+     * efficiently calculated. That is, it is not cached and
+     * {@link WFS110ProtocolHandler#getCount(Query)} returns {@code -1}.
+     * </p>
+     * 
+     * @return the FeatureCollection size.
      * @see DataFeatureCollection#getCount()
+     * @see WFS110ProtocolHandler#getCount(Query)
      */
     @Override
     public int getCount() throws IOException {
-        return protocolHandler.getCount(query);
+        if (cachedSize != -1) {
+            return cachedSize;
+        }
+        getBounds();
+        return cachedSize;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected Iterator<SimpleFeature> openIterator() throws IOException {
         FeatureReader reader;
-        reader = protocolHandler.getFeatureReader(contentType, query, Transaction.AUTO_COMMIT);
+        reader = protocolHandler.getFeatureReader(query, Transaction.AUTO_COMMIT);
         return new FeatureReaderIterator(reader);
     }
 }

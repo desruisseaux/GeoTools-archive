@@ -13,11 +13,15 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.SAXException;
 
 /**
+ * {@link GetFeatureParser} for {@link WFSFeatureReader} that uses the geotools
+ * {@link StreamingParser} to fetch Features out of a WFS GetFeature response.
  * 
  * @author Gabriel Roldan
- * @version $Id$
+ * @version $Id: StreamingParserFeatureReader.java 28937 2008-01-25 10:52:22Z
+ *          desruisseaux $
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReader.java $
  */
 class StreamingParserFeatureReader implements GetFeatureParser {
 
@@ -60,6 +64,8 @@ class StreamingParserFeatureReader implements GetFeatureParser {
     public SimpleFeature parse() throws IOException {
         Object parsed = parser.parse();
         SimpleFeature feature = (SimpleFeature) parsed;
+        if (feature != null)
+            System.out.println(feature.getAttribute("the_geom"));// TODO:REMOVE!!
         return feature;
     }
 

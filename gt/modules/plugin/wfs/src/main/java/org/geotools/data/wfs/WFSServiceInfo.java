@@ -9,7 +9,7 @@ import org.geotools.data.ServiceInfo;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public interface WFSServiceInfo extends ServiceInfo {
 

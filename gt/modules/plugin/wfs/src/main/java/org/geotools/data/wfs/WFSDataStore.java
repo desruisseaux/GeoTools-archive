@@ -26,7 +26,7 @@ import org.geotools.data.DataStore;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStore.java $
  */
 public interface WFSDataStore extends DataStore {

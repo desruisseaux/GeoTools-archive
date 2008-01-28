@@ -22,7 +22,7 @@ import junit.framework.TestCase;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public class WFSDataStoreTest extends TestCase {
 

@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @version $Id: StreamingParserFeatureReaderTest.java 28884 2008-01-22
  *          15:21:03Z groldan $
  * @since 2.5.x
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReaderTest.java $
  */
 public class StreamingParserFeatureReaderTest extends TestCase {

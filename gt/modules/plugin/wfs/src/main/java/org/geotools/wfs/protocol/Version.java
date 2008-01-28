@@ -26,7 +26,7 @@ import java.util.List;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/Version.java $
  */
 public enum Version {

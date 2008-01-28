@@ -74,7 +74,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @author Gabriel Roldan
      * @version $Id$
      * @since 2.5.x
-     * @URL $URL:
+     * @source $URL:
      *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     public static class WFSFactoryParam<T> extends Param {
@@ -116,7 +116,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @author Gabriel Roldan
      * @version $Id$
      * @since 2.5.x
-     * @URL $URL:
+     * @source $URL:
      *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     private static class WFSAuthenticator extends Authenticator {

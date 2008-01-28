@@ -21,7 +21,7 @@ package org.geotools.wfs.protocol;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public enum WFSOperationType {
     GET_CAPABILITIES("GetCapabilities"), 

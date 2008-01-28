@@ -10,7 +10,6 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -99,23 +98,23 @@ public class WFSFeatureSource implements FeatureSource, org.geotools.data.wfs.WF
     /**
      * @see FeatureSource#getFeatures(Filter)
      */
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public WFSFeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(typeName, filter));
     }
 
     /**
      * @see FeatureSource#getFeatures()
      */
-    public FeatureCollection getFeatures() throws IOException {
+    public WFSFeatureCollection getFeatures() throws IOException {
         return getFeatures(new DefaultQuery(typeName));
     }
 
     /**
      * @see FeatureSource#getFeatures(Query)
      */
-    public FeatureCollection getFeatures(final Query query) throws IOException {
+    public WFSFeatureCollection getFeatures(final Query query) throws IOException {
         Query namedQuery = namedQuery(typeName, query);
-        return new WFSFeatureCollection(featureType, protocolHandler, namedQuery);
+        return new WFSFeatureCollection(protocolHandler, namedQuery);
     }
 
     /**

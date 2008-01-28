@@ -17,8 +17,6 @@
 package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
@@ -32,7 +30,6 @@ import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.WFSConfiguration;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
@@ -42,15 +39,11 @@ import org.opengis.filter.Filter;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/WFSDataStore.java $
  */
 public final class WFS_1_1_0_DataStore implements WFSDataStore {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
-
-    private static WFSConfiguration configuration;
-
-    private final Map<String, SimpleFeatureType> featureTypeCache;
 
     private WFS110ProtocolHandler protocolHandler;
 
@@ -62,12 +55,6 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
     @SuppressWarnings("unchecked")
     public WFS_1_1_0_DataStore(final WFS110ProtocolHandler connectionFactory) {
         this.protocolHandler = connectionFactory;
-        this.featureTypeCache = new HashMap<String, SimpleFeatureType>();
-        synchronized (WFS_1_1_0_DataStore.class) {
-            if (configuration == null) {
-                configuration = new WFSConfiguration();
-            }
-        }
     }
 
     public WFSServiceInfo getInfo() {
@@ -81,14 +68,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
     public SimpleFeatureType getSchema(final String typeName) throws IOException {
-        if (featureTypeCache.containsKey(typeName)) {
-            return featureTypeCache.get(typeName);
-        }
-
-        SimpleFeatureType ftype = protocolHandler.parseDescribeFeatureType(typeName);
-        synchronized (featureTypeCache) {
-            featureTypeCache.put(typeName, ftype);
-        }
+        SimpleFeatureType ftype = protocolHandler.getFeatureType(typeName);
         return ftype;
 
     }
@@ -114,16 +94,13 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      *      org.geotools.data.Transaction)
      */
     public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
-        String typeName = query.getTypeName();
-        SimpleFeatureType featureType = getSchema(typeName);
-        return protocolHandler.getFeatureReader(featureType, query, transaction);
+        return protocolHandler.getFeatureReader(query, transaction);
     }
 
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public WFSFeatureSource getFeatureSource(final String typeName)
-            throws IOException {
+    public WFSFeatureSource getFeatureSource(final String typeName) throws IOException {
         return new WFSFeatureSource(this, typeName, protocolHandler);
     }
 

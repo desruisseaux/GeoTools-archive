@@ -7,7 +7,19 @@ import org.geotools.data.FeatureReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-public class WFSFeatureReader implements FeatureReader {
+/**
+ * Adapts a {@link GetFeatureParser} to the geotools {@link FeatureReader}
+ * interface, being the base for all the data content related implementations in
+ * the WFS module.
+ * 
+ * @author Gabriel Roldan (TOPP)
+ * @version $Id$
+ * @since 2.5.x
+ * @source $URL$
+ * @see WFS110ProtocolHandler#getFeatureReader(org.geotools.data.Query,
+ *      org.geotools.data.Transaction)
+ */
+class WFSFeatureReader implements FeatureReader {
 
     private SimpleFeature next;
 
@@ -15,11 +27,12 @@ public class WFSFeatureReader implements FeatureReader {
 
     private SimpleFeatureType featureType;
 
-    public WFSFeatureReader(final SimpleFeatureType featureType, final GetFeatureParser parser)
-            throws IOException {
-        this.featureType = featureType;
+    public WFSFeatureReader(final GetFeatureParser parser) throws IOException {
         this.parser = parser;
         this.next = parser.parse();
+        if (this.next != null) {
+            this.featureType = next.getFeatureType();
+        }
     }
 
     /**
@@ -38,6 +51,10 @@ public class WFSFeatureReader implements FeatureReader {
      * @see FeatureReader#getFeatureType()
      */
     public SimpleFeatureType getFeatureType() {
+        if (featureType == null) {
+            throw new IllegalStateException(
+                    "No features were retrieved, shouldn't be calling getFeatureType()");
+        }
         return featureType;
     }
 

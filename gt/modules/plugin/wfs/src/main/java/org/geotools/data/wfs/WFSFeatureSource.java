@@ -12,7 +12,7 @@ import org.geotools.data.ResourceInfo;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public interface WFSFeatureSource extends FeatureSource {
 

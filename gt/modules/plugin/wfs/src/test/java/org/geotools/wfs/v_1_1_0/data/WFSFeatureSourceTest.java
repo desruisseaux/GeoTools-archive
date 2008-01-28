@@ -19,12 +19,13 @@ package org.geotools.wfs.v_1_1_0.data;
 import java.io.IOException;
 
 import org.geotools.data.ResourceInfo;
+import org.geotools.feature.FeatureCollection;
 
 /**
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public class WFSFeatureSourceTest extends DataTestSupport {
 
@@ -36,7 +37,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         super.setUp();
         createProtocolHandler("geoserver_capabilities_1_1_0.xml", false, null);
         dataStore = new WFS_1_1_0_DataStore(protocolHandler);
-        //statesSource = dataStore.getFeatureSource("topp:states");
+        statesSource = dataStore.getFeatureSource("topp:states");
     }
 
     protected void tearDown() throws Exception {
@@ -45,11 +46,11 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         statesSource = null;
     }
     
-    public void testCreate(){
+    public void testCreate() throws IOException{
         try{
             new WFSFeatureSource(dataStore, "nonExistentTypeName", protocolHandler);
             fail("Expected IOException for a non existent type name");
-        }catch(IOException e){
+        }catch(IllegalArgumentException e){
             assertTrue(true);
         }
     }
@@ -91,9 +92,11 @@ public class WFSFeatureSourceTest extends DataTestSupport {
     /**
      * Test method for
      * {@link WFSFeatureSource#getFeatures(org.geotools.data.Query)}.
+     * @throws IOException 
      */
-    public void testGetFeaturesQuery() {
-        fail("Not yet implemented");
+    public void testGetFeaturesQuery() throws IOException {
+        FeatureCollection features = statesSource.getFeatures();
+        assertNotNull(features);
     }
 
 }

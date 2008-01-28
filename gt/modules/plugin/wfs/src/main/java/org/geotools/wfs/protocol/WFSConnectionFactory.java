@@ -25,7 +25,7 @@ import org.geotools.wfs.v_1_0_0.data.LogInputStream;
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
  */
 public abstract class WFSConnectionFactory {

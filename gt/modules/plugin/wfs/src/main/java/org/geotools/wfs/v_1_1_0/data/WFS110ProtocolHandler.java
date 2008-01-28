@@ -19,11 +19,13 @@ import static org.geotools.wfs.protocol.HttpMethod.GET;
 import static org.geotools.wfs.protocol.HttpMethod.POST;
 import static org.geotools.wfs.protocol.WFSOperationType.GET_FEATURE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -43,6 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,13 +71,21 @@ import net.opengis.wfs.WfsFactory;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.data.crs.ReprojectFeatureReader;
+import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSConfiguration;
@@ -82,6 +93,7 @@ import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.wfs.protocol.Version;
 import org.geotools.wfs.protocol.WFSConnectionFactory;
 import org.geotools.wfs.protocol.WFSOperationType;
+import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -96,7 +108,11 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
 import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
@@ -120,6 +136,8 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      */
     private final Map<String, FeatureTypeType> typeInfos;
 
+    private final Map<String, SimpleFeatureType> featureTypeCache;
+
     /**
      * Creates the protocol handler by parsing the capabilities document from
      * the provided input stream.
@@ -136,6 +154,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         super(Version.v1_1_0, tryGzip, auth, encoding);
         this.capabilities = parseCapabilities(capabilitiesReader);
         this.typeInfos = new HashMap<String, FeatureTypeType>();
+        this.featureTypeCache = new HashMap<String, SimpleFeatureType>();
 
         final List<FeatureTypeType> ftypes = capabilities.getFeatureTypeList().getFeatureType();
         QName typeName;
@@ -305,7 +324,8 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
         final SimpleFeatureType featureType;
         CoordinateReferenceSystem crs = getFeatureTypeCRS(typeName);
-        featureType = EmfAppSchemaParser.parse(configuration, featureDescriptorName, describeUrl, crs);
+        featureType = EmfAppSchemaParser.parse(configuration, featureDescriptorName, describeUrl,
+                crs);
 
         // adapt the feature type name
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
@@ -389,6 +409,18 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         return featureTypeInfo.getAbstract();
     }
 
+    /**
+     * Returns the bounds of the given feature type stated in the capabilities
+     * document but in the feature type default CRS.
+     * 
+     * @param typeName
+     * @return the {@code ows:WGS84BoundingBox} capabilities bounds for
+     *         {@code typeName} but in the native CRS (that is, transformed to
+     *         the CRS declared as the feature type's {@code DefaultSRS})
+     * @throws IllegalStateException
+     *             if the capabilities document does not supply the required
+     *             information.
+     */
     @SuppressWarnings("unchecked")
     public ReferencedEnvelope getFeatureTypeBounds(final String typeName) {
         FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
@@ -397,15 +429,27 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             WGS84BoundingBoxType bboxType = bboxList.get(0);
             List lowerCorner = bboxType.getLowerCorner();
             List upperCorner = bboxType.getUpperCorner();
-            double minx = (Double) lowerCorner.get(0);
-            double miny = (Double) lowerCorner.get(1);
-            double maxx = (Double) upperCorner.get(0);
-            double maxy = (Double) upperCorner.get(1);
-            CoordinateReferenceSystem crs = getFeatureTypeCRS(typeName);
-            ReferencedEnvelope typeBounds = new ReferencedEnvelope(minx, maxx, miny, maxy, crs);
-            return typeBounds;
+            double minLon = (Double) lowerCorner.get(0);
+            double minLat = (Double) lowerCorner.get(1);
+            double maxLon = (Double) upperCorner.get(0);
+            double maxLat = (Double) upperCorner.get(1);
+
+            ReferencedEnvelope latLonBounds = new ReferencedEnvelope(minLon, maxLon, minLat,
+                    maxLat, DefaultGeographicCRS.WGS84);
+
+            CoordinateReferenceSystem dataCrs = getFeatureTypeCRS(typeName);
+
+            ReferencedEnvelope bounds;
+            try {
+                bounds = latLonBounds.transform(dataCrs, true);
+            } catch (Exception e) {
+                throw new IllegalStateException("Error transforming WGS84 BoundingBox for "
+                        + typeName + " to its default CRS", e);
+            }
+            return bounds;
         }
-        return new ReferencedEnvelope();
+        throw new IllegalStateException(
+                "The capabilities document does not supply the ows:WGS84BoundingBox element");
     }
 
     public CoordinateReferenceSystem getFeatureTypeCRS(final String typeName) {
@@ -435,30 +479,105 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
     /**
      * 
      * @param query
-     * @return The bounding box of the datasource or null if unknown and too
-     *         expensive for the method to calculate or any errors occur.
+     * @return The bounding box of the datasource or {@code null} if unknown and
+     *         too expensive for the method to calculate or any errors occur.
      */
     public ReferencedEnvelope getBounds(final Query query) throws IOException {
         if (!Filter.INCLUDE.equals(query.getFilter())) {
             return null;
         }
-        String typeName = query.getTypeName();
-        return getFeatureTypeBounds(typeName);
+        final String typeName = query.getTypeName();
+
+        ReferencedEnvelope featureTypeBounds;
+
+        featureTypeBounds = getFeatureTypeBounds(typeName);
+
+        final CoordinateReferenceSystem featureTypeCrs = featureTypeBounds
+                .getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem queryCrs = query.getCoordinateSystem();
+        if (queryCrs != null && !CRS.equalsIgnoreMetadata(queryCrs, featureTypeCrs)) {
+            try {
+                featureTypeBounds = featureTypeBounds.transform(queryCrs, true);
+            } catch (TransformException e) {
+                LOGGER.log(Level.INFO, "Error transforming bounds for " + typeName, e);
+                featureTypeBounds = null;
+            } catch (FactoryException e) {
+                LOGGER.log(Level.INFO, "Error transforming bounds for " + typeName, e);
+                featureTypeBounds = null;
+            }
+        }
+        return featureTypeBounds;
     }
 
     /**
-     * TODO: implement using GetFeature with {@code resultType=hits}
+     * If the query is fully supported, makes a {@code GetFeature} request with
+     * {@code resultType=hits} and returns the counts returned by the server,
+     * otherwise returns {@code -1} as the result is too expensive to calculate.
      * 
      * @param query
      * @return
      */
     public int getCount(final Query query) throws IOException {
-        return 0;
+        final String typeName = query.getTypeName();
+        // TODO: check if filter is fully supported, return -1 if not
+        final Filter filter = query.getFilter();
+
+        int featureCount = -1;
+
+        final InputStream responseStream;
+        responseStream = sendGetFeatures(query, typeName, filter);
+        try {
+            XmlPullParser parser = null;
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+
+            // parse root element
+            parser = factory.newPullParser();
+            parser.setInput(responseStream, "UTF-8");
+            parser.nextTag();
+
+            String numberOfFeatures = null;
+            // look for schema location
+            for (int i = 0; i < parser.getAttributeCount(); i++) {
+                if ("numberOfFeatures".equals(parser.getAttributeName(i))) {
+                    numberOfFeatures = parser.getAttributeValue(i);
+                    break;
+                }
+            }
+            // reset input stream
+            parser.setInput(null);
+            if (numberOfFeatures == null) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.finer("Response din't return numberOfFeatures");
+                }
+            } else {
+                featureCount = Integer.valueOf(numberOfFeatures);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, "Error calculating query count", e);
+        } finally {
+            responseStream.close();
+        }
+        return featureCount;
     }
 
+    /**
+     * Makes a WFS GetFeature request for the given geotools query and returns a
+     * feature reader whose content is accordingly limited by the query, even if
+     * the backend WFS can't cope up with the full query.
+     * 
+     * @param query
+     * @param transaction
+     * @return a FeatureReader correctly set up to return the contents as per
+     *         requested by the query
+     * @throws IOException
+     */
     @SuppressWarnings("unchecked")
-    public FeatureReader getFeatureReader(final SimpleFeatureType contentType, final Query query,
-            final Transaction transaction) throws IOException {
+    public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
+            throws IOException {
+        SimpleFeatureType contentType = getQueryType(query);
+
         // by now encode the full query to be sent to the server.
         // TODO: implement filter splitting for server supported/unsupported
 
@@ -470,6 +589,68 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             return new EmptyFeatureReader(contentType);
         }
 
+        final InputStream responseStream;
+        responseStream = sendGetFeatures(query, typeName, filter);
+        final QName name = featureTypeInfo.getName();
+        final Configuration configuration = getConfiguration();
+        GetFeatureParser parser = new StreamingParserFeatureReader(configuration, responseStream,
+                name);
+        FeatureReader reader = new WFSFeatureReader(parser);
+
+        if (!reader.hasNext()) {
+            return new EmptyFeatureReader(contentType);
+        }
+
+        SimpleFeatureType readerType = reader.getFeatureType();
+        if (!contentType.equals(readerType)) {
+            final boolean cloneContents = false;
+            reader = new ReTypeFeatureReader(reader, contentType, cloneContents);
+        }
+        return reader;
+    }
+
+    public SimpleFeatureType getQueryType(final Query query) throws IOException {
+        String typeName = query.getTypeName();
+        final SimpleFeatureType featureType = getFeatureType(typeName);
+        final CoordinateReferenceSystem coordinateSystemReproject = query
+                .getCoordinateSystemReproject();
+
+        String[] propertyNames = query.getPropertyNames();
+
+        SimpleFeatureType queryType = featureType;
+        if (propertyNames != null && propertyNames.length > 0) {
+            try {
+                queryType = DataUtilities.createSubType(queryType, propertyNames);
+            } catch (SchemaException e) {
+                throw new DataSourceException(e);
+            }
+        } else {
+            propertyNames = DataUtilities.attributeNames(featureType);
+        }
+
+        if (coordinateSystemReproject != null) {
+            try {
+                queryType = DataUtilities.createSubType(featureType, propertyNames,
+                        coordinateSystemReproject);
+            } catch (SchemaException e) {
+                throw new DataSourceException(e);
+            }
+        }
+
+        return queryType;
+    }
+
+    /**
+     * Protected to be easily overriden by a unit test friendly subclass
+     * 
+     * @return
+     */
+    Configuration getConfiguration() {
+        return configuration;
+    }
+
+    private InputStream sendGetFeatures(final Query query, final String typeName, Filter filter)
+            throws IOException, MalformedURLException {
         final InputStream responseStream;
         // TODO: enable POST
         if (false && supports(GET_FEATURE, POST)) {
@@ -493,11 +674,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
                     sortBy, false);
             responseStream = sendGet(getFeatureGetUrl);
         }
-        final QName name = featureTypeInfo.getName();
-        GetFeatureParser parser = new StreamingParserFeatureReader(configuration, responseStream,
-                name);
-        WFSFeatureReader reader = new WFSFeatureReader(contentType, parser);
-        return reader;
+        return responseStream;
     }
 
     /**
@@ -510,12 +687,12 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      * @param maxFeatures
      * @param sortBy
      * @return
-     * @throws MalformedURLException
+     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     private URL createGetFeatureGet(final String typeName, final List<String> propertyNames,
             final Filter filter, final int maxFeatures, final List<SortBy> sortBy, boolean hits)
-            throws MalformedURLException {
+            throws IOException {
         final URL getFeatureGetUrl = getOperationURL(GET_FEATURE, GET);
         Map<String, String> kvpMap = new LinkedHashMap<String, String>();
         {
@@ -565,7 +742,8 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             kvpMap.put("PROPERTYNAME", sb.toString());
         }
 
-        if (Filter.INCLUDE != filter) {
+        // TODO: enable filter
+        if (false && Filter.INCLUDE != filter) {
             if (filter instanceof BBOX) {
 
             } else if (filter instanceof Id) {
@@ -635,19 +813,30 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         return getFeatureRequest;
     }
 
-    private String encodeGetFeatureGetFilter(Filter filter) {
-        return null;
+    private String encodeGetFeatureGetFilter(final Filter filter) throws IOException {
+
+        OGCConfiguration filterConfig = new OGCConfiguration();
+        Encoder encoder = new Encoder(filterConfig);
+
+        OutputStream out = new ByteArrayOutputStream();
+        encoder.encode(filter, OGC.Filter, out);
+        String encoded = out.toString();
+        System.out.println(encoded);
+        return encoded;
     }
 
     /**
      * Sends a GET request represented by {@code fullQuery} and returns an input
      * stream from which to get the server response.
+     * <p>
+     * Note this method is package protected only to easy unit testing
+     * </p>
      * 
      * @param fullQuery
      * @return
      * @throws IOException
      */
-    private InputStream sendGet(final URL fullQuery) throws IOException {
+    InputStream sendGet(final URL fullQuery) throws IOException {
         HttpURLConnection connection = getConnection(fullQuery, GET);
         InputStream responseStream = getInputStream(connection);
         return responseStream;
@@ -709,6 +898,10 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
     /**
      * Returns the feature type metadata object parsed from the capabilities
      * document for the given {@code typeName}
+     * <p>
+     * NOTE: this method is package protected just to be also accessed by unit
+     * test.
+     * </p>
      * 
      * @param typeName
      *            the typeName as stated in the capabilities
@@ -719,11 +912,23 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      *             if {@code typeName} is not the name of a FeatureType stated
      *             in the capabilities document.
      */
-    private FeatureTypeType getFeatureTypeInfo(final String typeName) {
+    FeatureTypeType getFeatureTypeInfo(final String typeName) {
         if (!typeInfos.containsKey(typeName)) {
             throw new IllegalArgumentException("Type name not found: " + typeName);
         }
         return typeInfos.get(typeName);
+    }
+
+    public SimpleFeatureType getFeatureType(final String typeName) throws IOException {
+        if (featureTypeCache.containsKey(typeName)) {
+            return featureTypeCache.get(typeName);
+        }
+
+        SimpleFeatureType ftype = parseDescribeFeatureType(typeName);
+        synchronized (featureTypeCache) {
+            featureTypeCache.put(typeName, ftype);
+        }
+        return ftype;
     }
 
 }
