@@ -309,8 +309,10 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         count = featureSource.getCount(query);
 
         if (count != -1) {
-            // we have an optimization!
-            return count;
+            // optimization worked, return maxFeatures if count is
+            // greater.
+            int maxFeatures = query.getMaxFeatures();
+            return (count < maxFeatures) ? count : maxFeatures;
         }
 
         // Okay lets count the FeatureReader
