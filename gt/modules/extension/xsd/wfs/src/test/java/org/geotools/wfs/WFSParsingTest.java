@@ -28,6 +28,7 @@ import net.opengis.wfs.FeatureTypeListType;
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.WFSCapabilitiesType;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.w3c.dom.Document;
 import java.io.BufferedWriter;
@@ -43,6 +44,8 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -157,12 +160,17 @@ public class WFSParsingTest extends TestCase {
         XSDSchema schema = Schemas.parse(loc);
 
         assertNotNull(schema);
-        assertEquals(1, schema.getTypeDefinitions().size());
+        final String targetNs = "http://cite.opengeospatial.org/gmlsf";
+        final String featureName = "PrimitiveGeoFeature";
+        QName name = new QName(targetNs, featureName);
+        XSDElementDeclaration elementDeclaration = Schemas.getElementDeclaration(schema, name);
+        assertNotNull(elementDeclaration);
+        
 
-        XSDComplexTypeDefinition type = (XSDComplexTypeDefinition) schema.getTypeDefinitions().get(
-                0);
+        XSDComplexTypeDefinition type = (XSDComplexTypeDefinition) elementDeclaration.getType();
+        
         assertEquals("PrimitiveGeoFeatureType", type.getName());
-        assertEquals("http://cite.opengeospatial.org/gmlsf", type.getTargetNamespace());
+        assertEquals(targetNs, type.getTargetNamespace());
     }
 
     public void testParseGetFeature() throws Exception {
