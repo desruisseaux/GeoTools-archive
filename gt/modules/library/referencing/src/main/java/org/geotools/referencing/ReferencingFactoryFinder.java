@@ -138,8 +138,7 @@ public final class ReferencingFactoryFinder extends FactoryFinder {
          */
         if (authorityNames == null) {
             authorityNames = new LinkedHashSet<String>();
-            final Hints hints = mergeSystemHints(null);
-            hints.clear(); // We want an empty StrictHints instance.
+            final Hints hints = EMPTY_HINTS;
 loop:       for (int i=0; ; i++) {
                 final Set<? extends AuthorityFactory> factories;
                 switch (i) {

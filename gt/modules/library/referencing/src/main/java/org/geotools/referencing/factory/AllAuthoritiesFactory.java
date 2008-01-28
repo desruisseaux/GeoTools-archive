@@ -130,7 +130,14 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * Returns a copy of the hints specified by the user at construction time.
      */
     private Hints getHints() {
-        return hints.isEmpty() ? null : new Hints(hints);
+        if (hints.isEmpty()) {
+            return ReferencingFactoryFinder.EMPTY_HINTS;
+        } else {
+            // Clones EMPTY_HINTS as a trick for getting a StricHints instance.
+            final Hints hints = ReferencingFactoryFinder.EMPTY_HINTS.clone();
+            hints.putAll(this.hints);
+            return hints;
+        }
     }
 
     /**

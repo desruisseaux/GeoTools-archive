@@ -931,6 +931,16 @@ public class Hints extends RenderingHints {
     }
 
     /**
+     * Returns a new map of hints with the same content than this map.
+     *
+     * @since 2.4
+     */
+    @Override
+    public Hints clone() {
+        return (Hints) super.clone();
+    }
+
+    /**
      * Notifies that {@linkplain System#getProperties system properties} will need to be scanned
      * for any property keys defined in the {@link GeoTools} class. New values found (if any) will
      * be added to the set of {@linkplain GeoTools#getDefaultHints default hints}. For example if

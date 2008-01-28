@@ -15,6 +15,9 @@
  */
 package org.geotools.factory;
 
+import java.util.Map;
+import java.awt.RenderingHints;
+
 
 /**
  * Hints which should not be merged with global hints, usually because the global hints have
@@ -25,11 +28,55 @@ package org.geotools.factory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class StrictHints extends Hints {
+class StrictHints extends Hints {
     /**
      * Creates a set of strict hints which is a copy of the specified hints.
      */
     public StrictHints(final Hints hints) {
         super(hints);
+    }
+
+    /**
+     * An immutable set of empty hints.
+     */
+    static final class Empty extends StrictHints {
+        /**
+         * Creates an empty instance.
+         */
+        Empty() {
+            super(null);
+        }
+
+        /**
+         * Unsupported operation.
+         */
+        @Override
+        public void add(RenderingHints hints) {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Unsupported operation.
+         */
+        @Override
+        public Object put(Object key, Object value) {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Unsupported operation.
+         */
+        @Override
+        public void putAll(Map<?,?> map) {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Returns a modifiable copy.
+         */
+        @Override
+        public StrictHints clone() {
+            return new StrictHints(null);
+        }
     }
 }

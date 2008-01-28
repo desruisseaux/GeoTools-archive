@@ -26,10 +26,12 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.factory.FactoryNotFoundException;
 
 
 /**
@@ -112,11 +114,24 @@ public final class URN_AuthorityFactoryTest extends TestCase {
     /**
      * Tests fetching the URN authority when the "longitude first axis order" hint is set.
      */
-    public void testWhenForceXY() {
+    public void testWhenForceXY() throws FactoryException {
         try {
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "http");
             Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-            assertNotNull(ReferencingFactoryFinder.getCRSAuthorityFactory("URN:OGC:DEF", null));
+            try {
+                ReferencingFactoryFinder.getCRSAuthorityFactory("URN:OGC:DEF", null);
+                fail("URN factory should not accept FORCE_LONGITUDE_FIRST_AXIS_ORDER = TRUE");
+            } catch (FactoryNotFoundException e) {
+                // This is the expected exception.
+            }
+            try {
+                CRS.decode("URN:OGC:DEF:CRS:CRS:84", true);
+                fail("URN factory should not accept FORCE_LONGITUDE_FIRST_AXIS_ORDER = TRUE");
+            } catch (NoSuchAuthorityCodeException e) {
+                // This is the expected exception.
+            }
+            CoordinateReferenceSystem crs = CRS.decode("URN:OGC:DEF:CRS:CRS:84");
+            assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
         } finally {
             Hints.removeSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);
             Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);

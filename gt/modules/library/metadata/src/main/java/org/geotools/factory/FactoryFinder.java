@@ -27,6 +27,11 @@ package org.geotools.factory;
  */
 public abstract class FactoryFinder {
     /**
+     * A set of empty hints, which exclude any {@linkplain Geotools#getDefaultHints system hints}.
+     */
+    public static final Hints EMPTY_HINTS = new StrictHints.Empty();
+
+    /**
      * Creates a new factory finder.
      */
     protected FactoryFinder() {

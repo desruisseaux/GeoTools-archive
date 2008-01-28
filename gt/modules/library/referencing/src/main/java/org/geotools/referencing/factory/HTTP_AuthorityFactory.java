@@ -127,9 +127,6 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * constructor as well.
      */
     static AllAuthoritiesFactory getFactory(Hints hints, final String authority) {
-        if (hints == null || hints.isEmpty()) {
-            return AllAuthoritiesFactory.DEFAULT;
-        }
         if (!defaultAxisOrderHints(hints, authority)) {
             hints = new Hints(hints);
             hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
