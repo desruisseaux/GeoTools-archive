@@ -2,7 +2,6 @@ package org.geotools.geometry.iso.primitive;
 
 import junit.framework.TestCase;
 
-import org.geotools.filter.GeometryFilterImpl;
 import org.geotools.geometry.GeometryBuilder;
 import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.PrecisionModel;
