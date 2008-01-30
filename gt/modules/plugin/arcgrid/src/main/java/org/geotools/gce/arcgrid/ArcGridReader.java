@@ -739,9 +739,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		}
 		if (crs == null) {
 			crs = AbstractGridFormat.getDefaultCRS();
-			LOGGER.info(new StringBuffer(
-					"Unable to find crs, continuing with default WGS4 CRS")
-					.append("\n").append(crs.toWKT()).toString());
+			LOGGER.info( "Unable to find crs, continuing with default WGS4 CRS" );
 		}
 	}
 }
