@@ -35,7 +35,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
 
     protected void setUp() throws Exception {
         super.setUp();
-        createProtocolHandler("geoserver_capabilities_1_1_0.xml", false, null);
+        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
         dataStore = new WFS_1_1_0_DataStore(protocolHandler);
         statesSource = dataStore.getFeatureSource("topp:states");
     }

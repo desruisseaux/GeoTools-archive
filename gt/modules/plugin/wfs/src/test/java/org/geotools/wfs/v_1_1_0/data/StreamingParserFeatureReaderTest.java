@@ -58,11 +58,10 @@ public class StreamingParserFeatureReaderTest extends TestCase {
      * @throws Exception
      */
     public void testParseGeoServerSimpleFeatures() throws Exception {
-        final String nsUri = "http://www.openplans.org/spearfish";
-        final QName featureName = new QName(nsUri, "archsites");
+        final QName featureName = DataTestSupport.GEOS_ARCHSITES_TYPENAME;
         final int expectedCount = 3;
-        final String fileName = "geoserver_archsites_features.xml";
-        final String schemaName = "schemas/geoserver/geoserver_archsites_describeFeatureType.xsd";
+        final String fileName = DataTestSupport.GEOS_ARCHSITES_DATA;
+        final String schemaName = DataTestSupport.GEOS_ARCHSITES_SCHEMA;
 
         final FeatureVisitor assertor = new FeatureVisitor() {
             public void visit(Feature f) {
@@ -87,11 +86,10 @@ public class StreamingParserFeatureReaderTest extends TestCase {
      * @throws Exception
      */
     public void testParseCubeWerxComplexFeatures_GovernmentalUnitCE() throws Exception {
-        final String nsUri = "http://www.fgdc.gov/framework/073004/gubs";
-        final QName featureName = new QName(nsUri, "GovernmentalUnitCE");
+        final QName featureName = DataTestSupport.CUBEWERX_GOVUNITCE_TYPENAME;
         final int expectedCount = 3;
-        final String fileName = "CubeWerx_nsdi_GovernmentalUnitCE.xml";
-        final String schemaName = "schemas/CubeWerx_nsdi/CubeWerx_nsdi_GovernmentalUnitCE_DescribeFeatureType.xsd";
+        final String fileName = DataTestSupport.CUBEWERX_GOVUNITCE_DATA;
+        final String schemaName = DataTestSupport.CUBEWERX_GOVUNITCE_SCHEMA;
 
         final FeatureVisitor assertor = new FeatureVisitor() {
             public void visit(Feature f) {

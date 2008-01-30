@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @version $Id$
  * @since 2.5.x
  * @source $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParserTest.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/EmfAppSchemaParserTest.java $
  */
 public class EmfAppSchemaParserTest extends TestCase {
 
@@ -57,31 +57,32 @@ public class EmfAppSchemaParserTest extends TestCase {
      * @throws IOException
      */
     public void testParseGeoServerSimpleFeatureType() throws IOException {
-        final String namespace = "http://www.openplans.org/topp";
-        final String featureName = "states";
-        final QName featureTypeName = new QName(namespace, featureName);
-        final String schemaFileName = "schemas/geoserver/DescribeFeatureType_States.xsd";
+        final QName featureTypeName = DataTestSupport.GEOS_STATES_TYPENAME;
+        final String schemaFileName = DataTestSupport.GEOS_STATES_SCHEMA;
         final URL schemaLocation = TestData.getResource(this, schemaFileName);
         final int expectedAttributeCount = 28;
 
-        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation, expectedAttributeCount);
+        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation,
+                expectedAttributeCount);
+        assertNotNull(ftype);
     }
 
     public void testParseCubeWerx_GML_Level1_FeatureType() throws IOException {
-        final String namespace = "http://www.fgdc.gov/framework/073004/gubs";
-        final String featureName = "GovernmentalUnitCE";
-        final QName featureTypeName = new QName(namespace, featureName);
-        final String schemaFileName = "schemas/CubeWerx_nsdi/CubeWerx_nsdi_GovernmentalUnitCE_DescribeFeatureType.xsd";
+        final QName featureTypeName = DataTestSupport.CUBEWERX_GOVUNITCE_TYPENAME;
+        final String schemaFileName = DataTestSupport.CUBEWERX_GOVUNITCE_SCHEMA;
         final URL schemaLocation = TestData.getResource(this, schemaFileName);
         final int expectedAttributeCount = 18;
 
-        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation, expectedAttributeCount);
-        for (AttributeDescriptor descriptor : ftype.getAttributes()){
+        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation,
+                expectedAttributeCount);
+        for (AttributeDescriptor descriptor : ftype.getAttributes()) {
             System.out.print(descriptor.getName().getNamespaceURI());
             System.out.print("#");
             System.out.print(descriptor.getName().getLocalPart());
-            System.out.print("[" + descriptor.getMinOccurs() + ":" + descriptor.getMaxOccurs() + "]");
-            System.out.print(" (" + descriptor.getType().getName() + ": " + descriptor.getType().getBinding() + ")");
+            System.out.print("[" + descriptor.getMinOccurs() + ":" + descriptor.getMaxOccurs()
+                    + "]");
+            System.out.print(" (" + descriptor.getType().getName() + ": "
+                    + descriptor.getType().getBinding() + ")");
             System.out.println("");
         }
     }
@@ -90,12 +91,11 @@ public class EmfAppSchemaParserTest extends TestCase {
             final URL schemaLocation, int expectedAttributeCount) throws IOException {
         assertNotNull(schemaLocation);
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-        
+
         Configuration configuration = new WFSConfiguration();
-        
+
         SimpleFeatureType featureType;
-        featureType = EmfAppSchemaParser.parse(configuration, featureTypeName,
-                schemaLocation, crs);
+        featureType = EmfAppSchemaParser.parse(configuration, featureTypeName, schemaLocation, crs);
 
         assertNotNull(featureType);
         assertSame(crs, featureType.getCRS());
