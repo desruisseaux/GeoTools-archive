@@ -36,7 +36,6 @@ import org.opengis.geometry.Geometry;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Ring;
 
-import com.vividsolutions.jts.geom.LinearRing;
 
 /**
  * Computes the topological relationship ({@link Location}) of a single point
