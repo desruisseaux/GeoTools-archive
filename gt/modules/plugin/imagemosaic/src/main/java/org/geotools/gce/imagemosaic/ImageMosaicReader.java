@@ -97,6 +97,7 @@ import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 
 /**
  * This reader is repsonsible for providing access to mosaic of georeferenced
@@ -490,7 +491,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		Rectangle dim = null;
 		boolean blend = false;
 		int maxNumTiles=this.maxAllowedTiles;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
@@ -534,7 +535,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				}
 				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
 						.getName().toString())) {
-					overviewPolicy=param.stringValue();
+					overviewPolicy=(OverviewPolicy) param.getValue();
 					continue;
 				}	
 				if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES
@@ -587,7 +588,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private GridCoverage loadTiles(GeneralEnvelope requestedOriginalEnvelope,
 			Color transparentColor, Color outputTransparentColor,
 			double inputImageThresholdValue, Rectangle pixelDimension,
-			boolean fading, String overviewPolicy, int maxNumTiles) throws IOException {
+			boolean fading, OverviewPolicy overviewPolicy, int maxNumTiles) throws IOException {
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER
@@ -757,7 +758,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Color outputTransparentColor, final Envelope requestedJTSEnvelope,
 			final List<SimpleFeature> features,
 			final Iterator<SimpleFeature> it, double inputImageThresholdValue,
-			Rectangle dim, int numImages, boolean blend, String overviewPolicy)
+			Rectangle dim, int numImages, boolean blend, OverviewPolicy overviewPolicy)
 			throws DataSourceException, TransformException {
 
 		try {

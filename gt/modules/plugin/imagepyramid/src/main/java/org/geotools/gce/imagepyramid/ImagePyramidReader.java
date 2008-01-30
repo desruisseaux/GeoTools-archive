@@ -41,6 +41,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.factory.FactoryRegistryException;
@@ -360,7 +361,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -383,7 +384,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					}
 					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
 							.getName().toString())) {
-						overviewPolicy = param.stringValue();
+						overviewPolicy = (OverviewPolicy) param.getValue();
 						continue;
 					}
 				}
@@ -412,7 +413,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @throws IOException
 	 */
 	private GridCoverage loadTiles(GeneralEnvelope requestedEnvelope,
-			Rectangle dim, GeneralParameterValue[] params, String overviewPolicy)
+			Rectangle dim, GeneralParameterValue[] params, OverviewPolicy overviewPolicy)
 			throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
@@ -495,7 +496,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @throws FactoryRegistryException
 	 */
 	private GridCoverage loadRequestedTiles(GeneralEnvelope requestedEnvelope,
-			Rectangle dim, GeneralParameterValue[] params, String overviewPolicy)
+			Rectangle dim, GeneralParameterValue[] params, OverviewPolicy overviewPolicy)
 			throws TransformException, IOException {
 
 		// if we get here we have something to load

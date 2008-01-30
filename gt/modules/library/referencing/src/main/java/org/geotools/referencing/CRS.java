@@ -945,7 +945,7 @@ public final class CRS {
                 final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
                 final CoordinateOperation operation;
                 try {
-                    operation = factory.createOperation(targetCRS, targetCRS);
+                    operation = factory.createOperation(sourceCRS, targetCRS);
                 } catch (FactoryException exception) {
                     throw new TransformException(Errors.format(ErrorKeys.CANT_TRANSFORM_ENVELOPE), exception);
                 }

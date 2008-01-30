@@ -79,6 +79,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.vividsolutions.jts.io.InStream;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 
 /**
  * This class can read an arc grid data source (ArcGrid or GRASS ASCII) and
@@ -422,7 +423,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
@@ -438,7 +439,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 				}
 				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
 						.getName().toString())) {
-					overviewPolicy=param.stringValue();
+					overviewPolicy=(OverviewPolicy) param.getValue();
 				}
 			}
 		}
@@ -457,7 +458,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim, String overviewPolicy) throws IOException {
+			Rectangle requestedDim, OverviewPolicy overviewPolicy) throws IOException {
 
 		if (!closeMe) {
 

@@ -29,7 +29,6 @@ import java.lang.reflect.Modifier;
 import javax.naming.Name;
 import javax.sql.DataSource;
 
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.util.InternationalString;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
@@ -74,48 +73,13 @@ public class Hints extends RenderingHints {
      */
     private static boolean needScan = true;
 
+
+
     ////////////////////////////////////////////////////////////////////////
     ////////                                                        ////////
-    ////////                        Factories                       ////////
-    ////////                                                        ////////
-    ////////  The following keys are mainly about getting instances ////////
-    ////////  of the right factory.  Keys for factory configuration ////////
-    ////////  other than JTS are defined in their own categories    ////////
-    ////////  after this one.  JTS factories are treated especially ////////
-    ////////  because they are implemented outside Geotools.        ////////
+    ////////              Coordinate Reference Systems              ////////
     ////////                                                        ////////
     ////////////////////////////////////////////////////////////////////////
-
-    /**
-     * The {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
-     *
-     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
-     */
-    public static final ClassKey JTS_GEOMETRY_FACTORY = new ClassKey(
-            "com.vividsolutions.jts.geom.GeometryFactory");
-
-    /**
-     * The {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
-     *
-     * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
-     */
-    public static final ClassKey JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
-            "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
-
-    /**
-     * The {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
-     *
-     * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
-     */
-    public static final Key JTS_PRECISION_MODEL = new Key(
-            "com.vividsolutions.jts.geom.PrecisionModel");
-
-    /**
-     * The spatial reference ID for {@link com.vividsolutions.jts.geom.GeometryFactory}.
-     *
-     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
-     */
-    public static final Key JTS_SRID = new Key(Integer.class);
 
     /**
      * The {@link org.opengis.referencing.crs.CRSAuthorityFactory} instance to use.
@@ -191,93 +155,6 @@ public class Hints extends RenderingHints {
             "org.opengis.referencing.operation.MathTransformFactory");
 
     /**
-     * The {@link org.geotools.data.FeatureLockFactory} instance to use.
-     *
-     * @see CommonFactoryFinder#getFeatureLockFactory
-     *
-     * @since 2.4
-     */
-    public static final ClassKey FEATURE_LOCK_FACTORY = new ClassKey(
-            "org.geotools.data.FeatureLockFactory");
-
-    /**
-     * The {@link org.geotools.feature.FeatureCollections} instance to use.
-     *
-     * @see CommonFactoryFinder#getFeatureCollections
-     *
-     * @since 2.4
-     */
-    public static final ClassKey FEATURE_COLLECTIONS = new ClassKey(
-            "org.geotools.feature.FeatureCollections");
-
-    /**
-     * The {@link org.geotools.feature.FeatureTypeFactory} instance to use.
-     *
-     * @see CommonFactoryFinder#getFeatureTypeFactory
-     *
-     * @since 2.4
-     */
-    public static final ClassKey FEATURE_TYPE_FACTORY = new ClassKey(
-            "org.geotools.feature.FeatureTypeFactory");
-
-    /**
-     * Used to provide the <cite>type name</cite> for the returned
-     * {@link org.geotools.feature.FeatureTypeFactory}. Values should
-     * be instances of {@link String}.
-     *
-     * @since 2.4
-     */
-    public static final Key FEATURE_TYPE_FACTORY_NAME = new Key(String.class);
-
-    /**
-     * Whether the features returned by the feature collections should be considered detached from the
-     * datastore, that is, they are updatable without altering the backing store (makes sense only
-     * if features are kept in memory or if there is some transparent persistent mechanism in place,
-     * such as the Hibernate one)
-     *
-     * @since 2.4
-     */
-    public static final Key FEATURE_DETACHED = new Key(Boolean.class);
-
-    /**
-     * The {@link org.geotools.styling.StyleFactory} instance to use.
-     *
-     * @see CommonFactoryFinder#getStyleFactory
-     *
-     * @since 2.4
-     */
-    public static final ClassKey STYLE_FACTORY = new ClassKey(
-            "org.geotools.styling.StyleFactory");
-
-    /**
-     * The {@link org.geotools.feature.AttributeTypeFactory} instance to use.
-     *
-     * @see CommonFactoryFinder#getAttributeTypeFactory
-     *
-     * @since 2.4
-     */
-    public static final ClassKey ATTRIBUTE_TYPE_FACTORY = new ClassKey(
-            "org.geotools.feature.AttributeTypeFactory");
-
-    /**
-     * The {@link org.opengis.filter.FilterFactory} instance to use.
-     *
-     * @see CommonFactoryFinder#getFilterFactory
-     *
-     * @since 2.4
-     */
-    public static final ClassKey FILTER_FACTORY = new ClassKey(
-            "org.opengis.filter.FilterFactory");
-
-
-
-    ////////////////////////////////////////////////////////////////////////
-    ////////                                                        ////////
-    ////////              Coordinate Reference Systems              ////////
-    ////////                                                        ////////
-    ////////////////////////////////////////////////////////////////////////
-
-    /**
      * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem}
      * to use. This is used by some factories capable to provide a default CRS
      * when no one were explicitly specified by the user.
@@ -339,7 +216,7 @@ public class Hints extends RenderingHints {
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
     public static final OptionKey DATUM_SHIFT_METHOD = new OptionKey(
-            "Molodenski","Abridged_Molodenski","Geocentric","*");
+            "Molodenski", "Abridged_Molodenski", "Geocentric", "*");
 
     /**
      * Tells if {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate
@@ -479,6 +356,411 @@ public class Hints extends RenderingHints {
      */
     public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
 
+    /**
+     * Version number of the requested service. This hint is used for example in order to get
+     * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
+     * backed by a particular version of EPSG database. The value should be an instance of
+     * {@link org.geotools.util.Version}.
+     *
+     * @since 2.4
+     */
+    public static final Key VERSION = new Key("org.geotools.util.Version");
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                     ISO Geometries                     ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use in
+     * ISO geometry factories.
+     *
+     * @see #JTS_SRID
+     * @since 2.5
+     */
+    public static final Key CRS = new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
+
+    /**
+     * The {@link org.opengis.geometry.Precision} to use in ISO geometry factories.
+     *
+     * @see #JTS_PRECISION_MODEL
+     * @since 2.5
+     */
+    public static final Key PRECISION = new Key("org.opengis.geometry.Precision");
+
+    /**
+     * The {@link org.opengis.geometry.PositionFactory} instance to use.
+     *
+     * @since 2.5
+     */
+    public static final Key POSITION_FACTORY = new Key("org.opengis.geometry.PositionFactory");
+
+    /**
+     * The {@link org.opengis.geometry.coordinate.GeometryFactory} instance to use.
+     *
+     * @see #JTS_GEOMETRY_FACTORY
+     * @since 2.5
+     */
+    public static final Key GEOMETRY_FACTORY = new Key("org.opengis.geometry.coordinate.GeometryFactory");
+
+    /**
+     * The {@link org.opengis.geometry.complex.ComplexFactory} instance to use.
+     *
+     * @since 2.5
+     */
+    public static final Key COMPLEX_FACTORY = new Key("org.opengis.geometry.complex.ComplexFactory");
+
+    /**
+     * The {@link org.opengis.geometry.aggregate.AggregateFactory} instance to use.
+     *
+     * @since 2.5
+     */
+    public static final Key AGGREGATE_FACTORY = new Key("org.opengis.geometry.aggregate.AggregateFactory");
+
+    /**
+     * The {@link org.opengis.geometry.primitive.PrimitiveFactory} instance to use.
+     *
+     * @since 2.5
+     */
+    public static final Key PRIMITIVE_FACTORY = new Key("org.opengis.geometry.primitive.PrimitiveFactory");
+
+    /**
+     * If {@code true}, geometry will be validated on creation. A value of {@code false}
+     * may speedup geometry creation at the cost of less safety.
+     *
+     * @since 2.5
+     */
+    public static final Key GEOMETRY_VALIDATE = new Key(Boolean.class);
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                     JTS Geometries                     ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
+     *
+     * @see #GEOMETRY_FACTORY
+     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
+     */
+    public static final ClassKey JTS_GEOMETRY_FACTORY = new ClassKey(
+            "com.vividsolutions.jts.geom.GeometryFactory");
+
+    /**
+     * The {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
+     */
+    public static final ClassKey JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
+            "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
+
+    /**
+     * The {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
+     * @see #PRECISION
+     */
+    public static final Key JTS_PRECISION_MODEL = new Key(
+            "com.vividsolutions.jts.geom.PrecisionModel");
+
+    /**
+     * The spatial reference ID for {@link com.vividsolutions.jts.geom.GeometryFactory}.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
+     * @see #CRS
+     */
+    public static final Key JTS_SRID = new Key(Integer.class);
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                        Features                        ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link org.geotools.data.FeatureLockFactory} instance to use.
+     *
+     * @see CommonFactoryFinder#getFeatureLockFactory
+     *
+     * @since 2.4
+     */
+    public static final ClassKey FEATURE_LOCK_FACTORY = new ClassKey(
+            "org.geotools.data.FeatureLockFactory");
+
+    /**
+     * The {@link org.geotools.feature.FeatureCollections} instance to use.
+     *
+     * @see CommonFactoryFinder#getFeatureCollections
+     *
+     * @since 2.4
+     */
+    public static final ClassKey FEATURE_COLLECTIONS = new ClassKey(
+            "org.geotools.feature.FeatureCollections");
+
+    /**
+     * The {@link org.geotools.feature.FeatureTypeFactory} instance to use.
+     *
+     * @see CommonFactoryFinder#getFeatureTypeFactory
+     *
+     * @since 2.4
+     */
+    public static final ClassKey FEATURE_TYPE_FACTORY = new ClassKey(
+            "org.geotools.feature.FeatureTypeFactory");
+
+    /**
+     * Used to provide the <cite>type name</cite> for the returned
+     * {@link org.geotools.feature.FeatureTypeFactory}. Values should
+     * be instances of {@link String}.
+     *
+     * @since 2.4
+     */
+    public static final Key FEATURE_TYPE_FACTORY_NAME = new Key(String.class);
+
+    /**
+     * Whether the features returned by the feature collections should be considered detached from
+     * the datastore, that is, they are updatable without altering the backing store (makes sense
+     * only if features are kept in memory or if there is some transparent persistent mechanism in
+     * place, such as the Hibernate one)
+     *
+     * @since 2.4
+     */
+    public static final Key FEATURE_DETACHED = new Key(Boolean.class);
+
+    /**
+     * The {@link org.geotools.styling.StyleFactory} instance to use.
+     *
+     * @see CommonFactoryFinder#getStyleFactory
+     *
+     * @since 2.4
+     */
+    public static final ClassKey STYLE_FACTORY = new ClassKey(
+            "org.geotools.styling.StyleFactory");
+
+    /**
+     * The {@link org.geotools.feature.AttributeTypeFactory} instance to use.
+     *
+     * @see CommonFactoryFinder#getAttributeTypeFactory
+     *
+     * @since 2.4
+     */
+    public static final ClassKey ATTRIBUTE_TYPE_FACTORY = new ClassKey(
+            "org.geotools.feature.AttributeTypeFactory");
+
+    /**
+     * The {@link org.opengis.filter.FilterFactory} instance to use.
+     *
+     * @see CommonFactoryFinder#getFilterFactory
+     *
+     * @since 2.4
+     */
+    public static final ClassKey FILTER_FACTORY = new ClassKey(
+            "org.opengis.filter.FilterFactory");
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                     Grid Coverages                     ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
+     *
+     * @deprecated The {@code GridCoverageProcessor} interface is not yet
+     *             stable. Avoid dependencies if possible.
+     */
+    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
+    // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
+
+    /**
+     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to ignore
+     * the built-in overviews when creating a {@link org.opengis.coverage.grid.GridCoverage2D}
+     * object during a read. This hints also implied that no decimation on reading is performed.
+     *
+     * @since 2.3
+     *
+     * @deprecated use the correct {@link #OVERVIEW_POLICY} instead.
+     */
+    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
+
+    /**
+     * Key to control the maximum allowed number of tiles that we will load.
+     * If this number is exceeded, i.e. we request an area which is too large
+     * instead of getting stuck with opening thousands of files we throw an error.
+     *
+     * @since 2.5
+     */
+    public static final Key MAX_ALLOWED_TILES = new Key(Integer.class);
+
+    /**
+     * Key to control the name of the attribute that contains the location for
+     * the tiles in the mosaic index.
+     *
+     * @since 2.5
+     */
+    public static final Key MOSAIC_LOCATION_ATTRIBUTE = new Key(String.class);
+
+    /**
+     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
+     * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model,
+     * Tile Caching,...) or the direct {@code ImageReader}'s read methods.
+     *
+     * @since 2.4
+     */
+    public static final Key USE_JAI_IMAGEREAD = new Key(Boolean.class);
+
+    /**
+     * Overview policy, will choose the overview with the lower resolution among the ones
+     * with higher resolution than one used for rendering.
+     *
+     * @since 2.5
+     *
+     * @deprecated Moved to {@link org.geotools.coverage.grid.io.OverviewPolicy#QUALITY}.
+     */
+    public static Object VALUE_OVERVIEW_POLICY_QUALITY;
+
+    /**
+     * Overview policy, will ignore the overviews.
+     *
+     * @since 2.5
+     *
+     * @deprecated Moved to {@link org.geotools.coverage.grid.io.OverviewPolicy#IGNORE}.
+     */
+    public static Object VALUE_OVERVIEW_POLICY_IGNORE;
+
+    /**
+     * Overview policy, will choose the overview with with the resolution closest to the one used
+     * for rendering
+     *
+     * @since 2.5
+     *
+     * @deprecated Moved to {@link org.geotools.coverage.grid.io.OverviewPolicy#NEAREST}.
+     */
+    public static Object VALUE_OVERVIEW_POLICY_NEAREST;
+
+    /**
+     * Overview policy, will choose the overview with the higher resolution among the ones
+     * with lower resolution than one used for rendering.
+     *
+     * @since 2.5
+     *
+     * @deprecated Moved to {@link org.geotools.coverage.grid.io.OverviewPolicy#SPEED}.
+     */
+    public static Object VALUE_OVERVIEW_POLICY_SPEED;
+    static {
+        try {
+            final Class c = Class.forName("org.geotools.coverage.grid.io.OverviewPolicy");
+            VALUE_OVERVIEW_POLICY_QUALITY = c.getField("QUALITY").get(null);
+            VALUE_OVERVIEW_POLICY_IGNORE  = c.getField("IGNORE").get(null);
+            VALUE_OVERVIEW_POLICY_NEAREST = c.getField("NEAREST").get(null);
+            VALUE_OVERVIEW_POLICY_SPEED   = c.getField("SPEED").get(null);
+        } catch (Exception e) {
+            // Ignore since it is normal if the coverage module is not in the classpath.
+            // This is just a temporary patch, so hopefull we will remove this ugly hack soon.
+        }
+    }
+
+    /**
+     * Overview choosing policy. The value most be one of
+     * {link #org.geotools.coverage.grid.io.OverviewPolicy} enumeration.
+     *
+     * @since 2.5
+     */
+    public static final Key OVERVIEW_POLICY = new Key(
+            "org.geotools.coverage.grid.io.OverviewPolicy");
+
+    /**
+     * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
+     * processor} to perform operations on the specified view.
+     * <p>
+     * Some operation when called on a {@linkplain org.geotools.coverage.grid.GridCoverage2D grid
+     * coverage} tries to converts to {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
+     * geophysics} view before to execute. The rationale behind this is that the other views are
+     * just the rendered version of a coverage data, and operations like interpolations have a
+     * physical meaning only when applied on the geophysics view (e.g. interpolate <cite>Sea
+     * Surface Temperature</cite> (SST) values, not the RGB values that colorize the temperature).
+     * <p>
+     * However, in some cases like when doing pure rendering of images, we might want to force
+     * operations to work on {@linkplain org.geotools.coverage.grid.ViewType#PHOTOGRAPHIC
+     * photographic} view directly, even performing color expansions as needed. This can be
+     * accomplished by setting this hint to the desired view. Be aware that interpolations
+     * after color expansions may produce colors that do not accuratly represent the geophysical
+     * value.
+     *
+     * @since 2.5
+     */
+    public static final Key COVERAGE_PROCESSING_VIEW = new Key("org.geotools.coverage.grid.ViewType");
+
+    /**
+     * @deprecated Replaced by {@link #COVERAGE_PROCESSING_VIEW} key with a
+     *             {@link org.geotools.coverage.grid.ViewType#PHOTOGRAPHIC} value.
+     *
+     * @since 2.4
+     *
+     * @todo We may need to find a more accurate name, especially when the enumeration in
+     *       {@link org.geotools.coverage.grid.ViewType} will be ready to work. Maybe
+     *       something like {@code PROCESS_ON_VISUAL_VIEW}.
+     */
+    public static final Key REPLACE_NON_GEOPHYSICS_VIEW = new Key(Boolean.class);
+
+    /**
+     * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
+     * (as a {@link String} value) to use during serialization of image data in
+     * a {@link org.geotools.coverage.grid.GridCoverage2D} object. This encoding
+     * is given to the {@link javax.media.jai.remote.SerializableRenderedImage}
+     * constructor. Valid values include (but is not limited to) {@code "raw"},
+     * {@code "gzip"} and {@code "jpeg"}.
+     * <p>
+     * <strong>Note:</strong> We recommend to avoid the {@code "jpeg"} codec
+     * for grid coverages.
+     *
+     * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
+     *
+     * @since 2.3
+     */
+    public static final Key TILE_ENCODING = new Key(String.class);
+
+    /**
+     * The {@link javax.media.jai.JAI} instance to use.
+     */
+    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
+
+    /**
+     * The {@link org.opengis.coverage.SampleDimensionType} to use.
+     */
+    public static final Key SAMPLE_DIMENSION_TYPE = new Key("org.opengis.coverage.SampleDimensionType");
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                      Data stores                       ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The maximum number of associations traversed in a datastore query.
+     * <p>
+     * This maps directly to the {@code traversalXlinkDepth} parameter in a WFS query.
+     */
+    public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key(Integer.class);
+
+    /**
+     * The name of a property to traverse in a datastore query.
+     * <p>
+     * This maps directly to a {@code xlinkPropertyName} in a WFS query.
+     */
+    public static final Hints.Key ASSOCIATION_PROPERTY = new Key("org.opengis.filter.expression.PropertyName");
+
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -598,191 +880,6 @@ public class Hints extends RenderingHints {
      * @since 2.5
      */
     public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 1000);
-
-    /**
-     * Version number of the requested service. This hint is used for example in order to get
-     * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
-     * backed by a particular version of EPSG database. The value should be an instance of
-     * {@link org.geotools.util.Version}.
-     *
-     * @since 2.4
-     */
-    public static final Key VERSION = new Key("org.geotools.util.Version");
-
-
-
-    ////////////////////////////////////////////////////////////////////////
-    ////////                                                        ////////
-    ////////                     Grid Coverages                     ////////
-    ////////                                                        ////////
-    ////////////////////////////////////////////////////////////////////////
-
-    /**
-     * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
-     *
-     * @deprecated The {@code GridCoverageProcessor} interface is not yet
-     *             stable. Avoid dependencies if possible.
-     */
-    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
-    // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
-
-    /**
-     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to ignore
-     * the built-in overviews when creating a {@link org.opengis.coverage.grid.GridCoverage}
-     * object during a read. This hints also implied that no decimation on reading is performed.
-     *
-     * @since 2.3
-     * @deprecated use the correct {@link #OVERVIEW_POLICY} instead.
-     */
-    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
-
-    /**
-     * Key to control the max allowed number of tiles that we will load.
-     *
-     * If this number is exceeded, i.e. we request an area which is too large
-     * instead of getting stuck with opening thousands of files we throw an error.
-     * @since 2.5
-     */
-    public static final Key MAX_ALLOWED_TILES = new Key(Integer.class);
-
-    /**
-     * Key to control the namee of the attribute that contains the location for
-     * the tiles in the mosaic index.
-     *
-     * @since 2.5
-     */
-    public static final Key MOSAIC_LOCATION_ATTRIBUTE = new Key(String.class);
-
-    /**
-     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
-     * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model,
-     * Tile Caching,...) or the direct {@code ImageReader}'s read methods.
-     *
-     * @since 2.4
-     */
-    public static final Key USE_JAI_IMAGEREAD = new Key(Boolean.class);
-
-    /**
-     * Overview policy, will choose the overview with the lower resolution among the ones
-     * with higher resolution than one used for rendering.
-     *
-     * @since 2.5
-     */
-    public static final String VALUE_OVERVIEW_POLICY_QUALITY = "Quality";
-
-    /**
-     * Overview policy, will ignore the overviews.
-     *
-     * @since 2.5
-     */
-    public static final String VALUE_OVERVIEW_POLICY_IGNORE = "Ignore";
-
-    /**
-     * Overview policy, will choose the overview with with the resolution closest to the one used
-     * for rendering
-     *
-     * @since 2.5
-     */
-    public static final String VALUE_OVERVIEW_POLICY_NEAREST = "Nearest";
-
-    /**
-     * Overview policy, will choose the overview with the higher resolution among the ones
-     * with lower resolution than one used for rendering.
-     *
-     * @since 2.5
-     */
-    public static final String VALUE_OVERVIEW_POLICY_SPEED = "Speed";
-
-    /**
-     * Overview choosing policy.
-     *
-     * @see Hints#VALUE_OVERVIEW_POLICY_QUALITY
-     * @see Hints#VALUE_OVERVIEW_POLICY_NEAREST
-     * @see Hints#VALUE_OVERVIEW_POLICY_SPEED
-     *
-     * @since 2.5
-     */
-    public static final OptionKey OVERVIEW_POLICY = new OptionKey(VALUE_OVERVIEW_POLICY_QUALITY,
-            VALUE_OVERVIEW_POLICY_NEAREST, VALUE_OVERVIEW_POLICY_SPEED,VALUE_OVERVIEW_POLICY_IGNORE);
-
-
-    /**
-     * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
-     * processor} to perform operations on the non-geophysics view.
-     * <p>
-     * Some operation when called on a {@linkplain org.geotools.coverage.grid.GridCoverage grid
-     * coverage} that is the non-geophysics view of another grid coverage try to go back to the
-     * latter before executing even if they could execute fine without doing so. The rationale
-     * behind this is that the non-geophysics view is just the rendered version of a coverage,
-     * hence operations should be applied onto the geophysics companion.
-     * <p>
-     * However, in some cases like when doing pure rendering of photographic images, we might want
-     * to force this operations to work on the non-geophysics view directly, even performing color
-     * expansions as needed. This can be accomplished by setting this hint to {@code true}. Be
-     * aware that interpolations in non-photographic images (i.e. a colormap like a <cite>Sea
-     * Surface Temperature</cite> image) after color expansions may produce wrong colors.
-     *
-     * @since 2.4
-     *
-     * @todo We may need to find a more accurate name, especially when the enumeration in
-     *       {@link org.geotools.coverage.grid.ViewType} will be ready to work. Maybe
-     *       something like {@code PROCESS_ON_VISUAL_VIEW}.
-     */
-    public static final Key REPLACE_NON_GEOPHYSICS_VIEW = new Key(Boolean.class);
-
-    /**
-     * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
-     * (as a {@link String} value) to use during serialization of image data in
-     * a {@link org.geotools.coverage.grid.GridCoverage2D} object. This encoding
-     * is given to the {@link javax.media.jai.remote.SerializableRenderedImage}
-     * constructor. Valid values include (but is not limited to) {@code "raw"},
-     * {@code "gzip"} and {@code "jpeg"}.
-     * <p>
-     * <strong>Note:</strong> We recommend to avoid the {@code "jpeg"} codec
-     * for grid coverages.
-     *
-     * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
-     *
-     * @since 2.3
-     */
-    public static final Key TILE_ENCODING = new Key(String.class);
-
-    /**
-     * The {@link javax.media.jai.JAI} instance to use.
-     */
-    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
-
-    /**
-     * The {@link org.opengis.coverage.SampleDimensionType} to use.
-     */
-    public static final Key SAMPLE_DIMENSION_TYPE = new Key(
-            "org.opengis.coverage.SampleDimensionType");
-
-    /**
-     * The {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
-     */
-    public static final Key CRS = new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
-    public static final Key PRECISION = new Key("org.opengis.geometry.Precision");
-    public static final Key POSITION_FACTORY = new Key("org.opengis.geometry.PositionFactory");
-    public static final Key GEOMETRY_FACTORY = new Key("org.opengis.geometry.coordinate.GeometryFactory");
-    public static final Key COMPLEX_FACTORY = new Key("org.opengis.geometry.complex.ComplexFactory");
-    public static final Key AGGREGATE_FACTORY = new Key("org.opengis.geometry.aggregate.AggregateFactory");
-    public static final Key PRIMITIVE_FACTORY = new Key("org.opengis.geometry.primitive.PrimitiveFactory");
-    public static final Key GEOMETRY_VALIDATE = new Key(Boolean.class);
-
-    /**
-     * The maximum number of associations traversed in a datastore query.
-     * <p>
-     * This maps directly to the {@code traversalXlinkDepth} parameter in a WFS query.
-     */
-    public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key(Integer.class);
-
-    /**
-     * The name of a property to traverse in a datastore query.
-     * <p>
-     * This maps directly to a {@code xlinkPropertyName} in a WFS query.
-     */
-    public static final Hints.Key ASSOCIATION_PROPERTY = new Key(PropertyName.class);
 
     /**
      * Constructs an initially empty set of hints.

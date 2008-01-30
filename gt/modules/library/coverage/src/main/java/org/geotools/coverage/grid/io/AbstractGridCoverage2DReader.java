@@ -195,7 +195,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	protected Integer setReadParams(String overviewPolicy,ImageReadParam readP,
+	protected Integer setReadParams(OverviewPolicy overviewPolicy,ImageReadParam readP,
 			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
 			throws IOException, TransformException {
 		
@@ -219,7 +219,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// //
 		// when policy is explictly provided it overrides the policy provided
 		// using hints.
-		if(overviewPolicy==null||overviewPolicy.length()<=0)
+		if(overviewPolicy == null)
 		overviewPolicy = extractOverviewPolicy();
 		
 		
@@ -235,7 +235,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// requested to ignore overviews
 		//
 		// //
-		if (overviewPolicy.equalsIgnoreCase(Hints.VALUE_OVERVIEW_POLICY_IGNORE))
+		if (overviewPolicy.equals(OverviewPolicy.IGNORE))
 			return imageChoice;
 
 		// //
@@ -284,22 +284,22 @@ public abstract class AbstractGridCoverage2DReader implements
 	 *         {@link Hints#VALUE_OVERVIEW_POLICY_SPEED}, {@link Hints#VALUE_OVERVIEW_POLICY_QUALITY}.
 	 *         Default is {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST}.
 	 */
-	private String extractOverviewPolicy() {
-		String overviewPolicy=null;
+	private OverviewPolicy extractOverviewPolicy() {
+		OverviewPolicy overviewPolicy=null;
 		// check if a policy was provided using hints (check even the
 		// deprecated one)
 		if (this.hints != null)
 			if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
-				overviewPolicy = (String) this.hints.get(Hints.OVERVIEW_POLICY);
+				overviewPolicy = (OverviewPolicy) this.hints.get(Hints.OVERVIEW_POLICY);
 			else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
 				overviewPolicy = ((Boolean) this.hints
-						.get(Hints.IGNORE_COVERAGE_OVERVIEW)).booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
-						: hints.VALUE_OVERVIEW_POLICY_QUALITY;
+						.get(Hints.IGNORE_COVERAGE_OVERVIEW)).booleanValue() ? OverviewPolicy.IGNORE
+						: OverviewPolicy.QUALITY;
 
 		// use default if not provided. Default is nearest
-		if (overviewPolicy == null || overviewPolicy.length() == 0)
-			overviewPolicy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
-		assert overviewPolicy!=null&&overviewPolicy.length()>0;
+		if (overviewPolicy == null)
+			overviewPolicy = OverviewPolicy.NEAREST;
+		assert overviewPolicy != null;
 		return overviewPolicy;
 	}
 	
@@ -341,16 +341,16 @@ public abstract class AbstractGridCoverage2DReader implements
 		// //
 		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
 		if (o != null && ((Boolean) o).booleanValue()) {
-			return setReadParams(Hints.VALUE_OVERVIEW_POLICY_IGNORE, readP, requestedEnvelope, requestedDim);
+			return setReadParams(OverviewPolicy.IGNORE, readP, requestedEnvelope, requestedDim);
 
 		}
-		return setReadParams(Hints.VALUE_OVERVIEW_POLICY_QUALITY, readP, requestedEnvelope, requestedDim);
+		return setReadParams(OverviewPolicy.QUALITY, readP, requestedEnvelope, requestedDim);
 		
 	}
 
-	private Integer getOverviewImage(String policy, double[] requestedRes) {
+	private Integer getOverviewImage(OverviewPolicy policy, double[] requestedRes) {
 	    // setup policy
-        if(policy == null||policy.length()<=0)
+        if(policy == null)
         	policy=extractOverviewPolicy();
         
         // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)

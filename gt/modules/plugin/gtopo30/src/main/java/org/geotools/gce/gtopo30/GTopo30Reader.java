@@ -85,6 +85,7 @@ import org.opengis.referencing.operation.TransformException;
 import com.sun.media.imageio.stream.RawImageInputStream;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReader;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 
 /**
  * This class provides a GridCoverageReader for the GTopo30Format.
@@ -321,7 +322,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -344,7 +345,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					}
 					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
 							.getName().toString())) {
-						overviewPolicy=param.stringValue();
+						overviewPolicy=(OverviewPolicy) param.getValue();
 						continue;
 					}					
 				}
@@ -418,7 +419,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 *             if an error occurs
 	 */
 	private GridCoverage2D getGridCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle dim, String overviewPolicy) throws IOException {
+			Rectangle dim, OverviewPolicy overviewPolicy) throws IOException {
 		int hrWidth = originalGridRange.getLength(0);
 		int hrHeight = originalGridRange.getLength(1);
 
@@ -504,11 +505,11 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 
 		// setting metadata
 		final Map metadata = new HashMap();
-		metadata.put("maximum", new Double(stats.getMax()));
-		metadata.put("minimum", new Double(stats.getMin()));
-		metadata.put("mean", new Double(stats.getAverage()));
-		metadata.put("std_dev", new Double(stats.getStdDev()));
-		metadata.put("nodata", new Double(-9999.0));
+		metadata.put("maximum", Double.valueOf(stats.getMax()));
+		metadata.put("minimum", Double.valueOf(stats.getMin()));
+		metadata.put("mean", Double.valueOf(stats.getAverage()));
+		metadata.put("std_dev", Double.valueOf(stats.getStdDev()));
+		metadata.put("nodata", Double.valueOf(-9999.0));
 
 		// /////////////////////////////////////////////////////////////////////
 		//

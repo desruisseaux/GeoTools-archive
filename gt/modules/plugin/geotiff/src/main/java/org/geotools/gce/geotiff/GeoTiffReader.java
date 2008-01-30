@@ -77,6 +77,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 
 /**
  * this class is responsible for exposing the data and the Georeferencing
@@ -342,7 +343,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -365,7 +366,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 					}
 					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
 							.getName().toString())) {
-						overviewPolicy=param.stringValue();
+						overviewPolicy=(OverviewPolicy) param.getValue();
 						continue;
 					}					
 				}

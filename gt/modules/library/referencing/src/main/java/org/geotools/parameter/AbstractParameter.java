@@ -120,18 +120,19 @@ public abstract class AbstractParameter extends Formattable
     /**
      * Verify that the specified value is of the specified class.
      *
-     * @param  valueClass the expected class.
+     * @param  expectedClass the expected class.
      * @param  value The expected value, or {@code null}.
      * @throws IllegalArgumentException if {@code value} is non-null and has a non-assignable
      *         class.
      */
-    static <T> void ensureValidClass(final Class<?> valueClass, final Object value)
+    static <T> void ensureValidClass(final Class<?> expectedClass, final Object value)
             throws IllegalArgumentException
     {
         if (value != null) {
-            if (!valueClass.isAssignableFrom(value.getClass())) {
+            final Class<?> valueClass = value.getClass();
+            if (!expectedClass.isAssignableFrom(valueClass)) {
                 throw new IllegalArgumentException(Errors.format(
-                        ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), valueClass));
+                        ErrorKeys.ILLEGAL_CLASS_$2, valueClass, expectedClass));
             }
         }
     }

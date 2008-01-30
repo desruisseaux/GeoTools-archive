@@ -21,9 +21,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -39,6 +37,7 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.BorderExtenderConstant;
 import javax.media.jai.operator.MosaicDescriptor;
+import javax.media.jai.InterpolationNearest;
 
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoverage;
@@ -147,6 +146,7 @@ final class Resampler2D extends GridCoverage2D {
         }
         GridCoverage2D coverage = new Resampler2D(source, image, geometry, sampleDimensions);
         switch (actionTaken) {
+            case NATIVE:
             case PACKED:     coverage = coverage.view(ViewType.GEOPHYSICS); break;
             case GEOPHYSICS: coverage = coverage.view(ViewType.PACKED);     break;
         }
@@ -419,6 +419,7 @@ final class Resampler2D extends GridCoverage2D {
             layout.unsetTileLayout();
             // At this point, only the color model and sample model are left valids.
         }
+        final Rectangle sourceBB = sourceGG.getGridRange2D();
         final Rectangle targetBB = targetGG.getGridRange2D();
         if (isBoundsUndefined(layout, false)) {
             layout.setMinX  (targetBB.x);
@@ -439,17 +440,23 @@ final class Resampler2D extends GridCoverage2D {
             layout.setSampleModel(model);
         }
         /*
-         * Creates the border extender from the background value.
+         * Creates the border extender from the background values. We add it inconditionnaly as
+         * a matter of principle, but it will be ignored by all JAI operations except "Affine".
+         * There is an exception for the case where the user didn't specified explicitly the
+         * desired target grid range. NOT specifying border extender will allows "Affine" to
+         * shrink the target image bounds to the range containing computed values.
          */
         final double[] background = CoverageUtilities.getBackgroundValues(sourceCoverage);
         if (background != null && background.length != 0) {
-            final BorderExtender borderExtender;
-            if (XArray.allEquals(background, 0)) {
-                borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_ZERO);
-            } else {
-                borderExtender = new BorderExtenderConstant(background);
+            if (!automaticGR) {
+                final BorderExtender borderExtender;
+                if (XArray.allEquals(background, 0)) {
+                    borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_ZERO);
+                } else {
+                    borderExtender = new BorderExtenderConstant(background);
+                }
+                hints.put(JAI.KEY_BORDER_EXTENDER, borderExtender);
             }
-            hints.put(JAI.KEY_BORDER_EXTENDER, borderExtender);
         }
         /*
          * We need to correctly manage the Hints to control the replacement of IndexColorModel.
@@ -489,7 +496,6 @@ final class Resampler2D extends GridCoverage2D {
             sourceImage = PlanarImage.wrapRenderedImage(sourceCoverage.getRenderedImage());
             paramBlk.removeSources();
             paramBlk.addSource(sourceImage);
-            final Rectangle sourceBB = sourceGG.getGridRange2D();
             if (targetBB.equals(sourceBB)) {
                 /*
                  * Optimization in case we have nothing to do, not even a crop. Reverts to the
@@ -499,6 +505,7 @@ final class Resampler2D extends GridCoverage2D {
                  * sooner in this method.
                  */
                 switch (actionTaken) {
+                    case NATIVE:
                     case PACKED:     sourceCoverage = sourceCoverage.view(ViewType.GEOPHYSICS); break;
                     case GEOPHYSICS: sourceCoverage = sourceCoverage.view(ViewType.PACKED);     break;
                 }
@@ -532,7 +539,7 @@ final class Resampler2D extends GridCoverage2D {
              *         is to just update the 'gridToCRS' value. We returns a grid coverage wrapping
              *         the SOURCE image with the updated grid geometry.
              */
-            if (automaticGR && allSteps instanceof AffineTransform) {
+            if ((automaticGR || targetBB.equals(sourceBB)) && allSteps instanceof AffineTransform) {
                 if (automaticGG) {
                     // Cheapest approach: just update 'gridToCRS'.
                     MathTransform mtr;
@@ -555,8 +562,31 @@ final class Resampler2D extends GridCoverage2D {
             } else {
                 /*
                  * General case: constructs the warp transform.
+                 * 
+                 * TODO: JAI 1.1.3 seems to have a bug when the target envelope is greater than
+                 *       the source envelope:  Warp on float values doesn't set to 'background'
+                 *       the points outside the envelope. The operation seems to work correctly
+                 *       on integer values, so as a workaround we restart the operation without
+                 *       interpolation (which increase the chances to get it down on integers).
+                 *       Remove this hack when this JAI bug will be fixed.
+                 *
                  * TODO: Move the check for AffineTransform into WarpTransform2D.
                  */
+                if (interpolation != null && !(interpolation instanceof InterpolationNearest)) {
+                    switch (sourceImage.getSampleModel().getTransferType()) {
+                        case java.awt.image.DataBuffer.TYPE_DOUBLE:
+                        case java.awt.image.DataBuffer.TYPE_FLOAT: {
+                            Envelope source = CRS.transform(sourceGG.getEnvelope(), targetCRS);
+                            Envelope target = CRS.transform(targetGG.getEnvelope(), targetCRS);
+                            source = targetGG.reduce(source);
+                            target = targetGG.reduce(target);
+                            if (!(new GeneralEnvelope(source).contains(target, true))) {
+                                return reproject(sourceCoverage, targetCRS, targetGG, null, hints);
+                            }
+                        }
+                    }
+                }
+                // -------- End of JAI bug workaround --------
                 operation = "Warp";
                 final Warp warp;
                 if (allSteps2D instanceof AffineTransform) {

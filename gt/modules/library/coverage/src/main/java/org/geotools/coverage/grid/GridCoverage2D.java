@@ -34,8 +34,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
@@ -102,12 +106,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private static final long serialVersionUID = 667472989475027853L;
 
     /**
-     * The views returned by {@link #views}. Constructed when first needed.
-     * Note that some views may appear in the {@link #sources} list.
-     */
-    private transient ViewsManager views;
-
-    /**
      * The raster data.
      */
     protected transient final PlanarImage image;
@@ -135,11 +133,16 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     final GridSampleDimension[] sampleDimensions;
 
     /**
-     * {@code true} is all sample in the image are geophysics values.
-     *
-     * @deprecated Not used at this time. Need to be replaced by an {@code EnumSet<ViewType>}.
+     * The views returned by {@link #views}. Constructed when first needed.
+     * Note that some views may appear in the {@link #sources} list.
      */
-    private final boolean isGeophysics;
+    private transient ViewsManager views;
+
+    /**
+     * The set of views that this coverage represents. Will be created
+     * by {@link #getViewTypes} only when first needed.
+     */
+    private transient Set<ViewType> viewTypes;
 
     /**
      * Used for transforming a direct position from arbitrary to internal CRS.
@@ -175,7 +178,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         image            = coverage.image;
         gridGeometry     = coverage.gridGeometry;
         sampleDimensions = coverage.sampleDimensions;
-        isGeophysics     = coverage.isGeophysics;
         tileEncoding     = coverage.tileEncoding;
         // Do not share the views, since subclasses will create different instances.
     }
@@ -225,7 +227,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
          * is thrown.
          */
         sampleDimensions = new GridSampleDimension[image.getNumBands()];
-        isGeophysics = RenderedSampleDimension.create(name, image, bands, sampleDimensions);
+        RenderedSampleDimension.create(name, image, bands, sampleDimensions);
         /*
          * Computes the grid range if it was not explicitly provided. The range will be inferred
          * from the image size, if needed. The envelope computation (if needed) requires a valid
@@ -919,6 +921,27 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             throw new IllegalStateException(); // As a safety, but should never happen.
         }
         return views;
+    }
+
+    /**
+     * Returns the set of views that this coverage represents. The same coverage may be used for
+     * more than one view. For example a coverage could be valid both as a {@link ViewType#PACKED
+     * PACKED} and {@link ViewType#RENDERED RENDERED} view.
+     *
+     * @since 2.5
+     */
+    public synchronized Set<ViewType> getViewTypes() {
+        if (viewTypes == null) {
+            final Set<ViewType> viewTypes = EnumSet.allOf(ViewType.class);
+            for (final Iterator<ViewType> it=viewTypes.iterator(); it.hasNext();) {
+                if (view(it.next()) != this) {
+                    it.remove();
+                }
+            }
+            // Assign only in successful.
+            this.viewTypes = Collections.unmodifiableSet(viewTypes);
+        }
+        return viewTypes;
     }
 
     /**

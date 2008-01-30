@@ -194,18 +194,19 @@ public class Resample extends Operation2D {
      * for the {@code "Resample"} operation.
      */
     public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
-        GridCoverage2D         source = (GridCoverage2D)               parameters.parameter("Source")                   .getValue();
-        Interpolation          interp = ImageUtilities.toInterpolation(parameters.parameter("InterpolationType")        .getValue());
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem)    parameters.parameter("CoordinateReferenceSystem").getValue();
-        GridGeometry         gridGeom = (GridGeometry)                 parameters.parameter("GridGeometry")             .getValue();
-        GridCoverage2D       coverage; // The result to be computed below.
-        if (crs == null) {
-            crs = source.getCoordinateReferenceSystem();
+        final GridCoverage2D source = (GridCoverage2D) parameters.parameter("Source").getValue();
+        final Interpolation interpolation = ImageUtilities.toInterpolation(
+                parameters.parameter("InterpolationType").getValue());
+        CoordinateReferenceSystem targetCRS = (CoordinateReferenceSystem)
+                parameters.parameter("CoordinateReferenceSystem").getValue();
+        if (targetCRS == null) {
+            targetCRS = source.getCoordinateReferenceSystem();
         }
-        final GridGeometry2D gridGeom2D = (gridGeom == null || gridGeom instanceof GridGeometry2D)
-                ? (GridGeometry2D) gridGeom : new GridGeometry2D(gridGeom);
+        final GridGeometry2D targetGG = GridGeometry2D.wrap(
+                (GridGeometry) parameters.parameter("GridGeometry").getValue());
+        final GridCoverage2D target;
         try {
-            coverage = Resampler2D.reproject(source, crs, gridGeom2D, interp,
+            target = Resampler2D.reproject(source, targetCRS, targetGG, interpolation,
                 (hints instanceof Hints) ? hints : new Hints(hints));
         } catch (FactoryException exception) {
             throw new CannotReprojectException(Errors.format(
@@ -214,7 +215,7 @@ public class Resample extends Operation2D {
             throw new CannotReprojectException(Errors.format(
                     ErrorKeys.CANT_REPROJECT_$1, source.getName()), exception);
         }
-        return coverage;
+        return target;
     }
 
     /**

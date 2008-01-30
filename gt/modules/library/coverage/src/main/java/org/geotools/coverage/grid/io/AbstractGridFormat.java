@@ -141,13 +141,13 @@ public abstract class AbstractGridFormat implements Format {
 	 * to specify the policy a reader should adopt when chhosing the right
 	 * overview during a read operation.
 	 */
-	public static final DefaultParameterDescriptor OVERVIEW_POLICY = new DefaultParameterDescriptor(
-			Hints.OVERVIEW_POLICY.toString(), String.class, new String[] {
-					Hints.VALUE_OVERVIEW_POLICY_IGNORE,
-					Hints.VALUE_OVERVIEW_POLICY_NEAREST,
-					Hints.VALUE_OVERVIEW_POLICY_QUALITY,
-					Hints.VALUE_OVERVIEW_POLICY_SPEED },
-			Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+	public static final DefaultParameterDescriptor<OverviewPolicy> OVERVIEW_POLICY = new DefaultParameterDescriptor<OverviewPolicy>(
+			Hints.OVERVIEW_POLICY.toString(), OverviewPolicy.class, new OverviewPolicy[] {
+					OverviewPolicy.IGNORE,
+					OverviewPolicy.NEAREST,
+					OverviewPolicy.QUALITY,
+					OverviewPolicy.SPEED },
+			OverviewPolicy.QUALITY);
 	
 	/**
 	 * @see org.opengis.coverage.grid.Format#getName()

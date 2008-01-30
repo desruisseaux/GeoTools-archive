@@ -21,7 +21,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.media.jai.Interpolation;
@@ -238,7 +237,9 @@ public final class CoverageUtilities {
                 sd = ((GridSampleDimension) sd).geophysics(false);
             }
             MathTransform1D tr = sd.getSampleToGeophysics();
-            return tr!=null && !tr.isIdentity();
+            if (tr!=null && !tr.isIdentity()) {
+                return true;
+            }
         }
         return false;
     }
@@ -254,10 +255,10 @@ public final class CoverageUtilities {
                     return true;
                 }
             }
-            final Collection sources = coverage.getSources();
+            final Collection<GridCoverage> sources = coverage.getSources();
             if (sources != null) {
-                for (final Iterator it=sources.iterator(); it.hasNext();) {
-                    if (uses((GridCoverage) it.next(), image)) {
+                for (final GridCoverage source : sources) {
+                    if (uses(source, image)) {
                         return true;
                     }
                 }
@@ -290,9 +291,9 @@ public final class CoverageUtilities {
     /**
      * @deprecated Use {@link #preferredViewForOperation} instead.
      *
-     * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to be
-     *         provided, 2 if we need to employ the geophysics vew of the provided coverage,
-     *         3 if we suggest to employ the non-geophysics vew of the provided coverage.
+     * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to
+     *         be provided, 2 if we need to employ the geophysics view of the provided coverage,
+     *         3 if we suggest to employ the non-geophysics view of the provided coverage.
      *
      * @since 2.3.1
      */
@@ -305,7 +306,9 @@ public final class CoverageUtilities {
             case SAME:         return 0;
             case PHOTOGRAPHIC: return 1;
             case GEOPHYSICS:   return 2;
-            case PACKED:       return 3;
+            case RENDERED:
+            case PACKED:
+            case NATIVE:       return 3;
             default: throw new AssertionError(type);
         }
     }
@@ -313,7 +316,6 @@ public final class CoverageUtilities {
     /**
      * General purpose method used in various operations for {@link GridCoverage2D} to help
      * with taking decisions on how to treat coverages with respect to their {@link ColorModel}.
-     *
      * <p>
      * The need for this method arose in consideration of the fact that applying most operations
      * on coverage whose {@link ColorModel} is an instance of {@link IndexColorModel} may lead to
@@ -321,16 +323,14 @@ public final class CoverageUtilities {
      * "Scale" with {@link InterpolationBilinear} on a non-geophysics {@link GridCoverage2D} with an
      * {@link IndexColorModel}) or more simply on the operation itself ("SubsampleAverage" cannot
      * be applied at all on a {@link GridCoverage2D} backed by an {@link IndexColorModel}).
-     *
      * <p>
      * This method suggests the actions to take depending on the structure of the provided
      * {@link GridCoverage2D}, the provided {@link Interpolation} and if the operation uses
      * a filter or not (this is useful for operations like SubsampleAverage or FilteredSubsample).
-     *
      * <p>
      * In general the idea is as follows: If the original coverage is backed by a
      * {@link RenderedImage} with an {@link IndexColorModel}, we have the following cases:
-     *
+     * <p>
      * <ul>
      *  <li>if the interpolation is {@link InterpolationNearest} and there is no filter involved
      *      we can apply the operation on the {@link IndexColorModel}-backed coverage with nor
@@ -346,10 +346,9 @@ public final class CoverageUtilities {
      *      </ul>
      *  </li>
      * </ul>
-     *
      * <p>
      * A special case is when we want to apply an operation on the geophysics view of a coverage
-     * that does not involve high order interpolation of filters. In this case we suggest to apply
+     * that does not involve high order interpolation or filters. In this case we suggest to apply
      * the operation on the non-geophysics view, which is usually much faster. Users may ignore
      * this advice.
      *
@@ -359,19 +358,75 @@ public final class CoverageUtilities {
      * @param hints to use when applying a certain operation.
      * @return {@link ViewType#SAME} if nothing has to be done on the provided coverage,
      *         {@link ViewType.PHOTOGRAPHIC} if a color expansion has to be provided,
-     *         {@link ViewType#GEOPHYSICS} if we need to employ the geophysics vew of
+     *         {@link ViewType#GEOPHYSICS} if we need to employ the geophysics view of
      *         the provided coverage,
-     *         {@link ViewType#PACKED} if we suggest to employ the non-geophysics vew
+     *         {@link ViewType#NATIVE} if we suggest to employ the native (usually packed) view
      *         of the provided coverage.
      *
      * @since 2.5
+     *
+     * @todo Move this method in {@link org.geotools.coverage.processing.Operation2D}.
      */
     public static ViewType preferredViewForOperation(final GridCoverage2D coverage,
             final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
     {
+        /*
+         * Checks if the user specified explicitly the view he wants to use for performing
+         * the calculations.
+         */
+        if (hints != null) {
+            final Object candidate = hints.get(Hints.COVERAGE_PROCESSING_VIEW);
+            if (candidate instanceof ViewType) {
+                return (ViewType) candidate;
+            }
+        }
+        /*
+         * Tries to infer automatically the view to use.  If there is no sample dimension with
+         * a "sample to geophysics" transform, then we assume that the image has no geophysics
+         * meaning and would better be handled as photographic.
+         */
         final RenderedImage sourceImage = coverage.getRenderedImage();
-        if (!(sourceImage.getColorModel() instanceof IndexColorModel)) {
-            return ViewType.SAME;
+        if (sourceImage.getColorModel() instanceof IndexColorModel) {
+            if (!hasRenderingCategories(coverage)) {
+                return ViewType.PHOTOGRAPHIC;
+            }
+            // The old way to request explicitly a color expansion.
+            if (hints != null && Boolean.FALSE.equals(hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW))) {
+                return ViewType.PHOTOGRAPHIC;
+            }
+            /*
+             * If there is no filter and no interpolation, then we don't need to operate on
+             * geophysics value. The packed view is usually faster. We could returns either
+             * NATIVE, PACKED or SAME, which are equivalent in many cases:
+             *
+             *  - SAME is likely equivalent to PACKED because we checked that the color model is indexed.
+             *  - NATIVE is likely equivalent to PACKED because data in NetCDF or HDF files are often packed.
+             *
+             * However those views differ in their behavior when the native data are geophysics
+             * rather than packed (e.g. a NetCDF file with floating point values). In this case,
+             * NATIVE is equivalent to GEOPHYSICS. The tradeoff of each views are:
+             *
+             *  - NATIVE is more accurate but slower when native data are geophysics
+             *    (but as fast as other views when native data are packed).
+             *
+             *  - SAME is "as the user said" on the assumption that if he asked an operation on
+             *    a packed view of a coverage rather than the geophysics view, he know what he
+             *    is doing.
+             */
+            if (!hasFilter && (interpolation == null || interpolation instanceof InterpolationNearest)) {
+                if (hints != null) {
+                    final Object rendering = hints.get(RenderingHints.KEY_RENDERING);
+                    if (RenderingHints.VALUE_RENDER_QUALITY.equals(rendering)) {
+                        return ViewType.NATIVE;
+                    }
+                    if (RenderingHints.VALUE_RENDER_SPEED.equals(rendering)) {
+                        return ViewType.SAME;
+                    }
+                }
+                return ViewType.SAME; // Default value.
+            }
+            // In this case we need to go back the geophysics view of the source coverage.
+            return ViewType.GEOPHYSICS;
         }
         /*
          * The operations are usually applied on floating-point values, in order
@@ -385,35 +440,15 @@ public final class CoverageUtilities {
          * floating-point image is derived from the integer image, not the
          * converse).
          */
-        if (!hasFilter && (interpolation instanceof InterpolationNearest)) {
-            final GridCoverage2D candidate = coverage.view(ViewType.PACKED);
+        if (!hasFilter && (interpolation == null || interpolation instanceof InterpolationNearest)) {
+            final GridCoverage2D candidate = coverage.view(ViewType.NATIVE);
             if (candidate != coverage) {
                 final List<RenderedImage> sources = coverage.getRenderedImage().getSources();
-                if (sources != null) {
-                    if (sources.contains(candidate.getRenderedImage())) {
-                        return ViewType.PACKED;
-                    }
+                if (sources != null && sources.contains(candidate.getRenderedImage())) {
+                    return ViewType.NATIVE;
                 }
             }
-            return ViewType.SAME;
-        } else if (hasRenderingCategories(coverage)) {
-            /*
-             * Do we need to explode the Palette to RGB(A)? This is needed only when we have
-             * a coverage that has a geophysics view which has itself an IndexColorModel and
-             * we want to perform an operation that involves an higher order interpolation or
-             * a filter (like with SubsampleAverage).
-             */
-            boolean useNonGeoView = false;
-            if (hints != null) {
-                // REPLACE_NON_GEOPHYSICS_VIEW default value is 'true'.
-                // useNonGeoView value is the opposite of REPLACE_NON_GEOPHYSICS_VIEW.
-                useNonGeoView = Boolean.FALSE.equals(hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW));
-            }
-            if (!useNonGeoView) {
-                // in this case we need to go back the geophysics view of the source coverage.
-                return ViewType.GEOPHYSICS;
-            }
         }
-        return ViewType.PHOTOGRAPHIC;
+        return ViewType.SAME;
     }
 }
