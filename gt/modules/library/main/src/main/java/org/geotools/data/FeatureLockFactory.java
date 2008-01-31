@@ -69,7 +69,7 @@ public abstract class FeatureLockFactory implements Factory {
      * To aid in tracing your may wish to supply your own name,
      * rather than <code>LockID<code>, for use in lock generation.</p>
      *
-     * @param duration FeatureLock duration in seconds
+     * @param duration FeatureLock duration in milliseconds
      */
     public static FeatureLock generate(long duration) {
 	   return generate("LockID", duration);
