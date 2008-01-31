@@ -1425,6 +1425,17 @@
         <enabled>false</enabled>
       </releases>
     </pluginRepository>
+    <pluginRepository>
+      <id>refractions</id>
+      <name>Refractions Research Maven 2 Repository</name>
+      <url>http://lists.refractions.net/m2</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository> 
   </pluginRepositories>
 
 
