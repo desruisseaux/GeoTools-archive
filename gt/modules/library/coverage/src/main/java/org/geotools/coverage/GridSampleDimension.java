@@ -1406,9 +1406,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     @Override
     public String toString() {
         if (categories != null) {
-            return categories.toString(this);
+            return categories.toString(this, description);
         } else {
-            return Classes.getShortClassName(this);
+            return Classes.getShortClassName(this) + "[\"" + description + "\"]";
         }
     }
 

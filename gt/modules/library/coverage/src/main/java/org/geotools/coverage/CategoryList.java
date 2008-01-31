@@ -149,6 +149,8 @@ class CategoryList extends AbstractList<Category>
 
     /**
      * The name for this category list. Will be constructed only when first needed.
+     * This is given to {@link GridSampleDimension} only if the user did not specified
+     * explicitly a description.
      *
      * @see #getName
      */
@@ -456,9 +458,10 @@ class CategoryList extends AbstractList<Category>
     }
 
     /**
-     * Returns the name of this object. The default implementation returns the name
-     * of what seems to be the "main" category (i.e. the quantitative category with
-     * the widest range of sample values) followed by the geophysics value range.
+     * Returns the name of this object. This method returns the name of what seems to be the "main"
+     * category (i.e. the quantitative category with the widest range of sample values) concatenated
+     * with the geophysics value range. This is given to {@link GridSampleDimension} only if the
+     * user did not specified explicitly a description.
      */
     public final InternationalString getName() {
         if (name == null) {
@@ -761,23 +764,27 @@ class CategoryList extends AbstractList<Category>
      */
     @Override
     public final String toString() {
-        return toString(this);
+        return toString(this, null);
     }
 
     /**
      * Returns a string representation of this category list. The {@code owner}
      * argument allow for a different class name to be formatted.
      */
-    final String toString(final Object owner) {
+    final String toString(final Object owner, final InternationalString description) {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         StringBuffer buffer = new StringBuffer(Classes.getShortClassName(owner));
+        buffer.append('(');
+        if (description != null && description != name) {
+            buffer.append('"').append(description).append("\":");
+        }
         buffer = formatRange(buffer, null);
         if (hasGaps) {
             buffer.append(" with gaps");
         }
-        buffer.append(lineSeparator);
+        buffer.append(')').append(lineSeparator);
         /*
-         * Ecrit la liste des catégories en dessous.
+         * Writes categories below the SampleDimension description;
          */
         for (int i=0; i<categories.length; i++) {
             buffer.append("   ")

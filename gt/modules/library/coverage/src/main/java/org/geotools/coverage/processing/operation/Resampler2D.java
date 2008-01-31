@@ -144,6 +144,11 @@ final class Resampler2D extends GridCoverage2D {
                 break;
             }
         }
+        /*
+         * The resampling may have been performed on the geophysics view. Try to restore the
+         * original view. TODO: we need a more accurate way to determine what was the original
+         * view.
+         */
         GridCoverage2D coverage = new Resampler2D(source, image, geometry, sampleDimensions);
         switch (actionTaken) {
             case NATIVE:
