@@ -628,9 +628,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		}
 		if (crs == null) {
 			crs = AbstractGridFormat.getDefaultCRS();
-			LOGGER.info(new StringBuffer(
-					"Unable to find crs, continuing with default WGS4 CRS")
-					.append("\n").append(crs.toWKT()).toString());
+			LOGGER.info("Unable to find crs, continuing with default WGS4 CRS");
 		}
 
 	}
