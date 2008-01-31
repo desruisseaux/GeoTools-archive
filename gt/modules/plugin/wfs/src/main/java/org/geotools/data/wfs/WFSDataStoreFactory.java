@@ -75,7 +75,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @version $Id$
      * @since 2.5.x
      * @source $URL:
-     *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
+     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     public static class WFSFactoryParam<T> extends Param {
         private T defaultValue;
@@ -117,7 +117,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @version $Id$
      * @since 2.5.x
      * @source $URL:
-     *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
+     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
      */
     private static class WFSAuthenticator extends Authenticator {
         private java.net.PasswordAuthentication pa;
@@ -136,7 +136,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         }
     }
 
-    private static final WFSFactoryParam[] parametersInfo = new WFSFactoryParam[9];
+    private static final WFSFactoryParam[] parametersInfo = new WFSFactoryParam[10];
     static {
         String name;
         Class clazz;
@@ -196,6 +196,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
                 + "provided data even if it does not accurately match the schema.  Errors will "
                 + "be logged but the parsing will continue if this is true.  Default is false";
         parametersInfo[8] = new WFSFactoryParam(name, clazz, description, Boolean.FALSE);
+
+        name = "WFSDataStoreFactory:MAXFEATURES";
+        clazz = Integer.class;
+        description = "Positive integer used as a hard limit for the amount of Features to retrieve"
+                + " for each FeatureType. A value of zero or not providing this parameter means no limit.";
+        parametersInfo[9] = new WFSFactoryParam(name, clazz, description, Integer.valueOf(0));
     }
 
     /**
@@ -271,6 +277,13 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      */
     public static final WFSFactoryParam<Boolean> LENIENT = parametersInfo[8];
 
+    /**
+     * Optional positive {@code Integer} used as a hard limit for the amount of
+     * Features to retrieve for each FeatureType. A value of zero or not
+     * providing this parameter means no limit.
+     */
+    public static final WFSFactoryParam<Integer> MAXFEATURES = parametersInfo[9];
+
     protected Map<Map, WFSDataStore> perParameterSetDataStoreCache = new HashMap();
 
     /**
@@ -301,6 +314,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final boolean tryGZIP = TRY_GZIP.lookUp(params);
         final boolean lenient = LENIENT.lookUp(params);
         final String encoding = ENCODING.lookUp(params);
+        final Integer maxFeatures = MAXFEATURES.lookUp(params);
 
         if (((user == null) && (pass != null)) || ((pass == null) && (user != null))) {
             throw new IOException(
@@ -350,7 +364,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
             final WFS110ProtocolHandler connectionFac = new WFS110ProtocolHandler(capsIn, tryGZIP,
-                    auth, encoding);
+                    auth, encoding, maxFeatures);
             dataStore = new WFS_1_1_0_DataStore(connectionFac);
         }
 
@@ -470,10 +484,10 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      */
     public static URL createGetCapabilitiesRequest(URL host, Version version) {
-        if(host == null){
+        if (host == null) {
             throw new NullPointerException("null url");
         }
-        if(version == null){
+        if (version == null) {
             throw new NullPointerException("version");
         }
         String protocol = host.getProtocol();
@@ -534,8 +548,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             String version = params.get("VERSION");
             if (version != null) {
                 requestVersion = Version.find(version);
-                if(requestVersion == null){
-                    //default to 1.0.0
+                if (requestVersion == null) {
+                    // default to 1.0.0
                     requestVersion = Version.v1_0_0;
                 }
             }

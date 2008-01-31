@@ -27,8 +27,10 @@ import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -45,6 +47,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
 import org.geotools.xml.Configuration;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -90,7 +93,8 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     private void createProtocolHandler(String capabilitiesFileName, boolean tryGzip,
             Authenticator auth) throws IOException {
         InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8");
+        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8", Integer
+                .valueOf(0));
     }
 
     /**
@@ -108,7 +112,8 @@ public class WFS110ProtocolHandlerTest extends TestCase {
         }
         try {
             InputStream badData = new ByteArrayInputStream(new byte[1024]);
-            protocolHandler = new WFS110ProtocolHandler(badData, false, null, "UTF-8");
+            protocolHandler = new WFS110ProtocolHandler(badData, false, null, "UTF-8", Integer
+                    .valueOf(0));
             fail("Excpected DataSourceException as a capabilities document was not provided");
         } catch (DataSourceException e) {
             assertTrue(true);
@@ -173,7 +178,8 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      */
     public void testParseDescribeFeatureType_GeoServer() throws Exception {
         InputStream stream = TestData.openStream(this, DataTestSupport.GEOS_CAPABILITIES);
-        protocolHandler = new WFS110ProtocolHandler(stream, false, null, "UTF-8") {
+        protocolHandler = new WFS110ProtocolHandler(stream, false, null, "UTF-8", Integer
+                .valueOf(0)) {
             @Override
             public URL getDescribeFeatureTypeURLGet(final String typeName)
                     throws MalformedURLException {
@@ -381,8 +387,13 @@ public class WFS110ProtocolHandlerTest extends TestCase {
 
         public QueryOverrideProtocolHandler(final String capabilitiesFile, final String featuresFile)
                 throws IOException {
+            this(capabilitiesFile, featuresFile, Integer.valueOf(0));
+        }
+
+        public QueryOverrideProtocolHandler(final String capabilitiesFile,
+                final String featuresFile, final int maxFeatures) throws IOException {
             super(TestData.openStream(WFS110ProtocolHandlerTest.this, capabilitiesFile), false,
-                    null, "UTF-8");
+                    null, "UTF-8", maxFeatures);
             this.featuresFileName = featuresFile;
         }
 
@@ -426,6 +437,33 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      * @throws IOException
      */
     public void testGetFeatureReader() throws IOException {
+        // no limits
+        List<Feature> features = testGetFeatureReader(0, Integer.MAX_VALUE);
+        assertEquals(3, features.size());
+    }
+
+    public void testGetFeatureReaderWithMaxFeatures() throws IOException {
+        final int hardLimitMaxFeatures = 2;
+
+        List<Feature> features = testGetFeatureReader(hardLimitMaxFeatures, Integer.MAX_VALUE);
+        assertEquals(hardLimitMaxFeatures, features.size());
+
+        final int queryMaxFeatures = 1;
+        features = testGetFeatureReader(hardLimitMaxFeatures, queryMaxFeatures);
+        assertEquals(queryMaxFeatures, features.size());
+    }
+
+    /**
+     * 
+     * @param maxFeatures
+     *            the hard limit maxFeatures, 0 for no limit
+     * @param queryMaxFeatures
+     *            the query max features, Integre.MAX_VALUE for no limit
+     * @return the features parsed
+     * @throws IOException
+     */
+    public List<Feature> testGetFeatureReader(final int maxFeatures, final int queryMaxFeatures)
+            throws IOException {
         final String capabilitiesFileName = DataTestSupport.GEOS_CAPABILITIES;
         final String typeName = DataTestSupport.GEOS_ARCHSITES_FEATURETYPENAME;
         String featuresFileName = DataTestSupport.GEOS_ARCHSITES_DATA;
@@ -435,7 +473,8 @@ public class WFS110ProtocolHandlerTest extends TestCase {
         final Configuration testConfiguration = new TestWFSConfiguration(featureNameSpace,
                 schemaLocation.toExternalForm());
 
-        protocolHandler = new QueryOverrideProtocolHandler(capabilitiesFileName, featuresFileName) {
+        protocolHandler = new QueryOverrideProtocolHandler(capabilitiesFileName, featuresFileName,
+                Integer.valueOf(maxFeatures)) {
             public URL getDescribeFeatureTypeURLGet(String typeName) {
                 return schemaLocation;
             }
@@ -447,27 +486,22 @@ public class WFS110ProtocolHandlerTest extends TestCase {
         };
 
         SimpleFeatureType contentType = protocolHandler.parseDescribeFeatureType(typeName);
-        Query query = new DefaultQuery(typeName);
+        DefaultQuery query = new DefaultQuery(typeName);
+        query.setMaxFeatures(queryMaxFeatures);
         Transaction transaction = Transaction.AUTO_COMMIT;
         FeatureReader reader = protocolHandler.getFeatureReader(query, transaction);
         assertNotNull(reader);
         assertEquals(contentType, reader.getFeatureType());
 
         SimpleFeature next;
+        List<Feature> features = new ArrayList<Feature>();
 
-        assertTrue(reader.hasNext());
-        next = reader.next();
-        assertNotNull(next);
+        while (reader.hasNext()) {
+            next = reader.next();
+            features.add(next);
+        }
 
-        assertTrue(reader.hasNext());
-        next = reader.next();
-        assertNotNull(next);
-
-        assertTrue(reader.hasNext());
-        next = reader.next();
-        assertNotNull(next);
-
-        assertFalse(reader.hasNext());
+        return features;
     }
 
 }

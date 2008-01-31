@@ -113,7 +113,7 @@ public abstract class DataTestSupport extends TestCase {
     protected void createProtocolHandler(String capabilitiesFileName, boolean tryGzip,
             Authenticator auth) throws IOException {
         InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8") {
+        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8", Integer.valueOf(0)) {
             @Override
             public URL getDescribeFeatureTypeURLGet(final String typeName)
                     throws MalformedURLException {

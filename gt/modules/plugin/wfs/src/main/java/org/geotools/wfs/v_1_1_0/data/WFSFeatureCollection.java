@@ -46,7 +46,8 @@ class WFSFeatureCollection extends DataFeatureCollection {
      *            properly named query
      * @throws IOException
      */
-    public WFSFeatureCollection(WFS110ProtocolHandler protocolHandler, Query query) throws IOException {
+    public WFSFeatureCollection(WFS110ProtocolHandler protocolHandler, Query query)
+            throws IOException {
         this.contentType = protocolHandler.getQueryType(query);
         this.protocolHandler = protocolHandler;
         this.query = query;
@@ -125,7 +126,11 @@ class WFSFeatureCollection extends DataFeatureCollection {
         if (cachedSize != -1) {
             return cachedSize;
         }
-        getBounds();
+        cachedSize = protocolHandler.getCount(query);
+        if (cachedSize == -1) {
+            //no luck, cache both bounds and count with a full scan
+            getBounds();
+        }
         return cachedSize;
     }
 

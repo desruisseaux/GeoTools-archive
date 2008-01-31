@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -45,7 +44,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,11 +72,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
-import org.geotools.data.crs.ReprojectFeatureReader;
-import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.v1_1.OGC;
@@ -108,7 +105,6 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
@@ -139,6 +135,11 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
     private final Map<String, SimpleFeatureType> featureTypeCache;
 
     /**
+     * Hard limit for maxFeatures parameter. 0 means no limit.
+     */
+    private Integer maxFeaturesHardLimit;
+
+    /**
      * Creates the protocol handler by parsing the capabilities document from
      * the provided input stream.
      * 
@@ -146,12 +147,14 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      * @param tryGzip
      * @param auth
      * @param encoding
+     * @param maxFeatures
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
     public WFS110ProtocolHandler(InputStream capabilitiesReader, boolean tryGzip,
-            Authenticator auth, String encoding) throws IOException {
+            Authenticator auth, String encoding, Integer maxFeatures) throws IOException {
         super(Version.v1_1_0, tryGzip, auth, encoding);
+        this.maxFeaturesHardLimit = maxFeatures;
         this.capabilities = parseCapabilities(capabilitiesReader);
         this.typeInfos = new HashMap<String, FeatureTypeType>();
         this.featureTypeCache = new HashMap<String, SimpleFeatureType>();
@@ -606,6 +609,11 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             final boolean cloneContents = false;
             reader = new ReTypeFeatureReader(reader, contentType, cloneContents);
         }
+
+        if (this.maxFeaturesHardLimit.intValue() > 0 || query.getMaxFeatures() != Integer.MAX_VALUE) {
+            int maxFeatures = Math.min(maxFeaturesHardLimit.intValue(), query.getMaxFeatures());
+            reader = new MaxFeatureReader(reader, maxFeatures);
+        }
         return reader;
     }
 
@@ -668,6 +676,9 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
                 propertyNames = Arrays.asList(propNames);
             }
             int maxFeatures = query.getMaxFeatures();
+            if (this.maxFeaturesHardLimit.intValue() > 0) {
+                maxFeatures = Math.min(maxFeatures, this.maxFeaturesHardLimit.intValue());
+            }
             List<SortBy> sortBy = (List<SortBy>) (query.getSortBy() == null ? Collections
                     .emptyList() : Arrays.asList(query.getSortBy()));
             getFeatureGetUrl = createGetFeatureGet(typeName, propertyNames, filter, maxFeatures,
@@ -744,8 +755,12 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
         // TODO: enable filter
         if (false && Filter.INCLUDE != filter) {
-            if (filter instanceof BBOX) {
-
+            if (false && filter instanceof BBOX) {
+                // TODO: encode BBOX filters as the special case BBOX parameter,
+                // though I guess it'd be not that easy as it seems to require a
+                // the coordinates to have as many ordinates as the CRS and a
+                // crs URI
+                // BBOX bbox = (BBOX) filter;
             } else if (filter instanceof Id) {
                 final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
                 StringBuffer idValues = new StringBuffer();
@@ -817,11 +832,13 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
         OGCConfiguration filterConfig = new OGCConfiguration();
         Encoder encoder = new Encoder(filterConfig);
-
+        // do not write the xml declaration
+        // encoder.setEncodeFullDocument(false);
+     
         OutputStream out = new ByteArrayOutputStream();
         encoder.encode(filter, OGC.Filter, out);
         String encoded = out.toString();
-        System.out.println(encoded);
+        encoded = encoded.replaceAll("\n", "");
         return encoded;
     }
 
