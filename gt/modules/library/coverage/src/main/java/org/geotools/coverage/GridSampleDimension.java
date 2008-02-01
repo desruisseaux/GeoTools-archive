@@ -604,7 +604,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         /*
          * Checks the supplied description to see if it is null. In such a case it
          * builds up a new description by using the list of categories supplied.
-         * This secondo description is much less human readable and it is therefore
+         * This second description is much less human readable and it is therefore
          * much better if the user provide a meaningful name for this sample
          * dimension.
          */

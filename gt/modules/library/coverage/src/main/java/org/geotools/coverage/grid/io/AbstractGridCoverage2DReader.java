@@ -50,10 +50,12 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -555,52 +557,6 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected final GridCoverage createImageCoverage(PlanarImage image,
 			MathTransform raster2Model) throws IOException {
 
-		// deciding the number range
-		NumberRange geophysicRange = null;
-
-		switch (image.getSampleModel().getTransferType()) {
-		case DataBuffer.TYPE_BYTE:
-			geophysicRange = new NumberRange(0, 255);
-
-			break;
-
-		case DataBuffer.TYPE_USHORT:
-			geophysicRange = new NumberRange(0, 65535);
-
-			break;
-		// going to treat following cases as DEM
-		case DataBuffer.TYPE_INT:
-			geophysicRange = new NumberRange(Integer.MIN_VALUE,
-					Integer.MAX_VALUE);
-			break;
-		case DataBuffer.TYPE_SHORT:
-			geophysicRange = new NumberRange(Short.MIN_VALUE, Short.MAX_VALUE);
-			break;
-		case DataBuffer.TYPE_DOUBLE:
-
-			geophysicRange = new NumberRange(Double.MIN_VALUE, Double.MAX_VALUE);
-			break;
-		case DataBuffer.TYPE_FLOAT:
-			geophysicRange = new NumberRange(Float.MIN_VALUE, Float.MAX_VALUE);
-			return createDEMCoverage(image);
-		default:
-			throw new DataSourceException(
-					"createImageCoverage:Data buffer type not supported by this world image reader! Use byte, ushort or int");
-		}
-
-		/**
-		 * Now we shuld be able to create the sample dimensions and the
-		 * categories for this coverage in a much better and meaningful way
-		 * using the color model and the color space type.
-		 * 
-		 * @todo How do we handle the NoData when it is 0?
-		 * 
-		 */
-		// convenieience category in order to
-		final Category values = new Category("values",
-				new Color[] { Color.BLACK }, geophysicRange,
-				LinearTransform1D.IDENTITY);
-
 		// creating bands
 		final int numBands = image.getSampleModel().getNumBands();
 		final GridSampleDimension[] bands = new GridSampleDimension[numBands];
@@ -620,38 +576,30 @@ public abstract class AbstractGridCoverage2DReader implements
 				names[2] = "Saturation band";
 
 			} else {
-				/**
-				 * 
-				 * 
-				 * @TODO we need to support more types than the ones we have
-				 *       here.
-				 * 
-				 * 
-				 */
 				// not IHS, let's take the type
 				final int type = cs.getType();
 				switch (type) {
 				case ColorSpace.CS_GRAY:
 				case ColorSpace.TYPE_GRAY:
-					names[0] = "grayscale band";
+					names[0] = "GRAY";
 					break;
 				case ColorSpace.CS_sRGB:
 				case ColorSpace.CS_LINEAR_RGB:
 				case ColorSpace.TYPE_RGB:
-					names[0] = "Red band";
-					names[1] = "Green band";
-					names[2] = "Blue band";
+					names[0] = "RED";
+					names[1] = "GREEN";
+					names[2] = "BLUE";
 					break;
 				case ColorSpace.TYPE_CMY:
-					names[0] = "Cyan band";
-					names[1] = "Magenta band";
-					names[2] = "Yellow band";
+					names[0] = "CYAN";
+					names[1] = "MAGENTA";
+					names[2] = "YELLOW";
 					break;
 				case ColorSpace.TYPE_CMYK:
-					names[0] = "Cyan band";
-					names[1] = "Magenta band";
-					names[2] = "Yellow band";
-					names[3] = "K band";
+					names[0] = "CYAN";
+					names[1] = "MAGENTA";
+					names[2] = "YELLOW";
+					names[3] = "K";
 					break;
 
 				}
@@ -659,9 +607,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		}
 		// setting bands names.
 		for (int i = 0; i < numBands; i++) {
-
-			bands[i] = new GridSampleDimension(names[i],
-					new Category[] { values }, null).geophysics(true);
+			bands[i] = new GridSampleDimension(names[i]).geophysics(true);
 		}
 
 		// creating coverage
@@ -674,53 +620,6 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	}
 
-	/**
-	 * Creates a {@link GridCoverage} for a coverage that is not a simple image
-	 * but that contains complex dadta from measurements.
-	 * 
-	 * 
-	 * <p>
-	 * This usually means that the original {@link DataBuffer#getDataType()} is
-	 * of one of the following types:
-	 * 
-	 * <ul>
-	 * <li>{@link DataBuffer#TYPE_FLOAT}</li>
-	 * <li>{@link DataBuffer#TYPE_DOUBLE}</li>
-	 * <li>{@link DataBuffer#TYPE_INT}</li>
-	 * <li>{@link DataBuffer#TYPE_SHORT}</li>
-	 * </ul>
-	 * 
-	 * and it implies that we have to prepare a transformation from geophysics
-	 * values to non-geophysics values.
-	 * 
-	 * @param coverage
-	 *            a {@link PlanarImage} containing the source coverage.
-	 * @return a {@link GridCoverage}.
-	 */
-	private GridCoverage createDEMCoverage(PlanarImage coverage) {
-		// Create the SampleDimension, with colors and byte transformation
-		// needed for visualization
-		final UnitFormat unitFormat = UnitFormat.getStandardInstance();
-		Unit uom = null;
-
-		// unit of measure is meter usually, is this a good guess?
-		try {
-			uom = unitFormat.parseUnit("m");
-		} catch (ParseException e) {
-			uom = null;
-		}
-
-		final Category values = new Category("elevation", demColors,
-				new NumberRange(2, 10), new NumberRange(-1, 8849));
-
-		final GridSampleDimension band = new GridSampleDimension(
-				"digital elevation", new Category[] { values }, uom)
-				.geophysics(true);
-
-		return coverageFactory.create(coverageName, coverage, originalEnvelope,
-				new GridSampleDimension[] { band }, null, null);
-
-	}
 
 	/**
 	 * This method is responsible for computing the resolutions in for the
@@ -922,7 +821,10 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected final static boolean isScaleTranslate(MathTransform transform) {
 		if (!(transform instanceof AffineTransform))
 			return false;
+		
 		AffineTransform at = (AffineTransform) transform;
-		return at.getShearX() < EPS && at.getShearY() < EPS;
+		final double scale=Math.abs(XAffineTransform.getRotation(at));
+		return !Double.isNaN(scale)&&scale < EPS ;
+//		return at.getShearX() < EPS && at.getShearY() < EPS;
 	}
 }
