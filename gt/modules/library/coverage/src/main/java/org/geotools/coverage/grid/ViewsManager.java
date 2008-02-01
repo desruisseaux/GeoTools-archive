@@ -41,6 +41,7 @@ import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.FormatDescriptor;
 import javax.media.jai.operator.LookupDescriptor;
+import static java.lang.Double.isNaN;
 
 import org.opengis.util.InternationalString;
 import org.opengis.coverage.grid.GridCoverage;
@@ -81,13 +82,6 @@ final class ViewsManager {
     private static final float EPS = 1E-5f;
 
     /**
-     * {@code true} if we should apply a conservative policy for the "piecewise" operation.
-     * The conservative policy is to apply "piecewise" only if there is no ambiguity about what
-     * the user wants.
-     */
-    private static final boolean CONSERVATIVE_PIECEWISE = true;
-
-    /**
      * The views. The coverage that created this {@code ViewsManager} must be stored under
      * the {@link ViewType#NATIVE} key.
      */
@@ -103,7 +97,7 @@ final class ViewsManager {
         boolean geophysics   = true; // 'true' only if all bands are geophysics.
         boolean photographic = true; // 'true' only if no band have category.
         final int numBands = coverage.getNumSampleDimensions();
-        for (int i=0; i<numBands; i++) {
+scan:   for (int i=0; i<numBands; i++) {
             final GridSampleDimension band = coverage.getSampleDimension(i);
             if (band != null) {
                 final List<Category> categories = band.getCategories();
@@ -112,9 +106,17 @@ final class ViewsManager {
                     continue;
                 }
                 photographic = false;
-                if (band == band.geophysics(false)) {
-                    geophysics = false;
+                final GridSampleDimension packed = band.geophysics(false);
+                if (band != packed) {
+                    for (final Category category : packed.getCategories()) {
+                        if (category.isQuantitative()) {
+                            // Preserves the geophysics value if at least one category
+                            // is quantitative. Otherwise it will be set to 'false'.
+                            continue scan;
+                        }
+                    }
                 }
+                geophysics = false;
             }
         }
         final ViewType type;
@@ -440,38 +442,55 @@ testLinear: for (int i=0; i<numBands; i++) {
                     final Category sourceCategory = sources.get(j);
                     final Category packedCategory = sourceCategory.geophysics(false);
                     MathTransform1D transform = packedCategory.getSampleToGeophysics();
+                    final double offset, scale;
                     if (transform == null) {
                         /*
                          * A qualitative category was found. Those categories maps NaN values,
                          * which need the special processing performed by our "SampleTranscode"
-                         * operation. So "Piecewise" is eliminated, but as a special case the
-                         * "Rescale" operation could continue to work if the NaN value maps to 0.
+                         * operation. However there is a few special cases where JAI operations
+                         * could still fit:
+                         *
+                         * - In "packed to geophysics" transform, we can still use "Piecewise"
+                         *   if the minimum and maximum target value are equals (usually NaN).
+                         *
+                         * - In "geophysics to packed" transform, we can still use "Rescale"
+                         *   if the NaN value maps to 0.
                          */
-                        canPiecewise = false;
-                        if (!toGeo) {
+                        if (toGeo) {
+                            canRescale = false;
+                            final NumberRange target = sourceCategory.geophysics(true).getRange();
+                            offset = target.getMinimum();
+                            if (Double.doubleToRawLongBits(offset) != Double.doubleToRawLongBits(target.getMaximum())) {
+                                canPiecewise = false;
+                                break testLinear;
+                            }
+                            scale = 0;
+                        } else {
+                            canPiecewise = false;
                             assert !packedCategory.equals(sourceCategory) : packedCategory;
                             final NumberRange range = packedCategory.getRange();
                             if (range.getMinimum(true) == 0 && range.getMaximum(true) == 0) {
-                                assert Double.isNaN(sourceCategory.getRange().getMinimum()) : sourceCategory;
+                                assert isNaN(sourceCategory.getRange().getMinimum()) : sourceCategory;
                                 conditional = true;
                                 continue;
                             }
+                            canRescale = false;
+                            break testLinear;
                         }
-                        canRescale = false;
-                        break testLinear;
-                    }
-                    if (!toGeo) {
-                        // We are going to convert geophysics values to native one.
-                        transform = transform.inverse();
-                    }
-                    final double offset = transform.transform(0);
-                    final double scale  = transform.derivative(Double.NaN);
-                    if (Double.isNaN(scale) || Double.isNaN(offset)) {
-                        // One category doesn't use a linear transformation. We can't deal with
-                        // that with "Rescale" or "Piecewise". Fallback on our "SampleTranscode".
-                        canRescale   = false;
-                        canPiecewise = false;
-                        break testLinear;
+                    } else {
+                        if (!toGeo) {
+                            // We are going to convert geophysics values to packed ones.
+                            transform = transform.inverse();
+                        }
+                        offset = transform.transform(0);
+                        scale  = transform.derivative(Double.NaN);
+                        if (isNaN(scale) || isNaN(offset)) {
+                            // One category doesn't use a linear transformation. We can't deal with
+                            // that with "Rescale" or "Piecewise". Fallback on our "SampleTranscode".
+                            canRescale   = false;
+                            canPiecewise = false;
+                            break testLinear;
+                        }
                     }
                     // Allocates arrays the first time the loop is run up to this point.
                     // Store scale and offset, and check if they still the same.
@@ -490,7 +509,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                     if (offset!=offsets[i] || scale!=scales[i]) {
                         canRescale = false;
                     }
-                    // Compute breakpoints.
+                    // Computes breakpoints.
                     final NumberRange range = sourceCategory.getRange();
                     final double    minimum = range.getMinimum(true);
                     final double    maximum = range.getMaximum(true);
@@ -500,28 +519,26 @@ testLinear: for (int i=0; i<numBands; i++) {
                     final float   targetMax = (float)(maximum * scale + offset);
                     assert sourceMin <= sourceMax : range;
                     if (Math.abs(minimum - expectedSource) <= EPS) {
-                        if (Math.abs(targetMin - expectedTarget) <= EPS) {
-                            // This breakpoint is identical to the previous one. Do not
-                            // duplicate; overwrites the previous one since this one is
-                            // likely to be more accurate.
+                        if (Math.abs(targetMin - expectedTarget) <= EPS || isNaN(expectedTarget)) {
+                            /*
+                             * This breakpoint is identical to the previous one. Do not duplicate;
+                             * overwrites the previous breakpoint since the later is likely to be
+                             * more accurate. Note that we accept NaN in expected (not calculated)
+                             * target values but not in source values, because "Piecewise" performs
+                             * its search on source values, wich must be monotonically increasing.
+                             */
                             jbp--;
                         } else {
                             // Found a discontinuity!!! The "piecewise" operation is not really
                             // designed for such case. The behavior between the last breakpoint
                             // and the current one may not be what the user expected.
                             assert sourceBreakpoints[jbp-1] < sourceMin : expectedSource;
-                            if (CONSERVATIVE_PIECEWISE) {
-                                canPiecewise = false;
-                            }
-                        }
-                    } else if (j != 0) {
-                        // Found a gap between the last category and the current one. The
-                        // "piecewise" operation may not behave as the user expected  for
-                        // sample values falling in this gap.
-                        assert !(expectedSource > sourceMin) : expectedSource;
-                        if (CONSERVATIVE_PIECEWISE) {
                             canPiecewise = false;
                         }
+                    } else if (j != 0) {
+                        // Found a gap between the last category and the current one. But the
+                        // piecewise operation still work as expected for values not in the gap.
+                        assert !(expectedSource > sourceMin) : expectedSource;
                     }
                     sourceBreakpoints[jbp  ] = sourceMin;
                     sourceBreakpoints[jbp+1] = sourceMax;
@@ -531,24 +548,16 @@ testLinear: for (int i=0; i<numBands; i++) {
                     expectedSource = range.getMaximum(false);
                     expectedTarget = expectedSource * scale + offset;
                 }
-                if (false) {
-                    // HACK: temporarily disabled because 'javac' 1.4.1_02 produces invalid
-                    //       bytecode. This bug is fixed in 'java' 1.4.2-beta. Furthermore,
-                    //       the "piecewise" operation throws an ArrayIndexOutOfBoundsException
-                    //       in JAI code for an unknow reason...
-                    breakpoints[i][0] = sourceBreakpoints = XArray.resize(sourceBreakpoints, jbp);
-                    breakpoints[i][1] = targetBreakpoints = XArray.resize(targetBreakpoints, jbp);
-                    assert XArray.isSorted(sourceBreakpoints);
-                } else {
-                    canPiecewise = false;
-                }
+                breakpoints[i][0] = sourceBreakpoints = XArray.resize(sourceBreakpoints, jbp);
+                breakpoints[i][1] = targetBreakpoints = XArray.resize(targetBreakpoints, jbp);
+                assert XArray.isSorted(sourceBreakpoints);
             }
             if (canRescale && scales!=null && (!conditional || isZeroExcluded(image, scales, offsets))) {
                 operation = "Rescale";
                 param = param.add(scales).add(offsets);
             } else if (canPiecewise && breakpoints!=null) {
-                operation = "Piecewise";
-                param = param.add(breakpoints);
+//                operation = "Piecewise";
+//                param = param.add(breakpoints);
             }
         } catch (TransformException exception) {
             /*

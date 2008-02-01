@@ -16,16 +16,12 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.util.Random;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -56,7 +52,7 @@ public class CategoryTest extends TestCase {
      * Random number generator for this test.
      */
     private static final Random random = new Random(9119969932919929834L);
-    
+
     /**
      * Constructs a test case with the given name.
      */

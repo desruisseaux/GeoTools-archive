@@ -784,13 +784,12 @@ class CategoryList extends AbstractList<Category>
         }
         buffer.append(')').append(lineSeparator);
         /*
-         * Writes categories below the SampleDimension description;
+         * Writes categories below the SampleDimension description.
+         * The symbol used for the main category is "triangular bullet".
          */
-        for (int i=0; i<categories.length; i++) {
-            buffer.append("   ")
-                  .append(categories[i] == main ? '*' : ' ')
-                  .append(categories[i])
-                  .append(lineSeparator);
+        for (final Category category : categories) {
+            buffer.append("  ").append(category == main ? '\u2023' : ' ').append(' ')
+                  .append(category).append(lineSeparator);
         }
         return buffer.toString();
     }

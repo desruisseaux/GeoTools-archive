@@ -1168,26 +1168,26 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     @Override
     public String toString() {
-        final StringWriter buffer = new StringWriter();
-        buffer.write(Classes.getShortClassName(this));
-        buffer.write("[\"");
-        buffer.write(String.valueOf(getName()));
-        buffer.write('"');
+        final StringWriter out = new StringWriter();
+        out.write(Classes.getShortClassName(this));
+        out.write("[\"");
+        out.write(String.valueOf(getName()));
+        out.write('"');
         final Envelope envelope = getEnvelope();
         if (envelope != null) {
-            buffer.write(", ");
-            buffer.write(envelope.toString());
+            out.write(", ");
+            out.write(envelope.toString());
         }
         if (crs != null) {
-            buffer.write(", ");
-            buffer.write(Classes.getShortClassName(crs));
-            buffer.write("[\"");
-            buffer.write(crs.getName().getCode());
-            buffer.write("\"]");
+            out.write(", ");
+            out.write(Classes.getShortClassName(crs));
+            out.write("[\"");
+            out.write(crs.getName().getCode());
+            out.write("\"]");
         }
-        buffer.write(']');
+        out.write(']');
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        final LineWriter filter = new LineWriter(buffer, lineSeparator + "    ");
+        final LineWriter filter = new LineWriter(out, lineSeparator + "\u2502   ");
         final int n = getNumSampleDimensions();
         try {
             filter.write(lineSeparator);
@@ -1199,6 +1199,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
             // Should not happen
             throw new AssertionError(exception);
         }
+        final StringBuffer buffer = out.getBuffer();
+        buffer.setLength(buffer.lastIndexOf(lineSeparator) + lineSeparator.length());
         return buffer.toString();
     }
 

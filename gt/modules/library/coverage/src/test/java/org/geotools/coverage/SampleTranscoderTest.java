@@ -14,41 +14,34 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.coverage.grid;
+package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.RenderedImage;
 import java.util.Random;
 
-// JAI dependencies
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.RenderedOp;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
-import org.geotools.coverage.Category;
-import org.geotools.coverage.CategoryListTest;
-import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.ViewType;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 
 /**
- * Test the {@link SampleTranscoder} implementation. Image adapter depends
+ * Tests the {@link SampleTranscoder} implementation. Image adapter depends
  * heavily on {@link CategoryList}, so this one should be tested first.
  *
  * @source $URL$
@@ -74,7 +67,7 @@ public class SampleTranscoderTest extends TestCase {
     private GridSampleDimension band1;
 
     /**
-     * Run the suite from the command line.
+     * Runs the suite from the command line.
      */
     public static void main(final String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -95,8 +88,9 @@ public class SampleTranscoderTest extends TestCase {
     }
 
     /**
-     * Set up common objects used for all tests.
+     * Sets up common objects used for all tests.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         band1 = new GridSampleDimension("Temperature", new Category[] {
@@ -152,13 +146,13 @@ public class SampleTranscoderTest extends TestCase {
         final MathTransform identity = IdentityTransform.create(2);
         final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage2D coverage;
-        coverage = (GridCoverage2D) factory.create("Test", source, DefaultGeographicCRS.WGS84,
-                                        identity, new GridSampleDimension[]{band}, null, null);
+        coverage = factory.create("Test", source, DefaultGeographicCRS.WGS84,
+                    identity, new GridSampleDimension[]{band}, null, null);
         /*
          * Apply the operation. The SampleTranscoder class is suppose to transform our
          * integers into real-world values. Check if the result use floating-points.
          */
-        final RenderedImage target = coverage.geophysics(true).getRenderedImage();
+        final RenderedImage target = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
         assertSame(target, PlanarImage.wrapRenderedImage(target));
         assertEquals(DataBuffer.TYPE_BYTE, source.getSampleModel().getDataType());
         if (coverage.getRenderedImage() != target) {
@@ -176,10 +170,10 @@ public class SampleTranscoderTest extends TestCase {
          * Compare the resulting values with the original data.
          */
         RenderedImage back = PlanarImage.wrapRenderedImage(target).getAsBufferedImage();
-        coverage = (GridCoverage2D) factory.create("Test", back, DefaultGeographicCRS.WGS84,
+        coverage = factory.create("Test", back, DefaultGeographicCRS.WGS84,
                     identity, new GridSampleDimension[]{band.geophysics(true)}, null, null);
 
-        back = coverage.geophysics(false).getRenderedImage();
+        back = coverage.view(ViewType.PACKED).getRenderedImage();
         assertEquals(DataBuffer.TYPE_BYTE, back.getSampleModel().getDataType());
         sourceData = source.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);
         targetData =   back.getData().getSamples(0, 0, SIZE, SIZE, 0, (double[])null);

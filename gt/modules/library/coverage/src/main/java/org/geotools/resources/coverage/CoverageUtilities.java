@@ -22,6 +22,7 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBilinear;
@@ -448,6 +449,36 @@ public final class CoverageUtilities {
                     return ViewType.NATIVE;
                 }
             }
+        }
+        return ViewType.SAME;
+    }
+
+    /**
+     * The preferred view in which to returns the coverage after the operation.
+     * This method returns a view that match the current state of the given coverage.
+     *
+     * @param  coverage The source coverage <strong>before</strong> the operation.
+     * @return The suggested view, or {@link ViewType#SAME} if this method doesn't
+     *         have any suggestion.
+     *
+     * @since 2.5
+     *
+     * @todo Move this method in {@link org.geotools.coverage.processing.Operation2D}.
+     */
+    public static ViewType preferredViewAfterOperation(final GridCoverage2D coverage) {
+        final Set<ViewType> views = coverage.getViewTypes();
+        // Most restrictive views first, less restrictive last.
+        if (views.contains(ViewType.GEOPHYSICS)) {
+            return ViewType.GEOPHYSICS;
+        }
+        if (views.contains(ViewType.RENDERED)) {
+            return ViewType.RENDERED;
+        }
+        if (views.contains(ViewType.PACKED)) {
+            return ViewType.PACKED;
+        }
+        if (views.contains(ViewType.PHOTOGRAPHIC)) {
+            return ViewType.PHOTOGRAPHIC;
         }
         return ViewType.SAME;
     }

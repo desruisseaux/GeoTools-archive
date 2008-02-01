@@ -16,25 +16,20 @@
  */
 package org.geotools.coverage;
 
-// J2SE and JAI dependencies
 import java.util.Arrays;
 import java.util.Random;
 import javax.media.jai.util.Range;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
 /**
- * Test the {@link CategoryList} implementation.
+ * Tests the {@link CategoryList} implementation.
  *
  * @source $URL$
  * @version $Id$
@@ -42,7 +37,7 @@ import org.geotools.resources.XArray;
  */
 public class CategoryListTest extends TestCase {
     /**
-     * Set to <code>true</code> in order to print diagnostic messages.
+     * Set to {@code true} in order to print diagnostic messages.
      */
     private static final boolean PRINT = false;
 
@@ -70,7 +65,7 @@ public class CategoryListTest extends TestCase {
     public static Test suite() {
         return new TestSuite(CategoryListTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -93,11 +88,11 @@ public class CategoryListTest extends TestCase {
         for (int pass=0; pass<50; pass++) {
             final double[] array = new double[64];
             for (int i=0; i<array.length; i++) {
-                array[i] = (random.nextInt(100)-50)/10;
+                array[i] = (random.nextInt(100) - 50) / 10;
             }
             Arrays.sort(array);
             for (int i=0; i<300; i++) {
-                final double searchFor = (random.nextInt(150)-75)/10;
+                final double searchFor = (random.nextInt(150) - 75) / 10;
                 assertEquals("binarySearch", Arrays.binarySearch(array, searchFor),
                                        CategoryList.binarySearch(array, searchFor));
             }
@@ -157,13 +152,13 @@ public class CategoryListTest extends TestCase {
                 // This is the expected exception.
             }
         }
-        // Remove the wrong category. Now, construction should succed.
-        categories = (Category[]) XArray.resize(categories, categories.length-1);
+        // Removes the wrong category. Now, construction should succed.
+        categories = XArray.resize(categories, categories.length-1);
         new CategoryList(categories, null);
     }
 
     /**
-     * Test the {@link CategoryList#getCategory} method and a
+     * Tests the {@link CategoryList#getCategory} method and a
      * limited set of {@link CategoryList#transform} calls.
      */
     public void testGetCategory() throws TransformException {
@@ -189,7 +184,7 @@ public class CategoryListTest extends TestCase {
             assertTrue  ("min included", range.isMinIncluded() == true);
             assertTrue  ("max included", range.isMaxIncluded() == false);
             /*
-             * Check category search.
+             * Checks category search.
              */
             assertSame(  "0", list.getCategory(  0), categories[0]);
             assertSame(  "7", list.getCategory(  7), categories[1]);
@@ -214,7 +209,7 @@ public class CategoryListTest extends TestCase {
                 assertNull("200", list.getCategory(200));
             }
             /*
-             * Check transformations.
+             * Checks transformations.
              */
             assertTrue  (  "0", Double.isNaN(list.transform(0)));
             assertTrue  (  "7", Double.isNaN(list.transform(7)));
@@ -273,7 +268,7 @@ public class CategoryListTest extends TestCase {
     }
 
     /**
-     * Compare two arrays. Special comparaison is performed for NaN values.
+     * Compares two arrays. Special comparaison is performed for NaN values.
      */
     public static void compare(final double[] output0, final double[] output1, final double eps) {
         assertEquals("length", output0.length, output1.length);

@@ -23,7 +23,6 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -42,7 +41,6 @@ import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.coverage.processing.AbstractProcessor;
-import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.factory.Hints;
@@ -72,7 +70,7 @@ public final class ResampleTest extends GridCoverageTest {
      * Small number for comparaisons.
      */
     private static final double EPS = 1E-6;
-    
+
     /**
      * The source grid coverage, to be initialized by {@link #setUp}.
      * Contains 8-bits indexed color model for a PNG image, with categories.
@@ -155,7 +153,7 @@ public final class ResampleTest extends GridCoverageTest {
     /**
      * Projects the specified image to the specified CRS.
      * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
-     * @param show 
+     * @param show
      *
      * @return The operation name which was applied on the image, or {@code null} if none.
      */
@@ -170,29 +168,25 @@ public final class ResampleTest extends GridCoverageTest {
      * Tests the "Resample" operation with an identity transform.
      */
     public void testIdentity() {
-        assertEquals("Lookup", projectTo(coverage, coverage.getCoordinateReferenceSystem(), null,null,true,SHOW));
-        assertNull(projectTo(indexedCoverage, indexedCoverage.getCoordinateReferenceSystem(), null,null,true,SHOW));
-        assertNull(projectTo(indexedCoverageWithTransparency, indexedCoverageWithTransparency.getCoordinateReferenceSystem(), null,null,true,SHOW));
-        assertNull(projectTo(floatCoverage, floatCoverage.getCoordinateReferenceSystem(), null,null,true,SHOW));
+        assertEquals("Lookup", projectTo(coverage, coverage.getCoordinateReferenceSystem(), null, null, true, SHOW));
+        assertNull(projectTo(indexedCoverage, indexedCoverage.getCoordinateReferenceSystem(), null, null, true, SHOW));
+        assertNull(projectTo(indexedCoverageWithTransparency, indexedCoverageWithTransparency.getCoordinateReferenceSystem(), null, null, true, SHOW));
+        assertNull(projectTo(floatCoverage, floatCoverage.getCoordinateReferenceSystem(), null, null, true, SHOW));
     }
 
     /**
      * Tests the "Resample" operation with a "Crop" transform.
      */
     public void testCrop() {
-        assertEquals("Crop", projectTo(coverage,null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,200,200)),
-                             (MathTransform)null, null), null,true,SHOW));
-        assertEquals("Crop", projectTo(indexedCoverage,null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,100,100)),
-                             (MathTransform)null, null), null,true,SHOW));
-        assertEquals("Crop", projectTo(indexedCoverageWithTransparency,null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,100,100)),
-                             (MathTransform)null, null), null,true,SHOW));
-        assertEquals("Crop", projectTo(floatCoverage,null, new GridGeometry2D(
-                             new GeneralGridRange(new Rectangle(50,50,100,100)),
-                             (MathTransform)null, null),
-                             new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE),true, SHOW));
+        final GridGeometry2D g1,g2;
+        g1 = new GridGeometry2D(new GeneralGridRange(new Rectangle(50,50,100,100)), (MathTransform)null, null);
+        g2 = new GridGeometry2D(new GeneralGridRange(new Rectangle(50,50,200,200)), (MathTransform)null, null);
+        assertEquals("Crop",   projectTo(coverage,        null, g2, null, false, SHOW));
+        assertEquals("Lookup", projectTo(coverage,        null, g2, null, true,  SHOW));
+        assertEquals("Crop",   projectTo(indexedCoverage, null, g1, null, false, SHOW));
+        assertEquals("Crop",   projectTo(indexedCoverageWithTransparency, null, g1, null, false, SHOW));
+        assertEquals("Crop",   projectTo(floatCoverage, null, g1,
+                new Hints(Hints.COVERAGE_PROCESSING_VIEW, ViewType.PHOTOGRAPHIC), true, SHOW));
     }
 
     /**
@@ -206,6 +200,7 @@ public final class ResampleTest extends GridCoverageTest {
      * Tests the "Resample" operation with a stereographic coordinate system.
      */
     public void testsNad83() throws FactoryException {
+        final Hints photo = new Hints(Hints.COVERAGE_PROCESSING_VIEW, ViewType.PHOTOGRAPHIC);
         final CoordinateReferenceSystem crs = CRS.parseWKT(
                 "GEOGCS[\"NAD83\"," +
                   "DATUM[\"North_American_Datum_1983\"," +
@@ -216,21 +211,20 @@ public final class ResampleTest extends GridCoverageTest {
                   "AXIS[\"Lat\",NORTH]," +
                   "AXIS[\"Long\",EAST]," +
                   "AUTHORITY[\"EPSG\",\"4269\"]]");
-        assertEquals("Warp", projectTo(indexedCoverage,crs, null, null,false,SHOW));
-        assertEquals("Warp", projectTo(indexedCoverageWithTransparency,crs, null, null,false,SHOW));
-        assertEquals("Warp", projectTo(floatCoverage,crs, null,
-                             new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE), false,SHOW));
+        assertEquals("Warp", projectTo(indexedCoverage, crs, null, null, false, SHOW));
+        assertEquals("Warp", projectTo(indexedCoverageWithTransparency, crs, null, null, false, SHOW));
+        assertEquals("Warp", projectTo(floatCoverage, crs, null, photo, true, SHOW));
     }
 
     /**
      * Tests the "Resample" operation with an "Affine" transform.
      */
     public void testAffine() {
-        performAffine(coverage,                        null, true,  "Lookup",     "Affine",SHOW);
-        performAffine(indexedCoverage,                 null, true,  "Lookup",     "Affine",SHOW);
-        performAffine(indexedCoverageWithTransparency, null, false, "BandSelect", "Affine",SHOW);
-        performAffine(floatCoverage, new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE),
-                      false, "Lookup", "Affine",SHOW);
+        final Hints photo = new Hints(Hints.COVERAGE_PROCESSING_VIEW, ViewType.PHOTOGRAPHIC);
+        performAffine(coverage,                        null, true,  "Lookup",     "Affine", SHOW);
+        performAffine(indexedCoverage,                 null, true,  "Lookup",     "Affine", SHOW);
+        performAffine(indexedCoverageWithTransparency, null, false, "BandSelect", "Affine", SHOW);
+        performAffine(floatCoverage,                  photo, false, "Lookup",     "Affine", SHOW);
     }
 
     /**

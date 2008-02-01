@@ -44,6 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 import javax.media.jai.Interpolation;
+import javax.media.jai.OperationNode;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.remote.SerializableRenderedImage;
@@ -64,6 +65,7 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Loggings;
@@ -933,6 +935,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     public synchronized Set<ViewType> getViewTypes() {
         if (viewTypes == null) {
             final Set<ViewType> viewTypes = EnumSet.allOf(ViewType.class);
+            viewTypes.remove(ViewType.SAME); // Removes trivial view.
             for (final Iterator<ViewType> it=viewTypes.iterator(); it.hasNext();) {
                 if (view(it.next()) != this) {
                     it.remove();
@@ -1047,5 +1050,20 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         image.dispose();
         return true;
+    }
+
+    /**
+     * Returns a string representation of this grid coverage.
+     * This is mostly for debugging purpose and may change in any future version.
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder(super.toString());
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        buffer.append("\u2514 Image=").append(Classes.getShortClassName(image)).append('[');
+        if (image instanceof OperationNode) {
+            buffer.append('"').append(((OperationNode) image).getOperationName()).append('"');
+        }
+        return buffer.append("] as views ").append(getViewTypes()).append(lineSeparator).toString();
     }
 }

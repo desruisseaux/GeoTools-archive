@@ -16,25 +16,22 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RenderedOp;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link GridSampleDimension} implementation. Since {@code GridSampleDimension}
+ * Tests the {@link GridSampleDimension} implementation. Since {@code GridSampleDimension}
  * rely on {@link CategoryList} for many of its work, many {@code GridSampleDimension}
  * tests are actually {@code CategoryList} tests.
  *
@@ -107,7 +104,7 @@ public class SampleDimensionTest extends TestCase {
     public static Test suite() {
         return new TestSuite(SampleDimensionTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -116,8 +113,9 @@ public class SampleDimensionTest extends TestCase {
     }
 
     /**
-     * Set up common objects used for all tests.
+     * Sets up common objects used for all tests.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -131,7 +129,7 @@ public class SampleDimensionTest extends TestCase {
     }
 
     /**
-     * Test the consistency of the sample dimension.
+     * Tests the consistency of the sample dimension.
      */
     public void testSampleDimension() {
         final double[] nodataValues = test.getNoDataValues();
@@ -155,7 +153,7 @@ public class SampleDimensionTest extends TestCase {
     }
 
     /**
-     * Test the creation of an {@link SampleTranscoder} using the image operation registry.
+     * Tests the creation of an {@link SampleTranscoder} using the image operation registry.
      * This allow to apply the operation in the same way than other JAI operations, without
      * any need for a direct access to package-private method.
      */
@@ -189,7 +187,7 @@ public class SampleDimensionTest extends TestCase {
     }
 
     /**
-     * Test the {@link GridSampleDimension#rescale} method.
+     * Tests the {@link GridSampleDimension#rescale} method.
      */
     public void testRescale() {
         GridSampleDimension scaled;

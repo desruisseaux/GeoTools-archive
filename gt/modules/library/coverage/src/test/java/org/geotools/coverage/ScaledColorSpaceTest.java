@@ -34,7 +34,7 @@ import org.geotools.coverage.grid.Viewer;
 
 /**
  * Tests the {@link ScaledColorSpace} implementation.
- * This is a visual test when run on the command line.
+ * This is a visual test when run from the command line.
  *
  * @source $URL$
  * @version $Id$
@@ -67,7 +67,7 @@ public class ScaledColorSpaceTest extends TestCase {
     public static Test suite() {
         return new TestSuite(ScaledColorSpaceTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -76,8 +76,9 @@ public class ScaledColorSpaceTest extends TestCase {
     }
 
     /**
-     * Set up common objects used for all tests.
+     * Sets up common objects used for all tests.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         minimum = random.nextDouble()*100;
@@ -89,10 +90,11 @@ public class ScaledColorSpaceTest extends TestCase {
         final ColorModel model = new ComponentColorModel(colors, false, false, transparency, datatype);
         final WritableRaster data = model.createCompatibleWritableRaster(200,200);
         final BufferedImage image = new BufferedImage(model, data, false, null);
-        for (int x=data.getWidth(); --x>=0;) {
-            for (int y=data.getHeight(); --y>=0;) {
-                double v = Math.hypot((double)x/data.getWidth() - 0.5,
-                                      (double)y/data.getWidth() - 0.5);
+        final int width  = data.getWidth();
+        final int height = data.getHeight();
+        for (int x=width; --x>=0;) {
+            for (int y=height; --y>=0;) {
+                double v = Math.hypot((double)x / width - 0.5, (double)y / height - 0.5);
                 v = v*(maximum-minimum) + minimum;
                 data.setSample(x,y,0,v);
             }
@@ -101,7 +103,7 @@ public class ScaledColorSpaceTest extends TestCase {
     }
 
     /**
-     * Test the color space.
+     * Tests the color space.
      */
     public void testColorSpace() {
         assertEquals(minimum, colors.getMinValue(0), 1E-4);
@@ -116,7 +118,7 @@ public class ScaledColorSpaceTest extends TestCase {
     }
 
     /**
-     * Run the visual test.
+     * Runs the visual test.
      */
     public static void main(final String[] args) throws Exception {
         final ScaledColorSpaceTest test = new ScaledColorSpaceTest(null);

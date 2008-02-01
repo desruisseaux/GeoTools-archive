@@ -105,8 +105,8 @@ public class GridCoverageTest extends TestCase {
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         final ObjectOutputStream out = new ObjectOutputStream(buffer);
         try {
-            out.writeObject(coverage.geophysics(false));
-//          out.writeObject(coverage.geophysics(true ));
+            out.writeObject(coverage.view(ViewType.PACKED));
+//          out.writeObject(coverage.view(ViewType.GEOPHYSICS));
         } catch (IllegalArgumentException e) {
             /*
              * TODO: this exception occurs when ImageLayout contains a SampleModel or a ColorModel
@@ -124,8 +124,8 @@ public class GridCoverageTest extends TestCase {
         out.close();
         final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
         GridCoverage2D read;
-        read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
-//      read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
+        read = (GridCoverage2D) in.readObject(); assertSame(read, read.view(ViewType.PACKED));
+//      read = (GridCoverage2D) in.readObject(); assertSame(read, read.view(ViewType.GEOPHYSICS));
 //      assertNotSame(read, read.geophysics(true));
         in.close();
     }
@@ -170,10 +170,10 @@ public class GridCoverageTest extends TestCase {
          * Tests the creation of a "geophysics" view. This test make sure that the
          * 'geophysics' method do not creates more grid coverage than needed.
          */
-        GridCoverage2D geophysics= coverage.geophysics(true);
-        assertSame(coverage,       coverage.geophysics(false));
-        assertSame(coverage,     geophysics.geophysics(false));
-        assertSame(geophysics,   geophysics.geophysics(true ));
+        GridCoverage2D geophysics= coverage.view(ViewType.GEOPHYSICS);
+        assertSame(coverage,       coverage.view(ViewType.PACKED));
+        assertSame(coverage,     geophysics.view(ViewType.PACKED));
+        assertSame(geophysics,   geophysics.view(ViewType.GEOPHYSICS));
         assertFalse( coverage.equals(geophysics));
         assertFalse( coverage.getSampleDimension(0).getSampleToGeophysics().isIdentity());
         assertTrue(geophysics.getSampleDimension(0).getSampleToGeophysics().isIdentity());
@@ -241,7 +241,7 @@ public class GridCoverageTest extends TestCase {
     {
         GridCoverage2D projected = projectTo(coverage, targetCRS, geometry, hints, useGeophysics);
         final RenderedImage image = projected.getRenderedImage();
-        projected = projected.geophysics(false);
+        projected = projected.view(ViewType.PACKED);
         String operation = null;
         if (image instanceof RenderedOp) {
             operation = ((RenderedOp) image).getOperationName();
@@ -267,12 +267,10 @@ public class GridCoverageTest extends TestCase {
                                               final GridGeometry2D geometry, final Hints hints,
                                               final boolean useGeophysics)
     {
-        final AbstractProcessor processor = (hints != null) ? new DefaultProcessor(hints)
-                        : AbstractProcessor.getInstance();
-        final String arg1;
-        final Object value1;
-        final String arg2;
-        final Object value2;
+        final AbstractProcessor processor = (hints != null) ?
+                new DefaultProcessor(hints) : AbstractProcessor.getInstance();
+        final String arg1,   arg2;
+        final Object value1, value2;
         if (targetCRS != null) {
             arg1 = "CoordinateReferenceSystem";
             value1 = targetCRS;
@@ -289,7 +287,7 @@ public class GridCoverageTest extends TestCase {
             arg2 = "InterpolationType";
             value2 = "bilinear";
         }
-        GridCoverage2D projected = coverage.geophysics(useGeophysics);
+        GridCoverage2D projected = coverage.view(useGeophysics ? ViewType.GEOPHYSICS : ViewType.PACKED);
         final ParameterValueGroup param = processor.getOperation("Resample").getParameters();
         param.parameter("Source").setValue(projected);
         param.parameter(arg1).setValue(value1);

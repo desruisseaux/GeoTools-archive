@@ -105,6 +105,9 @@ public final class ColorUtilities {
      * Copies {@code colors} into array {@code ARGB} from index {@code lower}
      * inclusive to index {@code upper} exclusive. If {@code upper-lower} is not
      * equals to the length of {@code colors} array, then colors will be interpolated.
+     * <p>
+     * <b>Note:</b> Profiling shows that this method is a "hot spot". It needs to be fast,
+     * which is why the implementation is not as straight-forward as it could.
      *
      * @param colors Colors to copy into the {@code ARGB} array.
      * @param ARGB   Array of integer to write ARGB values to.
@@ -115,30 +118,45 @@ public final class ColorUtilities {
     public static void expand(final Color[] colors, final int[] ARGB,
                               final int lower, final int upper)
     {
+        /*
+         * Trivial cases.
+         */
         switch (colors.length) {
             case 1: Arrays.fill(ARGB, lower, upper, colors[0].getRGB()); // fall through
             case 0: return; // Note: getRGB() is really getARGB()
         }
-        switch (upper-lower) {
+        switch (upper - lower) {
             case 1: ARGB[lower] = colors[0].getRGB(); // fall through
             case 0: return; // Note: getRGB() is really getARGB()
         }
-        final int  maxBase = colors.length-2;
-        final double scale = (double)(colors.length-1) / (double)(upper-1-lower);
-        for (int i=lower; i<upper; i++) {
-            final double index = (i-lower)*scale;
-            final int     base = Math.min(maxBase, (int)(index+EPS)); // Round toward 0, which is really what we want.
-            final double delta = index-base;
-            final Color     C0 = colors[base+0];
-            final Color     C1 = colors[base+1];
-            int A = C0.getAlpha();
-            int R = C0.getRed  ();
-            int G = C0.getGreen();
-            int B = C0.getBlue ();
-            ARGB[i] = (roundByte(A + delta*(C1.getAlpha() - A)) << 24) |
-                      (roundByte(R + delta*(C1.getRed  () - R)) << 16) |
-                      (roundByte(G + delta*(C1.getGreen() - G)) <<  8) |
-                      (roundByte(B + delta*(C1.getBlue () - B)) <<  0);
+        /*
+         * Prepares the coefficients for the iteration.
+         * The non-final ones will be updated inside the loop.
+         */
+        final double scale = (double)(colors.length - 1) / (double)(upper - 1 - lower);
+        final int maxBase = colors.length - 2;
+        double index = 0;
+        int    base  = 0;
+        for (int i=lower;;) {
+            final int C0 = colors[base + 0].getRGB();
+            final int C1 = colors[base + 1].getRGB();
+            final int A0 = (C0 >>> 24) & 0xFF,   A1 = ((C1 >>> 24) & 0xFF) - A0;
+            final int R0 = (C0 >>> 16) & 0xFF,   R1 = ((C1 >>> 16) & 0xFF) - R0;
+            final int G0 = (C0 >>>  8) & 0xFF,   G1 = ((C1 >>>  8) & 0xFF) - G0;
+            final int B0 = (C0       ) & 0xFF,   B1 = ((C1       ) & 0xFF) - B0;
+            final int oldBase = base;
+            do {
+                final double delta = index - base;
+                ARGB[i] = (roundByte(A0 + delta*A1) << 24) |
+                          (roundByte(R0 + delta*R1) << 16) |
+                          (roundByte(G0 + delta*G1) <<  8) |
+                          (roundByte(B0 + delta*B1));
+                if (++i == upper) {
+                    return;
+                }
+                index = (i - lower) * scale;
+                base = Math.min(maxBase, (int)(index + EPS)); // Really want rounding toward 0.
+            } while (base == oldBase);
         }
     }
 
