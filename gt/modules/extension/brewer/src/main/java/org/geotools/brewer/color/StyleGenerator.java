@@ -214,7 +214,7 @@ public class StyleGenerator {
         Symbolizer symb;
 
         if (defaultStroke == null) {
-            defaultStroke = sb.createStroke(Color.BLACK, 1, opacity);
+            defaultStroke = sb.createStroke(color, 1, opacity);
         }
 
         if ((geometryAttrType.getType().getBinding() == MultiPolygon.class)
