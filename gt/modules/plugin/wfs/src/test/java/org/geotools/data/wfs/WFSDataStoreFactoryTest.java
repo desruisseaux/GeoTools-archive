@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.Authenticator;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +11,14 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.geotools.test.TestData;
+import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
 
 public class WFSDataStoreFactoryTest extends TestCase {
 
     private WFSDataStoreFactory dsf;
 
-    private Map params;
+    private Map<String, Serializable> params;
 
     public WFSDataStoreFactoryTest(String name) {
         super(name);
@@ -27,7 +27,7 @@ public class WFSDataStoreFactoryTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         dsf = new WFSDataStoreFactory();
-        params = new HashMap();
+        params = new HashMap<String, Serializable>();
     }
 
     protected void tearDown() throws Exception {
@@ -65,8 +65,8 @@ public class WFSDataStoreFactoryTest extends TestCase {
         // load the test file
         final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
             @Override
-            byte[] loadCapabilities(final URL capabilitiesUrl, final boolean tryGZIP,
-                    final Authenticator auth) throws IOException {
+            byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
+                    throws IOException {
                 InputStream in = capabilitiesUrl.openStream();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int aByte;

@@ -2,15 +2,14 @@ package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.xml.namespace.QName;
 
 import junit.framework.TestCase;
 
 import org.geotools.test.TestData;
+import org.geotools.wfs.protocol.ConnectionFactory;
+import org.geotools.wfs.protocol.DefaultConnectionFactory;
 
 public abstract class DataTestSupport extends TestCase {
 
@@ -28,7 +27,8 @@ public abstract class DataTestSupport extends TestCase {
     /**
      * Type name for the sample geoserver states featuretype
      */
-    public static final QName GEOS_STATES_TYPENAME = new QName("http://www.openplans.org/topp", "states");
+    public static final QName GEOS_STATES_TYPENAME = new QName("http://www.openplans.org/topp",
+            "states");
 
     /**
      * Prefixed type name for the sample geoserver states featuretype as used in
@@ -103,28 +103,40 @@ public abstract class DataTestSupport extends TestCase {
     }
 
     /**
+     * Creates the test {@link #protocolHandler} with a default connection
+     * factory that parses the capabilities object from the test xml file
+     * pointed out by {@code capabilitiesFileName}
+     * <p>
      * Tests methods call this one to set up a protocolHandler to test
+     * </p>
      * 
      * @param capabilitiesFileName
-     * @param tryGzip
-     * @param auth
+     *            the relative path under {@code test-data} for the file
+     *            containing the WFS_Capabilities document.
      * @throws IOException
      */
-    protected void createProtocolHandler(String capabilitiesFileName, boolean tryGzip,
-            Authenticator auth) throws IOException {
-        InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8", Integer.valueOf(0)) {
-            @Override
-            public URL getDescribeFeatureTypeURLGet(final String typeName)
-                    throws MalformedURLException {
-                if ("topp:states".equals(typeName)) {
-                    String schemaLocation = DataTestSupport.GEOS_STATES_SCHEMA;
-                    URL url = TestData.getResource(this, schemaLocation);
-                    assertNotNull(url);
-                    return url;
-                }
-                throw new IllegalArgumentException("unknown typename: " + typeName);
-            }
-        };
+    protected void createProtocolHandler(String capabilitiesFileName) throws IOException {
+        ConnectionFactory connFac = new DefaultConnectionFactory();
+        createProtocolHandler(capabilitiesFileName, connFac);
     }
+
+    /**
+     * Creates the test {@link #protocolHandler} with the provided connection
+     * factory that parses the capabilities object from the test xml file
+     * pointed out by {@code capabilitiesFileName}
+     * <p>
+     * Tests methods call this one to set up a protocolHandler to test
+     * </p>
+     * 
+     * @param capabilitiesFileName
+     *            the relative path under {@code test-data} for the file
+     *            containing the WFS_Capabilities document.
+     * @throws IOException
+     */
+    protected void createProtocolHandler(String capabilitiesFileName, ConnectionFactory connFac)
+            throws IOException {
+        InputStream stream = TestData.openStream(this, capabilitiesFileName);
+        protocolHandler = new WFS110ProtocolHandler(stream, connFac, Integer.valueOf(0));
+    }
+
 }

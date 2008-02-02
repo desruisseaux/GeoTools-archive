@@ -115,7 +115,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
     private boolean lenient;
 
-    WFS100ProtocolHandler connectionFactory;
+    WFS100ProtocolHandler protocolHandler;
 
     private String[] typeNames = null;
 
@@ -149,11 +149,11 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * @throws SAXException
      * @throws IOException
      */
-    public WFS_1_0_0_DataStore(HttpMethod protocol, WFS100ProtocolHandler connectionFactory,
+    public WFS_1_0_0_DataStore(HttpMethod protocol, WFS100ProtocolHandler protocolHandler,
             int timeout, int buffer, boolean lenient) throws SAXException, IOException {
         super(true);
-        this.capabilities = connectionFactory.getCapabilities();
-        this.connectionFactory = connectionFactory;
+        this.capabilities = protocolHandler.getCapabilities();
+        this.protocolHandler = protocolHandler;
         this.lenient = lenient;
 
         this.preferredProtocol = protocol;
@@ -329,7 +329,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             // t.getDefaultGeometry());
         }
         try {
-            URL url = connectionFactory.getDescribeFeatureTypeURLGet(typeName);
+            URL url = protocolHandler.getDescribeFeatureTypeURLGet(typeName);
             if (url != null) {
                 SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
                 build.init(featureType);
@@ -347,12 +347,12 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
     // protected for testing
     protected SimpleFeatureType getSchemaGet(String typeName) throws SAXException, IOException {
-        HttpURLConnection hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, GET);
+        HttpURLConnection hc = protocolHandler.createDescribeFeatureTypeConnection(typeName, GET);
         if (hc == null) {
             return null;
         }
 
-        InputStream is = connectionFactory.getInputStream(hc);
+        InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
         Schema schema;
         try {
             schema = SchemaFactory.getInstance(null, is);
@@ -394,7 +394,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     protected SimpleFeatureType getSchemaPost(String typeName) throws IOException, SAXException {
         // getConnection(postUrl, tryGZIP, false, auth);
         HttpURLConnection hc;
-        hc = connectionFactory.createDescribeFeatureTypeConnection(typeName, POST);
+        hc = protocolHandler.createDescribeFeatureTypeConnection(typeName, POST);
 
         // write request
         Writer osw = getOutputStream(hc);
@@ -412,7 +412,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[] { WFSSchema.NAMESPACE.toString(),
                     uri.toString() });
 
-        hints.put(DocumentWriter.ENCODING, connectionFactory.getEncoding());
+        hints.put(DocumentWriter.ENCODING, protocolHandler.getEncoding());
         try {
             DocumentWriter.writeDocument(new String[] { typeName }, WFSSchema.getInstance(), osw,
                     hints);
@@ -423,7 +423,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
         osw.flush();
         osw.close();
-        InputStream is = connectionFactory.getInputStream(hc);
+        InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
 
         Schema schema;
         try {
@@ -478,7 +478,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
                     String bb = printBBoxGet(((GeometryFilter) request.getFilter()), request
                             .getTypeName());
                     if (bb != null)
-                        url += ("&BBOX=" + URLEncoder.encode(bb, connectionFactory.getEncoding()));
+                        url += ("&BBOX=" + URLEncoder.encode(bb, protocolHandler.getEncoding()));
                 } else {
                     if (Filters.getFilterType(request.getFilter()) == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
@@ -496,21 +496,21 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
                                 && request.getFilter() != Filter.EXCLUDE) {
                             url += "&FILTER="
                                     + URLEncoder.encode(printFilter(request.getFilter()),
-                                            connectionFactory.getEncoding());
+                                            protocolHandler.getEncoding());
                         }
                     }
                 }
             }
         }
 
-        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), connectionFactory
+        url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), protocolHandler
                 .getEncoding()));
 
         Logging.getLogger("org.geotools.data.wfs").fine(url);
         Logging.getLogger("org.geotools.data.communication").fine("Output: " + url);
         getUrl = new URL(url);
-        HttpURLConnection hc = connectionFactory.getConnection(getUrl, GET);
-        InputStream is = connectionFactory.getInputStream(hc);
+        HttpURLConnection hc = protocolHandler.getConnectionFactory().getConnection(getUrl, GET);
+        InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
         WFSTransactionState ts = null;
 
         if (!(transaction == Transaction.AUTO_COMMIT)) {
@@ -655,13 +655,13 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             return null;
         }
 
-        HttpURLConnection hc = connectionFactory.getConnection(postUrl, POST);
+        HttpURLConnection hc = protocolHandler.getConnectionFactory().getConnection(postUrl, POST);
 
         Writer w = getOutputStream(hc);
 
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT, WFSSchema.getInstance().getElements()[2]); // GetFeature
-        hints.put(DocumentWriter.ENCODING, connectionFactory.getEncoding());
+        hints.put(DocumentWriter.ENCODING, protocolHandler.getEncoding());
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w, hints);
         } catch (OperationNotSupportedException e) {
@@ -673,7 +673,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         }
 
         // JE: permit possibility for GZipped data.
-        InputStream is = connectionFactory.getInputStream(hc);
+        InputStream is = protocolHandler.getConnectionFactory().getInputStream(hc);
 
         WFSTransactionState ts = null;
 

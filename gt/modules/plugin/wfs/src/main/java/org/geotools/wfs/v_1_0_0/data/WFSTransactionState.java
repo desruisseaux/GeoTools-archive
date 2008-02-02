@@ -228,7 +228,8 @@ public class WFSTransactionState implements State {
             return null;
         }
 
-        HttpURLConnection hc = ds.connectionFactory.getConnection(postUrl, POST);
+        HttpURLConnection hc = ds.protocolHandler.getConnectionFactory().getConnection(postUrl,
+                POST);
         // System.out.println("connection to commit");
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT, WFSSchema.getInstance().getElements()[24]); // Transaction
@@ -275,7 +276,7 @@ public class WFSTransactionState implements State {
         w.flush();
         w.close();
 
-        InputStream is = this.ds.connectionFactory.getInputStream(hc);
+        InputStream is = this.ds.protocolHandler.getConnectionFactory().getInputStream(hc);
 
         hints = new HashMap();
 

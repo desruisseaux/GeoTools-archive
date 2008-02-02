@@ -118,7 +118,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
 
             public URI getSchema() {
                 try {
-                    return ds.connectionFactory.getDescribeFeatureTypeURLGet(fname).toURI();
+                    return ds.protocolHandler.getDescribeFeatureTypeURLGet(fname).toURI();
                 } catch (MalformedURLException e) {
                     return null;
                 } catch (URISyntaxException e) {

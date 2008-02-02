@@ -40,11 +40,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
+import org.geotools.wfs.protocol.ConnectionFactory;
+import org.geotools.wfs.protocol.DefaultConnectionFactory;
 import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.wfs.protocol.Version;
-import org.geotools.wfs.protocol.WFSConnectionFactory;
+import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.wfs.v_1_0_0.data.WFS100ProtocolHandler;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
 import org.geotools.wfs.v_1_1_0.data.WFS110ProtocolHandler;
@@ -110,31 +113,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         }
     }
 
-    /**
-     * A simple user/password authenticator
-     * 
-     * @author Gabriel Roldan
-     * @version $Id$
-     * @since 2.5.x
-     * @source $URL:
-     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
-     */
-    private static class WFSAuthenticator extends Authenticator {
-        private java.net.PasswordAuthentication pa;
-
-        /**
-         * 
-         * @param user
-         * @param pass
-         */
-        public WFSAuthenticator(String user, String pass) {
-            pa = new java.net.PasswordAuthentication(user, pass.toCharArray());
-        }
-
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return pa;
-        }
-    }
+    
 
     private static final WFSFactoryParam[] parametersInfo = new WFSFactoryParam[10];
     static {
@@ -315,22 +294,19 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final boolean lenient = LENIENT.lookUp(params);
         final String encoding = ENCODING.lookUp(params);
         final Integer maxFeatures = MAXFEATURES.lookUp(params);
+        final Charset defaultEncoding = Charset.forName(encoding);
 
         if (((user == null) && (pass != null)) || ((pass == null) && (user != null))) {
             throw new IOException(
                     "Cannot define only one of USERNAME or PASSWORD, must define both or neither");
         }
 
-        final Authenticator auth;
-        if (user != null && pass != null) {
-            auth = new WFSAuthenticator(user, pass);
-        } else {
-            auth = null;
-        }
-
         final WFSDataStore dataStore;
-        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest, tryGZIP,
-                auth);
+        final ConnectionFactory connectionFac = new DefaultConnectionFactory(tryGZIP, user, pass,
+                defaultEncoding);
+
+        final byte[] wfsCapabilitiesRawData = loadCapabilities(getCapabilitiesRequest,
+                connectionFac);
         Element rootElement;
         {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(wfsCapabilitiesRawData);
@@ -350,12 +326,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
 
         if (Version.v1_0_0 == version) {
             InputStream reader = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            final WFS100ProtocolHandler connectionFac = new WFS100ProtocolHandler(reader, tryGZIP,
-                    auth, encoding);
+            final WFS100ProtocolHandler protocolHandler = new WFS100ProtocolHandler(reader,
+                    connectionFac);
 
             try {
                 HttpMethod prefferredProtocol = Boolean.TRUE.equals(protocol) ? POST : GET;
-                dataStore = new WFS_1_0_0_DataStore(prefferredProtocol, connectionFac, timeout,
+                dataStore = new WFS_1_0_0_DataStore(prefferredProtocol, protocolHandler, timeout,
                         buffer, lenient);
             } catch (SAXException e) {
                 logger.warning(e.toString());
@@ -363,9 +339,9 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             }
         } else {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
-            final WFS110ProtocolHandler connectionFac = new WFS110ProtocolHandler(capsIn, tryGZIP,
-                    auth, encoding, maxFeatures);
-            dataStore = new WFS_1_1_0_DataStore(connectionFac);
+            final WFS110ProtocolHandler protocolHandler = new WFS110ProtocolHandler(capsIn,
+                    connectionFac, maxFeatures);
+            dataStore = new WFS_1_1_0_DataStore(protocolHandler);
         }
 
         perParameterSetDataStoreCache.put(new HashMap(params), dataStore);
@@ -567,12 +543,13 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
      * @return
      * @throws IOException
      */
-    byte[] loadCapabilities(final URL capabilitiesUrl, final boolean tryGZIP,
-            final Authenticator auth) throws IOException {
+    byte[] loadCapabilities(final URL capabilitiesUrl, final ConnectionFactory connectionFac)
+            throws IOException {
         byte[] wfsCapabilitiesRawData;
-        HttpURLConnection hc = WFSConnectionFactory.getConnection(capabilitiesUrl, tryGZIP, GET,
-                auth);
-        InputStream inputStream = WFSConnectionFactory.getInputStream(hc, tryGZIP);
+
+        HttpURLConnection hc = connectionFac.getConnection(capabilitiesUrl, GET);
+        InputStream inputStream = connectionFac.getInputStream(hc);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buff = new byte[1024];
         int readCount;

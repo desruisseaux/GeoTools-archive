@@ -17,15 +17,22 @@
 package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.test.TestData;
+import org.geotools.wfs.protocol.ConnectionFactory;
+import org.geotools.wfs.protocol.DefaultConnectionFactory;
 
 /**
  * @author Gabriel Roldan
  * @version $Id$
  * @since 2.5.x
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/WFSFeatureSourceTest.java $
  */
 public class WFSFeatureSourceTest extends DataTestSupport {
 
@@ -35,9 +42,27 @@ public class WFSFeatureSourceTest extends DataTestSupport {
 
     protected void setUp() throws Exception {
         super.setUp();
-        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
+        createTestProtocolHandler(DataTestSupport.GEOS_CAPABILITIES);
         dataStore = new WFS_1_1_0_DataStore(protocolHandler);
         statesSource = dataStore.getFeatureSource("topp:states");
+    }
+
+    private void createTestProtocolHandler(String capabilitiesFileName) throws IOException {
+        InputStream stream = TestData.openStream(this, capabilitiesFileName);
+        ConnectionFactory cf = new DefaultConnectionFactory();
+        protocolHandler = new WFS110ProtocolHandler(stream, cf, Integer.valueOf(0)) {
+            @Override
+            public URL getDescribeFeatureTypeURLGet(final String typeName)
+                    throws MalformedURLException {
+                if (GEOS_STATES_FEATURETYPENAME.equals(typeName)) {
+                    String schemaLocation = DataTestSupport.GEOS_STATES_SCHEMA;
+                    URL url = TestData.getResource(this, schemaLocation);
+                    assertNotNull(url);
+                    return url;
+                }
+                throw new IllegalArgumentException("unknown typename: " + typeName);
+            }
+        };
     }
 
     protected void tearDown() throws Exception {
@@ -45,12 +70,12 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         dataStore = null;
         statesSource = null;
     }
-    
-    public void testCreate() throws IOException{
-        try{
+
+    public void testCreate() throws IOException {
+        try {
             new WFSFeatureSource(dataStore, "nonExistentTypeName", protocolHandler);
             fail("Expected IOException for a non existent type name");
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             assertTrue(true);
         }
     }
@@ -66,7 +91,8 @@ public class WFSFeatureSourceTest extends DataTestSupport {
 
     /**
      * Test method for {@link WFSFeatureSource#getBounds()}.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public void testGetBounds() throws IOException {
         assertNotNull(statesSource.getBounds());
@@ -92,7 +118,8 @@ public class WFSFeatureSourceTest extends DataTestSupport {
     /**
      * Test method for
      * {@link WFSFeatureSource#getFeatures(org.geotools.data.Query)}.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public void testGetFeaturesQuery() throws IOException {
         FeatureCollection features = statesSource.getFeatures();

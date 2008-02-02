@@ -19,7 +19,6 @@ import static org.geotools.wfs.protocol.HttpMethod.GET;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,21 +28,21 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.util.logging.Logging;
+import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.wfs.protocol.Version;
-import org.geotools.wfs.protocol.WFSConnectionFactory;
 import org.geotools.wfs.protocol.WFSOperationType;
+import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
 
-public class WFS100ProtocolHandler extends WFSConnectionFactory {
+public class WFS100ProtocolHandler extends WFSProtocolHandler {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
     private WFSCapabilities capabilities;
 
-    public WFS100ProtocolHandler(InputStream capabilitiesReader, boolean tryGzip,
-            Authenticator auth, String encoding) throws IOException {
-        super(Version.v1_0_0, tryGzip, auth, encoding);
+    public WFS100ProtocolHandler(InputStream capabilitiesReader, ConnectionFactory connectionFac) throws IOException {
+        super(Version.v1_0_0, connectionFac);
         capabilities = parseCapabilities(capabilitiesReader);
     }
 
@@ -51,6 +50,10 @@ public class WFS100ProtocolHandler extends WFSConnectionFactory {
         return capabilities;
     }
 
+    public ConnectionFactory getConnectionFactory(){
+        return super.connectionFac;
+    }
+    
     @SuppressWarnings("unchecked")
     private WFSCapabilities parseCapabilities(InputStream capabilitiesReader) throws IOException {
         // TODO: move to some 1.0.0 specific class

@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -86,10 +85,11 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSConfiguration;
+import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.wfs.protocol.Version;
-import org.geotools.wfs.protocol.WFSConnectionFactory;
 import org.geotools.wfs.protocol.WFSOperationType;
+import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
@@ -110,7 +110,7 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class WFS110ProtocolHandler extends WFSConnectionFactory {
+public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
@@ -151,9 +151,9 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public WFS110ProtocolHandler(InputStream capabilitiesReader, boolean tryGzip,
-            Authenticator auth, String encoding, Integer maxFeatures) throws IOException {
-        super(Version.v1_1_0, tryGzip, auth, encoding);
+    public WFS110ProtocolHandler(InputStream capabilitiesReader, ConnectionFactory connectionFac,
+            Integer maxFeatures) throws IOException {
+        super(Version.v1_1_0, connectionFac);
         this.maxFeaturesHardLimit = maxFeatures;
         this.capabilities = parseCapabilities(capabilitiesReader);
         this.typeInfos = new HashMap<String, FeatureTypeType>();
@@ -369,7 +369,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
 
     private Object parse(final URL url, final HttpMethod method) throws IOException {
 
-        final HttpURLConnection connection = getConnection(url, method);
+        final HttpURLConnection connection = connectionFac.getConnection(url, method);
         String contentEncoding = connection.getContentEncoding();
         Charset charset = Charset.forName("UTF-8"); // TODO: un-hardcode
         if (null != contentEncoding) {
@@ -381,7 +381,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
             }
         }
         Parser parser = new Parser(configuration);
-        InputStream in = getInputStream(connection);
+        InputStream in = connectionFac.getInputStream(connection);
         Reader reader = new InputStreamReader(in, charset);
         Object parsed;
         try {
@@ -683,7 +683,7 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
                     .emptyList() : Arrays.asList(query.getSortBy()));
             getFeatureGetUrl = createGetFeatureGet(typeName, propertyNames, filter, maxFeatures,
                     sortBy, false);
-            responseStream = sendGet(getFeatureGetUrl);
+            responseStream = connectionFac.getInputStream(getFeatureGetUrl, GET);
         }
         return responseStream;
     }
@@ -834,29 +834,12 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         Encoder encoder = new Encoder(filterConfig);
         // do not write the xml declaration
         // encoder.setEncodeFullDocument(false);
-     
+
         OutputStream out = new ByteArrayOutputStream();
         encoder.encode(filter, OGC.Filter, out);
         String encoded = out.toString();
         encoded = encoded.replaceAll("\n", "");
         return encoded;
-    }
-
-    /**
-     * Sends a GET request represented by {@code fullQuery} and returns an input
-     * stream from which to get the server response.
-     * <p>
-     * Note this method is package protected only to easy unit testing
-     * </p>
-     * 
-     * @param fullQuery
-     * @return
-     * @throws IOException
-     */
-    InputStream sendGet(final URL fullQuery) throws IOException {
-        HttpURLConnection connection = getConnection(fullQuery, GET);
-        InputStream responseStream = getInputStream(connection);
-        return responseStream;
     }
 
     /**
@@ -882,14 +865,14 @@ public class WFS110ProtocolHandler extends WFSConnectionFactory {
         outputFormat.setIndent(2);
         encoder.setOutputFormat(outputFormat);
 
-        HttpURLConnection connection = getConnection(destination, POST);
+        HttpURLConnection connection = connectionFac.getConnection(destination, POST);
         OutputStream outputStream = connection.getOutputStream();
         try {
             encoder.encode(object, name, outputStream);
         } finally {
             outputStream.close();
         }
-        InputStream responseStream = getInputStream(connection);
+        InputStream responseStream = connectionFac.getInputStream(connection);
         return responseStream;
     }
 

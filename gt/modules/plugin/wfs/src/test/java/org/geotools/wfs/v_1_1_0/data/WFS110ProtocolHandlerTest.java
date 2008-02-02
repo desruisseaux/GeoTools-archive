@@ -24,7 +24,6 @@ import static org.geotools.wfs.protocol.WFSOperationType.GET_CAPABILITIES;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,19 +32,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import net.opengis.wfs.FeatureTypeType;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.test.TestData;
+import org.geotools.wfs.protocol.ConnectionFactory;
+import org.geotools.wfs.protocol.DefaultConnectionFactory;
+import org.geotools.wfs.protocol.HttpMethod;
 import org.geotools.xml.Configuration;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -64,9 +63,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/WFS110ProtocolHandlerTest.java $
  */
-public class WFS110ProtocolHandlerTest extends TestCase {
-
-    WFS110ProtocolHandler protocolHandler;
+public class WFS110ProtocolHandlerTest extends DataTestSupport {
 
     /**
      * @see junit.framework.TestCase#setUp()
@@ -83,21 +80,6 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     }
 
     /**
-     * Tests methods call this one to set up a protocolHandler to test
-     * 
-     * @param capabilitiesFileName
-     * @param tryGzip
-     * @param auth
-     * @throws IOException
-     */
-    private void createProtocolHandler(String capabilitiesFileName, boolean tryGzip,
-            Authenticator auth) throws IOException {
-        InputStream stream = TestData.openStream(this, capabilitiesFileName);
-        protocolHandler = new WFS110ProtocolHandler(stream, tryGzip, auth, "UTF-8", Integer
-                .valueOf(0));
-    }
-
-    /**
      * Test method for
      * {@link WFS110ProtocolHandler#WFS110ProtocolHandler(java.io.InputStream, boolean, java.net.Authenticator, java.lang.String)}.
      * 
@@ -105,21 +87,21 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      */
     public void testWFS110ProtocolHandler() throws IOException {
         try {
-            createProtocolHandler(DataTestSupport.GEOS_STATES_SCHEMA, false, null);
+            createProtocolHandler(DataTestSupport.GEOS_STATES_SCHEMA);
             fail("Excpected DataSourceException as a capabilities document was not provided");
         } catch (DataSourceException e) {
             assertTrue(true);
         }
         try {
             InputStream badData = new ByteArrayInputStream(new byte[1024]);
-            protocolHandler = new WFS110ProtocolHandler(badData, false, null, "UTF-8", Integer
-                    .valueOf(0));
+            ConnectionFactory connFac = new DefaultConnectionFactory();
+            protocolHandler = new WFS110ProtocolHandler(badData, connFac, Integer.valueOf(0));
             fail("Excpected DataSourceException as a capabilities document was not provided");
         } catch (DataSourceException e) {
             assertTrue(true);
         }
 
-        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
+        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES);
         assertNotNull(protocolHandler);
 
         assertEquals("My GeoServer WFS", protocolHandler.getServiceTitle());
@@ -136,7 +118,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      * @throws IOException
      */
     public void testSupports() throws IOException {
-        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
+        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES);
         assertTrue(protocolHandler.supports(DESCRIBE_FEATURETYPE, GET));
         // post was deliberately left off on the test capabilities file
         assertFalse(protocolHandler.supports(DESCRIBE_FEATURETYPE, POST));
@@ -147,7 +129,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      * {@link WFS110ProtocolHandler#getOperationURL(org.geotools.wfs.protocol.WFSOperationType, org.geotools.wfs.protocol.HttpMethod)}.
      */
     public void testGetOperationURL() throws IOException {
-        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
+        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES);
         final URL expectedGet = new URL("http://localhost:8080/geoserver/wfs/get?");
         final URL expectedPost = new URL("http://localhost:8080/geoserver/wfs/post?");
         assertEquals(expectedGet, protocolHandler.getOperationURL(GET_CAPABILITIES, GET));
@@ -160,7 +142,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      * @throws IOException
      */
     public void testGetCapabilitiesTypeNames() throws IOException {
-        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES, false, null);
+        createProtocolHandler(DataTestSupport.GEOS_CAPABILITIES);
         String[] names = protocolHandler.getCapabilitiesTypeNames();
         assertNotNull(names);
         assertEquals(3, names.length);
@@ -178,8 +160,8 @@ public class WFS110ProtocolHandlerTest extends TestCase {
      */
     public void testParseDescribeFeatureType_GeoServer() throws Exception {
         InputStream stream = TestData.openStream(this, DataTestSupport.GEOS_CAPABILITIES);
-        protocolHandler = new WFS110ProtocolHandler(stream, false, null, "UTF-8", Integer
-                .valueOf(0)) {
+        ConnectionFactory connFac = new DefaultConnectionFactory();
+        protocolHandler = new WFS110ProtocolHandler(stream, connFac, Integer.valueOf(0)) {
             @Override
             public URL getDescribeFeatureTypeURLGet(final String typeName)
                     throws MalformedURLException {
@@ -225,7 +207,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
 
     private void assertFeatureTypeCrs(String capabilitiesFileName, String typeName, String crs)
             throws IOException, NoSuchAuthorityCodeException, FactoryException {
-        createProtocolHandler(capabilitiesFileName, false, null);
+        createProtocolHandler(capabilitiesFileName);
         CoordinateReferenceSystem featureTypeCRS = protocolHandler.getFeatureTypeCRS(typeName);
         CoordinateReferenceSystem expectedCrs = CRS.decode(crs);
         assertTrue(CRS.equalsIgnoreMetadata(expectedCrs, featureTypeCRS));
@@ -277,7 +259,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
             String expectedCrsCode) throws IOException, NoSuchAuthorityCodeException,
             FactoryException {
 
-        createProtocolHandler(capabilitiesFileName, false, null);
+        createProtocolHandler(capabilitiesFileName);
 
         ReferencedEnvelope bounds = protocolHandler.getFeatureTypeBounds(typeName);
         assertNotNull(bounds);
@@ -300,7 +282,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     public void testGetBoundsIllegalState() throws IOException {
         final String capabilitiesFileName = DataTestSupport.CUBEWERX_CAPABILITIES;
         final String typeName = DataTestSupport.CUBEWERX_GOVUNITCE_FEATURETYPENAME;
-        createProtocolHandler(capabilitiesFileName, false, null);
+        createProtocolHandler(capabilitiesFileName);
         final DefaultQuery query = new DefaultQuery(typeName);
 
         // force the capabilities info for the type not to contain the latlon
@@ -331,7 +313,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     public void testGetBoundsFilter() throws IOException {
         final String capabilitiesFileName = DataTestSupport.CUBEWERX_CAPABILITIES;
         final String typeName = DataTestSupport.CUBEWERX_GOVUNITCE_FEATURETYPENAME;
-        createProtocolHandler(capabilitiesFileName, false, null);
+        createProtocolHandler(capabilitiesFileName);
         DefaultQuery query;
         {
             FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
@@ -357,7 +339,7 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     public void testGetBounds() throws IOException, NoSuchAuthorityCodeException, FactoryException {
         final String capabilitiesFileName = DataTestSupport.CUBEWERX_CAPABILITIES;
         final String typeName = DataTestSupport.CUBEWERX_GOVUNITCE_FEATURETYPENAME;
-        createProtocolHandler(capabilitiesFileName, false, null);
+        createProtocolHandler(capabilitiesFileName);
 
         DefaultQuery query;
         CoordinateReferenceSystem expectedCrs;
@@ -379,31 +361,6 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     }
 
     /**
-     * Overrides {@code sendGet} to return the contents of the test data file
-     * instead of actually sending a request to a remote server.
-     */
-    class QueryOverrideProtocolHandler extends WFS110ProtocolHandler {
-        private final String featuresFileName;
-
-        public QueryOverrideProtocolHandler(final String capabilitiesFile, final String featuresFile)
-                throws IOException {
-            this(capabilitiesFile, featuresFile, Integer.valueOf(0));
-        }
-
-        public QueryOverrideProtocolHandler(final String capabilitiesFile,
-                final String featuresFile, final int maxFeatures) throws IOException {
-            super(TestData.openStream(WFS110ProtocolHandlerTest.this, capabilitiesFile), false,
-                    null, "UTF-8", maxFeatures);
-            this.featuresFileName = featuresFile;
-        }
-
-        @Override
-        InputStream sendGet(final URL fullQuery) throws IOException {
-            return TestData.openStream(WFS110ProtocolHandlerTest.this, featuresFileName);
-        }
-    };
-
-    /**
      * <p>
      * Test method for
      * {@link WFS110ProtocolHandler#getCount(org.geotools.data.Query)}
@@ -414,18 +371,28 @@ public class WFS110ProtocolHandlerTest extends TestCase {
     public void testGetCount() throws IOException {
         String capabilitiesFileName = DataTestSupport.GEOS_CAPABILITIES;
         String typeName = DataTestSupport.GEOS_ARCHSITES_FEATURETYPENAME;
-        String featuresFileName = DataTestSupport.GEOS_ARCHSITES_DATA;
 
-        protocolHandler = new QueryOverrideProtocolHandler(capabilitiesFileName, featuresFileName);
+        ConnectionFactory connFac = new DefaultConnectionFactory() {
+            @Override
+            public InputStream getInputStream(URL query, HttpMethod method) throws IOException {
+                return TestData.openStream(this, DataTestSupport.GEOS_ARCHSITES_DATA);
+            }
+        };
+        createProtocolHandler(capabilitiesFileName, connFac);
         int count = protocolHandler.getCount(new DefaultQuery(typeName));
         assertEquals(3, count);
 
         // this one does not specify numberOfFeatures
         capabilitiesFileName = DataTestSupport.CUBEWERX_CAPABILITIES;
         typeName = DataTestSupport.CUBEWERX_GOVUNITCE_FEATURETYPENAME;
-        featuresFileName = DataTestSupport.CUBEWERX_GOVUNITCE_DATA;
+        connFac = new DefaultConnectionFactory() {
+            @Override
+            public InputStream getInputStream(URL query, HttpMethod method) throws IOException {
+                return TestData.openStream(this, DataTestSupport.CUBEWERX_GOVUNITCE_DATA);
+            }
+        };
 
-        protocolHandler = new QueryOverrideProtocolHandler(capabilitiesFileName, featuresFileName);
+        createProtocolHandler(capabilitiesFileName, connFac);
         count = protocolHandler.getCount(new DefaultQuery(typeName));
         assertEquals(-1, count);
     }
@@ -466,15 +433,23 @@ public class WFS110ProtocolHandlerTest extends TestCase {
             throws IOException {
         final String capabilitiesFileName = DataTestSupport.GEOS_CAPABILITIES;
         final String typeName = DataTestSupport.GEOS_ARCHSITES_FEATURETYPENAME;
-        String featuresFileName = DataTestSupport.GEOS_ARCHSITES_DATA;
+        final String featuresFileName = DataTestSupport.GEOS_ARCHSITES_DATA;
         final String featureNameSpace = DataTestSupport.GEOS_ARCHSITES_TYPENAME.getNamespaceURI();
         final String schemaFile = DataTestSupport.GEOS_ARCHSITES_SCHEMA;
         final URL schemaLocation = TestData.getResource(this, schemaFile);
         final Configuration testConfiguration = new TestWFSConfiguration(featureNameSpace,
                 schemaLocation.toExternalForm());
 
-        protocolHandler = new QueryOverrideProtocolHandler(capabilitiesFileName, featuresFileName,
-                Integer.valueOf(maxFeatures)) {
+        ConnectionFactory connFac = new DefaultConnectionFactory() {
+            @Override
+            public InputStream getInputStream(URL query, HttpMethod method) throws IOException {
+                return TestData.openStream(this, featuresFileName);
+            }
+        };
+
+        InputStream capabilitiesIn = TestData.openStream(this, capabilitiesFileName);
+        protocolHandler = new WFS110ProtocolHandler(capabilitiesIn, connFac, Integer
+                .valueOf(maxFeatures)) {
             public URL getDescribeFeatureTypeURLGet(String typeName) {
                 return schemaLocation;
             }
