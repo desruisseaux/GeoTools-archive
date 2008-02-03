@@ -15,7 +15,6 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -123,36 +122,6 @@ final class TreeTable extends JXTreeTable {
 
         setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(frame)));
         getTableHeader().setDefaultRenderer(new DefaultContextTreeHeaderRenderer());
-
-//        setHighlighters(new Highlighter() {
-//
-//            public Color col = Color.GRAY;
-//
-//            public Component highlight(Component arg0, ComponentAdapter arg1) {
-//                
-//                if (!arg1.isSelected()) {
-//                    if (arg1.getValue() instanceof MapLayer) {
-//                        col = Color.GRAY;
-//                    } else {
-//                        col = Color.WHITE;
-//                    }
-//                    arg0.setBackground(col);
-//                }
-//
-//                return arg0;
-//            }
-//
-//            public void addChangeListener(ChangeListener arg0) {
-//            }
-//
-//            public void removeChangeListener(ChangeListener arg0) {
-//            }
-//
-//            public ChangeListener[] getChangeListeners() {
-//                return new ChangeListener[]{};
-//            }
-//        });
-        //setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
 
         initCellEditAcceleration();
         initDragAndDrop();
@@ -998,6 +967,6 @@ final class TreeTable extends JXTreeTable {
      */
     TreeContextListener[] getTreeContextListeners() {
         return getTreeTableModel().getTreeContextListeners();
-    }
+    }    
 }
 

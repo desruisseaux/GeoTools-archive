@@ -63,6 +63,7 @@ public class JMap2DInfoBar extends JToolBar {
         });
 
         gui_chk_refresh.setText(bundle.getString("autorefresh"));
+        gui_chk_refresh.setOpaque(false);
         gui_chk_refresh.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent arg0) {

@@ -117,12 +117,14 @@ public class JMap2DMouseCoordPanel extends javax.swing.JPanel {
         menu.add(jMenuItem2);
 
         setComponentPopupMenu(menu);
+        setOpaque(false);
 
         jLabel1.setComponentPopupMenu(menu);
         jLabel1.setText(bundle.getString("mouse_coord")); // NOI18N
 
         jtf_coord.setComponentPopupMenu(menu);
         jtf_coord.setEditable(false);
+        jtf_coord.setOpaque(false);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

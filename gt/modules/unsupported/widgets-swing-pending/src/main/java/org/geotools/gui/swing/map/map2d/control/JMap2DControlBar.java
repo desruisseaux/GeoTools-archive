@@ -16,12 +16,10 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 

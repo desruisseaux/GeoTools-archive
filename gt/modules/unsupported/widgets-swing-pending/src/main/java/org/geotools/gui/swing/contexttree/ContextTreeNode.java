@@ -29,6 +29,8 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  */
 public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
     
+    protected String tooltip = null;
+    
     protected final LightContextTreeModel lightModel;
     
         
@@ -144,6 +146,13 @@ public abstract class ContextTreeNode extends AbstractMutableTreeTableNode{
         }
     }
     
+    public String getToolTip(){
+        return tooltip;
+    }
+    
+    public void setToolTip(String tip){
+        tooltip = tip;
+    }
     
         
 }

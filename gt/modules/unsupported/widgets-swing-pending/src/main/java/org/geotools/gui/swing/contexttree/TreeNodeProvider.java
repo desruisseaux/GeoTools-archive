@@ -93,6 +93,8 @@ public final class TreeNodeProvider extends ComponentProvider<JLabel> {
             
             rendererComponent.setIcon( (ico == null)? arg0.getIcon(): ico);           
             rendererComponent.setText( (value == null)? "" : value.toString() );
+            
+            rendererComponent.setToolTipText(node.getToolTip());
                     
             
 //            if (node.getUserObject() instanceof MapContext) {
