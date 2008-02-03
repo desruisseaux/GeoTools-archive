@@ -43,36 +43,7 @@ public class StyleGroup implements SubNodeGroup {
     public boolean isValid(Object target) {
         return (target instanceof MapLayer);
     }
-
-    public ContextTreeNode[] createNodes(final LightContextTreeModel model, Object target) {
-        final MapLayer layer = (MapLayer) target;
-        Style style = layer.getStyle();
-
-        ContextTreeNode root = new PackStyleNode(model, "Style", layer);
-
-        FeatureTypeStyle[] ftss = style.getFeatureTypeStyles();
-
-        for (FeatureTypeStyle fts : ftss) {
-            ContextTreeNode ftsnode = new FeatureTypeStyleNode(model, fts);
-            root.add(ftsnode);
-
-            Rule[] rules = fts.getRules();
-            for (Rule rule : rules) {
-                ContextTreeNode rulenode = new RuleNode(model, rule);
-                Symbolizer[] symbs = rule.getSymbolizers();
-                for (Symbolizer symb : symbs) {
-                    Icon ico = new ImageIcon(RANDOM_STYLE_FACTORY.createGlyph(symb));
-                    SymbolizerNode symbnode = new SymbolizerNode(model, ico, symb);
-                    rulenode.add(symbnode);
-                }
-                ftsnode.add(rulenode);
-            }
-        }
-
-
-        return new ContextTreeNode[]{root};
-    }
-
+    
     private class PackStyleNode extends ContextTreeNode {
 
         private LightContextTreeModel model;
@@ -238,5 +209,33 @@ public class StyleGroup implements SubNodeGroup {
         @Override
         public void setValue(Object obj) {
         }
+    }
+
+    public void createNodes(LightContextTreeModel model, ContextTreeNode parentnode) {
+        final MapLayer layer = (MapLayer) parentnode.getUserObject();
+        Style style = layer.getStyle();
+
+        ContextTreeNode root = new PackStyleNode(model, "Style", layer);
+
+        FeatureTypeStyle[] ftss = style.getFeatureTypeStyles();
+
+        for (FeatureTypeStyle fts : ftss) {
+            ContextTreeNode ftsnode = new FeatureTypeStyleNode(model, fts);
+            root.add(ftsnode);
+
+            Rule[] rules = fts.getRules();
+            for (Rule rule : rules) {
+                ContextTreeNode rulenode = new RuleNode(model, rule);
+                Symbolizer[] symbs = rule.getSymbolizers();
+                for (Symbolizer symb : symbs) {
+                    Icon ico = new ImageIcon(RANDOM_STYLE_FACTORY.createGlyph(symb));
+                    SymbolizerNode symbnode = new SymbolizerNode(model, ico, symb);
+                    rulenode.add(symbnode);
+                }
+                ftsnode.add(rulenode);
+            }
+        }
+
+        model.insetNodeInto(root, parentnode, parentnode.getChildCount());
     }
 }

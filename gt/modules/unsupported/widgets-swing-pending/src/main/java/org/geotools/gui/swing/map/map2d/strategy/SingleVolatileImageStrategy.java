@@ -67,6 +67,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     private boolean mustupdate = false;
     private double rotation = 0d;
     private boolean autorefresh = true;
+    private boolean isRendering = false;
 
     /**
      * create a default SingleVolatileImageStrategy
@@ -336,6 +337,11 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     public boolean isAutoRefresh() {
         return autorefresh;
     }
+    
+    public boolean isPainting() {
+        return isRendering;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // ------------- different from SingleBufferedImageStrategy --------------//
     ////////////////////////////////////////////////////////////////////////////
@@ -373,7 +379,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     }
 
     private void fireRenderingEvent(boolean isRendering) {
-
+        this.isRendering = isRendering;
         isDrawing = isRendering;
 
         StrategyListener[] lst = getStrategyListeners();
@@ -426,16 +432,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     private class MapLayerListListen implements MapLayerListListener {
 
         public void layerAdded(MapLayerListEvent event) {
-
-            if (context.getLayers().length == 1) {
-                try {
-                    setMapArea(context.getLayerBounds());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                testRefresh();
-            }
+                testRefresh();            
         }
 
         public void layerRemoved(MapLayerListEvent event) {

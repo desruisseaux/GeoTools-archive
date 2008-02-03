@@ -67,6 +67,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
     private boolean mustupdate = false;
     private double rotation = 0d;
     private boolean autorefresh = true;
+    private boolean isRendering = false;
 
     /**
      * create a default MergeBufferedImageStrategy
@@ -217,7 +218,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
     //------------------TRIGGERS------------------------------------------------
     private void fireRenderingEvent(boolean isRendering) {
-
+    this.isRendering = isRendering;
         StrategyListener[] lst = getStrategyListeners();
 
         for (StrategyListener l : lst) {
@@ -387,6 +388,11 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
     public boolean isAutoRefresh() {
         return autorefresh;
     }
+    
+    public boolean isPainting() {
+        return isRendering;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -431,14 +437,6 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
             MapLayer layer = event.getLayer();
             stock.put(layer, createBufferImage(layer));
-
-            if (context.getLayers().length == 1) {
-                try {
-                    setMapArea(context.getLayerBounds());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
             mergeBuffers();
         }

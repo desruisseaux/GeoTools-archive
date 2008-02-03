@@ -308,11 +308,13 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
             ContextTreeNode tn = (ContextTreeNode) node;
             Object obj = tn.getUserObject();
             if(group.isValid(obj)){
-                ContextTreeNode[] nodes = group.createNodes(lightModel,obj);
-                for(ContextTreeNode n : nodes){
-                    subnodes.get(group).add(n);
-                    insertNodeInto(n, tn, tn.getChildCount());
-                }
+                group.createNodes(lightModel,tn);
+                
+//                ContextTreeNode[] nodes = group.createNodes(lightModel,obj);
+//                for(ContextTreeNode n : nodes){
+//                    subnodes.get(group).add(n);
+//                    insertNodeInto(n, tn, tn.getChildCount());
+//                }
                 
             }
         }

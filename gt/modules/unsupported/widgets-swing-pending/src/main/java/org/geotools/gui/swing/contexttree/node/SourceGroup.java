@@ -35,8 +35,10 @@ public class SourceGroup implements SubNodeGroup {
         return (target instanceof MapLayer);
     }
 
-    public ContextTreeNode[] createNodes(final LightContextTreeModel model, Object target) {
-        final MapLayer layer = (MapLayer) target;
+ 
+
+    public void createNodes(final LightContextTreeModel model, ContextTreeNode parentnode) {
+        final MapLayer layer = (MapLayer) parentnode.getUserObject();
         final DataStore ds = layer.getFeatureSource().getDataStore();
         
         ContextTreeNode node = new ContextTreeNode(model) {
@@ -74,8 +76,7 @@ public class SourceGroup implements SubNodeGroup {
             }
         };
         
-        node.setUserObject(ds);
-        
-        return new ContextTreeNode[]{node};
+        node.setUserObject(ds);        
+        model.insetNodeInto(node, parentnode, 0);
     }
 }

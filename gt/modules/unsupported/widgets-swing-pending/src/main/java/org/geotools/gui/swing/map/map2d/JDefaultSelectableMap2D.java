@@ -212,15 +212,15 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         Class jtsClass = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
         if (jtsClass.equals(Point.class) || jtsClass.equals(MultiPoint.class)) {
-            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.6f);
             Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
-            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(1f));
 
             Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
             Graphic gra = STYLE_BUILDER.createGraphic();
-            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setOpacity(STYLE_BUILDER.literalExpression(1f));
             gra.setMarks(new Mark[]{mark});
-            gra.setSize(STYLE_BUILDER.literalExpression(14));
+            gra.setSize(STYLE_BUILDER.literalExpression(15));
 
             PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
 
@@ -230,15 +230,15 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             return pointSelectionStyle;
 
         } else if (jtsClass.equals(LineString.class) || jtsClass.equals(MultiLineString.class)) {
-            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.6f);
             Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
-            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(1f));
 
             Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
             Graphic gra = STYLE_BUILDER.createGraphic();
-            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setOpacity(STYLE_BUILDER.literalExpression(1f));
             gra.setMarks(new Mark[]{mark});
-            gra.setSize(STYLE_BUILDER.literalExpression(14));
+            gra.setSize(STYLE_BUILDER.literalExpression(5));
 
             PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
             LineSymbolizer ls = STYLE_BUILDER.createLineSymbolizer(stroke);
@@ -252,17 +252,17 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             return lineSelectionStyle;
 
         } else if (jtsClass.equals(Polygon.class) || jtsClass.equals(MultiPolygon.class)) {
-            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.4f);
+            Fill fill = STYLE_BUILDER.createFill(selectionStyleColor, 0.6f);
             Stroke stroke = STYLE_BUILDER.createStroke(selectionStyleColor, 2);
-            stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            stroke.setOpacity(STYLE_BUILDER.literalExpression(1f));
 
             PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
 
             Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
             Graphic gra = STYLE_BUILDER.createGraphic();
-            gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+            gra.setOpacity(STYLE_BUILDER.literalExpression(1f));
             gra.setMarks(new Mark[]{mark});
-            gra.setSize(STYLE_BUILDER.literalExpression(14));
+            gra.setSize(STYLE_BUILDER.literalExpression(5));
             PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
 
 
@@ -362,15 +362,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         MapContext context = getRenderingStrategy().getContext();
         CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
-        System.out.println(layer);
-        System.out.println(layer.getFeatureSource());
-        System.out.println(layer.getFeatureSource().getSchema());
         CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
 
         if (layerCRS == null) {
             layerCRS = contextCRS;
         }
-
 
 
         if (!contextCRS.equals(layerCRS)) {
@@ -635,52 +631,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         doSelection(geometry);
     }
 
-//    protected SimpleFeature findFeature(Geometry geom, MapLayer layer) {
-//
-//        MapContext context = renderingStrategy.getContext();
-//        Filter f = null;
-//
-//        if ((context == null) || (selectionMapContext.getLayerCount() == 0) || (layer == null)) {
-//            return null;
-//        }
-//
-//        try {
-//            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
-//
-//            if (name.equals("")) {
-//                name = "the_geom";
-//            }
-//
-//            geom = projectGeometry(geom, layer);
-//
-//            try {
-//                f = ff.intersects(ff.property(name), ff.literal(geom));
-//                applyStyleFilter(f);
-//                FeatureCollection col = layer.getFeatureSource().getFeatures(f);
-//                FeatureIterator fi = col.features();
-//
-//                while (fi.hasNext()) {
-//                    SimpleFeature sf = fi.next();
-//
-//                    for (Object obj : sf.getAttributes()) {
-//                        System.out.print(obj);
-//                    }
-//                    System.out.println("");
-//                }
-//                fi.close();
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//
-//
-//        } catch (IllegalFilterException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
     public void doSelection(Geometry geometry) {
 
         selectionGeometrie = geometry;
@@ -691,10 +641,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         if ((context == null) || (selectionMapContext.getLayerCount() == 0)) {
             return;
         }
-
-        fireSelectionChanged(geometry);
-
-
 
         for (MapLayer layer : selectionMapContext.getLayers()) {
 
@@ -708,6 +654,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
 
         selectionStrategy.refresh();
+        
+        fireSelectionChanged(geometry);
 
     }
 

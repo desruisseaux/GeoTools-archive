@@ -40,8 +40,9 @@ public class Map2DSelectionEvent extends EventObject{
     }
 
     /**
-     * Geometry corresponding to the selection zone
-     * @return JTS Geometry, or null if no selection
+     * Geometry corresponding to the selection zone.
+     * Geometry is in the mapcontext CRS.
+     * @return JTS Geometry, or null if no selection.
      */
     public Geometry getGeometry() {
         return env;

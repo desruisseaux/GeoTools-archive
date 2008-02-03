@@ -140,5 +140,11 @@ public interface RenderingStrategy {
      */
     public boolean isAutoRefresh();
     
+    /**
+     * true if the strategy is currently painting
+     * @return boolean
+     */
+    public boolean isPainting();
+    
         
 }

@@ -859,7 +859,7 @@ final class TreeTable extends JXTreeTable {
      * @return list of column models
      */
     TreeTableColumn[] getColumnModels() {
-        return (TreeTableColumn[]) getTreeTableModel().getColumnModels().toArray();
+        return getTreeTableModel().getColumnModels().toArray(new TreeTableColumn[0]);
     }
 
 ////////////////////////////////////////////////////////////////////////////////

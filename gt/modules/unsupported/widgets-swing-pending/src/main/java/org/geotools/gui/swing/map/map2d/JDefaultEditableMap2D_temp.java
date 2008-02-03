@@ -105,7 +105,7 @@ import org.opengis.referencing.operation.TransformException;
  * Default implementation of EditableMap2D
  * @author Johann Sorel
  */
-public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
+public class JDefaultEditableMap2D_temp extends JDefaultSelectableMap2D implements EditableMap2D {
 
     /**
      * Edition state of the map widget
@@ -117,8 +117,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     private final SingleBufferedImageStrategy memoryStrategy = new SingleBufferedImageStrategy();
     private final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final BufferComponent memoryPane = new BufferComponent();
-    private final MapLayer memoryLayer;
-    private final MapLayer edgesLayer;
+    private MapLayer memoryLayer = null;
+    private MapLayer edgesLayer = null;
     private MapLayer editionLayer = null;
     protected Cursor CUR_EDIT;
     protected Color editionStyleColor = Color.RED;
@@ -126,7 +126,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     /**
      * create a default JDefaultEditableMap2D
      */
-    public JDefaultEditableMap2D() {
+    public JDefaultEditableMap2D_temp() {
         super();
 
         mouseInputListener = new MouseListen();
@@ -139,47 +139,126 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
 
         //create the memory layers----------------------------------------------
+        
+        memoryLayer = new DefaultMapLayer(FeatureCollections.newCollection(), createStyle());
+        edgesLayer = new DefaultMapLayer(FeatureCollections.newCollection(), createPointStyle());
+        
 
-        MemoryDataStore mds = new MemoryDataStore();
-        SimpleFeatureType featureType = null;
-        MapLayer layer = null;
-        try {
-            featureType = DataUtilities.createType("memory", "geom:Geometry");
-        } catch (SchemaException se) {
-            se.printStackTrace();
-        }
+//        File memory_edit = new File("memory_edit.shp");
+//        Map<String, URL> params = null;
+//
+//        try {
+//            params = Collections.singletonMap("url", memory_edit.toURI().toURL());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (memory_edit.exists()) {
+//            System.out.println("existe");
+//            try {
+//                DataStore sds = DataStoreFinder.getDataStore(params);
+//                FeatureSource fs = sds.getFeatureSource(sds.getTypeNames()[0]);
+//                memoryLayer = new DefaultMapLayer(fs, createStyle());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            try {
+//                
+//                
+//                
+//                FileDataStoreFactorySpi factory = new IndexedShapefileDataStoreFactory();
+//                ShapefileDataStore myData = (ShapefileDataStore) factory.createNewDataStore(params);
+//                String buffer = "geom:Geometry";
+//                SimpleFeatureType featureType = DataUtilities.createType("memory", buffer);
+//                myData.createSchema(featureType);
+//                myData.dispose();
+//                DataStore sds = DataStoreFinder.getDataStore(params);
+//                FeatureSource fs = sds.getFeatureSource(sds.getTypeNames()[0]);
+//                memoryLayer = new DefaultMapLayer(fs, createStyle());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
-        if (featureType != null) {
-            try {
-                mds.createSchema(featureType);
-                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                layer = new DefaultMapLayer(fs, createStyle());
-            } catch (IOException se) {
-                se.printStackTrace();
-            }
-        }
-        memoryLayer = layer;
+
+//            System.out.println("cree");
+//            MemoryDataStore mds = new MemoryDataStore();
+//            SimpleFeatureType featureType = null;
+//            MapLayer layer = null;
+//            try {
+//                featureType = DataUtilities.createType("memory", "geom:Geometry");
+//            } catch (SchemaException se) {
+//                se.printStackTrace();
+//            }
+//
+//            if (featureType != null) {
+//                try {
+//                    mds.createSchema(featureType);
+//                    FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
+//                    layer = new DefaultMapLayer(fs, createStyle());
+//                } catch (IOException se) {
+//                    se.printStackTrace();
+//                }
+//            }
+//            memoryLayer = layer;
+//        }
 
 
-        mds = new MemoryDataStore();
-        featureType = null;
-        layer = null;
-        try {
-            featureType = DataUtilities.createType("memory", "geom:Point");
-        } catch (SchemaException se) {
-            se.printStackTrace();
-        }
 
-        if (featureType != null) {
-            try {
-                mds.createSchema(featureType);
-                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                layer = new DefaultMapLayer(fs, createPointStyle());
-            } catch (IOException se) {
-                se.printStackTrace();
-            }
-        }
-        edgesLayer = layer;
+//        File edges_edit = new File("memory_edit.shp");
+//        try {
+//            params = Collections.singletonMap("url", edges_edit.toURI().toURL());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (memory_edit.exists()) {
+//            try{
+//            System.out.println("existe");
+//            DataStore sds = DataStoreFinder.getDataStore(params);
+//            FeatureSource fs = sds.getFeatureSource(sds.getTypeNames()[0]);
+//            edgesLayer = new DefaultMapLayer(fs, createStyle());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            try{
+//            FileDataStoreFactorySpi factory = new IndexedShapefileDataStoreFactory();
+//            ShapefileDataStore myData = (ShapefileDataStore) factory.createNewDataStore(params);
+//            String buffer = "geom:Geometry";
+//            SimpleFeatureType featureType = DataUtilities.createType("memory", buffer);
+//            myData.createSchema(featureType);
+//            myData.dispose();
+//            DataStore sds = DataStoreFinder.getDataStore(params);
+//                FeatureSource fs = sds.getFeatureSource(sds.getTypeNames()[0]);
+//                edgesLayer = new DefaultMapLayer(fs, createStyle());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+
+
+//
+//        mds = new MemoryDataStore();
+//        featureType = null;
+//        layer = null;
+//        try {
+//            featureType = DataUtilities.createType("memory", "geom:Point");
+//        } catch (SchemaException se) {
+//            se.printStackTrace();
+//        }
+//
+//        if (featureType != null) {
+//            try {
+//                mds.createSchema(featureType);
+//                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
+//                layer = new DefaultMapLayer(fs, createPointStyle());
+//            } catch (IOException se) {
+//                se.printStackTrace();
+//            }
+//        }
+//        edgesLayer = layer;
 
 
         // memory strategy------------------------------------------------------
@@ -188,15 +267,18 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         memoryStrategy.setContext(memoryMapContext);
         memoryStrategy.setAutoRefreshEnabled(false);
 
+
     }
 
     private void buildCursors() {
         Toolkit tk = Toolkit.getDefaultToolkit();
         ImageIcon eci_edit = IconBundle.getResource().getIcon("16_edit");
 
+
         BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
         img.getGraphics().drawImage(eci_edit.getImage(), 0, 0, null);
         CUR_EDIT = tk.createCustomCursor(img, new java.awt.Point(7, 1), "edit");
+
     }
 
     private Style createPointStyle() {
@@ -224,12 +306,21 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
 
         PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
+
+        Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
+        Graphic gra = STYLE_BUILDER.createGraphic();
+        gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
+        gra.setMarks(new Mark[]{mark});
+        gra.setSize(STYLE_BUILDER.literalExpression(14));
+        PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
+
         LineSymbolizer ls = STYLE_BUILDER.createLineSymbolizer(stroke);
 
         Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ls});
         r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
         Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{pls});
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
+
 
         Style editionStyle = STYLE_BUILDER.createStyle();
         editionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r2, r3}));
@@ -440,6 +531,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     //---------------------Memory Layer-----------------------------------------
     private synchronized void setMemoryLayerGeometry(List<Geometry> geoms) {
 
+
+        
+
         Envelope mapArea = memoryStrategy.getMapArea();
 
         if (mapArea != null && memoryLayer != null) {
@@ -466,11 +560,31 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
 
             //commit
-            FeatureStore store = (FeatureStore) memoryLayer.getFeatureSource();
+//            FeatureStore store = (FeatureStore) memoryLayer.getFeatureSource();
+//            try {
+//                store.addFeatures(collection);
+//            } catch (Exception eek) {
+//                eek.printStackTrace();
+//            }
+            DataStore data = memoryLayer.getFeatureSource().getDataStore();
+            DefaultTransaction transaction = null;
+            FeatureStore store = null;
             try {
+                String featureName = data.getTypeNames()[0];
+                transaction = new DefaultTransaction();
+                store = (FeatureStore) data.getFeatureSource(featureName);
+                store.setTransaction(transaction);
                 store.addFeatures(collection);
+                transaction.commit();
             } catch (Exception eek) {
                 eek.printStackTrace();
+                try {
+                    store.getTransaction().rollback();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                transaction.close();
             }
 
 
@@ -504,13 +618,32 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                 }
 
                 //commit 
-                store = (FeatureStore) edgesLayer.getFeatureSource();
+//                store = (FeatureStore) edgesLayer.getFeatureSource();
+//                try {
+//                    store.addFeatures(collection);
+//                } catch (Exception eek) {
+//                    eek.printStackTrace();
+//                }
+                data = edgesLayer.getFeatureSource().getDataStore();
+                transaction = null;
+                store = null;
                 try {
+                    String featureName = data.getTypeNames()[0];
+                    transaction = new DefaultTransaction();
+                    store = (FeatureStore) data.getFeatureSource(featureName);
+                    store.setTransaction(transaction);
                     store.addFeatures(collection);
+                    transaction.commit();
                 } catch (Exception eek) {
                     eek.printStackTrace();
+                    try {
+                        store.getTransaction().rollback();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } finally {
+                    transaction.close();
                 }
-
             }
         }
 
@@ -519,16 +652,59 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private synchronized void clearMemoryLayer() {
 
+//        try {
+//            FeatureStore fst = (FeatureStore) memoryLayer.getFeatureSource();
+//            fst.removeFeatures(Filter.INCLUDE);
+//            fst = (FeatureStore) edgesLayer.getFeatureSource();
+//            fst.removeFeatures(Filter.INCLUDE);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        repaintMemoryLayer();
+
+        
+
+        FeatureStore store;
+        Filter filter = Filter.INCLUDE;
+
+        store = (FeatureStore) memoryLayer.getFeatureSource();
+        DefaultTransaction transaction = new DefaultTransaction("trans_maj");
+        store.setTransaction(transaction);
+
         try {
-            FeatureStore fst = (FeatureStore) memoryLayer.getFeatureSource();
-            fst.removeFeatures(Filter.INCLUDE);
-            fst = (FeatureStore) edgesLayer.getFeatureSource();
-            fst.removeFeatures(Filter.INCLUDE);
-        } catch (Exception e) {
-            e.printStackTrace();
+            store.removeFeatures(filter);
+            transaction.commit();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            try {
+                transaction.rollback();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            transaction.close();
         }
 
-        repaintMemoryLayer();
+
+        store = (FeatureStore) edgesLayer.getFeatureSource();
+        transaction = new DefaultTransaction("trans_maj");
+        store.setTransaction(transaction);
+
+        try {
+            store.removeFeatures(filter);
+            transaction.commit();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            try {
+                transaction.rollback();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            transaction.close();
+        }
+
     }
 
     private synchronized void repaintMemoryLayer() {
@@ -559,6 +735,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         clearMemoryLayer();
         setMemoryLayerGeometry(geomsOut);
+
 
     }
 
@@ -705,6 +882,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         private boolean hasEditionGeometry = false;
         private boolean hasGeometryChanged = false;
         private SimpleFeature editFeature = null;
+        //private List<Integer> editedNodes = new ArrayList<Integer>();
         private Map<Geometry, Integer[]> editedNodes = new HashMap<Geometry, Integer[]>();
 
         private void fireStateChange() {

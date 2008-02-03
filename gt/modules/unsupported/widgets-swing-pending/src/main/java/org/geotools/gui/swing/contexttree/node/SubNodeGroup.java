@@ -27,6 +27,6 @@ public interface SubNodeGroup {
 
     public boolean isValid(Object target);
     
-    public ContextTreeNode[] createNodes(LightContextTreeModel model,Object target);
+    public void createNodes(LightContextTreeModel model,ContextTreeNode parentnode);
     
 }
