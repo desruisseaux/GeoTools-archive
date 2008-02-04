@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.text.cql2.ParseException;
+import org.geotools.filter.text.generated.parsers.ParseException;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;

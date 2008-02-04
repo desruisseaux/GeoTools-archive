@@ -18,7 +18,7 @@
 package org.geotools.text.filter;
 
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.cql2.Token;
+import org.geotools.filter.text.cql2.IToken;
 
 
 /**
@@ -36,11 +36,11 @@ public class FilterBuilderException extends CQLException {
         super(message);
     }
 
-    public FilterBuilderException(String message, Token token) {
+    public FilterBuilderException(String message, IToken token) {
         super(message, token,null);
     }
 
-    public FilterBuilderException(String message, Token token, Throwable cause) {
+    public FilterBuilderException(String message, IToken token, Throwable cause) {
         super(message, token, cause, null);
     }
 }

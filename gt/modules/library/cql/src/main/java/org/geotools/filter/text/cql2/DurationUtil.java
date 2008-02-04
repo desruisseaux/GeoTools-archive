@@ -20,16 +20,19 @@ import java.util.Date;
 
 
 /**
- * Utility class for filter builder
- *
- * @since 2.4
+ * Duration utility class
+ * <p>
+ * Maintains convenient methods to manipulate the duration information.
+ * </p>
+ * @since 2.5
+ * 
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
  * @version $Id$
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/Util.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/cql2/DurationUtil.java $
  */
-final class Util {
+final class DurationUtil {
     private static final Calendar CALENDAR = Calendar.getInstance();
     private static final int YEARS = 0;
     private static final int MONTHS = 1;
@@ -44,7 +47,7 @@ final class Util {
     /** H,M,S */
     private static int[] DURATION_TIME = new int[3];
 
-    private Util() {
+    private DurationUtil() {
         // utility class
     }
 

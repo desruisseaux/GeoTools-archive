@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2006, GeoTools Project Management Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
  */
 package org.geotools.filter.text.cql2;
 
-import org.geotools.filter.text.cql2.Token;
+import org.geotools.filter.text.cql2.IToken;
 
 
 /**
@@ -28,15 +28,19 @@ import org.geotools.filter.text.cql2.Token;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/text/filter/Result.java $
  */
-final class Result {
+public final class Result {
     private int nodeType = 0;
     private Object built = null;
-    private Token token = null;
+    private IToken token = null;
 
-    Result(Object built, Token token, int nodeType) {
+    public Result(Object built, IToken token, int nodeType) {
         this.built = built;
         this.token = token;
         this.nodeType = nodeType;
+    }
+
+    public Result(Object built2, org.geotools.filter.text.generated.parsers.Token token2,
+            int type) {
     }
 
     public String toString() {
@@ -54,7 +58,7 @@ final class Result {
         return this.nodeType;
     }
 
-    public final Token getToken() {
+    public final IToken getToken() {
         return this.token;
     }
 }

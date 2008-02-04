@@ -16,14 +16,14 @@
  */
 package org.geotools.filter.text.cql2;
 
-import org.geotools.filter.text.cql2.ParseException;
-import org.geotools.filter.text.cql2.Token;
+import org.geotools.filter.text.generated.parsers.ParseException;
+import org.geotools.filter.text.cql2.IToken;
 
 
 /**
- * This exception is produced when the cql input string has sintax errors.
+ * This exception is produced when the cql input string has syntax errors.
  *
- * @author Mauricio Pazos - Axios Engineering
+ * @author Mauricio Pazos (Axios Engineering)
  * 
  * @version $Id$
  * @since 2.4
@@ -34,6 +34,7 @@ public class CQLException extends ParseException {
 
     protected Throwable cause = null;
     private String cqlSource = null;
+    private IToken currentToken = null;
 
     /**
      * New instance of CQLException
@@ -41,15 +42,15 @@ public class CQLException extends ParseException {
      * @param message   exception description
      * @param token     current token
      * @param cause     the cause
-     * @param cqlSource string analized
+     * @param cqlSource string analyzed
      */
-    public CQLException(String message, Token token, Throwable cause, String cqlSource) {
+    public CQLException(final String message, final IToken token, final Throwable cause, final String cqlSource) {
         super(message);
         
-        assert message != null;
+        assert message != null : "message can not be null";
+        assert cqlSource != null : "cqlSource can not be null";
 
-        super.currentToken = token;
-
+        this.currentToken = token;
         this.cause = cause;
         this.cqlSource = cqlSource;
     }
@@ -59,23 +60,32 @@ public class CQLException extends ParseException {
      * 
      * @param message   exception description
      * @param token     current token
-     * @param cqlSource analized string
+     * @param cqlSource analyzed string
      */
-    public CQLException(final String message, final Token token, final String cqlSource) {
+    public CQLException(final String message, final IToken token, final String cqlSource) {
         this(message, token, null, cqlSource);
     }
 
     /**
      * New instance of CQLException
-     *
-     * @param message   exception description
+     * @param message
+     * @param cqlSource
      */
-    public CQLException(String message) {
-        this(message, null, null, null);
+    public CQLException(final String message, final String cqlSource) {
+        this(message, null, null, cqlSource);
     }
 
     /**
-     * returns the cause
+     * New instance of CQLException
+     * 
+     * @param message
+     */
+    public CQLException(final String message) {
+        this(message, null, null, "");
+    }
+
+    /**
+     * Returns the cause
      *
      * @return the cause
      */
@@ -89,11 +99,11 @@ public class CQLException extends ParseException {
      * @return a message
      */
     public String getMessage() {
-        if (currentToken == null) {
-            return this.getMessage();
+        if (this.currentToken == null) {
+            return super.getMessage();
         }
 
-        return super.getMessage() + ", Current Token : " + currentToken.image;
+        return super.getMessage() + ", Current Token : " + currentToken.toString();
     }
 
     /**
@@ -103,22 +113,26 @@ public class CQLException extends ParseException {
      */
     public String getSyntaxError() {
 
+        if(currentToken == null){
+            return getMessage();
+        }
+
         // builds two lines the first has the source string, the second has
         // the pointer to syntax error.
-        
+
         // First Line
         StringBuffer msg = new StringBuffer(this.cqlSource);
         msg.append('\n');
 
         // Second Line
         // searches the last token recognized 
-        Token curToken = this.currentToken;
+        IToken curToken = this.currentToken;
 
-        while (curToken.next != null)
-            curToken = curToken.next;
+        while (curToken.hasNext() )
+            curToken = curToken.next();
 
         // add the pointer to error
-        int column = curToken.beginColumn - 1;
+        int column = curToken.beginColumn() - 1;
 
         for (int i = 0; i < column; i++) {
             msg.append(' ');

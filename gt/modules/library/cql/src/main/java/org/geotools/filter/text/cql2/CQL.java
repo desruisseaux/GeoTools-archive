@@ -123,24 +123,11 @@ public class CQL {
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
 
-        CQLCompiler compiler = makeCompiler(cqlPredicate,filterFactory);
-
-        try {
-            compiler.CompilationUnit();
+            ICompiler compiler = makeCompiler(cqlPredicate,filterFactory);
+            compiler.compileFilter();
             Filter result = compiler.getFilter();
 
             return result;
-
-        } catch( TokenMgrError e){
-            // note: TokenMgrError is an unchecked exception then the caller cannot 
-            // recovery itself if some lexical error happen. This clause catch that 
-            // exception an transform it in checked exception.
-            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
-            
-        } catch (ParseException e) {
-            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlPredicate);
-        }
-
     }
     
     /**
@@ -148,27 +135,41 @@ public class CQL {
      * @param predicate
      * @param filterFactory
      * @return CQLCompiler
+     * @throws CQLException 
      */
-    private static CQLCompiler makeCompiler(final String predicate, final FilterFactory filterFactory) {
+    private static ICompiler makeCompiler(final String predicate, final FilterFactory filterFactory) throws CQLException {
 
         FilterFactory ff = filterFactory;
 
         if (ff == null) {
             ff = CommonFactoryFinder.getFilterFactory((Hints) null);
         }
-        
-        return new CQLCompiler(predicate, ff);
+        ICompiler compiler = createCompiler(predicate, ff);
+
+        return compiler;
     }
 
     /**
-     * creates a new instance of compiler
+     * Creates a new compiler which implements {@link ICompiler}.
+     * 
+     * <p>
+     * Must be override in subclass if a new extension (or dialect) of CQL
+     * is required. 
+     * By default creates the {@link CQLCompiler}.
+     * </p>
      * @param predicate
-     * @param ff
+     * @param filterFactory
+     * 
      * @return CQLCompiler
      */
-    protected static CQLCompiler createCompiler(final String predicate, final FilterFactory filterFactory) {
+    protected static ICompiler createCompiler(final String predicate,
+                                              final FilterFactory filterFactory){
+        assert predicate != null: "predicate cannot be null";
+        assert filterFactory != null: "filterFactory cannot be null";
 
-        return new CQLCompiler(predicate, filterFactory);
+        CQLCompiler compiler = new CQLCompiler(predicate, filterFactory);
+
+        return compiler;
     }
 
     /**
@@ -201,24 +202,11 @@ public class CQL {
     public static Expression toExpression(final String cqlExpression,
                                           final FilterFactory filterFactory) throws CQLException {
 
-        CQLCompiler c = makeCompiler(cqlExpression, filterFactory);
-
-        try {
-            c.ExpressionCompilationUnit();
-        
-            Expression builtFilter = c.getExpression();
+            ICompiler compiler = makeCompiler(cqlExpression, filterFactory);
+            compiler.compileExpression();           
+            Expression builtFilter = compiler.getExpression();
 
             return builtFilter;
-        } catch( TokenMgrError e){
-            // note: TokenMgrError is an unchecked exception then the caller cannot 
-            // recovery itself if some lexical error happen. This clause catch that 
-            // exception an transform it in checked exception.
-            throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
-            
-        } catch (ParseException e) {
-            throw new CQLException(e.getMessage(), c.getToken(0),e, cqlExpression);
-        }
-
     }
 
     /**
@@ -233,6 +221,7 @@ public class CQL {
      */
     public static List<Filter> toFilterList(final String cqlFilterList)
         throws CQLException {
+        
         List<Filter> filters = CQL.toFilterList(cqlFilterList, null);
 
         return filters;
@@ -280,23 +269,11 @@ public class CQL {
     public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
 
-        CQLCompiler compiler = makeCompiler(cqlSourceFilterList, filterFactory);
+        ICompiler compiler = makeCompiler(cqlSourceFilterList, filterFactory);
+        compiler.compileFilterList();
+        List<Filter> results = compiler.getFilterList();
+        return results;
 
-        try {
-            compiler.MultipleCompilationUnit();
-            List<Filter> results = compiler.getResults();
-
-            return results;
-
-        } catch( TokenMgrError e){
-            // note: TokenMgrError is an unchecked exception then the caller cannot 
-            // recovery itself if some lexical error happen. This clause catch that 
-            // exception an transform it in checked exception.
-            throw new CQLException(e.getMessage(), compiler.getToken(0),e, cqlSourceFilterList);
-
-        } catch (ParseException e) {
-            throw new CQLException(e.getMessage() + ": " + cqlSourceFilterList, compiler.getToken(0), e, cqlSourceFilterList);
-        }
     }
 
 

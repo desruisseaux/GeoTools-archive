@@ -161,9 +161,9 @@ final class BuildResultStack {
     public String popIdentifierPart() throws CQLException {
         try {
             Result resultPart = stack.pop();
-            Token token = resultPart.getToken();
+            IToken token = resultPart.getToken();
 
-            return token.image;
+            return token.toString();
         } catch (ClassCastException e) {
             throw new CQLException("identifier part is expected");
         }

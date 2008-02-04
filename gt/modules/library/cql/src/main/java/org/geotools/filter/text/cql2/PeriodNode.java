@@ -70,7 +70,7 @@ class PeriodNode {
         Date firstDate = (Date) date.getValue();
         String strDuration = (String) duration.getValue();
 
-        Date lastDate = Util.addDurationToDate(firstDate, strDuration);
+        Date lastDate = DurationUtil.addDurationToDate(firstDate, strDuration);
 
         Literal literalLastDate = filterFactory.literal(lastDate);
 
@@ -85,7 +85,7 @@ class PeriodNode {
         Date lastDate = (Date) date.getValue();
         String strDuration = (String) duration.getValue();
 
-        Date firstDate = Util.subtractDurationToDate(lastDate, strDuration);
+        Date firstDate = DurationUtil.subtractDurationToDate(lastDate, strDuration);
 
         Literal literalFirstDate = filterFactory.literal(firstDate);
 

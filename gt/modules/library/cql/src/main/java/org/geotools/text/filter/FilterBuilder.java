@@ -22,7 +22,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.cql2.ParseException;
+import org.geotools.filter.text.generated.parsers.ParseException;
 
 
 /**
