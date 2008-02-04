@@ -39,7 +39,7 @@ public class SourceGroup implements SubNodeGroup {
         return (target instanceof MapLayer);
     }
 
-    public void createNodes(final LightContextTreeModel model, ContextTreeNode parentnode) {
+    public void installInNode(final LightContextTreeModel model, ContextTreeNode parentnode) {
         final MapLayer layer = (MapLayer) parentnode.getUserObject();
         final DataStore ds = layer.getFeatureSource().getDataStore();
 
@@ -125,6 +125,17 @@ public class SourceGroup implements SubNodeGroup {
 
         node.setToolTip(tooltip);
         model.insetNodeInto(node, parentnode, 0);
+    }
+    
+    public void removeForNode(LightContextTreeModel model, ContextTreeNode parentnode) {
+        
+        for(int max=parentnode.getChildCount(), i=max-1; i>=0;i--){
+            ContextTreeNode node = (ContextTreeNode) parentnode.getChildAt(i);
+            if(node.getUserObject() instanceof DataStore){
+                model.removeNodeFromParent(node);
+            }
+        }
+        
     }
     
     

@@ -211,7 +211,7 @@ public class StyleGroup implements SubNodeGroup {
         }
     }
 
-    public void createNodes(LightContextTreeModel model, ContextTreeNode parentnode) {
+    public void installInNode(LightContextTreeModel model, ContextTreeNode parentnode) {
         final MapLayer layer = (MapLayer) parentnode.getUserObject();
         Style style = layer.getStyle();
 
@@ -237,5 +237,17 @@ public class StyleGroup implements SubNodeGroup {
         }
 
         model.insetNodeInto(root, parentnode, parentnode.getChildCount());
+    }
+
+
+    public void removeForNode(LightContextTreeModel model, ContextTreeNode parentnode) {
+        
+        for(int max=parentnode.getChildCount(), i=max-1; i>=0;i--){
+            ContextTreeNode node = (ContextTreeNode) parentnode.getChildAt(i);
+            if(node.getUserObject() instanceof Style){
+                model.removeNodeFromParent(node);
+            }
+        }
+        
     }
 }

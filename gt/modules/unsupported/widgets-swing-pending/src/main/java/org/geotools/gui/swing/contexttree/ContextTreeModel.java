@@ -59,7 +59,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     private final JContextTree frame;
     private final ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
     private final ArrayList<SubNodeGroup> subgroups = new ArrayList<SubNodeGroup>();
-    private final Map<SubNodeGroup,List<ContextTreeNode>> subnodes = new HashMap<SubNodeGroup,List<ContextTreeNode>>();
+//    private final Map<SubNodeGroup,List<ContextTreeNode>> subnodes = new HashMap<SubNodeGroup,List<ContextTreeNode>>();
     private final Vector columnNames = new Vector(); 
     
     private final LightContextTreeModel lightModel;
@@ -263,21 +263,14 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     void addSubNodeGroup(SubNodeGroup group) {
         if(group!=null && !subgroups.contains(group)){
             subgroups.add(group);           
-            subnodes.put(group, new ArrayList<ContextTreeNode>());
             visitNode(getRoot(),group);       
         }        
     }
     
     void removeSubNodeGroup(SubNodeGroup group) {
-        if(group!=null && subgroups.contains(group)){
-            
-            List<ContextTreeNode> nodes = subnodes.get(group);            
-            for(ContextTreeNode n : nodes){
-                removeNodeFromParent(n);
-            }
-            
-            subnodes.remove(group);            
-            subgroups.remove(group);           
+        if(group!=null && subgroups.contains(group)){                                           
+            subgroups.remove(group);     
+            cleanNode(getRoot(), group);
         }        
     }
             
@@ -308,13 +301,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
             ContextTreeNode tn = (ContextTreeNode) node;
             Object obj = tn.getUserObject();
             if(group.isValid(obj)){
-                group.createNodes(lightModel,tn);
-                
-//                ContextTreeNode[] nodes = group.createNodes(lightModel,obj);
-//                for(ContextTreeNode n : nodes){
-//                    subnodes.get(group).add(n);
-//                    insertNodeInto(n, tn, tn.getChildCount());
-//                }
+                group.installInNode(lightModel,tn);                
                 
             }
         }
@@ -336,14 +323,12 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         }
         
         if(node instanceof ContextTreeNode ){
-            ContextTreeNode tn = (ContextTreeNode) node;            
-            List<ContextTreeNode> lst = subnodes.get(group);
-            
-            if(lst.contains(tn)){
-                lst.remove(tn);
-                removeNodeFromParent(tn);
+            ContextTreeNode tn = (ContextTreeNode) node;   
+            Object obj = tn.getUserObject();
+            if(group.isValid(obj)){
+                group.removeForNode(lightModel,tn);
             }
-            
+                        
         }
     }
     
