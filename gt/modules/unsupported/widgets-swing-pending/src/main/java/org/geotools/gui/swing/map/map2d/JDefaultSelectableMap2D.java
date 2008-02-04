@@ -168,7 +168,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             double height = mapArea.getHeight();
             Coordinate[] coord = new Coordinate[5];
 
-            int taille = 3;
+            int taille = 4;
 
             coord[0] = toMapCoord(mx - taille, my - taille, width, height, bounds);
             coord[1] = toMapCoord(mx - taille, my + taille, width, height, bounds);
