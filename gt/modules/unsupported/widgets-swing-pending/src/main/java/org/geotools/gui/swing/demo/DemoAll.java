@@ -309,6 +309,7 @@ public class DemoAll extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         group_jdatachooser = new javax.swing.ButtonGroup();
         dia_about = new javax.swing.JDialog();
@@ -331,6 +332,7 @@ public class DemoAll extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
+        jToolBar2 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -436,7 +438,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane.setLayout(pan_mappaneLayout);
         pan_mappaneLayout.setHorizontalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 522, Short.MAX_VALUE)
+            .add(0, 514, Short.MAX_VALUE)
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -459,7 +461,7 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -470,7 +472,7 @@ public class DemoAll extends javax.swing.JFrame {
 
         getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel2.setLayout(new java.awt.GridBagLayout());
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -497,13 +499,29 @@ public class DemoAll extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton2);
 
-        jPanel2.add(jToolBar1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jToolBar1, gridBagConstraints);
 
         gui_map2dcontrol.setFloatable(false);
-        jPanel2.add(gui_map2dcontrol);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(gui_map2dcontrol, gridBagConstraints);
 
         gui_map2dedit.setFloatable(false);
-        jPanel2.add(gui_map2dedit);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(gui_map2dedit, gridBagConstraints);
+
+        jToolBar2.setFloatable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jToolBar2, gridBagConstraints);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -1020,6 +1038,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;

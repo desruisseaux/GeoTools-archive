@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 
 import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
+import org.geotools.gui.swing.propertyedit.LayerCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerGeneralPanel;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
@@ -59,6 +60,7 @@ public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
 
     private void init() {
         lst.add(new LayerGeneralPanel());
+        lst.add(new LayerCRSPropertyPanel());
         lst.add(new LayerFilterPropertyPanel());
         lst.add(new LayerStylePropertyPanel());
 

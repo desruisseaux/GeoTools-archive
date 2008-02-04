@@ -92,6 +92,8 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
 
         jLabel1.setText("Coordinate Reference Systems :");
 
+        gui_jtf_crs.setBackground(new java.awt.Color(255, 255, 255));
+        gui_jtf_crs.setEditable(false);
         gui_jtf_crs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 gui_jtf_crsActionPerformed(evt);
@@ -112,8 +114,8 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                    .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                    .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                    .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jLabel1)
                         .add(21, 21, 21)))
@@ -127,7 +129,7 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(gui_jtf_crs, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                .add(pan_list, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -144,7 +146,7 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -220,16 +222,23 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
     }
 
     private void init() {
-//        String epsg = context.getCoordinateReferenceSystem().getName().toString();
-//        gui_jtf_crs.setText(epsg);
-//        liste.setCRS(context.getCoordinateReferenceSystem());
-//        setIdentifiedObject(context.getCoordinateReferenceSystem());
+
+        if (layer != null) {
+            try {
+                String epsg = layer.getFeatureSource().getSchema().getCRS().getName().toString();
+                gui_jtf_crs.setText(epsg);
+                liste.setCRS(layer.getFeatureSource().getSchema().getCRS());
+                setIdentifiedObject(layer.getFeatureSource().getSchema().getCRS());
+            } catch (Exception e) {
+            }
+        }
+
     }
-    
+
     public void reset() {
         init();
     }
-    
+
     private void setIdentifiedObject(final IdentifiedObject item) {
         String text;
         try {
@@ -258,5 +267,4 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
     private void setErrorMessage(final String message) {
         wktArea.setText(Vocabulary.format(VocabularyKeys.ERROR_$1, message));
     }
-    
 }
