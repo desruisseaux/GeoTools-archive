@@ -37,6 +37,9 @@ public class LiteralExpressionImpl extends DefaultExpression
 	
     /** Holds a reference to the literal. */
     private Object literal = null;
+    
+    /** The converted value guessed inside evaluate(Feature) **/
+    private Object parsedValue = null;
 
     /**
      * Constructor with literal.
@@ -215,26 +218,22 @@ public class LiteralExpressionImpl extends DefaultExpression
         //try and be somewhat smart about this.
         
         //ASSERTION: literal is always a string.
-        if (literal == null || literal.getClass() != String.class) {
-            return literal;
-        }
-        String s = (String)literal;
-        try {
-            return new Integer(s);
-        } catch (Exception e) {
-        }
+        if(parsedValue != null)
+            return parsedValue;
         
-        try {
-            return new Double(s);
-        } catch (Exception e) {
-        }
-        
-        try {
-            return new BigInteger(s);
-        } catch (Exception e) {
-        }
-        
-        return literal;
+        if (literal == null || !(literal instanceof String)) {
+            parsedValue = literal;
+        } else {
+            String s = (String) literal;
+            Value v = new Value(s);
+            Class[] contexts = new Class[] {Integer.class, BigInteger.class, Double.class};
+            for (int i = 0; i < contexts.length && parsedValue == null; i++) {
+                parsedValue = v.value(contexts[i]);
+            }
+            if(parsedValue == null)
+                parsedValue = literal;
+        }  
+        return parsedValue;
     }
     
     public Object evaluate(Object feature, Class context) {
