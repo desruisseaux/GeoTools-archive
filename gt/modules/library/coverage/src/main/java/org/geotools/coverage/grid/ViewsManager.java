@@ -59,6 +59,8 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
@@ -175,6 +177,9 @@ scan:   for (int i=0; i<numBands; i++) {
 
     /**
      * Invoked by {@linkplain GridCoverage2D#view} for getting a view.
+     *
+     * <strong>NOTE:</strong> {@link GridCoverage2D#toString()} requires that this method is
+     * synchronized on {@code this}.
      */
     public synchronized GridCoverage2D get(final GridCoverage2D caller, final ViewType type) {
         GridCoverage2D coverage = views.get(type);
@@ -605,7 +610,9 @@ testLinear: for (int i=0; i<numBands; i++) {
             final Locale    locale = coverage.getLocale();
             final LogRecord record = Loggings.getResources(locale).getLogRecord(
                     AbstractProcessor.OPERATION, LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
-                        name.toString(locale), Integer.valueOf(code), shortName
+                        (name != null) ? name.toString(locale) :
+                            Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED),
+                        Integer.valueOf(code), shortName
                     });
             record.setSourceClassName(GridCoverage2D.class.getName());
             record.setSourceMethodName("geophysics");

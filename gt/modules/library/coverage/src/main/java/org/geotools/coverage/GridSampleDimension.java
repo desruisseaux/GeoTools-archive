@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;  // For javadoc
 import java.awt.image.IndexColorModel;
-import java.awt.image.RenderedImage;  // For javadoc
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -400,14 +399,17 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             int lower = 0;
             final int length = categories.length;
             for (int upper=1; upper<=length; upper++) {
-                if (upper != length &&
-                        categories[lower].toString().trim().equalsIgnoreCase(
-                        categories[upper].toString().trim()))
-                {
-                    // If there is a suite of categories with identical name,  create only one
-                    // category with range [lower..upper] instead of one new category for each
-                    // sample value.
-                    continue;
+                if (upper != length) {
+                    final String nameLower = categories[lower].toString().trim();
+                    final String nameUpper = categories[upper].toString().trim();
+                    if (nameLower.equalsIgnoreCase(nameUpper)) {
+                        /*
+                         * If there is a suite of categories with identical name,  create only one
+                         * category with range [lower..upper] instead of one new category for each
+                         * sample value.
+                         */
+                        continue;
+                    }
                 }
                 final CharSequence name = categories[lower];
                 Number min = TypeMap.wrapSample(lower,   type, false);
@@ -1232,17 +1234,17 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Returns a color model for this sample dimension. The default implementation create a color
      * model with 1 band using each category's colors as returned by {@link Category#getColors}.
-     * The returned color model will typically use {@link java.awt.image.DataBuffer#TYPE_FLOAT} if
-     * this sample dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
-     * geophysics}, or an integer data type otherwise.
+     * The returned color model will typically use {@link DataBuffer#TYPE_FLOAT} if this sample
+     * dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics}, or
+     * an integer data type otherwise.
      * <p>
      * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
      * special implementations of {@code GridSampleDimension}. In this particular case,
      * the color model created by this {@code getColorModel()} method will have the same number of
-     * bands than the grid coverage's {@link RenderedImage}.
+     * bands than the grid coverage's {@link java.awt.image.RenderedImage}.
      *
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage} objects
+     *         with values in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      */
     public ColorModel getColorModel() {
@@ -1256,9 +1258,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Returns a color model for this sample dimension. The default implementation create the
      * color model using each category's colors as returned by {@link Category#getColors}. The
-     * returned color model will typically use {@link java.awt.image.DataBuffer#TYPE_FLOAT} if
-     * this sample dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS
-     * geophysics}, or an integer data type otherwise.
+     * returned color model will typically use {@link DataBuffer#TYPE_FLOAT} if this sample
+     * dimension is {@linkplain org.geotools.coverage.grid.ViewType#GEOPHYSICS geophysics},
+     * or an integer data type otherwise.
      *
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
@@ -1266,8 +1268,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *         model will renderer only the {@code visibleBand} and ignore the others, but
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage} objects
+     *         with values in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      *
      * @todo This method may be deprecated in a future version. It it strange to use
@@ -1276,6 +1278,10 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      */
     public ColorModel getColorModel(final int visibleBand, final int numBands) {
         if (categories != null) {
+            if (isGeophysics && hasQualitative) {
+                // Data likely to have NaN values, which require a floating point type.
+                return categories.getColorModel(visibleBand, numBands, DataBuffer.TYPE_FLOAT);
+            }
             return categories.getColorModel(visibleBand, numBands);
         }
         return null;
@@ -1291,9 +1297,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *         model will renderer only the {@code visibleBand} and ignore the others, but
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
-     * @param  type The data type that has to be used for the sample model
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
+     * @param  type The data type that has to be used for the sample model.
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage} objects
+     *         with values in the <code>{@link #getRange}</code> range. May be {@code null} if this
      *         sample dimension has no category.
      *
      * @todo This method may be deprecated in a future version. It it strange to use

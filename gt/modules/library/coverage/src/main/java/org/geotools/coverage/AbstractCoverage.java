@@ -131,7 +131,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     private static final int VISIBLE_BAND = 0;
 
     /**
-     * The coverage name.
+     * The coverage name, or {@code null} if none.
      */
     private final InternationalString name;
 
@@ -145,7 +145,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * reference system is {@code null}, then the subclasses must override {@link #getDimension()}.
      *
      * @param name
-     *          The coverage name.
+     *          The coverage name, or {@code null} if none.
      * @param crs
      *          The coordinate reference system. This specifies the CRS used when accessing
      *          a coverage or grid coverage with the {@code evaluate(...)} methods.
@@ -192,8 +192,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
 
     /**
-     * Returns the coverage name. The default implementation returns the name
-     * specified at construction time.
+     * Returns the coverage name, or {@code null} if none. The default
+     * implementation returns the name specified at construction time.
      */
     public InternationalString getName() {
         return name;

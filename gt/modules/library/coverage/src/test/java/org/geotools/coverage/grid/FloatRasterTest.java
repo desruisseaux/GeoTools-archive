@@ -16,28 +16,22 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE and JAI dependencies
 import java.awt.Color;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import javax.media.jai.RasterFactory;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// GeoAPI dependencies
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.geometry.Envelope2D;
 import org.geotools.coverage.CoverageFactoryFinder;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 
 /**
@@ -114,7 +108,9 @@ public class FloatRasterTest extends TestCase {
         Color[] colors = new Color[] {Color.BLUE, Color.CYAN, Color.WHITE, Color.YELLOW, Color.RED};
         gc = factory.create("My colored coverage", raster, envelope,
                             null, null, null, new Color[][] {colors}, null);
-        if (display) ((GridCoverage2D) gc).geophysics(false).show();
+        if (display) {
+            ((GridCoverage2D) gc).view(ViewType.RENDERED).show();
+        }
     }
 
     /**

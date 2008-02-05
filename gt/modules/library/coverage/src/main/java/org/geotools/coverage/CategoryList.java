@@ -22,7 +22,6 @@ package org.geotools.coverage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RasterFormatException;
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -594,16 +593,16 @@ class CategoryList extends AbstractList<Category>
      *         model will renderer only the {@code visibleBand} and ignore the others, but
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@linkplain #getRange}</code> range.
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage}
+     *         objects with values in the <code>{@linkplain #getRange}</code> range.
      */
     public final ColorModel getColorModel(final int visibleBand, final int numBands) {
         int type = DataBuffer.TYPE_FLOAT;
         final NumberRange range = getRange();
-        final Class rt = range.getElementClass();
+        final Class<? extends Number> rt = range.getElementClass();
         if (Byte.class.equals(rt) || Short.class.equals(rt) || Integer.class.equals(rt)) {
-            final int min = ((Number)range.getMinValue()).intValue();
-            final int max = ((Number)range.getMaxValue()).intValue();
+            final int min = ((Number) range.getMinValue()).intValue();
+            final int max = ((Number) range.getMaxValue()).intValue();
             if (min >= 0) {
                 if (max < 0x100) {
                     type = DataBuffer.TYPE_BYTE;
@@ -618,7 +617,7 @@ class CategoryList extends AbstractList<Category>
                 type = DataBuffer.TYPE_INT;
             }
         }
-        return ColorModelFactory.getColorModel(categories, type, visibleBand, numBands);
+        return getColorModel(visibleBand, numBands, type);
     }
 
     /**
@@ -631,9 +630,9 @@ class CategoryList extends AbstractList<Category>
      *         model will renderer only the {@code visibleBand} and ignore the others, but
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
-     * @param  type The transfer type used in the sample model
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link #getRange}</code> range.
+     * @param  type The transfer type used in the sample model.
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage}
+     *         objects with values in the <code>{@link #getRange}</code> range.
      */
     public final ColorModel getColorModel(final int visibleBand, final int numBands, final int type) {
         return ColorModelFactory.getColorModel(categories, type, visibleBand, numBands);

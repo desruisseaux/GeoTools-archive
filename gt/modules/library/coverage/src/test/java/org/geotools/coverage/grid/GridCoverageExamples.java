@@ -146,10 +146,10 @@ public final class GridCoverageExamples extends Assert {
          * Tests the creation of a "geophysics" view. This test make sure that the
          * 'geophysics' method do not creates more grid coverage than needed.
          */
-        GridCoverage2D geophysics= coverage.geophysics(true);
-        assertSame(coverage,       coverage.geophysics(false));
-        assertSame(coverage,     geophysics.geophysics(false));
-        assertSame(geophysics,   geophysics.geophysics(true ));
+        GridCoverage2D geophysics= coverage.view(ViewType.GEOPHYSICS);
+        assertSame(coverage,       coverage.view(ViewType.PACKED));
+        assertSame(coverage,     geophysics.view(ViewType.PACKED));
+        assertSame(geophysics,   geophysics.view(ViewType.GEOPHYSICS));
         assertFalse( coverage.equals(geophysics));
         assertFalse( coverage.getSampleDimension(0).getSampleToGeophysics().isIdentity());
         assertTrue(geophysics.getSampleDimension(0).getSampleToGeophysics().isIdentity());
@@ -193,11 +193,11 @@ public final class GridCoverageExamples extends Assert {
      * Returns a {@link GridCoverage} which may be used as a "real world" example.
      *
      * @param  number The example number. Numbers are numeroted from
-     *               0 to {@link #getNumExamples()} exclusive.
+     *                0 to {@link #getNumExamples()} exclusive.
      * @return The "real world" grid coverage.
      * @throws IOException if an I/O operation was needed and failed.
      */
-    public static GridCoverage2D getExample( final int number) throws IOException {
+    public static GridCoverage2D getExample(final int number) throws IOException {
         final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         final String                   path;
         final Category[]         categories;
@@ -224,8 +224,8 @@ public final class GridCoverageExamples extends Assert {
                 // 41°S - 5°N ; 35°E - 80°E  (450 x 460 pixels)
                 bounds = new Rectangle2D.Double(35, -41, 45, 46);
                 bands = new GridSampleDimension[] {
-                        new GridSampleDimension("Measure", categories, null)
-                    };
+                    new GridSampleDimension("Measure", categories, null)
+                };
                 break;
             }
             case 1: {
@@ -240,9 +240,8 @@ public final class GridCoverageExamples extends Assert {
                 // 34°N - 45°N ; 07°W - 12°E  (1200 x 700 pixels)
                 bounds = new Rectangle2D.Double(-7, 34, 19, 11);
                 bands = new GridSampleDimension[] {
-                        new GridSampleDimension("Measure", categories, null).geophysics(false)
-                    };
-
+                    new GridSampleDimension("Measure", categories, null).geophysics(false)
+                };
                 break;
             }
             case 2: {
@@ -254,7 +253,7 @@ public final class GridCoverageExamples extends Assert {
             	path   = "world_dem.gif";
                 bounds = new Rectangle2D.Double(-180,-90, 360, 180);
                 crs    = DefaultGeographicCRS.WGS84;
-                bands=null;
+                bands  = null;
                 break;
             }
             case 3:{

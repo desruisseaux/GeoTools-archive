@@ -554,7 +554,7 @@ control:    for (int p=0; p<=1; p++) {
      * @see RenderableImage#createDefaultRendering()
      */
     public GridCoverage2D getGridCoverage2D(final Date time) throws CannotEvaluateException {
-        final InternationalString      name = getName();
+        final InternationalString name = getName();
         final CoordinateReferenceSystem crs = CRS.getHorizontalCRS(this.crs);
         if (crs == null) {
             throw new CannotEvaluateException(

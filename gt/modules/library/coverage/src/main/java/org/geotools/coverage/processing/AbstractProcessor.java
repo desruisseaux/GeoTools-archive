@@ -33,6 +33,7 @@ import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.InternationalString;
 
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.Interpolator2D;
@@ -205,10 +206,12 @@ public abstract class AbstractProcessor {
      */
     private static String getName(final Coverage coverage, final Locale locale) {
         if (coverage instanceof AbstractCoverage) {
-            return ((AbstractCoverage) coverage).getName().toString(locale);
-        } else {
-            return Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED);
+            final InternationalString name = ((AbstractCoverage) coverage).getName();
+            if (name != null) {
+                return name.toString(locale);
+            }
         }
+        return Vocabulary.getResources(locale).getString(VocabularyKeys.UNTITLED);
     }
 
     /**

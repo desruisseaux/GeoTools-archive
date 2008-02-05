@@ -16,21 +16,17 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
 import java.util.Arrays;
 import java.util.Map;
 
-// JAI dependencies
 import javax.media.jai.FloatDoubleColorModel;
 import javax.media.jai.RasterFactory;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
@@ -68,7 +64,8 @@ final class ColorModelFactory {
      *       {@link ColorModel} if they plan to reuse it often in a short period of time.</li>
      * </ul>
      */
-    private static final Map/*<ColorModelFactory,ColorModel>*/ colors = new WeakValueHashMap();
+    private static final Map<ColorModelFactory,ColorModel> colors =
+            new WeakValueHashMap<ColorModelFactory,ColorModel>();
 
     /**
      * The list of categories for the construction of a single instance of a {@link ColorModel}.
@@ -109,7 +106,7 @@ final class ColorModelFactory {
         this.visibleBand = visibleBand;
         this.numBands    = numBands;
         this.type        = type;
-        if (visibleBand<0 || visibleBand>=numBands) {
+        if (visibleBand < 0 || visibleBand >= numBands) {
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.BAD_BAND_NUMBER_$1, visibleBand));
         }
@@ -129,15 +126,15 @@ final class ColorModelFactory {
      *         model will renderer only the {@code visibleBand} and ignore the others, but
      *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
-     * @return The requested color model, suitable for {@link RenderedImage} objects with values
-     *         in the <code>{@link CategoryList#getRange}</code> range.
+     * @return The requested color model, suitable for {@link java.awt.image.RenderedImage}
+     *         objects with values in the <code>{@linkplain CategoryList#getRange}</code> range.
      */
     public static ColorModel getColorModel(final Category[] categories, final int type,
                                            final int visibleBand, final int numBands)
     {
         synchronized (colors) {
             ColorModelFactory key = new ColorModelFactory(categories, type, visibleBand, numBands);
-            ColorModel model = (ColorModel) colors.get(key);
+            ColorModel model = colors.get(key);
             if (model == null) {
                 model = key.getColorModel();
                 colors.put(key, model);
@@ -150,24 +147,24 @@ final class ColorModelFactory {
      * Constructs the color model.
      */
     private ColorModel getColorModel() {
+        double minimum = 0;
+        double maximum = 1;
         final int categoryCount = categories.length;
+        if (categoryCount != 0) {
+            minimum = categories[0].minimum;
+            for (int i=categoryCount; --i >= 0;) {
+                final double value = categories[i].maximum;
+                if (!Double.isNaN(value)) {
+                    maximum = value;
+                    break;
+                }
+            }
+        }
         if (type != DataBuffer.TYPE_BYTE && type != DataBuffer.TYPE_USHORT) {
             // If the requested type is any type not supported by IndexColorModel,
             // fallback on a generic (but very slow!) color model.
-            double min = 0;
-            double max = 1;
-            if (categoryCount != 0) {
-                min = categories[0].minimum;
-                for (int i=categoryCount; --i >= 0;) {
-                    final double val = categories[i].maximum;
-                    if (!Double.isNaN(val)) {
-                        max = val;
-                        break;
-                    }
-                }
-            }
             final int  transparency = Transparency.OPAQUE;
-            final ColorSpace colors = new ScaledColorSpace(visibleBand, numBands, min, max);
+            final ColorSpace colors = new ScaledColorSpace(visibleBand, numBands, minimum, maximum);
             if (false) {
                 // This is the J2SE implementation of color model. It should be our preferred one.
                 // Unfortunatly, as of JAI 1.1 we have to use JAI implementation instead of J2SE's
@@ -196,24 +193,26 @@ final class ColorModelFactory {
         if (numBands == 1 && categoryCount == 0) {
             // Construct a gray scale palette.
             final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-            final int[] nBits = {DataBuffer.getDataTypeSize(type)};
+            final int[] nBits = {
+                DataBuffer.getDataTypeSize(type)
+            };
             return new ComponentColorModel(cs, nBits, false, true, Transparency.OPAQUE, type);
         }
         /*
          * Computes the number of entries required for the color palette.
-         * We take the upper range value of the last category.
+         * We take the upper range value of the last non-NaN category.
          */
-        final int mapSize = (int) Math.round(categories[categoryCount - 1].maximum) + 1;
+        final int mapSize = ((int) Math.round(maximum)) + 1;
         final int[]  ARGB = new int[mapSize];
         /*
-         * Interpolate the colors in the color palette. Colors that do not fall
+         * Interpolates the colors in the color palette. Colors that do not fall
          * in the range of a category will be set to a transparent color.
          */
         for (int i=0; i<categoryCount; i++) {
             final Category category = categories[i];
             ColorUtilities.expand(category.getColors(), ARGB,
-                                  (int)Math.round(category.minimum),
-                                  (int)Math.round(category.maximum)+1);
+                                  (int) Math.round(category.minimum),
+                                  (int) Math.round(category.maximum) + 1);
         }
         return ColorUtilities.getIndexColorModel(ARGB, numBands, visibleBand);
     }
@@ -221,6 +220,7 @@ final class ColorModelFactory {
     /**
      * Returns a hash code.
      */
+    @Override
     public int hashCode() {
         final int categoryCount = categories.length;
         int code = 962745549 + (numBands*37 + visibleBand)*37 + categoryCount;
@@ -232,8 +232,9 @@ final class ColorModelFactory {
     }
 
     /**
-     * Check this object with an other one for equality.
+     * Checks this object with an other one for equality.
      */
+    @Override
     public boolean equals(final Object other) {
         if (other == this) {
             return true;
