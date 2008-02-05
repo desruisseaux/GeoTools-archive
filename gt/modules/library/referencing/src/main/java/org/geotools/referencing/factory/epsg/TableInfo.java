@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -14,6 +14,8 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.referencing.factory.epsg;
+
+import org.opengis.referencing.IdentifiedObject;
 
 
 /**
@@ -30,7 +32,7 @@ final class TableInfo {
     /**
      * The class of object to be created.
      */
-    public final Class type;
+    public final Class<?> type;
 
     /**
      * The table name for SQL queries. May contains a {@code "JOIN"} clause.
@@ -55,7 +57,7 @@ final class TableInfo {
     /**
      * Sub-interfaces of {@link #type} to handle, or {@code null} if none.
      */
-    public final Class[] subTypes;
+    public final Class<?>[] subTypes;
 
     /**
      * Names of {@link #subTypes} in the database, or {@code null} if none.
@@ -65,7 +67,7 @@ final class TableInfo {
     /**
      * Stores information about a specific table.
      */
-    TableInfo(final Class type, final String table,
+    TableInfo(final Class<?> type, final String table,
               final String codeColumn, final String nameColumn)
     {
         this(type, table, codeColumn, nameColumn, null, null, null);
@@ -74,9 +76,9 @@ final class TableInfo {
     /**
      * Stores information about a specific table.
      */
-    TableInfo(final Class type,
+    TableInfo(final Class<?> type,
               final String table, final String codeColumn, final String nameColumn,
-              final String typeColumn, final Class[] subTypes, final String[] typeNames)
+              final String typeColumn, final Class<?>[] subTypes, final String[] typeNames)
     {
         this.type       = type;
         this.table      = table;
@@ -103,7 +105,7 @@ final class TableInfo {
      *       in which case we basically want to iterate through every tables.</p></li>
      * </ul>
      */
-    public boolean isTypeOf(final Class kind) {
+    public boolean isTypeOf(final Class<?> kind) {
         return type.isAssignableFrom(kind) || kind.isAssignableFrom(type);
     }
 }

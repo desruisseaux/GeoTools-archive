@@ -97,15 +97,15 @@ public class DimensionFilter {
     public DimensionFilter() {
         this(ReferencingFactoryFinder.getMathTransformFactory(null));
     }
-    
+
     /**
      * Constructs a dimension filter with a
      * {@linkplain ReferencingFactoryFinder#getMathTransformFactory math transform factory
      * built using the provided hints}.
      *
-     * @param hints to control the creation of the {@link MathTransformFactory}.
+     * @param hints Hints to control the creation of the {@link MathTransformFactory}.
      */
-    public DimensionFilter(Hints hints) {
+    public DimensionFilter(final Hints hints) {
         this(ReferencingFactoryFinder.getMathTransformFactory(hints));
     }
 

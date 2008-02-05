@@ -73,9 +73,11 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     private static final long serialVersionUID = 1752330560227688940L;
 
     /**
-     * Minimum and maximum ordinate values. The first half contains minimum
-     * ordinates, while the last half contains maximum ordinates. Consider
-     * this reference as final; it is modified by {@link #clone} only.
+     * Minimum and maximum ordinate values. The first half contains minimum ordinates, while the
+     * last half contains maximum ordinates. This layout is convenient for the creation of lower
+     * and upper corner direct positions.
+     * <p>
+     * Consider this reference as final; it is modified by {@link #clone} only.
      */
     private double[] ordinates;
 
@@ -101,7 +103,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      */
     public GeneralEnvelope(final double min, final double max) {
         ordinates = new double[] {min, max};
-        checkCoherence();
+        checkCoordinates(ordinates);
     }
 
     /**
@@ -122,7 +124,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         ordinates = new double[minDP.length + maxDP.length];
         System.arraycopy(minDP, 0, ordinates, 0,            minDP.length);
         System.arraycopy(maxDP, 0, ordinates, minDP.length, maxDP.length);
-        checkCoherence();
+        checkCoordinates(ordinates);
     }
 
     /**
@@ -177,7 +179,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
                 ordinates[i]           = envelope.getMinimum(i);
                 ordinates[i+dimension] = envelope.getMaximum(i);
             }
-            checkCoherence();
+            checkCoordinates(ordinates);
         }
     }
 
@@ -209,7 +211,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
             rect.getMinX(), rect.getMinY(),
             rect.getMaxX(), rect.getMaxY()
         };
-        checkCoherence();
+        checkCoordinates(ordinates);
     }
 
     /**
@@ -301,12 +303,11 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * Checks if ordinate values in the minimum point are less than or
      * equal to the corresponding ordinate value in the maximum point.
      *
-     * @throws IllegalArgumentException if an ordinate value in the minimum
-     *         point is not less than or equal to the corresponding ordinate
-     *         value in the maximum point.
+     * @throws IllegalArgumentException if an ordinate value in the minimum point is not less
+     *         than or equal to the corresponding ordinate value in the maximum point.
      */
-    private void checkCoherence() throws IllegalArgumentException {
-        final int dimension = ordinates.length/2;
+    private static void checkCoordinates(final double[] ordinates) throws IllegalArgumentException {
+        final int dimension = ordinates.length / 2;
         for (int i=0; i<dimension; i++) {
             if (!(ordinates[i] <= ordinates[dimension+i])) { // Use '!' in order to catch 'NaN'.
                 throw new IllegalArgumentException(Errors.format(
@@ -451,7 +452,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     }
 
     /**
-     * Set the envelope's range along the specified dimension.
+     * Sets the envelope's range along the specified dimension.
      *
      * @param dimension The dimension to set.
      * @param minimum   The minimum value along the specified dimension.
@@ -459,21 +460,48 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      */
     public void setRange(final int dimension, double minimum, double maximum) {
         if (minimum > maximum) {
-            // Make an empty envelope (min==max)
-            // while keeping it legal (min<=max).
-            minimum = maximum = 0.5*(minimum+maximum);
+            // Make an empty envelope (min == max)
+            // while keeping it legal (min <= max).
+            minimum = maximum = 0.5 * (minimum + maximum);
         }
         if (dimension >= 0) {
             // An exception will be thrown before any change if 'dimension' is out of range.
-            ordinates[dimension+ordinates.length/2] = maximum;
-            ordinates[dimension                   ] = minimum;
+            ordinates[dimension + ordinates.length/2] = maximum;
+            ordinates[dimension                     ] = minimum;
         } else {
             throw new ArrayIndexOutOfBoundsException(dimension);
         }
     }
 
     /**
-     * Set this envelope to the same coordinate values than the specified envelope.
+     * Sets the envelope to the specified values, which must be the lower corner coordinates
+     * followed by upper corner coordinates. The number of arguments provided shall be twice
+     * this {@linkplain #getDimension envelope dimension}, and minimum shall not be greater
+     * than maximum.
+     * <p>
+     * <b>Example:</b>
+     * (<var>x</var><sub>min</sub>, <var>y</var><sub>min</sub>, <var>z</var><sub>min</sub>,
+     *  <var>x</var><sub>max</sub>, <var>y</var><sub>max</sub>, <var>z</var><sub>max</sub>)
+     *
+     * @since 2.5
+     */
+    public void setEnvelope(final double... ordinates) {
+        if ((ordinates.length & 1) != 0) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ODD_ARRAY_LENGTH_$1, ordinates.length));
+        }
+        final int dimension  = ordinates.length >>> 1;
+        final int check = this.ordinates.length >>> 1;
+        if (dimension != check) {
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$3, "ordinates", dimension, check));
+        }
+        checkCoordinates(ordinates);
+        System.arraycopy(ordinates, 0, this.ordinates, 0, ordinates.length);
+    }
+
+    /**
+     * Sets this envelope to the same coordinate values than the specified envelope.
      *
      * @param  envelope The new envelope to copy coordinates from.
      * @throws MismatchedDimensionException if the specified envelope doesn't have the expected

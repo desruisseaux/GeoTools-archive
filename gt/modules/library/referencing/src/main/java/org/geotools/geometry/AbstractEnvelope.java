@@ -16,13 +16,11 @@
  */
 package org.geotools.geometry;
 
-// OpenGIS dependencies
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -96,10 +94,14 @@ public abstract class AbstractEnvelope implements Envelope {
     }
 
     /**
-     * Returns a string representation of this envelope. The default implementation is okay
-     * for occasional formatting (for example for debugging purpose). But if there is a lot
-     * of envelopes to format, users will get more control by using their own instance of
-     * {@link org.geotools.measure.CoordinateFormat}.
+     * Returns a string representation of this envelope. The default implementation returns a
+     * string containing {@linkplain #getLowerCorner lower corner} coordinates first, followed
+     * by {@linkplain #getUpperCorner upper corner} coordinates. Other informations like the
+     * CRS or class name may or may not be presents at implementor choice.
+     * <p>
+     * This string is okay for occasional formatting (for example for debugging purpose). But
+     * if there is a lot of envelopes to format, users will get more control by using their own
+     * instance of {@link org.geotools.measure.CoordinateFormat}.
      */
     @Override
     public String toString() {
@@ -107,18 +109,27 @@ public abstract class AbstractEnvelope implements Envelope {
     }
 
     /**
-     * Formats the specified envelope.
+     * Formats the specified envelope. The returned string will contain the
+     * {@linkplain #getLowerCorner lower corner} coordinates first, followed by
+     * {@linkplain #getUpperCorner upper corner} coordinates.
      */
     static String toString(final Envelope envelope) {
-        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(envelope)).append('[');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(envelope));
         final int dimension = envelope.getDimension();
-        for (int i=0; i<dimension; i++) {
-            if (i != 0) {
-                buffer.append(", ");
+        if (dimension != 0) {
+            String separator = "[(";
+            for (int i=0; i<dimension; i++) {
+                buffer.append(separator).append(envelope.getMinimum(i));
+                separator = ", ";
             }
-            buffer.append(envelope.getMinimum(i)).append(" : ").append(envelope.getMaximum(i));
+            separator = "), (";
+            for (int i=0; i<dimension; i++) {
+                buffer.append(separator).append(envelope.getMaximum(i));
+                separator = ", ";
+            }
+            buffer.append(")]");
         }
-        return buffer.append(']').toString();
+        return buffer.toString();
     }
 
     /**

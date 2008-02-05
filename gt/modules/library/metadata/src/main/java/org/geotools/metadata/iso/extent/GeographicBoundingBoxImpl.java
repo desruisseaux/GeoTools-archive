@@ -167,6 +167,11 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
 
     /**
      * Creates a geographic bounding box initialized to the specified values.
+     * <p>
+     * <strong>Caution:</strong> Arguments are expected in the same order than they appear in the
+     * ISO 19115 specification. This is different than the order commonly found in Java world,
+     * which is rather (<var>x</var><sub>min</sub>, <var>y</var><sub>min</sub>,
+     * <var>x</var><sub>max</sub>, <var>y</var><sub>max</sub>).
      */
     public GeographicBoundingBoxImpl(final double westBoundLongitude,
                                      final double eastBoundLongitude,
@@ -264,6 +269,11 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
 
     /**
      * Sets the bounding box to the specified values.
+     * <p>
+     * <strong>Caution:</strong> Arguments are expected in the same order than they appear in the
+     * ISO 19115 specification. This is different than the order commonly found in Java world,
+     * which is rather (<var>x</var><sub>min</sub>, <var>y</var><sub>min</sub>,
+     * <var>x</var><sub>max</sub>, <var>y</var><sub>max</sub>).
      *
      * @since 2.5
      */

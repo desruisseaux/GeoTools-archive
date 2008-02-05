@@ -68,6 +68,11 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     private static final long serialVersionUID = 1535101265352133948L;
 
     /**
+     * Tolerance value for floating point comparaison.
+     */
+    private static final double EPS = 1E-8;
+
+    /**
      * The base of the logarithm.
      */
     public final double base;
@@ -93,10 +98,10 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * Constructs a new logarithmic transform which is the
      * inverse of the supplied exponentional transform.
      */
-    LogarithmicTransform1D(final ExponentialTransform1D inverse) {
+    private LogarithmicTransform1D(final ExponentialTransform1D inverse) {
         this.base    = inverse.base;
         this.lnBase  = inverse.lnBase;
-        this.offset  = -Math.log(inverse.scale)/lnBase;
+        this.offset  = -Math.log(inverse.scale) / lnBase;
         this.inverse = inverse;
     }
 
@@ -105,7 +110,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
      * Instances should be created using the {@linkplain #create factory method}, which
      * may returns optimized implementations for some particular argument values.
      *
-     * @param base    The base of the logarithm.
+     * @param base    The base of the logarithm (typically 10).
      * @param offset  The offset to add to the logarithm.
      */
     protected LogarithmicTransform1D(final double base, final double offset) {
@@ -115,14 +120,28 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     }
 
     /**
+     * Constructs a new logarithmic transform which is the
+     * inverse of the supplied exponentional transform.
+     */
+    static LogarithmicTransform1D create(final ExponentialTransform1D inverse) {
+        if (Math.abs(inverse.base - 10) < EPS) {
+            return new Base10(inverse);
+        }
+        return new LogarithmicTransform1D(inverse);
+    }
+
+    /**
      * Constructs a new logarithmic transform.
      *
-     * @param base    The base of the logarithm.
+     * @param base    The base of the logarithm (typically 10).
      * @param offset  The offset to add to the logarithm.
      */
     public static MathTransform1D create(final double base, final double offset) {
-        if (base==Double.POSITIVE_INFINITY || base==0) {
+        if (base == Double.POSITIVE_INFINITY || Math.abs(base) <= EPS) {
             return LinearTransform1D.create(0, offset);
+        }
+        if (Math.abs(base - 10) < EPS) {
+            return new Base10(offset);
         }
         return new LogarithmicTransform1D(base, offset);
     }
@@ -222,6 +241,66 @@ public class LogarithmicTransform1D extends AbstractMathTransform
             dstOff += numPts;
             while (--numPts >= 0) {
                 dstPts[--dstOff] = Math.log(srcPts[srcOff++])/lnBase + offset;
+            }
+        }
+    }
+
+    /**
+     * Special case for base 10 taking advantage of extra precision provided by {@link Math#log10}.
+     */
+    private static final class Base10 extends LogarithmicTransform1D {
+        /** For cross-version compatibility. */
+        private static final long serialVersionUID = -5435804027536647558L;
+
+        /** Constructs the inverse of the supplied exponentional transform. */
+        Base10(final ExponentialTransform1D inverse) {
+            super(inverse);
+        }
+
+        /** Creates a new instance with the given offset. */
+        protected Base10(final double offset) {
+            super(10, offset);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public double transform(final double value) {
+            return Math.log10(value) + offset;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void transform(final float[] srcPts, int srcOff,
+                              final float[] dstPts, int dstOff, int numPts)
+        {
+            if (srcPts!=dstPts || srcOff>=dstOff) {
+                while (--numPts >= 0) {
+                    dstPts[dstOff++] = (float) (Math.log10(srcPts[srcOff++]) + offset);
+                }
+            } else {
+                srcOff += numPts;
+                dstOff += numPts;
+                while (--numPts >= 0) {
+                    dstPts[--dstOff] = (float) (Math.log10(srcPts[srcOff++]) + offset);
+                }
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void transform(final double[] srcPts, int srcOff,
+                              final double[] dstPts, int dstOff, int numPts)
+        {
+            if (srcPts!=dstPts || srcOff>=dstOff) {
+                while (--numPts >= 0) {
+                    dstPts[dstOff++] = Math.log10(srcPts[srcOff++]) + offset;
+                }
+            } else {
+                srcOff += numPts;
+                dstOff += numPts;
+                while (--numPts >= 0) {
+                    dstPts[--dstOff] = Math.log10(srcPts[srcOff++]) + offset;
+                }
             }
         }
     }
@@ -346,7 +425,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform1D createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
             return create(doubleValue(BASE,   values),

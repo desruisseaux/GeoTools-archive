@@ -86,13 +86,11 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
         }
         Collection<CRSAuthorityFactory> factories =
                 ReferencingFactoryFinder.getCRSAuthorityFactories(hints);
-        if (!longitudeFirst &&
-            Boolean.TRUE.equals(hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE)))
-        {
+        if (Boolean.TRUE.equals(hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE))) {
             /*
-             * If the user didn't asked for longitude first but the global hints contain such
-             * requirement, then we may loose some authorities like "URN:OGC:...". Search again
-             * without such requirement and add any new authorities found.
+             * If hints contain a requirement for "longitude first", then we may loose some
+             * authorities like "URN:OGC:...". Search again without such requirement and add
+             * any new authorities found.
              */
             factories = new ArrayList<CRSAuthorityFactory>(factories);
             final Set<Citation> authorities = new LinkedHashSet<Citation>();

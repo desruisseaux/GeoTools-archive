@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.awt.RenderingHints;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
@@ -361,8 +362,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * in this map, and returns {@code false} if some are found (thus blocking the call to
      * {@link #dispose} by the {@link ThreadedEpsgFactory} timer).
      */
-    private final Map<Class,Reference<AuthorityCodes>> authorityCodes =
-            new HashMap<Class,Reference<AuthorityCodes>>();
+    private final Map<Class<?>, Reference<AuthorityCodes>> authorityCodes =
+            new HashMap<Class<?>, Reference<AuthorityCodes>>();
 
     /**
      * Cache for axis names. This service is not provided by {@link BufferedAuthorityFactory}
@@ -393,13 +394,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * Pool of naming systems, used for caching.
      * There is usually few of them (about 15).
      */
-    private final Map scopes = new HashMap();
+    private final Map<String,LocalName> scopes = new HashMap<String,LocalName>();
 
     /**
      * The properties to be given the objects to construct.
      * Reused every time {@link #createProperties} is invoked.
      */
-    private final Map properties = new HashMap();
+    private final Map<String,Object> properties = new HashMap<String,Object>();
 
     /**
      * A safety guard for preventing never-ending loops in recursive calls to
@@ -407,7 +408,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * which need to create a target datum. The target datum could have its own
      * Bursa-Wolf parameters, with one of them pointing again to the source datum.
      */
-    private final Set safetyGuard = new HashSet();
+    private final Set<String> safetyGuard = new HashSet<String>();
 
     /**
      * The buffered authority factory, or {@code this} if none. This field is set
@@ -478,6 +479,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @throws FactoryException if the database's metadata can't be fetched.
      */
+    @Override
     public synchronized String getBackingStoreDescription() throws FactoryException {
         final Citation   authority = getAuthority();
         final TableWriter    table = new TableWriter(null, " ");
@@ -520,8 +522,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * values specified in {@linkplain DirectAuthorityFactory#getImplementationHints subclass},
      * with the addition of {@link Hints#VERSION VERSION}.
      */
-    // @Override
-    public Map getImplementationHints() {
+    @Override
+    public Map<RenderingHints.Key,?> getImplementationHints() {
         if (authority == null) {
             // For the computation of Hints.VERSION.
             getAuthority();
@@ -551,7 +553,9 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class<? extends IdentifiedObject> type)
+            throws FactoryException
+    {
         return getAuthorityCodes0(type);
     }
 
@@ -559,17 +563,17 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * Implementation of {@link #getAuthorityCodes} as a private method, for protecting
      * {@link #getDescriptionText} from user overriding of {@link #getAuthorityCodes}.
      */
-    private synchronized Set/*<String>*/ getAuthorityCodes0(final Class type) throws FactoryException {
+    private synchronized Set<String> getAuthorityCodes0(final Class<?> type) throws FactoryException {
         /*
          * If the set were already requested previously for the given type, returns it.
          * Otherwise, a new one will be created (but will not use the database connection yet).
          */
-        Reference      reference = (Reference) authorityCodes.get(type);
-        AuthorityCodes candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+        Reference<AuthorityCodes> reference = authorityCodes.get(type);
+        AuthorityCodes candidate = (reference!=null) ? reference.get() : null;
         if (candidate != null) {
             return candidate;
         }
-        Set result = Collections.EMPTY_SET;
+        Set<String> result = Collections.emptySet();
         for (int i=0; i<TABLES_INFO.length; i++) {
             final TableInfo table = TABLES_INFO[i];
             /*
@@ -595,8 +599,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  */
                 final AuthorityCodes codes;
                 codes = new AuthorityCodes(connection, TABLES_INFO[i], type, this);
-                reference = (Reference) authorityCodes.get(codes.type);
-                candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+                reference = authorityCodes.get(codes.type);
+                candidate = (reference!=null) ? reference.get() : null;
                 final boolean cache;
                 if (candidate == null) {
                     candidate = codes;
@@ -607,7 +611,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     cache = !(reference instanceof SoftReference);
                 }
                 if (cache) {
-                    reference = new SoftReference(candidate);
+                    reference = new SoftReference<AuthorityCodes>(candidate);
                     authorityCodes.put(codes.type, reference);
                 }
                 /*
@@ -619,7 +623,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     result = candidate;
                 } else {
                     if (result instanceof AuthorityCodes) {
-                        result = new LinkedHashSet(result);
+                        result = new LinkedHashSet<String>(result);
                     }
                     result.addAll(candidate);
                 }
@@ -642,7 +646,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         for (int i=0; i<TABLES_INFO.length; i++) {
             final Set codes = getAuthorityCodes0(TABLES_INFO[i].type);
             if (codes instanceof AuthorityCodes) {
-                final String text = (String) ((AuthorityCodes) codes).asMap().get(primaryKey);
+                final String text = ((AuthorityCodes) codes).asMap().get(primaryKey);
                 if (text != null) {
                     return new SimpleInternationalString(text);
                 }
@@ -676,7 +680,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             throws SQLException
     {
         assert Thread.holdsLock(this);
-        PreparedStatement stmt = (PreparedStatement) statements.get(key);
+        PreparedStatement stmt = statements.get(key);
         if (stmt == null) {
             stmt = connection.prepareStatement(adaptSQL(sql));
             statements.put(key, stmt);
@@ -815,7 +819,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
              * created for the current table. Otherwise, we will create a new statement.
              */
             final String KEY = "NumericalIdentifier";
-            PreparedStatement statement = (PreparedStatement) statements.get(KEY);
+            PreparedStatement statement = statements.get(KEY);
             if (statement != null) {
                 if (!table.equals(lastTableForName)) {
                     statements.remove(KEY);
@@ -834,7 +838,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             identifier = null;
             final ResultSet result = statement.executeQuery();
             while (result.next()) {
-                identifier = (String) ensureSingleton(result.getString(1), identifier, code);
+                identifier = ensureSingleton(result.getString(1), identifier, code);
             }
             result.close();
             if (identifier == null) {
@@ -860,7 +864,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @todo Use generic type when we will be allowed to compile for J2SE 1.5.
      */
-    private static Object ensureSingleton(final Object newValue, final Object oldValue, final String code)
+    private static <T> T ensureSingleton(final T newValue, final T oldValue, final String code)
             throws FactoryException
     {
         if (oldValue == null) {
@@ -881,7 +885,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param  remarks Remarks, or {@code null} if none.
      * @return The name together with a set of properties.
      */
-    private Map createProperties(final String name, final String code, String remarks)
+    private Map<String,Object> createProperties(final String name, final String code, String remarks)
             throws SQLException, FactoryException
     {
         properties.clear();
@@ -902,7 +906,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         /*
          * Search for alias.
          */
-        List alias = null;
+        List<GenericName> alias = null;
         final PreparedStatement stmt;
         stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME, ALIAS"
                                        + " FROM [Alias] INNER JOIN [Naming System]"
@@ -918,7 +922,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             if (scope == null) {
                 generic = new LocalName(local);
             } else {
-                LocalName cached = (LocalName) scopes.get(scope);
+                LocalName cached = scopes.get(scope);
                 if (cached == null) {
                     cached = new LocalName(scope);
                     scopes.put(scope, cached);
@@ -926,14 +930,14 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 generic = new ScopedName(cached, local);
             }
             if (alias == null) {
-                alias = new ArrayList();
+                alias = new ArrayList<GenericName>();
             }
             alias.add(generic);
         }
         result.close();
         if (alias != null) {
             properties.put(IdentifiedObject.ALIAS_KEY,
-                           (GenericName[]) alias.toArray(new GenericName[alias.size()]));
+                           alias.toArray(new GenericName[alias.size()]));
         }
         return properties;
     }
@@ -949,11 +953,11 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @param  remarks Remarks, or {@code null} if none.
      * @return The name together with a set of properties.
      */
-    private Map createProperties(final String name, final String code,
-                                 String area, String scope, String remarks)
+    private Map<String,Object> createProperties(final String name, final String code,
+            String area, String scope, String remarks)
             throws SQLException, FactoryException
     {
-        final Map properties = createProperties(name, code, remarks);
+        final Map<String,Object> properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = buffered.createExtent(area);
             properties.put(Datum.DOMAIN_OF_VALIDITY_KEY, extent);
@@ -976,10 +980,11 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized IdentifiedObject createObject(final String code) throws FactoryException {
         ensureNonNull("code", code);
         final String       KEY = "IdentifiedObject";
-        PreparedStatement stmt = (PreparedStatement) statements.get(KEY); // Null allowed.
+        PreparedStatement stmt = statements.get(KEY); // Null allowed.
         StringBuilder    query = null; // Will be created only if the last statement doesn't suit.
         /*
          * Iterates through all tables listed in TABLES_INFO, starting with the table used during
@@ -1089,9 +1094,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
-    public synchronized Unit createUnit(final String code)
-            throws FactoryException
-    {
+    @Override
+    public synchronized Unit createUnit(final String code) throws FactoryException {
         ensureNonNull("code", code);
         Unit returnValue = null;
         try {
@@ -1124,7 +1128,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     // TODO: provide a localized message.
                     throw new FactoryException("Unsupported unit: " + code);
                 }
-                returnValue = (Unit) ensureSingleton(unit, returnValue, code);
+                returnValue = ensureSingleton(unit, returnValue, code);
             }
             result.close();
         }
@@ -1146,9 +1150,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
-    public synchronized Ellipsoid createEllipsoid(final String code)
-            throws FactoryException
-    {
+    @Override
+    public synchronized Ellipsoid createEllipsoid(final String code) throws FactoryException {
         ensureNonNull("code", code);
         Ellipsoid returnValue = null;
         try {
@@ -1180,7 +1183,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final String unitCode          = getString(result, 6, code);
                 final String remarks           = result.getString( 7);
                 final Unit   unit              = buffered.createUnit(unitCode);
-                final Map    properties        = createProperties(name, epsg, remarks);
+                final Map<String,Object> properties = createProperties(name, epsg, remarks);
                 final Ellipsoid ellipsoid;
                 if (inverseFlattening == 0) {
                     if (semiMinorAxis == 0) {
@@ -1206,7 +1209,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  * Now that we have built an ellipsoid, compare
                  * it with the previous one (if any).
                  */
-                returnValue = (Ellipsoid) ensureSingleton(ellipsoid, returnValue, code);
+                returnValue = ensureSingleton(ellipsoid, returnValue, code);
             }
             result.close();
         } catch (SQLException exception) {
@@ -1227,6 +1230,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized PrimeMeridian createPrimeMeridian(final String code)
             throws FactoryException
     {
@@ -1252,10 +1256,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final String unit_code = getString(result, 4, code);
                 final String remarks   = result.getString( 5);
                 final Unit unit        = buffered.createUnit(unit_code);
-                final Map properties   = createProperties(name, epsg, remarks);
+                final Map<String,Object> properties = createProperties(name, epsg, remarks);
                 PrimeMeridian primeMeridian = factories.getDatumFactory().createPrimeMeridian(
                                               properties, longitude, unit);
-                returnValue = (PrimeMeridian) ensureSingleton(primeMeridian, returnValue, code);
+                returnValue = ensureSingleton(primeMeridian, returnValue, code);
             }
             result.close();
         } catch (SQLException exception) {
@@ -1276,9 +1280,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
-    public synchronized Extent createExtent(final String code)
-            throws FactoryException
-    {
+    @Override
+    public synchronized Extent createExtent(final String code) throws FactoryException {
         ensureNonNull("code", code);
         Extent returnValue = null;
         try {
@@ -1377,13 +1380,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                  +             " CO.COORD_OP_CODE DESC"); // GEOT-846 fix
         stmt.setString(1, code);
         ResultSet result = stmt.executeQuery();
-        List bwInfos = null;
+        List<Object> bwInfos = null;
         while (result.next()) {
             final String operation = getString(result, 1, code);
             final int    method    = getInt   (result, 2, code);
             final String datum     = getString(result, 3, code);
             if (bwInfos == null) {
-                bwInfos = new ArrayList();
+                bwInfos = new ArrayList<Object>();
             }
             bwInfos.add(new BursaWolfInfo(operation, method, datum));
         }
@@ -1400,10 +1403,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
          */
         int size = bwInfos.size();
         if (size > 1) {
-            final BursaWolfInfo[] codes = (BursaWolfInfo[]) bwInfos.toArray(new BursaWolfInfo[size]);
+            final BursaWolfInfo[] codes = bwInfos.toArray(new BursaWolfInfo[size]);
             sort(codes);
             bwInfos.clear();
-            final Set added = new HashSet();
+            final Set<String> added = new HashSet<String>();
             for (int i=0; i<codes.length; i++) {
                 final BursaWolfInfo candidate = codes[i];
                 if (added.add(candidate.target)) {
@@ -1453,7 +1456,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             }
             bwInfos.set(i, parameters);
         }
-        return (BursaWolfParameters[]) bwInfos.toArray(new BursaWolfParameters[size]);
+        return bwInfos.toArray(new BursaWolfParameters[size]);
     }
 
     /**
@@ -1469,6 +1472,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *       {@link VerticalDatumType#GEOIDAL}. We don't know yet how
      *       to maps the exact vertical datum type from the EPSG database.
      */
+    @Override
     public synchronized Datum createDatum(final String code) throws FactoryException {
         ensureNonNull("code", code);
         Datum returnValue = null;
@@ -1499,7 +1503,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final String area    = result.getString( 6);
                 final String scope   = result.getString( 7);
                 final String remarks = result.getString( 8);
-                Map properties = createProperties(name, epsg, area, scope, remarks);
+                Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                 if (anchor != null) {
                     properties.put(Datum.ANCHOR_POINT_KEY, anchor);
                 }
@@ -1526,7 +1530,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  *     case, we lost our paranoiac check for duplication.
                  */
                 if (type.equals("geodetic")) {
-                    properties = new HashMap(properties); // Protect from changes
+                    properties = new HashMap<String,Object>(properties); // Protect from changes
                     final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result,  9, code));
                     final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 10, code));
                     final BursaWolfParameters[] param = createBursaWolfParameters(primaryKey, result);
@@ -1544,7 +1548,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     result.close();
                     throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                 }
-                returnValue = (Datum) ensureSingleton(datum, returnValue, code);
+                returnValue = ensureSingleton(datum, returnValue, code);
                 if (result == null) {
                     // Bypass the 'result.close()' line below:
                     // the ResultSet has already been closed.
@@ -1568,7 +1572,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     private AxisName getAxisName(final String code) throws FactoryException {
         assert Thread.holdsLock(this);
-        AxisName returnValue = (AxisName) axisNames.get(code);
+        AxisName returnValue = axisNames.get(code);
         if (returnValue == null) try {
             final PreparedStatement stmt;
             stmt = prepareStatement("AxisName", "SELECT COORD_AXIS_NAME, DESCRIPTION, REMARKS"
@@ -1586,7 +1590,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     description += System.getProperty("line.separator", "\n") + remarks;
                 }
                 final AxisName axis = new AxisName(name, description);
-                returnValue = (AxisName) ensureSingleton(axis, returnValue, code);
+                returnValue = ensureSingleton(axis, returnValue, code);
             }
             result.close();
             if (returnValue == null) {
@@ -1606,6 +1610,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
+    @Override
     public synchronized CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
@@ -1621,7 +1626,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                     +             " UOM_CODE"
                                     +       " FROM [Coordinate Axis]"
                                     +      " WHERE COORD_AXIS_CODE = ?");
-            stmt.setString(1, code);
+            stmt.setString(1, primaryKey);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg         = getString(result, 1, code);
@@ -1644,11 +1649,11 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     }
                 }
                 final AxisName an = getAxisName(nameCode);
-                final Map properties = createProperties(an.name, epsg, an.description);
+                final Map<String,Object> properties = createProperties(an.name, epsg, an.description);
                 final CSFactory factory = factories.getCSFactory();
                 final CoordinateSystemAxis axis = factory.createCoordinateSystemAxis(
                         properties, abbreviation, direction, buffered.createUnit(unit));
-                returnValue = (CoordinateSystemAxis) ensureSingleton(axis, returnValue, code);
+                returnValue = ensureSingleton(axis, returnValue, code);
             }
             result.close();
         } catch (SQLException exception) {
@@ -1713,6 +1718,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized CoordinateSystem createCoordinateSystem(final String code)
             throws FactoryException
     {
@@ -1738,7 +1744,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final int  dimension = getInt   (result, 4, code);
                 final String remarks = result.getString( 5);
                 final CoordinateSystemAxis[] axis = createAxesForCoordinateSystem(primaryKey, dimension);
-                final Map properties = createProperties(name, epsg, remarks); // Must be after axis
+                final Map<String,Object> properties = createProperties(name, epsg, remarks); // Must be after axis
                 final CSFactory factory = factories.getCSFactory();
                 CoordinateSystem cs = null;
                 if (type.equals("ellipsoidal")) {
@@ -1785,7 +1791,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     throw new FactoryException(Errors.format(
                                                ErrorKeys.UNEXPECTED_DIMENSION_FOR_CS_$1, type));
                 }
-                returnValue = (CoordinateSystem) ensureSingleton(cs, returnValue, code);
+                returnValue = ensureSingleton(cs, returnValue, code);
             }
             result.close();
         } catch (SQLException exception) {
@@ -1817,6 +1823,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
@@ -1874,9 +1881,9 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                         result.close(); // Must be close before createGeographicCRS
                         result = null;
                         final GeographicCRS baseCRS = buffered.createGeographicCRS(geoCode);
-                        datum = (GeodeticDatum) baseCRS.getDatum(); // TODO: remove cast with J2SE 1.5.
+                        datum = baseCRS.getDatum(); // TODO: remove cast with J2SE 1.5.
                     }
-                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                     crs = factory.createGeographicCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
@@ -1895,7 +1902,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     final GeographicCRS  baseCRS = buffered.createGeographicCRS(geoCode);
                     final CoordinateOperation op = buffered.createCoordinateOperation(opCode);
                     if (op instanceof Conversion) {
-                        final Map properties = createProperties(name, epsg, area, scope, remarks);
+                        final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                         crs = factories.createProjectedCRS(properties, baseCRS, (Conversion)op, cs);
                     } else {
                          throw noSuchAuthorityCode(Projection.class, opCode);
@@ -1909,7 +1916,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     final String        dmCode = getString(result, 8, code);
                     final VerticalCS    cs     = buffered.createVerticalCS   (csCode);
                     final VerticalDatum datum  = buffered.createVerticalDatum(dmCode);
-                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                     crs = factory.createVerticalCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
@@ -1933,7 +1940,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                         safetyGuard.remove(epsg);
                     }
                     // Note: Don't invoke 'createProperties' sooner.
-                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                     crs  = factory.createCompoundCRS(properties,
                            new CoordinateReferenceSystem[] {crs1, crs2});
                 }
@@ -1945,7 +1952,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     final String           dmCode = getString(result, 8, code);
                     final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
                     final GeodeticDatum    datum  = buffered.createGeodeticDatum   (dmCode);
-                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                     if (cs instanceof CartesianCS) {
                         crs = factory.createGeocentricCRS(properties, datum, (CartesianCS) cs);
                     } else if (cs instanceof SphericalCS) {
@@ -1965,7 +1972,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     final String           dmCode = getString(result, 8, code);
                     final CoordinateSystem cs     = buffered.createCoordinateSystem(csCode);
                     final EngineeringDatum datum  = buffered.createEngineeringDatum(dmCode);
-                    final Map properties = createProperties(name, epsg, area, scope, remarks);
+                    final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                     crs = factory.createEngineeringCRS(properties, datum, cs);
                 }
                 /* ----------------------------------------------------------------------
@@ -1975,7 +1982,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     result.close();
                     throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                 }
-                returnValue = (CoordinateReferenceSystem) ensureSingleton(crs, returnValue, code);
+                returnValue = ensureSingleton(crs, returnValue, code);
                 if (result == null) {
                     // Bypass the 'result.close()' line below:
                     // the ResultSet has already been closed.
@@ -2000,6 +2007,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized ParameterDescriptor createParameterDescriptor(final String code)
             throws FactoryException
     {
@@ -2022,7 +2030,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final String name    = getString(result, 2, code);
                 final String remarks = result.getString( 3);
                 final Unit   unit;
-                final Class  type;
+                final Class<?> type;
                 /*
                  * Search for units. We will choose the most commonly used one in parameter values.
                  * If the parameter appears to have at least one non-null value in the "Parameter
@@ -2052,10 +2060,10 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  * Now creates the parameter descriptor.
                  */
                 final ParameterDescriptor descriptor;
-                final Map properties = createProperties(name, epsg, remarks);
+                final Map<String,Object> properties = createProperties(name, epsg, remarks);
                 descriptor = new DefaultParameterDescriptor(properties, type,
                                     null, null, null, null, unit, true);
-                returnValue = (ParameterDescriptor) ensureSingleton(descriptor, returnValue, code);
+                returnValue = ensureSingleton(descriptor, returnValue, code);
             }
         } catch (SQLException exception) {
             throw databaseFailure(OperationMethod.class, code, exception);
@@ -2084,13 +2092,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                    + " ORDER BY SORT_ORDER");
         stmt.setString(1, method);
         final ResultSet results = stmt.executeQuery();
-        final List  descriptors = new ArrayList();
+        final List<ParameterDescriptor> descriptors = new ArrayList<ParameterDescriptor>();
         while (results.next()) {
             final String param = getString(results, 1, method);
             descriptors.add(buffered.createParameterDescriptor(param));
         }
         results.close();
-        return (ParameterDescriptor[]) descriptors.toArray(new ParameterDescriptor[descriptors.size()]);
+        return descriptors.toArray(new ParameterDescriptor[descriptors.size()]);
     }
 
     /**
@@ -2192,6 +2200,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized OperationMethod createOperationMethod(final String code)
             throws FactoryException
     {
@@ -2219,13 +2228,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 final int sourceDimensions = encoded >>> 16;
                 final int targetDimensions = encoded & 0xFFFF;
                 final ParameterDescriptor[] descriptors = createParameterDescriptors(epsg);
-                final Map properties = createProperties(name, epsg, remarks);
+                final Map<String,Object> properties = createProperties(name, epsg, remarks);
                 if (formula != null) {
                     properties.put(OperationMethod.FORMULA_KEY, formula);
                 }
                 method = new DefaultOperationMethod(properties, sourceDimensions, targetDimensions,
                          new DefaultParameterDescriptorGroup(properties, descriptors));
-                returnValue = (OperationMethod) ensureSingleton(method, returnValue, code);
+                returnValue = ensureSingleton(method, returnValue, code);
             }
         } catch (SQLException exception) {
             throw databaseFailure(OperationMethod.class, code, exception);
@@ -2253,14 +2262,14 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                 +   " AND TARGET_CRS_CODE IS NOT NULL");
         stmt.setString(1, code);
         final ResultSet result = stmt.executeQuery();
-        final Map   dimensions = new HashMap();
+        final Map<Dimensions,Dimensions> dimensions = new HashMap<Dimensions,Dimensions>();
         final Dimensions  temp = new Dimensions((2 << 16) | 2); // Default to (2,2) dimensions.
         Dimensions max = temp;
         while (result.next()) {
             final short sourceDimensions = getDimensionForCRS(result.getString(1));
             final short targetDimensions = getDimensionForCRS(result.getString(2));
             temp.encoded = (sourceDimensions << 16) | (targetDimensions);
-            Dimensions candidate = (Dimensions) dimensions.get(temp);
+            Dimensions candidate = dimensions.get(temp);
             if (candidate == null) {
                 candidate = new Dimensions(temp.encoded);
                 dimensions.put(candidate, candidate);
@@ -2277,12 +2286,16 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
     private static final class Dimensions {
         /** The dimensions as an encoded value. */ int encoded;
         /** The occurences of this dimensions.  */ int occurences;
-        Dimensions(final int e) {encoded = e;}
-        public int hashCode() {return encoded;}
-        public boolean equals(final Object object) { // MUST ignore 'occurences'.
+        Dimensions(final int e) {
+            encoded = e;
+        }
+        @Override public int hashCode() {
+            return encoded;
+        }
+        @Override public boolean equals(final Object object) { // MUST ignore 'occurences'.
             return (object instanceof Dimensions) && ((Dimensions) object).encoded == encoded;
         }
-        public String toString() {
+        @Override public String toString() {
             return "[(" + (encoded >>> 16) + ',' + (encoded & 0xFFFF) + ")\u00D7" + occurences + ']';
         }
     }
@@ -2297,19 +2310,19 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         final Short cached = axisCounts.get(code);
         final short dimension;
         if (cached == null) {
-        	stmt = prepareStatement("Dimension",
-            		"  SELECT COUNT(COORD_AXIS_CODE)"
-                    +  " FROM [Coordinate Axis]"
-                    + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE "
-                    +                           " FROM [Coordinate Reference System]"
-                    +                          " WHERE COORD_REF_SYS_CODE = ?)");
-	        stmt.setString(1, code);
-	        final ResultSet result = stmt.executeQuery();
-	        dimension = result.next() ? result.getShort(1) : 2;
-	        axisCounts.put(code, dimension);
-	        result.close();
+            stmt = prepareStatement("Dimension",
+                "  SELECT COUNT(COORD_AXIS_CODE)"
+                + " FROM [Coordinate Axis]"
+                + " WHERE COORD_SYS_CODE = (SELECT COORD_SYS_CODE "
+                + " FROM [Coordinate Reference System]"
+                + " WHERE COORD_REF_SYS_CODE = ?)");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            dimension = result.next() ? result.getShort(1) : 2;
+            axisCounts.put(code, dimension);
+            result.close();
         } else {
-        	dimension = cached.shortValue();
+            dimension = cached.shortValue();
         }
         return dimension;
     }
@@ -2321,12 +2334,12 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     final boolean isProjection(final String code) throws SQLException {
         final PreparedStatement stmt;
-        Boolean projection = (Boolean) codeProjection.get(code);
+        Boolean projection = codeProjection.get(code);
         if (projection == null) {
 	        stmt = prepareStatement("isProjection", "SELECT COORD_REF_SYS_CODE"
-	                                              +  " FROM [Coordinate Reference System]"
-	                                              + " WHERE PROJECTION_CONV_CODE = ?"
-	                                              +   " AND COORD_REF_SYS_KIND LIKE 'projected%'");
+                                      +  " FROM [Coordinate Reference System]"
+                                      + " WHERE PROJECTION_CONV_CODE = ?"
+                                      +   " AND COORD_REF_SYS_KIND LIKE 'projected%'");
 	        stmt.setString(1, code);
 	        final ResultSet result = stmt.executeQuery();
 	        final boolean found = result.next();
@@ -2348,6 +2361,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @throws FactoryException if some other kind of failure occured in the backing
      *         store. This exception usually have {@link SQLException} as its cause.
      */
+    @Override
     public synchronized CoordinateOperation createCoordinateOperation(final String code)
             throws FactoryException
     {
@@ -2473,7 +2487,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                  *       methods like createCoordinateReferenceSystem and createOperationMethod
                  *       overwrite the properties map.
                  */
-                final Map properties = createProperties(name, epsg, area, scope, remarks);
+                final Map<String,Object> properties = createProperties(name, epsg, area, scope, remarks);
                 if (version!=null && (version=version.trim()).length()!=0) {
                     properties.put(CoordinateOperation.OPERATION_VERSION_KEY, version);
                 }
@@ -2525,7 +2539,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                                                    + " ORDER BY OP_PATH_STEP");
                     cstmt.setString(1, epsg);
                     final ResultSet cr = cstmt.executeQuery();
-                    final List codes = new ArrayList();
+                    final List<String> codes = new ArrayList<String>();
                     while (cr.next()) {
                         codes.add(cr.getString(1));
                     }
@@ -2535,7 +2549,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                         throw recursiveCall(ConcatenatedOperation.class, epsg);
                     } try {
                         for (int i=0; i<operations.length; i++) {
-                            operations[i] = buffered.createCoordinateOperation((String) codes.get(i));
+                            operations[i] = buffered.createCoordinateOperation(codes.get(i));
                         }
                     } finally {
                         safetyGuard.remove(epsg);
@@ -2579,7 +2593,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                      * At this stage, the parameters are ready for use. Creates the math transform
                      * and wraps it in the final operation (a Conversion or a Transformation).
                      */
-                    final Class expected;
+                    final Class<? extends Operation> expected;
                     if (isTransformation) {
                         expected = Transformation.class;
                     } else if (isConversion) {
@@ -2594,7 +2608,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     operation = DefaultOperation.create(properties, sourceCRS, targetCRS,
                                                         mt, method, expected);
                 }
-                returnValue = (CoordinateOperation) ensureSingleton(operation, returnValue, code);
+                returnValue = ensureSingleton(operation, returnValue, code);
                 if (result == null) {
                     // Bypass the 'result.close()' line below:
                     // the ResultSet has already been closed.
@@ -2626,6 +2640,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *       I don't know yet how to instruct Access to put null values last using standard SQL
      *       ("IIF" is not standard, and Access doesn't seem to understand "CASE ... THEN" clauses).
      */
+    @Override
     public synchronized Set createFromCoordinateReferenceSystemCodes(final String sourceCode,
                                                                      final String targetCode)
             throws FactoryException
@@ -2702,7 +2717,6 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *              string objects, then the {@link Object#toString} method must returns the code
      *              for each element.
      */
-    // TODO: Use generic type for "Object[] codes" with J2SE 1.5.
     private void sort(final Object[] codes) throws SQLException, FactoryException {
         if (codes.length <= 1) {
             return; // Nothing to sort.
@@ -2811,7 +2825,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             }
             String sql = "SELECT " + select + " FROM " + from + " WHERE " + where + "='" + code + '\'';
             sql = adaptSQL(sql);
-            final Set/*<String>*/ result = new LinkedHashSet();
+            final Set<String> result = new LinkedHashSet<String>();
             try {
                 final Statement s = connection.createStatement();
                 final ResultSet r = s.executeQuery(sql);
@@ -2898,11 +2912,13 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     final synchronized boolean canDispose() {
         boolean can = true;
-        Map pool/*<SoftReference,WeakReference>*/ = null;
-        for (final Iterator it=authorityCodes.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry  entry     = (Map.Entry)      it.next();
-            final Reference  reference = (Reference)      entry.getValue();
-            final AuthorityCodes codes = (AuthorityCodes) reference.get();
+        Map<SoftReference,WeakReference<AuthorityCodes>> pool = null;
+        for (final Iterator<Map.Entry<Class<?>, Reference<AuthorityCodes>>> it=
+                authorityCodes.entrySet().iterator(); it.hasNext();)
+        {
+            final Map.Entry<Class<?>, Reference<AuthorityCodes>> entry = it.next();
+            final Reference<AuthorityCodes> reference = entry.getValue();
+            final AuthorityCodes codes = reference.get();
             if (codes == null) {
                 it.remove();
                 continue;
@@ -2919,12 +2935,12 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                 // statement as key). So we need to manage a pool of references for avoiding
                 // duplication.
                 if (pool == null) {
-                    pool = new IdentityHashMap();
+                    pool = new IdentityHashMap<SoftReference,WeakReference<AuthorityCodes>>();
                 }
-                WeakReference weak = (WeakReference) pool.get(reference);
+                WeakReference<AuthorityCodes> weak = pool.get(reference);
                 if (weak == null) {
-                    weak = new WeakReference(codes);
-                    pool.put(reference, weak);
+                    weak = new WeakReference<AuthorityCodes>(codes);
+                    pool.put((SoftReference) reference, weak);
                 }
                 entry.setValue(weak);
             }
@@ -2937,13 +2953,16 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @throws FactoryException if an error occured while closing the connection.
      */
+    @Override
     public synchronized void dispose() throws FactoryException {
         final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
         final boolean isClosed;
         try {
             isClosed = connection.isClosed();
-            for (final Iterator it=authorityCodes.values().iterator(); it.hasNext();) {
-                final AuthorityCodes set = (AuthorityCodes) ((Reference) it.next()).get();
+            for (final Iterator<Reference<AuthorityCodes>> it=
+                    authorityCodes.values().iterator(); it.hasNext();)
+            {
+                final AuthorityCodes set = it.next().get();
                 if (set != null) {
                     set.finalize();
                 }
@@ -3007,6 +3026,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @throws Throwable if an error occured while closing the connection.
      */
+    @Override
     protected final void finalize() throws Throwable {
         dispose();
         super.finalize();

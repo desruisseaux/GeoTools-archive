@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.Projection;
 
 import org.geotools.util.logging.Logging;
@@ -51,16 +52,11 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class AuthorityCodes extends AbstractSet implements Serializable {
+final class AuthorityCodes extends AbstractSet<String> implements Serializable {
     /**
      * For compatibility with different versions.
      */
     private static final long serialVersionUID = 7105664579449680562L;
-
-    /**
-     * The logger name.
-     */
-    private static final String LOGGER = "org.geotools.referencing.factory.epsg";
 
     /**
      * The factory which is the owner of this set. One purpose of this field (even if it were not
@@ -74,7 +70,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * The type for this code set. This is translated to the most appropriate
      * interface type even if the user supplied an implementation type.
      */
-    public final Class type;
+    public final Class<?> type;
 
     /**
      * {@code true} if {@link #type} is assignable to {@link Projection}.
@@ -85,7 +81,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * A view of this set as a map with object's name as values, or {@code null} if none.
      * Will be created only when first needed.
      */
-    private transient java.util.Map asMap;
+    private transient java.util.Map<String,String> asMap;
 
     /**
      * The SQL command to use for creating the {@code queryAll} statement.
@@ -132,10 +128,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * @param  type       The type to query.
      * @param  factory    The factory originator.
      */
-    public AuthorityCodes(final Connection        connection,
-                          final TableInfo         table,
-                          final Class             type,
-                          final DirectEpsgFactory factory)
+    public AuthorityCodes(final Connection connection, final TableInfo table,
+                          final Class<?> type, final DirectEpsgFactory factory)
     {
         this.factory    = factory;
         this.connection = connection;
@@ -146,10 +140,10 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         }
         buffer.append(" FROM ").append(table.table);
         boolean hasWhere = false;
-        Class tableType = table.type;
+        Class<?> tableType = table.type;
         if (table.typeColumn != null) {
             for (int i=0; i<table.subTypes.length; i++) {
-                final Class candidate = table.subTypes[i];
+                final Class<?> candidate = table.subTypes[i];
                 if (candidate.isAssignableFrom(type)) {
                     buffer.append(" WHERE (").append(table.typeColumn)
                           .append(" LIKE '").append(table.typeNames[i]).append("%'");
@@ -241,6 +235,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * Returns {@code true} if this collection contains no elements.
      * This method fetch at most one row instead of counting all rows.
      */
+    @Override
     public synchronized boolean isEmpty() {
         if (size != -1) {
             return size == 0;
@@ -288,6 +283,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * Returns {@code true} if this collection contains the specified element.
      */
+    @Override
     public synchronized boolean contains(final Object code) {
         boolean exists = false;
         if (code != null) try {
@@ -309,7 +305,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * Returns an iterator over the codes. The iterator is backed by a living {@link ResultSet},
      * which will be closed as soon as the iterator reach the last element.
      */
-    public synchronized java.util.Iterator iterator() {
+    @Override
+    public synchronized java.util.Iterator<String> iterator() {
         try {
             final Iterator iterator = new Iterator(getAll());
             /*
@@ -321,7 +318,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
             return iterator;
         } catch (SQLException exception) {
             unexpectedException("iterator", exception);
-            return Collections.EMPTY_SET.iterator();
+            final Set<String> empty = Collections.emptySet();
+            return empty.iterator();
         }
     }
 
@@ -331,7 +329,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * database.
      */
     protected Object writeReplace() throws ObjectStreamException {
-        return new LinkedHashSet(this);
+        return new LinkedHashSet<String>(this);
     }
 
     /**
@@ -339,6 +337,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * by {@link DirectEpsgFactory#dispose}, which is okay in this particular case since
      * the implementation of this method can be executed an arbitrary amount of times.
      */
+    @Override
     protected synchronized void finalize() throws SQLException {
         if (querySingle != null) {
             querySingle.close();
@@ -362,11 +361,11 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * Invoked when an exception occured. This method just log a warning.
      */
-    static void unexpectedException(final Class        classe,
+    static void unexpectedException(final Class<?>     classe,
                                     final String       method,
                                     final SQLException exception)
     {
-        Logging.unexpectedException(LOGGER, classe, method, exception);
+        Logging.unexpectedException(classe, method, exception);
     }
 
     /**
@@ -378,7 +377,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         record.setSourceClassName(AuthorityCodes.class.getName());
         record.setSourceMethodName(method);
         record.setThrown(exception);
-        Logging.getLogger(LOGGER).log(record);
+        Logging.getLogger(AuthorityCodes.class).log(record);
     }
 
     /**
@@ -386,7 +385,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * {@link AuthorityCodes} in order to prevent a call to {@link AuthorityCodes#finalize}
      * before the iteration is finished.
      */
-    private final class Iterator implements java.util.Iterator {
+    private final class Iterator implements java.util.Iterator<String> {
         /** The result set, or {@code null} if there is no more elements. */
         private ResultSet results;
 
@@ -417,7 +416,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         }
 
         /** Returns the next element. */
-        public Object next() {
+        public String next() {
             if (results == null) {
                 throw new NoSuchElementException();
             }
@@ -437,6 +436,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         }
 
         /** Closes the underlying result set. */
+        @Override
         protected void finalize() throws SQLException {
             next = null;
             if (results != null) {
@@ -464,7 +464,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * Returns a view of this set as a map with object's name as value, or {@code null} if none.
      */
-    final java.util.Map asMap() {
+    final java.util.Map<String,String> asMap() {
         if (asMap == null) {
             asMap = new Map();
         }
@@ -475,10 +475,11 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * A view of {@link AuthorityCodes} as a map, with authority codes as key and
      * object names as values.
      */
-    private final class Map extends AbstractMap {
+    private final class Map extends AbstractMap<String,String> {
         /**
          * Returns the number of key-value mappings in this map.
          */
+        @Override
         public int size() {
             return AuthorityCodes.this.size();
         }
@@ -486,6 +487,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         /**
          * Returns {@code true} if this map contains no key-value mappings.
          */
+        @Override
         public boolean isEmpty() {
             return AuthorityCodes.this.isEmpty();
         }
@@ -493,7 +495,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         /**
          * Returns the description to which this map maps the specified EPSG code.
          */
-        public Object get(final Object code) {
+        @Override
+        public String get(final Object code) {
             String value = null;
             if (code != null) try {
                 synchronized (AuthorityCodes.this) {
@@ -515,6 +518,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         /**
          * Returns {@code true} if this map contains a mapping for the specified EPSG code.
          */
+        @Override
         public boolean containsKey(final Object key) {
             return contains(key);
         }
@@ -522,7 +526,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         /**
          * Returns a set view of the keys contained in this map.
          */
-        public Set keySet() {
+        @Override
+        public Set<String> keySet() {
             return AuthorityCodes.this;
         }
 
@@ -531,7 +536,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
          *
          * @todo Not yet implemented.
          */
-        public Set entrySet() {
+        public Set<java.util.Map.Entry<String,String>> entrySet() {
             throw new UnsupportedOperationException();
         }
     }

@@ -1030,7 +1030,7 @@ public class Hints extends RenderingHints {
     /**
      * Returns a new map of hints with the same content than this map.
      *
-     * @since 2.4
+     * @since 2.5
      */
     @Override
     public Hints clone() {

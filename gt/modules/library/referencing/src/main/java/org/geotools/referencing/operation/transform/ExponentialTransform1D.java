@@ -172,7 +172,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
     @Override
     public MathTransform1D inverse() {
         if (inverse == null) {
-            inverse = new LogarithmicTransform1D(this);
+            inverse = LogarithmicTransform1D.create(this);
         }
         return inverse;
     }
@@ -380,7 +380,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform1D createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
             return create(doubleValue(BASE,  values),

@@ -124,13 +124,9 @@ public final class URN_AuthorityFactoryTest extends TestCase {
             } catch (FactoryNotFoundException e) {
                 // This is the expected exception.
             }
-            try {
-                CRS.decode("URN:OGC:DEF:CRS:CRS:84", true);
-                fail("URN factory should not accept FORCE_LONGITUDE_FIRST_AXIS_ORDER = TRUE");
-            } catch (NoSuchAuthorityCodeException e) {
-                // This is the expected exception.
-            }
-            CoordinateReferenceSystem crs = CRS.decode("URN:OGC:DEF:CRS:CRS:84");
+            CoordinateReferenceSystem crs = CRS.decode("URN:OGC:DEF:CRS:CRS:84", true);
+            assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+            crs = CRS.decode("URN:OGC:DEF:CRS:CRS:84");
             assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
         } finally {
             Hints.removeSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);
