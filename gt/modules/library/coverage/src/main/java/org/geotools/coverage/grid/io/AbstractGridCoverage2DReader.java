@@ -21,10 +21,12 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,27 +38,25 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.PlanarImage;
-import javax.units.Unit;
-import javax.units.UnitFormat;
 
-import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DefaultResourceInfo;
+import org.geotools.data.DefaultServiceInfo;
+import org.geotools.data.ResourceInfo;
+import org.geotools.data.ServiceInfo;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.coverage.CoverageUtilities;
-import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.GridCoverage;
@@ -810,6 +810,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	public int getGridCoverageCount() {
 		throw new UnsupportedOperationException("Unsupported opertion.");
 	}
+	
+	
 
 	/**
 	 * Checks the transformation is a pure scale/translate instance (using a
@@ -827,4 +829,48 @@ public abstract class AbstractGridCoverage2DReader implements
 		return !Double.isNaN(scale)&&scale < EPS ;
 //		return at.getShearX() < EPS && at.getShearY() < EPS;
 	}
+
+   /**
+    * Information about this source.
+    * <p>
+    * Subclasses should provide additional format specific information.
+    * 
+    * @return ServiceInfo describing getSource().
+    */
+   ServiceInfo getInfo(){
+       DefaultServiceInfo info = new DefaultServiceInfo();
+       info.setDescription( source.toString() );
+       if( source instanceof URL ){
+           URL url = (URL) source;
+           info.setTitle( url.getFile() );
+           try {
+               info.setSource( url.toURI() );
+           } catch (URISyntaxException e) {               
+           }
+       }
+       else if( source instanceof File ){
+           File file = (File) source;
+           String filename = file.getName();
+           if( filename == null || filename.length() == 0 ){
+               info.setTitle( file.getName() );
+           }
+           info.setSource( file.toURI() );
+       }
+       return info;
+   }
+   
+   /**
+    * Information about the named gridcoveage.
+    * 
+    * @param subname Name indicing grid coverage to describe
+    * @return ResourceInfo describing grid coverage indicated
+    */
+   ResourceInfo getInfo( String subname ){
+       DefaultResourceInfo info = new DefaultResourceInfo();
+       info.setName( subname );
+       info.setBounds( new ReferencedEnvelope( this.getOriginalEnvelope()));
+       info.setCRS( this.getCrs() );
+       info.setTitle( subname );
+       return info;
+   }
 }
