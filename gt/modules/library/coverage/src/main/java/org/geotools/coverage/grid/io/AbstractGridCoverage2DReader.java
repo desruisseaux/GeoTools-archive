@@ -837,7 +837,7 @@ public abstract class AbstractGridCoverage2DReader implements
     * 
     * @return ServiceInfo describing getSource().
     */
-   ServiceInfo getInfo(){
+   public ServiceInfo getInfo(){
        DefaultServiceInfo info = new DefaultServiceInfo();
        info.setDescription( source.toString() );
        if( source instanceof URL ){
@@ -865,7 +865,7 @@ public abstract class AbstractGridCoverage2DReader implements
     * @param subname Name indicing grid coverage to describe
     * @return ResourceInfo describing grid coverage indicated
     */
-   ResourceInfo getInfo( String subname ){
+   public ResourceInfo getInfo( String subname ){
        DefaultResourceInfo info = new DefaultResourceInfo();
        info.setName( subname );
        info.setBounds( new ReferencedEnvelope( this.getOriginalEnvelope()));
