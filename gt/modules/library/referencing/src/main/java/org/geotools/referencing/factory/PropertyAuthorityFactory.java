@@ -87,15 +87,16 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * loaded by the constructor. However if such modification are made, then we
      * should update {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} accordingly.
      * It may be an issue since hints are supposed to be immutable after factory
-     * construction. For now, this class to not allow addition of elements.
+     * construction. For now, this class do not allow addition of elements.
      */
     private final Properties definitions = new Properties();
 
     /**
-     * An unmodifiable view of {@linkplain #definitions} as a map.
+     * An unmodifiable view of the authority keys. This view is always up to date
+     * even if entries are added or removed in the {@linkplain #definitions} map.
      */
     @SuppressWarnings("unchecked")
-    private final Map<String,String> definitionsMap = Collections.unmodifiableMap((Map) definitions);
+    private final Set<String> codes = Collections.unmodifiableSet((Set) definitions.keySet());
 
     /**
      * Views of {@link #codes} for different types. Views will be constructed only when first
@@ -175,8 +176,8 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
          * to find this factory (GEOT-1175).
          */
         final Symbols s = Symbols.DEFAULT;
-        for (final String wkt : definitionsMap.values()) {
-            if (s.containsAxis(wkt)) {
+        for (final Object wkt : this.definitions.values()) {
+            if (s.containsAxis((String) wkt)) {
                 return;
             }
         }
@@ -220,7 +221,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             throws FactoryException
     {
         if (type==null || type.isAssignableFrom(IdentifiedObject.class)) {
-            return definitionsMap.keySet();
+            return codes;
         }
         if (filteredCodes == null) {
             filteredCodes = new HashMap<Class<? extends IdentifiedObject>, Set<String>>();
@@ -228,7 +229,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         synchronized (filteredCodes) {
             Set<String> filtered = filteredCodes.get(type);
             if (filtered == null) {
-                filtered = new Codes(definitionsMap, type);
+                @SuppressWarnings("unchecked")
+                final Map<String,String> map = (Map) definitions;
+                filtered = new Codes(map, type);
                 filteredCodes.put(type, filtered);
             }
             return filtered;
@@ -276,7 +279,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             final String wkt = definitions.get(key);
             final int length = wkt.length();
             int i=0; while (i<length && Character.isJavaIdentifierPart(wkt.charAt(i))) i++;
-            Class candidate = Parser.getClassOf(wkt.substring(0,i));
+            Class<?> candidate = Parser.getClassOf(wkt.substring(0,i));
             if (candidate == null) {
                 candidate = IdentifiedObject.class;
             }

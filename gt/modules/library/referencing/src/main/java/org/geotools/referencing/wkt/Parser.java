@@ -1012,12 +1012,12 @@ public class Parser extends MathTransformParser {
      * @param  element The WKT element name.
      * @return The GeoAPI class of the specified element, or {@code null} if unknow.
      */
-    public static Class getClassOf(String element) {
+    public static Class<?> getClassOf(String element) {
         if (element == null) {
             return null;
         }
         element = element.trim().toUpperCase(Locale.US);
-        final Class type = (Class) getTypeMap().get(element);
+        final Class<?> type = getTypeMap().get(element);
         assert type == null || type.equals(MathTransform.class)
                 || element.equals(getNameOf(type)) : type;
         return type;
