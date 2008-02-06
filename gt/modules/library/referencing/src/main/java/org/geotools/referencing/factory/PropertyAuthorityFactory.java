@@ -154,6 +154,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         super(factories, MINIMUM_PRIORITY + 10);
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
+
+        // TODO: Following line should not be commented-out.
+        // See http://jira.codehaus.org/browse/GEOT-1699
+//      hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
         ensureNonNull("authorities", authorities);
@@ -179,8 +183,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             if (s.containsAxis((String) wkt)) {
                 LOGGER.warning("Axis elements found in a wkt definition, the force longitude " +
                         "first axis order hint might not be respected:\n" + wkt);
+                return;
             }
         }
+        hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
     }
 
     /**
