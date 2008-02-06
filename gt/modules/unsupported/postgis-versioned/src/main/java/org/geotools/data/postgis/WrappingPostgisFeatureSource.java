@@ -7,6 +7,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -29,6 +30,10 @@ public class WrappingPostgisFeatureSource implements FeatureSource {
             VersionedPostgisDataStore store) {
         this.wrapped = wrapped;
         this.store = store;
+    }
+    
+    public ResourceInfo getInfo() {
+        return wrapped.getInfo();
     }
 
     public DataStore getDataStore() {

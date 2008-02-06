@@ -18,6 +18,8 @@ package org.geotools.data.dir;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +29,7 @@ import java.util.Set;
 
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -34,8 +37,10 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -108,6 +113,18 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         }
     }
 
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from Directory "+dir );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
+        info.setSource( dir.toURI() );
+        try {
+            info.setPublisher( new URI(System.getenv("user.name")) );
+        } catch (URISyntaxException e) {
+        }
+        return info;
+    }
+    
     /**
      * @see org.geotools.data.DataStore#getTypeNames()
      */

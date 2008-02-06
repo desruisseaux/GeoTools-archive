@@ -16,20 +16,25 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -235,6 +240,13 @@ public abstract class ContentDataStore implements DataStore {
     // DataStore API
     //
 
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from "+getClass().getSimpleName() );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
+        return info;
+    }
+    
     /**
      * Returns the names of all entries or types provided by the datastore.
      * <p>

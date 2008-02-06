@@ -37,6 +37,7 @@ import javax.sql.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLocking;
@@ -46,6 +47,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.VersioningDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
@@ -61,6 +63,7 @@ import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -167,7 +170,13 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     protected JDBCDataStoreConfig getConfig() {
         return wrapped.getConfig();
     }
-
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from PostGIS, managed with a version history" );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
+        return info;
+    }
+    
     public String[] getTypeNames() throws IOException {
         List names = new ArrayList(Arrays.asList(wrapped.getTypeNames()));
         names.remove(TBL_TABLESCHANGED);

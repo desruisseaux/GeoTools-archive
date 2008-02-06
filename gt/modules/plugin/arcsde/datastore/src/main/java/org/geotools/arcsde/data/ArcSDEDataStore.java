@@ -37,6 +37,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -48,8 +49,10 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -162,6 +165,13 @@ public class ArcSDEDataStore implements DataStore {
         return layerNames.toArray(new String[layerNames.size()]);
     }
 
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from ArcSDE" );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );        
+        return info;
+    }
+    
     /**
      * TODO: implement dispose()!
      */

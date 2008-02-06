@@ -17,9 +17,13 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.Icon;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -29,13 +33,16 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
+import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -170,6 +177,65 @@ public abstract class ContentFeatureSource implements FeatureSource {
      */
     public final boolean isView() {
         return query != null && query != Query.ALL;
+    }
+    /**
+     * A default ResourceInfo with a generic description.
+     * <p>
+     * Subclasses should override to provide an explicit ResourceInfo
+     * object for their content.
+     * @return description of features contents
+     */
+    public ResourceInfo getInfo() {
+        return new ResourceInfo(){
+            final Set<String> words = new HashSet<String>();
+            {
+                words.add("features");
+                words.add( ContentFeatureSource.this.getSchema().getTypeName() );
+            }
+            public ReferencedEnvelope getBounds() {
+                try {
+                    return ContentFeatureSource.this.getBounds();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            public CoordinateReferenceSystem getCRS() {
+                return ContentFeatureSource.this.getSchema().getCRS();
+            }
+    
+            public String getDescription() {
+                return null;
+            }
+    
+            public Icon getIcon() {
+                return null;
+            }
+    
+            public Set<String> getKeywords() {
+                return words;
+            }
+    
+            public String getName() {
+                return ContentFeatureSource.this.getSchema().getTypeName();
+            }
+    
+            public URI getSchema() {
+                Name name = ContentFeatureSource.this.getSchema().getName();
+                URI namespace;
+                try {
+                    namespace = new URI( name.getNamespaceURI() );
+                    return namespace;                    
+                } catch (URISyntaxException e) {
+                    return null;
+                }                
+            }
+    
+            public String getTitle() {
+                Name name = ContentFeatureSource.this.getSchema().getName();
+                return name.getLocalPart();
+            }
+            
+        };
     }
     
     /**

@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.view.DefaultView;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -160,9 +161,16 @@ public abstract class AbstractDataStore implements DataStore {
         return Collections.EMPTY_MAP;
     }
        
-    /** Convience method for retriving all the names from the Catalog Entires */
+    /** helper method for retrieving all the names. */
     public abstract String[] getTypeNames() throws IOException;
 
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from "+getClass().getSimpleName() );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );        
+        return info;
+    }
+    
     /** Retrive schema information for typeName */
     public abstract SimpleFeatureType getSchema(String typeName)
         throws IOException;

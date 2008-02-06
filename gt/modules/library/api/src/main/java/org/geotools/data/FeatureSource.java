@@ -62,13 +62,20 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @version $Id$
  */
 public interface FeatureSource {
+    
+    /**
+     * Information describing the contents of this resoruce.
+     * <p>
+     * Please note that for FeatureContent:
+     * <ul>
+     * <li>name - unqiue with in the context of a Service
+     * <li>schema - used to identify the type of resource; usually gml schema; although it may be more specific
+     * <ul>
+     */
+    ResourceInfo getInfo();
+    
     /**
      * Access to the DataStore implementing this FeatureStore.
-     *
-     * <p>
-     * You may use this to access such as <code>namespace</code> provided by
-     * DataStore.
-     * </p>
      *
      * @return DataStore implementing this FeatureStore
      */
@@ -236,4 +243,6 @@ public interface FeatureSource {
      * @return a set of {@link RenderingHints#Key} objects (eventually empty, never null).
      */
     public Set /*<RenderingHints.Key>*/ getSupportedHints();
+    
+    // FeatureReader getFeatureReader( Query query ); // ask justin for proposal
 }

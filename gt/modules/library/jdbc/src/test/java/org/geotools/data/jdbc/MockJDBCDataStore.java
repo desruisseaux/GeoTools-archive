@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
@@ -46,7 +47,9 @@ public class MockJDBCDataStore extends JDBCDataStore {
 		typeHandler.setFIDMapper("FEATURE_TYPE2", new TypedFIDMapper(new BasicFIDMapper("ID", 255), "FEATURE_TYPE2"));
     }
 
-    
+   public ServiceInfo getInfo() {
+        return null;
+    }
 
     /* (non-Javadoc)
      * @see org.geotools.data.jdbc.JDBCDataStore#createGeometryReader(org.geotools.feature.AttributeType, org.geotools.data.jdbc.JDBCDataStore.QueryData, int)

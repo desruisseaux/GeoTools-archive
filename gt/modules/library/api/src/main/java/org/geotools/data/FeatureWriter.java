@@ -176,4 +176,7 @@ public interface FeatureWriter {
      * possibly if close has been called (up to the implementation).
      */
     void close() throws IOException;
+    
+    //FeatureWriter getFeatureWriter( Filter filter); // ask justin for proposal
+    //FeatureWriter getFeatureWriter( boolean append); // ask justin for proposal
 }

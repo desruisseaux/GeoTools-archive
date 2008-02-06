@@ -128,6 +128,18 @@ public interface DataStore {
     String[] getTypeNames() throws IOException;
 
     /**
+     * Information about this service.
+     * <p>
+     * This method offers access to a summary of header or metadata
+     * information describing the service.
+     * </p>
+     * Subclasses may return a specific ServiceInfo instance that has
+     * additional information (such as FilterCapabilities). 
+     * @return SeviceInfo
+     */
+    ServiceInfo getInfo();
+    
+    /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
      *
      * <p>
@@ -140,7 +152,6 @@ public interface DataStore {
      *
      * @throws IOException If typeName cannot be found
      */
-
     //FeatureType getSchema(String typeName) throws IOException;
     SimpleFeatureType getSchema(String typeName) throws IOException;
 

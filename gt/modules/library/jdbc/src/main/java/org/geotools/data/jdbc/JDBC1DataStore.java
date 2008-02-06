@@ -39,6 +39,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -50,6 +51,7 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.BasicAttributeIO;
@@ -60,6 +62,7 @@ import org.geotools.data.view.DefaultView;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.SQLEncoder;
@@ -305,6 +308,13 @@ public abstract class JDBC1DataStore implements DataStore {
 		return new InProcessLockingManager();
 	}
 
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from "+getClass().getSimpleName() );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );        
+        return info;
+    }
+    
 	/**
 	 * @see org.geotools.data.DataStore#getFeatureTypes()
 	 */

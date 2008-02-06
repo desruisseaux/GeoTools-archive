@@ -16,6 +16,8 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,15 +25,20 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
+
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -90,6 +97,58 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         this.hints = Collections.unmodifiableSet(new HashSet(hints));
     }
     
+    public ResourceInfo getInfo() {
+        return new ResourceInfo(){
+            final Set<String> words = new HashSet<String>();
+            {
+                words.add("features");
+                words.add( AbstractFeatureSource.this.getSchema().getTypeName() );
+            }
+            public ReferencedEnvelope getBounds() {
+                try {
+                    return AbstractFeatureSource.this.getBounds();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            public CoordinateReferenceSystem getCRS() {
+                return AbstractFeatureSource.this.getSchema().getCRS();
+            }
+
+            public String getDescription() {
+                return null;
+            }
+
+            public Icon getIcon() {
+                return null;
+            }
+
+            public Set<String> getKeywords() {
+                return words;
+            }
+
+            public String getName() {
+                return AbstractFeatureSource.this.getSchema().getTypeName();
+            }
+
+            public URI getSchema() {
+                Name name = AbstractFeatureSource.this.getSchema().getName();
+                URI namespace;
+                try {
+                    namespace = new URI( name.getNamespaceURI() );
+                    return namespace;                    
+                } catch (URISyntaxException e) {
+                    return null;
+                }                
+            }
+
+            public String getTitle() {
+                Name name = AbstractFeatureSource.this.getSchema().getName();
+                return name.getLocalPart();
+            }
+            
+        };
+    }
     /**
      * Retrieve the Transaction this FeatureSource is operating against.
      *

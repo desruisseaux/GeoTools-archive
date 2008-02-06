@@ -16,6 +16,8 @@
 package org.geotools.data.jdbc;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,19 +28,25 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
+
+import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -99,7 +107,59 @@ public class JDBCFeatureSource implements FeatureSource {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
     }
-
+    
+    public ResourceInfo getInfo() {
+        return new ResourceInfo(){
+            final Set<String> words = new HashSet<String>();
+            {
+                words.add("features");
+                words.add( JDBCFeatureSource.this.getSchema().getTypeName() );
+            }
+            public ReferencedEnvelope getBounds() {
+                try {
+                    return JDBCFeatureSource.this.getBounds();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            public CoordinateReferenceSystem getCRS() {
+                return JDBCFeatureSource.this.getSchema().getCRS();
+            }
+    
+            public String getDescription() {
+                return null;
+            }
+    
+            public Icon getIcon() {
+                return null;
+            }
+    
+            public Set<String> getKeywords() {
+                return words;
+            }
+    
+            public String getName() {
+                return JDBCFeatureSource.this.getSchema().getTypeName();
+            }
+    
+            public URI getSchema() {
+                Name name = JDBCFeatureSource.this.getSchema().getName();
+                URI namespace;
+                try {
+                    namespace = new URI( name.getNamespaceURI() );
+                    return namespace;                    
+                } catch (URISyntaxException e) {
+                    return null;
+                }                
+            }
+    
+            public String getTitle() {
+                Name name = JDBCFeatureSource.this.getSchema().getName();
+                return name.getLocalPart();
+            }
+            
+        };
+    }
     /**
      * Retrieve DataStore for this FetureSource.
      *

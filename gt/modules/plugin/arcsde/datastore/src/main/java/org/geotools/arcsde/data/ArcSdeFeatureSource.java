@@ -1,10 +1,15 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.Icon;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -13,12 +18,16 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.ResourceInfo;
+import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -33,6 +42,61 @@ public class ArcSdeFeatureSource implements FeatureSource {
         this.typeInfo = typeInfo;
         this.dataStore = dataStore;
     }
+    
+    public ResourceInfo getInfo() {
+        return new ResourceInfo(){
+            final Set<String> words = new HashSet<String>();
+            {
+                words.add("features");
+                words.add("view");
+                words.add( ArcSdeFeatureSource.this.getSchema().getTypeName() );
+            }
+            public ReferencedEnvelope getBounds() {
+                try {
+                    return ArcSdeFeatureSource.this.getBounds();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            public CoordinateReferenceSystem getCRS() {
+                return ArcSdeFeatureSource.this.getSchema().getCRS();
+            }
+
+            public String getDescription() {
+                return null;
+            }
+
+            public Icon getIcon() {
+                return null;
+            }
+
+            public Set<String> getKeywords() {
+                return words;
+            }
+
+            public String getName() {
+                return ArcSdeFeatureSource.this.getSchema().getTypeName();
+            }
+
+            public URI getSchema() {
+                Name name = ArcSdeFeatureSource.this.getSchema().getName();
+                URI namespace;
+                try {
+                    namespace = new URI( name.getNamespaceURI() );
+                    return namespace;                    
+                } catch (URISyntaxException e) {
+                    return null;
+                }                
+            }
+
+            public String getTitle() {
+                Name name = ArcSdeFeatureSource.this.getSchema().getName();
+                return name.getLocalPart();
+            }
+            
+        };
+    }
+    
 
     /**
      * @see FeatureSource#addFeatureListener(FeatureListener)

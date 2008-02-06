@@ -22,13 +22,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.ServiceInfo;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -54,6 +59,18 @@ public class PropertyDataStore extends AbstractDataStore {
         directory = dir;
         this.namespaceURI = namespaceURI;
     }
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from Directory "+directory );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );
+        info.setSource( directory.toURI() );
+        try {
+            info.setPublisher( new URI(System.getenv("user.name")) );
+        } catch (URISyntaxException e) {
+        }
+        return info;
+    }
+    
     public void setNamespaceURI(String namespaceURI) {
         this.namespaceURI = namespaceURI;
     }

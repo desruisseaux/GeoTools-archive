@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.EmptyFeatureWriter;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -30,9 +31,11 @@ import org.geotools.data.FilteringFeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
+import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -178,6 +181,14 @@ public class AbstractDataStore2 implements DataStore {
         }
         return null;
     }
+    
+    public ServiceInfo getInfo() {
+        DefaultServiceInfo info = new DefaultServiceInfo();
+        info.setDescription("Features from "+getClass().getSimpleName() );
+        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );        
+        return null;
+    }
+    
     /** Retrive schema information for typeName */
     public SimpleFeatureType getSchema(String typeName)
         throws IOException{
