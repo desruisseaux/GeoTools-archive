@@ -885,7 +885,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             String candidate = finder.findIdentifier(object);
-            if (candidate == null) {
+            if (candidate != null) {
                 return candidate;
             }
             ensureFallback();
