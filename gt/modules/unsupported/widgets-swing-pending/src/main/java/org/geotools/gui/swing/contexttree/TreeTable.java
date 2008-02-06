@@ -247,7 +247,7 @@ final class TreeTable extends JXTreeTable {
         }
     }
 
-    public TreeSelectionManager getSelectionManager() {
+    TreeSelectionManager getSelectionManager() {
         return selectionManager;
     }
 

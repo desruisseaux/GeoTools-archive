@@ -59,7 +59,6 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     private final JContextTree frame;
     private final ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
     private final ArrayList<SubNodeGroup> subgroups = new ArrayList<SubNodeGroup>();
-//    private final Map<SubNodeGroup,List<ContextTreeNode>> subnodes = new HashMap<SubNodeGroup,List<ContextTreeNode>>();
     private final Vector columnNames = new Vector(); 
     
     private final LightContextTreeModel lightModel;

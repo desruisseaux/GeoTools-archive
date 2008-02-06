@@ -14,23 +14,12 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree;
-
-import java.util.EventListener;
+package org.geotools.gui.swing.toolbox;
 
 /**
- * Selection listener for JContextTree
- * 
+ *
  * @author johann sorel
  */
-public interface TreeSelectionListener extends EventListener{
-        
-    /**
-     * When selection changed
-     * 
-     * @param event the event
-     */
-    public void selectionChanged(TreeSelectionEvent event) ;
-     
-        
+public interface ProcessTool {
+
 }

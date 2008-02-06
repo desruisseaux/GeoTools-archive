@@ -17,6 +17,8 @@
 package org.geotools.gui.swing.contexttree;
 
 import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 /**
  *
@@ -57,15 +59,14 @@ class TreeSelectionManager implements javax.swing.event.TreeSelectionListener{
         return listeners.getListeners(TreeSelectionListener.class);
     }
     
-    public void valueChanged(javax.swing.event.TreeSelectionEvent e) {
-        TreeSelectionEvent tse = new TreeSelectionEvent(tree, tree.getSelection());
-        fireEvent(tse);
+    public void valueChanged(TreeSelectionEvent e) {
+        fireEvent( (TreeSelectionEvent)e.cloneWithSource(tree) );
     }
     
     private void fireEvent(TreeSelectionEvent tse){
         TreeSelectionListener[] list = getTreeSelectionListeners();
         for (TreeSelectionListener tsl : list) {
-            tsl.selectionChanged(tse);
+            tsl.valueChanged(tse);
         }
     }
     
