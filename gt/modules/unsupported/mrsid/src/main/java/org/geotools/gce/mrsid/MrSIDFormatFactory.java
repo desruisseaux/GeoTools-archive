@@ -57,11 +57,12 @@ public final class MrSIDFormatFactory implements GridFormatFactorySpi {
 
 			Class
 					.forName("it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi");
-			available = MrSIDImageReaderSpi.isAvailable();
-			final MrSIDImageReaderSpi spi = new MrSIDImageReaderSpi();
-			available = available && spi.isDriverAvailable();
+			available = new MrSIDImageReaderSpi().isAvailable();
 			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine("MrSIDFormatFactory is availaible.");
+				if(available)
+					LOGGER.fine("MrSIDFormatFactory is availaible.");
+				else
+					LOGGER.fine("MrSIDFormatFactory is not availaible.");
 		} catch (ClassNotFoundException cnf) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("MrSIDFormatFactory is not availaible.");
