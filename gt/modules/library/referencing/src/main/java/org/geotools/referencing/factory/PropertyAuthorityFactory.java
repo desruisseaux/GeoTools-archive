@@ -15,19 +15,16 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -39,7 +36,6 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.util.InternationalString;
 import org.opengis.util.GenericName;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.NamedIdentifier;
@@ -96,17 +92,17 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     private final Properties definitions = new Properties();
 
     /**
-     * An unmodifiable view of the authority keys. This view is always up to date
-     * even if entries are added or removed in the {@linkplain #definitions} map.
+     * An unmodifiable view of {@linkplain #definitions} as a map.
      */
-    private final Set codes = Collections.unmodifiableSet(definitions.keySet());
+    @SuppressWarnings("unchecked")
+    private final Map<String,String> definitionsMap = Collections.unmodifiableMap((Map) definitions);
 
     /**
      * Views of {@link #codes} for different types. Views will be constructed only when first
      * needed. View are always up to date even if entries are added or removed in the
      * {@linkplain #definitions} map.
      */
-    private transient Map filteredCodes;
+    private transient Map<Class<? extends IdentifiedObject>, Set<String>> filteredCodes;
 
     /**
      * A WKT parser.
@@ -179,8 +175,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
          * to find this factory (GEOT-1175).
          */
         final Symbols s = Symbols.DEFAULT;
-        for (final Iterator it=this.definitions.values().iterator(); it.hasNext();) {
-            final String wkt = (String) it.next();
+        for (final String wkt : definitionsMap.values()) {
             if (s.containsAxis(wkt)) {
                 return;
             }
@@ -221,17 +216,19 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      *         returns an empty set.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class<? extends IdentifiedObject> type)
+            throws FactoryException
+    {
         if (type==null || type.isAssignableFrom(IdentifiedObject.class)) {
-            return codes;
+            return definitionsMap.keySet();
         }
         if (filteredCodes == null) {
-            filteredCodes = new HashMap();
+            filteredCodes = new HashMap<Class<? extends IdentifiedObject>, Set<String>>();
         }
         synchronized (filteredCodes) {
-            Set filtered = (Set) filteredCodes.get(type);
+            Set<String> filtered = filteredCodes.get(type);
             if (filtered == null) {
-                filtered = new Codes((Map) definitions, type);
+                filtered = new Codes(definitionsMap, type);
                 filteredCodes.put(type, filtered);
             }
             return filtered;
@@ -245,6 +242,11 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * if the user just want to check for the existence of a particular code.
      */
     private static final class Codes extends DerivedSet<String, String> {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 2681905294171687900L;
+
         /**
          * The spatial reference objects type.
          */
@@ -417,6 +419,11 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * code if it was not explicitly specified in the WKT.
      */
     private final class Parser extends org.geotools.referencing.wkt.Parser {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -5910561042299146066L;
+
         /**
          * The authority code for the WKT to be parsed.
          */

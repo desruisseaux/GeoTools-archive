@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,14 +15,9 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.net.URL;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 
@@ -82,6 +77,7 @@ public class EsriExtension extends FactoryUsingWKT {
      *
      * @return The URL, or {@code null} if none.
      */
+    @Override
     protected URL getDefinitionsURL() {
         return EsriExtension.class.getResource(FILENAME);
     }

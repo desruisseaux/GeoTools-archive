@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,19 +15,14 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.net.URL;
-
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
 import org.geotools.factory.Hints;
 
 
 /**
  * Provides common {@linkplain CoordinateReferenceSystem Coordinate Reference Systems}
- * not found in the standard EPSG database. Those CRS will be registered in 
+ * not found in the standard EPSG database. Those CRS will be registered in
  * {@code "EPSG"} name space.
  *
  * @since 2.4
@@ -68,6 +63,7 @@ public class UnnamedExtension extends FactoryUsingWKT {
      *
      * @return The URL, or {@code null} if none.
      */
+    @Override
     protected URL getDefinitionsURL() {
         return UnnamedExtension.class.getResource(FILENAME);
     }
