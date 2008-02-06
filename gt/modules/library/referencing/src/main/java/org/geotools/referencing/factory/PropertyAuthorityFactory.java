@@ -154,7 +154,6 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         super(factories, MINIMUM_PRIORITY + 10);
         // The following hints have no effect on this class behaviour,
         // but tell to the user what this factory do about axis order.
-        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
         ensureNonNull("authorities", authorities);
@@ -178,10 +177,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         final Symbols s = Symbols.DEFAULT;
         for (final Object wkt : this.definitions.values()) {
             if (s.containsAxis((String) wkt)) {
-                return;
+                LOGGER.warning("Axis elements found in a wkt definition, the force longitude " +
+                        "first axis order hint might not be respected:\n" + wkt);
             }
         }
-        hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
     }
 
     /**
