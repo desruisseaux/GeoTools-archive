@@ -87,8 +87,10 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
 
     /**
      * The maximal polynomial degree allowed.
+     *
+     * @since 2.4
      */
-    static final int MAX_DEGREE = 7;
+    public static final int MAX_DEGREE = 7;
 
     /**
      * The warp object. Transformations will be applied using the
@@ -239,11 +241,10 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          *       direct transform.
          */
         warp = WarpPolynomial.createWarp(dstCoords, dstOffset, srcCoords, srcOffset, numCoords,
-                                         1/preScaleX, 1/preScaleY, postScaleX, postScaleY, degree);
+                1/preScaleX, 1/preScaleY, postScaleX, postScaleY, degree);
         inverse = new WarpTransform2D(
                WarpPolynomial.createWarp(srcCoords, srcOffset, dstCoords, dstOffset, numCoords,
-                                         1/postScaleX, 1/postScaleY, preScaleX, preScaleY, degree),
-               this);
+                1/postScaleX, 1/postScaleY, preScaleX, preScaleY, degree), this);
     }
 
     /**

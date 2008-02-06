@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.transform;
+package org.geotools.referencing.operation.builder;
 
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
@@ -41,6 +41,7 @@ import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.matrix.Matrix2;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
