@@ -136,7 +136,7 @@ public class OGCBinaryLogicOpTypeBinding extends AbstractComplexBinding {
             for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
                 Filter filter = (Filter) f.next();
 
-                if (filter instanceof BinaryComparisonOperator) {
+                if (filter instanceof BinaryComparisonOperator && !(filter instanceof BinarySpatialOperator)) {
                     comparison.add(filter);
                 }
             }
