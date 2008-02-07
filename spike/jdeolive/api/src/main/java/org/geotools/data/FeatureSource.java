@@ -19,7 +19,10 @@ import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -61,7 +64,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureSource {
+public interface FeatureSource<T extends FeatureType, F extends Feature> {
     
     /**
      * Information describing the contents of this resoruce.
@@ -110,7 +113,7 @@ public interface FeatureSource {
      *
      * @see Query
      */
-    FeatureCollection getFeatures(Query query) throws IOException;
+    FeatureCollection<T,F> getFeatures(Query query) throws IOException;
 
     /**
      * Loads features from the datasource into the returned FeatureResults,
@@ -123,7 +126,7 @@ public interface FeatureSource {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection getFeatures(Filter filter) throws IOException;
+    FeatureCollection<T,F> getFeatures(Filter filter) throws IOException;
 
     /**
      * Loads all features from the datasource into the return FeatureResults.
@@ -137,7 +140,7 @@ public interface FeatureSource {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection getFeatures() throws IOException;
+    FeatureCollection<T,F> getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource
@@ -162,7 +165,8 @@ public interface FeatureSource {
      */
 
     //FeatureType getSchema();
-    SimpleFeatureType getSchema();
+    //SimpleFeatureType getSchema();
+    T getSchema();
 
     /**
      * Gets the bounding box of this datasource.

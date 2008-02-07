@@ -17,7 +17,10 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
 
@@ -42,7 +45,7 @@ import org.geotools.feature.FeatureCollection;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureStore extends FeatureSource {
+public interface FeatureStore<T extends FeatureType, F extends Feature> extends FeatureSource<T,F> {
     /**
      * Adds all features from the passed feature collection to the datasource.
      *
@@ -108,7 +111,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @throws IOException if there are any datasource errors.
      */
-    void setFeatures(FeatureReader reader) throws IOException;
+    void setFeatures(FeatureReader<T,F> reader) throws IOException;
 
     /**
      * Provides a transaction for commit/rollback control of this FeatureStore.

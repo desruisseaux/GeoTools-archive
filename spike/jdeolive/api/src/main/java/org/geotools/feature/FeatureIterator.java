@@ -15,6 +15,7 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 
 
@@ -27,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Ian Schneider
  * @source $URL$
  */
-public interface FeatureIterator {
+public interface FeatureIterator<F extends Feature> {
     /**
      * Does another Feature exist in this Iteration.
      * <p>
@@ -44,7 +45,7 @@ public interface FeatureIterator {
      *
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
-    public SimpleFeature next() throws java.util.NoSuchElementException;
+    public F next() throws java.util.NoSuchElementException;
 
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).

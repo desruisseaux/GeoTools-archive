@@ -17,8 +17,11 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * The low-level interface for reading Features. Will use the underlying
@@ -78,7 +81,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureReader {
+public interface FeatureReader<T extends FeatureType, F extends Feature> {
     /**
      * Return the FeatureType this reader has been configured to create.
      *
@@ -86,8 +89,9 @@ public interface FeatureReader {
      */
 
     //FeatureType getFeatureType();
-    SimpleFeatureType getFeatureType();
-
+    //SimpleFeatureType getFeatureType();
+    T getFeatureType();
+    
     /**
      * Reads the next Feature in the FeatureReader.
      *
@@ -101,8 +105,9 @@ public interface FeatureReader {
      */
 
     //Feature next() throws IOException, IllegalAttributeException, NoSuchElementException;
-    SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException;
-
+    //SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException;
+    F next() throws IOException, IllegalArgumentException, NoSuchElementException;
+    
     /**
      * Query whether this FeatureReader has another Feature.
      *

@@ -17,9 +17,10 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -97,7 +98,7 @@ import org.geotools.util.ProgressListener;
  * @version $Id$
  *
  */
-public interface FeatureCollection extends ResourceCollection, SimpleFeature {
+public interface FeatureCollection<T extends FeatureType,F extends Feature> extends ResourceCollection, SimpleFeature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -136,7 +137,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      *
      * @return A FeatureIterator.
      */
-    FeatureIterator features();
+    FeatureIterator<F> features();
 
     /**
      * Clean up any resources assocaited with this iterator in a manner similar to JDO collections.
@@ -268,7 +269,8 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      */
 
     //org.geotools.feature.FeatureType getSchema();
-    SimpleFeatureType getSchema();
+    //SimpleFeatureType getSchema();
+    T getSchema();
 
     /**
      * Will visit the contents of the feature collection.

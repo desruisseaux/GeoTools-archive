@@ -16,8 +16,11 @@
 package org.geotools.data;
 
 import java.io.IOException;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -59,7 +62,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureWriter {
+public interface FeatureWriter<T extends FeatureType, F extends Feature> {
     /**
      * FeatureType this reader has been configured to create.
      *
@@ -67,7 +70,8 @@ public interface FeatureWriter {
      */
 
     //FeatureType getFeatureType();
-    SimpleFeatureType getFeatureType();
+    //SimpleFeatureType getFeatureType();
+    T getFeatureType();
 
     /**
      * Reads a Feature from the underlying AttributeReader.
@@ -84,7 +88,8 @@ public interface FeatureWriter {
      */
 
     //Feature next() throws IOException;
-    SimpleFeature next() throws IOException;
+    //SimpleFeature next() throws IOException;
+    F next() throws IOException;
 
     /**
      * Removes current Feature, must be called before hasNext.

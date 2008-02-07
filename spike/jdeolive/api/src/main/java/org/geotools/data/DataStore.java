@@ -16,6 +16,8 @@
 package org.geotools.data;
 
 import java.io.IOException;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
@@ -68,7 +70,7 @@ import org.geotools.feature.SchemaException;
  * @source $URL$
  * @version $Id$
  */
-public interface DataStore {
+public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
     /**
      * Creates storage for a new <code>featureType</code>.
      *
@@ -182,8 +184,8 @@ public interface DataStore {
      * @throws IOException If FeatureSource is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
-    FeatureSource getView(Query query) throws IOException, SchemaException;
-
+    FeatureSource<SimpleFeatureType,SimpleFeature> getView(Query query) throws IOException, SchemaException;
+    
     /**
      * Access a FeatureSource for typeName providing a high-level API.
      *
@@ -207,7 +209,7 @@ public interface DataStore {
      *
      * @return FeatureSource (or subclass) providing operations for typeName
      */
-    FeatureSource getFeatureSource(String typeName) throws IOException;
+    FeatureSource<SimpleFeatureType,SimpleFeature> getFeatureSource(String typeName) throws IOException;
 
     /**
      * Access a FeatureReader providing access to Feature information.
@@ -319,7 +321,7 @@ public interface DataStore {
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureReader getFeatureReader(Query query, Transaction transaction)
+    FeatureReader<SimpleFeatureType,SimpleFeature> getFeatureReader(Query query, Transaction transaction)
         throws IOException;
 
     /**
@@ -376,7 +378,7 @@ public interface DataStore {
      *
      * @return FeatureWriter Allows Sequential Modification of featureType
      */
-    FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriter(String typeName, Filter filter, Transaction transaction)
         throws IOException;
 
     /**
@@ -398,7 +400,7 @@ public interface DataStore {
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
+    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriter(String typeName, Transaction transaction)
         throws IOException;
 
     /**
@@ -417,7 +419,7 @@ public interface DataStore {
      *
      * @throws IOException
      */
-    FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriterAppend(String typeName, Transaction transaction)
         throws IOException;
 
     /**
