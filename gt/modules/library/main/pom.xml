@@ -227,6 +227,11 @@
       <scope>provided</scope>   <!-- Needed for compilation, not for running -->
     </dependency>
     <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>edu.oswego</groupId>
       <artifactId>concurrent</artifactId>
       <!-- The version number is specified in the parent POM. -->
