@@ -231,7 +231,7 @@ public class GridDemo {
              * We also have to set the column size of controlling grid that is going to be generated
              * Within this grid there will be just approximative billiner interpalation used.
              */
-            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 1000, 1000, env,
+            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 2, 2, env,
                     coverage.getGridGeometry().getGridToCRS().inverse());
 
             SimilarTransformBuilder builder =  new SimilarTransformBuilder(vectors);

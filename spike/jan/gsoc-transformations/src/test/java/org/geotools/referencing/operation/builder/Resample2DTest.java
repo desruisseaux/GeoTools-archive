@@ -66,8 +66,8 @@ public class Resample2DTest extends TestCase {
         //coverage = coverageGenerator(100, 100);
     }
 
-    public void ttestEnvelope() throws TransformException, FactoryException {
-        GeneralMatrix M = new GeneralMatrix(3, 3);
+    public void testEnvelope() throws TransformException, FactoryException {
+       /* GeneralMatrix M = new GeneralMatrix(3, 3);
         double[] m0 = { 0.991, 0.01, 0.001 };
         double[] m1 = { -0.01, 0.991, 0.001 };
         double[] m2 = { 0, 0, 1 };
@@ -97,7 +97,7 @@ public class Resample2DTest extends TestCase {
          * Test whether CRS.transform return smae envelope as processor.doOperation
          */
 
-       //  assertEquals(targetEnv, (GeneralEnvelope)target.getEnvelope());
+       //  assertEquals(targetEnv, (GeneralEnvelope)target.getEnvelope());*/
     }
 
     public static Test suite() {

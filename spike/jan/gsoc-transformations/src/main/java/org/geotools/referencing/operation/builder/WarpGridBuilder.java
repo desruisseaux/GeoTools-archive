@@ -370,7 +370,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * @return
      * @throws IOException
      */
-    public File getDeltaFile(int dim, String path) throws IOException, FactoryException {
+    public File writeDeltaFile(int dim, String path) throws IOException, FactoryException {
         ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
         final float[] warpPositions = (float[]) WarpParams.parameter("warpPositions").getValue();
         File file = new File(path);
@@ -496,7 +496,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
     /**
      * 
-     * @return Grid height
+     * @return Number of y Grid Cells
      */
     public int getHeight() {
         return globalValues.getWarpGridParameters().parameter("yNumCells").intValue();
@@ -527,7 +527,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
     /**
      * 
-     * @return Grid width
+     * @return Number of grid cells width
      */
     public int getWidth() {
         return globalValues.getWarpGridParameters().parameter("xNumCells").intValue();
@@ -575,8 +575,29 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     }
 
     public void setEnvelope(Envelope envelope) {
+    	cleanTransformationVars();
         this.envelope = envelope;
     }
+    
+    /**
+     * Cleans all variable to force the recalculation of grid. 
+     */
+    protected void cleanTransformationVars(){
+    	this.warpPositions = null;
+		this.dxgrid = null;
+		this.dygrid= null;
+		this.localpositions = null;
+    }
+    
+    
+	public void setMappedPositions(List<MappedPosition> positions)
+			throws MismatchedSizeException, MismatchedDimensionException,
+			MismatchedReferenceSystemException {
+		// TODO Auto-generated method stub
+    	cleanTransformationVars();
+		
+		super.setMappedPositions(positions);
+	}
 
     /**
      * Takes care about parameters
@@ -685,4 +706,6 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             return trans;
         }
     }
+
+	
 }

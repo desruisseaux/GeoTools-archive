@@ -15,14 +15,13 @@
  */
 package org.geotools.referencing.operation.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
-import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.geometry.DirectPosition;
@@ -38,7 +37,11 @@ import org.opengis.referencing.operation.TransformException;
 
 
 public class RSGridBuilder extends WarpGridBuilder {
-    private final RubberSheetBuilder rsBuilder;
+  
+
+	private RubberSheetBuilder rsBuilder;
+	
+	private List<DirectPosition> quad;
 
     /**
      * Builds controlling Grid using RubberSheet Transformation
@@ -82,7 +85,11 @@ public class RSGridBuilder extends WarpGridBuilder {
         p3 = new DirectPosition2D(crs, p3.getOrdinate(0), p3.getOrdinate(1));
         
         
-        Quadrilateral quad = new Quadrilateral(p0, p1, p2, p3);  
+        quad = new ArrayList<DirectPosition>(); 
+        quad.add(p0);//new Quadrilateral(p0, p1, p2, p3); 
+        quad.add(p1);
+        quad.add(p2);
+        quad.add(p3);
         rsBuilder = new RubberSheetBuilder(super.getGridMappedPositions(), quad);
     }
 
@@ -128,4 +135,22 @@ public class RSGridBuilder extends WarpGridBuilder {
 
         return source;
     }   
+       
+
+	
+	public void setMappedPositions(List<MappedPosition> positions)
+			throws MismatchedSizeException, MismatchedDimensionException,
+			MismatchedReferenceSystemException {
+    	
+		super.setMappedPositions(positions);
+		try {
+			rsBuilder = new RubberSheetBuilder(super.getGridMappedPositions(), quad);
+		} catch (TriangulationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

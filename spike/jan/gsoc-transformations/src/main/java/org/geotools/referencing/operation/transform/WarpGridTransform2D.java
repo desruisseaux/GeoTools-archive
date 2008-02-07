@@ -46,6 +46,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Transformation;
@@ -59,7 +60,7 @@ import org.opengis.referencing.operation.Transformation;
  */
 public class WarpGridTransform2D extends WarpTransform2D {
     /** Inverse Math Transform */
-    private MathTransform inverse;
+    private MathTransform2D inverse;
 
     /** World to grid math transform */
     private MathTransform worldToGrid;
@@ -283,7 +284,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         return wgt;
     }
 
-    public MathTransform inverse() throws NoninvertibleTransformException {
+    public MathTransform2D inverse() throws NoninvertibleTransformException {
         // TODO Auto-generated method stub
      //   if (inverse == null) {
             inverse = calculateInverse(((WarpGrid) getWarp()).getXStart(),

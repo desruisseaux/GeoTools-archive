@@ -20,15 +20,18 @@ import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D;
-import org.geotools.referencing.operation.transform.WarpGridTransform2D.Provider;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D.ProviderFile;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -37,7 +40,8 @@ import org.opengis.referencing.operation.TransformException;
  *
  */
 public class WarpGridBuilderTest extends TestCase {
-    private double tolerance = 0.03; //cm
+    private double tolerance = 0.03; //cm   
+    DefaultEngineeringCRS l;
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
     private boolean show = false;
     private boolean write = false;
@@ -71,11 +75,11 @@ public class WarpGridBuilderTest extends TestCase {
     private List<MappedPosition> generateMappedPositions(Envelope env, int number,
         double deltas, CoordinateReferenceSystem crs) {
         List<MappedPosition> vectors = new ArrayList<MappedPosition>();
-        double minx = env.getLowerCorner().getCoordinates()[0]+10;
-        double miny = env.getLowerCorner().getCoordinates()[1]+10;
+        double minx = env.getLowerCorner().getCoordinates()[0];
+        double miny = env.getLowerCorner().getCoordinates()[1];
 
-        double maxx = env.getUpperCorner().getCoordinates()[0]-10;
-        double maxy = env.getUpperCorner().getCoordinates()[1]-10;
+        double maxx = env.getUpperCorner().getCoordinates()[0];
+        double maxy = env.getUpperCorner().getCoordinates()[1];
 
         final Random random = new Random(8578348921369L);
 
@@ -98,7 +102,7 @@ public class WarpGridBuilderTest extends TestCase {
     public void testIDWWarpGridBuilder() {
     	  try {
               // Envelope 20*20 km 00
-              Envelope env = new Envelope2D(crs, 0, 0, 400000, 200000);
+              Envelope env = new Envelope2D(crs, -50, -50, 400000, 200000);
               
               // Generates 15 MappedPositions of approximately 2 m differences
               List<MappedPosition> mp = generateMappedPositions(env, 6, 2, crs);
@@ -140,10 +144,11 @@ public class WarpGridBuilderTest extends TestCase {
     public void testTPSWarpGridBuilder() {
         try {
            
-            Envelope env = new Envelope2D(crs, 0, 0, 400000, 200000);
+        	
+            Envelope env = new Envelope2D(crs, 0, 0, 2000, 2000 );
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List<MappedPosition> mp = generateMappedPositions(env, 20, 1, crs);
+            List<MappedPosition> mp = generateMappedPositions(env, 10, 1, crs);
 
             GeneralMatrix M = new GeneralMatrix(3, 3);
             double[] m0 = { 1, 0, 0 };
@@ -153,10 +158,9 @@ public class WarpGridBuilderTest extends TestCase {
             M.setRow(1, m1);
             M.setRow(2, m2);
 
-            WarpGridBuilder builder = new TPSGridBuilder(mp, 5000, 5000, env,
-                    ProjectiveTransform.create(M));
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 10, 10, env,ProjectiveTransform.create(M));
             
-            builder.getDeltaFile(0, "/home/jezekjan/gridfile.txt");
+            //builder.getDeltaFile(0, "/home/jezekjan/gridfile.txt");
 
             GridCoverage2D dx  =  (new GridCoverageFactory()).create("tps - dx", builder.getDxGrid(), env);
             GridCoverage2D dy =  (new GridCoverageFactory()).create("tps - dy", builder.getDyGrid(), env);
@@ -178,7 +182,7 @@ public class WarpGridBuilderTest extends TestCase {
             }
                       
            assertBuilder(builder);
-            assertInverse(builder);
+           assertInverse(builder);
             
           
         } catch (Exception e) {
@@ -230,27 +234,30 @@ public class WarpGridBuilderTest extends TestCase {
         }
     }
     
-    public void ttestFileProvider(){
+    public void testFileProvider(){
     	   try {
                // Envelope 20*20 km 
-               Envelope env = new Envelope2D(crs, 0, 0, 500, 500);
+               Envelope env = new Envelope2D(crs, 10, 10, 500, 500);
                GeneralMatrix M = new GeneralMatrix(3, 3);
-           
+                       
+
+             //  WarpGridBuilder builder = new RSGridBuilder(mp, 3, 3, env,
+             //          ProjectiveTransform.create(M));
 
                // Generates 15 MappedPositions of approximately 2 m differences
                List<MappedPosition> mp = generateMappedPositions(env, 15, 1, crs);
 
-               WarpGridBuilder builder = new IDWGridBuilder(mp, 20, 20, env);
+               WarpGridBuilder builder = new IDWGridBuilder(mp, 20, 20, env, ProjectiveTransform.create(M));
 
                final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-               ParameterValueGroup gridParams = factory.getDefaultParameters("Warp Grid (form file)");
+               ParameterValueGroup gridParams = factory.getDefaultParameters("Warp Grid (from file)");
                String pathx = path+"dx";
                String pathy = path+"dy";
-               builder.getDeltaFile(0, pathx);
-               builder.getDeltaFile(1, pathy);
+               builder.writeDeltaFile(0, pathx);
+               builder.writeDeltaFile(1, pathy);
                gridParams.parameter("X_difference_file").setValue(pathx);
                gridParams.parameter("Y_difference_file").setValue(pathy);
-               MathTransform mt = (new Provider()).createMathTransform(gridParams);
+               MathTransform mt = (new ProviderFile()).createMathTransform(gridParams);
                MathTransform mtOriginal = builder.getMathTransform();
                
               
@@ -277,9 +284,10 @@ public class WarpGridBuilderTest extends TestCase {
 
         try {
             for (int i = 0; i < mp.size(); i++) {
-             //   Assert.assertEquals(0,
-              //      ((MappedPosition) mp.get(i)).getError(builder.getMathTransform(), null),
-              //       tolerance);                          
+            	
+                Assert.assertEquals(0,
+                    ((MappedPosition) mp.get(i)).getError(builder.getMathTransform(), null),
+                     tolerance);                          
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -287,7 +295,7 @@ public class WarpGridBuilderTest extends TestCase {
     }
 
     private void assertInverse(MathTransformBuilder builder) {
-       /* try {
+        try {
             List<MappedPosition> mp = builder.getMappedPositions();
 
             for (int i = 0; i < mp.size(); i++) {
@@ -308,7 +316,7 @@ public class WarpGridBuilderTest extends TestCase {
         } catch (FactoryException e) {
           
             e.printStackTrace();
-        }*/
+        }
 
         //builder.getMathTransform().inverse();
     }
