@@ -21,9 +21,11 @@ import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
 
 import org.opengis.feature.Feature;
+import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.util.ProgressListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -248,5 +250,23 @@ public interface FeatureSource<T extends FeatureType, F extends Feature> {
      */
     public Set /*<RenderingHints.Key>*/ getSupportedHints();
     
-    // FeatureReader getFeatureReader( Query query ); // ask justin for proposal
+    // FeatureReader getFeatureReader( Query qury ); // ask justin for proposal
+
+    /**
+     * Accepts a visitor which is iterated over the entire set of features.
+     * 
+     * @param visitor The visitor.
+     * @param listener The listener to track progress of iteration.
+     */
+    void accept( FeatureVisitor visitor, ProgressListener listener ) throws IOException;
+
+    /**
+     * Accepts a visitor which is iterated over a filtered set of features.
+     * 
+     * @param filter Filter specifying the set of features to iterate over.
+     * @param visitor The visitor.
+     * @param listener Listener to track progress of iteration.
+     */
+    void accept( Filter filter, FeatureVisitor visitor, ProgressListener listener ) 
+        throws IOException;
 }
