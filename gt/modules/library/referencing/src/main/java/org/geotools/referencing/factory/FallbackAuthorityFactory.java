@@ -860,7 +860,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
          */
         private void ensureFallback() throws FactoryException {
             if (fallback == null) {
-                fallback = FallbackAuthorityFactory.this.getIdentifiedObjectFinder(getProxy().getType());
+                fallback = FallbackAuthorityFactory.this.fallback.getIdentifiedObjectFinder(getProxy().getType());
             }
             fallback.setFullScanAllowed(isFullScanAllowed());
         }
@@ -871,7 +871,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate = finder.find(object);
-            if (candidate == null) {
+            if (candidate != null) {
                 return candidate;
             }
             ensureFallback();

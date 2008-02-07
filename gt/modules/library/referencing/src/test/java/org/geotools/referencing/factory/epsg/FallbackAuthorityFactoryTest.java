@@ -20,20 +20,17 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ProjectedCRS;
-
-// Geotools dependencies
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -159,6 +156,47 @@ public class FallbackAuthorityFactoryTest extends TestCase {
         } catch (FactoryException e) {
             // cool, that's what we expected
         }
+    }
+    
+    /**
+     * GEOT-1702, make sure looking up for an existing code does not result in a
+     * StackOverflowException
+     * @throws FactoryException
+     */
+    public void testLookupSuccessfull() throws FactoryException {
+        CoordinateReferenceSystem crs = CRS.decode("EPSG:42101");
+        String code = CRS.lookupIdentifier(crs, true);
+        assertEquals("EPSG:42101", code);
+    }
+    
+    /**
+     * GEOT-1702, make sure looking up for a non existing code does not result in a
+     * StackOverflowException
+     * @throws FactoryException
+     */
+    public void testLookupFailing() throws FactoryException {
+        String wkt = "PROJCS[\"Google Mercator\", \r\n" + 
+                "  GEOGCS[\"WGS 84\", \r\n" + 
+                "    DATUM[\"World Geodetic System 1984\", \r\n" + 
+                "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]], \r\n" + 
+                "      AUTHORITY[\"EPSG\",\"6326\"]], \r\n" + 
+                "    PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], \r\n" + 
+                "    UNIT[\"degree\", 0.017453292519943295], \r\n" + 
+                "    AXIS[\"Geodetic latitude\", NORTH], \r\n" + 
+                "    AXIS[\"Geodetic longitude\", EAST], \r\n" + 
+                "    AUTHORITY[\"EPSG\",\"4326\"]], \r\n" + 
+                "  PROJECTION[\"Mercator_1SP\"], \r\n" + 
+                "  PARAMETER[\"latitude_of_origin\", 0.0], \r\n" + 
+                "  PARAMETER[\"central_meridian\", 0.0], \r\n" + 
+                "  PARAMETER[\"scale_factor\", 1.0], \r\n" + 
+                "  PARAMETER[\"false_easting\", 0.0], \r\n" + 
+                "  PARAMETER[\"false_northing\", 0.0], \r\n" + 
+                "  UNIT[\"m\", 1.0], \r\n" + 
+                "  AXIS[\"Easting\", EAST], \r\n" + 
+                "  AXIS[\"Northing\", NORTH], \r\n" + 
+                "  AUTHORITY[\"EPSG\",\"900913\"]]";
+        CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        assertNull(CRS.lookupIdentifier(crs, true));
     }
 
     /**
