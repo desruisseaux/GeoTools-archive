@@ -27,7 +27,9 @@ import javax.swing.JDialog;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.apache.commons.collections.map.SingletonMap;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.contexttree.JContextTree;
@@ -73,13 +75,13 @@ import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.toolbox.WidgetTool;
 import org.geotools.gui.swing.toolbox.WidgetToolListener;
-import org.geotools.gui.swing.toolbox.tools.clipping.ClippingTTDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.clipping.ClippingTTDescriptor;
 import org.geotools.gui.swing.toolbox.tooltree.JToolTree;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeListener;
 import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
-import org.geotools.gui.swing.toolbox.tools.shapecreation.ShapeCreationTTDescriptor;
-import org.geotools.gui.swing.toolbox.tools.svg2mif.SVG2MIFTTDescriptor;
-import org.geotools.gui.swing.toolbox.tools.vdem2csv.VDem2CSVTTDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.shapecreation.ShapeCreationTTDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.svg2mif.SVG2MIFTTDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.vdem2csv.VDem2CSVTTDescriptor;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -231,21 +233,21 @@ public class DemoAll extends javax.swing.JFrame {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            DataStore store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
+            DataStore store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp")));
             FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");
             context.addLayer(layer);
 
-            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
+            store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp")));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_line.shp");
             context.addLayer(layer);
 
-            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
+            store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp")));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
@@ -307,6 +309,7 @@ public class DemoAll extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         group_jdatachooser = new javax.swing.ButtonGroup();
         dia_about = new javax.swing.JDialog();
@@ -324,10 +327,12 @@ public class DemoAll extends javax.swing.JFrame {
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
         pantoolbox = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
+        jToolBar2 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -433,11 +438,11 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane.setLayout(pan_mappaneLayout);
         pan_mappaneLayout.setHorizontalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 667, Short.MAX_VALUE)
+            .add(0, 514, Short.MAX_VALUE)
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 457, Short.MAX_VALUE)
+            .add(0, 456, Short.MAX_VALUE)
         );
 
         jpanel8.add(pan_mappane, java.awt.BorderLayout.CENTER);
@@ -456,18 +461,21 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
 
         getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jToolBar1.setFloatable(false);
+        jToolBar1.setRollover(true);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/geotools/gui/swing/icon/defaultset/crystalproject/16x16/actions/folder_new.png"))); // NOI18N
         jButton1.setBorderPainted(false);
@@ -478,7 +486,7 @@ public class DemoAll extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1);
+        jToolBar1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/geotools/gui/swing/icon/defaultset/crystalproject/16x16/actions/edit_add.png"))); // NOI18N
         jButton2.setBorderPainted(false);
@@ -489,13 +497,31 @@ public class DemoAll extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2);
+        jToolBar1.add(jButton2);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jToolBar1, gridBagConstraints);
 
         gui_map2dcontrol.setFloatable(false);
-        jPanel2.add(gui_map2dcontrol);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(gui_map2dcontrol, gridBagConstraints);
 
         gui_map2dedit.setFloatable(false);
-        jPanel2.add(gui_map2dedit);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(gui_map2dedit, gridBagConstraints);
+
+        jToolBar2.setFloatable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jToolBar2, gridBagConstraints);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -1011,6 +1037,8 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
