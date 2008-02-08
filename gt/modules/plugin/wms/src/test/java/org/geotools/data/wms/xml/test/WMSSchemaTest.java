@@ -66,23 +66,23 @@ public class WMSSchemaTest extends TestCase {
 		assertEquals(capabilities.getService().getMaxWidth(), 2000);
 		assertEquals(capabilities.getService().getMaxHeight(), 2000);
 		
-		assertEquals(capabilities.getRequest().getGetCapabilities().getFormatStrings()[0], "text/xml");
+		assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().get(0), "text/xml");
 		assertEquals(capabilities.getRequest().getGetCapabilities().getGet(), new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
 		assertEquals(capabilities.getRequest().getGetCapabilities().getPost(), new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
 		
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings().length, 5);
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0], "image/gif");
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[1], "image/png");
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[2], "image/jpeg");
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[3], "image/bmp");
-		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[4], "image/swf");
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().size(), 5);
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().get(0), "image/gif");
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().get(1), "image/png");
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().get(2), "image/jpeg");
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().get(3), "image/bmp");
+		assertEquals(capabilities.getRequest().getGetMap().getFormats().get(4), "image/swf");
 		assertEquals(capabilities.getRequest().getGetMap().getGet(), new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
 		
-		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings().length, 4);
-		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[0], "text/xml");
-		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[1], "text/plain");
-		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[2], "text/html");
-		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[3], "text/swf");
+		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().size(), 4);
+		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(0), "text/xml");
+		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(1), "text/plain");
+		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(2), "text/html");
+		assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(3), "text/swf");
 		assertEquals(capabilities.getRequest().getGetFeatureInfo().getGet(), new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
 		
 		Layer topLayer = (Layer) capabilities.getLayerList().get(0);

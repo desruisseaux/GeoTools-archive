@@ -198,7 +198,7 @@ public class ServersTest extends TestCase {
             } else {
                 out.println("found.");
                 out.print("Searching for a suitable format...");
-                List formats = Arrays.asList(caps.getRequest().getGetMap().getFormatStrings());
+                List formats = caps.getRequest().getGetMap().getFormats();
                 if (formats.contains("image/png")) {
                     format = "image/png";
                     out.println("using 'image/png'.");

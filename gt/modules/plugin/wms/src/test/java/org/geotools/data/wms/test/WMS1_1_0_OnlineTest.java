@@ -159,22 +159,22 @@ public class WMS1_1_0_OnlineTest extends WMS1_0_0_OnlineTest {
             assertEquals(capabilities.getService().getOnlineResource(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?"));
             assertNull(capabilities.getService().getKeywordList());
             
-            assertEquals(capabilities.getRequest().getGetCapabilities().getFormatStrings().length, 1);
-            assertEquals(capabilities.getRequest().getGetCapabilities().getFormatStrings()[0], "application/vnd.ogc.wms_xml");
+            assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().size(), 1);
+            assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().get(0), "application/vnd.ogc.wms_xml");
             assertEquals(capabilities.getRequest().getGetCapabilities().getGet(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?"));
             assertEquals(capabilities.getRequest().getGetCapabilities().getPost(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?"));
             
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings().length, 7);
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0], "image/gif");
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[3], "image/wbmp");
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[6], "image/tiff");
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().size(), 7);
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().get(0), "image/gif");
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().get(3), "image/wbmp");
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().get(6), "image/tiff");
             assertEquals(capabilities.getRequest().getGetMap().getGet(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?"));
             assertEquals(capabilities.getRequest().getGetMap().getPost(), new URL("http://dev1.dmsolutions.ca/cgi-bin/mswms_gmap?"));
             
-            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings().length, 3);
-            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[0], "text/plain");
-            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[1], "text/html");
-            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormatStrings()[2], "application/vnd.ogc.gml");
+            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().size(), 3);
+            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(0), "text/plain");
+            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(1), "text/html");
+            assertEquals(capabilities.getRequest().getGetFeatureInfo().getFormats().get(2), "application/vnd.ogc.gml");
             
             assertEquals(capabilities.getLayerList().size(), 12);
             

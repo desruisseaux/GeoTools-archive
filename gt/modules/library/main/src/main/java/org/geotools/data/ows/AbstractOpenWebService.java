@@ -24,14 +24,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import javax.swing.Icon;
+
+import org.geotools.data.DefaultServiceInfo;
+import org.geotools.data.ResourceInfo;
+import org.geotools.data.ServiceInfo;
 import org.geotools.ows.ServiceException;
 
 /**
@@ -47,10 +56,12 @@ import org.geotools.ows.ServiceException;
  * @author Richard Gould
  *
  */
-public abstract class AbstractOpenWebService {
+public abstract class AbstractOpenWebService<C extends Capabilities, R extends Object> {
     protected final URL serverURL;
-    protected Capabilities capabilities;
-
+    protected C capabilities;
+    protected ServiceInfo info;
+    protected Map<R,ResourceInfo> resourceInfo = new HashMap<R,ResourceInfo>();
+    
     /** Contains the specifications that are to be used with this service */
     protected Specification[] specs;
     protected Specification specification;
@@ -80,7 +91,7 @@ public abstract class AbstractOpenWebService {
         }
     }
 
-    public AbstractOpenWebService(Capabilities capabilties, URL serverURL) {
+    public AbstractOpenWebService(C capabilties, URL serverURL) {
 		if (capabilties == null) {
 			throw new NullPointerException("Capabilities cannot be null.");
 		}
@@ -108,7 +119,45 @@ public abstract class AbstractOpenWebService {
 		this.capabilities = capabilties;
 	}
 
-	/**
+    /**
+     * Description of this service.
+     * <p>
+     * Provides a very quick description of the service, for more information
+     * please review the capabilitie document.
+     * <p>
+     * @return description of  this service.
+     */
+    public ServiceInfo getInfo(){
+        synchronized ( capabilities ){
+            if( info == null && capabilities != null){
+                info = createInfo();
+            }
+            return info;
+        }                
+    }
+    /**
+     * Implemented by a subclass to describe service
+     * @return ServiceInfo
+     */
+    protected abstract ServiceInfo createInfo();
+
+    public ResourceInfo getInfo( R resource ){
+        synchronized ( capabilities ){ 
+            if( !resourceInfo.containsKey( resource ) ){
+                resourceInfo.put( resource, createInfo( resource ) );
+            }
+        }
+        return resourceInfo.get( resource );
+    }
+    
+    protected abstract ResourceInfo createInfo(R resource );
+
+    
+    private void syncrhonized( Capabilities capabilities2 ) {
+        // TODO Auto-generated method stub        
+    }
+
+    /**
      * Sets up the specifications/versions that this server is capable of
      * communicating with.
      */
@@ -147,7 +196,7 @@ public abstract class AbstractOpenWebService {
      * @throws IOException if there is an error communicating with the server, or the XML cannot be parsed
      * @throws ServiceException if the server returns a ServiceException
      */
-    protected Capabilities negotiateVersion() throws IOException, ServiceException {
+    protected C negotiateVersion() throws IOException, ServiceException {
         List versions = new ArrayList(specs.length);
         Exception exception = null;
 
@@ -167,9 +216,9 @@ public abstract class AbstractOpenWebService {
             GetCapabilitiesRequest request = tempSpecification.createGetCapabilitiesRequest(serverURL);
 
             //Grab document
-            Capabilities tempCapabilities;
+            C tempCapabilities;
             try {
-                tempCapabilities = issueRequest(request).getCapabilities();
+                tempCapabilities = (C) issueRequest(request).getCapabilities();
             } catch (ServiceException e) {
             	tempCapabilities = null;
             	exception = e;

@@ -30,14 +30,14 @@ import org.geotools.data.ows.OperationType;
  * @deprecated Use of OperationType should be sufficient
  */
 public class WMSOperationType extends OperationType {
-    public WMSOperationType() {
+    private WMSOperationType() {
         super();
     }
 
     /**
      * 
      * @deprecated Use OperationType.getFormats();
-     */
+     *
     public String[] getFormatStrings() {
         return (String[]) formats.toArray(new String[formats.size()]);
     }
@@ -46,7 +46,7 @@ public class WMSOperationType extends OperationType {
      * 
      * @param formats
      * @deprecated Use OpeartionType.setFormats();
-     */
+     *
     public void setFormatStrings(String[] formats) {
     	if (formats == null) {
     		this.formats = null;
@@ -54,5 +54,5 @@ public class WMSOperationType extends OperationType {
     		this.formats = new ArrayList(formats.length);
     		this.formats.addAll(Arrays.asList(formats));
     	}    	
-    }
+    }*/
 }

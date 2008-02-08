@@ -72,13 +72,13 @@ import org.opengis.util.InternationalString;
  */
 public class ProgressWindow implements ProgressListener {
     /**
-     * Initial with for the progress window, in pixels.
+     * Initial width for the progress window, in pixels.
      */
     private static final int WIDTH = 360;
 
     /**
      * Initial height for the progress window, in pixels.
-     * Increase this value is some component (e.g. the "Cancel" button) seems truncated.
+     * Increase this value if some component (e.g. the "Cancel" button) seems truncated.
      * The current value has been tested for Metal look and feel.
      */
     private static final int HEIGHT = 140;

@@ -116,7 +116,7 @@ public class WebMapServerOnlineTest extends ServerTestCase {
         request.setDimensions("400", "400");
 
         String format = "image/gif";
-        List formats = Arrays.asList(wms.getCapabilities().getRequest().getGetMap().getFormatStrings());
+        List formats = wms.getCapabilities().getRequest().getGetMap().getFormats();
         if (!formats.contains("image/gif")) {
             format = (String) formats.get(0);
         } 

@@ -120,11 +120,11 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
             assertEquals(capabilities.getService().getOnlineResource(),
                     new URL("http://www2.demis.nl"));
             assertEquals(capabilities.getRequest().getGetCapabilities()
-            .getFormatStrings()[0],
+            .getFormats().get(0),
                     "application/vnd.ogc.wms_xml");
             assertEquals(capabilities.getRequest().getGetFeatureInfo().getGet(),
                     new URL("http://www2.demis.nl/wms/wms.asp?wms=WorldMap&"));
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings().length,
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().size(),
                     4);
             
             assertEquals(capabilities.getLayerList().size(), 21);

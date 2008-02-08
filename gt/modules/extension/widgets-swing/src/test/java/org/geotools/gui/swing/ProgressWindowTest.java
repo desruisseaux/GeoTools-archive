@@ -17,6 +17,7 @@
 package org.geotools.gui.swing;
 
 // J2Se dependencies
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.util.Locale;
 
@@ -41,7 +42,7 @@ public class ProgressWindowTest extends TestCase {
     /** The source, if any.                */ private static String source;
     /** Text to put in the margin, if any. */ private static String margin;
     /** Warning to print, if any.          */ private static String warning;
-    /** {@code true} for enabling display. */ private static boolean display;
+    /** {@code true} for enabling display. */ private static boolean display = !GraphicsEnvironment.isHeadless();
 
     /**
      * Construct the test case.

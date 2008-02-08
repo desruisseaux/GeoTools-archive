@@ -29,9 +29,15 @@ public class WMSCapabilities extends Capabilities {
     private WMSRequest request;
     private Layer layer;
     
-    private List layers; //cache
+    private List<Layer> layers; //cache
 	private String[] exceptions;
 
+	/**
+	 * Get the root layer, the contents of the Web Map Server are the children
+	 * of this layer.
+	 * 
+	 * @return The "root" Layer for the Web Map Server
+	 */
     public Layer getLayer() {
         return layer;
     }
@@ -39,21 +45,29 @@ public class WMSCapabilities extends Capabilities {
     public void setLayer(Layer layer) {
         this.layer = layer;
     }
-    
-    public List getLayerList() {
+        
+    /**
+     * Access a flat view of the layers available in the WMS.
+     * <p>
+     * The information available here is the same as doing a top down
+     * walk of all the layers available via getLayer().
+     * 
+     * @return List of all available layers
+     */
+    public List<Layer> getLayerList() {
         if (layers == null) {
-            layers = new ArrayList();
+            layers = new ArrayList<Layer>();
             layers.add(layer);
             addChildrenRecursive(layers, layer);
         }        
         return Collections.unmodifiableList(layers);
     }
     
-    private void addChildrenRecursive(List layers, Layer layer) {
-        if (layer.getChildren() != null) {
-            for (int i = 0; i < layer.getChildren().length; i++) {
-                layers.add(layer.getChildren()[i]);
-                addChildrenRecursive(layers, layer.getChildren()[i]);
+    private void addChildrenRecursive(List<Layer> layers, Layer layer) {
+        if (layer.getChildren() != null){
+            for( Layer child : layer.getChildren() ){
+                layers.add( child );
+                addChildrenRecursive( layers, child );
             }
         }
     }

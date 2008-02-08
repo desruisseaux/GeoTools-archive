@@ -15,6 +15,8 @@
  */
 package org.geotools.data.ows;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,8 +27,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+import org.geotools.data.DefaultResourceInfo;
+import org.geotools.data.ResourceInfo;
+import org.geotools.data.wms.WMSOperationType;
+import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -39,6 +51,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 
 /**
  * Nested list of zero or more map Layers offered by this server. It contains
@@ -48,7 +62,8 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @author rgould
  * @source $URL$
  */
-public class Layer implements Comparable {
+public class Layer implements Comparable<Layer> {
+    
     /** A machine-readable (typically one word) identifier */
     private String name;
 
@@ -59,15 +74,17 @@ public class Layer implements Comparable {
     private String[] keywords;
 
     /** A set of Strings representing SRSs */
-    private Set srs = null;
+    private Set<String> srs = null;
+    
     /** the union of the layers's SRSs and the parent's SRSs */
-    private Set allSRSCache = null;
+    private Set<String> allSRSCache = null;
+    
     /**
      * A HashMap representings the bounding boxes on each layer. The Key is the
      * CRS (or SRS) of the bounding box. The Value is the BoundingBox object
      * itself.
      */
-    private HashMap boundingBoxes = null;
+    private HashMap<Object,CRSEnvelope> boundingBoxes = null;
 
     /**
      * A boundingbox containing the minimum rectangle of the map data in
@@ -76,7 +93,7 @@ public class Layer implements Comparable {
     private CRSEnvelope latLonBoundingBox = null;
 
     /** A list of type org.opengis.layer.Style */
-    private List styles;
+    private List<org.opengis.layer.Style> styles;
     private Boolean queryable = null;
     
     private double scaleHintMin = Double.NaN;
@@ -88,13 +105,20 @@ public class Layer implements Comparable {
     private Layer[] children;
 
 	private Map envelopeCache=Collections.synchronizedMap(new WeakHashMap());
-    
+	
+	/**
+	 * Crate a layer with no human readable title.
+	 * <p>
+	 * These layers are simply for organization and storage of common
+	 * settings (like SRS or style settings). These settings will be
+	 * valid for all children. 
+	 */
     public Layer() {
-        
+        this(null );
     }
 
     /**
-     * DOCUMENT ME!
+     * Create a layer with an optional title
      *
      * @param title
      */
@@ -113,11 +137,11 @@ public class Layer implements Comparable {
      * @return a HashMap of all of this layer's bounding boxes or null if no
      * bounding boxes found
      */
-    public HashMap getBoundingBoxes() {
+    public HashMap<Object,CRSEnvelope> getBoundingBoxes() {
        if (boundingBoxes == null) {
           Layer parent = this.getParent();
           while (parent != null) {
-             HashMap bb = parent.getBoundingBoxes();
+             HashMap<Object,CRSEnvelope> bb = parent.getBoundingBoxes();
              if (bb != null)
                 return bb;
              else 
@@ -272,9 +296,7 @@ public class Layer implements Comparable {
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object arg0) {
-        Layer layer = (Layer) arg0;
-
+    public int compareTo(Layer layer) {        
         if ((this.getName() != null) && (layer.getName() != null)) {
             return this.getName().compareTo(layer.getName());
         }

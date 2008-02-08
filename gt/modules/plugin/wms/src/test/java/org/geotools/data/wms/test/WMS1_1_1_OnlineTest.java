@@ -81,11 +81,11 @@ public class WMS1_1_1_OnlineTest extends WMS1_1_0_OnlineTest {
             assertEquals(capabilities.getService().getContactInformation().getContactInfo().getAddress().getDeliveryPoints().iterator().next(), "555 Street St.");
             assertEquals(capabilities.getService().getContactInformation().getContactInfo().getAddress().getElectronicMailAddresses().iterator().next(), "email@domain.com");
             
-            assertEquals(capabilities.getRequest().getGetCapabilities().getFormatStrings()[0], "application/vnd.ogc.wms_xml");
+            assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().get(0), "application/vnd.ogc.wms_xml");
             assertEquals(capabilities.getRequest().getGetCapabilities().getGet(), new URL("http://terraservice.net/ogccapabilities.ashx"));
             assertEquals(capabilities.getRequest().getGetCapabilities().getPost(), new URL("http://terraservice.net/ogccapabilities.ashx"));
             
-            assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0], "image/jpeg");
+            assertEquals(capabilities.getRequest().getGetMap().getFormats().get(0), "image/jpeg");
             assertEquals(capabilities.getRequest().getGetMap().getGet(), new URL("http://terraservice.net/ogcmap.ashx"));
             
             assertNull(capabilities.getRequest().getGetFeatureInfo());

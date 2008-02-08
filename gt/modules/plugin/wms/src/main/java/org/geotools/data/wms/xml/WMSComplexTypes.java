@@ -36,7 +36,6 @@ import org.geotools.data.ows.StyleImpl;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.wms.WMS1_0_0;
-import org.geotools.data.wms.WMSOperationType;
 import org.geotools.data.wms.xml.WMSSchema.WMSAttribute;
 import org.geotools.data.wms.xml.WMSSchema.WMSComplexType;
 import org.geotools.data.wms.xml.WMSSchema.WMSElement;
@@ -123,7 +122,7 @@ public class WMSComplexTypes {
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
 
-			WMSOperationType operationType = null;
+		    org.geotools.data.ows.OperationType operationType = null;
 
 			List formatStrings = new ArrayList();
 
@@ -136,16 +135,11 @@ public class WMSComplexTypes {
 				}
 
 				if (sameName(elems[1], value[i])) {
-					operationType = (WMSOperationType) value[i].getValue();
+					operationType = (org.geotools.data.ows.OperationType) value[i].getValue();
 				}
 			}
 
-			String[] strings = new String[formatStrings.size()];
-			for (int i = 0; i < formatStrings.size(); i++) {
-				strings[i] = (String) formatStrings.get(i);
-			}
-
-			operationType.setFormatStrings(strings);
+			operationType.setFormats(new ArrayList(formatStrings));
 
 			return operationType;
 		}
@@ -155,7 +149,7 @@ public class WMSComplexTypes {
 		}
 
 		public Class getInstanceType() {
-			return WMSOperationType.class;
+			return org.geotools.data.ows.OperationType.class;
 		}
 
 		public boolean canEncode(Element element, Object value, Map hints) {
@@ -1900,40 +1894,40 @@ public class WMSComplexTypes {
 
 				if (sameName(elems[0], value[i])
 						|| sameName(elems[8], value[i])) {
-					request.setGetCapabilities((WMSOperationType) value[i]
+					request.setGetCapabilities((org.geotools.data.ows.OperationType) value[i]
 							.getValue());
 				}
 
 				if (sameName(elems[1], value[i])
 						|| sameName(elems[9], value[i])) {
-					request.setGetMap((WMSOperationType) value[i].getValue());
+					request.setGetMap((org.geotools.data.ows.OperationType) value[i].getValue());
 				}
 
 				if (sameName(elems[2], value[i])
 						|| sameName(elems[10], value[i])) {
-					request.setGetFeatureInfo((WMSOperationType) value[i]
+					request.setGetFeatureInfo((org.geotools.data.ows.OperationType) value[i]
 							.getValue());
 				}
 
 				if (sameName(elems[3], value[i])) {
-					request.setDescribeLayer((WMSOperationType) value[i]
+					request.setDescribeLayer((org.geotools.data.ows.OperationType) value[i]
 							.getValue());
 				}
 
 				if (sameName(elems[4], value[i])) {
-					request.setGetLegendGraphic((WMSOperationType) value[i]
+					request.setGetLegendGraphic((org.geotools.data.ows.OperationType) value[i]
 							.getValue());
 				}
 
 				if (sameName(elems[5], value[i])) {
 					request
-							.setGetStyles((WMSOperationType) value[i]
+							.setGetStyles((org.geotools.data.ows.OperationType) value[i]
 									.getValue());
 				}
 
 				if (sameName(elems[6], value[i])) {
 					request
-							.setPutStyles((WMSOperationType) value[i]
+							.setPutStyles((org.geotools.data.ows.OperationType) value[i]
 									.getValue());
 				}
 
@@ -2050,7 +2044,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return WMSOperationType.class;
+			return org.geotools.data.ows.OperationType.class;
 		}
 
 		/*
@@ -2125,7 +2119,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			WMSOperationType operationType = new WMSOperationType();
+		    org.geotools.data.ows.OperationType operationType = new org.geotools.data.ows.OperationType();
 
 			for (int i = 0; i < value.length; i++) {
 				if (sameName(elems[0], value[i])) {
@@ -2155,7 +2149,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.Type#getInstanceType()
 		 */
 		public Class getInstanceType() {
-			return WMSOperationType.class;
+			return org.geotools.data.ows.OperationType.class;
 		}
 
 		/*

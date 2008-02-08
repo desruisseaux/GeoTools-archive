@@ -25,7 +25,7 @@ import java.util.List;
  * @source $URL$
  */
 public class OperationType {
-	protected List formats;
+	protected List<String> formats;
 	protected URL get;
 	protected URL post;
 
@@ -35,11 +35,11 @@ public class OperationType {
      * 
      * @return a List of Strings, each of which usually represent a mime type
      */
-    public List getFormats() {
+    public List<String> getFormats() {
         return formats;
     }
 
-    public void setFormats(List formats) {
+    public void setFormats(List<String> formats) {
         this.formats = formats;
     }
 

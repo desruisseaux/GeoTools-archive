@@ -25,20 +25,20 @@ import org.geotools.data.wms.WMSOperationType;
  * @source $URL$
  */
 public class WMSRequest {
-    private WMSOperationType getCapabilities;
-    private WMSOperationType getMap;
-    private WMSOperationType getFeatureInfo;
-    private WMSOperationType describeLayer;
-    private WMSOperationType getLegendGraphic;
-    private WMSOperationType getStyles;
-    private WMSOperationType putStyles;
+    private OperationType getCapabilities;
+    private OperationType getMap;
+    private OperationType getFeatureInfo;
+    private OperationType describeLayer;
+    private OperationType getLegendGraphic;
+    private OperationType getStyles;
+    private OperationType putStyles;
 
     /**
      * DOCUMENT ME!
      *
      * @return Returns the getCapabilities.
      */
-    public WMSOperationType getGetCapabilities() {
+    public OperationType getGetCapabilities() {
         return getCapabilities;
     }
 
@@ -47,7 +47,7 @@ public class WMSRequest {
      *
      * @param getCapabilities The getCapabilities to set.
      */
-    public void setGetCapabilities(WMSOperationType getCapabilities) {
+    public void setGetCapabilities(OperationType getCapabilities) {
         this.getCapabilities = getCapabilities;
     }
 
@@ -56,7 +56,7 @@ public class WMSRequest {
      *
      * @return Returns the getFeatureInfo.
      */
-    public WMSOperationType getGetFeatureInfo() {
+    public OperationType getGetFeatureInfo() {
         return getFeatureInfo;
     }
 
@@ -65,7 +65,7 @@ public class WMSRequest {
      *
      * @param getFeatureInfo The getFeatureInfo to set.
      */
-    public void setGetFeatureInfo(WMSOperationType getFeatureInfo) {
+    public void setGetFeatureInfo(OperationType getFeatureInfo) {
         this.getFeatureInfo = getFeatureInfo;
     }
 
@@ -74,7 +74,7 @@ public class WMSRequest {
      *
      * @return Returns the getMap.
      */
-    public WMSOperationType getGetMap() {
+    public OperationType getGetMap() {
         return getMap;
     }
 
@@ -83,31 +83,31 @@ public class WMSRequest {
      *
      * @param getMap The getMap to set.
      */
-    public void setGetMap(WMSOperationType getMap) {
+    public void setGetMap(OperationType getMap) {
         this.getMap = getMap;
     }
-    public WMSOperationType getDescribeLayer() {
+    public OperationType getDescribeLayer() {
         return describeLayer;
     }
-    public void setDescribeLayer( WMSOperationType describeLayer ) {
+    public void setDescribeLayer( OperationType describeLayer ) {
         this.describeLayer = describeLayer;
     }
-    public WMSOperationType getGetLegendGraphic() {
+    public OperationType getGetLegendGraphic() {
         return getLegendGraphic;
     }
-    public void setGetLegendGraphic( WMSOperationType getLegendGraphic ) {
+    public void setGetLegendGraphic( OperationType getLegendGraphic ) {
         this.getLegendGraphic = getLegendGraphic;
     }
-    public WMSOperationType getGetStyles() {
+    public OperationType getGetStyles() {
         return getStyles;
     }
-    public void setGetStyles( WMSOperationType getStyles ) {
+    public void setGetStyles( OperationType getStyles ) {
         this.getStyles = getStyles;
     }
-    public WMSOperationType getPutStyles() {
+    public OperationType getPutStyles() {
         return putStyles;
     }
-    public void setPutStyles( WMSOperationType putStyles ) {
+    public void setPutStyles( OperationType putStyles ) {
         this.putStyles = putStyles;
     }
 }

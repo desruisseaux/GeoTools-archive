@@ -104,8 +104,8 @@ public interface ServiceInfo {
      * <p>
      * <ul>
      * <li>Service type for open web services
-     * <li>File format or extention for on disk files
-     * <li>Xml schema namespace for this service type.
+     * <li>File format or extension for on disk files
+     * <li>XML schema namespace for this service type.
      * </ul>
      * <p>
      * @return URI used to identify service type
