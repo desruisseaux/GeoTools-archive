@@ -150,8 +150,8 @@ public class DemoAll extends javax.swing.JFrame {
             }
 
             public void contextActivated(TreeContextEvent event) {
-                if (event.getMapContext() != null) {
-                    map.getRenderingStrategy().setContext(event.getMapContext());
+                if (event.getContext() != null) {
+                    map.getRenderingStrategy().setContext(event.getContext());
                 }
             }
 

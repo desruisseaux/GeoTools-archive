@@ -60,7 +60,7 @@ public class TreeContextEvent extends EventObject{
      * return the Mapcontext affected by the event
      * @return concern Mapcontext
      */
-    public MapContext getMapContext() {
+    public MapContext getContext() {
         return this.mapcontext;
     }
     

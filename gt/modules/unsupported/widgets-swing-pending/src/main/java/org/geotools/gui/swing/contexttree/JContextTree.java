@@ -68,8 +68,7 @@ public class JContextTree extends JComponent{
         
         add(BorderLayout.CENTER,pane);
     }
-    
-    
+        
     /**
      * get the Popupmenu manager
      * @return JContextTreePopup
@@ -78,14 +77,26 @@ public class JContextTree extends JComponent{
         return treetable.getPopupMenu();
     }
         
+    /**
+     * model that handle selections
+     * @return TreeSelectionModel
+     */
     public TreeSelectionModel getTreeSelectionModel(){
         return treetable.getTreeSelectionModel();
     }
         
+    /**
+     * 
+     * @return true if selection is only composed of MapLayer
+     */
     public boolean selectionContainOnlyLayers(){
         return treetable.onlyMapLayers(getTreeSelectionModel().getSelectionPaths());
     }
     
+    /**
+     * 
+     * @return true if selection is only composed of MapContext
+     */
     public boolean selectionContainOnlyContexts(){
         return treetable.onlyMapContexts(getTreeSelectionModel().getSelectionPaths());
     }
@@ -493,29 +504,6 @@ public class JContextTree extends JComponent{
         return treetable.getTreeContextListeners();
     }
     
-    /**
-     * add tree Selection Listener 
-     * @param ker the new listener
-     */
-    public void addTreeSelectionListener(TreeSelectionListener ker) {
-        treetable.getSelectionManager().addTreeSelectionListener(ker);        
-    }
-    
-    /**
-     * remove tree Selection Listener 
-     * @param ker the listner to remove
-     */
-    public void removeTreeSelectionListener(TreeSelectionListener ker) {
-        treetable.getSelectionManager().removeTreeSelectionListener(ker);
-    }
-    
-    /**
-     * get tree Selection Listeners array
-     * @return the listener's table
-     */
-    public TreeSelectionListener[] getTreeSelectionListeners() {
-        return treetable.getSelectionManager().getTreeSelectionListeners();
-    }
     
     
 }
