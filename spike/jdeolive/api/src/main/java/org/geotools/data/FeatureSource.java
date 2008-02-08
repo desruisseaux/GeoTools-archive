@@ -250,7 +250,7 @@ public interface FeatureSource<T extends FeatureType, F extends Feature> {
      */
     public Set /*<RenderingHints.Key>*/ getSupportedHints();
     
-    // FeatureReader getFeatureReader( Query qury ); // ask justin for proposal
+    // FeatureReader getFeatureReader( Query query ); // ask justin for proposal
 
     /**
      * Accepts a visitor which is iterated over the entire set of features.

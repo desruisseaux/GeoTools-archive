@@ -18,9 +18,7 @@ public interface DataAccess<T extends FeatureType, F extends Feature> {
         throws IOException;
     
     List<Name> getNames() throws IOException;
-    
-    T getSchema(String typeName) throws IOException;
-    
+        
     T getSchema(Name name) throws IOException;
     
     FeatureSource<T,F> getView(Query query) throws IOException, SchemaException;
