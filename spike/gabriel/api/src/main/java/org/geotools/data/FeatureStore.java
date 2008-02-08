@@ -24,48 +24,55 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.identity.FeatureId;
 import org.geotools.feature.FeatureCollection;
-
 
 /**
  * Provides storage of data for Features.
- *
+ * 
  * <p>
  * Individual shapefiles, database tables, etc. are modified through this
  * interface.
  * </p>
- *
+ * 
  * <p>
  * This is a prototype DataSource replacement please see FeatureSource for more
  * information.
  * </p>
- *
+ * 
  * @author Jody Garnett
  * @author Ray Gallagher
  * @author Rob Hranac, TOPP
  * @author Chris Holmes, TOPP
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/spike/gabriel/api/src/main/java/org/geotools/data/FeatureStore.java $
  * @version $Id$
  */
-public interface FeatureStore extends Store<SimpleFeatureType, SimpleFeature>, FeatureSource {
+public interface FeatureStore extends
+        Store<SimpleFeatureType, SimpleFeature, SimpleFeatureCollection>, FeatureSource {
     /**
      * Adds all features from the passed feature collection to the datasource.
-     *
-     * @param collection The collection of features to add.
+     * 
+     * @param collection
+     *            The collection of features to add.
      * @return the FeatureIds of the newly added features.
-     *
-     * @throws IOException if anything goes wrong.
+     * 
+     * @throws IOException
+     *             if anything goes wrong.
      */
-    Set addFeatures(SimpleFeatureCollection collection) throws IOException;
+    Set<FeatureId> addFeatures(SimpleFeatureCollection collection) throws IOException;
 
     /**
      * Deletes the all the current Features of this datasource and adds the new
-     * collection.  Primarily used as a convenience method for file
-     * datasources.
-     *
-     * @param reader - the collection to be written
-     *
-     * @throws IOException if there are any datasource errors.
+     * collection. Primarily used as a convenience method for file datasources.
+     * 
+     * @param reader -
+     *            the collection to be written
+     * 
+     * @throws IOException
+     *             if there are any datasource errors.
      */
     void setFeatures(FeatureReader reader) throws IOException;
+
+    public FeatureWriter getFeatureWriter(Query query);
 }

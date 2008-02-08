@@ -109,7 +109,7 @@ public interface DataStoreFactorySpi extends FeatureDataFactory<SimpleFeatureTyp
 	 * <p>
 	 * Please check your params with canProcess( params ) before calling this method.
 	 */
-	public DataStore createFeatureData(Map params) throws IOException;
+	//public DataStore createFeatureData(Map params) throws IOException;
 
 	/**
 	 * Create a new DataStore, you will need to call dataStore.createScheme( featureType ) before use.
@@ -122,7 +122,7 @@ public interface DataStoreFactorySpi extends FeatureDataFactory<SimpleFeatureTyp
 	 * <li>add content using datastore.getFeaureStore( featureType.getName() ).addFeatures( ... )
 	 * </ul>
 	 */
-	public DataStore createNewFeatureData( Map params ) throws IOException;
+	//public DataStore createNewFeatureData( Map params ) throws IOException;
 	
     DataStore createDataStore(Map params) throws IOException;
 

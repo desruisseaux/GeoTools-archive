@@ -4,6 +4,8 @@ import java.awt.RenderingHints.Key;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -29,15 +31,23 @@ public class SampleDataStoreFactory implements DataStoreFactorySpi {
         return null;
     }
 
-    public org.geotools.data.DataRepositoryFactory.Param[] getParametersInfo() {
-        return null;
-    }
-
     public boolean isAvailable() {
         return false;
     }
 
     public Map<Key, ?> getImplementationHints() {
+        return null;
+    }
+
+    public boolean canCreateNew(Map params) {
+        return false;
+    }
+
+    public Icon getIcon() {
+        return null;
+    }
+
+    public org.geotools.data.FeatureDataFactory.Param[] getParametersInfo() {
         return null;
     }
 

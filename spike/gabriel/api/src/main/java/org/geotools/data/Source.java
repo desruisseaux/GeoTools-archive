@@ -248,7 +248,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * may decide not to honor the hint.
      * @return a set of {@link RenderingHints#Key} objects (eventually empty, never null).
      */
-    public Set /*<RenderingHints.Key>*/ getSupportedHints();
+    public Set<RenderingHints.Key> getSupportedHints();
     
     public Reader<T,F> getFeatureReader( Query qury ); // ask justin for proposal
 

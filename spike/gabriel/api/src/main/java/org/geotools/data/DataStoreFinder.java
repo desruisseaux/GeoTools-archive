@@ -113,7 +113,7 @@ public final class DataStoreFinder {
                 }
                 if (isAvailable) {
                     try {
-                        return fac.createFeatureData(params);
+                        return fac.createDataStore(params);
                     } catch (IOException couldNotConnect) {
                         canProcessButNotAvailable = couldNotConnect;
                         LOGGER.log(Level.WARNING, fac.getDisplayName()

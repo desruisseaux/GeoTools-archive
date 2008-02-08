@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
@@ -71,6 +72,13 @@ import org.geotools.feature.SchemaException;
  * @version $Id$
  */
 public interface DataStore extends FeatureData<SimpleFeatureType,SimpleFeature>{
+    
+    /**
+     * Type narrows return type to FeatureSource
+     * @since 2.5
+     */
+    public FeatureSource getFeatureSource(Name name) throws IOException;
+    
     /**
      * Creates storage for a new <code>featureType</code>.
      *

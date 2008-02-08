@@ -13,11 +13,11 @@ import org.opengis.feature.type.FeatureType;
 
 public class SampleDataRepositoryFactory implements FeatureDataFactory<FeatureType, Feature> {
 
-    public FeatureData<FeatureType, Feature> createNewFeatureData(Map params) throws IOException {
+    public FeatureData<FeatureType, Feature> createNewDataStore(Map params) throws IOException {
         return new SampleDataRepository();
     }
 
-    public FeatureData<FeatureType, Feature> createFeatureData(Map params) throws IOException {
+    public FeatureData<FeatureType, Feature> createDataStore(Map params) throws IOException {
         return new SampleDataRepository();
     }
 

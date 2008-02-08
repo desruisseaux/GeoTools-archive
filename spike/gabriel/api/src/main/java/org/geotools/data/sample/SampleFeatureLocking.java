@@ -1,18 +1,22 @@
 package org.geotools.data.sample;
 
+import java.awt.RenderingHints.Key;
 import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.FeatureData;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Reader;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.SimpleFeatureCollection;
 import org.geotools.data.Transaction;
+import org.geotools.data.Writer;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.FeatureVisitor;
@@ -25,16 +29,11 @@ import org.opengis.util.ProgressListener;
 
 public class SampleFeatureLocking implements FeatureLocking {
 
-    public Set addFeatures(SimpleFeatureCollection collection) throws IOException {
+    public Set<FeatureId> addFeatures(SimpleFeatureCollection collection) throws IOException {
         return null;
     }
 
     public void setFeatures(FeatureReader reader) throws IOException {
-    }
-
-    public Set<FeatureId> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
-            throws IOException {
-        return null;
     }
 
     public Transaction getTransaction() {
@@ -52,17 +51,15 @@ public class SampleFeatureLocking implements FeatureLocking {
     public void removeFeatures(Filter filter) throws IOException {
     }
 
-    public void setFeatures(Reader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
-    }
-
     public void setTransaction(Transaction transaction) {
     }
 
-    public void accept(FeatureVisitor visitor, ProgressListener listener) throws IOException {
+    public void accept(FeatureVisitor<SimpleFeature> visitor, ProgressListener listener)
+            throws IOException {
     }
 
-    public void accept(Filter filter, FeatureVisitor visitor, ProgressListener listener)
-            throws IOException {
+    public void accept(Filter filter, FeatureVisitor<SimpleFeature> visitor,
+            ProgressListener listener) throws IOException {
     }
 
     public void addFeatureListener(FeatureListener listener) {
@@ -80,24 +77,6 @@ public class SampleFeatureLocking implements FeatureLocking {
         return 0;
     }
 
-    public DataStore getDataStore() {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures(Query query)
-            throws IOException {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures(Filter filter)
-            throws IOException {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures() throws IOException {
-        return null;
-    }
-
     public ResourceInfo getInfo() {
         return null;
     }
@@ -106,7 +85,7 @@ public class SampleFeatureLocking implements FeatureLocking {
         return null;
     }
 
-    public Set getSupportedHints() {
+    public Set<Key> getSupportedHints() {
         return null;
     }
 
@@ -137,4 +116,30 @@ public class SampleFeatureLocking implements FeatureLocking {
     public void unLockFeatures(Query query) throws IOException {
     }
 
+    public FeatureWriter getFeatureWriter(Query query) {
+        return null;
+    }
+
+    public DataStore getDataStore() {
+        return null;
+    }
+
+    public FeatureReader getFeatureReader(Query qury) {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures(Query query) throws IOException {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures(Filter filter) throws IOException {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures() throws IOException {
+        return null;
+    }
+
+    public void setFeatures(Reader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
+    }
 }

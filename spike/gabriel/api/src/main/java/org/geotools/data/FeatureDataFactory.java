@@ -108,9 +108,11 @@ import org.opengis.feature.type.FeatureType;
  */
 public interface FeatureDataFactory<T extends FeatureType, F extends Feature> extends Factory {
 
-    FeatureData<T, F> createFeatureData(Map params) throws IOException;
+    FeatureData<T, F> createDataStore(Map params) throws IOException;
+    //FeatureData<T, F> createFeatureData(Map params) throws IOException;
 
-    FeatureData<T, F> createNewFeatureData(Map params) throws IOException;
+    FeatureData<T, F> createNewDataStore(Map params) throws IOException;
+    //FeatureData<T, F> createNewFeatureData(Map params) throws IOException;
 
     /**
      * Icon used to describe this file or service
