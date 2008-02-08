@@ -97,6 +97,13 @@ public class MosaicImageReader extends ImageReader {
     private transient ImageReader reading;
 
     /**
+     * Constructs an image reader with the default provider.
+     */
+    public MosaicImageReader() {
+        this(null);
+    }
+
+    /**
      * Constructs an image reader with the specified provider.
      */
     public MosaicImageReader(final ImageReaderSpi spi) {
@@ -148,33 +155,8 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public void setInput(Object input, final boolean seekForwardOnly, final boolean ignoreMetadata) {
-        final TileManager[] managers;
-        if (input == null) {
-            managers = null;
-        } else if (input instanceof TileManager[]) {
-            managers = ((TileManager[]) input).clone();
-        } else if (input instanceof TileManager) {
-            managers = new TileManager[] {(TileManager) input};
-        } else if (input instanceof Tile[]) {
-            managers = TileManagerFactory.DEFAULT.create((Tile[]) input);
-        } else if (input instanceof Collection) {
-            @SuppressWarnings("unchecked") // TileManagerFactory will checks indirectly.
-            final Collection<Tile> c = (Collection<Tile>) input;
-            managers = TileManagerFactory.DEFAULT.create(c);
-        } else {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_CLASS_$2, input.getClass(), TileManager.class));
-        }
-        /*
-         * Before to assign the value, make sure that there is no null value.
-         */
+        final TileManager[] managers = TileManagerFactory.DEFAULT.createFromObject(input);
         final int numImages = (managers != null) ? managers.length : 0;
-        for (int i=0; i<numImages; i++) {
-            if (managers[i] == null) {
-                throw new IllegalArgumentException(Errors.format(
-                        ErrorKeys.NULL_ARGUMENT_$1, "input[" + i + ']'));
-            }
-        }
         super.setInput(input=managers, seekForwardOnly, ignoreMetadata);
         availableLocales = null; // Will be computed by getAvailableLocales() when first needed.
         /*
@@ -1331,16 +1313,16 @@ public class MosaicImageReader extends ImageReader {
      */
     public static class Spi extends ImageReaderSpi {
         /**
-         * The format names.
+         * The format names. This array is shared with {@link MosaicImageWriter.Spi}.
          */
-        private static final String[] NAMES = new String[] {
+        static final String[] NAMES = new String[] {
             "mosaic"
         };
 
         /**
-         * The input types.
+         * The input types. This array is shared with {@link MosaicImageWriter.Spi}.
          */
-        private static final Class<?>[] INPUT_TYPES = new Class[] {
+        static final Class<?>[] INPUT_TYPES = new Class[] {
             TileManager[].class,
             TileManager.class,
             Tile[].class,
@@ -1373,7 +1355,6 @@ public class MosaicImageReader extends ImageReader {
          * implementation returns {@code true} if the given object is non-null and an instance
          * of an {@linkplain #inputTypes input types}, or {@code false} otherwise.
          */
-        @Override
         public boolean canDecodeInput(final Object source) throws IOException {
             if (source != null) {
                 final Class<?> type = source.getClass();
@@ -1389,7 +1370,6 @@ public class MosaicImageReader extends ImageReader {
         /**
          * Returns a new {@link MosaicImageReader}.
          */
-        @Override
         public ImageReader createReaderInstance(final Object extension) throws IOException {
             return new MosaicImageReader(this);
         }
@@ -1399,7 +1379,6 @@ public class MosaicImageReader extends ImageReader {
          *
          * @todo Localize.
          */
-        @Override
         public String getDescription(final Locale locale) {
             return "Mosaic Image Reader";
         }

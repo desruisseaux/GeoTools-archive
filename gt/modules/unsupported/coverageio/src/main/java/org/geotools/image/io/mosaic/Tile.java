@@ -486,8 +486,8 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns the image reader provider. This is the provider used for creating
-     * the {@linkplain ImageReader image reader} to be used for reading this tile.
+     * Returns the image reader provider (never {@code null}). This is the provider used for
+     * creating the {@linkplain ImageReader image reader} to be used for reading this tile.
      *
      * @see ImageReaderSpi#createReaderInstance()
      */

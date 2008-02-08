@@ -1020,6 +1020,24 @@ public final class XArray {
     }
 
     /**
+     * Returns {@code true} if at least one element in the first array is {@linkplain Object#equals
+     * equals} to an element in the second array. The element doesn't need to be at the same index
+     * in both array.
+     * <p>
+     * This method should be used only for very small arrays since it may be very slow. If the
+     * arrays are large or if an array will be involved in more than one search, consider using
+     * {@link java.util.HashSet} instead.
+     */
+    public static boolean intersects(final Object[] array1, final Object[] array2) {
+        for (final Object element : array1) {
+            if (contains(array2, element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a string representation of an array of numbers. Current implementation
      * supports only primitive or subclasses of {@link Number}.
      *

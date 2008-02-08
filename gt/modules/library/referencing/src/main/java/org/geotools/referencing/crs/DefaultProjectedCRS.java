@@ -298,9 +298,9 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
             String name;
             if (nameMatches(desc, name=SEMI_MAJOR) || nameMatches(desc, name=SEMI_MINOR)) {
                 /*
-                 * Do not format semi-major and semi-minor axis length in most cases, since those
-                 * informations are provided in the ellipsoid. An exception occurs if the lengths
-                 * are different from the ones declared in the datum.
+                 * Do not format semi-major and semi-minor axis length in most cases,  since those
+                 * informations are provided in the ellipsoid. An exception to this rule occurs if
+                 * the lengths are different from the ones declared in the datum.
                  */
                 if (param instanceof ParameterValue) {
                     final double value = ((ParameterValue) param).doubleValue(axisUnit);

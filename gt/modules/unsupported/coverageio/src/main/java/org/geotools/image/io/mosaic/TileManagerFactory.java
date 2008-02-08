@@ -25,6 +25,8 @@ import java.awt.geom.AffineTransform; // For javadoc
 import org.geotools.factory.Hints;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.coverage.grid.ImageGeometry;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -48,6 +50,45 @@ public class TileManagerFactory extends AbstractFactory {
      */
     protected TileManagerFactory(final Hints hints) {
         // We have no usage for those hints at this time, but some may be added later.
+    }
+
+    /**
+     * Creates tile managers from the specified object, which may be {@code null}. If non-null, the
+     * object shall be an instance of {@code TileManager[]}, {@code TileManager}, {@code Tile[]} or
+     * {@code Collection<Tile>}.
+     *
+     * @param  tiles The tiles, or {@code null}.
+     * @return The tile managers, or {@code null} if {@code tiles} was null.
+     * @throws IllegalArgumentException if {@code tiles} is not an instance of a valid class,
+     *         or if it is an array or a collection containing null elements.
+     */
+    public TileManager[] createFromObject(final Object tiles) throws IllegalArgumentException {
+        final TileManager[] managers;
+        if (tiles == null) {
+            managers = null;
+        } else if (tiles instanceof TileManager[]) {
+            managers = ((TileManager[]) tiles).clone();
+        } else if (tiles instanceof TileManager) {
+            managers = new TileManager[] {(TileManager) tiles};
+        } else if (tiles instanceof Tile[]) {
+            managers = create((Tile[]) tiles);
+        } else if (tiles instanceof Collection) {
+            @SuppressWarnings("unchecked") // create(Collection) will checks indirectly.
+            final Collection<Tile> c = (Collection<Tile>) tiles;
+            managers = create(c);
+        } else {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, tiles.getClass(), TileManager.class));
+        }
+        if (managers != null) {
+            for (int i=0; i<managers.length; i++) {
+                if (managers[i] == null) {
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.NULL_ARGUMENT_$1, "input[" + i + ']'));
+                }
+            }
+        }
+        return managers;
     }
 
     /**

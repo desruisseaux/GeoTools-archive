@@ -224,9 +224,9 @@ public final class ImageUtilities {
      * This method it aimed to computing a tile size such that the tile grid would have overlapped
      * the image bound in order to avoid having tiles crossing the image bounds and being therefore
      * partially empty. This method will never returns a tile size smaller than
-     * {@value #GEOTOOLS_MIN_TILE_SIZE}. If this method can't suggest a size, then it left the corresponding
-     * {@code size} field ({@link Dimension#width width} or {@link Dimension#height height})
-     * unchanged.
+     * {@value ImageUtilities#GEOTOOLS_MIN_TILE_SIZE}. If this method can't suggest a size,
+     * then it left the corresponding {@code size} field ({@link Dimension#width width} or
+     * {@link Dimension#height height}) unchanged.
      * <p>
      * The {@link Dimension#width width} and {@link Dimension#height height} fields are processed
      * independently in the same way. The following discussion use the {@code width} field as an

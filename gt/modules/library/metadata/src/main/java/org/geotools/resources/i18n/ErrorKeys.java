@@ -702,6 +702,11 @@ public final class ErrorKeys {
     public static final int NO_IMAGE_INPUT = 97;
 
     /**
+     * No output set.
+     */
+    public static final int NO_IMAGE_OUTPUT = 202;
+
+    /**
      * No suitable image reader for this input.
      */
     public static final int NO_IMAGE_READER = 98;
