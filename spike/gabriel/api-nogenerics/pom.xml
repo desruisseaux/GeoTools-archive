@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-api-parametrized-arguments</artifactId>
+  <artifactId>gt2-api-nogenerics</artifactId>
   <packaging>jar</packaging>
   <name>API interfaces</name>
   <url>http://maven.geotools.fr/reports/modules/library/api/</url>
