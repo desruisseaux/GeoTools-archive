@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JPopupMenu;
 
-import org.geotools.gui.swing.contexttree.popup.MapRelatedTreePopupItem;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
-import org.geotools.gui.swing.map.Map;
-import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  * Dynamic Popup used by JXMapContextTree
@@ -36,20 +33,8 @@ public final class JContextTreePopup {
     final ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
     private final TreeTable treetable;
     private final JContextTree frame;
-    private Map map;
 
-    
-    /**
-     *
-     * Creates a new instance of JXMapContextTreePopup
-     * Dynamic Popup used by JXMapContextTree
-     * @param tree the tree related to the poup
-     * @param treetable 
-     */
-    JContextTreePopup(TreeTable treetable,JContextTree frame) {
-        this(treetable,frame,null);
-    }
-    
+        
     /**
      * Creates a new instance of JXMapContextTreePopup
      * Dynamic Popup used by JXMapContextTree
@@ -57,11 +42,10 @@ public final class JContextTreePopup {
      * @param map 
      * @param treetable the tree related to the popup
      */
-    JContextTreePopup(TreeTable treetable,JContextTree frame,Map2D map) {
+    JContextTreePopup(TreeTable treetable,JContextTree frame) {
         super();
         this.treetable = treetable;
         this.frame = frame;
-        this.map = map;
         this.popup = new TreePopup(treetable, this);
     }
         
@@ -73,17 +57,7 @@ public final class JContextTreePopup {
         return frame;
     }
     
-    public void setMap(Map map){
-        this.map = map;
-        
-        for(TreePopupItem pc : controls){
-            
-            if( pc instanceof MapRelatedTreePopupItem){
-                ((MapRelatedTreePopupItem)pc).setMap(map);
-            }
-        }
-    }
-       
+           
     /**
      * Add a Control to the PopupMenu
      * @param control the new popup

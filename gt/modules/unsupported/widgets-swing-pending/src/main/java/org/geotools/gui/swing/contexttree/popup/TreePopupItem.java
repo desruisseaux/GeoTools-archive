@@ -16,8 +16,8 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import org.geotools.gui.swing.contexttree.SelectionData;
 import java.awt.Component;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -31,13 +31,13 @@ public interface TreePopupItem {
      * @param selection 
      * @return 
      */
-    public boolean isValid(SelectionData[] selection);
+    public boolean isValid(TreePath[] selection);
     
     /**
      * return the component to by shown
      * @param selection 
      * @return 
      */
-    public Component getComponent(SelectionData[] selection);
+    public Component getComponent(TreePath[] selection);
     
 }

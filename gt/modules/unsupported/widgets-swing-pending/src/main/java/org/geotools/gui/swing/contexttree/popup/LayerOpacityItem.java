@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.column.OpacityComponent;
+import org.geotools.map.MapLayer;
 
 /**
  *
@@ -35,15 +37,18 @@ public class LayerOpacityItem implements TreePopupItem{
         comp.setOpaque(false);
     }
            
-    public boolean isValid(SelectionData[] selection) {
+    public boolean isValid(TreePath[] selection) {
         if (selection.length == 1) {
-            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
+            ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();            
+            return ( node.getUserObject() instanceof MapLayer ) ;
         }
-        return false;
+        return false;        
     }
 
-    public Component getComponent(SelectionData[] selection) {
-        comp.parse(selection[0].getLayer());
+    public Component getComponent(TreePath[] selection) {
+        ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+        MapLayer layer = (MapLayer) node.getUserObject() ;        
+        comp.parse(layer);
         return comp;
     }
 

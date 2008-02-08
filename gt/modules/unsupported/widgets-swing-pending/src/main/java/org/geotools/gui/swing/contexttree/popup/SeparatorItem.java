@@ -21,7 +21,7 @@ import java.awt.Component;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
 
 /**
  * Default popup control separator, use for JContextTreePopup
@@ -40,11 +40,11 @@ public class SeparatorItem extends JSeparator implements TreePopupItem{
         setOrientation(SwingConstants.HORIZONTAL);
     }
     
-    public boolean isValid(SelectionData[] selection) {
+    public boolean isValid(TreePath[] selection) {
         return true;
     }
 
-    public Component getComponent(SelectionData[] selection) {
+    public Component getComponent(TreePath[] selection) {
         return this;
     }
     

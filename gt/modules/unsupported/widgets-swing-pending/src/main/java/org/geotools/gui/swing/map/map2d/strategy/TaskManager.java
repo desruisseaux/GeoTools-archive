@@ -13,38 +13,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.contexttree;
 
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
+package org.geotools.gui.swing.map.map2d.strategy;
 
 /**
  *
  * @author johann sorel
  */
-public final class SelectionData {
-    
-    private final MapContext context;
-    private final MapLayer layer;
-    private final Object sub;
+public class TaskManager {
 
-    SelectionData(MapContext context, MapLayer layer, Object obj) {
-        this.context = context;
-        this.layer = layer;
-        this.sub = obj;
-    }
+   
     
-    public MapContext getContext(){
-        return context;
-    }
-    
-    public MapLayer getLayer(){
-        return layer;
-    }
-    
-    public Object getSubObject(){
-        return sub;
-    }
     
 }
-

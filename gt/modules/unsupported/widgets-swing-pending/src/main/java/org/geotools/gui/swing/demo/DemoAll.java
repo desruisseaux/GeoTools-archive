@@ -267,7 +267,7 @@ public class DemoAll extends javax.swing.JFrame {
 
         popup.addItem(new LayerVisibilityItem());           //layer         
         popup.addItem(new SeparatorItem());
-        popup.addItem(new LayerZoomItem(null));              //layer
+        popup.addItem(new LayerZoomItem(map));              //layer
         popup.addItem(new LayerFeatureItem());              //layer
         popup.addItem(new ContextActiveItem(tree));         //context
         popup.addItem(new SeparatorItem());
@@ -285,7 +285,6 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new RuleMaxScaleItem());
 
 
-        popup.setMap(map);
         if(map instanceof SelectableMap2D){
             colSelection.setMap( (SelectableMap2D)map);
         }

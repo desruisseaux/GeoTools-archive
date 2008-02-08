@@ -22,8 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.icon.IconBundle;
 
 /**
@@ -55,11 +55,11 @@ public class CutItem implements TreePopupItem{
         
     }
     
-    public boolean isValid(SelectionData[] selection) {
-        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
+    public boolean isValid(TreePath[] selection) {
+        return tree.selectionContainOnlyContexts() || tree.selectionContainOnlyLayers();
     }
 
-    public Component getComponent(SelectionData[] selection) {
+    public Component getComponent(TreePath[] selection) {
         cutitem.setEnabled( tree.canCutSelection() );
         return cutitem;
     }

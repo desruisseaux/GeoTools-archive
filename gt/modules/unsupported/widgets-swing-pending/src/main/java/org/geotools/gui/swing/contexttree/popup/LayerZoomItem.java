@@ -20,7 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapLayer;
@@ -29,7 +30,7 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  * Default popup control for zoom on MapLayer, use for JContextTreePopup
  */
-public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelatedTreePopupItem {
+public class LayerZoomItem extends JMenuItem implements TreePopupItem {
 
     private MapLayer layer;
     private NavigableMap2D map;
@@ -70,15 +71,17 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
                 });
     }
    
-    public boolean isValid(SelectionData[] selection) {
+    public boolean isValid(TreePath[] selection) {
         if (selection.length == 1) {
-            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
+            ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();            
+            return ( node.getUserObject() instanceof MapLayer ) ;
         }
         return false;
     }
 
-    public Component getComponent(SelectionData[] selection) {
-        layer = selection[0].getLayer();
+    public Component getComponent(TreePath[] selection) {
+        ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+        layer = (MapLayer) node.getUserObject() ;
         this.setEnabled((map != null));
 
         return this;

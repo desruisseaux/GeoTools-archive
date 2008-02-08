@@ -15,7 +15,6 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Component;
 import java.awt.Point;
 import javax.swing.JPopupMenu;
@@ -23,8 +22,6 @@ import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 
 /**
  *
@@ -51,7 +48,7 @@ final class TreePopup extends JPopupMenu {
         if (view) {
             removeAll();
 
-            SelectionData[] selection = {};
+            TreePath[] selection = {};
 
             if (treetable != null) {
 
@@ -68,33 +65,8 @@ final class TreePopup extends JPopupMenu {
                     treetable.getTreeSelectionModel().clearSelection();
                 }
 
-                selection = manager.getTree().getSelection();
+                selection = treetable.getTreeSelectionModel().getSelectionPaths();
                 
-//                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
-//
-//                if (paths != null) {
-//
-//                    selection = new SelectionData[paths.length];
-//
-//                    for (int i = 0; i < paths.length; i++) {
-//
-//                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
-//                        Object last = lastnode.getUserObject();
-//
-//                        if (last instanceof MapLayer) {
-//                            MapLayer layer = (MapLayer) last;
-//                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-//                            SelectionData data = new SelectionData(context, layer);
-//                            selection[i] = data;
-//                        } else if (last instanceof MapContext) {
-//                            MapContext context = (MapContext) last;
-//                            SelectionData data = new SelectionData(context, null);
-//                            selection[i] = data;
-//                        }
-//
-//                    }
-//                }
-
             }
 
             for (TreePopupItem control : manager.controls) {

@@ -22,8 +22,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
 
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.map.MapContext;
 
 
@@ -64,16 +65,18 @@ public class ContextActiveItem extends JCheckBoxMenuItem implements TreePopupIte
             }
         });
     }
-
-    public boolean isValid(SelectionData[] selection) {
+    
+    public boolean isValid(TreePath[] selection) {
         if (selection.length == 1) {
-            return (selection[0].getLayer() == null && selection[0].getSubObject() == null) ;
+            ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();            
+            return ( node.getUserObject() instanceof MapContext ) ;
         }
         return false;
     }
 
-    public Component getComponent(SelectionData[] selection) {
-        context = selection[0].getContext();
+    public Component getComponent(TreePath[] selection) {
+        ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+        context = (MapContext) node.getUserObject() ;
         this.setSelected( context.equals(xtree.getActiveContext()));
         
         return this;

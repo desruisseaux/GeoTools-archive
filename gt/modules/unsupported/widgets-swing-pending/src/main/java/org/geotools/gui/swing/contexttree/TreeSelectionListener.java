@@ -14,30 +14,24 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.popup;
+package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.map.Map;
+import java.util.EventListener;
+import javax.swing.event.TreeSelectionEvent;
 
 /**
- * Interface for TreePopupItem needing a MapPane element 
+ * Selection listener for JContextTree
  * 
  * @author johann sorel
  */
-public interface MapRelatedTreePopupItem extends TreePopupItem {
-
+public interface TreeSelectionListener extends EventListener{
+        
     /**
-     * set target MapPane
+     * When selection changed
      * 
-     * @param map
+     * @param event the event
      */
-    public void setMap(Map map);
-    
-    /**
-     * get MapPane
-     * 
-     * @return
-     */
-    public Map getMap();
-    
-    
+    public void selectionChanged(TreeSelectionEvent event) ;
+     
+        
 }

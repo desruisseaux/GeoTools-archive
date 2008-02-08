@@ -8,7 +8,8 @@ package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
 import javax.swing.SpinnerNumberModel;
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.styling.Rule;
 
 /**
@@ -80,16 +81,18 @@ public class RuleMaxScaleItem extends javax.swing.JPanel implements TreePopupIte
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
-    public boolean isValid(SelectionData[] selection) {
+    public boolean isValid(TreePath[] selection) {
         rule = null;
         if (selection.length == 1) {
-            return (selection[0].getSubObject() instanceof Rule) ;
+            ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+            return (node.getUserObject() instanceof Rule) ;
         }
         return false;
     }
 
-    public Component getComponent(SelectionData[] selection) {
-        rule = (Rule) selection[0].getSubObject();
+    public Component getComponent(TreePath[] selection) {
+        ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+        rule = (Rule) node.getUserObject() ;
         gui_scale.setValue( rule.getMaxScaleDenominator() );
         return this;
     }

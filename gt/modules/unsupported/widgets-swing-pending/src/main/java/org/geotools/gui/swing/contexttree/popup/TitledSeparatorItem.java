@@ -21,7 +21,7 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.SwingConstants;
 
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.JXTitledSeparator;
 
 /**
@@ -70,8 +70,13 @@ public abstract class TitledSeparatorItem extends JXTitledSeparator implements T
         super(title,position,img);
     }
     
-    public Component getComponent(SelectionData[] selection) {
+    public Component getComponent(TreePath[] selection) {
         return this;
     }
+    
+    public boolean isValid(TreePath[] selection){
+        return true;
+    }
+    
     
 }

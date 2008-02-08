@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreeSelectionModel;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
@@ -45,13 +46,17 @@ import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapContext;
 
 /**
- *
+ * JContextTree is used to handle MapContexts and their MapLayers. this component
+ * is based on a JXTreeTable.
  * @author johann sorel
  */
 public class JContextTree extends JComponent{
 
     private final TreeTable treetable;
     
+    /**
+     * build a default JContextTree.
+     */
     public JContextTree(){
         treetable = new TreeTable(this);
         
@@ -65,21 +70,24 @@ public class JContextTree extends JComponent{
     }
     
     
+    /**
+     * get the Popupmenu manager
+     * @return JContextTreePopup
+     */
     public JContextTreePopup getPopupMenu(){
         return treetable.getPopupMenu();
     }
-    
-    
-    public SelectionData[] getSelection(){
-        return treetable.getSelectionArray();
+        
+    public TreeSelectionModel getTreeSelectionModel(){
+        return treetable.getTreeSelectionModel();
+    }
+        
+    public boolean selectionContainOnlyLayers(){
+        return treetable.onlyMapLayers(getTreeSelectionModel().getSelectionPaths());
     }
     
-    public boolean containOnlyLayers(SelectionData[] datas){
-        return treetable.onlyMapLayers(datas);
-    }
-    
-    public boolean containOnlyContexts(SelectionData[] datas){
-        return treetable.onlyMapContexts(datas);
+    public boolean selectionContainOnlyContexts(){
+        return treetable.onlyMapContexts(getTreeSelectionModel().getSelectionPaths());
     }
     
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +117,7 @@ public class JContextTree extends JComponent{
                 
         popup.addItem(new LayerVisibilityItem());           //layer         
         popup.addItem(new SeparatorItem() );        
-        popup.addItem(new LayerZoomItem(null));              //layer
+        popup.addItem(new LayerZoomItem(map));              //layer
         popup.addItem(new LayerFeatureItem());              //layer
         popup.addItem(new ContextActiveItem(tree));         //context
         popup.addItem(new SeparatorItem() );
@@ -123,7 +131,6 @@ public class JContextTree extends JComponent{
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
                 
-        popup.setMap(map);
         
         tree.revalidate();
 

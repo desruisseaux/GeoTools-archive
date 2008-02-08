@@ -49,8 +49,6 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
 final class TreeTable extends JXTreeTable {
 
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/contexttree/Bundle");
-    
-    
     /**
      * Default copy action used for Key Input
      */
@@ -99,7 +97,7 @@ final class TreeTable extends JXTreeTable {
     /**
      * the buffer containing the cutted/copied datas
      */
-    private final List<SelectionData> buffer = new ArrayList<SelectionData>();
+    private final List<Object> buffer = new ArrayList<Object>();
     private final JContextTreePopup popupManager;
     private final TreeSelectionManager selectionManager;
     /**
@@ -237,16 +235,6 @@ final class TreeTable extends JXTreeTable {
         }
     }
 
-    private Object findSubObject(TreePath tp) {
-        ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-        Object obj = lastnode.getUserObject();
-        if (!(obj instanceof MapLayer) && !(obj instanceof MapContext)) {
-            return obj;
-        } else {
-            return null;
-        }
-    }
-
     TreeSelectionManager getSelectionManager() {
         return selectionManager;
     }
@@ -255,54 +243,19 @@ final class TreeTable extends JXTreeTable {
         return popupManager;
     }
 
-    List<SelectionData> getSelectionList() {
+    List<Object> getSelectionList() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
-        List<SelectionData> temp = new ArrayList<SelectionData>();
+        List<Object> temp = new ArrayList<Object>();
 
         if (hasSelection(selections)) {
 
             for (TreePath tp : selections) {
-                MapContext context = findContext(tp);
-                MapLayer layer = findLayer(tp);
-                Object obj = findSubObject(tp);
-                SelectionData data = new SelectionData(context, layer, obj);
-                temp.add(data);
+                temp.add(((ContextTreeNode) tp.getLastPathComponent()).getUserObject());
             }
 
-//            if (onlyMapLayers(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-//                    MapLayer layer = (MapLayer) lastnode.getUserObject();
-//                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-//                    SelectionData data = new SelectionData(context, layer);
-//                    temp.add(data);
-//                }
-//
-//
-//            } else if (onlyMapContexts(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-//                    MapContext context = (MapContext) lastnode.getUserObject();
-//                    SelectionData data = new SelectionData(context, null);
-//                    temp.add(data);
-//                }
-//
-//            }
         }
 
         return temp;
-    }
-
-    SelectionData[] getSelectionArray() {
-        SelectionData[] datas = null;
-
-        List<SelectionData> temp = getSelectionList();
-        datas = new SelectionData[temp.size()];
-        temp.toArray(datas);
-
-        return datas;
     }
 
     /**
@@ -341,17 +294,8 @@ final class TreeTable extends JXTreeTable {
         }
         return false;
     }
-        
-    private boolean onlyMapContexts(List<SelectionData> lst) {
-        for (SelectionData data : lst) {
-            if (data.getLayer() != null || data.getSubObject() != null) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    private boolean onlyMapContexts(TreePath[] paths) {
+    public boolean onlyMapContexts(TreePath[] paths) {
         for (TreePath path : paths) {
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapContext)) {
                 return false;
@@ -359,26 +303,18 @@ final class TreeTable extends JXTreeTable {
         }
         return true;
     }
-    
-    public boolean onlyMapContexts(SelectionData[] datas){        
-        for (SelectionData data : datas) {
-            if (data.getLayer() != null || data.getSubObject() != null) {
-                return false;
-            }
-        }
-        return true;        
-    }
 
-    private boolean onlyMapLayers(List<SelectionData> lst) {
-        for (SelectionData data : lst) {
-            if (data.getLayer() == null || data.getSubObject() != null) {
+    public boolean onlyMapContexts(List<Object> buf) {
+        for (Object obj : buf) {
+            if (!(obj instanceof MapContext)) {
                 return false;
             }
         }
         return true;
     }
-
-    private boolean onlyMapLayers(TreePath[] paths) {
+    
+    
+    public boolean onlyMapLayers(TreePath[] paths) {
         for (TreePath path : paths) {
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapLayer)) {
                 return false;
@@ -387,9 +323,9 @@ final class TreeTable extends JXTreeTable {
         return true;
     }
     
-    public boolean onlyMapLayers(SelectionData[] datas){
-         for (SelectionData data : datas) {
-            if (data.getLayer() == null || data.getSubObject() != null) {
+    public boolean onlyMapLayers(List<Object> buf) {
+        for (Object obj : buf) {
+            if (!(obj instanceof MapLayer)) {
                 return false;
             }
         }
@@ -594,44 +530,24 @@ final class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
-            List<SelectionData> datas = getSelectionList();
+            if (onlyMapLayers(selections)) {
+                for (TreePath tp : selections) {
+                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+                    MapLayer layer = (MapLayer) lastnode.getUserObject();
+                    buffer.add(layer);
+                }
+                return true;
 
-            if (onlyMapLayers(datas) || onlyMapContexts(datas)) {
-                for (SelectionData data : datas) {
-                    buffer.add(data);
+            } else if (onlyMapContexts(selections)) {
+                for (TreePath tp : selections) {
+                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
+                    MapContext context = (MapContext) lastnode.getUserObject();
+                    buffer.add(context);
                 }
                 return true;
             }
-
-//            if (onlyMapLayers(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-//                    MapLayer layer = (MapLayer) lastnode.getUserObject();
-//                    MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
-//                    SelectionData data = new SelectionData(context, layer);
-//                    buffer.add(data);
-//                }
-//
-//                return true;
-//
-//            } else if (onlyMapContexts(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    ContextTreeNode lastnode = (ContextTreeNode) tp.getLastPathComponent();
-//                    MapContext context = (MapContext) lastnode.getUserObject();
-//                    SelectionData data = new SelectionData(context, null);
-//                    buffer.add(data);
-//                }
-//
-//                return true;
-//            }
-
-
         }
-
         return false;
-
     }
 
     /**
@@ -645,44 +561,25 @@ final class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
-            List<SelectionData> datas = getSelectionList();
+            if (onlyMapLayers(selections)) {
+                for (TreePath path : selections) {
+                    ContextTreeNode childNode = (ContextTreeNode) path.getLastPathComponent();
+                    ContextTreeNode parentNode = (ContextTreeNode) childNode.getParent();
 
-            if (onlyMapLayers(datas)) {
-                for (SelectionData data : datas) {
-                    buffer.add(data);
-                    data.getContext().removeLayer(data.getLayer());
+                    buffer.add(childNode.getUserObject());
+                    ((MapContext) parentNode.getUserObject()).removeLayer((MapLayer) childNode.getUserObject());
                 }
                 return true;
-            }else if(onlyMapContexts(datas)){
-                for (SelectionData data : datas) {
-                    buffer.add(data);
-                    removeMapContext(data.getContext());
+            } else if (onlyMapContexts(selections)) {
+                for (TreePath path : selections) {
+                    ContextTreeNode parentNode = (ContextTreeNode) path.getLastPathComponent();
+
+                    buffer.add(parentNode.getUserObject());
+                    removeMapContext((MapContext) parentNode.getUserObject());
                 }
                 return true;
             }
 
-//            if (onlyMapLayers(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
-//                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
-//
-//                    SelectionData data = new SelectionData(parent, layer);
-//                    buffer.add(data);
-//                    parent.removeLayer(layer);
-//                }
-//                return true;
-//            } else if (onlyMapContexts(selections)) {
-//
-//                for (TreePath tp : selections) {
-//                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
-//
-//                    SelectionData data = new SelectionData(context, null);
-//                    buffer.add(data);
-//                    removeMapContext(context);
-//                }
-//                return true;
-//            }
 
         }
         return false;
@@ -712,8 +609,8 @@ final class TreeTable extends JXTreeTable {
                             MapLayer insertlayer = (MapLayer) ((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject();
                             MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) selections[0].getLastPathComponent()).getParent()).getUserObject();
 
-                            for (SelectionData data : buffer) {
-                                MapLayer layer = data.getLayer();
+                            for (Object data : buffer) {
+                                MapLayer layer = (MapLayer) data;
 
                                 if (parent.indexOf(layer) == -1) {
                                     parent.addLayer(layer);
@@ -731,8 +628,8 @@ final class TreeTable extends JXTreeTable {
                             MapContext context = (MapContext) ((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject();
 
 
-                            for (SelectionData data : buffer) {
-                                MapLayer layer = data.getLayer();
+                            for (Object data : buffer) {
+                                MapLayer layer = (MapLayer) data;
 
                                 if (context.indexOf(layer) == -1) {
                                     context.addLayer(layer);
@@ -750,8 +647,8 @@ final class TreeTable extends JXTreeTable {
 
             } else if (onlyMapContexts(buffer)) {
 
-                for (SelectionData data : buffer) {
-                    MapContext context = data.getContext();
+                for (Object data : buffer) {
+                    MapContext context = (MapContext) data;
 
                     if (getMapContextIndex(context) == -1) {
                         addMapContext(context);
@@ -774,8 +671,8 @@ final class TreeTable extends JXTreeTable {
      * 
      * @return object array, can be MapLayers or MapContexts or empty array
      */
-    SelectionData[] getBuffer() {
-        return buffer.toArray(new SelectionData[buffer.size()]);
+    Object[] getBuffer() {
+        return buffer.toArray(new Object[buffer.size()]);
     }
 
     void clearBuffer() {
@@ -967,6 +864,6 @@ final class TreeTable extends JXTreeTable {
      */
     TreeContextListener[] getTreeContextListeners() {
         return getTreeTableModel().getTreeContextListeners();
-    }    
+    }
 }
 

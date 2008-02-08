@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -104,11 +104,11 @@ public class PasteItem implements TreePopupItem {
         return tooltip;
     }
 
-    public boolean isValid(SelectionData[] selection) {
-        return tree.containOnlyContexts(selection) || tree.containOnlyLayers(selection);
+    public boolean isValid(TreePath[] selection) {
+        return tree.selectionContainOnlyContexts() || tree.selectionContainOnlyLayers();
     }
 
-    public Component getComponent(SelectionData[] selection) {
+    public Component getComponent(TreePath[] selection) {
         pasteitem.setEnabled(tree.canPasteBuffer());
         pasteitem.setToolTipText(buildToolTip(tree.getBuffer()));
 

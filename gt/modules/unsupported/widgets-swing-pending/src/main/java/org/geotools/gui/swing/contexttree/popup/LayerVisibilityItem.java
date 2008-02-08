@@ -25,7 +25,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import javax.swing.JPanel;
-import org.geotools.gui.swing.contexttree.SelectionData;
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.column.OpacityComponent;
 import org.geotools.map.MapLayer;
 
@@ -69,15 +70,17 @@ public class LayerVisibilityItem extends JPanel implements TreePopupItem{
     }
     
     
-    public boolean isValid(SelectionData[] selection) {
+    public boolean isValid(TreePath[] selection) {
         if (selection.length == 1) {
-            return (selection[0].getLayer() != null && selection[0].getSubObject() == null) ;
+            ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();            
+            return ( node.getUserObject() instanceof MapLayer ) ;
         }
         return false;
     }
 
-    public Component getComponent(SelectionData[] selection) {
-        layer = selection[0].getLayer();
+    public Component getComponent(TreePath[] selection) {
+        ContextTreeNode node = (ContextTreeNode) selection[0].getLastPathComponent();  
+        layer = (MapLayer) node.getUserObject() ;
         jck.setSelected(layer.isVisible());
         opa.parse(layer);
         
