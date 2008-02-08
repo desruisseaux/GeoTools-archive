@@ -70,7 +70,7 @@ import org.geotools.feature.SchemaException;
  * @source $URL$
  * @version $Id$
  */
-public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
+public interface DataStore extends DataRepository<SimpleFeatureType,SimpleFeature>{
     /**
      * Creates storage for a new <code>featureType</code>.
      *
@@ -130,18 +130,6 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
     String[] getTypeNames() throws IOException;
 
     /**
-     * Information about this service.
-     * <p>
-     * This method offers access to a summary of header or metadata
-     * information describing the service.
-     * </p>
-     * Subclasses may return a specific ServiceInfo instance that has
-     * additional information (such as FilterCapabilities). 
-     * @return SeviceInfo
-     */
-    ServiceInfo getInfo();
-    
-    /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
      *
      * <p>
@@ -154,7 +142,6 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @throws IOException If typeName cannot be found
      */
-    //FeatureType getSchema(String typeName) throws IOException;
     SimpleFeatureType getSchema(String typeName) throws IOException;
 
     /**
@@ -184,7 +171,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      * @throws IOException If FeatureSource is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
-    FeatureSource<SimpleFeatureType,SimpleFeature> getView(Query query) throws IOException, SchemaException;
+    FeatureSource getView(Query query) throws IOException, SchemaException;
     
     /**
      * Access a FeatureSource for typeName providing a high-level API.
@@ -209,7 +196,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @return FeatureSource (or subclass) providing operations for typeName
      */
-    FeatureSource<SimpleFeatureType,SimpleFeature> getFeatureSource(String typeName) throws IOException;
+    FeatureSource getFeatureSource(String typeName) throws IOException;
 
     /**
      * Access a FeatureReader providing access to Feature information.
@@ -321,7 +308,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureReader<SimpleFeatureType,SimpleFeature> getFeatureReader(Query query, Transaction transaction)
+    FeatureReader getFeatureReader(Query query, Transaction transaction)
         throws IOException;
 
     /**
@@ -378,7 +365,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @return FeatureWriter Allows Sequential Modification of featureType
      */
-    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+    FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
         throws IOException;
 
     /**
@@ -400,7 +387,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriter(String typeName, Transaction transaction)
+    FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
         throws IOException;
 
     /**
@@ -419,7 +406,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType,SimpleFeature>{
      *
      * @throws IOException
      */
-    FeatureWriter<SimpleFeatureType,SimpleFeature> getFeatureWriterAppend(String typeName, Transaction transaction)
+    FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
         throws IOException;
 
     /**

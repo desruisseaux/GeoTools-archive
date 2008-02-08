@@ -81,13 +81,13 @@ import org.opengis.feature.type.FeatureType;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureReader extends Reader<SimpleFeatureType, SimpleFeature> {
+public interface Reader<T extends FeatureType, F extends Feature> {
     /**
      * Return the FeatureType this reader has been configured to create.
      *
      * @return the FeatureType of the Features this FeatureReader will create.
      */
-    SimpleFeatureType getFeatureType();
+    T getFeatureType();
     
     /**
      * Reads the next Feature in the FeatureReader.
@@ -100,5 +100,24 @@ public interface FeatureReader extends Reader<SimpleFeatureType, SimpleFeature> 
      * @throws NoSuchElementException If there are no more Features in the
      *         Reader.
      */
-    SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException;
+    F next() throws IOException, IllegalArgumentException, NoSuchElementException;
+    
+    /**
+     * Query whether this FeatureReader has another Feature.
+     *
+     * @return True if there are more Features to be read. In other words, true
+     *         if calls to next would return a feature rather than throwing an
+     *         exception.
+     *
+     * @throws IOException If an error occurs determining if there are more
+     *         Features.
+     */
+    boolean hasNext() throws IOException;
+
+    /**
+     * Release the underlying resources associated with this stream.
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    void close() throws IOException;
 }
