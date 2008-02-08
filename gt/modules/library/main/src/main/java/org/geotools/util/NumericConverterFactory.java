@@ -91,14 +91,17 @@ public class NumericConverterFactory implements ConverterFactory {
     			}
     		
     			//floating point
+                        // JD: we use the string reprensentation to avoid coordinate
+                        // drift due to precision issues, there could be some 
+                        // performance issues with this.
     			if ( Double.class.equals( target ) ) {
-    				return new Double( s.doubleValue() );
+    				return new Double( s.toString() );
     			}
     			if ( Float.class.equals( target ) ) {
-    				return new Float( s.floatValue() );
+    				return new Float( s.toString() );
     			}
     			if ( BigDecimal.class.equals( target ) ) {
-    				return new BigDecimal( s.doubleValue() );
+    				return new BigDecimal( s.toString() );
     			}
     			
     			if (Number.class.equals( target )) {

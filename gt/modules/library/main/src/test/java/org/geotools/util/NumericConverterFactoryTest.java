@@ -60,7 +60,7 @@ public class NumericConverterFactoryTest extends TestCase {
 		//to double
 		assertEquals( 
 			new Double( 127.127 ).doubleValue(), 
-			((Double)convert( new Float( 127.127 ), Double.class )).doubleValue(), 0.001 
+			((Double)convert( new Float( 127.127 ), Double.class )).doubleValue(), 1e-10 
 		);
 		assertEquals( new Double( 127.127 ), convert( new Double( 127.127 ), Double.class ) );
 		assertEquals( new Double( 127.127 ), convert( new BigDecimal( 127.127 ), Double.class ) );
@@ -68,9 +68,9 @@ public class NumericConverterFactoryTest extends TestCase {
 		//to big decimal
 		assertEquals( 
 			new BigDecimal( 127.127 ).doubleValue(), 
-			((BigDecimal) convert( new Float( 127.127 ), BigDecimal.class )).doubleValue(), 0.001 
+			((BigDecimal) convert( new Float( 127.127 ), BigDecimal.class )).doubleValue(), 1e-10
 		);
-		assertEquals( new BigDecimal( 127.127 ), convert( new Double( 127.127 ), BigDecimal.class ) );
+		assertEquals( new BigDecimal( "127.127" ), convert( new Double( 127.127 ), BigDecimal.class ) );
 		assertEquals( new BigDecimal( 127.127 ), convert( new BigDecimal( 127.127 ), BigDecimal.class ) );
 	}
 	
