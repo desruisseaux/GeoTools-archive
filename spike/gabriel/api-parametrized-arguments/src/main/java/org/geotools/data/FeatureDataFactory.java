@@ -106,12 +106,12 @@ import org.opengis.feature.type.FeatureType;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public interface FeatureDataFactory<T extends FeatureType, F extends Feature> extends Factory {
+public interface FeatureDataFactory extends Factory {
 
-    FeatureData<T, F> createDataStore(Map params) throws IOException;
+    FeatureData createDataStore(Map params) throws IOException;
     //FeatureData<T, F> createFeatureData(Map params) throws IOException;
 
-    FeatureData<T, F> createNewDataStore(Map params) throws IOException;
+    FeatureData createNewDataStore(Map params) throws IOException;
     //FeatureData<T, F> createNewFeatureData(Map params) throws IOException;
 
     /**

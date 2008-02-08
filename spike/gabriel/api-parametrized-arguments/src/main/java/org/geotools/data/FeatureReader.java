@@ -80,7 +80,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureReader extends Reader<SimpleFeatureType, SimpleFeature> {
+public interface FeatureReader extends Reader{
     /**
      * Return the FeatureType this reader has been configured to create.
      *

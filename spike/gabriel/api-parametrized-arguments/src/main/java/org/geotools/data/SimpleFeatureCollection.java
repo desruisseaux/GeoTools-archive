@@ -9,6 +9,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * as it be cleaner and I don't actually want to introduce geoapi FeatureCollection as it kind
  * of not fit with the rest of our data api being home made. 
  */
-public interface SimpleFeatureCollection extends FeatureCollection<SimpleFeatureType, SimpleFeature> {
+public interface SimpleFeatureCollection extends FeatureCollection {
 
 }

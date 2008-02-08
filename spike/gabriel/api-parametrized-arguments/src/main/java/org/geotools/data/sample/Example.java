@@ -50,19 +50,17 @@ public class Example {
         // WFSDataStore, etc
         Iterator repositories = DataStoreFinder.getAvailableRepositories();
         Name typeName = null; // use a real one in real life
-        FeatureData<FeatureType, Feature> ds = DataStoreFinder.getDataRepository(new HashMap());
+        FeatureData ds = DataStoreFinder.getDataRepository(new HashMap());
 
-        Reader<FeatureType, Feature> featureReader = ds.getFeatureSource(typeName)
-                .getFeatureReader(Query.ALL);
+        Reader featureReader = ds.getFeatureSource(typeName).getFeatureReader(Query.ALL);
         Feature next = featureReader.next();
 
-        Source<FeatureType, Feature> featureSource = ds.getFeatureSource(typeName);
+        Source featureSource = ds.getFeatureSource(typeName);
         FeatureType schema = featureSource.getSchema();
-        FeatureCollection<FeatureType, Feature> features = featureSource.getFeatures();
+        FeatureCollection features = featureSource.getFeatures();
 
-        Store<FeatureType, Feature> store = (Store<FeatureType, Feature>) ds
-                .getFeatureSource(typeName);
-        Writer<FeatureType, Feature> featureWriter = store.getFeatureWriter(Query.ALL);
+        Store store = (Store) ds.getFeatureSource(typeName);
+        Writer featureWriter = store.getFeatureWriter(Query.ALL);
         Feature next2 = featureWriter.next();
         FeatureType featureType = featureWriter.getFeatureType();
     }

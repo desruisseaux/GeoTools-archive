@@ -46,7 +46,7 @@ import org.opengis.filter.Filter;
  * &#064;version $Id$
  * 
  */
-public interface Locking<T extends FeatureType, F extends Feature> extends Store<T, F> {
+public interface Locking extends Store {
     /**
      * All locking operations will operate against the provided
      * <code>lock</code>.

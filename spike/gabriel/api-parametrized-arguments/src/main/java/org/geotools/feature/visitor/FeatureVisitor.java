@@ -16,6 +16,7 @@
 package org.geotools.feature.visitor;
 
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -26,10 +27,10 @@ import org.opengis.feature.Feature;
  * @since 2.2.M2
  * @source $URL$
  */
-public abstract class FeatureVisitor<F extends Feature> implements org.opengis.feature.FeatureVisitor<F> {
-	public Object visit(F feature, Object extraData) {
+public abstract class FeatureVisitor implements org.opengis.feature.FeatureVisitor {
+	public Object visit(SimpleFeature feature, Object extraData) {
 		visit( feature );
 		return extraData;
 	}	
-    public abstract void visit(F feature);
+    public abstract void visit(Feature feature);
 }

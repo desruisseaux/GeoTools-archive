@@ -18,8 +18,6 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.identity.FeatureId;
 
 /**
@@ -43,8 +41,7 @@ import org.opengis.filter.identity.FeatureId;
  *         http://svn.geotools.org/geotools/trunk/spike/gabriel/api/src/main/java/org/geotools/data/FeatureStore.java $
  * @version $Id$
  */
-public interface FeatureStore extends
-        Store<SimpleFeatureType, SimpleFeature>, FeatureSource {
+public interface FeatureStore extends Store, FeatureSource {
     /**
      * Adds all features from the passed feature collection to the datasource.
      * 

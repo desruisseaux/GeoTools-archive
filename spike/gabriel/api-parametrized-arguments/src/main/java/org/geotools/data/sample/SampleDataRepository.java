@@ -7,16 +7,15 @@ import org.geotools.data.FeatureData;
 import org.geotools.data.Query;
 import org.geotools.data.Source;
 import org.geotools.feature.SchemaException;
-import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
-public class SampleDataRepository implements FeatureData<FeatureType, Feature> {
+public class SampleDataRepository implements FeatureData {
 
     public void createSchema(FeatureType featureType) throws IOException {
     }
 
-    public Source<FeatureType, Feature> getFeatureSource(Name name) throws IOException {
+    public Source getFeatureSource(Name name) throws IOException {
         return null;
     }
 
@@ -28,7 +27,7 @@ public class SampleDataRepository implements FeatureData<FeatureType, Feature> {
         return null;
     }
 
-    public Source<FeatureType, Feature> getView(Query query) throws IOException, SchemaException {
+    public Source getView(Query query) throws IOException, SchemaException {
         return null;
     }
 

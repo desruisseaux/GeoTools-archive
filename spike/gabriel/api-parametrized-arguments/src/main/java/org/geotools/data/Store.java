@@ -18,12 +18,10 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 
-import org.opengis.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
-import org.geotools.feature.FeatureCollection;
 
 /**
  * Provides storage of data for Features.
@@ -46,7 +44,7 @@ import org.geotools.feature.FeatureCollection;
  *         http://svn.geotools.org/geotools/trunk/spike/gabriel/api/src/main/java/org/geotools/data/Store.java $
  * @version $Id$
  */
-public interface Store<T extends FeatureType, F extends Feature> extends Source<T, F> {
+public interface Store extends Source {
     /**
      * Adds all features from the passed feature collection to the datasource.
      * 
@@ -57,7 +55,7 @@ public interface Store<T extends FeatureType, F extends Feature> extends Source<
      * @throws IOException
      *             if anything goes wrong.
      */
-    Set<FeatureId> addFeatures(FeatureCollection<T, F> collection) throws IOException;
+    Set<FeatureId> addFeatures(FeatureCollection collection) throws IOException;
 
     /**
      * Removes all of the features specificed by the passed filter from the
@@ -124,7 +122,7 @@ public interface Store<T extends FeatureType, F extends Feature> extends Source<
      * @throws IOException
      *             if there are any datasource errors.
      */
-    void setFeatures(Reader<T, F> reader) throws IOException;
+    void setFeatures(Reader reader) throws IOException;
 
     /**
      * Provides a transaction for commit/rollback control of this FeatureStore.
@@ -179,7 +177,7 @@ public interface Store<T extends FeatureType, F extends Feature> extends Source<
      * @return Writer used to update content in place
      * @throws IOException
      */
-    Writer<T, F> getFeatureWriter(Query query) throws IOException;
+    Writer getFeatureWriter(Query query) throws IOException;
 
     // Writer<T,F> getFeatureWriter(Filter filter) throws IOException; //
     // perhaps only this?
@@ -193,5 +191,5 @@ public interface Store<T extends FeatureType, F extends Feature> extends Source<
      * @return
      * @throws IOException
      */
-    // Writer<T, F> getFeatureWriterInsert() throws IOException;
+    // Writer getFeatureWriterInsert() throws IOException;
 }

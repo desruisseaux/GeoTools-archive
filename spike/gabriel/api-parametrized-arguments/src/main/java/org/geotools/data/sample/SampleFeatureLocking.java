@@ -18,7 +18,6 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.FeatureVisitor;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -27,40 +26,33 @@ import org.opengis.util.ProgressListener;
 
 /**
  * This fake implementation illustrates the actual problem with this approach,
- * that you cannot as easily narrow the parameters when they're genericized. See
- * {@link #setFeatures(FeatureReader)} and {@link #setFeatures(Reader)}, as
- * well as {@link #addFeatures(FeatureCollection)} and
- * {@link #addFeatures(SimpleFeatureCollection)}, they end up being overloaded
- * versions of the originals and go against the intent of the proposal that is
- * to keep the DataStore based API as close as possible as it was. See the third
- * spike apprach to find out how it would be to approach it in a way to only
- * parametrize the argument types strictly needed to cope with that goal.
+ * which is FeatureStore ends up with overloaded versions of setFeatures and
+ * addFeatures. If we can live with that and don't want to introduce generics in
+ * the api this would be the way to go.
  * 
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5.x
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/spike/gabriel/api-parametrized-arguments/src/main/java/org/geotools/data/sample/SampleFeatureLocking.java $
  */
 public class SampleFeatureLocking implements FeatureLocking {
 
     // ///////////////////////////////////////////////
-    // the following are the problematic methods and illustrate why this
-    // approach goes only half way////
+    // the following are the problematic methods ///
     // ///////////////////////////////////////////////
-
-    public void setFeatures(FeatureReader reader) throws IOException {
-    }
-
-    public void setFeatures(Reader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
-    }
-
-    public Set<FeatureId> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
-            throws IOException {
+    public Set<FeatureId> addFeatures(FeatureCollection collection) throws IOException {
         return null;
     }
 
     public Set<FeatureId> addFeatures(SimpleFeatureCollection collection) throws IOException {
         return null;
+    }
+
+    public void setFeatures(FeatureReader reader) throws IOException {
+    }
+
+    public void setFeatures(Reader reader) throws IOException {
     }
 
     // /////////
@@ -87,12 +79,11 @@ public class SampleFeatureLocking implements FeatureLocking {
     public void setTransaction(Transaction transaction) {
     }
 
-    public void accept(FeatureVisitor<SimpleFeature> visitor, ProgressListener listener)
-            throws IOException {
+    public void accept(FeatureVisitor visitor, ProgressListener listener) throws IOException {
     }
 
-    public void accept(Filter filter, FeatureVisitor<SimpleFeature> visitor,
-            ProgressListener listener) throws IOException {
+    public void accept(Filter filter, FeatureVisitor visitor, ProgressListener listener)
+            throws IOException {
     }
 
     public void addFeatureListener(FeatureListener listener) {

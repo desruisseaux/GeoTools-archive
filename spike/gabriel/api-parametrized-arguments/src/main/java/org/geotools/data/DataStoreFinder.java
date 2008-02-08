@@ -26,8 +26,6 @@ import java.util.logging.Logger;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.FeatureType;
 
 /**
  * Borrowed from main module to keep the spike self contained.
@@ -56,7 +54,7 @@ public final class DataStoreFinder {
      * @throws IOException
      */
     public static DataStore getDataStore(Map params) throws IOException {
-        FeatureData<? extends FeatureType, ? extends Feature> repository;
+        FeatureData repository;
         repository = getDataRepository(params);
         if (repository instanceof DataStore) {
             return (DataStore) repository;
@@ -81,15 +79,15 @@ public final class DataStoreFinder {
      *             If a suitable loader can be found, but it can not be attached
      *             to the specified resource without errors.
      */
-    public static synchronized FeatureData<FeatureType, Feature> getDataRepository(Map params)
+    public static synchronized FeatureData getDataRepository(Map params)
             throws IOException {
         Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null,
                 null);
-        FeatureDataFactory<FeatureType, Feature> fac;
+        FeatureDataFactory fac;
 
         IOException canProcessButNotAvailable = null;
         while (ps.hasNext()) {
-            fac = (FeatureDataFactory<FeatureType, Feature>) ps.next();
+            fac = (FeatureDataFactory) ps.next();
             boolean canProcess = false;
             try {
                 canProcess = fac.canProcess(params);
@@ -159,9 +157,9 @@ public final class DataStoreFinder {
         Set availableDS = new HashSet(5);
         Iterator it = getServiceRegistry().getServiceProviders(FeatureData.class, null,
                 null);
-        FeatureDataFactory<? extends FeatureType,? extends Feature> dsFactory;
+        FeatureDataFactory dsFactory;
         while (it.hasNext()) {
-            dsFactory = (FeatureDataFactory<? extends FeatureType, ? extends Feature>) it.next();
+            dsFactory = (FeatureDataFactory) it.next();
 
             if (dsFactory.isAvailable()) {
                 availableDS.add(dsFactory);

@@ -16,16 +16,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
-import org.geotools.factory.Factory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -102,7 +93,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public interface DataStoreFactorySpi extends FeatureDataFactory<SimpleFeatureType, SimpleFeature> {
+public interface DataStoreFactorySpi extends FeatureDataFactory {
 
 	/**
 	 * Create a new FeatureData object for accessing an existing file or service.

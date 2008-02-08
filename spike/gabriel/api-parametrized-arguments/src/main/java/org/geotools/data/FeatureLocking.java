@@ -42,6 +42,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * &#064;version $Id$
  * 
  */
-public interface FeatureLocking extends FeatureStore, Locking<SimpleFeatureType, SimpleFeature> {
+public interface FeatureLocking extends FeatureStore, Locking {
 
 }

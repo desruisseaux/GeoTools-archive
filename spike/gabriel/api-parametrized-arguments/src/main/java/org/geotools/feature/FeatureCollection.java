@@ -98,7 +98,7 @@ import org.geotools.util.ProgressListener;
  * @version $Id$
  *
  */
-public interface FeatureCollection<T extends FeatureType,F extends Feature> extends ResourceCollection, SimpleFeature {
+public interface FeatureCollection extends ResourceCollection, SimpleFeature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -137,7 +137,7 @@ public interface FeatureCollection<T extends FeatureType,F extends Feature> exte
      *
      * @return A FeatureIterator.
      */
-    FeatureIterator<F> features();
+    FeatureIterator features();
 
     /**
      * Clean up any resources assocaited with this iterator in a manner similar to JDO collections.
@@ -269,8 +269,7 @@ public interface FeatureCollection<T extends FeatureType,F extends Feature> exte
      */
 
     //org.geotools.feature.FeatureType getSchema();
-    //SimpleFeatureType getSchema();
-    T getSchema();
+    FeatureType getSchema();
 
     /**
      * Will visit the contents of the feature collection.

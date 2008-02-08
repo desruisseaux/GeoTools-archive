@@ -18,16 +18,13 @@ package org.geotools.data;
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;
-import com.vividsolutions.jts.geom.Envelope;
 
-import org.opengis.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.FeatureVisitor;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.util.ProgressListener;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
 /**
@@ -66,7 +63,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @source $URL$
  * @version $Id$
  */
-public interface Source<T extends FeatureType, F extends Feature> {
+public interface Source {
     
     /**
      * Information describing the contents of this resoruce.
@@ -84,7 +81,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      *
      * @return DataStore implementing this FeatureStore
      */
-    FeatureData<T, F> getDataStore();
+    FeatureData getDataStore();
 
     /**
      * Adds a listener to the list that's notified each time a change to the
@@ -115,7 +112,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      *
      * @see Query
      */
-    FeatureCollection<T,F> getFeatures(Query query) throws IOException;
+    FeatureCollection getFeatures(Query query) throws IOException;
 
     /**
      * Loads features from the datasource into the returned FeatureResults,
@@ -128,7 +125,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection<T,F> getFeatures(Filter filter) throws IOException;
+    FeatureCollection getFeatures(Filter filter) throws IOException;
 
     /**
      * Loads all features from the datasource into the return FeatureResults.
@@ -142,7 +139,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection<T,F> getFeatures() throws IOException;
+    FeatureCollection getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource
@@ -165,10 +162,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * @task REVISIT: we could also just use DataStore to capture multi
      *       FeatureTypes?
      */
-
-    //FeatureType getSchema();
-    //SimpleFeatureType getSchema();
-    T getSchema();
+    FeatureType getSchema();
 
     /**
      * Gets the bounding box of this datasource.
@@ -250,7 +244,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      */
     public Set<RenderingHints.Key> getSupportedHints();
     
-    public Reader<T,F> getFeatureReader( Query qury ); // ask justin for proposal
+    public Reader getFeatureReader( Query qury ); // ask justin for proposal
 
     /**
      * Accepts a visitor which is iterated over the entire set of features.
@@ -258,7 +252,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * @param visitor The visitor.
      * @param listener The listener to track progress of iteration.
      */
-    void accept( FeatureVisitor<F> visitor, ProgressListener listener ) throws IOException;
+    void accept( FeatureVisitor visitor, ProgressListener listener ) throws IOException;
 
     /**
      * Accepts a visitor which is iterated over a filtered set of features.
@@ -267,6 +261,6 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * @param visitor The visitor.
      * @param listener Listener to track progress of iteration.
      */
-    void accept( Filter filter, FeatureVisitor<F> visitor, ProgressListener listener ) 
+    void accept( Filter filter, FeatureVisitor visitor, ProgressListener listener ) 
         throws IOException;
 }

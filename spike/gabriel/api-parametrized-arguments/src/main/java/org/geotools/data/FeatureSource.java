@@ -58,7 +58,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureSource extends Source<SimpleFeatureType, SimpleFeature> {
+public interface FeatureSource extends Source {
 
     DataStore getDataStore();
 

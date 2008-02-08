@@ -13,6 +13,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
@@ -99,5 +100,11 @@ public class SampleDataStore implements DataStore {
     }
 
     public void dispose() {
+    }
+
+    public void createSchema(FeatureType featureType) throws IOException {
+    }
+
+    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
     }
 }

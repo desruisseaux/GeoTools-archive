@@ -24,17 +24,17 @@ import org.opengis.feature.type.Name;
  * @param <F>
  *            Feature content provided
  */
-public interface FeatureData<T extends FeatureType, F extends Feature> {
+public interface FeatureData {
 
-    void createSchema(T featureType) throws IOException;
+    void createSchema(FeatureType featureType) throws IOException;
 
-    void updateSchema(String typeName, T featureType) throws IOException;
+    void updateSchema(String typeName, FeatureType featureType) throws IOException;
 
     List<Name> getNames() throws IOException;
 
-    T getSchema(Name name) throws IOException;
+    FeatureType getSchema(Name name) throws IOException;
 
-    Source<T, F> getView(Query query) throws IOException, SchemaException;
+    Source getView(Query query) throws IOException, SchemaException;
 
     /**
      * Read/write access based on capabilities, client code need an instanceof
@@ -44,7 +44,7 @@ public interface FeatureData<T extends FeatureType, F extends Feature> {
      * @return
      * @throws IOException
      */
-    Source<T, F> getFeatureSource(Name name) throws IOException;
+    Source getFeatureSource(Name name) throws IOException;
 
     /**
      * Write access; if available

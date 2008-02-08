@@ -8,25 +8,25 @@ import javax.swing.Icon;
 
 import org.geotools.data.FeatureData;
 import org.geotools.data.FeatureDataFactory;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.FeatureType;
 
-public class SampleDataRepositoryFactory implements FeatureDataFactory<FeatureType, Feature> {
+public class SampleDataRepositoryFactory implements FeatureDataFactory {
 
-    public FeatureData<FeatureType, Feature> createNewDataStore(Map params) throws IOException {
+    public FeatureData createNewDataStore(Map params) throws IOException {
         return new SampleDataRepository();
     }
 
-    public FeatureData<FeatureType, Feature> createDataStore(Map params) throws IOException {
+    public FeatureData createDataStore(Map params) throws IOException {
         return new SampleDataRepository();
     }
 
     public boolean canProcess(Map params) {
         return false;
     }
-	public boolean canCreateNew(Map params) {
-		return false;
-	}
+
+    public boolean canCreateNew(Map params) {
+        return false;
+    }
+
     public String getDescription() {
         return null;
     }
@@ -34,9 +34,11 @@ public class SampleDataRepositoryFactory implements FeatureDataFactory<FeatureTy
     public String getDisplayName() {
         return null;
     }
-	public Icon getIcon() {
-		return null;
-	}
+
+    public Icon getIcon() {
+        return null;
+    }
+
     public org.geotools.data.FeatureDataFactory.Param[] getParametersInfo() {
         return null;
     }
