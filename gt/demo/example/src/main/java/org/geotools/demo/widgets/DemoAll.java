@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.demo.widgets;
+package org.geotools.gui.swing.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -150,8 +150,8 @@ public class DemoAll extends javax.swing.JFrame {
             }
 
             public void contextActivated(TreeContextEvent event) {
-                if (event.getMapContext() != null) {
-                    map.getRenderingStrategy().setContext(event.getMapContext());
+                if (event.getContext() != null) {
+                    map.getRenderingStrategy().setContext(event.getContext());
                 }
             }
 
