@@ -154,4 +154,27 @@ public interface Store<T extends FeatureType, F extends Feature> extends Source<
      * @return Transaction in use, or <code>Transaction.AUTO_COMMIT</code>
      */
     Transaction getTransaction();
+    
+    /**
+     * Low level API used to update content in place.
+     * <p>
+     * You can use getFeatureWriter( Query.ALL ) to
+     * visit all contents.
+     * <p>
+     * @param filter Used to select the features to update
+     * @return Writer used to update content in place
+     * @throws IOException
+     */
+    Writer<T,F> getFeatureWriter(Query query) throws IOException;
+    //Writer<T,F> getFeatureWriter(Filter filter) throws IOException; // perhaps only this?
+    /**
+     * Low level API used to insert additional content.
+     * <p>
+     * Please note that feature "order" is not fixed, internally features
+     * may be stored a TreeSet, or a Spatial index, or usually located
+     * in a spatial database. 
+     * @return
+     * @throws IOException
+     */
+    Writer<T,F> getFeatureWriterInsert() throws IOException;
 }

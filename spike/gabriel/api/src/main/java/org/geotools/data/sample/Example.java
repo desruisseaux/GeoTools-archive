@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.geotools.data.DataRepository;
+import org.geotools.data.FeatureData;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureReader;
@@ -48,7 +48,7 @@ public class Example {
         // WFSDataStore, etc
         Iterator repositories = DataStoreFinder.getAvailableRepositories();
         
-        DataRepository<FeatureType, Feature> ds = DataStoreFinder.getDataRepository(new HashMap());
+        FeatureData<FeatureType, Feature> ds = DataStoreFinder.getDataRepository(new HashMap());
         
         Reader<FeatureType, Feature> featureReader = ds.getFeatureReader(Query.ALL, Transaction.AUTO_COMMIT);
         Feature next = featureReader.next();

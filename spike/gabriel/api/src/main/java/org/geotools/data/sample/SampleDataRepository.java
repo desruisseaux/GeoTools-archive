@@ -3,7 +3,7 @@ package org.geotools.data.sample;
 import java.io.IOException;
 import java.util.List;
 
-import org.geotools.data.DataRepository;
+import org.geotools.data.FeatureData;
 import org.geotools.data.Query;
 import org.geotools.data.Reader;
 import org.geotools.data.Source;
@@ -15,7 +15,7 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
-public class SampleDataRepository implements DataRepository<FeatureType, Feature> {
+public class SampleDataRepository implements FeatureData<FeatureType, Feature> {
 
     public void createSchema(FeatureType featureType) throws IOException {
     }

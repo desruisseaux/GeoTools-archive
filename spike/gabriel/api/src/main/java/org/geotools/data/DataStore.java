@@ -70,7 +70,7 @@ import org.geotools.feature.SchemaException;
  * @source $URL$
  * @version $Id$
  */
-public interface DataStore extends DataRepository<SimpleFeatureType,SimpleFeature>{
+public interface DataStore extends FeatureData<SimpleFeatureType,SimpleFeature>{
     /**
      * Creates storage for a new <code>featureType</code>.
      *

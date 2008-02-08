@@ -15,18 +15,21 @@
  */
 package org.geotools.feature.visitor;
 
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.Feature;
 
 
 /**
- * FeatureVisitor interface (for Feature Calculations)
+ * FeatureVisitor interface (for reviewing feature content).
  *
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
  * @source $URL$
- * @deprecated use {@link org.opengis.feature.FeatureVisitor}.
  */
-public interface FeatureVisitor extends org.opengis.feature.FeatureVisitor {
-    public void visit(SimpleFeature feature);
+public abstract class FeatureVisitor<F extends Feature> implements org.opengis.feature.FeatureVisitor<F> {
+	public Object visit(F feature, Object extraData) {
+		visit( feature );
+		return extraData;
+	}	
+    public abstract void visit(F feature);
 }

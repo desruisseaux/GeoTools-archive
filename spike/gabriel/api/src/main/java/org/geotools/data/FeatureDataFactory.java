@@ -24,13 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.swing.Icon;
+
 import org.opengis.feature.Feature;
 import org.geotools.factory.Factory;
 import org.opengis.feature.type.FeatureType;
 
 
 /**
- * Constructs a live DataStore from a set of parameters.
+ * Constructs a live FeatureData from a set of parameters.
  *
  * <p>
  * An instance of this interface should exist for all data stores which want to
@@ -103,12 +106,20 @@ import org.opengis.feature.type.FeatureType;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public interface DataRepositoryFactory<T extends FeatureType, F extends Feature> extends Factory {
+public interface FeatureDataFactory<T extends FeatureType, F extends Feature> extends Factory {
 
-    DataRepository<T, F> createDataStore(Map params) throws IOException;
+    FeatureData<T, F> createFeatureData(Map params) throws IOException;
 
-    DataRepository<T, F> createNewDataStore(Map params) throws IOException;
+    FeatureData<T, F> createNewFeatureData(Map params) throws IOException;
 
+    /**
+     * Icon used to describe this file or service
+     * <p>
+     * The icon size is 48x48 
+     * @return Icon
+     */
+    Icon getIcon();
+    
     /**
      * Name suitable for display to end user.
      *
@@ -187,6 +198,13 @@ public interface DataRepositoryFactory<T extends FeatureType, F extends Feature>
      *         pressent.
      */
     boolean canProcess(java.util.Map params);
+    
+    /**
+     * Can we use these parameters to make a new feature data?
+     * @param params
+     * @return
+     */
+    boolean canCreateNew(java.util.Map params);
 
     /**
      * Test to see if this datastore is available, if it has all the

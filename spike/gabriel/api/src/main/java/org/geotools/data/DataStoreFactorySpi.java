@@ -102,8 +102,28 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public interface DataStoreFactorySpi extends DataRepositoryFactory<SimpleFeatureType, SimpleFeature> {
+public interface DataStoreFactorySpi extends FeatureDataFactory<SimpleFeatureType, SimpleFeature> {
 
+	/**
+	 * Create a new FeatureData object for accessing an existing file or service.
+	 * <p>
+	 * Please check your params with canProcess( params ) before calling this method.
+	 */
+	public DataStore createFeatureData(Map params) throws IOException;
+
+	/**
+	 * Create a new DataStore, you will need to call dataStore.createScheme( featureType ) before use.
+	 * <p>
+	 * Workflow:
+	 * <ul>
+	 * <li>check params with canCreateNew( params )
+	 * <li>create a new DataSTore with createNewFeatureData( params )
+	 * <li>add a schema using datastore.createSchema( featureType )
+	 * <li>add content using datastore.getFeaureStore( featureType.getName() ).addFeatures( ... )
+	 * </ul>
+	 */
+	public DataStore createNewFeatureData( Map params ) throws IOException;
+	
     DataStore createDataStore(Map params) throws IOException;
 
     DataStore createNewDataStore(Map params) throws IOException;

@@ -84,7 +84,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      *
      * @return DataStore implementing this FeatureStore
      */
-    DataRepository<T, F> getDataStore();
+    FeatureData<T, F> getDataStore();
 
     /**
      * Adds a listener to the list that's notified each time a change to the

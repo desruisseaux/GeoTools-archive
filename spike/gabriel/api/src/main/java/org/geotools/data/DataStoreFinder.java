@@ -56,7 +56,7 @@ public final class DataStoreFinder {
      * @throws IOException
      */
     public static DataStore getDataStore(Map params) throws IOException {
-        DataRepository<? extends FeatureType, ? extends Feature> repository;
+        FeatureData<? extends FeatureType, ? extends Feature> repository;
         repository = getDataRepository(params);
         if (repository instanceof DataStore) {
             return (DataStore) repository;
@@ -81,15 +81,15 @@ public final class DataStoreFinder {
      *             If a suitable loader can be found, but it can not be attached
      *             to the specified resource without errors.
      */
-    public static synchronized DataRepository<FeatureType, Feature> getDataRepository(Map params)
+    public static synchronized FeatureData<FeatureType, Feature> getDataRepository(Map params)
             throws IOException {
         Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null,
                 null);
-        DataRepositoryFactory<FeatureType, Feature> fac;
+        FeatureDataFactory<FeatureType, Feature> fac;
 
         IOException canProcessButNotAvailable = null;
         while (ps.hasNext()) {
-            fac = (DataRepositoryFactory<FeatureType, Feature>) ps.next();
+            fac = (FeatureDataFactory<FeatureType, Feature>) ps.next();
             boolean canProcess = false;
             try {
                 canProcess = fac.canProcess(params);
@@ -113,7 +113,7 @@ public final class DataStoreFinder {
                 }
                 if (isAvailable) {
                     try {
-                        return fac.createDataStore(params);
+                        return fac.createFeatureData(params);
                     } catch (IOException couldNotConnect) {
                         canProcessButNotAvailable = couldNotConnect;
                         LOGGER.log(Level.WARNING, fac.getDisplayName()
@@ -157,11 +157,11 @@ public final class DataStoreFinder {
      */
     public static synchronized Iterator getAvailableRepositories() {
         Set availableDS = new HashSet(5);
-        Iterator it = getServiceRegistry().getServiceProviders(DataRepositoryFactory.class, null,
+        Iterator it = getServiceRegistry().getServiceProviders(FeatureData.class, null,
                 null);
-        DataRepositoryFactory<? extends FeatureType,? extends Feature> dsFactory;
+        FeatureDataFactory<? extends FeatureType,? extends Feature> dsFactory;
         while (it.hasNext()) {
-            dsFactory = (DataRepositoryFactory<? extends FeatureType, ? extends Feature>) it.next();
+            dsFactory = (FeatureDataFactory<? extends FeatureType, ? extends Feature>) it.next();
 
             if (dsFactory.isAvailable()) {
                 availableDS.add(dsFactory);

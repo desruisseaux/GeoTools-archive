@@ -4,25 +4,29 @@ import java.awt.RenderingHints.Key;
 import java.io.IOException;
 import java.util.Map;
 
-import org.geotools.data.DataRepository;
-import org.geotools.data.DataRepositoryFactory;
+import javax.swing.Icon;
+
+import org.geotools.data.FeatureData;
+import org.geotools.data.FeatureDataFactory;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 
-public class SampleDataRepositoryFactory implements DataRepositoryFactory<FeatureType, Feature> {
+public class SampleDataRepositoryFactory implements FeatureDataFactory<FeatureType, Feature> {
 
-    public DataRepository<FeatureType, Feature> createDataStore(Map params) throws IOException {
+    public FeatureData<FeatureType, Feature> createNewFeatureData(Map params) throws IOException {
         return new SampleDataRepository();
     }
 
-    public DataRepository<FeatureType, Feature> createNewDataStore(Map params) throws IOException {
+    public FeatureData<FeatureType, Feature> createFeatureData(Map params) throws IOException {
         return new SampleDataRepository();
     }
 
     public boolean canProcess(Map params) {
         return false;
     }
-
+	public boolean canCreateNew(Map params) {
+		return false;
+	}
     public String getDescription() {
         return null;
     }
@@ -30,8 +34,10 @@ public class SampleDataRepositoryFactory implements DataRepositoryFactory<Featur
     public String getDisplayName() {
         return null;
     }
-
-    public org.geotools.data.DataRepositoryFactory.Param[] getParametersInfo() {
+	public Icon getIcon() {
+		return null;
+	}
+    public org.geotools.data.FeatureDataFactory.Param[] getParametersInfo() {
         return null;
     }
 
