@@ -250,7 +250,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      */
     public Set /*<RenderingHints.Key>*/ getSupportedHints();
     
-    // FeatureReader getFeatureReader( Query qury ); // ask justin for proposal
+    public Reader<T,F> getFeatureReader( Query qury ); // ask justin for proposal
 
     /**
      * Accepts a visitor which is iterated over the entire set of features.
@@ -258,7 +258,7 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * @param visitor The visitor.
      * @param listener The listener to track progress of iteration.
      */
-    void accept( FeatureVisitor visitor, ProgressListener listener ) throws IOException;
+    void accept( FeatureVisitor<F> visitor, ProgressListener listener ) throws IOException;
 
     /**
      * Accepts a visitor which is iterated over a filtered set of features.
@@ -267,6 +267,6 @@ public interface Source<T extends FeatureType, F extends Feature> {
      * @param visitor The visitor.
      * @param listener Listener to track progress of iteration.
      */
-    void accept( Filter filter, FeatureVisitor visitor, ProgressListener listener ) 
+    void accept( Filter filter, FeatureVisitor<F> visitor, ProgressListener listener ) 
         throws IOException;
 }
