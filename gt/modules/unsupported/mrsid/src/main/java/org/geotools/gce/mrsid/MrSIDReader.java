@@ -48,12 +48,13 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
@@ -66,7 +67,6 @@ import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -100,7 +100,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 	/** Absolute path to the parent dir for this coverage. */
 	private String parentPath;
-	
+
 	/**
 	 * WGS84 envelope for this coverage.
 	 */
@@ -157,7 +157,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				// prevent the use from reordering axes
 				this.hints.add(hints);
 			}
-			this.coverageFactory = FactoryFinder
+			this.coverageFactory = CoverageFactoryFinder
 					.getGridCoverageFactory(this.hints);
 
 			// //
@@ -368,8 +368,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			try {
 				inStream.close();
 			} catch (Throwable e) {
-				if(LOGGER.isLoggable(Level.FINE))
-					LOGGER.log(Level.FINE,e.getLocalizedMessage(),e);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			}
 		else {
 			inStream.reset();
@@ -544,7 +544,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	public GridCoverage read(GeneralParameterValue[] params)
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
-		String overviewPolicy=null;
+		OverviewPolicy overviewPolicy = null;
 		Rectangle requestedDim = null;
 		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
 		int iUseJAI = 0;
@@ -563,18 +563,17 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
 					continue;
-				} 
-				if (name
-						.equalsIgnoreCase(AbstractGridFormat.USE_JAI_IMAGEREAD
-								.getName().toString())) {
+				}
+				if (name.equalsIgnoreCase(AbstractGridFormat.USE_JAI_IMAGEREAD
+						.getName().toString())) {
 					iUseJAI = param.booleanValue() ? 1 : -1;
 					continue;
 				}
-				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
-						.getName().toString())) {
-					overviewPolicy=param.stringValue();
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName()
+						.toString())) {
+					overviewPolicy = (OverviewPolicy) param.getValue();
 					continue;
-				}		
+				}
 			}
 		}
 		return createCoverage(readEnvelope, requestedDim, iUseJAI,
@@ -586,7 +585,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @param requestedDim
 	 * @param iUseJAI
-	 * @param overviewPolicy 
+	 * @param overviewPolicy
 	 * @param readEnvelope
 	 * 
 	 * @return a GridCoverage
@@ -594,14 +593,13 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim, int iUseJAI, String overviewPolicy)
+			Rectangle requestedDim, int iUseJAI, OverviewPolicy overviewPolicy)
 			throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
 			inStream.mark();
 		}
-
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -610,7 +608,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final GeneralEnvelope adjustedRequestEnvelope = new GeneralEnvelope(2);
-		final Rectangle sourceRegion = new Rectangle();	
+		final Rectangle sourceRegion = new Rectangle();
 		evaluateRequestedEnvelope(requestedEnvelope, adjustedRequestEnvelope,
 				sourceRegion);
 
@@ -626,17 +624,17 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		} else
 			throw new IllegalArgumentException();
 
-		// /////////////////////////////////////////////////////////////////////
+		// ////////////////////////////////////////////////////////////////////
 		//
 		// Doing an image read for reading the coverage.
 		//
-		// /////////////////////////////////////////////////////////////////////
+		// ////////////////////////////////////////////////////////////////////
 
 		// //
 		//
-		// Setting subsampling factors with some checkings
+		// Setting subsampling factors with some checks
 		// 1) the subsampling factors cannot be zero
-		// 2) the subsampling factors cannot be such that the w 7or h are zero
+		// 2) the subsampling factors cannot be such that the w or h are zero
 		//
 		// //
 		final ImageReadParam readP = new ImageReadParam();
@@ -653,9 +651,9 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			return null;
 		}
-		
+
 		final PlanarImage coverage;
-		if (sourceRegion != null&&!sourceRegion.isEmpty())
+		if (sourceRegion != null && !sourceRegion.isEmpty())
 			readP.setSourceRegion(sourceRegion);
 
 		// //
@@ -707,7 +705,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 										originalGridRange.getLength(1)
 												/ (1.0 * ssHeight),
 										sourceRegion.x + 0.5,
-										sourceRegion.y + 0.5)), raster2Model));				
+										sourceRegion.y + 0.5)), raster2Model));
 			} else {
 				// In case of no adjustedRequestEnvelope (As an instance, when
 				// reading the whole image), I can use the transformation. So,
@@ -749,7 +747,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	private void evaluateRequestedEnvelope(GeneralEnvelope requestedEnvelope,
 			GeneralEnvelope adjustedRequestEnvelope, Rectangle sourceRegion)
 			throws DataSourceException {
-		try{
+		try {
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Check if we have something to load by intersecting the requested
@@ -758,9 +756,9 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			// The comparison is done first in WGS84 in order to avoid problems
 			// when trying to reproject envelopes from different CRS
 			//
-			// /////////////////////////////////////////////////////////////////////		
+			// /////////////////////////////////////////////////////////////////////
 			if (requestedEnvelope != null) {
-				
+
 				// /////////////////////////////////////////////////////////////////////
 				//
 				// PHASE 1
@@ -768,120 +766,135 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				// PREPARING THE REQUESTED ENVELOPE FOR LATER INTERSECTION
 				//
 				// /////////////////////////////////////////////////////////////////////
-				
+
 				// //
 				//
-				// Get the requested envelope CRS and convert it to 2D if necessary
+				// Get the requested envelope CRS and convert it to 2D if
+				// necessary
 				//
 				// //
-				CoordinateReferenceSystem requestedEnvelopeCRS=requestedEnvelope.getCoordinateReferenceSystem();
+				CoordinateReferenceSystem requestedEnvelopeCRS = requestedEnvelope
+						.getCoordinateReferenceSystem();
 				final MathTransform transformTo2D;
 				final GeneralEnvelope requestedEnvelope2D;
-				if(requestedEnvelopeCRS.getCoordinateSystem().getDimension()!=2)
-				{
-					transformTo2D=CRS.findMathTransform(requestedEnvelopeCRS, CRS.getHorizontalCRS(requestedEnvelopeCRS));
-					requestedEnvelopeCRS=CRS.getHorizontalCRS(requestedEnvelopeCRS);
-				}
-				else
-					transformTo2D=IdentityTransform.create(2);
-				if(!transformTo2D.isIdentity())
-				{
-					requestedEnvelope2D=CRS.transform(transformTo2D, requestedEnvelope);
-					requestedEnvelope2D.setCoordinateReferenceSystem(requestedEnvelopeCRS);
-				}
-				else
-					requestedEnvelope2D= new GeneralEnvelope(requestedEnvelope);
-				assert requestedEnvelope2D.getCoordinateReferenceSystem().getCoordinateSystem().getDimension()==2;
-				
+				if (requestedEnvelopeCRS.getCoordinateSystem().getDimension() != 2) {
+					transformTo2D = CRS.findMathTransform(requestedEnvelopeCRS,
+							CRS.getHorizontalCRS(requestedEnvelopeCRS));
+					requestedEnvelopeCRS = CRS
+							.getHorizontalCRS(requestedEnvelopeCRS);
+				} else
+					transformTo2D = IdentityTransform.create(2);
+				if (!transformTo2D.isIdentity()) {
+					requestedEnvelope2D = CRS.transform(transformTo2D,
+							requestedEnvelope);
+					requestedEnvelope2D
+							.setCoordinateReferenceSystem(requestedEnvelopeCRS);
+				} else
+					requestedEnvelope2D = new GeneralEnvelope(requestedEnvelope);
+				assert requestedEnvelope2D.getCoordinateReferenceSystem()
+						.getCoordinateSystem().getDimension() == 2;
+
 				// //
 				//
-				// Now convert the requested envelope to WGS84 if needed for safer
+				// Now convert the requested envelope to WGS84 if needed for
+				// safer
 				// comparisons later on with the original crs of this coverage
 				//
 				// //
 				final MathTransform transformToWGS84;
-				if (!CRS
-						.equalsIgnoreMetadata(requestedEnvelopeCRS,
-								DefaultGeographicCRS.WGS84)) {
-					//get a math transform to go to WGS84
-					transformToWGS84=CRS.findMathTransform(requestedEnvelopeCRS, DefaultGeographicCRS.WGS84,true);
+				if (!CRS.equalsIgnoreMetadata(requestedEnvelopeCRS,
+						DefaultGeographicCRS.WGS84)) {
+					// get a math transform to go to WGS84
+					transformToWGS84 = CRS.findMathTransform(
+							requestedEnvelopeCRS, DefaultGeographicCRS.WGS84,
+							true);
 
-				}
-				else
-					transformToWGS84=IdentityTransform.create(2);
-				//do we need to transform the requested envelope?
+				} else
+					transformToWGS84 = IdentityTransform.create(2);
+				// do we need to transform the requested envelope?
 				final GeneralEnvelope requestedEnvelopeWGS84;
-				if(!transformToWGS84.isIdentity())
-				{
-					requestedEnvelopeWGS84=CRS.transform(transformToWGS84, requestedEnvelope2D);
-					requestedEnvelopeWGS84.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-				}
-				else
-					requestedEnvelopeWGS84= new GeneralEnvelope(requestedEnvelope2D);
-				
-				
+				if (!transformToWGS84.isIdentity()) {
+					requestedEnvelopeWGS84 = CRS.transform(transformToWGS84,
+							requestedEnvelope2D);
+					requestedEnvelopeWGS84
+							.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
+				} else
+					requestedEnvelopeWGS84 = new GeneralEnvelope(
+							requestedEnvelope2D);
 
-				
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// PHASE 2				
+				// PHASE 2
 				//
 				// NOW CHECKING THE INTERSECTION IN WGS84
 				//
-				////
+				// //
 				//
 				// If the two envelopes intersect each other in WGS84 we are
 				// reasonably sure that they intersect
 				//
 				// /////////////////////////////////////////////////////////////////////
 				initOriginalEnvelopes2D();
-				if (!requestedEnvelopeWGS84.intersects(this.WGS84OriginalEnvelope, true)) {
+				if (!requestedEnvelopeWGS84.intersects(
+						this.WGS84OriginalEnvelope, true)) {
 					if (LOGGER.isLoggable(Level.FINE))
 						LOGGER
 								.warning("The requested envelope does not intersect the envelope of this coverage, we will throw an exception.");
 					throw new DataSourceException(
 							"The requested envelope does not intersect the envelope of this coverage, we will throw an exception.");
 				}
-				
-				
+
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// PHASE 3				
+				// PHASE 3
 				//
 				// NOW DO THE INTERSECTION USING THE NATIVE 2D CRS
 				//
-				////
+				// //
 				//
 				// If this does not work we go back to reprojectin the wgs84
 				// requested envelope
 				//				
 				// /////////////////////////////////////////////////////////////////////
-				try{
-					//convert the requested envelope 2d to this coverage native crs
-					if(!CRS.equalsIgnoreMetadata(requestedEnvelope2D.getCoordinateReferenceSystem(),this.spatialReferenceSystem2D))
-						adjustedRequestEnvelope = CRS.transform(CRS.findMathTransform(
-								requestedEnvelope2D.getCoordinateReferenceSystem(), this.spatialReferenceSystem2D),
+				try {
+					// convert the requested envelope 2d to this coverage native
+					// crs
+					if (!CRS.equalsIgnoreMetadata(requestedEnvelope2D
+							.getCoordinateReferenceSystem(),
+							this.spatialReferenceSystem2D))
+						adjustedRequestEnvelope = CRS.transform(CRS
+								.findMathTransform(requestedEnvelope2D
+										.getCoordinateReferenceSystem(),
+										this.spatialReferenceSystem2D),
 								requestedEnvelope2D);
 
-				}catch (TransformException te) {
-					// something bad happened while trying to transform this envelope
+				} catch (TransformException te) {
+					// something bad happened while trying to transform this
+					// envelope
 					// let's try with wgs84
-					adjustedRequestEnvelope.intersect(this.WGS84OriginalEnvelope);
-					adjustedRequestEnvelope = CRS.transform(CRS.findMathTransform(
-							requestedEnvelopeWGS84.getCoordinateReferenceSystem(), this.spatialReferenceSystem2D),
-							requestedEnvelopeWGS84);					
-					
+					adjustedRequestEnvelope
+							.intersect(this.WGS84OriginalEnvelope);
+					adjustedRequestEnvelope = CRS.transform(CRS
+							.findMathTransform(requestedEnvelopeWGS84
+									.getCoordinateReferenceSystem(),
+									this.spatialReferenceSystem2D),
+							requestedEnvelopeWGS84);
+
 				}
-				// intersect the requested area with the bounds of this layer in native crs
+				// intersect the requested area with the bounds of this layer in
+				// native crs
+				if (adjustedRequestEnvelope.isEmpty())
+					adjustedRequestEnvelope = requestedEnvelope.clone();
 				adjustedRequestEnvelope.intersect(this.originalEnvelope2D);
-				adjustedRequestEnvelope.setCoordinateReferenceSystem(this.spatialReferenceSystem2D);
-				
+				adjustedRequestEnvelope
+						.setCoordinateReferenceSystem(this.spatialReferenceSystem2D);
+
 				// /////////////////////////////////////////////////////////////////////
 				//
 				// NOW BUILDING A SUITABLE CROP REGION
 				//
 				// /////////////////////////////////////////////////////////////////////
-	
+
 				// //
 				//
 				// compute the crop region
@@ -890,7 +903,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				final GeneralGridRange finalRange = new GeneralGridRange(CRS
 						.transform(this.getOriginalGridToWorld(
 								PixelInCell.CELL_CORNER).inverse(),
-								adjustedRequestEnvelope));
+								adjustedRequestEnvelope),PixelInCell.CELL_CORNER);
 				// CROP
 				sourceRegion.setRect(finalRange.toRectangle());
 				if (!sourceRegion.intersects(this.originalGridRange
@@ -898,10 +911,10 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 						|| sourceRegion.isEmpty())
 					throw new DataSourceException(
 							"The crop region is empty invalid.");
-				sourceRegion.setRect(sourceRegion.intersection(this.originalGridRange.toRectangle()));
-	
-			}else
-			{
+				sourceRegion.setRect(sourceRegion
+						.intersection(this.originalGridRange.toRectangle()));
+
+			} else {
 				// we do not have a requested envelope, let's load it all
 				adjustedRequestEnvelope.setEnvelope(this.originalEnvelope);
 				adjustedRequestEnvelope.setCoordinateReferenceSystem(this.crs);
@@ -917,11 +930,12 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		} catch (FactoryException e) {
 			throw new DataSourceException(
 					"Unable to create a coverage for this source", e);
-		}		
+		}
 	}
 
 	/**
-	 * Tries to lazily compute the WGS84 version for the envelope of this coverage
+	 * Tries to lazily compute the WGS84 version for the envelope of this
+	 * coverage
 	 * 
 	 * @throws FactoryException
 	 * @throws TransformException
@@ -929,11 +943,11 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	private void initOriginalEnvelopes2D() throws FactoryException,
 			TransformException {
 		synchronized (this) {
-			////
+			// //
 			//
 			// Get the original envelope in WGS84
 			//
-			////
+			// //
 			if (WGS84OriginalEnvelope == null) {
 				if (!CRS.equalsIgnoreMetadata(this.crs,
 						DefaultGeographicCRS.WGS84)) {
@@ -941,39 +955,45 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					final MathTransform toWGS84 = CRS.findMathTransform(
 							this.crs, DefaultGeographicCRS.WGS84, true);
 					if (!toWGS84.isIdentity()) {
-						WGS84OriginalEnvelope =new Envelope2D( CRS.transform(toWGS84,
-								this.originalEnvelope));
-						WGS84OriginalEnvelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-						
+						WGS84OriginalEnvelope = new Envelope2D(CRS.transform(
+								toWGS84, this.originalEnvelope));
+						WGS84OriginalEnvelope
+								.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
+
 					}
 				}
-				//we don't need to do anything 
-				if(WGS84OriginalEnvelope==null)
-					WGS84OriginalEnvelope= new Envelope2D(this.originalEnvelope);
+				// we don't need to do anything
+				if (WGS84OriginalEnvelope == null)
+					WGS84OriginalEnvelope = new Envelope2D(
+							this.originalEnvelope);
 			}
-			
-			////
+
+			// //
 			//
 			// Get the original envelope 2d and its spatial reference system
 			//
-			////
-			if(this.spatialReferenceSystem2D==null)
-			{
-				if(this.crs.getCoordinateSystem().getDimension()!=2)
-				{
-					this.spatialReferenceSystem2D=CRS.getHorizontalCRS(this.getCrs());
-					assert this.spatialReferenceSystem2D.getCoordinateSystem().getDimension()==2;
-					this.originalEnvelope2D = new Envelope2D(CRS.transform(CRS.findMathTransform(
-						this.crs, (CoordinateReferenceSystem) this.spatialReferenceSystem2D),
-						originalEnvelope));
+			// //
+			if (this.spatialReferenceSystem2D == null) {
+				if (this.crs.getCoordinateSystem().getDimension() != 2) {
+					this.spatialReferenceSystem2D = CRS.getHorizontalCRS(this
+							.getCrs());
+					assert this.spatialReferenceSystem2D.getCoordinateSystem()
+							.getDimension() == 2;
+					this.originalEnvelope2D = new Envelope2D(
+							CRS
+									.transform(
+											CRS
+													.findMathTransform(
+															this.crs,
+															(CoordinateReferenceSystem) this.spatialReferenceSystem2D),
+											originalEnvelope));
+				} else {
+					this.spatialReferenceSystem2D = this.crs;
+					this.originalEnvelope2D = new Envelope2D(
+							this.originalEnvelope);
+
 				}
-				else
-				{
-					this.spatialReferenceSystem2D=this.crs;
-					this.originalEnvelope2D= new Envelope2D(this.originalEnvelope);
-					
-				}
-			}				
+			}
 		}
 	}
 
@@ -1081,7 +1101,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				if (prj.exists()) {
 					projReader = new PrjFileReader(new FileInputStream(prj)
 							.getChannel());
-					crs = projReader.getCoordinateSystem();
+					crs = projReader.getCoodinateSystem();
 				}
 			} catch (FileNotFoundException e) {
 				// warn about the error but proceed, it is not fatal
