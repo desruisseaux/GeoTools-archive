@@ -125,6 +125,7 @@
         <configuration>
           <excludes>
             <!-- The following tests are skipped because they do not extend OnlineTestCase -->
+            <exclude>**/LocalGeoServerOnlineTest.java</exclude>
             <exclude>**/WMSReaderOnlineTest.java</exclude>
             <exclude>**/WebMapServerOnlineTest.java</exclude>
             <exclude>**/WMS1_0_0_OnlineTest.java</exclude>
