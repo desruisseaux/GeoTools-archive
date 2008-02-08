@@ -18,14 +18,9 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 
-import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureType;
-import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
-import org.geotools.feature.FeatureCollection;
 
 /**
  * Provides storage of data for Features.
@@ -49,7 +44,7 @@ import org.geotools.feature.FeatureCollection;
  * @version $Id$
  */
 public interface FeatureStore extends
-        Store<SimpleFeatureType, SimpleFeature, SimpleFeatureCollection>, FeatureSource {
+        Store<SimpleFeatureType, SimpleFeature>, FeatureSource {
     /**
      * Adds all features from the passed feature collection to the datasource.
      * 

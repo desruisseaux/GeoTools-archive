@@ -46,8 +46,7 @@ import org.geotools.feature.FeatureCollection;
  *         http://svn.geotools.org/geotools/trunk/spike/gabriel/api/src/main/java/org/geotools/data/Store.java $
  * @version $Id$
  */
-public interface Store<T extends FeatureType, F extends Feature, C extends FeatureCollection<T, F>>
-        extends Source<T, F> {
+public interface Store<T extends FeatureType, F extends Feature> extends Source<T, F> {
     /**
      * Adds all features from the passed feature collection to the datasource.
      * 
@@ -58,7 +57,7 @@ public interface Store<T extends FeatureType, F extends Feature, C extends Featu
      * @throws IOException
      *             if anything goes wrong.
      */
-    Set<FeatureId> addFeatures(C collection) throws IOException;
+    Set<FeatureId> addFeatures(FeatureCollection<T, F> collection) throws IOException;
 
     /**
      * Removes all of the features specificed by the passed filter from the
@@ -182,7 +181,7 @@ public interface Store<T extends FeatureType, F extends Feature, C extends Featu
      */
     Writer<T, F> getFeatureWriter(Query query) throws IOException;
 
-    //Writer<T,F> getFeatureWriter(Filter filter) throws IOException; //
+    // Writer<T,F> getFeatureWriter(Filter filter) throws IOException; //
     // perhaps only this?
     /**
      * Low level API used to insert additional content.
@@ -194,5 +193,5 @@ public interface Store<T extends FeatureType, F extends Feature, C extends Featu
      * @return
      * @throws IOException
      */
-    //Writer<T, F> getFeatureWriterInsert() throws IOException;
+    // Writer<T, F> getFeatureWriterInsert() throws IOException;
 }

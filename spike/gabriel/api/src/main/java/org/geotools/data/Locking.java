@@ -18,7 +18,6 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 
-import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
@@ -47,8 +46,7 @@ import org.opengis.filter.Filter;
  * &#064;version $Id$
  * 
  */
-public interface Locking<T extends FeatureType, F extends Feature, C extends FeatureCollection<T, F>>
-        extends Store<T, F, C> {
+public interface Locking<T extends FeatureType, F extends Feature> extends Store<T, F> {
     /**
      * All locking operations will operate against the provided
      * <code>lock</code>.

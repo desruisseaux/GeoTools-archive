@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureData;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLocking;
@@ -16,7 +15,6 @@ import org.geotools.data.Reader;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.SimpleFeatureCollection;
 import org.geotools.data.Transaction;
-import org.geotools.data.Writer;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.FeatureVisitor;
@@ -27,13 +25,48 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.util.ProgressListener;
 
+/**
+ * This fake implementation illustrates the actual problem with this approach,
+ * that you cannot as easily narrow the parameters when they're genericized. See
+ * {@link #setFeatures(FeatureReader)} and {@link #setFeatures(Reader)}, as
+ * well as {@link #addFeatures(FeatureCollection)} and
+ * {@link #addFeatures(SimpleFeatureCollection)}, they end up being overloaded
+ * versions of the originals and go against the intent of the proposal that is
+ * to keep the DataStore based API as close as possible as it was. See the third
+ * spike apprach to find out how it would be to approach it in a way to only
+ * parametrize the argument types strictly needed to cope with that goal.
+ * 
+ * @author Gabriel Roldan (TOPP)
+ * @version $Id$
+ * @since 2.5.x
+ * @source $URL$
+ */
 public class SampleFeatureLocking implements FeatureLocking {
+
+    // ///////////////////////////////////////////////
+    // the following are the problematic methods and illustrate why this
+    // approach goes only half way////
+    // ///////////////////////////////////////////////
+
+    public void setFeatures(FeatureReader reader) throws IOException {
+    }
+
+    public void setFeatures(Reader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
+    }
+
+    public Set<FeatureId> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+            throws IOException {
+        return null;
+    }
 
     public Set<FeatureId> addFeatures(SimpleFeatureCollection collection) throws IOException {
         return null;
     }
 
-    public void setFeatures(FeatureReader reader) throws IOException {
+    // /////////
+
+    public FeatureWriter getFeatureWriter(Query query) {
+        return null;
     }
 
     public Transaction getTransaction() {
@@ -77,6 +110,26 @@ public class SampleFeatureLocking implements FeatureLocking {
         return 0;
     }
 
+    public DataStore getDataStore() {
+        return null;
+    }
+
+    public FeatureReader getFeatureReader(Query qury) {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures(Query query) throws IOException {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures(Filter filter) throws IOException {
+        return null;
+    }
+
+    public SimpleFeatureCollection getFeatures() throws IOException {
+        return null;
+    }
+
     public ResourceInfo getInfo() {
         return null;
     }
@@ -116,30 +169,4 @@ public class SampleFeatureLocking implements FeatureLocking {
     public void unLockFeatures(Query query) throws IOException {
     }
 
-    public FeatureWriter getFeatureWriter(Query query) {
-        return null;
-    }
-
-    public DataStore getDataStore() {
-        return null;
-    }
-
-    public FeatureReader getFeatureReader(Query qury) {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures(Query query) throws IOException {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures(Filter filter) throws IOException {
-        return null;
-    }
-
-    public SimpleFeatureCollection getFeatures() throws IOException {
-        return null;
-    }
-
-    public void setFeatures(Reader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
-    }
 }
