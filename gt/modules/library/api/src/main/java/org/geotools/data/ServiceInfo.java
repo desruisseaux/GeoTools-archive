@@ -128,8 +128,14 @@ public interface ServiceInfo {
 
     /**
      * Icon used to represent this service.
-     * 
+     * <p>
+     * Icons can be requested at a specific size (the closest available size
+     * will be returned). You can use a size of -1 to request the largest size
+     * available (in case you want to do your own rescaling).
+     * <p>
+     * @param size Size of icon requested, -1 for default size
      * @return Icon representing this service.
      */
     Icon getIcon();
+    //Icon getIcon( int size );
 }
