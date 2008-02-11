@@ -291,7 +291,7 @@ public final class ImageUtilities {
          */
         for (int i=0; i<=stop; i++) {
             int s;
-            if ((s=tileSize+i) <= MAX_TILE_SIZE) {
+            if ((s = tileSize+i) <= MAX_TILE_SIZE) {
                 final int r = imageSize % s;
                 if (r == 0) {
                     // Found a size >= to 'tileSize' which is a dividor of image size.
@@ -302,7 +302,7 @@ public final class ImageUtilities {
                     sopt = s;
                 }
             }
-            if ((s=tileSize-i) >= GEOTOOLS_MIN_TILE_SIZE) {
+            if ((s = tileSize-i) >= GEOTOOLS_MIN_TILE_SIZE) {
                 final int r = imageSize % s;
                 if (r == 0) {
                     // Found a size <= to 'tileSize' which is a dividor of image size.

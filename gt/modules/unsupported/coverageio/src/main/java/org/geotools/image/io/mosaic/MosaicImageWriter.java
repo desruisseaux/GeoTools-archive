@@ -25,8 +25,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 import javax.imageio.*;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.IIORegistry;
@@ -38,6 +40,9 @@ import javax.imageio.stream.ImageOutputStream;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -149,6 +154,7 @@ public class MosaicImageWriter extends ImageWriter {
     public void writeFromInput(final Object input, final int inputIndex, final int outputIndex)
             throws IOException
     {
+        final Logger logger = Logging.getLogger(MosaicImageWriter.class);
         /*
          * Gets the reader first - especially before getOutput() - because the user may have
          * overriden filter(ImageReader) and set the output accordingly. TileBuilder do that.
@@ -159,18 +165,65 @@ public class MosaicImageWriter extends ImageWriter {
         if (managers == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
         }
-        final Collection<Tile> tiles = managers[outputIndex].getTiles();
-        for (final Tile tile : tiles) {
-            final Object       tileInput = tile.getInput();
-            final Rectangle sourceRegion = tile.getAbsoluteRegion();
-            final Dimension  subSampling = tile.getSubsampling();
-            params.setSourceRegion(sourceRegion);
-            params.setSourceSubsampling(subSampling.width, subSampling.height, 0, 0);
-            final RenderedImage image = reader.readAsRenderedImage(inputIndex, params);
-            final ImageWriter writer = getImageWriter(tile, image);
-            writer.write(image);
-            close(writer.getOutput(), tileInput);
-            writer.dispose();
+        final Collection<Tile> tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
+        Iterator<Tile> it;
+rescan: while ((it = tiles.iterator()).hasNext()) {
+            /*
+             * Loads the image for the first tile in the list. Later in this loop,
+             * we will try to write as many tiles as we can using this single image.
+             * The tiles successfully written will be removed from the list, so next
+             * iterations will process only the remaining tiles.
+             */
+            Tile tile = it.next();
+            logger.info(Vocabulary.format(VocabularyKeys.LOADING_$1, tile));
+            final Rectangle imageRegion = tile.getAbsoluteRegion();
+            final Dimension imageSubsampling = tile.getSubsampling();
+            params.setSourceRegion(imageRegion);
+            params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
+            final RenderedImage image  = reader.readAsRenderedImage(inputIndex, params);
+            /*
+             * Prepares the parameter to be given to the writer. At first, we will simply
+             * write the whole image. Subsequent iterations may write only a subsampled
+             * portion of the image.
+             */
+            int xSubsampling = 1;
+            int ySubsampling = 1;
+            Rectangle sourceRegion = null;
+            do {
+                it.remove();
+                final ImageWriter writer = getImageWriter(tile, image);
+                final ImageWriteParam wp = writer.getDefaultWriteParam();
+                wp.setSourceRegion(sourceRegion);
+                wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
+                writer.write(null, new IIOImage(image, null, null), wp);
+                close(writer.getOutput(), tile.getInput());
+                writer.dispose();
+                /*
+                 * Searchs in next tiles until we found one inside the same region with a resolution
+                 * which is lower by an integer ratio.  If such tile is found, we can write it using
+                 * the already loaded image instead of loading it again.  Giving that loading even a
+                 * portion of a big image file may be long,  the performance enhancement of doing so
+                 * is significant. This case occurs mostly with TileLayout.CONSTANT_GEOGRAPHIC_AREA.
+                 */
+                Dimension nextSubsampling;
+                do {
+                    if (!it.hasNext()) {
+                        continue rescan;
+                    }
+                    tile = it.next();
+                    sourceRegion = tile.getAbsoluteRegion();
+                    nextSubsampling = tile.getSubsampling();
+                } while ((nextSubsampling.width  % imageSubsampling.width ) != 0 ||
+                         (nextSubsampling.height % imageSubsampling.height) != 0 ||
+                         !imageRegion.contains(sourceRegion));
+                xSubsampling = nextSubsampling.width  / imageSubsampling.width;
+                ySubsampling = nextSubsampling.height / imageSubsampling.height;
+                sourceRegion.translate(-imageRegion.x, -imageRegion.y);
+                sourceRegion.x      /= imageSubsampling.width;
+                sourceRegion.y      /= imageSubsampling.height;
+                sourceRegion.width  /= imageSubsampling.width;
+                sourceRegion.height /= imageSubsampling.height;
+            } while (true);
         }
         close(reader.getInput(), input);
         reader.dispose();
