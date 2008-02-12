@@ -42,6 +42,8 @@ import javax.swing.event.MouseInputListener;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
+import org.geotools.gui.swing.map.map2d.action.DefaultSelectionAction;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.SelectionDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
@@ -78,6 +80,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+
 /**
  * Default implementation of navigableMap2D
  * @author Johann Sorel
@@ -98,43 +101,26 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
     private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-    private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
-    private final SelectionDecoration selectionPane = new SelectionDecoration();
     private final BufferComponent selectedPane = new BufferComponent();
     private final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Color selectionStyleColor = Color.GREEN;
     private Geometry selectionGeometrie = null;
-    protected Cursor CUR_SELECT;
+    
+    private DefaultSelectionAction selectionAction = new DefaultSelectionAction();
+    
 
     /**
      * create a default JDefaultSelectableMap2D
      */
     public JDefaultSelectableMap2D() {
         super();
-        mouseInputListener = new MouseListen();
         mapLayerListlistener = new MapLayerListListen();
-        addMouseListener(mouseInputListener);
-        addMouseMotionListener(mouseInputListener);
 
         selectionStrategy.setContext(selectionMapContext);
 
-
         addMapDecoration(selectedPane);
-        addMapDecoration(selectionPane);
-
-        buildCursors();
-    }
-
-    private void buildCursors() {
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        ImageIcon ico_select = IconBundle.getResource().getIcon("16_select");
-
-
-        BufferedImage img = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
-        img.getGraphics().drawImage(ico_select.getImage(), 0, 0, null);
-        CUR_SELECT = tk.createCustomCursor(img, new java.awt.Point(1, 1), "select");
 
     }
 
@@ -146,28 +132,20 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @param my : y coordinate of the mouse on the map (in pixel)
      * @return JTS geometry (corresponding to a square of 6x6 pixel around mouse coordinate)
      */
-    protected Geometry mousePositionToGeometry(double mx, double my) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        if (mapArea != null) {
-            Rectangle bounds = getBounds();
-            double width = mapArea.getWidth();
-            double height = mapArea.getHeight();
+    protected Geometry mousePositionToGeometry(int mx, int my) {
             Coordinate[] coord = new Coordinate[5];
 
             int taille = 4;
 
-            coord[0] = toMapCoord(mx - taille, my - taille, width, height, bounds);
-            coord[1] = toMapCoord(mx - taille, my + taille, width, height, bounds);
-            coord[2] = toMapCoord(mx + taille, my + taille, width, height, bounds);
-            coord[3] = toMapCoord(mx + taille, my - taille, width, height, bounds);
+            coord[0] = toMapCoord(mx - taille, my - taille);
+            coord[1] = toMapCoord(mx - taille, my + taille);
+            coord[2] = toMapCoord(mx + taille, my + taille);
+            coord[3] = toMapCoord(mx + taille, my - taille);
             coord[4] = coord[0];
 
             LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
             return GEOMETRY_FACTORY.createPolygon(lr1, null);
-        }
-
-        return null;
+       
     }
 
     /**
@@ -307,37 +285,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     
-
-    private void doMouseSelection(double mx, double my) {
-
-        Geometry geometry = mousePositionToGeometry(mx, my);
-        if (geometry != null) {
-            doSelection(geometry);
-        }
-    }
-
-    private void doMouseSelection(double mx, double my, double ex, double ey) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        if (mapArea != null) {
-            Rectangle bounds = getBounds();
-            double width = mapArea.getWidth();
-            double height = mapArea.getHeight();
-            Coordinate[] coord = new Coordinate[5];
-
-            coord[0] = toMapCoord(mx, my, width, height, bounds);
-            coord[1] = toMapCoord(mx, ey, width, height, bounds);
-            coord[2] = toMapCoord(ex, ey, width, height, bounds);
-            coord[3] = toMapCoord(ex, my, width, height, bounds);
-            coord[4] = coord[0];
-
-            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
-            Geometry geometry = GEOMETRY_FACTORY.createPolygon(lr1, null);
-
-            doSelection(geometry);
-        }
-    }
-
     protected Geometry projectGeometry(Geometry geom, MapLayer layer) {
         MathTransform transform = null;
 
@@ -471,11 +418,21 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         selectionStrategy.refresh();
 
     }
+    
 
     //---------------------JDefaultMap2D override-------------------------------    
 
-
-
+    @Override
+    public void setActionState(ACTION_STATE state) {
+        super.setActionState(state);
+        
+        if(state == ACTION_STATE.SELECT){
+            selectionAction.install(this, this);
+        }else if(selectionAction.isInstalled()){
+            selectionAction.uninstall();
+        }
+    }
+    
     @Override
     protected void mapAreaChanged(Map2DMapAreaEvent event) {
         super.mapAreaChanged(event);
@@ -653,84 +610,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------        
-
-    private class MouseListen implements MouseInputListener {
-
-        int startX = 0;
-        int startY = 0;
-        int lastX = 0;
-        int lastY = 0;
-
-        private void drawRectangle(boolean view, boolean fill) {
-            int left = Math.min(startX, lastX);
-            int right = Math.max(startX, lastX);
-            int top = Math.max(startY, lastY);
-            int bottom = Math.min(startY, lastY);
-            int width = right - left;
-            int height = top - bottom;
-            selectionPane.setFill(fill);
-            selectionPane.setCoord(left, bottom, width, height, view);
-        //graphics.drawRect(left, bottom, width, height);
-        }
-
-        public void mouseClicked(MouseEvent e) {
-
-            switch (actionState) {
-                case SELECT:
-                    doMouseSelection(e.getX(), e.getY());
-                    return;
-            }
-
-
-        }
-
-        public void mousePressed(MouseEvent e) {
-            startX = e.getX();
-            startY = e.getY();
-            lastX = 0;
-            lastY = 0;
-
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            lastX = e.getX();
-            lastY = e.getY();
-
-            switch (actionState) {
-                case SELECT:
-                    drawRectangle(false, true);
-                    doMouseSelection(startX, startY, lastX, lastY);
-                    return;
-            }
-        }
-
-        public void mouseEntered(MouseEvent e) {
-            switch (actionState) {
-                case SELECT:
-                    setCursor(CUR_SELECT);
-                    break;
-            }
-        }
-
-        public void mouseExited(MouseEvent e) {
-        }
-
-        public void mouseDragged(MouseEvent e) {
-            lastX = e.getX();
-            lastY = e.getY();
-
-            switch (actionState) {
-                case SELECT:
-                    drawRectangle(true, true);
-                    return;
-            }
-
-        }
-
-        public void mouseMoved(MouseEvent e) {
-        }
-    }
-
+    
     private class MapLayerListListen implements MapLayerListListener {
 
         public void layerAdded(MapLayerListEvent event) {

@@ -15,10 +15,13 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import java.beans.PropertyChangeEvent;
 import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,18 +129,10 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
     //----------------------Over/Sub/information layers-------------------------
 
-    /**
-     * get the top InformationDecoration of the map2d widget
-     * @return InformationDecoration
-     */
     public InformationDecoration getInformationLayer() {
         return informationDecoration;
     }
 
-    /**
-     * set the decoration behind the map
-     * @param back : MapDecoration, use null to remove the decoration
-     */
     public void setBackDecoration(MapDecoration back) {
 
         if (backDecoration != null) {
@@ -153,18 +148,10 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mainDecorationPane.repaint();
     }
 
-    /**
-     * get the decoration behind the map
-     * @return MapDecoration : or null if no back decoration
-     */
     public MapDecoration getBackDecoration() {
         return backDecoration;
     }
 
-    /**
-     * add a Decoration between the map and the information top decoration
-     * @param deco : MapDecoration to add
-     */
     public void addDecoration(MapDecoration deco) {
 
         if (deco != null && !userDecorations.contains(deco)) {
@@ -176,11 +163,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         }
     }
 
-    /**
-     * insert a MapDecoration at a specific index
-     * @param index : index where to isert the decoration
-     * @param deco : MapDecoration to add
-     */
     public void addDecoration(int index, MapDecoration deco) {
 
         if (deco != null && !userDecorations.contains(deco)) {
@@ -192,20 +174,10 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         }
     }
 
-    /**
-     * get the index of a MapDecoration
-     * @param deco : MapDecoration to find
-     * @return index of the MapDecoration
-     * @throw ClassCastException or NullPointerException
-     */
     public int getDecorationIndex(MapDecoration deco) {
         return userDecorations.indexOf(deco);
     }
 
-    /**
-     * remove a MapDecoration
-     * @param deco : MapDecoration to remove
-     */
     public void removeDecoration(MapDecoration deco) {
         if (deco != null && userDecorations.contains(deco)) {
             deco.setMap2D(null);
@@ -216,10 +188,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         }
     }
 
-    /**
-     * get an array of all MapDecoration
-     * @return array of MapDecoration
-     */
     public MapDecoration[] getDecorations() {
         return userDecorations.toArray(EMPTY_OVERLAYER_ARRAY);
     }
@@ -236,6 +204,24 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //-----------------------------MAP2D----------------------------------------
+    
+    public Coordinate toMapCoord(int mx, int my) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+
+        Rectangle bounds = getBounds();
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        return toMapCoord(mx, my, width, height, bounds);
+    }
+
+    private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
+        Envelope mapArea = renderingStrategy.getMapArea();
+
+        double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
+        double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
+        return new Coordinate(mapX, mapY);
+    }
+    
 
     public void setRenderingStrategy(RenderingStrategy stratege) {
 

@@ -16,8 +16,11 @@
 
 package org.geotools.gui.swing.map.map2d;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.Component;
 import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
+import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
@@ -64,5 +67,72 @@ public interface Map2D extends Map{
      * @return array of Map2DListener
      */
     public Map2DListener[] getMap2DListeners();
+    
+    
+    //---------------------Basic functions--------------------------------------
+    
+    /**
+     * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
+     * @param mx : x coordinate of the mouse on the map (in pixel)
+     * @param my : y coordinate of the mouse on the map (in pixel)
+     * @return JTS Coordinate
+     */
+    public Coordinate toMapCoord(int mx, int my);
+    
         
+    //----------------------Over/Sub/information layers-------------------------
+    
+    /**
+     * get the top InformationDecoration of the map2d widget
+     * @return InformationDecoration
+     */
+    public InformationDecoration getInformationLayer();
+
+    /**
+     * set the decoration behind the map
+     * @param back : MapDecoration, use null to remove the decoration
+     */
+    public void setBackDecoration(MapDecoration back);
+
+    /**
+     * get the decoration behind the map
+     * @return MapDecoration : or null if no back decoration
+     */
+    public MapDecoration getBackDecoration();
+
+    /**
+     * add a Decoration between the map and the information top decoration
+     * @param deco : MapDecoration to add
+     */
+    public void addDecoration(MapDecoration deco);
+
+    /**
+     * insert a MapDecoration at a specific index
+     * @param index : index where to isert the decoration
+     * @param deco : MapDecoration to add
+     */
+    public void addDecoration(int index, MapDecoration deco);
+
+    /**
+     * get the index of a MapDecoration
+     * @param deco : MapDecoration to find
+     * @return index of the MapDecoration
+     * @throw ClassCastException or NullPointerException
+     */
+    public int getDecorationIndex(MapDecoration deco);
+
+    /**
+     * remove a MapDecoration
+     * @param deco : MapDecoration to remove
+     */
+    public void removeDecoration(MapDecoration deco);
+
+    /**
+     * get an array of all MapDecoration
+     * @return array of MapDecoration
+     */
+    public MapDecoration[] getDecorations();
+
+    
+    
 }

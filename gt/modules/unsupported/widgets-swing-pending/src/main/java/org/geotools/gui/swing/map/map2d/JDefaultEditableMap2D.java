@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

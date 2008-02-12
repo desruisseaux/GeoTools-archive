@@ -21,13 +21,13 @@ import java.util.ResourceBundle;
 import org.geotools.gui.swing.toolbox.Parameter;
 import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetToolDescriptor;
 
 /**
  *
  * @author johann Sorel
  */
-public class VDem2CSVTTDescriptor implements WidgetToolDescriptor{
+public class VDem2CSVTTDescriptor extends AbstractWidgetToolDescriptor{
 
     private final String[] path = ToolTreeConstants.getInstance().FILE_CONVERT.getPath();
     String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle").getString("title");
@@ -38,6 +38,7 @@ public class VDem2CSVTTDescriptor implements WidgetToolDescriptor{
     }
 
 
+    @Override
     public String[] getPath() {
         return path;
     }
@@ -46,8 +47,10 @@ public class VDem2CSVTTDescriptor implements WidgetToolDescriptor{
         return new VDem2CSVTool();
     }
 
+    @Override
     public Parameter[] getParametersInfo() {
         return EMPTY_PARAMETER_ARRAY;
     }
+
 
 }

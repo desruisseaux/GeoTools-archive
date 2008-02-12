@@ -72,30 +72,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
         buildCursors();
     }
-    
-    /**
-     * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
-     * @param mx : x coordinate of the mouse on the map (in pixel)
-     * @param my : y coordinate of the mouse on the map (in pixel)
-     * @return JTS Coordinate
-     */
-    protected Coordinate toMapCoord(int mx, int my) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        Rectangle bounds = getBounds();
-        double width = mapArea.getWidth();
-        double height = mapArea.getHeight();
-        return toMapCoord(mx, my, width, height, bounds);
-    }
-
-    protected Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
-        double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
-        return new Coordinate(mapX, mapY);
-    }
-    
+      
     private void buildCursors() {
         Toolkit tk = Toolkit.getDefaultToolkit();
         ImageIcon ico_zoomIn = IconBundle.getResource().getIcon("16_zoom_in");
