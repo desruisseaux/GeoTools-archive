@@ -212,6 +212,38 @@ public class Parser {
     }
 
     /**
+     * @return Flag determining if the parser is validatin or not.
+     */
+    public boolean isValidating() {
+        return handler.isValidating();
+    }
+    
+    /**
+     * Sets the flag which controls how the parser handles validation errors.
+     * <p>
+     * When this flag is set, the parser will throw an exception when it encounters 
+     * a validation error. Otherise the error will be stored, retreivable from 
+     * {@link #getValidationErrors()}.
+     * </p>
+     * <p>
+     * The default behavior is to set this flag to <code>false</code>. So client
+     * code should explicitly set this flag if it is desired that the exception 
+     * be thrown when the validation error occurs.
+     * </p>
+     * @param fail failure flag, <code>true</code> to fail, otherwise <code>false</code>
+     */
+    public void setFailOnValidationError( boolean fail ) {
+        handler.setFailOnValidationError( fail );
+    }
+    
+    /**
+     * @return The flag determining how the parser deals with validation errors.
+     */
+    public boolean isFailOnValidationError() {
+        return handler.isFailOnValidationError();
+    }
+    
+    /**
      * Returns a list of any validation errors that occured while parsing.
      *
      * @return A list of errors, or an empty list if none.

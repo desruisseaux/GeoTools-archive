@@ -20,6 +20,7 @@ import java.util.List;
 import org.geotools.ml.MLConfiguration;
 import org.geotools.ml.Mail;
 import org.geotools.ml.bindings.MLSchemaLocationResolver;
+import org.xml.sax.SAXException;
 
 
 public class ParserTest extends TestCase {
@@ -51,5 +52,15 @@ public class ParserTest extends TestCase {
         parser.parse(MLSchemaLocationResolver.class.getResourceAsStream("mails-invalid.xml"));
 
         assertFalse(0 == parser.getValidationErrors().size());
+        
+        //test immeediate failure case
+        parser.setFailOnValidationError(true);
+        try {
+            parser.parse(MLSchemaLocationResolver.class.getResourceAsStream("mails-invalid.xml"));    
+            fail( "should have thrown an error with setFailOnValidationError set");
+        }
+        catch( SAXException e ) {
+        }
+        
     }
 }

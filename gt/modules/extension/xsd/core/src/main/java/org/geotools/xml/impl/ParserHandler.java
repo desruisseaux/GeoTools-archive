@@ -99,7 +99,10 @@ public class ParserHandler extends DefaultHandler {
 
     /** flag to indicate if the parser should validate or not */
     boolean validating;
-
+    
+    /** flag to control if an exception is thrown on a falidation error */
+    boolean failOnValidationError = false;
+    
     /** wether the parser is strict or not */
     boolean strict = false;
 
@@ -131,6 +134,14 @@ public class ParserHandler extends DefaultHandler {
 
     public void setValidating(boolean validating) {
         this.validating = validating;
+    }
+    
+    public void setFailOnValidationError( boolean failOnValidationError ) {
+        this.failOnValidationError = failOnValidationError;
+    }
+    
+    public boolean isFailOnValidationError() {
+        return failOnValidationError;
     }
 
     public List getValidationErrors() {
@@ -591,6 +602,12 @@ O:          for (int i = 0; i < schemas.length; i++) {
 
     public void error(SAXParseException e) throws SAXException {
         logger.log(Level.WARNING, e.getMessage());
+        
+        //check fail on validation flag
+        if ( isFailOnValidationError() ) {
+            throw e;
+        }
+        
         errors.add(e);
     }
 
