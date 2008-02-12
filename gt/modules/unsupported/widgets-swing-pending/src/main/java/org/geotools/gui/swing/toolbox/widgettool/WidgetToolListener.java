@@ -15,7 +15,7 @@
  */
 
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.widgettool;
 
 import java.util.EventListener;
 
@@ -24,6 +24,6 @@ import java.util.EventListener;
  */
 public interface WidgetToolListener extends EventListener{
 
-    public void objectCreated(Object obj);
+    public void objectCreated(Object[] obj);
     
 }

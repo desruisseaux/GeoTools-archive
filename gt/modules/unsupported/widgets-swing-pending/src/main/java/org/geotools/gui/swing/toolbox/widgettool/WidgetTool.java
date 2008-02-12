@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.widgettool;
 
 import org.geotools.gui.swing.toolbox.tooltree.*;
 import javax.swing.JComponent;
@@ -26,7 +26,7 @@ import javax.swing.JComponent;
  */
 public interface WidgetTool {
 
-    public final WidgetToolListener[] EMPTY_TREETOOLLISTENER_ARRAY = {};
+    public final WidgetToolListener[] EMPTY_LISTENER_ARRAY = {};
     
     
     /**

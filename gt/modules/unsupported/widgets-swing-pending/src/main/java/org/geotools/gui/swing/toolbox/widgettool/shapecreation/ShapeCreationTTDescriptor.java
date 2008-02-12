@@ -18,19 +18,19 @@ package org.geotools.gui.swing.toolbox.widgettool.shapecreation;
 
 import java.util.Map;
 import java.util.ResourceBundle;
-import org.geotools.gui.swing.toolbox.tooltree.Parameter;
-import org.geotools.gui.swing.toolbox.WidgetTool;
-import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetToolDescriptor;
 
 /**
  *
  * @author johann sorel
  */
-public class ShapeCreationTTDescriptor implements WidgetToolDescriptor{
+public class ShapeCreationTTDescriptor extends AbstractWidgetToolDescriptor{
 
    
-    private final String[] path = ToolTreePaths.getInstance().FILE_CREATE.getPath();
+    private final String[] path = ToolTreeConstants.getInstance().FILE_CREATE.getPath();
     
     private String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/shapecreation/Bundle").getString("shapefile_creation");
        
@@ -39,6 +39,7 @@ public class ShapeCreationTTDescriptor implements WidgetToolDescriptor{
         return title;
     }
 
+    @Override
     public String[] getPath() {
         return path;
     }
@@ -47,6 +48,7 @@ public class ShapeCreationTTDescriptor implements WidgetToolDescriptor{
         return new ShapeCreationTool();
     }
 
+    @Override
     public Parameter[] getParametersInfo() {
         return EMPTY_PARAMETER_ARRAY;
     }

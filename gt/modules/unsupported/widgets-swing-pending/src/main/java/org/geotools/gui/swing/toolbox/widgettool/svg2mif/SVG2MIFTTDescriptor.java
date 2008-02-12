@@ -18,24 +18,25 @@ package org.geotools.gui.swing.toolbox.widgettool.svg2mif;
 
 import java.util.Map;
 import java.util.ResourceBundle;
-import org.geotools.gui.swing.toolbox.tooltree.Parameter;
-import org.geotools.gui.swing.toolbox.WidgetTool;
-import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetToolDescriptor;
 
 /**
  *
  * @author Laurent Jegou
  */
-public class SVG2MIFTTDescriptor implements WidgetToolDescriptor{
+public class SVG2MIFTTDescriptor extends AbstractWidgetToolDescriptor{
 
-    private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();    
+    private final String[] path = ToolTreeConstants.getInstance().FILE_CONVERT.getPath();    
     String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/svg2mif/Bundle").getString("title");
     
     public String getTitle(){
         return "SVG > MIF";
     }
 
+    @Override
     public String[] getPath() {
         return path;
     }
@@ -44,6 +45,7 @@ public class SVG2MIFTTDescriptor implements WidgetToolDescriptor{
         return new SVG2MIFTool();
     }
 
+    @Override
     public Parameter[] getParametersInfo() {
         return EMPTY_PARAMETER_ARRAY;
     }

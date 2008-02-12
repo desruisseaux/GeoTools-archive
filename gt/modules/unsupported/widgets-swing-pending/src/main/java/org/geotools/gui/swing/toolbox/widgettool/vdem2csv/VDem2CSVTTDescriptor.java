@@ -18,10 +18,10 @@ package org.geotools.gui.swing.toolbox.widgettool.vdem2csv;
 
 import java.util.Map;
 import java.util.ResourceBundle;
-import org.geotools.gui.swing.toolbox.tooltree.Parameter;
-import org.geotools.gui.swing.toolbox.WidgetTool;
-import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 
 /**
  *
@@ -29,7 +29,7 @@ import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
  */
 public class VDem2CSVTTDescriptor implements WidgetToolDescriptor{
 
-    private final String[] path = ToolTreePaths.getInstance().FILE_CONVERT.getPath();
+    private final String[] path = ToolTreeConstants.getInstance().FILE_CONVERT.getPath();
     String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/vdem2csv/Bundle").getString("title");
     
     

@@ -14,11 +14,10 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.widgettool;
 
-import org.geotools.gui.swing.toolbox.tooltree.*;
-import org.geotools.gui.swing.toolbox.WidgetTool;
 import java.util.Map;
+import org.geotools.gui.swing.toolbox.Parameter;
 
 /**
  * @author johann sorel
@@ -28,7 +27,11 @@ public interface WidgetToolDescriptor {
     /**
      * empty Parameter array
      */
-    public final Parameter[] EMPTY_PARAMETER_ARRAY = {};
+    public static final Parameter[] EMPTY_PARAMETER_ARRAY = {};
+    /**
+     * empty String array
+     */
+    public static final String[] EMPTY_STRING_ARRAY = {};
     
     /**
      * @return name of the tool
@@ -36,10 +39,28 @@ public interface WidgetToolDescriptor {
     public String getTitle();
     
     /**
+     * short description of the tool
+     * @return String
+     */
+    public String getDescription();
+    
+    /**
      * used to categorize a widget tool
      * @return String Path ex: {utilities,convert}
      */
     public String[] getPath();
+    
+    /**
+     * Keywords for this tool
+     * @return String[]
+     */
+    public String[] getKeyWords();
+    
+    /**
+     * Array of string for categories 
+     * @return String[]
+     */
+    public String[] getCategories();
     
     /**
      * @param parameters 

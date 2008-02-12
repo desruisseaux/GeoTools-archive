@@ -14,12 +14,34 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.widgettool;
+
+import org.geotools.gui.swing.toolbox.Parameter;
 
 /**
  *
  * @author johann sorel
  */
-public interface ProcessTool {
+public abstract class AbstractWidgetToolDescriptor implements WidgetToolDescriptor{
+
+    public String getDescription() {
+        return "";
+    }
+
+    public String[] getPath() {
+        return EMPTY_STRING_ARRAY;
+    }
+
+    public String[] getKeyWords() {
+        return EMPTY_STRING_ARRAY;
+    }
+
+    public String[] getCategories() {
+        return EMPTY_STRING_ARRAY;
+    }
+
+    public Parameter[] getParametersInfo() {
+        return EMPTY_PARAMETER_ARRAY;
+    }
 
 }

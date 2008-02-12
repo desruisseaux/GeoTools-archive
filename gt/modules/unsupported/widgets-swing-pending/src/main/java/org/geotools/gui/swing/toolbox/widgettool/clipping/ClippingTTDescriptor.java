@@ -18,19 +18,20 @@ package org.geotools.gui.swing.toolbox.widgettool.clipping;
 
 import java.util.Map;
 import java.util.ResourceBundle;
-import org.geotools.gui.swing.toolbox.tooltree.Parameter;
-import org.geotools.gui.swing.toolbox.WidgetTool;
-import org.geotools.gui.swing.toolbox.tooltree.ToolTreePaths;
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.Parameter;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
+import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 
 /**
  *
  * @author johann sorel
  */
-public class ClippingTTDescriptor implements WidgetToolDescriptor{
+public class ClippingTTDescriptor extends AbstractWidgetToolDescriptor{
 
    
-    private final String[] path = ToolTreePaths.getInstance().ANALYSE_GEOMETRIE.getPath();
+    private final String[] path = ToolTreeConstants.getInstance().ANALYSE_GEOMETRIE.getPath();
     
     private String title = ResourceBundle.getBundle("org/geotools/gui/swing/toolbox/tools/clipping/Bundle").getString("clip");
        

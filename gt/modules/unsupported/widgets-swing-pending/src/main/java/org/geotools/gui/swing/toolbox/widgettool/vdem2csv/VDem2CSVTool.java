@@ -25,7 +25,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.geotools.gui.swing.misc.filtre.mnt.FiltreVDem;
 import org.geotools.gui.swing.misc.filtre.txt.FiltreCSV;
-import org.geotools.gui.swing.toolbox.AbstractWidgetTool;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 
 /**
  *

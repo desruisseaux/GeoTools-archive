@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.tooltree;
+package org.geotools.gui.swing.toolbox;
 
 
 /**

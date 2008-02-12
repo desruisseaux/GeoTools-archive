@@ -15,6 +15,8 @@
  */
 package org.geotools.gui.swing.toolbox.widgettool.clipping;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -36,6 +38,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FileDataStoreFactorySpi;
@@ -47,28 +50,34 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
-import org.geotools.gui.swing.toolbox.process.ClipProcess;
-import org.geotools.gui.swing.toolbox.process.ProcessListener;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  *
  * @author johann sorel
  */
-public class ClippingTool extends AbstractWidgetTool {
+public class ClippingTool_old extends AbstractWidgetTool {
 
+    private final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private LayerListModel inModel = new LayerListModel();
     private LayerListModel clipModel = new LayerListModel();
     private File outFile = null;
@@ -83,7 +92,7 @@ public class ClippingTool extends AbstractWidgetTool {
      * Creates new form ClippingTool 
      * @param parameters 
      */
-    public ClippingTool(Map parameters) {
+    public ClippingTool_old(Map parameters) {
         initComponents();
 
         Object obj = parameters.get("layers");
@@ -195,7 +204,7 @@ public class ClippingTool extends AbstractWidgetTool {
                 geotype = "MultiPolygon";
             }
 
-            
+
             //make the simplefeaturetype
             // Tell this shapefile what type of data it will store
             StringBuffer buffer = new StringBuffer();
@@ -205,9 +214,6 @@ public class ClippingTool extends AbstractWidgetTool {
 
             List<AttributeDescriptor> lst = type.getAttributes();
             for (AttributeDescriptor att : lst) {
-
-
-
 
                 if (att != geodesc) {
                     String name = att.getName().toString();
@@ -239,6 +245,144 @@ public class ClippingTool extends AbstractWidgetTool {
         }
 
         return myData;
+    }
+
+    private void fillLayer(FeatureCollection lstFeatures, FeatureSource datastore) {
+        FeatureStore store;
+
+        if (datastore instanceof FeatureStore) {
+            store = (FeatureStore) datastore;
+
+            DefaultTransaction transaction = new DefaultTransaction();
+            store.setTransaction(transaction);
+
+            try {
+                store.addFeatures(lstFeatures);
+                transaction.commit();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                try {
+                    store.getTransaction().rollback();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                transaction.close();
+            }
+        }
+    }
+
+    private void clip(
+            CoordinateReferenceSystem inCRS,
+            CoordinateReferenceSystem clipCRS,
+            FeatureCollection outCol,
+            SimpleFeature inSF,
+            SimpleFeatureType outType)
+            throws IllegalArgumentException {
+
+        boolean sameCRS = inCRS.equals(clipCRS);
+        MathTransform transformToClipCRS = null;
+        MathTransform transformToInCRS = null;
+
+        Geometry inGeom = null;
+
+
+
+        if (sameCRS) {
+            inGeom = (Geometry) inSF.getDefaultGeometry();
+        } else {
+
+            try {
+                transformToClipCRS = CRS.findMathTransform(inCRS, clipCRS, true);
+                transformToInCRS = CRS.findMathTransform(clipCRS, inCRS, true);
+            } catch (FactoryException ex) {
+                throw new IllegalArgumentException();
+            }
+
+            try {
+                inGeom = JTS.transform((Geometry) inSF.getDefaultGeometry(), transformToClipCRS);
+            } catch (MismatchedDimensionException ex) {
+                throw new IllegalArgumentException();
+            } catch (TransformException ex) {
+                throw new IllegalArgumentException();
+            }
+
+        }
+
+        if (inGeom != null) {
+
+            //We should make a second filter here to reduce the feature list ans speed up
+            //JTSGeometryFactory geoFact = new JTSGeometryFactory();
+            //FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
+            //Filter filter = ff.intersects(ff.property(geoAtt), ff.literal(env));
+
+            FeatureCollection clipCol = null;
+            try {
+                clipCol = clipLayer.getFeatureSource().getFeatures();
+            } catch (IOException e) {
+                throw new IllegalArgumentException();
+            }
+
+
+            if (clipCol != null) {
+                FeatureIterator ite = clipCol.features();
+
+                //we create the clipped geometry
+                Geometry outGeom = null;
+                while (ite.hasNext()) {
+                    Geometry clipGeom = (Geometry) ite.next().getDefaultGeometry();
+
+                    if (inGeom.intersects(clipGeom)) {
+                        Geometry partGeom = inGeom.intersection(clipGeom);
+                        outGeom = (outGeom == null) ? partGeom : outGeom.union(partGeom);
+                    }
+                }
+
+                if (outGeom != null) {
+
+                    //we project back to original CRS if needed
+                    if (!sameCRS) {
+                        try {
+                            outGeom = JTS.transform( outGeom, transformToInCRS );
+                        } catch (MismatchedDimensionException ex) {
+                            throw new IllegalArgumentException();
+                        } catch (TransformException ex) {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+
+                    //we verify the geometry is a Multi-Geometry
+                    if (outGeom instanceof Point) {
+                        outGeom = GEOMETRY_FACTORY.createMultiPoint(new Point[]{(Point) outGeom});
+                    } else if (outGeom instanceof LineString) {
+                        outGeom = GEOMETRY_FACTORY.createMultiLineString(new LineString[]{(LineString) outGeom});
+                    } else if (outGeom instanceof Polygon) {
+                        outGeom = GEOMETRY_FACTORY.createMultiPolygon(new Polygon[]{(Polygon) outGeom});
+                    }
+
+                    //we copy each attribut and replace the geometry
+                    Object[] values = new Object[outType.getAttributeCount()];
+                    AttributeDescriptor geomAttribut = outType.getDefaultGeometry();
+                    List<AttributeDescriptor> attributes = outType.getAttributes();
+
+                    for (int i = 0,  max = attributes.size(); i < max; i++) {
+                        AttributeDescriptor oneAttribut = attributes.get(i);
+
+                        if (oneAttribut.equals(geomAttribut)) {
+                            values[i] = outGeom;
+                        } else {
+                            Object obj = inSF.getAttribute(attlink.get(oneAttribut.getName().toString()));
+                            values[i] = (obj != null) ? obj : oneAttribut.getDefaultValue();
+                        }
+                    }
+
+                    SimpleFeature myFeature = SimpleFeatureBuilder.build(outType, values, null);
+                    outCol.add(myFeature);
+                }
+
+            }
+        }
+
     }
 
     /** This method is called from within the constructor to
@@ -321,17 +465,17 @@ public class ClippingTool extends AbstractWidgetTool {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+                    .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(gui_jcb_inlayer, 0, 308, Short.MAX_VALUE))
+                        .add(gui_jcb_inlayer, 0, 319, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(gui_progress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                        .add(gui_progress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gui_ok))
                     .add(layout.createSequentialGroup()
-                        .add(gui_jtf_inexternal, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                        .add(gui_jtf_inexternal, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gui_but_infile))
                     .add(layout.createSequentialGroup()
@@ -339,12 +483,12 @@ public class ClippingTool extends AbstractWidgetTool {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gui_jcb_cliplayer, 0, 268, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(gui_jtf_clipexternal, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                        .add(gui_jtf_clipexternal, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gui_but_clipfile))
                     .add(jLabel3)
                     .add(layout.createSequentialGroup()
-                        .add(gui_jtf_outfile, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                        .add(gui_jtf_outfile, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gui_but_outfile)))
                 .addContainerGap())
@@ -378,7 +522,7 @@ public class ClippingTool extends AbstractWidgetTool {
                     .add(gui_jtf_outfile, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 47, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(gui_progress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+                    .add(gui_progress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, gui_ok))
                 .addContainerGap())
         );
@@ -460,58 +604,8 @@ public class ClippingTool extends AbstractWidgetTool {
 
 
 
-        FeatureSource inFS = inLayer.getFeatureSource();
-        SimpleFeatureType inType = inFS.getSchema();
 
-        DataStore outStore = createShapeFile(outFile, inType, inType.getCRS(), inLayer.getTitle());
-        
-        try{
-            attlink.put(inType.getDefaultGeometry().getName().toString(), 
-                    outStore.getSchema(outStore.getTypeNames()[0]).getDefaultGeometry().getName().toString());
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
-        try {
-            FeatureCollection source = inLayer.getFeatureSource().getFeatures();
-            FeatureCollection clip = clipLayer.getFeatureSource().getFeatures();
-            FeatureStore out = (FeatureStore) outStore.getFeatureSource(outStore.getTypeNames()[0]);
-
-
-            ClipProcess process = new ClipProcess(source, clip, out,attlink);
-
-
-            gui_ok.setEnabled(false);
-            gui_progress.setValue(0);
-
-            process.addProcessListener(new ProcessListener() {
-
-                public void processChanged(int val, int max, String desc) {
-                    gui_progress.setMaximum(max);
-                    gui_progress.setValue(val);
-                    gui_progress.setString(desc);
-                }
-
-                public void objectCreated(Object obj) {
-                }
-
-                public void processEnded(String desc) {
-                    gui_progress.setString(desc);
-                    gui_ok.setEnabled(true);
-                }
-
-                public void processInterrupted(Exception e) {
-                    gui_progress.setString(error);
-                    e.printStackTrace();
-                    gui_ok.setEnabled(true);
-                }
-            });
-
-            new Thread(process).start();
-
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+        new clipThread().start();                
 }//GEN-LAST:event_gui_okActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -530,4 +624,74 @@ public class ClippingTool extends AbstractWidgetTool {
     private javax.swing.JLabel jLabel3;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
     // End of variables declaration//GEN-END:variables
+
+    // private classes ---------------------------------------------------------
+    private class clipThread extends Thread {
+
+        private int x = 0;
+        private int max = 0;
+
+        @Override
+        public void run() {
+            gui_ok.setEnabled(false);
+            gui_progress.setValue(0);
+
+            FeatureSource inFS = inLayer.getFeatureSource();
+            SimpleFeatureType inType = inFS.getSchema();
+            CoordinateReferenceSystem inCRS = inLayer.getFeatureSource().getSchema().getCRS();
+
+            CoordinateReferenceSystem clipCRS = clipLayer.getFeatureSource().getSchema().getCRS();
+
+            DataStore outStore = createShapeFile(outFile, inType, inType.getCRS(), inLayer.getTitle());
+
+            String geoAtt = inLayer.getFeatureSource().getSchema().getDefaultGeometry().getName().toString();
+
+            //we make a first filter with envelope to limite the collection size
+            ReferencedEnvelope env = clipLayer.getBounds();
+            FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
+            Filter filter = ff.intersects(ff.property(geoAtt), ff.literal(env));
+
+            try {
+                SimpleFeatureType outType = outStore.getSchema(outStore.getTypeNames()[0]);
+
+                FeatureCollection inCol = inFS.getFeatures(filter);
+                FeatureIterator ite = inCol.features();
+
+                FeatureCollection outCol = FeatureCollections.newCollection();
+                max = inCol.size();
+                gui_progress.setMaximum(max);
+
+                x = 0;
+                while (ite.hasNext()) {
+                    x++;
+                    SimpleFeature sf = ite.next();
+                    clip(inCRS, clipCRS, outCol, sf, outType);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            gui_progress.setValue(x);
+                            gui_progress.setString(x + " / " + max);
+                        }
+                    });
+
+                }
+
+                String name = outStore.getTypeNames()[0];
+                FeatureSource source = outStore.getFeatureSource(name);
+                fillLayer(outCol, source);
+
+                fireObjectCreation(new Object[]{outStore});
+
+            } catch (IOException ex) {
+                gui_progress.setString(error);
+            } catch (IllegalArgumentException i) {
+                gui_progress.setString(error);
+            } finally {
+                gui_ok.setEnabled(true);
+            }
+
+
+        }
+    }
 }

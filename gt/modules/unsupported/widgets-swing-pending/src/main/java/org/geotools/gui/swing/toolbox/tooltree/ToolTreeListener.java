@@ -17,7 +17,7 @@
 
 package org.geotools.gui.swing.toolbox.tooltree;
 
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import java.util.EventListener;
 
 /**

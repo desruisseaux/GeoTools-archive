@@ -22,9 +22,9 @@ import java.lang.ref.WeakReference;
  *
  * @author johann sorel
  */
-public class ToolTreePaths {
+public class ToolTreeConstants {
 
-    private static WeakReference<ToolTreePaths> ref = null;
+    private static WeakReference<ToolTreeConstants> ref = null;
     
     
     public final ToolTreePath ANALYSE = new ToolTreePath(null,"analyse");
@@ -45,15 +45,15 @@ public class ToolTreePaths {
      * ToolTreePaths instance
      * @return ToolTreePaths
      */
-    public static ToolTreePaths getInstance(){
+    public static ToolTreeConstants getInstance(){
      
-        ToolTreePaths cst = null;
+        ToolTreeConstants cst = null;
         if(ref != null){
             cst = ref.get();
            }
         
         if(cst == null){
-            cst = new ToolTreePaths();
+            cst = new ToolTreeConstants();
             ref = new WeakReference(cst);
         }
         

@@ -16,11 +16,14 @@
 
 package org.geotools.gui.swing.toolbox.tooltree;
 
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
+import java.util.ResourceBundle;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.ScrollPaneConstants;
 
 /**
@@ -29,18 +32,23 @@ import javax.swing.ScrollPaneConstants;
  */
 public class JToolTree extends JComponent{
 
+    
     private final TreeTable treetable;
     
     public JToolTree(){
+        
         treetable = new TreeTable(this);
         
+        //the tree view
         JScrollPane pane = new JScrollPane(treetable);
         pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
-        setLayout(new BorderLayout());
         
-        add(BorderLayout.CENTER,pane);        
+        setLayout(new BorderLayout());
+        add(BorderLayout.CENTER,pane);    
+        
+        
     }
     
     public void addTool(WidgetToolDescriptor tool){

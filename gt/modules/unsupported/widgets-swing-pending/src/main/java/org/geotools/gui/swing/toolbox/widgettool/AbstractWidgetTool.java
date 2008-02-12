@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox;
+package org.geotools.gui.swing.toolbox.widgettool;
 
 import org.geotools.gui.swing.toolbox.tooltree.*;
 import javax.swing.JComponent;
@@ -32,7 +32,7 @@ public abstract class AbstractWidgetTool extends JPanel implements WidgetTool{
         return this;
     }
     
-    protected void fireObjectCreation(Object obj){
+    protected void fireObjectCreation(Object[] obj){
         WidgetToolListener[] listeners = getWidgetToolListeners();
         
         for(WidgetToolListener listener : listeners){
@@ -63,5 +63,7 @@ public abstract class AbstractWidgetTool extends JPanel implements WidgetTool{
     public WidgetToolListener[] getWidgetToolListeners() {
         return LISTENERS.getListeners(WidgetToolListener.class);
     }
+    
+    
     
 }

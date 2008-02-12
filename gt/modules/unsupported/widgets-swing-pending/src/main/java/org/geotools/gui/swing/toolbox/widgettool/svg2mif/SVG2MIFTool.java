@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreMifMid;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreSVG;
-import org.geotools.gui.swing.toolbox.AbstractWidgetTool;
+import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.DCircle;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.DLine;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.DPoint;
