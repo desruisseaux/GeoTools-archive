@@ -73,12 +73,12 @@ import org.geotools.gui.swing.map.map2d.decoration.ImageDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
-import org.geotools.gui.swing.toolbox.WidgetTool;
-import org.geotools.gui.swing.toolbox.WidgetToolListener;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolListener;
 import org.geotools.gui.swing.toolbox.widgettool.clipping.ClippingTTDescriptor;
 import org.geotools.gui.swing.toolbox.tooltree.JToolTree;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeListener;
-import org.geotools.gui.swing.toolbox.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.shapecreation.ShapeCreationTTDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.SVG2MIFTTDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.vdem2csv.VDem2CSVTTDescriptor;
@@ -192,24 +192,26 @@ public class DemoAll extends javax.swing.JFrame {
 
                 wt.addWidgetToolListener(new WidgetToolListener() {
 
-                    public void objectCreated(Object obj) {
-                        if (obj instanceof DataStore) {
-                            RandomStyleFactory rsf = new RandomStyleFactory();
+                    public void objectCreated(Object[] objs) {
+                        for (Object obj : objs) {
+                            if (obj instanceof DataStore) {
+                                RandomStyleFactory rsf = new RandomStyleFactory();
 
-                            DataStore store = (DataStore) obj;
+                                DataStore store = (DataStore) obj;
 
-                            try {
-                                String name = store.getTypeNames()[0];
-                                FeatureSource source = store.getFeatureSource(name);
-                                MapLayer layer = new DefaultMapLayer(source, rsf.createRandomVectorStyle(source));
+                                try {
+                                    String name = store.getTypeNames()[0];
+                                    FeatureSource source = store.getFeatureSource(name);
+                                    MapLayer layer = new DefaultMapLayer(source, rsf.createRandomVectorStyle(source));
 
-                                if (tree.getActiveContext() != null) {
-                                    tree.getActiveContext().addLayer(layer);
+                                    if (tree.getActiveContext() != null) {
+                                        tree.getActiveContext().addLayer(layer);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
 
+                            }
                         }
                     }
                 });
@@ -233,21 +235,21 @@ public class DemoAll extends javax.swing.JFrame {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            DataStore store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp")));
+            DataStore store = DataStoreFinder.getDataStore(new SingletonMap("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp")));
             FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");
             context.addLayer(layer);
 
-            store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp")));
+            store = DataStoreFinder.getDataStore(new SingletonMap("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp")));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_line.shp");
             context.addLayer(layer);
 
-            store = DataStoreFinder.getDataStore(new SingletonMap("url",DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp")));
+            store = DataStoreFinder.getDataStore(new SingletonMap("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp")));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
@@ -285,10 +287,10 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new RuleMaxScaleItem());
 
 
-        if(map instanceof SelectableMap2D){
-            colSelection.setMap( (SelectableMap2D)map);
+        if (map instanceof SelectableMap2D) {
+            colSelection.setMap((SelectableMap2D) map);
         }
-        
+
 
         tree.addColumn(colVisible);
         tree.addColumn(colOpacity);
