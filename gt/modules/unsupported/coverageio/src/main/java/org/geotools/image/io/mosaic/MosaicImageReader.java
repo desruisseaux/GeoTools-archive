@@ -300,15 +300,16 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
-     * Returns a reader sample, or {@code null}. This method tries to returns an instance of the
-     * most specific reader class. If no suitable instance is found, then it returns {@code null}.
+     * Returns a reader for the tiles, or {@code null}. This method tries to returns an instance
+     * of the most specific reader class. If no suitable instance is found, then it returns
+     * {@code null}.
      * <p>
      * This method is typically invoked for fetching an instance of {@code ImageReadParam}. We
      * look for the most specific class because it may contains additional parameters that are
      * ignored by super-classes. If we fail to find a suitable instance, then the caller shall
      * fallback on the {@link ImageReader} default implementation.
      */
-    private ImageReader getTileReader() {
+    final ImageReader getTileReader() {
         final Set<ImageReader> readers = getTileReaders();
         Class<?> type = Classes.specializedClass(readers);
         while (type!=null && ImageReader.class.isAssignableFrom(type)) {

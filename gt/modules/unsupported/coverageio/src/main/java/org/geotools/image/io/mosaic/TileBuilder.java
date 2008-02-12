@@ -20,6 +20,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import javax.imageio.ImageReader;
@@ -41,6 +43,11 @@ import org.geotools.resources.image.ImageUtilities;
  * @author Martin Desruisseaux
  */
 public class TileBuilder {
+    /**
+     * Default value for {@link #prefix}. Current implementation uses "L" as in "Level".
+     */
+    private static final String DEFAULT_PREFIX = "L";
+
     /**
      * The factory to use for creating {@link TileManager} instances.
      */
@@ -88,7 +95,7 @@ public class TileBuilder {
     /**
      * The expected size of row and column filed in generated names.
      */
-    private transient int rowFieldSize, columnFieldSize;
+    private transient int overviewFieldSize, rowFieldSize, columnFieldSize;
 
     /**
      * The prefix to put before tile filenames. If {@code null}, will be inferred
@@ -292,7 +299,7 @@ public class TileBuilder {
          * selects the longuest file extension (e.g. "tiff" instead of "tif").
          */
         if (prefix == null) {
-            prefix = "L";
+            prefix = DEFAULT_PREFIX;
         }
         extension = "";
         final String[] suffix = tileReaderSpi.getFileSuffixes();
@@ -304,8 +311,9 @@ public class TileBuilder {
                 }
             }
         }
-        columnFieldSize = 0;
-        rowFieldSize = 0;
+        overviewFieldSize = 0;
+        rowFieldSize      = 0;
+        columnFieldSize   = 0;
         switch (layout) {
             case CONSTANT_GEOGRAPHIC_AREA: return createTileManager(true);
             case CONSTANT_TILE_SIZE:       return createTileManager(false);
@@ -328,7 +336,34 @@ public class TileBuilder {
         final Rectangle  tileBounds  = new Rectangle(tileSize);
         final Rectangle  imageBounds = new Rectangle(untiledBounds);
         final Dimension  subsampling = new Dimension(1,1);
+        /*
+         * Computes the number of overviews that we may expect. This loop is identical to the
+         * loop after minus the code related to Tile objects creation. More specifically, its
+         * stop condition must be identical.
+         */
         int overview = 0;
+        do {
+            overview++;
+            tileBounds.setLocation(imageBounds.x, imageBounds.y);
+            if (tileBounds.contains(imageBounds)) {
+                break;
+            }
+            nextSubsampling(subsampling);
+            imageBounds.setRect(untiledBounds);
+            divide(imageBounds, subsampling);
+            if (constantArea) {
+                tileBounds.setSize(tileSize);
+                divide(tileBounds, subsampling);
+            }
+        } while (isValidSize(tileBounds));
+        overviewFieldSize = ((int) Math.log10(overview)) + 1; // Really want rounding toward 0.
+        /*
+         * Now process to Tile objects creation.
+         */
+        tileBounds .setSize(tileSize);
+        imageBounds.setRect(untiledBounds);
+        subsampling.setSize(1,1);
+        overview = 0;
         do {
             final int xmin = imageBounds.x;
             final int ymin = imageBounds.y;
@@ -348,32 +383,52 @@ public class TileBuilder {
                 y++;
             }
             overview++;
+            tileBounds.setLocation(xmin, ymin);
             if (tileBounds.contains(imageBounds)) {
                 break;
             }
-            Dimension change = changeForNextSubsampling(tileBounds);
-            subsampling.width  *= change.width;
-            subsampling.height *= change.height;
-            imageBounds.width  /= change.width;
-            imageBounds.height /= change.height;
-            imageBounds.x      /= change.width;
-            imageBounds.y      /= change.height;
+            nextSubsampling(subsampling);
+            imageBounds.setRect(untiledBounds);
+            divide(imageBounds, subsampling);
             if (constantArea) {
-                tileBounds.width  /= change.width;
-                tileBounds.height /= change.height;
+                tileBounds.setSize(tileSize);
+                divide(tileBounds, subsampling);
             }
-        } while (tileBounds.width >= minimumTileSize.width || tileBounds.height >= minimumTileSize.height);
+        } while (isValidSize(tileBounds));
         final TileManager[] managers = factory.create(tiles);
         return managers[0];
     }
 
     /**
-     * Returns a divisor for the given tile which is close to the
-     * {@linkplain #getPreferredSubsampling preferred subsampling}.
+     * Returns {@code true} if the specified rectangle has a size equals or greater than the
+     * minimum tile size.
      */
-    private Dimension changeForNextSubsampling(final Rectangle tileBounds) {
-        return new Dimension(changeForNextSubsampling(tileBounds.width,  xSubsampling),
-                             changeForNextSubsampling(tileBounds.height, ySubsampling));
+    private boolean isValidSize(final Rectangle bounds) {
+        return bounds.width >= minimumTileSize.width || bounds.height >= minimumTileSize.height;
+    }
+
+    /**
+     * Divides a rectangle by the given subsampling.
+     */
+    private static void divide(final Rectangle bounds, final Dimension subsampling) {
+        bounds.x      /= subsampling.width;
+        bounds.y      /= subsampling.height;
+        bounds.width  /= subsampling.width;
+        bounds.height /= subsampling.height;
+    }
+
+    /**
+     * Searchs for a subsampling which is close to a multiple of
+     * {@linkplain #getPreferredSubsampling preferred subsampling}.
+     * The subsampling dimension is updated in-place.
+     */
+    private void nextSubsampling(final Dimension subsampling) {
+        // Following really wants a rounding toward 0 in integer divisions.
+        int dx = (subsampling.width  / xSubsampling + 1) * xSubsampling;
+        int dy = (subsampling.height / ySubsampling + 1) * ySubsampling;
+        dx = nextSubsampling(untiledBounds.width,  dx, subsampling.width);
+        dy = nextSubsampling(untiledBounds.height, dy, subsampling.height);
+        subsampling.setSize(dx, dy);
     }
 
     /**
@@ -384,13 +439,17 @@ public class TileBuilder {
      *
      * @param  size A size for the raster. It could be the width or height value.
      * @param  subsampling The preferred subsampling for divising the size.
+     * @param  lower The minimal subsampling, exclusive.
      * @return The proposed subsampling value.
      */
-    private static int changeForNextSubsampling(final int size, final int subsampling) {
+    private static int nextSubsampling(final int size, int subsampling, final int lower) {
+        if (subsampling <= lower) {
+            subsampling = lower + 1;
+        }
         if (size % subsampling != 0) {
             for (int i=1; i<=5; i++) {
                 int candidate = subsampling - i;
-                if (candidate > 1 && size % candidate == 0) {
+                if (candidate > lower && size % candidate == 0) {
                     return candidate;
                 }
                 candidate = subsampling + i;
@@ -408,10 +467,10 @@ public class TileBuilder {
      */
     private void computeFieldSizes(final Rectangle imageBounds, final Rectangle tileBounds) {
         final StringBuilder buffer = new StringBuilder();
-        column(buffer, imageBounds.width / tileBounds.width, 0);
+        format26(buffer, imageBounds.width / tileBounds.width, 0);
         columnFieldSize = buffer.length();
         buffer.setLength(0);
-        row(buffer, imageBounds.height / tileBounds.height, 0);
+        format10(buffer, imageBounds.height / tileBounds.height, 0);
         rowFieldSize = buffer.length();
     }
 
@@ -427,21 +486,21 @@ public class TileBuilder {
      */
     private String generateFilename(final int overview, final int column, final int row) {
         final StringBuilder buffer = new StringBuilder(prefix);
-        buffer.append(overview + 1).append('_');
-        column(buffer, column, columnFieldSize);
-        row(buffer, row, rowFieldSize);
+        format10(buffer, overview, overviewFieldSize); buffer.append('_');
+        format26(buffer, column,   columnFieldSize);
+        format10(buffer, row,      rowFieldSize);
         return buffer.append('.').append(extension).toString();
     }
 
     /**
-     * Formats a row number in base 10.
+     * Formats a number in base 10.
      *
      * @param buffer The buffer where to write the row number.
-     * @param row    The row number to format, starting at 0.
+     * @param n      The row number to format, starting at 0.
      * @param size   The expected width (for padding with '0').
      */
-    private static void row(final StringBuilder buffer, final int row, final int size) {
-        final String s = Integer.toString(row + 1);
+    private static void format10(final StringBuilder buffer, final int n, final int size) {
+        final String s = Integer.toString(n + 1);
         for (int i=size-s.length(); --i >= 0;) {
             buffer.append('0');
         }
@@ -453,15 +512,15 @@ public class TileBuilder {
      * more columns than alphabet has letters, then another letter is added in the same way.
      *
      * @param buffer The buffer where to write the column number.
-     * @param column The column number to format, starting at 0.
+     * @param n      The column number to format, starting at 0.
      * @param size   The expected width (for padding with 'A').
      */
-    private static void column(final StringBuilder buffer, int column, final int size) {
-        if (size > 1 || column >= 26) {
-            column(buffer, column / 26, size - 1);
-            column %= 26;
+    private static void format26(final StringBuilder buffer, int n, final int size) {
+        if (size > 1 || n >= 26) {
+            format26(buffer, n / 26, size - 1);
+            n %= 26;
         }
-        buffer.append((char) ('A' + column));
+        buffer.append((char) ('A' + n));
     }
 
     /**
@@ -483,14 +542,19 @@ public class TileBuilder {
          * Creates the tiles for the specified untiled images.
          */
         @Override
-        protected boolean filter(final ImageReader reader) throws IOException {
+        protected boolean filter(ImageReader reader) throws IOException {
             final Rectangle bounds = new Rectangle();
             bounds.width  = reader.getWidth (inputIndex);
             bounds.height = reader.getHeight(inputIndex);
             // Sets only after successful reading of image size.
-            final ImageReaderSpi spi = reader.getOriginatingProvider();
-            if (spi != null && getTileReaderSpi() == null) {
-                setTileReaderSpi(spi);
+            if (reader instanceof MosaicImageReader) {
+                reader = ((MosaicImageReader) reader).getTileReader();
+            }
+            if (reader != null) { // May be null as a result of above line.
+                final ImageReaderSpi spi = reader.getOriginatingProvider();
+                if (spi != null && getTileReaderSpi() == null) {
+                    setTileReaderSpi(spi);
+                }
             }
             setUntiledImageBounds(bounds);
             tiles = createTileManager();
@@ -513,9 +577,11 @@ public class TileBuilder {
             String filename;
             if (input instanceof File) {
                 filename = ((File) input).getName();
-            } else {
+            } else if (input instanceof URI || input instanceof URL || input instanceof CharSequence) {
                 filename = input.toString();
                 filename = filename.substring(filename.lastIndexOf('/') + 1);
+            } else {
+                filename = DEFAULT_PREFIX;
             }
             int length = filename.lastIndexOf('.');
             if (length < 0) {

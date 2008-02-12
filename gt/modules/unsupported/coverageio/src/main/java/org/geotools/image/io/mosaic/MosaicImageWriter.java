@@ -287,6 +287,22 @@ rescan: while ((it = tiles.iterator()).hasNext()) {
      *         while creating an image reader or initiazing it.
      */
     private ImageReader getImageReader(final Object input) throws IOException {
+        /*
+         * First check if the input type is one of those accepted by MosaicImageReader.  We
+         * perform this check in a dedicaced code since MosaicImageReader is not registered
+         * as a SPI, because it does not comply to Image I/O contract which requires that
+         * readers accept ImageInputStream.
+         */
+        for (final Class<?> type : MosaicImageReader.Spi.INPUT_TYPES) {
+            if (type.isInstance(input)) {
+                final ImageReader reader = new MosaicImageReader();
+                reader.setInput(input);
+                if (filter(reader)) {
+                    return reader;
+                }
+                break;
+            }
+        }
         ImageInputStream stream = null;
         boolean createStream = false;
         /*
