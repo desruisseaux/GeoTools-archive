@@ -63,6 +63,10 @@ public class NullProgressListener implements ProgressListener {
         //do nothing
     }
 
+    public float getProgress() {
+        return 0;
+    }
+    
     public void complete() {
         //do nothing
     }
@@ -79,7 +83,7 @@ public class NullProgressListener implements ProgressListener {
         return canceled;
     }
 
-    public void warningOccurred(String source, String margin, String warning) {
+    public void warningOccurred(String source, String location, String warning) {
         //do nothing
     }
 

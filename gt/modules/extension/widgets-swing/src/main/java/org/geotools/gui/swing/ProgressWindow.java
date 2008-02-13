@@ -283,7 +283,14 @@ public class ProgressWindow implements ProgressListener {
         if (p>100) p=100;
         set(Caller.PROGRESS, new Integer(p));
     }
-
+    public float getProgress() {
+        BoundedRangeModel model = progressBar.getModel();
+        float progress = (float) (model.getValue() - model.getMinimum());
+        float limit = (float) model.getMaximum();
+        
+        return progress / limit;
+    }
+    
     /**
      * Notifies that the operation has finished. The window will disaspears, except
      * if it contains warning or exception stack traces.

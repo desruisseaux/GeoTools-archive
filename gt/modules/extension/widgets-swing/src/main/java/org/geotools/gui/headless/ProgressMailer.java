@@ -88,6 +88,8 @@ public class ProgressMailer implements ProgressListener {
      */
     private volatile boolean canceled;
 
+    private float percent;
+
     /**
      * Creates an objects reporting progress to the specified email address.
      *
@@ -206,6 +208,7 @@ public class ProgressMailer implements ProgressListener {
      * @param percent Pourcentage effectué (entre 0 et 100).
      */
     private void send(final String method, final float percent) {
+        this.percent = percent;
         final Runtime       system = Runtime.getRuntime();
         final float    MEMORY_UNIT = (1024f*1024f);
         final float     freeMemory = system.freeMemory()  / MEMORY_UNIT;
@@ -246,6 +249,10 @@ public class ProgressMailer implements ProgressListener {
         }
     }
 
+    public float getProgress() {
+        return percent;
+    }
+    
     /**
      * Send an emails saying that the operation finished.
      */
