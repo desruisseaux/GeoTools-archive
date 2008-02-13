@@ -79,37 +79,4 @@ public class StreamingParserFeatureReaderTest extends AbstractGetFeatureParserTe
             e.printStackTrace();
         }
     }
-
-    // private void runGetFeaturesParsing() throws IOException {
-    // StreamingParserFeatureReader reader;
-    // {
-    // final URL getFeatures = new URL(
-    // "http://frameworkwfs.usgs.gov/framework/wfs/wfs.cgi?DATASTORE=Framework&DATASTORE=Framework&"
-    // +
-    // "SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=gubs:GovernmentalUnitCE&"
-    // + "PROPERTYNAME=geometry&maxFeatures=10");
-    //
-    // InputStream input = new BufferedInputStream(getFeatures.openStream());
-    // Configuration configuration = new WFSConfiguration();
-    // URL describeUrl = TestData.getResource(this, CUBEWERX_GOVUNITCE_SCHEMA);
-    // reader = new StreamingParserFeatureReader(configuration, input,
-    // CUBEWERX_GOVUNITCE_TYPENAME, describeUrl);
-    //        
-    // getParser(CUBEWERX_GOVUNITCE_TYPENAME, CUBEWERX_GOVUNITCE_SCHEMA,
-    // featureType, dataFile)
-    // }
-    //
-    // int count = 0;
-    // SimpleFeature feature;
-    // Object defaultGeometry;
-    // while ((feature = reader.parse()) != null) {
-    // defaultGeometry = feature.getDefaultGeometry();
-    // count++;
-    // System.out.print('.');
-    // if (count % 100 == 0) {
-    // System.out.print('\n');
-    // }
-    // }
-    // System.out.println("\nFetched " + count + " features");
-    // }
 }
