@@ -16,7 +16,6 @@
 package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -28,24 +27,18 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.event.MouseInputListener;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.jts.JTS;
-import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
-import org.geotools.gui.swing.map.map2d.action.DefaultSelectionAction;
+import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionHandler;
+import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
-import org.geotools.gui.swing.map.map2d.decoration.SelectionDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
@@ -75,11 +68,11 @@ import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 
 /**
  * Default implementation of navigableMap2D
@@ -99,17 +92,20 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * Style builder for sld style creation
      */
     protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
+    /**
+     * Filter factory 2
+     */
+    protected final FilterFactory2 FILTER_FACTORY_2 = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
     private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MapLayerListListener mapLayerListlistener;
-    private final BufferComponent selectedPane = new BufferComponent();
-    private final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+    private final BufferComponent selectedDecoration = new BufferComponent();
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
+    private MapContext oldMapcontext = null;
     private Color selectionStyleColor = Color.GREEN;
     private Geometry selectionGeometrie = null;
-    
-    private DefaultSelectionAction selectionAction = new DefaultSelectionAction();
-    
+    private SelectionHandler selectionHandler = new DefaultSelectionHandler();
+    private SELECTION_FILTER selectionFilter = SELECTION_FILTER.INTERSECTS;
 
     /**
      * create a default JDefaultSelectableMap2D
@@ -120,11 +116,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         selectionStrategy.setContext(selectionMapContext);
 
-        addMapDecoration(selectedPane);
+        addMapDecoration(selectedDecoration);
 
     }
-
-    
 
     /**
      *  transform a mouse coordinate in JTS Geometry using the CRS of the mapcontext
@@ -133,19 +127,19 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @return JTS geometry (corresponding to a square of 6x6 pixel around mouse coordinate)
      */
     protected Geometry mousePositionToGeometry(int mx, int my) {
-            Coordinate[] coord = new Coordinate[5];
+        Coordinate[] coord = new Coordinate[5];
 
-            int taille = 4;
+        int taille = 4;
 
-            coord[0] = toMapCoord(mx - taille, my - taille);
-            coord[1] = toMapCoord(mx - taille, my + taille);
-            coord[2] = toMapCoord(mx + taille, my + taille);
-            coord[3] = toMapCoord(mx + taille, my - taille);
-            coord[4] = coord[0];
+        coord[0] = toMapCoord(mx - taille, my - taille);
+        coord[1] = toMapCoord(mx - taille, my + taille);
+        coord[2] = toMapCoord(mx + taille, my + taille);
+        coord[3] = toMapCoord(mx + taille, my - taille);
+        coord[4] = coord[0];
 
-            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
-            return GEOMETRY_FACTORY.createPolygon(lr1, null);
-       
+        LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
+        return GEOMETRY_FACTORY.createPolygon(lr1, null);
+
     }
 
     /**
@@ -164,11 +158,148 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             if (name.equals("")) {
                 name = "the_geom";
             }
-            f = ff.intersects(ff.property(name), ff.literal(geom));
+            Expression exp1 = FILTER_FACTORY_2.property(name);
+            Expression exp2 = FILTER_FACTORY_2.literal(geom);
+            switch (selectionFilter) {
+                case CONTAINS:
+                    f = FILTER_FACTORY_2.contains(exp1, exp2);
+                    break;
+                case CROSSES:
+                    f = FILTER_FACTORY_2.crosses(exp1, exp2);
+                    break;
+                case DISJOINT:
+                    f = FILTER_FACTORY_2.disjoint(exp1, exp2);
+                    break;
+                case INTERSECTS:
+                    f = FILTER_FACTORY_2.intersects(exp1, exp2);
+                    break;
+                case OVERLAPS:
+                    f = FILTER_FACTORY_2.overlaps(exp1, exp2);
+                    break;
+                case TOUCHES:
+                    f = FILTER_FACTORY_2.touches(exp1, exp2);
+                    break;
+                case WITHIN:
+                    f = FILTER_FACTORY_2.within(exp1, exp2);
+                    break;
+            }
+            f = FILTER_FACTORY_2.intersects(exp1, exp2);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return f;
+    }
+
+    /**
+     * reproject a geometry from the current Mapcontext to layer CRS
+     * @param geom
+     * @param layer
+     * @return
+     */
+    protected Geometry projectGeometry(Geometry geom, MapLayer layer) {
+        MathTransform transform = null;
+
+        MapContext context = getRenderingStrategy().getContext();
+        CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
+        CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
+
+        if (layerCRS == null) {
+            layerCRS = contextCRS;
+        }
+
+
+        if (!contextCRS.equals(layerCRS)) {
+            try {
+                transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                geom = JTS.transform(geom, transform);
+            } catch (Exception ex) {
+                System.out.println("Error using default layer CRS, searching for a close CRS");
+
+                try {
+                    Integer epsgId = CRS.lookupEpsgCode(layerCRS, true);
+                    if (epsgId != null) {
+                        System.out.println("Close CRS found, will replace original CRS for convertion");
+                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
+                        layerCRS = newCRS;
+                        transform = CRS.findMathTransform(contextCRS, layerCRS);
+                    } else {
+                        System.out.println("No close CRS found, will force convert");
+                        try {
+                            transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Search Error, no close CRS found, will force convertion");
+
+                    try {
+                        transform = CRS.findMathTransform(contextCRS, layerCRS, true);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
+                ex.printStackTrace();
+            }
+        }
+
+        return geom;
+    }
+
+    /**
+     * reproject a geometry from a CRS to another
+     * @param geom
+     * @param inCRS
+     * @param outCRS
+     * @return
+     */
+    protected Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
+        MathTransform transform = null;
+
+        MapContext context = getRenderingStrategy().getContext();
+
+        if (outCRS == null) {
+            outCRS = inCRS;
+        }
+
+
+
+        if (!inCRS.equals(outCRS)) {
+            try {
+                transform = CRS.findMathTransform(inCRS, outCRS, true);
+                geom = JTS.transform(geom, transform);
+            } catch (Exception ex) {
+                System.out.println("Error using default layer CRS, searching for a close CRS");
+
+                try {
+                    Integer epsgId = CRS.lookupEpsgCode(outCRS, true);
+                    if (epsgId != null) {
+                        System.out.println("Close CRS found, will replace original CRS for convertion");
+                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
+                        outCRS = newCRS;
+                        transform = CRS.findMathTransform(inCRS, outCRS);
+                    } else {
+                        System.out.println("No close CRS found, will force convert");
+                        try {
+                            transform = CRS.findMathTransform(inCRS, outCRS, true);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Search Error, no close CRS found, will force convertion");
+
+                    try {
+                        transform = CRS.findMathTransform(inCRS, outCRS, true);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
+                ex.printStackTrace();
+            }
+        }
+
+        return geom;
     }
 
     private Style createStyle(MapLayer layer) {
@@ -284,106 +415,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     }
 
-    
-    protected Geometry projectGeometry(Geometry geom, MapLayer layer) {
-        MathTransform transform = null;
-
-        MapContext context = getRenderingStrategy().getContext();
-        CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
-        CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
-
-        if (layerCRS == null) {
-            layerCRS = contextCRS;
-        }
-
-
-        if (!contextCRS.equals(layerCRS)) {
-            try {
-                transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                geom = JTS.transform(geom, transform);
-            } catch (Exception ex) {
-                System.out.println("Error using default layer CRS, searching for a close CRS");
-
-                try {
-                    Integer epsgId = CRS.lookupEpsgCode(layerCRS, true);
-                    if (epsgId != null) {
-                        System.out.println("Close CRS found, will replace original CRS for convertion");
-                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
-                        layerCRS = newCRS;
-                        transform = CRS.findMathTransform(contextCRS, layerCRS);
-                    } else {
-                        System.out.println("No close CRS found, will force convert");
-                        try {
-                            transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Search Error, no close CRS found, will force convertion");
-
-                    try {
-                        transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
-                }
-                ex.printStackTrace();
-            }
-        }
-
-        return geom;
-    }
-
-    protected Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
-        MathTransform transform = null;
-
-        MapContext context = getRenderingStrategy().getContext();
-
-        if (outCRS == null) {
-            outCRS = inCRS;
-        }
-
-
-
-        if (!inCRS.equals(outCRS)) {
-            try {
-                transform = CRS.findMathTransform(inCRS, outCRS, true);
-                geom = JTS.transform(geom, transform);
-            } catch (Exception ex) {
-                System.out.println("Error using default layer CRS, searching for a close CRS");
-
-                try {
-                    Integer epsgId = CRS.lookupEpsgCode(outCRS, true);
-                    if (epsgId != null) {
-                        System.out.println("Close CRS found, will replace original CRS for convertion");
-                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
-                        outCRS = newCRS;
-                        transform = CRS.findMathTransform(inCRS, outCRS);
-                    } else {
-                        System.out.println("No close CRS found, will force convert");
-                        try {
-                            transform = CRS.findMathTransform(inCRS, outCRS, true);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Search Error, no close CRS found, will force convertion");
-
-                    try {
-                        transform = CRS.findMathTransform(inCRS, outCRS, true);
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
-                }
-                ex.printStackTrace();
-            }
-        }
-
-        return geom;
-    }
-
     private void fireSelectionChanged(Geometry geo) {
         Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo);
 
@@ -395,44 +426,19 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     }
 
-    @Override
-    protected void setRendering(boolean render) {
-        super.setRendering(render);
-
-        MapContext context = getRenderingStrategy().getContext();
-
-        if (context != null && context.getCoordinateReferenceSystem() != null) {
-            try {
-                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-            } catch (TransformException ex) {
-                ex.printStackTrace();
-            } catch (FactoryException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (context != null && context.getAreaOfInterest() != null) {
-            selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
-        }
-        
-        selectionStrategy.refresh();
-
-    }
-    
-
-    //---------------------JDefaultMap2D override-------------------------------    
-
+    //---------------------MAP2D OVERLOAD---------------------------------------  
     @Override
     public void setActionState(ACTION_STATE state) {
-        super.setActionState(state);
-        
-        if(state == ACTION_STATE.SELECT){
-            selectionAction.install(this, this);
-        }else if(selectionAction.isInstalled()){
-            selectionAction.uninstall();
+
+        if (state == ACTION_STATE.SELECT && !selectionHandler.isInstalled()) {
+            selectionHandler.install(this);
+        } else if (selectionHandler.isInstalled()) {
+            selectionHandler.uninstall();
         }
+
+        super.setActionState(state);
     }
-    
+
     @Override
     protected void mapAreaChanged(Map2DMapAreaEvent event) {
         super.mapAreaChanged(event);
@@ -472,17 +478,65 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     @Override
     protected void mapContextChanged(Map2DContextEvent event) {
-        selectionMapContext.clearLayerList();
-        copies.clear();
 
-        MapContext context = event.getNewContext();
+        if (event.getNewContext() != oldMapcontext) {
+            oldMapcontext = event.getNewContext();
+
+            selectionMapContext.clearLayerList();
+            copies.clear();
+
+            MapContext context = event.getNewContext();
+
+            if (context != null && context.getCoordinateReferenceSystem() != null) {
+                try {
+                    selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+                    if (context.getAreaOfInterest() != null) {
+                        selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
+                    }
+                } catch (TransformException ex) {
+                    ex.printStackTrace();
+                } catch (FactoryException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (event.getPreviousContext() != null) {
+                event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
+            }
+
+            if (event.getNewContext() != null) {
+                event.getNewContext().addMapLayerListListener(mapLayerListlistener);
+            }
+        }
+
+
+        super.mapContextChanged(event);
+    }
+
+    @Override
+    public void setRenderingStrategy(RenderingStrategy stratege) {
+
+        if (actionState == ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
+            selectionHandler.uninstall();
+        }
+
+        super.setRenderingStrategy(stratege);
+
+        if (actionState == ACTION_STATE.SELECT) {
+            selectionHandler.install(this);
+        }
+
+    }
+
+    @Override
+    protected void setRendering(boolean render) {
+        super.setRendering(render);
+
+        MapContext context = getRenderingStrategy().getContext();
 
         if (context != null && context.getCoordinateReferenceSystem() != null) {
             try {
                 selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-                if (context.getAreaOfInterest() != null) {
-                    selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
-                }
             } catch (TransformException ex) {
                 ex.printStackTrace();
             } catch (FactoryException ex) {
@@ -490,19 +544,16 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
         }
 
-        if (event.getPreviousContext() != null) {
-            event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
+        if (context != null && context.getAreaOfInterest() != null) {
+            selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
         }
 
-        if (event.getNewContext() != null) {
-            event.getNewContext().addMapLayerListListener(mapLayerListlistener);
-        }
+        selectionStrategy.refresh();
 
-        super.mapContextChanged(event);
     }
 
-    //----------------------SELECTABLE MAP2D------------------------------------
 
+    //----------------------SELECTABLE MAP2D------------------------------------
     private void addSelectableLayerNU(MapLayer layer) {
         if (layer != null) {
             MapLayer copy = FACILITIES_FACTORY.duplicateLayer(layer);
@@ -558,8 +609,30 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     public boolean isLayerSelectable(MapLayer layer) {
         return copies.containsKey(layer);
-//        return (selectionMapContext.indexOf(layer) == -1) ? false : true ;
-//        return selectableLayers.contains(layer);
+    }
+
+    public void setSelectionFilter(SELECTION_FILTER filter) {
+        if (filter == null) {
+            throw new NullPointerException();
+        } else {
+            selectionFilter = filter;
+        }
+    }
+
+    public SELECTION_FILTER getSelectionFilter() {
+        return selectionFilter;
+    }
+
+    public void setSelectionHandler(SelectionHandler handler) {
+        if (handler == null) {
+            throw new NullPointerException();
+        } else {
+            selectionHandler = handler;
+        }
+    }
+
+    public SelectionHandler getSelectionHandler() {
+        return selectionHandler;
     }
 
     public void doSelection(double x, double y) {
@@ -592,7 +665,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
 
         selectionStrategy.refresh();
-        
+
         fireSelectionChanged(geometry);
 
     }
@@ -610,7 +683,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------        
-    
     private class MapLayerListListen implements MapLayerListListener {
 
         public void layerAdded(MapLayerListEvent event) {

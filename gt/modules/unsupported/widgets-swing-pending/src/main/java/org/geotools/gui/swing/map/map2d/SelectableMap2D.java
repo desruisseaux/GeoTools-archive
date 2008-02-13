@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.map.MapLayer;
 
@@ -26,6 +27,29 @@ import org.geotools.map.MapLayer;
  */
 public interface SelectableMap2D extends NavigableMap2D{
         
+    public static enum SELECTION_FILTER{
+        CONTAINS(""),
+        CROSSES(""),
+        DISJOINT(""),
+        INTERSECTS(""),
+        OVERLAPS(""),
+        TOUCHES(""),
+        WITHIN("");
+        
+        private final String title;
+        
+        SELECTION_FILTER(String key){
+            title = key;
+        }
+        
+        public String getTitle(){
+            return title;
+        }
+        
+        
+    };
+    
+    
     /**
      * add a MapLayer in the selection list
      * @param layer : Maplayer to add
@@ -56,6 +80,32 @@ public interface SelectableMap2D extends NavigableMap2D{
      * @return true if layer is in the selection list, false if not
      */
     public boolean isLayerSelectable(MapLayer layer);
+        
+    /**
+     * the filter will determine the featurefilter used
+     * most used filters are are SELECTION_FILTER.WITHIN and SELECTION_FILTER.INTERSECTS
+     * @param filter
+     */
+    public void setSelectionFilter(SELECTION_FILTER filter);
+    
+    /**
+     * 
+     * @return SELECTION_FILTER
+     */
+    public SELECTION_FILTER getSelectionFilter();
+    
+    /**
+     * the SelectionHandler is managing the selection decoration and the related listeners.
+     * @param handler
+     */
+    public void setSelectionHandler(SelectionHandler handler);
+    
+    /**
+     * 
+     * @return SelectionHandler
+     */
+    public SelectionHandler getSelectionHandler();
+    
     
     /**
      * make a selection with x,y coordinate
