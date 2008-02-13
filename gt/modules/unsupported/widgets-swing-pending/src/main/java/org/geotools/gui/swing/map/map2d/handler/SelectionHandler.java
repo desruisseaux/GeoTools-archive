@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.action;
+package org.geotools.gui.swing.map.map2d.handler;
 
 import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
@@ -23,7 +23,7 @@ import org.geotools.gui.swing.map.map2d.SelectableMap2D;
  *
  * @author johann sorel
  */
-public interface SelectionAction {
+public interface SelectionHandler {
 
         
     /**
@@ -31,7 +31,7 @@ public interface SelectionAction {
      * @param map2d
      * @param mapComponent
      */
-    void install(SelectableMap2D map2d, JComponent mapComponent);
+    void install(SelectableMap2D map2d);
     
     /**
      * 
