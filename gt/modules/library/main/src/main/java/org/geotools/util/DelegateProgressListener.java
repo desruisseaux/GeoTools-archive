@@ -62,7 +62,7 @@ public class DelegateProgressListener implements org.opengis.util.ProgressListen
     }
 
     public void warningOccurred( String source, String location, String warning ){
-        delegate.warningOccurred( source, margin, warning );
+        delegate.warningOccurred( source, location, warning );
     }
     
 }
