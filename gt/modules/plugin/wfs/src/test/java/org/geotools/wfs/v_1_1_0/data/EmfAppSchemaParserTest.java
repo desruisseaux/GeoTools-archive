@@ -18,6 +18,7 @@ package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -60,21 +61,33 @@ public class EmfAppSchemaParserTest extends TestCase {
         final QName featureTypeName = DataTestSupport.GEOS_STATES_TYPENAME;
         final String schemaFileName = DataTestSupport.GEOS_STATES_SCHEMA;
         final URL schemaLocation = TestData.getResource(this, schemaFileName);
-        final int expectedAttributeCount = 28;
+        final int expectedAttributeCount = 23;
 
-        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation,
-                expectedAttributeCount);
+        SimpleFeatureType ftype = testParseDescribeSimpleFeatureType(featureTypeName,
+                schemaLocation, expectedAttributeCount);
         assertNotNull(ftype);
+        assertNotNull(ftype.getDefaultGeometry());
+        assertEquals("the_geom", ftype.getDefaultGeometry().getLocalName());
     }
 
     public void testParseCubeWerx_GML_Level1_FeatureType() throws IOException {
         final QName featureTypeName = DataTestSupport.CUBEWERX_GOVUNITCE_TYPENAME;
         final String schemaFileName = DataTestSupport.CUBEWERX_GOVUNITCE_SCHEMA;
         final URL schemaLocation = TestData.getResource(this, schemaFileName);
-        final int expectedAttributeCount = 18;
+        // Expect only the subset of simple attributes:
+        // {typeAbbreviation:String,instanceName:String,officialDescription:String,
+        // instanceCode:String,codingSystemReference:String,geometry:"gml:SurfacePropertyType",
+        // typeDefinition:String}.
+        // Plus, the following ones are being assigned multiplicity 0:1 by the
+        // parser when they're not:
+        // {instanceAlternateName:String[0..*],codingSystemReference:String[0..*]}
+        // And the last one: governmentalUnitType has a complex type, yet it
+        // gets parsed as String
+        // and I can't find out why (would be happier if it were bound to Object.class)
+        final int expectedAttributeCount = 10;
 
-        SimpleFeatureType ftype = testParseDescribeFeatureType(featureTypeName, schemaLocation,
-                expectedAttributeCount);
+        SimpleFeatureType ftype = testParseDescribeSimpleFeatureType(featureTypeName,
+                schemaLocation, expectedAttributeCount);
         for (AttributeDescriptor descriptor : ftype.getAttributes()) {
             System.out.print(descriptor.getName().getNamespaceURI());
             System.out.print("#");
@@ -87,7 +100,15 @@ public class EmfAppSchemaParserTest extends TestCase {
         }
     }
 
-    private SimpleFeatureType testParseDescribeFeatureType(final QName featureTypeName,
+    /**
+     * @param featureTypeName
+     * @param schemaLocation
+     * @param expectedAttributeCount
+     * @return
+     * @throws IOException
+     * @see {@link EmfAppSchemaParser#parseSimpleFeatureType(Configuration, QName, URL, CoordinateReferenceSystem)}
+     */
+    private SimpleFeatureType testParseDescribeSimpleFeatureType(final QName featureTypeName,
             final URL schemaLocation, int expectedAttributeCount) throws IOException {
         assertNotNull(schemaLocation);
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
@@ -95,13 +116,18 @@ public class EmfAppSchemaParserTest extends TestCase {
         Configuration configuration = new WFSConfiguration();
 
         SimpleFeatureType featureType;
-        featureType = EmfAppSchemaParser.parse(configuration, featureTypeName, schemaLocation, crs);
+        featureType = EmfAppSchemaParser.parseSimpleFeatureType(configuration, featureTypeName,
+                schemaLocation, crs);
 
         assertNotNull(featureType);
         assertSame(crs, featureType.getCRS());
 
         List<AttributeDescriptor> attributes = featureType.getAttributes();
-        assertEquals(expectedAttributeCount, attributes.size());
+        List<String> names = new ArrayList<String>(attributes.size());
+        for (AttributeDescriptor desc : attributes) {
+            names.add(desc.getLocalName());
+        }
+        assertEquals(names.toString(), expectedAttributeCount, attributes.size());
         return featureType;
     }
 }

@@ -25,8 +25,9 @@ import java.util.logging.Logger;
  * 
  * @author Jesse
  * @since 1.1.0
+ * @deprecated just remove this class, no longer in use
  */
-public class LogInputStream extends InputStream {
+class LogInputStream extends InputStream {
     private InputStream delegate;
     private Level level;
 

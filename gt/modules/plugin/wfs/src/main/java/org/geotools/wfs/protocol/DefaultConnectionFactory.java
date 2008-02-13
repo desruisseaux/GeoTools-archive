@@ -15,14 +15,16 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import org.geotools.util.logging.Logging;
-import org.geotools.wfs.v_1_0_0.data.LogInputStream;
+
+import sun.rmi.log.LogInputStream;
 
 /**
  * Handles setting up connections to a WFS based on a WFS capabilities document,
  * taking care of GZIP and authentication.
  * 
  * @author Gabriel Roldan
- * @version $Id$
+ * @version $Id: DefaultConnectionFactory.java 29055 2008-02-02 17:38:44Z
+ *          groldan $
  * @since 2.5.x
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/io/WFSConnectionFactory.java $
@@ -47,7 +49,8 @@ public class DefaultConnectionFactory implements ConnectionFactory {
      * A simple user/password authenticator
      * 
      * @author Gabriel Roldan
-     * @version $Id$
+     * @version $Id: DefaultConnectionFactory.java 29055 2008-02-02 17:38:44Z
+     *          groldan $
      * @since 2.5.x
      * @source $URL:
      *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/data/wfs/WFSDataStoreFactory.java $
@@ -177,14 +180,8 @@ public class DefaultConnectionFactory implements ConnectionFactory {
             }
         }
         is = new BufferedInputStream(is);
-        if (LOGGER.isLoggable(Level.FINE)) {
-            is = new LogInputStream(is, LOGGER, Level.FINE);
-        }
         // special logger for communication information only.
         Logger logger = Logging.getLogger("org.geotools.data.communication");
-        if (logger.isLoggable(Level.FINE)) {
-            is = new LogInputStream(is, logger, Level.FINE);
-        }
         return is;
     }
 

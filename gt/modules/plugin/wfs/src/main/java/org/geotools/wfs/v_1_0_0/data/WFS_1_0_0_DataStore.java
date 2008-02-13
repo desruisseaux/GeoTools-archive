@@ -579,9 +579,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             }
         }
         is = new BufferedInputStream(is);
-        if (LOGGER.isLoggable(Level.FINE)) {
-            is = new LogInputStream(is, LOGGER, Level.FINE);
-        }
+
         // special logger for communication information only.
         Logger logger = Logging.getLogger("org.geotools.data.communication");
         if (logger.isLoggable(Level.FINE)) {

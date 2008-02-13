@@ -94,6 +94,7 @@ import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
@@ -327,8 +328,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
         final SimpleFeatureType featureType;
         CoordinateReferenceSystem crs = getFeatureTypeCRS(typeName);
-        featureType = EmfAppSchemaParser.parse(configuration, featureDescriptorName, describeUrl,
-                crs);
+        featureType = EmfAppSchemaParser.parseSimpleFeatureType(configuration,
+                featureDescriptorName, describeUrl, crs);
 
         // adapt the feature type name
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
@@ -579,7 +580,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
     @SuppressWarnings("unchecked")
     public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
             throws IOException {
-        SimpleFeatureType contentType = getQueryType(query);
+        final SimpleFeatureType contentType = getQueryType(query);
 
         // by now encode the full query to be sent to the server.
         // TODO: implement filter splitting for server supported/unsupported
@@ -596,8 +597,12 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         responseStream = sendGetFeatures(query, typeName, filter);
         final QName name = featureTypeInfo.getName();
         final Configuration configuration = getConfiguration();
+
+        URL describeFeatureTypeURL = getDescribeFeatureTypeURLGet(typeName);
         GetFeatureParser parser = new StreamingParserFeatureReader(configuration, responseStream,
-                name);
+                name, describeFeatureTypeURL);
+        // GetFeatureParser parser = new XmlSimpleFeatureParser(responseStream,
+        // name, contentType);
         FeatureReader reader = new WFSFeatureReader(parser);
 
         if (!reader.hasNext()) {
@@ -638,7 +643,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
 
         if (coordinateSystemReproject != null) {
             try {
-                queryType = DataUtilities.createSubType(featureType, propertyNames,
+                queryType = DataUtilities.createSubType(queryType, propertyNames,
                         coordinateSystemReproject);
             } catch (SchemaException e) {
                 throw new DataSourceException(e);
@@ -742,7 +747,19 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             kvpMap.put("MAXFEATURES", String.valueOf(maxFeatures));
         }
 
-        if (propertyNames.size() > 0) {
+        List<String> properties = propertyNames;
+        if (propertyNames.size() == 0) {
+            // HACK: explicitly setting the property names to avoid retrieving
+            // complex attributes while we don't support them. This behaviour is
+            // dependant on the fact we're creating a simple feature view of the
+            // original types
+            SimpleFeatureType featureType = getFeatureType(typeName);
+            properties = new ArrayList<String>(featureType.getAttributeCount());
+            for (AttributeDescriptor att : featureType.getAttributes()) {
+                properties.add(att.getLocalName());
+            }
+        }
+        {
             StringBuffer sb = new StringBuffer();
             for (Iterator<String> it = propertyNames.iterator(); it.hasNext();) {
                 sb.append(it.next());
@@ -833,7 +850,9 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         OGCConfiguration filterConfig = new OGCConfiguration();
         Encoder encoder = new Encoder(filterConfig);
         // do not write the xml declaration
-        // encoder.setEncodeFullDocument(false);
+        OutputFormat format = new OutputFormat();
+        format.setOmitXMLDeclaration(true);
+        encoder.setOutputFormat(format);
 
         OutputStream out = new ByteArrayOutputStream();
         encoder.encode(filter, OGC.Filter, out);

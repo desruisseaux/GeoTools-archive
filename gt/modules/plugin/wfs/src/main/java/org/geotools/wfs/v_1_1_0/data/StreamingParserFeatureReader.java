@@ -2,11 +2,14 @@ package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.gml3.ApplicationSchemaConfiguration;
+import org.geotools.wfs.WFSConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.StreamingParser;
 import org.opengis.feature.simple.SimpleFeature;
@@ -21,7 +24,7 @@ import org.xml.sax.SAXException;
  *          desruisseaux $
  * @since 2.5.x
  * @source $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReader.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_1_0/data/StreamingParserFeatureReader.java $
  */
 class StreamingParserFeatureReader implements GetFeatureParser {
 
@@ -29,11 +32,57 @@ class StreamingParserFeatureReader implements GetFeatureParser {
 
     private InputStream inputStream;
 
-    public StreamingParserFeatureReader(Configuration configuration, InputStream input,
-            QName featureName) throws DataSourceException {
-        this.inputStream = input;
+    /**
+     * A WFS configuration for unit test support, that resolves schemas to the
+     * test data dir.
+     * 
+     * @author Gabriel Roldan
+     * @version $Id: TestWFSConfiguration.java 28989 2008-01-28 21:22:31Z
+     *          groldan $
+     * @since 2.5.x
+     * @source $URL:
+     *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/test/java/org/geotools/wfs/v_1_1_0/data/TestWFSConfiguration.java $
+     */
+    private static class WFSAppSchemaConfiguration extends ApplicationSchemaConfiguration {
+
+        /**
+         * 
+         * @param wfsConfiguration
+         *            the WFS configuration where to grab the bindings from
+         * @param namespace
+         *            the namespace of the target feature
+         * @param schemaLocation
+         *            the schema location (a DescribeFeatureType request works)
+         */
+        public WFSAppSchemaConfiguration(Configuration wfsConfiguration, String namespace,
+                String schemaLocation) {
+            super(namespace, schemaLocation);
+            addDependency(wfsConfiguration);
+        }
+
+    }
+
+    /**
+     * 
+     * @param wfsConfiguration
+     * @param getFeatureResponseStream
+     * @param featureName
+     * @param describeFeatureTypeRequest
+     * @throws DataSourceException
+     */
+    public StreamingParserFeatureReader(final Configuration wfsConfiguration,
+            final InputStream getFeatureResponseStream, QName featureName,
+            URL describeFeatureTypeRequest) throws DataSourceException {
+        this.inputStream = getFeatureResponseStream;
         try {
-            this.parser = new StreamingParser(configuration, input, featureName);
+            Configuration appSchemaConfiguration;
+            String namespaceURI = featureName.getNamespaceURI();
+            String schemaLocation = describeFeatureTypeRequest.toExternalForm();
+            appSchemaConfiguration = new WFSAppSchemaConfiguration(wfsConfiguration, namespaceURI,
+                    schemaLocation);
+
+            this.parser = new StreamingParser(appSchemaConfiguration, getFeatureResponseStream,
+                    featureName);
         } catch (ParserConfigurationException e) {
             throw new DataSourceException(e);
         } catch (SAXException e) {
@@ -64,8 +113,6 @@ class StreamingParserFeatureReader implements GetFeatureParser {
     public SimpleFeature parse() throws IOException {
         Object parsed = parser.parse();
         SimpleFeature feature = (SimpleFeature) parsed;
-        if (feature != null)
-            System.out.println(feature.getAttribute("the_geom"));// TODO:REMOVE!!
         return feature;
     }
 

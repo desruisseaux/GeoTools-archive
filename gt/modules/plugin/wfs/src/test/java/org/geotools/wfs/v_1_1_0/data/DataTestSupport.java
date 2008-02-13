@@ -51,6 +51,11 @@ public abstract class DataTestSupport extends TestCase {
     public static final String GEOS_ARCHSITES_FEATURETYPENAME = "sf:archsites";
 
     /**
+     * The CRS id for the geoserver archsites test data
+     */
+    public static final String GEOS_ARCHSITES_CRS = "EPSG:26713";
+
+    /**
      * Location of the file containing a sample GeoServer GetFeature response
      * for the {@code archsites} feature type
      */
@@ -81,6 +86,11 @@ public abstract class DataTestSupport extends TestCase {
     public static final String CUBEWERX_GOVUNITCE_DATA = "CubeWerx_nsdi/CubeWerx_nsdi_GovernmentalUnitCE.xml";
 
     /**
+     * EPSG id for the sample GovUnitCE data
+     */
+    public static final String CUBEWERX_GOVUNITCE_CRS = "EPSG:4269";
+
+    /**
      * Location of a test DescribeFeatureType response from a CubeWerx
      * {@code GovernmentalUnitCE} FeatureType
      */
@@ -90,6 +100,17 @@ public abstract class DataTestSupport extends TestCase {
      * Location of a test data capabilities from CubeWerx
      */
     public static final String CUBEWERX_CAPABILITIES = "CubeWerx_nsdi/CubeWerx_nsdi_GetCapabilities.xml";
+
+    public static final QName CUBEWERX_ROADSEG_TYPENAME = new QName(
+            "http://www.fgdc.gov/framework/073004/transportation", "RoadSeg");
+
+    public static final String CUBEWERX_ROADSEG_FEATURETYPENAME = "trans:RoadSeg";
+
+    public static final String CUBEWERX_ROADSEG_SCHEMA = "CubeWerx_nsdi/CubeWerx_nsdi_RoadSeg_DescribeFeatureType.xsd";
+
+    public static final String CUBEWERX_ROADSEG_CRS = "EPSG:4269";
+
+    public static final String CUBEWERX_ROADSEG_DATA = "CubeWerx_nsdi/CubeWerx_nsdi_RoadSeg.xml";
 
     protected WFS110ProtocolHandler protocolHandler;
 
