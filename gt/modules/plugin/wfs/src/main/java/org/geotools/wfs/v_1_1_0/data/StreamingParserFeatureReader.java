@@ -65,14 +65,22 @@ class StreamingParserFeatureReader implements GetFeatureParser {
     /**
      * 
      * @param wfsConfiguration
+     *            the configuration where to grab (wfs and gml) bindings from.
+     *            Should be an instance of {@link WFSConfiguration}.
      * @param getFeatureResponseStream
+     *            the response stream from a GetFeature operation.
      * @param featureName
+     *            the name of the Feature (ie, the top level xml element
+     *            declaration)
      * @param describeFeatureTypeRequest
+     *            provides the location of the GetFeature response schema to be
+     *            used by an {@link ApplicationSchemaConfiguration} in order to
+     *            resolve imports and includes.
      * @throws DataSourceException
      */
     public StreamingParserFeatureReader(final Configuration wfsConfiguration,
-            final InputStream getFeatureResponseStream, QName featureName,
-            URL describeFeatureTypeRequest) throws DataSourceException {
+            final InputStream getFeatureResponseStream, final QName featureName,
+            final URL describeFeatureTypeRequest) throws DataSourceException {
         this.inputStream = getFeatureResponseStream;
         try {
             Configuration appSchemaConfiguration;

@@ -16,6 +16,9 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
+import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.*;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -24,7 +27,9 @@ import javax.xml.namespace.QName;
 
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFSConfiguration;
+import org.geotools.wfs.v_1_0_0.data.CubewerksOnlineTest;
 import org.geotools.xml.Configuration;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -47,14 +52,64 @@ public class StreamingParserFeatureReaderTest extends AbstractGetFeatureParserTe
 
     @Override
     protected GetFeatureParser getParser(QName featureName, String schemaLocation,
-            SimpleFeatureType featureType, String dataFile) throws IOException {
+            SimpleFeatureType featureType, URL getFeaturesRequest) throws IOException {
         URL schemaLocationUrl = TestData.getResource(this, schemaLocation);
 
         Configuration configuration = new WFSConfiguration();
-        final InputStream inputStream = TestData.openStream(this, dataFile);
+        final InputStream inputStream = new BufferedInputStream(getFeaturesRequest.openStream());
         final StreamingParserFeatureReader featureReader;
         featureReader = new StreamingParserFeatureReader(configuration, inputStream, featureName,
                 schemaLocationUrl);
         return featureReader;
     }
+
+    /**
+     * This is to be run as a normal java application in order to reproduce a
+     * GetFeature request to the nsdi server and thus being able to
+     * assess/profile the OutOfMemory errors I'm getting in uDig
+     * 
+     * @param argv
+     */
+    public static void main(String argv[]) {
+        StreamingParserFeatureReaderTest test;
+        test = new StreamingParserFeatureReaderTest();
+        try {
+            test.runGetFeaturesParsing();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // private void runGetFeaturesParsing() throws IOException {
+    // StreamingParserFeatureReader reader;
+    // {
+    // final URL getFeatures = new URL(
+    // "http://frameworkwfs.usgs.gov/framework/wfs/wfs.cgi?DATASTORE=Framework&DATASTORE=Framework&"
+    // +
+    // "SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=gubs:GovernmentalUnitCE&"
+    // + "PROPERTYNAME=geometry&maxFeatures=10");
+    //
+    // InputStream input = new BufferedInputStream(getFeatures.openStream());
+    // Configuration configuration = new WFSConfiguration();
+    // URL describeUrl = TestData.getResource(this, CUBEWERX_GOVUNITCE_SCHEMA);
+    // reader = new StreamingParserFeatureReader(configuration, input,
+    // CUBEWERX_GOVUNITCE_TYPENAME, describeUrl);
+    //        
+    // getParser(CUBEWERX_GOVUNITCE_TYPENAME, CUBEWERX_GOVUNITCE_SCHEMA,
+    // featureType, dataFile)
+    // }
+    //
+    // int count = 0;
+    // SimpleFeature feature;
+    // Object defaultGeometry;
+    // while ((feature = reader.parse()) != null) {
+    // defaultGeometry = feature.getDefaultGeometry();
+    // count++;
+    // System.out.print('.');
+    // if (count % 100 == 0) {
+    // System.out.print('\n');
+    // }
+    // }
+    // System.out.println("\nFetched " + count + " features");
+    // }
 }
