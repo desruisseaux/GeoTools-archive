@@ -545,9 +545,13 @@ O:          for (int i = 0; i < schemas.length; i++) {
             // not match the one passed in, update the context if so
             if ((handler.getElementDeclaration().getTargetNamespace() != null)
                     && !handler.getElementDeclaration().getTargetNamespace().equals(uri)) {
-                namespaces.declarePrefix("", handler.getElementDeclaration().getTargetNamespace());
-                qualifiedName = new QName(handler.getElementDeclaration().getTargetNamespace(),
-                        qualifiedName.getLocalPart());
+                
+                if ( !handler.getElementDeclaration().isAbstract()) {
+                    namespaces.declarePrefix("", handler.getElementDeclaration().getTargetNamespace());
+                    qualifiedName = new QName(handler.getElementDeclaration().getTargetNamespace(),
+                            qualifiedName.getLocalPart());
+                }
+               
             }
 
             //signal the handler to start the element, and place it on the stack
