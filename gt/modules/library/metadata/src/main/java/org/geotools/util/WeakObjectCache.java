@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import EDU.oswego.cs.dl.util.concurrent.ReentrantLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -127,12 +127,8 @@ final class WeakObjectCache implements ObjectCache {
                 locks.put(key, lock);
             }
         }
-        try {
-            // Must be outside the above synchronized section, since this call may block.
-            lock.acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException( e );
-        }
+        // Must be outside the above synchronized section, since this call may block.
+        lock.lock();        
     }
 
     public void writeUnLock(final Object key) {
@@ -141,10 +137,10 @@ final class WeakObjectCache implements ObjectCache {
             if (lock == null) {
                 throw new IllegalMonitorStateException("Cannot unlock prior to locking");
             }
-            if( lock.holds() == 0 ){
+            if( lock.getHoldCount() == 0 ){
                 throw new IllegalMonitorStateException("Cannot unlock prior to locking");
             }
-            lock.release();
+            lock.unlock();
             //TODO: stop lock from being removed when another worker is trying to acquire it
             //TODO: review w/ J2SE 5.0
             //if (lock.holds() == 0) {
@@ -157,7 +153,7 @@ final class WeakObjectCache implements ObjectCache {
         synchronized (locks) {
             final ReentrantLock lock = (ReentrantLock) locks.get(key);
             if (lock != null) {
-                return lock.holds() != 0;
+                return lock.getHoldCount() != 0;
             }
         }
         return false;

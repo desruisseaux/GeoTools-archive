@@ -102,11 +102,6 @@
       <artifactId>jsr108</artifactId>
       <!-- The version number is specified in the parent POM. -->      
     </dependency>
-    <dependency>
-      <groupId>edu.oswego</groupId>
-      <artifactId>concurrent</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
 
     <!--
       The following is required only for compilation.  It should not be included

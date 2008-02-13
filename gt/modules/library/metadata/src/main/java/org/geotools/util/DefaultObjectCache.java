@@ -18,8 +18,9 @@ package org.geotools.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import EDU.oswego.cs.dl.util.concurrent.ReadWriteLock;
-import EDU.oswego.cs.dl.util.concurrent.ReentrantWriterPreferenceReadWriteLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+//import java.util.concurrent.locks.ReentrantWriterPreferenceReadWriteLock;
 
 
 /**
@@ -71,8 +72,9 @@ final class DefaultObjectCache implements ObjectCache {
         /**
          * The lock used to manage the {@linkplain #value}.
          */
-        private final ReadWriteLock lock = new ReentrantWriterPreferenceReadWriteLock();
-
+        private final ReadWriteLock lock = new ReentrantReadWriteLock();
+        // formally ReentrantReadWriteLock
+        
         /**
          * Creates an entry with no initial value.
          */
@@ -102,12 +104,14 @@ final class DefaultObjectCache implements ObjectCache {
          */
         public Object peek() {
             try {
-                lock.writeLock().acquire();
+                lock.writeLock().lock();
                 return value;
-            } catch (InterruptedException e) {
-                return null;
-            } finally {
-                lock.writeLock().release();
+            }
+//            catch (RuntimeException e) {
+//                return null;
+//            }
+            finally {
+                lock.writeLock().unlock();
             }
         }
 
@@ -119,13 +123,15 @@ final class DefaultObjectCache implements ObjectCache {
          */
         public Object getValue() {
             try {
-                lock.readLock().acquire();
+                lock.readLock().lock();
                 return value;
-            } catch (InterruptedException e) {
-                //TODO: add logger, or is this too performance constrained?
-                return null;
-            } finally {
-                lock.readLock().release();
+            }
+//            catch (InterruptedException e) {
+//                //TODO: add logger, or is this too performance constrained?
+//                return null;
+//            }
+            finally {
+                lock.readLock().unlock();
             }
         }
 
@@ -138,12 +144,13 @@ final class DefaultObjectCache implements ObjectCache {
          */
         public void setValue(Object value) {
             try {
-               lock.writeLock().acquire();
+               lock.writeLock().lock();
                this.value = value;
-            } catch (InterruptedException e) {
-
-            } finally {
-                lock.writeLock().release();
+            }
+//            catch (InterruptedException e) {
+//            }
+            finally {
+                lock.writeLock().unlock();
             }
         }
 
@@ -154,11 +161,7 @@ final class DefaultObjectCache implements ObjectCache {
          * to read or write.
          */
         public boolean writeLock() {
-            try {
-                lock.writeLock().acquire();
-            } catch (InterruptedException e) {
-                return false;
-            }
+            lock.writeLock().lock();
             return true;
         }
 
@@ -166,7 +169,7 @@ final class DefaultObjectCache implements ObjectCache {
          * Releases a write lock.  
          */
         public void writeUnLock() {
-            lock.writeLock().release();
+            lock.writeLock().unlock();
         }
     }
     

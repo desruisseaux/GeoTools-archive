@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.demo;
+package org.geotools.demo.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
