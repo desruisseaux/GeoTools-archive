@@ -36,6 +36,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -100,17 +101,26 @@ class EmfAppSchemaParser {
             final QName featureName, final URL schemaLocation, final CoordinateReferenceSystem crs)
             throws IOException {
         final SimpleFeatureType realType = parse(wfsConfiguration, featureName, schemaLocation, crs);
+        SimpleFeatureType subsetType = toSimpleFeatureType(realType);
+        return subsetType;
+    }
 
-        List<AttributeDescriptor> attributes;
-        attributes = new ArrayList<AttributeDescriptor>(realType.getAttributes());
+    public static SimpleFeatureType toSimpleFeatureType(final FeatureType realType)
+            throws DataSourceException {
+        List<PropertyDescriptor> attributes;
+        attributes = new ArrayList<PropertyDescriptor>(realType.getProperties());
         List<String> simpleProperties = new ArrayList<String>();
 
         // HACK HACK!! the parser sets no namespace to the properties so we're
         // doing a hardcode property name black list
         final List<String> ignoreList = Arrays.asList(new String[] { "location",
                 "metaDataProperty", "description", "name", "boundedBy" });
-        for (Iterator<AttributeDescriptor> it = attributes.iterator(); it.hasNext();) {
-            AttributeDescriptor descriptor = it.next();
+        for (Iterator<PropertyDescriptor> it = attributes.iterator(); it.hasNext();) {
+            PropertyDescriptor property = it.next();
+            if(!(property instanceof AttributeDescriptor)){
+                continue;
+            }
+            AttributeDescriptor descriptor = (AttributeDescriptor) property;
             Name name = descriptor.getName();
             String localName = name.getLocalPart();
             if (ignoreList.contains(localName)) {
@@ -121,9 +131,9 @@ class EmfAppSchemaParser {
                 break;
             }
         }
-        /// HACK END
+        // / HACK END
 
-        for (AttributeDescriptor descriptor : attributes) {
+        for (PropertyDescriptor descriptor : attributes) {
             Class<?> binding = descriptor.getType().getBinding();
             int maxOccurs = descriptor.getMaxOccurs();
             Name name = descriptor.getName();
@@ -134,13 +144,15 @@ class EmfAppSchemaParser {
                 continue;
             }
 
-            simpleProperties.add(descriptor.getLocalName());
+            simpleProperties.add(((AttributeDescriptor)descriptor).getLocalName());
         }
 
         String[] properties = simpleProperties.toArray(new String[simpleProperties.size()]);
         SimpleFeatureType subsetType;
         try {
-            subsetType = DataUtilities.createSubType(realType, properties);
+            //TODO: will need to handle FeatureType instead of direct casting to SimpleFeatureType
+            // once FeatureType support lands on trunk
+            subsetType = DataUtilities.createSubType((SimpleFeatureType)realType, properties);
         } catch (SchemaException e) {
             throw new DataSourceException(e);
         }

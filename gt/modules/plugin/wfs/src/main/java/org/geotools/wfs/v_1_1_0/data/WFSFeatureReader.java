@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * Adapts a {@link GetFeatureParser} to the geotools {@link FeatureReader}
@@ -31,7 +32,9 @@ class WFSFeatureReader implements FeatureReader {
         this.parser = parser;
         this.next = parser.parse();
         if (this.next != null) {
-            this.featureType = next.getFeatureType();
+            //this is the FeatureType as parsed by the StreamingParser, we need a simple view
+            FeatureType parsedType = next.getFeatureType();
+            this.featureType = EmfAppSchemaParser.toSimpleFeatureType(parsedType);
         }
     }
 

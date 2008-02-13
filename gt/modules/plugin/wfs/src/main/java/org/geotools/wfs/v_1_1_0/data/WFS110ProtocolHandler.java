@@ -71,6 +71,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
@@ -139,6 +140,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * Hard limit for maxFeatures parameter. 0 means no limit.
      */
     private Integer maxFeaturesHardLimit;
+
+    private boolean usePullParser;
 
     /**
      * Creates the protocol handler by parsing the capabilities document from
@@ -588,21 +591,36 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         final String typeName = query.getTypeName();
         final FeatureTypeType featureTypeInfo = getFeatureTypeInfo(typeName);
 
-        Filter filter = query.getFilter();
-        if (Filter.EXCLUDE.equals(filter)) {
-            return new EmptyFeatureReader(contentType);
+        Filter supportedFilter;
+        Filter unsupportedFilter;
+        {
+            Filter filter = query.getFilter();
+            if (Filter.EXCLUDE.equals(filter)) {
+                return new EmptyFeatureReader(contentType);
+            }
+            // TODO: split filters!!
+            if (filter instanceof BBOX || filter instanceof Id) {
+                supportedFilter = filter;
+                unsupportedFilter = Filter.EXCLUDE;
+            } else {
+                supportedFilter = Filter.INCLUDE;
+                unsupportedFilter = filter;
+            }
         }
 
         final InputStream responseStream;
-        responseStream = sendGetFeatures(query, typeName, filter);
+        responseStream = sendGetFeatures(query, typeName, supportedFilter);
         final QName name = featureTypeInfo.getName();
         final Configuration configuration = getConfiguration();
 
         URL describeFeatureTypeURL = getDescribeFeatureTypeURLGet(typeName);
-        GetFeatureParser parser = new StreamingParserFeatureReader(configuration, responseStream,
-                name, describeFeatureTypeURL);
-        // GetFeatureParser parser = new XmlSimpleFeatureParser(responseStream,
-        // name, contentType);
+        GetFeatureParser parser;
+        if (this.usePullParser) {
+            parser = new XmlSimpleFeatureParser(responseStream, name, contentType);
+        } else {
+            parser = new StreamingParserFeatureReader(configuration, responseStream, name,
+                    describeFeatureTypeURL);
+        }
         FeatureReader reader = new WFSFeatureReader(parser);
 
         if (!reader.hasNext()) {
@@ -612,7 +630,12 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         SimpleFeatureType readerType = reader.getFeatureType();
         if (!contentType.equals(readerType)) {
             final boolean cloneContents = false;
-            reader = new ReTypeFeatureReader(reader, contentType, cloneContents);
+            // reader = new ReTypeFeatureReader(reader, contentType,
+            // cloneContents);
+        }
+
+        if (Filter.EXCLUDE != unsupportedFilter) {
+            reader = new FilteringFeatureReader(reader, unsupportedFilter);
         }
 
         if (this.maxFeaturesHardLimit.intValue() > 0 || query.getMaxFeatures() != Integer.MAX_VALUE) {
@@ -662,8 +685,8 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         return configuration;
     }
 
-    private InputStream sendGetFeatures(final Query query, final String typeName, Filter filter)
-            throws IOException, MalformedURLException {
+    private InputStream sendGetFeatures(final Query query, final String typeName,
+            final Filter filter) throws IOException, MalformedURLException {
         final InputStream responseStream;
         // TODO: enable POST
         if (false && supports(GET_FEATURE, POST)) {
@@ -761,7 +784,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         }
         {
             StringBuffer sb = new StringBuffer();
-            for (Iterator<String> it = propertyNames.iterator(); it.hasNext();) {
+            for (Iterator<String> it = properties.iterator(); it.hasNext();) {
                 sb.append(it.next());
                 if (it.hasNext()) {
                     sb.append(",");
@@ -770,14 +793,37 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             kvpMap.put("PROPERTYNAME", sb.toString());
         }
 
-        // TODO: enable filter
-        if (false && Filter.INCLUDE != filter) {
-            if (false && filter instanceof BBOX) {
-                // TODO: encode BBOX filters as the special case BBOX parameter,
-                // though I guess it'd be not that easy as it seems to require a
-                // the coordinates to have as many ordinates as the CRS and a
-                // crs URI
-                // BBOX bbox = (BBOX) filter;
+        if (Filter.INCLUDE != filter) {
+            if (filter instanceof BBOX) {
+                final BBOX bbox = (BBOX) filter;
+                String srs = bbox.getSRS();
+                if (srs == null) {
+                    FeatureTypeType typeInfo = getFeatureTypeInfo(typeName);
+                    srs = typeInfo.getDefaultSRS();
+                }
+//                int dimension = 2;
+//                try {
+//                    CoordinateReferenceSystem crs = CRS.decode(srs);
+//                    dimension = crs.getCoordinateSystem().getDimension();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+
+                StringBuffer sb = new StringBuffer();
+                sb.append(bbox.getMinX()).append(',');
+                sb.append(bbox.getMinY()).append(',');
+//                for (int extraDim = 2; extraDim < dimension; extraDim++) {
+//                    sb.append("0,");
+//                }
+
+                sb.append(bbox.getMaxX()).append(',');
+                sb.append(bbox.getMaxY());//.append(',');
+//                for (int extraDim = 2; extraDim < dimension; extraDim++) {
+//                    sb.append("0,");
+//                }
+
+                //sb.append(srs);
+                kvpMap.put("BBOX", sb.toString());
             } else if (filter instanceof Id) {
                 final Set<Identifier> identifiers = ((Id) filter).getIdentifiers();
                 StringBuffer idValues = new StringBuffer();
@@ -798,9 +844,10 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException(e);
                 }
-                StringBuffer wfsParamDelimitedFilter = new StringBuffer("(");
+                StringBuffer wfsParamDelimitedFilter = new StringBuffer();
+                // wfsParamDelimitedFilter.append("(");
                 wfsParamDelimitedFilter.append(urlEncodedFilter);
-                wfsParamDelimitedFilter.append(")");
+                // wfsParamDelimitedFilter.append(")");
                 kvpMap.put("FILTER", wfsParamDelimitedFilter.toString());
             }
         }
@@ -948,6 +995,18 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             featureTypeCache.put(typeName, ftype);
         }
         return ftype;
+    }
+
+    /**
+     * Sets whether to use {@link XmlSimpleFeatureParser} or
+     * {@link StreamingParserFeatureReader}
+     * 
+     * @param usePullParser
+     *            if {@code true}, {@code XmlSimpleFeatureParser} will be used
+     *            to parse GetFeature responses.
+     */
+    public void setUsePullParser(boolean usePullParser) {
+        this.usePullParser = usePullParser;
     }
 
 }

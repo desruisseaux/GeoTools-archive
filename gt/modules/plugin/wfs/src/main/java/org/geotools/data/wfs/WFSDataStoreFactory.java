@@ -341,6 +341,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             InputStream capsIn = new ByteArrayInputStream(wfsCapabilitiesRawData);
             final WFS110ProtocolHandler protocolHandler = new WFS110ProtocolHandler(capsIn,
                     connectionFac, maxFeatures);
+            
+            /////////////////////////////////////
+            // this is a meanwhile hack to test the StreamingParser vs pull parser approaches //
+            String pullParserParam = String.valueOf(params.get("USE_PULL_PARSER"));
+            Boolean usePullParser = Boolean.valueOf(pullParserParam);
+            protocolHandler.setUsePullParser(usePullParser.booleanValue());
+            /////////////////////////////////////
+            
             dataStore = new WFS_1_1_0_DataStore(protocolHandler);
         }
 

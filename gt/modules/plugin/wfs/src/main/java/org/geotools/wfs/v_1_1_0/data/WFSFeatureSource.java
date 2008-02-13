@@ -43,11 +43,7 @@ public class WFSFeatureSource implements FeatureSource, org.geotools.data.wfs.WF
      * @see FeatureSource#getSchema()
      */
     public SimpleFeatureType getSchema() {
-        try {
-            return dataStore.getSchema(typeName);
-        } catch (IOException e) {
-            throw new RuntimeException("Unexpected exception", e);
-        }
+        return featureType;
     }
 
     /**
