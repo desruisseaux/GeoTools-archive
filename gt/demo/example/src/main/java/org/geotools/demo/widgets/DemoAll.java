@@ -31,7 +31,6 @@ import org.apache.commons.collections.map.SingletonMap;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.TreeContextEvent;
@@ -130,7 +129,8 @@ public class DemoAll extends javax.swing.JFrame {
 
         tree.addContext(context);
 
-        gui_map2dcontrol.setMap(map);
+        gui_map2dnavigation.setMap(map);
+        gui_map2dselection.setMap(map);
         gui_map2dinfo.setMap(map);
         gui_map2dedit.setMap(map);
 
@@ -331,7 +331,8 @@ public class DemoAll extends javax.swing.JFrame {
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        gui_map2dnavigation = new org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar();
+        gui_map2dselection = new org.geotools.gui.swing.map.map2d.control.JMap2DSelectionBar();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         jToolBar2 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -439,7 +440,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane.setLayout(pan_mappaneLayout);
         pan_mappaneLayout.setHorizontalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 514, Short.MAX_VALUE)
+            .add(0, 486, Short.MAX_VALUE)
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -462,7 +463,7 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -506,11 +507,18 @@ public class DemoAll extends javax.swing.JFrame {
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jToolBar1, gridBagConstraints);
 
-        gui_map2dcontrol.setFloatable(false);
+        gui_map2dnavigation.setFloatable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        jPanel2.add(gui_map2dcontrol, gridBagConstraints);
+        jPanel2.add(gui_map2dnavigation, gridBagConstraints);
+
+        gui_map2dselection.setFloatable(false);
+        gui_map2dselection.setRollover(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(gui_map2dselection, gridBagConstraints);
 
         gui_map2dedit.setFloatable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1000,9 +1008,10 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
     private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
-    private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar gui_map2dcontrol;
     private org.geotools.gui.swing.map.map2d.control.JMap2DEditBar gui_map2dedit;
     private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar gui_map2dnavigation;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DSelectionBar gui_map2dselection;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
