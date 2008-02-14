@@ -24,10 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.imageio.*;
 import javax.imageio.metadata.IIOMetadata;
@@ -60,10 +64,16 @@ import org.geotools.util.logging.Logging;
  */
 public class MosaicImageWriter extends ImageWriter {
     /**
+     * Maximum amount of pixels allowed when reading more than one tile at once.
+     */
+    private int maximumPixelCount;
+
+    /**
      * Constructs an image writer with the default provider.
      */
     public MosaicImageWriter() {
         this(null);
+        maximumPixelCount = (int) Math.min(1024*1024*1024, Runtime.getRuntime().maxMemory()) / 4;
     }
 
     /**
@@ -155,6 +165,7 @@ public class MosaicImageWriter extends ImageWriter {
             throws IOException
     {
         final Logger logger = Logging.getLogger(MosaicImageWriter.class);
+        final boolean loggable = logger.isLoggable(Level.FINE);
         /*
          * Gets the reader first - especially before getOutput() - because the user may have
          * overriden filter(ImageReader) and set the output accordingly. TileBuilder do that.
@@ -166,31 +177,48 @@ public class MosaicImageWriter extends ImageWriter {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
         }
         final Collection<Tile> tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
-        Iterator<Tile> it;
-rescan: while ((it = tiles.iterator()).hasNext()) {
+        while (!tiles.isEmpty()) {
             /*
-             * Loads the image for the first tile in the list. Later in this loop,
-             * we will try to write as many tiles as we can using this single image.
-             * The tiles successfully written will be removed from the list, so next
-             * iterations will process only the remaining tiles.
+             * Loads the image for some initial tile from the list. We will write as many tiles as
+             * we can using this single image. The tiles successfully written will be removed from
+             * the list, so next iterations will process only the remaining tiles.
              */
-            Tile tile = it.next();
-            logger.info(Vocabulary.format(VocabularyKeys.LOADING_$1, tile));
-            final Rectangle imageRegion = tile.getAbsoluteRegion();
-            final Dimension imageSubsampling = tile.getSubsampling();
-            params.setSourceRegion(imageRegion);
+            final Dimension imageSubsampling = new Dimension(); // Computed by next line.
+            final Tile imageTile = getEnclosingTile(tiles, imageSubsampling, maximumPixelCount);
+            if (loggable) {
+                logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
+            }
             params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
-            final RenderedImage image  = reader.readAsRenderedImage(inputIndex, params);
+            final Rectangle imageRegion = imageTile.getAbsoluteRegion();
+            params.setSourceRegion(imageRegion);
+            final RenderedImage image = reader.readAsRenderedImage(inputIndex, params);
             /*
-             * Prepares the parameter to be given to the writer. At first, we will simply
-             * write the whole image. Subsequent iterations may write only a subsampled
-             * portion of the image.
+             * Searchs tiles inside the same region with a resolution which is equals or lower by
+             * an integer ratio. If such tiles are found we can write them using the image loaded
+             * above instead of loading subimages.  Giving that loading even a portion from a big
+             * file may be long, the performance enhancement of doing so is significant.
              */
-            int xSubsampling = 1;
-            int ySubsampling = 1;
-            Rectangle sourceRegion = null;
-            do {
-                it.remove();
+            assert tiles.contains(imageTile) : imageTile;
+            for (final Iterator<Tile> it=tiles.iterator(); it.hasNext();) {
+                final Tile tile = it.next();
+                final Dimension subsampling = tile.getSubsampling();
+                if (!isDivisor(subsampling, imageSubsampling)) {
+                    continue;
+                }
+                final Rectangle sourceRegion = tile.getAbsoluteRegion();
+                if (!imageRegion.contains(sourceRegion)) {
+                    continue;
+                }
+                if (loggable) {
+                    logger.log(getLogRecord(VocabularyKeys.SAVING_$1, tile));
+                }
+                final int xSubsampling = subsampling.width  / imageSubsampling.width;
+                final int ySubsampling = subsampling.height / imageSubsampling.height;
+                sourceRegion.translate(-imageRegion.x, -imageRegion.y);
+                sourceRegion.x      /= imageSubsampling.width;
+                sourceRegion.y      /= imageSubsampling.height;
+                sourceRegion.width  /= imageSubsampling.width;
+                sourceRegion.height /= imageSubsampling.height;
                 final ImageWriter writer = getImageWriter(tile, image);
                 final ImageWriteParam wp = writer.getDefaultWriteParam();
                 wp.setSourceRegion(sourceRegion);
@@ -198,32 +226,8 @@ rescan: while ((it = tiles.iterator()).hasNext()) {
                 writer.write(null, new IIOImage(image, null, null), wp);
                 close(writer.getOutput(), tile.getInput());
                 writer.dispose();
-                /*
-                 * Searchs in next tiles until we found one inside the same region with a resolution
-                 * which is lower by an integer ratio.  If such tile is found, we can write it using
-                 * the already loaded image instead of loading it again.  Giving that loading even a
-                 * portion of a big image file may be long,  the performance enhancement of doing so
-                 * is significant. This case occurs mostly with TileLayout.CONSTANT_GEOGRAPHIC_AREA.
-                 */
-                Dimension nextSubsampling;
-                do {
-                    if (!it.hasNext()) {
-                        continue rescan;
-                    }
-                    tile = it.next();
-                    sourceRegion = tile.getAbsoluteRegion();
-                    nextSubsampling = tile.getSubsampling();
-                } while ((nextSubsampling.width  % imageSubsampling.width ) != 0 ||
-                         (nextSubsampling.height % imageSubsampling.height) != 0 ||
-                         !imageRegion.contains(sourceRegion));
-                xSubsampling = nextSubsampling.width  / imageSubsampling.width;
-                ySubsampling = nextSubsampling.height / imageSubsampling.height;
-                sourceRegion.translate(-imageRegion.x, -imageRegion.y);
-                sourceRegion.x      /= imageSubsampling.width;
-                sourceRegion.y      /= imageSubsampling.height;
-                sourceRegion.width  /= imageSubsampling.width;
-                sourceRegion.height /= imageSubsampling.height;
-            } while (true);
+            }
+            assert !tiles.contains(imageTile) : imageTile;
         }
         close(reader.getInput(), input);
         reader.dispose();
@@ -243,6 +247,139 @@ rescan: while ((it = tiles.iterator()).hasNext()) {
             }
             // Note: ImageOutputStream extends ImageInputStream, so the above check is suffisient.
         }
+    }
+
+    /**
+     * Returns a log message for the given tile.
+     */
+    private static LogRecord getLogRecord(final int key, final Tile tile) {
+        final LogRecord record = Vocabulary.getResources(null).getLogRecord(Level.FINE, key, tile);
+        record.setSourceClassName(MosaicImageWriter.class.getName());
+        record.setSourceMethodName("writeFromInput");
+        return record;
+    }
+
+    /**
+     * Returns a tile which enclose other tiles at finer resolution. Some tile layouts have a few
+     * big tiles with low resolution covering the same geographic area than many smaller tiles with
+     * finer resolution. If such overlapping is found, then this method returns one of the big tiles
+     * and sets {@code imageSubsampling} to some subsampling that may be finer than usual for the
+     * returned tile. Reading the big tile with that subsampling allows {@code MosaicImageWriter}
+     * to use the same {@link RenderedImage} for writing both the big tile and the finer ones.
+     * Example:
+     *
+     * <blockquote>
+     *   +-----------------------+          +-----------+-----------+
+     *   |                       |          |Subsampling|Subsampling|
+     *   |      Subsampling      |          |  = (2,2)  |  = (2,2)  |
+     *   |        = (4,4)        |          +-----------+-----------+
+     *   |                       |          |Subsampling|Subsampling|
+     *   |                       |          |  = (2,2)  |  = (2,2)  |
+     *   +-----------------------+          +-----------+-----------+
+     * </blockquote>
+     *
+     * Given the above, this method will returns the tile illustrated on the left side and set
+     * {@code imageSubsampling} to (2,2).
+     * <p>
+     * The algorithm implemented in this method is far from optimal and surely doesn't return
+     * the best tile in all case. It is a compromize attempting to reduce the amount of image
+     * data to load without too much CPU cost.
+     *
+     * @param tiles The tiles to examine. This collection is not modified.
+     * @param imageSubsampling Where to store the subsampling to use for reading the tile.
+     *        This is an output parameter only.
+     *
+     * @todo {@code tiles} argument should be a {@link RTree} in argument in order to
+     *       avoid creating it again and again at every method invocation.
+     */
+    private static Tile getEnclosingTile(final Collection<Tile> tiles,
+                                         final Dimension imageSubsampling,
+                                         final int maximumPixelCount)
+            throws IOException
+    {
+        final RTree tree = new RTree(tiles.toArray(new Tile[tiles.size()]));
+        final Set<Dimension> subsamplingDone = tiles.size() > 24 ? new HashSet<Dimension>() : null;
+        Tile selectedTile = null;
+        int subtileCount = 0;
+        for (final Tile tile : tiles) {
+            /*
+             * Gets the collection of tiles in the same area than the tile we are examinating.
+             * We will retain the tile with the largest filtered collection. Filtering will be
+             * performed only if there is some chance to get a larger collection than the most
+             * sucessful one so far.
+             */
+            final Rectangle region = tile.getAbsoluteRegion();
+            final Dimension subsampling = tile.getSubsampling();
+            if (subsamplingDone != null && !subsamplingDone.add(subsampling)) {
+                /*
+                 * In order to speedup this method, examine only one tile for each subsampling
+                 * value. This is a totally arbitrary choice but work well for the most common
+                 * tile layouts (constant area & constant size). Without such reduction, the
+                 * execution time of this method is too long for large tile collections. For
+                 * smaller collections, we can afford a systematic examination of all tiles.
+                 */
+                continue;
+            }
+            // Reminder: Collection in next line will be modified.
+            final Collection<Tile> enclosed = tree.containedIn(region);
+            if (enclosed.size() <= subtileCount) {
+                continue; // Already a smaller collection - no need to do more in this iteration.
+            }
+            /*
+             * Found a collection that may be larger than the most successful one so far. First,
+             * gets the smallest subsampling. In this process, we discart the subsampling that
+             * could not be used for reading the tile considered by the outer loop.
+             */
+            final long area = (long) region.width * (long) region.height;
+            Dimension finerSubsampling = null;
+            int bestSize = Integer.MAX_VALUE;
+            for (final Iterator<Tile> it=enclosed.iterator(); it.hasNext();) {
+                final Tile subtile = it.next();
+                final Dimension s = subtile.getSubsampling();
+                final int size = s.width * s.height;
+                if (!isDivisor(subsampling, s) || (area / size) > maximumPixelCount) {
+                    it.remove();
+                    continue;
+                }
+                if (size < bestSize) {
+                    bestSize = size;
+                    finerSubsampling = s;
+                }
+            }
+            final int size = finerSubsampling.width * finerSubsampling.height;
+            /*
+             * Found a subsampling that may be finer than the tile subsampling. Now removes
+             * every tiles which would consume too much memory if we try to read them using
+             * that subsampling.
+             */
+            for (final Iterator<Tile> it=enclosed.iterator(); it.hasNext();) {
+                final Tile subtile = it.next();
+                final Rectangle subregion = subtile.getAbsoluteRegion();
+                final long pixelCount = ((long) subregion.width * (long) subregion.height) / size;
+                if (pixelCount > maximumPixelCount) {
+                    it.remove();
+                }
+            }
+            /*
+             * Retains the tile with the largest filtered collection of sub-tiles.
+             */
+            final int tileCount = enclosed.size();
+            if (tileCount > subtileCount) {
+                selectedTile = tile;
+                subtileCount = tileCount;
+                imageSubsampling.setSize(finerSubsampling);
+            }
+        }
+        return selectedTile;
+    }
+
+    /**
+     * Returns {@code true} if the given denominator is a divisor of the given numerator
+     * for both {@linkplain Dimension#width width} and {@linkplain Dimension#height height}.
+     */
+    private static boolean isDivisor(final Dimension numerator, final Dimension denominator) {
+        return (numerator.width  % denominator.width ) == 0 &&
+               (numerator.height % denominator.height) == 0;
     }
 
     /**

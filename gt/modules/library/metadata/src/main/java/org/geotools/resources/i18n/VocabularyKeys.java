@@ -963,6 +963,11 @@ public final class VocabularyKeys {
     public static final int SATURATION = 146;
 
     /**
+     * Saving {0}...
+     */
+    public static final int SAVING_$1 = 242;
+
+    /**
      * Scale 1:{0} (approximative)
      */
     public static final int SCALE_$1 = 147;

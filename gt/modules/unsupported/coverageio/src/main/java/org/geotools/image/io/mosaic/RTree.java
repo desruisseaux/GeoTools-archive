@@ -33,7 +33,8 @@ import java.io.IOException;
  *       'RTree subtree(Envelope)' method.
  *
  *       NOTE: For the purpose of {@link TileManager}, we will need a RTree implementation that
- *       preserve insertion order (like LinkedHashSet).
+ *       preserve insertion order (like LinkedHashSet). We will also need a way to returns all
+ *       elements (maybe we should extends {@link java.util.AbstractSequentialList} directly).
  *
  * @since 2.5
  * @source $URL$
@@ -64,11 +65,36 @@ final class RTree {
 
     /**
      * Returns the tiles intersecting the given region.
+     *
+     * @todo Before this API goes public we need to clarify if the returned collection should be
+     *       semantically a copy or be backed by the underlying RTree (i.e. removing an element
+     *       from the view remove the corresponding element from the RTree). The later would be
+     *       better if not to hard to implement. We must keep in mind that current usage of this
+     *       method in {@link TileManager} expects a copy, so it will need to be modified.
      */
     public Collection<Tile> intersect(final Rectangle region) {
         final List<Tile> interest = new LinkedList<Tile>();
         for (int i=0; i<regions.length; i++) {
             if (region.intersects(regions[i])) {
+                interest.add(tiles[i]);
+            }
+        }
+        return interest;
+    }
+
+    /**
+     * Returns the tiles entirely contained in the given region.
+     *
+     * @todo Before this API goes public we need to clarify if the returned collection should be
+     *       semantically a copy or be backed by the underlying RTree (i.e. removing an element
+     *       from the view remove the corresponding element from the RTree). The later would be
+     *       better if not to hard to implement. We must keep in mind that current usage of this
+     *       method in {@link MosaicImageWriter} expects a copy, so it will need to be modified.
+     */
+    public Collection<Tile> containedIn(final Rectangle region) {
+        final List<Tile> interest = new LinkedList<Tile>();
+        for (int i=0; i<regions.length; i++) {
+            if (region.contains(regions[i])) {
                 interest.add(tiles[i]);
             }
         }
