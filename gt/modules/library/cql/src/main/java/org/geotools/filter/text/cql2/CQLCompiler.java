@@ -61,7 +61,7 @@ class CQLCompiler extends CQLParser implements ICompiler{
     /** cql expression to compile */
     private final String source;
 
-    private FilterBuilder builder;
+    private CQLFilterBuilder builder;
 
     /**
      * new instance of CQL Compiler
@@ -76,7 +76,7 @@ class CQLCompiler extends CQLParser implements ICompiler{
         assert filterFactory != null: "filterFactory cannot be null";
         
         this.source = cqlSource;
-        this.builder =  new FilterBuilder(cqlSource, filterFactory);
+        this.builder =  new CQLFilterBuilder(cqlSource, filterFactory);
     }
     
     /** 

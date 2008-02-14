@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @version Revision: 1.9
  * @since 2.5
  */
-public class FilterBuilder {
+public class CQLFilterBuilder {
 
     private static final WKTReader WKT_READER = new WKTReader();
 
@@ -61,12 +61,21 @@ public class FilterBuilder {
 
     private final String cqlSource;
 
+    protected FilterFactory getFilterFactory(){
+        return this.filterFactory;
+    }
+    
+    protected final BuildResultStack getResultStack(){
+        return this.resultStack;
+    }
     /**
      * New instance of FilterBuilder
      * @param cqlSource 
      * @param filterFactory
      */
-    public FilterBuilder(final String cqlSource, final FilterFactory filterFactory){
+    public CQLFilterBuilder(final String cqlSource, final FilterFactory filterFactory){
+        assert cqlSource != null: "illegal argument";
+        assert filterFactory != null: "illegal argument";
         
         this.cqlSource = cqlSource;
         this.filterFactory = filterFactory;

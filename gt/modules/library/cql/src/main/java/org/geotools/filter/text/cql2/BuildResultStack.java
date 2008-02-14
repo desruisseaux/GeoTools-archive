@@ -30,7 +30,7 @@ import org.opengis.filter.expression.PropertyName;
  * @version $Id$
  * @since 2.4
  */
-final class BuildResultStack {
+public final class BuildResultStack {
 
     private Stack<Result> stack = new Stack<Result>();
 

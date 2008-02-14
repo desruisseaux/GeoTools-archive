@@ -123,54 +123,13 @@ public class CQL {
     public static Filter toFilter(final String cqlPredicate, final FilterFactory filterFactory)
         throws CQLException {
 
-            ICompiler compiler = makeCompiler(cqlPredicate,filterFactory);
+            ICompiler compiler = CompilerFactory.makeCompiler(CompilerFactory.Language.CQL, cqlPredicate, filterFactory);
             compiler.compileFilter();
             Filter result = compiler.getFilter();
 
             return result;
     }
     
-    /**
-     * Initializes and create the new compiler
-     * @param predicate
-     * @param filterFactory
-     * @return CQLCompiler
-     * @throws CQLException 
-     */
-    private static ICompiler makeCompiler(final String predicate, final FilterFactory filterFactory) throws CQLException {
-
-        FilterFactory ff = filterFactory;
-
-        if (ff == null) {
-            ff = CommonFactoryFinder.getFilterFactory((Hints) null);
-        }
-        ICompiler compiler = createCompiler(predicate, ff);
-
-        return compiler;
-    }
-
-    /**
-     * Creates a new compiler which implements {@link ICompiler}.
-     * 
-     * <p>
-     * Must be override in subclass if a new extension (or dialect) of CQL
-     * is required. 
-     * By default creates the {@link CQLCompiler}.
-     * </p>
-     * @param predicate
-     * @param filterFactory
-     * 
-     * @return CQLCompiler
-     */
-    protected static ICompiler createCompiler(final String predicate,
-                                              final FilterFactory filterFactory){
-        assert predicate != null: "predicate cannot be null";
-        assert filterFactory != null: "filterFactory cannot be null";
-
-        CQLCompiler compiler = new CQLCompiler(predicate, filterFactory);
-
-        return compiler;
-    }
 
     /**
      * Parses the input string in OGC CQL format into an Expression, using the
@@ -202,7 +161,7 @@ public class CQL {
     public static Expression toExpression(final String cqlExpression,
                                           final FilterFactory filterFactory) throws CQLException {
 
-            ICompiler compiler = makeCompiler(cqlExpression, filterFactory);
+            ICompiler compiler = CompilerFactory.makeCompiler(CompilerFactory.Language.CQL, cqlExpression, filterFactory);
             compiler.compileExpression();           
             Expression builtFilter = compiler.getExpression();
 
@@ -269,7 +228,7 @@ public class CQL {
     public static List<Filter> toFilterList(final String cqlSourceFilterList, final FilterFactory filterFactory)
         throws CQLException {
 
-        ICompiler compiler = makeCompiler(cqlSourceFilterList, filterFactory);
+        ICompiler compiler = CompilerFactory.makeCompiler(CompilerFactory.Language.CQL, cqlSourceFilterList, filterFactory);
         compiler.compileFilterList();
         List<Filter> results = compiler.getFilterList();
         return results;

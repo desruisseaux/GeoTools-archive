@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.cql2.FilterBuilder;
 import org.geotools.filter.text.cql2.ICompiler;
 import org.geotools.filter.text.cql2.IToken;
 import org.geotools.filter.text.cql2.Result;
@@ -53,14 +52,14 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * @version Revision: 1.9
  * @since 
  */
-class TXTCompiler extends TXTParser implements ICompiler{
+public class TXTCompiler extends TXTParser implements ICompiler{
     
     private static final String ATTRIBUTE_PATH_SEPARATOR = "/";
 
     /** cql expression to compile */
     private final String source;
 
-    private final FilterBuilder builder;
+    private final TXTFilterBuilder builder;
 
     /**
      * new instance of TXTCompiler
@@ -75,7 +74,7 @@ class TXTCompiler extends TXTParser implements ICompiler{
         assert filterFactory != null: "filterFactory cannot be null";
         
         this.source = txtSource;
-        this.builder =  new FilterBuilder(txtSource, filterFactory);
+        this.builder =  new TXTFilterBuilder(txtSource, filterFactory);
     }
 
     /** 
@@ -106,7 +105,7 @@ class TXTCompiler extends TXTParser implements ICompiler{
             throw new CQLException(e.getMessage(), getTokenInPosition(0), e.getCause(), this.source);
         }
     }
-    
+
     
     public void compileFilterList() throws CQLException{
         try {
@@ -142,6 +141,11 @@ class TXTCompiler extends TXTParser implements ICompiler{
 
         return this.builder.getExpression();
     }
+    
+    public IToken getTokenInPosition(int index ){
+        return TokenAdapter.newAdapterFor( super.getToken(index));
+    }
+    
 
     /**
      * Returns the list of Filters built as the result of calling
@@ -156,9 +160,6 @@ class TXTCompiler extends TXTParser implements ICompiler{
         return this.builder.getFilterList();
     }
     
-    public IToken getTokenInPosition(int index ){
-        return TokenAdapter.newAdapterFor( super.getToken(index));
-    }
     
 
     public final void jjtreeOpenNodeScope(Node n) {
@@ -400,6 +401,16 @@ class TXTCompiler extends TXTParser implements ICompiler{
 
         case JJTFALSENODE:
             return this.builder.buildFalseLiteral(); 
+
+            // ----------------------------------------
+            //  id predicate
+            // ----------------------------------------
+        case JJTFEATURE_ID_NODE:
+            return this.builder.buildFeatureID(getTokenInPosition(0));
+
+            
+        case JJTID_PREDICATE_NODE:
+            return this.builder.buildFilterId(JJTFEATURE_ID_NODE);
         }
 
         return null;
