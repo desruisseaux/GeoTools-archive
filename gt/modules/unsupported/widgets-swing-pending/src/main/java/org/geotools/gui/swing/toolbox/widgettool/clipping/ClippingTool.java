@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.toolbox.widgettool.clipping;
 
+import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;

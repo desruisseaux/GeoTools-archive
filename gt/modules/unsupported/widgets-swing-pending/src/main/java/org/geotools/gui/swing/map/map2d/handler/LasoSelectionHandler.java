@@ -26,12 +26,11 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
-import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionDecoration;
 
 /**
  *
@@ -39,6 +38,9 @@ import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionDecoration;
  */
 public class LasoSelectionHandler implements SelectionHandler {
 
+    private static final ImageIcon ICON = IconBundle.getResource().getIcon("16_select_laso");
+    private static final String title = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/handler/Bundle").getString("laso");
+    
     protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final MouseInputListener mouseInputListener = new MouseListen();
     private final LasoSelectionDecoration selectionPane = new LasoSelectionDecoration();
@@ -172,5 +174,13 @@ public class LasoSelectionHandler implements SelectionHandler {
 
         public void mouseMoved(MouseEvent e) {
         }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public ImageIcon getIcon() {
+        return ICON;
     }
 }

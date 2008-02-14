@@ -72,7 +72,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
         buildCursors();
     }
-      
+
     private void buildCursors() {
         Toolkit tk = Toolkit.getDefaultToolkit();
         ImageIcon ico_zoomIn = IconBundle.getResource().getIcon("16_zoom_in");
@@ -415,7 +415,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                             return;
                     }
                 } //right mouse button : pan action
-                else if (e.getButton() == MouseEvent.BUTTON3) {
+                else if (e.getButton() == MouseEvent.BUTTON3 && (actionState == ACTION_STATE.PAN || actionState == ACTION_STATE.ZOOM_IN || actionState == ACTION_STATE.ZOOM_OUT)) {
                     zlevel = 1.0;
                     Coordinate ll = new Coordinate(mapX - (width2 / zlevel), mapY - (height2 / zlevel));
                     Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY + (height2 / zlevel));
@@ -448,7 +448,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         setCursor(CUR_ZOOM_OUT);
                         break;
                 }
-            } else if (mousebutton == MouseEvent.BUTTON3) {
+            } else if (mousebutton == MouseEvent.BUTTON3 && (actionState == ACTION_STATE.PAN || actionState == ACTION_STATE.ZOOM_IN || actionState == ACTION_STATE.ZOOM_OUT)) {
                 zoompanPanel.setCoord(0, 0, getWidth(), getHeight(), true);
                 setCursor(CUR_ZOOM_PAN);
             }
@@ -481,7 +481,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         break;
                 }
             } //right mouse button : pan action
-            else if (mousebutton == MouseEvent.BUTTON3) {
+            else if (mousebutton == MouseEvent.BUTTON3 && (actionState == ACTION_STATE.PAN || actionState == ACTION_STATE.ZOOM_IN || actionState == ACTION_STATE.ZOOM_OUT)) {
                 zoompanPanel.setFill(false);
                 zoompanPanel.setCoord(0, 0, 0, 0, false);
                 processDrag(startX, startY, endX, endY, true);
@@ -556,7 +556,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         break;
                 }
             } //right mouse button : pan action
-            else if (mousebutton == MouseEvent.BUTTON3) {
+            else if (mousebutton == MouseEvent.BUTTON3 && (actionState == ACTION_STATE.PAN || actionState == ACTION_STATE.ZOOM_IN || actionState == ACTION_STATE.ZOOM_OUT)) {
                 if ((lastX > 0) && (lastY > 0)) {
                     int dx = lastX - startX;
                     int dy = lastY - startY;
@@ -595,7 +595,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
             int val = e.getWheelRotation();
 
             Coordinate coord = toMapCoord(e.getX(), e.getY());
-            
+
             if (val > 0) {
                 Envelope env = getRenderingStrategy().getMapArea();
                 double width = env.getWidth();

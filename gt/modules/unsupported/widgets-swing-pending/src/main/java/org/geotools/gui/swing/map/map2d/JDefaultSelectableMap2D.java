@@ -148,7 +148,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @param layer : MapLayer for which the filter is made
      * @return Filter
      */
-    protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
+    public Filter createFilter(Geometry geom, MapLayer layer) {
         Filter f = null;
 
         geom = projectGeometry(geom, layer);
@@ -183,7 +183,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
                     f = FILTER_FACTORY_2.within(exp1, exp2);
                     break;
             }
-            f = FILTER_FACTORY_2.intersects(exp1, exp2);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,7 +195,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @param layer
      * @return
      */
-    protected Geometry projectGeometry(Geometry geom, MapLayer layer) {
+    public Geometry projectGeometry(Geometry geom, MapLayer layer) {
         MathTransform transform = null;
 
         MapContext context = getRenderingStrategy().getContext();
@@ -253,7 +252,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @param outCRS
      * @return
      */
-    protected Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
+    public Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
         MathTransform transform = null;
 
         MapContext context = getRenderingStrategy().getContext();
@@ -416,12 +415,34 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private void fireSelectionChanged(Geometry geo) {
-        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo);
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo, selectionFilter, selectionHandler);
 
         SelectableMap2DListener[] lst = getSelectableMap2DListeners();
 
         for (SelectableMap2DListener l : lst) {
-            l.mapSelectionChanged(mce);
+            l.selectionChanged(mce);
+        }
+
+    }
+
+    private void fireFilterChanged(SELECTION_FILTER filter) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, filter, selectionHandler);
+
+        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+
+        for (SelectableMap2DListener l : lst) {
+            l.selectionFilterChanged(mce);
+        }
+
+    }
+
+    private void fireHandlerChanged(SelectionHandler handler) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, selectionFilter, handler);
+
+        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+
+        for (SelectableMap2DListener l : lst) {
+            l.selectionHandlerChanged(mce);
         }
 
     }
@@ -562,7 +583,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
             if (selectionGeometrie != null) {
                 try {
-                    Filter f = getFeatureInGeometry(selectionGeometrie, copy);
+                    Filter f = createFilter(selectionGeometrie, copy);
                     applyStyleFilter(copy.getStyle(), f);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -614,8 +635,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     public void setSelectionFilter(SELECTION_FILTER filter) {
         if (filter == null) {
             throw new NullPointerException();
-        } else {
+        } else if (filter != selectionFilter) {
             selectionFilter = filter;
+            fireFilterChanged(selectionFilter);
         }
     }
 
@@ -626,8 +648,19 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     public void setSelectionHandler(SelectionHandler handler) {
         if (handler == null) {
             throw new NullPointerException();
-        } else {
+        } else if (handler != selectionHandler) {
+
+            if (selectionHandler.isInstalled()) {
+                selectionHandler.uninstall();
+            }
+
             selectionHandler = handler;
+
+            if (actionState == ACTION_STATE.SELECT) {
+                selectionHandler.install(this);
+            }
+
+            fireHandlerChanged(selectionHandler);
         }
     }
 
@@ -656,7 +689,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         for (MapLayer layer : selectionMapContext.getLayers()) {
 
             try {
-                f = getFeatureInGeometry(geometry, layer);
+                f = createFilter(geometry, layer);
                 applyStyleFilter(layer.getStyle(), f);
 
             } catch (Exception e) {

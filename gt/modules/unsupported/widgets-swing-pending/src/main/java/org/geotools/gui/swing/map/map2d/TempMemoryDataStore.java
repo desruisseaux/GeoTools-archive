@@ -63,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author jgarnett
  * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
  */
-class TempMemoryDataStore extends AbstractDataStore {
+public class TempMemoryDataStore extends AbstractDataStore {
 
     /** Memory holds Map of Feature by fid by typeName. */
     protected Map memory = new HashMap();

@@ -29,6 +29,10 @@ public interface SelectableMap2DListener extends EventListener{
      * called when the map2D selection changed
      * @param event : Map2DSelectionEvent
      */
-    public void mapSelectionChanged(Map2DSelectionEvent event);
+    public void selectionChanged(Map2DSelectionEvent event);
+    
+    public void selectionFilterChanged(Map2DSelectionEvent event);
+    
+    public void selectionHandlerChanged(Map2DSelectionEvent event);
     
 }

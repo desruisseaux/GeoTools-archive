@@ -23,6 +23,7 @@ import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -36,6 +37,10 @@ import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionDecoration;
  */
 public class DefaultSelectionHandler implements SelectionHandler {
 
+    
+    private static final ImageIcon ICON = IconBundle.getResource().getIcon("16_select_default");
+    private static final String title = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/handler/Bundle").getString("default");
+    
     protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final MouseInputListener mouseInputListener = new MouseListen();
     private final DefaultSelectionDecoration selectionPane = new DefaultSelectionDecoration();
@@ -175,6 +180,14 @@ public class DefaultSelectionHandler implements SelectionHandler {
 
         public void mouseMoved(MouseEvent e) {
         }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public ImageIcon getIcon() {
+        return ICON;
     }
 
     

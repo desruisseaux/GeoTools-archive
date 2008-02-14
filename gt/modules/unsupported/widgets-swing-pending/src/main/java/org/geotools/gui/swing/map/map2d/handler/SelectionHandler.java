@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.map.map2d.handler;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 
@@ -38,6 +39,14 @@ public interface SelectionHandler {
      */
     void uninstall();
     
+    /**
+     * 
+     * @return
+     */
     boolean isInstalled();
+    
+    String getTitle();
+    
+    ImageIcon getIcon();
     
 }

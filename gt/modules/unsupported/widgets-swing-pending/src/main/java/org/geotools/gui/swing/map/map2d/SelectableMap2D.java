@@ -17,9 +17,14 @@
 package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.ResourceBundle;
+import javax.swing.ImageIcon;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.map.MapLayer;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * interface for map2d widget how handle Selection
@@ -28,22 +33,28 @@ import org.geotools.map.MapLayer;
 public interface SelectableMap2D extends NavigableMap2D{
         
     public static enum SELECTION_FILTER{
-        CONTAINS(""),
-        CROSSES(""),
-        DISJOINT(""),
-        INTERSECTS(""),
-        OVERLAPS(""),
-        TOUCHES(""),
-        WITHIN("");
+        CONTAINS("contains","16_filter_contains"),
+        CROSSES("crosses","16_filter_crosses"),
+        DISJOINT("disjoint","16_filter_disjoint"),
+        INTERSECTS("intersects","16_filter_intersects"),
+        OVERLAPS("overlaps","16_filter_overlaps"),
+        TOUCHES("touches","16_filter_touches"),
+        WITHIN("within","16_filter_within");
         
         private final String title;
+        private final ImageIcon icon;
         
-        SELECTION_FILTER(String key){
-            title = key;
+        SELECTION_FILTER(String key,String logokey){
+            title = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/Bundle").getString(key);
+            icon = IconBundle.getResource().getIcon(logokey);
         }
         
         public String getTitle(){
             return title;
+        }
+        
+        public ImageIcon getIcon(){
+            return icon;
         }
         
         
@@ -106,6 +117,30 @@ public interface SelectableMap2D extends NavigableMap2D{
      */
     public SelectionHandler getSelectionHandler();
     
+    /**
+     * reproject a geometry from the current Mapcontext to layer CRS
+     * @param geom
+     * @param layer
+     * @return
+     */
+    public Geometry projectGeometry(Geometry geom, MapLayer layer);
+
+    /**
+     * reproject a geometry from a CRS to another
+     * @param geom
+     * @param inCRS
+     * @param outCRS
+     * @return
+     */
+    public Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS);    
+    
+    /**
+     * 
+     * @param geo
+     * @param layer
+     * @return
+     */
+    public Filter createFilter(Geometry geo, MapLayer layer);
     
     /**
      * make a selection with x,y coordinate

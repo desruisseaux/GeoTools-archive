@@ -1,8 +1,8 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,29 +13,39 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+package org.geotools.gui.swing.map.map2d.handler;
 
-package org.geotools.gui.swing.map;
+import javax.swing.ImageIcon;
+import org.geotools.gui.swing.map.map2d.EditableMap2D;
 
 /**
- * Class for all map constants and enums
- * 
+ *
  * @author johann sorel
  */
-public class MapConstants {
+public interface EditionHandler {
 
     /**
-     * Possible actions states available for a map
+     * 
+     * @param map2d
      */
-    public static enum ACTION_STATE{
-        ZOOM_IN,
-        ZOOM_OUT,
-        PAN,
-        SELECT,
-        EDIT,
-        NONE
-    };
-    
-    
-    
-     
+    void install(EditableMap2D map2d);
+
+    public void installListeners(EditableMap2D map2d);
+
+    /**
+     * 
+     */
+    void uninstall();
+
+    public void uninstallListeners();
+
+    /**
+     * 
+     * @return
+     */
+    boolean isInstalled();
+
+    String getTitle();
+
+    ImageIcon getIcon();
 }

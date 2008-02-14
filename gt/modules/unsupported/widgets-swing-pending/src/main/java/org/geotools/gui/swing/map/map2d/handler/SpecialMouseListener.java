@@ -1,8 +1,8 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -14,28 +14,15 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map;
+package org.geotools.gui.swing.map.map2d.handler;
+
+import javax.swing.event.MouseInputListener;
 
 /**
- * Class for all map constants and enums
- * 
+ *
  * @author johann sorel
  */
-public class MapConstants {
+abstract class SpecialMouseListener implements MouseInputListener{
 
-    /**
-     * Possible actions states available for a map
-     */
-    public static enum ACTION_STATE{
-        ZOOM_IN,
-        ZOOM_OUT,
-        PAN,
-        SELECT,
-        EDIT,
-        NONE
-    };
-    
-    
-    
-     
+    public abstract void fireStateChange();
 }

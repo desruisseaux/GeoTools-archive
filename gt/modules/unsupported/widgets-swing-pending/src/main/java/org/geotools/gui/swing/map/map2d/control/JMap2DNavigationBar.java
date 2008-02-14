@@ -32,7 +32,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  * 
  * @author johann sorel
  */
-public class JMap2DControlBar extends JToolBar {
+public class JMap2DNavigationBar extends JToolBar {
 
     
     
@@ -42,7 +42,6 @@ public class JMap2DControlBar extends JToolBar {
     private static final ImageIcon ICON_ZOOM_IN = IconBundle.getResource().getIcon("16_zoom_in");
     private static final ImageIcon ICON_ZOOM_OUT = IconBundle.getResource().getIcon("16_zoom_out");
     private static final ImageIcon ICON_ZOOM_PAN = IconBundle.getResource().getIcon("16_zoom_pan");
-    private static final ImageIcon ICON_SELECT = IconBundle.getResource().getIcon("16_select");
     private static final ImageIcon ICON_REFRESH = IconBundle.getResource().getIcon("16_data_reload");
     
     private final ZoomAllAction ACTION_ZOOM_ALL = new ZoomAllAction();
@@ -51,7 +50,6 @@ public class JMap2DControlBar extends JToolBar {
     private final ZoomInAction ACTION_ZOOM_IN = new ZoomInAction();
     private final ZoomOutAction ACTION_ZOOM_OUT = new ZoomOutAction();
     private final PanAction ACTION_ZOOM_PAN = new PanAction();
-    private final SelectAction ACTION_SELECT = new SelectAction();
     private final RefreshAction ACTION_REFRESH = new RefreshAction();
     
     
@@ -62,14 +60,13 @@ public class JMap2DControlBar extends JToolBar {
     private final JButton gui_zoomIn = buildButton(ICON_ZOOM_IN, ACTION_ZOOM_IN);
     private final JButton gui_zoomOut = buildButton(ICON_ZOOM_OUT, ACTION_ZOOM_OUT);
     private final JButton gui_zoomPan = buildButton(ICON_ZOOM_PAN, ACTION_ZOOM_PAN);
-    private final JButton gui_select = buildButton(ICON_SELECT, ACTION_SELECT);
     private final JButton gui_refresh = buildButton(ICON_REFRESH, ACTION_REFRESH);
     private final int largeur = 2;
 
     /**
      * Creates a new instance of JMap2DControlBar
      */
-    public JMap2DControlBar() {
+    public JMap2DNavigationBar() {
         this(null);
     }
 
@@ -77,7 +74,7 @@ public class JMap2DControlBar extends JToolBar {
      * Creates a new instance of JMap2DControlBar
      * @param pane : related Map2D or null
      */
-    public JMap2DControlBar(Map2D pane) {
+    public JMap2DNavigationBar(Map2D pane) {
         setMap(pane);
         init();
     }
@@ -90,7 +87,6 @@ public class JMap2DControlBar extends JToolBar {
         add(gui_zoomIn);
         add(gui_zoomOut);
         add(gui_zoomPan);
-        add(gui_select);
     }
     
     
@@ -115,7 +111,6 @@ public class JMap2DControlBar extends JToolBar {
         ACTION_NEXT.setMap(map);
         ACTION_PREVIOUS.setMap(map);
         ACTION_REFRESH.setMap(map);
-        ACTION_SELECT.setMap(map);
         ACTION_ZOOM_ALL.setMap(map);
         ACTION_ZOOM_IN.setMap(map);
         ACTION_ZOOM_OUT.setMap(map);

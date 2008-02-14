@@ -564,7 +564,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DControlBar" name="gui_map2dcontrol">
+        <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar" name="gui_map2dnavigation">
           <Properties>
             <Property name="floatable" type="boolean" value="false"/>
           </Properties>
@@ -574,6 +574,19 @@
             </Constraint>
           </Constraints>
         </Component>
+        <Container class="org.geotools.gui.swing.map.map2d.control.JMap2DSelectionBar" name="gui_map2dselection">
+          <Properties>
+            <Property name="floatable" type="boolean" value="false"/>
+            <Property name="rollover" type="boolean" value="true"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="-1" gridY="-1" gridWidth="1" gridHeight="1" fill="1" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="1.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+        </Container>
         <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DEditBar" name="gui_map2dedit">
           <Properties>
             <Property name="floatable" type="boolean" value="false"/>

@@ -16,15 +16,14 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.geotools.data.FeatureStore;
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
+import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
+import org.geotools.gui.swing.map.map2d.handler.MultiLineCreationHandler;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.map.MapLayer;
 
@@ -37,11 +36,11 @@ public class EditMultiLineAction extends AbstractAction {
     private Map2D map = null;
     private EditableMap2DListener listener = new EditableMap2DListener() {
 
-        public void mapEditStateChanged(Map2DEditStateEvent event) {
-        }
-
         public void mapEditLayerChanged(Map2DEditLayerEvent event) {
             checkLayer(event.getNewEditLayer());
+        }
+
+        public void editionHandlerChanged(EditionHandler handler) {
         }
     };
 
@@ -71,7 +70,7 @@ public class EditMultiLineAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent arg0) {
         if (map != null && map instanceof EditableMap2D) {
-            ((EditableMap2D) map).setEditState(MapConstants.EDIT_STATE.MULTI_LINE);
+            ((EditableMap2D) map).setEditionHandler(new MultiLineCreationHandler());
         }
 
     }

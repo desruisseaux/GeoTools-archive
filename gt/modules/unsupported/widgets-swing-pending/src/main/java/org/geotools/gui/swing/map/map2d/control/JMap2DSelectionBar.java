@@ -24,52 +24,51 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
- * JMap2DEditBar is a JPanel to handle edition state for an EditableMap2D
- * Layer selection, edition, line, polygon, point ...
+ * JMap2DControlBar is a JPanel to handle Navigation state for a NavigableMap2D
+ * ZoomIn/Out, pan, selection, refresh ...
  * 
  * @author johann sorel
  */
-public class JMap2DEditBar extends JToolBar {
+public class JMap2DSelectionBar extends JToolBar {
 
-    private static final ImageIcon ICON_EDIT = IconBundle.getResource().getIcon("16_edit");
     
-    private final EditAction ACTION_EDIT = new EditAction();
+    private static final ImageIcon ICON_SELECT = IconBundle.getResource().getIcon("16_select");
+    
+    private final SelectAction ACTION_SELECT = new SelectAction();
+    
     
     private Map2D map = null;
-    private final JButton gui_edit = buildButton(ICON_EDIT, ACTION_EDIT);
-    private final EditedLayerChooser gui_chooser = new EditedLayerChooser();
-    private final EditHandlerChooser gui_handler = new EditHandlerChooser();
+    private final JButton gui_select = buildButton(ICON_SELECT, ACTION_SELECT);
+    private final SelectFilterChooser gui_filter = new SelectFilterChooser();
+    private final SelectHandlerChooser gui_handler = new SelectHandlerChooser();
     private final int largeur = 2;
-    
-    
 
     /**
-     * Creates a new instance of JMap2DEditBar
+     * Creates a new instance of JMap2DControlBar
      */
-    public JMap2DEditBar() {
+    public JMap2DSelectionBar() {
         this(null);
     }
 
     /**
-     * Creates a new instance of JMap2DEditBar
+     * Creates a new instance of JMap2DControlBar
      * @param pane : related Map2D or null
      */
-    public JMap2DEditBar(Map2D pane) {
+    public JMap2DSelectionBar(Map2D pane) {
         setMap(pane);
         init();
     }
 
     private void init() {
-        add(gui_edit);
-        add(gui_chooser);
+        add(gui_select);
+        add(gui_filter);
         add(gui_handler);
     }
-
-
+    
+    
     private JButton buildButton(ImageIcon img,Action action) {
         JButton but = new JButton(action);
         but.setIcon(img);
@@ -81,17 +80,15 @@ public class JMap2DEditBar extends JToolBar {
         return but;
     }
     
-    
+
     /**
      * set the related Map2D
      * @param map2d : related Map2D
      */
     public void setMap(Map2D map2d) {
-
-        map = map2d;
-        ACTION_EDIT.setMap(map);
-        gui_chooser.setMap(map2d);
-        gui_handler.setMap(map2d);
+        map = map2d;        
+        ACTION_SELECT.setMap(map);
+        gui_filter.setMap(map);
+        gui_handler.setMap(map);
     }
-
 }

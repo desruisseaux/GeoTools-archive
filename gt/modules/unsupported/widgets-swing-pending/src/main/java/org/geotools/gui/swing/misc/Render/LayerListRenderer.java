@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.toolbox.widgettool.clipping;
+package org.geotools.gui.swing.misc.Render;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -41,6 +41,7 @@ public class LayerListRenderer implements ListCellRenderer{
     private static final ImageIcon ICON_LAYER_FILE_RASTER_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fr");
     private static final ImageIcon ICON_LAYER_DB_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_db");
     private final Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY,1);
+    private final Border nullborder = BorderFactory.createEmptyBorder(1,1,1,1);
     
     JLabel lbl = new JLabel();
     
@@ -58,7 +59,7 @@ public class LayerListRenderer implements ListCellRenderer{
         if(isSelected ){
             lbl.setBorder(border);
         }else{
-            lbl.setBorder(null);
+            lbl.setBorder(nullborder);
         }
                 
         return lbl;

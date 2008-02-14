@@ -15,23 +15,20 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
-import javax.swing.JList;
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
+import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
@@ -53,13 +50,11 @@ public class EditedLayerChooser extends JComboBox {
             if (map != null && map instanceof EditableMap2D) {
                 int selected = getSelectedIndex();
                 EditableMap2D editmap = (EditableMap2D) map;
-                editmap.setEditState(MapConstants.EDIT_STATE.NONE);
 
                 if (selected >= 1) {
                     editionLayer = editmap.getRenderingStrategy().getContext().getLayer(selected - 1);
                     editmap.setEditedMapLayer(editionLayer);
                 } else {
-                    editmap.setEditState(MapConstants.EDIT_STATE.NONE);
                     editmap.setEditedMapLayer(null);
                     editionLayer = null;
                 }
@@ -67,9 +62,6 @@ public class EditedLayerChooser extends JComboBox {
         }
     };
     private EditableMap2DListener editmapListener = new EditableMap2DListener() {
-
-        public void mapEditStateChanged(Map2DEditStateEvent event) {
-        }
 
         public void mapEditLayerChanged(Map2DEditLayerEvent event) {
             MapLayer layer = event.getNewEditLayer();
@@ -82,6 +74,9 @@ public class EditedLayerChooser extends JComboBox {
                 setSelectedIndex(0);
             }
             addItemListener(listListener);
+        }
+
+        public void editionHandlerChanged(EditionHandler handler) {
         }
     };
     
@@ -134,8 +129,12 @@ public class EditedLayerChooser extends JComboBox {
     };
 
     public EditedLayerChooser() {
-        setRenderer(new listRenderer());
+        setRenderer(new LayerListRenderer());
         initComboBox();
+             
+        setBorder(null);
+        setOpaque(false);
+        
     }
 
     private void initComboBox() {
@@ -202,16 +201,5 @@ public class EditedLayerChooser extends JComboBox {
         initComboBox();
     }
 
-    //----------------private classes-------------------------------------------
-    private class listRenderer extends DefaultListCellRenderer {
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value instanceof MapLayer) {
-                value = ((MapLayer) value).getTitle();
-            }
-
-            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        }
-    }
+    
 }
