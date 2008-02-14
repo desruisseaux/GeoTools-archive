@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.text.txt;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -36,11 +35,11 @@ import org.opengis.filter.Id;
  */
 public final class TXTTest extends TestCase{
     
+
     public void testFacade() throws Exception {
         TXT.toFilter("A = 1");
         TXT.toExpression("A + 1");
         TXT.toFilterList("A=1; B<4");
-        
     }
 
     /**
