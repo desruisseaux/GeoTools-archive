@@ -73,7 +73,7 @@ public class MosaicImageWriter extends ImageWriter {
      */
     public MosaicImageWriter() {
         this(null);
-        maximumPixelCount = (int) Math.min(1024*1024*1024, Runtime.getRuntime().maxMemory()) / 4;
+        maximumPixelCount = (int) Math.min(1024*1024*1024, Runtime.getRuntime().maxMemory()) / 16;
     }
 
     /**
@@ -191,6 +191,7 @@ public class MosaicImageWriter extends ImageWriter {
             params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
             final Rectangle imageRegion = imageTile.getAbsoluteRegion();
             params.setSourceRegion(imageRegion);
+            System.gc(); // Experience shows that it really prevents OutOfMemoryError at this point.
             final RenderedImage image = reader.readAsRenderedImage(inputIndex, params);
             /*
              * Searchs tiles inside the same region with a resolution which is equals or lower by

@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
-import org.geotools.resources.i18n.ErrorKeys;
+
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 
 
@@ -239,7 +240,24 @@ public class TileBuilder {
     }
 
     /**
-     * Sets the minimum tile size.
+     * Sets the minimum tile size. This builder will avoid creating tiles smaller than this size
+     * except in some conditions. More specifically:
+     * <p>
+     *   <li><p>
+     *     When computing overviews, the builder stops to increase subsampling when doing so
+     *     would produce tiles having {@linkplain Rectangle#width width} <strong>and</strong>
+     *     {@linkplain Rectangle#height height} smaller than the minimum tile size. This is
+     *     useful mostly for {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA}.
+     *   </p></li>
+     *     For a given overview level, the tiles in the last column and the tiles in the last
+     *     row are clipped to the image bounds. If clipping results in tiles having {@linkplain
+     *     Rectangle#width width} <strong>or</strong> {@linkplain Rectangle#height height} smaller
+     *     than the minimum tile size, then the whole level is discarted except if it is the last
+     *     one. This is useful mostly for {@link TileLayout#CONSTANT_TILE_SIZE}, in which case
+     *     setting the minimum tile size to the same value than {@linkplain #getTileSize tile size}
+     *     ensure that each layer contains only an integer amount of tiles.
+     *   <li><p>
+     * </p>
      */
     public void setMinimumTileSize(final Dimension size) {
         if (size.width < 2 || size.height < 2) {
@@ -365,22 +383,33 @@ public class TileBuilder {
         subsampling.setSize(1,1);
         overview = 0;
         do {
+            final int off  = tiles.size();
             final int xmin = imageBounds.x;
             final int ymin = imageBounds.y;
             final int xmax = imageBounds.x + imageBounds.width;
             final int ymax = imageBounds.y + imageBounds.height;
             computeFieldSizes(imageBounds, tileBounds);
-            int y = 0;
+            boolean hasSmallTiles = false;
+            int x=0, y=0;
             for (tileBounds.y = ymin; tileBounds.y < ymax; tileBounds.y += tileBounds.height) {
-                int x = 0;
+                x = 0;
                 for (tileBounds.x = xmin; tileBounds.x < xmax; tileBounds.x += tileBounds.width) {
                     final Rectangle clippedBounds = tileBounds.intersection(imageBounds);
                     final File file = new File(directory, generateFilename(overview, x, y));
                     final Tile tile = new Tile(tileReaderSpi, file, 0, clippedBounds, subsampling);
                     tiles.add(tile);
+                    if (clippedBounds.width  < minimumTileSize.width ||
+                        clippedBounds.height < minimumTileSize.height)
+                    {
+                        hasSmallTiles = true;
+                    }
                     x++;
                 }
                 y++;
+            }
+            if (hasSmallTiles && (x!=1 || y!=1)) {
+                // Discart every tiles in current overview level.
+                tiles.subList(off, tiles.size()).clear();
             }
             overview++;
             tileBounds.setLocation(xmin, ymin);
