@@ -213,10 +213,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         } else if (handler != editionHandler) {
 
             if (editionHandler.isInstalled()) {
-                if (actionState == ACTION_STATE.EDIT) {
-                    editionHandler.uninstallListeners();
-                }
-
+                editionHandler.uninstallListeners();                
                 editionHandler.uninstall();
             }
 
