@@ -227,6 +227,7 @@ public class MosaicImageWriter extends ImageWriter {
                 writer.write(null, new IIOImage(image, null, null), wp);
                 close(writer.getOutput(), tile.getInput());
                 writer.dispose();
+                it.remove();
             }
             assert !tiles.contains(imageTile) : imageTile;
         }

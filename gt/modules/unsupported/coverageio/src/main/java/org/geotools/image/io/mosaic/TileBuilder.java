@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
+import org.geotools.math.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.image.ImageUtilities;
 
 
 /**
@@ -48,6 +48,11 @@ public class TileBuilder {
      * Default value for {@link #prefix}. Current implementation uses "L" as in "Level".
      */
     private static final String DEFAULT_PREFIX = "L";
+
+    /**
+     * The default tile size.
+     */
+    private static final int DEFAULT_TILE_SIZE = 1024;
 
     /**
      * The factory to use for creating {@link TileManager} instances.
@@ -84,14 +89,12 @@ public class TileBuilder {
     private Dimension tileSize;
 
     /**
-     * The minimum tile size.
+     * The subsamplings to use when creating a new overview. Values at even index are
+     * <var>x</var> subsamplings and values at odd index are <var>y</var> subsamplings.
+     * If {@code null}, subsampling will be computed automatically from the image and
+     * tile size in order to get only entire tiles.
      */
-    private Dimension minimumTileSize;
-
-    /**
-     * The preferred subsampling to use when creating a new overview.
-     */
-    private int xSubsampling, ySubsampling;
+    private int[] subsamplings;
 
     /**
      * The expected size of row and column filed in generated names.
@@ -105,7 +108,7 @@ public class TileBuilder {
     private String prefix;
 
     /**
-     * File extension to be given to filename. Computed automatically by
+     * File extension to be given to filenames. Computed automatically by
      * {@link #createTileManager}.
      */
     private transient String extension;
@@ -125,10 +128,7 @@ public class TileBuilder {
      */
     public TileBuilder(final TileManagerFactory factory) {
         this.factory = (factory != null) ? factory : TileManagerFactory.DEFAULT;
-        minimumTileSize = new Dimension(64, 64);
         layout = TileLayout.CONSTANT_TILE_SIZE;
-        xSubsampling = 2;
-        ySubsampling = 2;
     }
 
     /**
@@ -210,11 +210,25 @@ public class TileBuilder {
     }
 
     /**
-     * Returns the tile size, or {@code null} if not set. In the later case, the tile size will
-     * be inferred from the untiled image size when {@link #createTileManager()} is invoked.
+     * Returns the tile size. If no tile size has been explicitly set, then a default tile size
+     * will be computed from the {@linkplain #getUntiledImageBounds untiled image bounds}. If no
+     * size can be computed, then this method returns {@code null}.
+     *
+     * @see #suggestTileSize
      */
     public Dimension getTileSize() {
-        return (tileSize != null) ? (Dimension) tileSize.clone() : null;
+        if (tileSize == null) {
+            final Rectangle untiledBounds = getUntiledImageBounds();
+            if (untiledBounds == null) {
+                return null;
+            }
+            int width  = untiledBounds.width;
+            int height = untiledBounds.height;
+            width  = suggestTileSize(width);
+            height = (height == untiledBounds.width) ? width : suggestTileSize(height);
+            tileSize = new Dimension(width, height);
+        }
+        return (Dimension) tileSize.clone();
     }
 
     /**
@@ -224,7 +238,7 @@ public class TileBuilder {
         if (size == null) {
             tileSize = null;
         } else {
-            if (size.width < minimumTileSize.width || size.height < minimumTileSize.height) {
+            if (size.width < 2 || size.height < 2) {
                 throw new IllegalArgumentException(Errors.format(
                         ErrorKeys.ILLEGAL_ARGUMENT_$1, "size"));
             }
@@ -233,59 +247,176 @@ public class TileBuilder {
     }
 
     /**
-     * Returns the minimum tile size.
+     * Suggests a tile size using default values.
      */
-    public Dimension getMinimumTileSize() {
-        return (Dimension) minimumTileSize.clone();
+    private static int suggestTileSize(final int imageSize) {
+        return suggestTileSize(imageSize, DEFAULT_TILE_SIZE,
+                DEFAULT_TILE_SIZE - DEFAULT_TILE_SIZE/4, DEFAULT_TILE_SIZE + DEFAULT_TILE_SIZE/4);
     }
 
     /**
-     * Sets the minimum tile size. This builder will avoid creating tiles smaller than this size
-     * except in some conditions. More specifically:
+     * Suggests a tile size ({@linkplain Dimension#width width} or {@linkplain Dimension#height
+     * height}) for the given image size. This methods search for a value <var>x</var> inside the
+     * {@code [minSize...maxSize]} range where {@code imageSize}/<var>x</var> has the largest amount
+     * of {@linkplain XMath#divisors divisors}. If more than one value have the same amount of
+     * divisors, then the one which is the closest to {@code tileSize} is returned.
+     *
+     * @param  imageSize The image size.
+     * @param  tileSize  The preferred tile size. Must be inside the {@code [minSize...maxSize]} range.
+     * @param  minSize   The minimum size, inclusive. Must be greater than 0.
+     * @param  maxSize   The maximum size, inclusive. Must be equals or greater that {@code minSize}.
+     * @return The suggested tile size. Inside the {@code [minSize...maxSize]} range except
+     *         if {@code imageSize} was smaller than {@link minSize}.
+     * @throws IllegalArgumentException if any argument doesn't meet the above-cited conditions.
+     */
+    public static int suggestTileSize(final int imageSize, final int tileSize,
+                                      final int minSize,   final int maxSize)
+            throws IllegalArgumentException
+    {
+        if (minSize <= 1 || minSize > maxSize) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_RANGE_$2, minSize, maxSize));
+        }
+        if (tileSize < minSize || tileSize > maxSize) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, tileSize, minSize, maxSize));
+        }
+        if (imageSize <= minSize) {
+            return imageSize;
+        }
+        int numDivisors = 0;
+        int best = tileSize;
+        for (int i=minSize; i<=maxSize; i++) {
+            if (imageSize % i != 0) {
+                continue;
+            }
+            final int n = XMath.divisors(imageSize / i).length;
+            if (n < numDivisors) {
+                continue;
+            }
+            if (n == numDivisors) {
+                if (Math.abs(i - tileSize) >= Math.abs(best - tileSize)) {
+                    continue;
+                }
+            }
+            best = i;
+            numDivisors = n;
+        }
+        return best;
+    }
+
+    /**
+     * Returns the subsampling for overview computations. If no subsamplings were {@linkplain
+     * #setSubsamplings(Dimension[]) explicitly set}, then this method computes automatically
+     * some subsamplings from the {@linkplain #getUntiledImageBounds untiled image bounds} and
+     * {@linkplain #getTileSize tile size}. If no subsampling can be computed, then this method
+     * returns {@code null}.
+     */
+    public Dimension[] getSubsamplings() {
+        if (subsamplings == null) {
+            final Rectangle untiledBounds = getUntiledImageBounds();
+            if (untiledBounds == null) {
+                return null;
+            }
+            final Dimension tileSize = getTileSize();
+            if (tileSize == null) {
+                return null;
+            }
+            int nx, ny;
+            switch (layout) {
+                default: // A conservative choice for unknown tile layout.
+                case CONSTANT_GEOGRAPHIC_AREA: {
+                    nx = tileSize.width;
+                    ny = tileSize.height;
+                    break;
+                }
+                case CONSTANT_TILE_SIZE: {
+                    nx = untiledBounds.width;
+                    ny = untiledBounds.height;
+                    if (nx % tileSize.width  == 0) nx /= tileSize.width;
+                    if (ny % tileSize.height == 0) ny /= tileSize.height;
+                    break;
+                }
+            }
+            final int[] width  = XMath.divisors(nx);
+            final int[] height = (nx == ny) ? width : XMath.divisors(ny);
+            int length = Math.min(width.length, height.length);
+            // Trims subsamplings which would produce tiles bigger than the image.
+            do {
+                if (length == 0) {
+                    return null;
+                }
+                --length;
+            } while (width [length] * tileSize.width  > untiledBounds.width &&
+                     height[length] * tileSize.height > untiledBounds.height);
+            length++;
+            subsamplings = new int[length * 2];
+            int source = 0;
+            for (int i=0; i<length; i++) {
+                subsamplings[source++] = width [i];
+                subsamplings[source++] = height[i];
+            }
+        }
+        final Dimension[] dimensions = new Dimension[subsamplings.length];
+        int source = 0;
+        for (int i=0; i<dimensions.length; i++) {
+            dimensions[i] = new Dimension(subsamplings[source++], subsamplings[source++]);
+        }
+        return dimensions;
+    }
+
+    /**
+     * Sets the subsamplings for overview computations. The number of overview levels created
+     * by this {@code TileBuilder} will be equals to the {@code subsamplings} array length.
      * <p>
-     *   <li><p>
-     *     When computing overviews, the builder stops to increase subsampling when doing so
-     *     would produce tiles having {@linkplain Rectangle#width width} <strong>and</strong>
-     *     {@linkplain Rectangle#height height} smaller than the minimum tile size. This is
-     *     useful mostly for {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA}.
-     *   </p></li>
-     *     For a given overview level, the tiles in the last column and the tiles in the last
-     *     row are clipped to the image bounds. If clipping results in tiles having {@linkplain
-     *     Rectangle#width width} <strong>or</strong> {@linkplain Rectangle#height height} smaller
-     *     than the minimum tile size, then the whole level is discarted except if it is the last
-     *     one. This is useful mostly for {@link TileLayout#CONSTANT_TILE_SIZE}, in which case
-     *     setting the minimum tile size to the same value than {@linkplain #getTileSize tile size}
-     *     ensure that each layer contains only an integer amount of tiles.
-     *   <li><p>
-     * </p>
+     * Subsamplings most be explicitly provided for {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA},
+     * but is optional for {@link TileLayout#CONSTANT_TILE_SIZE}. In the later case subsamplings
+     * may be {@code null} (the default), in which case they will be automatically computed from
+     * the {@linkplain #getUntiledImageBounds untiled image bounds} and {@linkplain #getTileSize
+     * tile size} in order to have only entire tiles (i.e. tiles in last columns and last rows
+     * don't need to be cropped).
      */
-    public void setMinimumTileSize(final Dimension size) {
-        if (size.width < 2 || size.height < 2) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$1, "size"));
+    public void setSubsamplings(final Dimension[] subsamplings) {
+        final int[] newSubsamplings;
+        if (subsamplings == null) {
+            newSubsamplings = null;
+        } else {
+            int target = 0;
+            newSubsamplings = new int[subsamplings.length * 2];
+            for (int i=0; i<subsamplings.length; i++) {
+                final Dimension subsampling = subsamplings[i];
+                final int xSubsampling = subsampling.width;
+                final int ySubsampling = subsampling.height;
+                if (xSubsampling < 1 || ySubsampling < 1) {
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$1, "subsamplings[" + i + ']'));
+                }
+                newSubsamplings[target++] = xSubsampling;
+                newSubsamplings[target++] = ySubsampling;
+            }
         }
-        minimumTileSize = new Dimension(size);
+        this.subsamplings = newSubsamplings;
     }
 
     /**
-     * Sets the preferred subsampling for overview computations. This is used for computing a
-     * new overview from the previous one. The value must be equals or greater than 2.
+     * Sets uniform subsamplings for overview computations. This convenience method delegates to
+     * {@link #setSubsamplings(Dimension[])} with the same value affected to both
+     * {@linkplain Dimension#width width} and {@linkplain Dimension#height height}.
      */
-    public void setPreferredSubsampling(final Dimension subsampling) {
-        if (subsampling.width < 2 || subsampling.height < 2) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$1, "subsampling"));
+    public void setSubsamplings(final int[] subsamplings) {
+        final Dimension[] newSubsamplings;
+        if (subsamplings == null) {
+            newSubsamplings = null;
+        } else {
+            newSubsamplings = new Dimension[subsamplings.length];
+            for (int i=0; i<subsamplings.length; i++) {
+                final int subsampling = subsamplings[i];
+                newSubsamplings[i] = new Dimension(subsampling, subsampling);
+            }
         }
-        xSubsampling = subsampling.width;
-        ySubsampling = subsampling.height;
-    }
-
-    /**
-     * Returns the preferred subsampling for overview computations.
-     * The default value is (2,2).
-     */
-    public Dimension getPreferredSubsampling() {
-        return new Dimension(xSubsampling, ySubsampling);
+        // Delegates to setSubsamplings(Dimension[]) instead of performing the same work in-place
+        // (which would have been more efficient) because the user may have overriden the former.
+        setSubsamplings(newSubsamplings);
     }
 
     /**
@@ -303,15 +434,11 @@ public class TileBuilder {
             // TODO: We may try to detect automatically the Spi in a future version.
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_READER));
         }
-        untiledBounds = getUntiledImageBounds();
+        untiledBounds = getUntiledImageBounds(); // Force computation, if any.
         if (untiledBounds == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
         }
-        tileSize = getTileSize();
-        if (tileSize == null) {
-            tileSize = untiledBounds.getSize();
-            tileSize = ImageUtilities.toTileSize(tileSize);
-        }
+        tileSize = getTileSize(); // Force computation
         /*
          * Selects an arbitrary prefix if none was explicitly defined. Then
          * selects the longuest file extension (e.g. "tiff" instead of "tif").
@@ -383,13 +510,11 @@ public class TileBuilder {
         subsampling.setSize(1,1);
         overview = 0;
         do {
-            final int off  = tiles.size();
             final int xmin = imageBounds.x;
             final int ymin = imageBounds.y;
             final int xmax = imageBounds.x + imageBounds.width;
             final int ymax = imageBounds.y + imageBounds.height;
             computeFieldSizes(imageBounds, tileBounds);
-            boolean hasSmallTiles = false;
             int x=0, y=0;
             for (tileBounds.y = ymin; tileBounds.y < ymax; tileBounds.y += tileBounds.height) {
                 x = 0;
@@ -398,18 +523,9 @@ public class TileBuilder {
                     final File file = new File(directory, generateFilename(overview, x, y));
                     final Tile tile = new Tile(tileReaderSpi, file, 0, clippedBounds, subsampling);
                     tiles.add(tile);
-                    if (clippedBounds.width  < minimumTileSize.width ||
-                        clippedBounds.height < minimumTileSize.height)
-                    {
-                        hasSmallTiles = true;
-                    }
                     x++;
                 }
                 y++;
-            }
-            if (hasSmallTiles && (x!=1 || y!=1)) {
-                // Discart every tiles in current overview level.
-                tiles.subList(off, tiles.size()).clear();
             }
             overview++;
             tileBounds.setLocation(xmin, ymin);
@@ -433,7 +549,8 @@ public class TileBuilder {
      * minimum tile size.
      */
     private boolean isValidSize(final Rectangle bounds) {
-        return bounds.width >= minimumTileSize.width || bounds.height >= minimumTileSize.height;
+        throw new UnsupportedOperationException("Unfinished work"); // TODO
+//        return bounds.width >= minimumTileSize.width || bounds.height >= minimumTileSize.height;
     }
 
     /**
@@ -452,12 +569,7 @@ public class TileBuilder {
      * The subsampling dimension is updated in-place.
      */
     private void nextSubsampling(final Dimension subsampling) {
-        // Following really wants a rounding toward 0 in integer divisions.
-        int dx = (subsampling.width  / xSubsampling + 1) * xSubsampling;
-        int dy = (subsampling.height / ySubsampling + 1) * ySubsampling;
-        dx = nextSubsampling(untiledBounds.width,  dx, subsampling.width);
-        dy = nextSubsampling(untiledBounds.height, dy, subsampling.height);
-        subsampling.setSize(dx, dy);
+        throw new UnsupportedOperationException("Unfinished work"); // TODO
     }
 
     /**

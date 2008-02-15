@@ -22,14 +22,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Simple mathematical functions. Some of these functions will be removed if JavaSoft provide a
- * standard implementation or fix some issues in Bug Parade:
- * <p>
- * <ul>
- *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4074599.html">Implement log10 (base 10 logarithm)</a></li>
- *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4358794.html">implement pow10 (power of 10) with optimization for integer powers</a>/li>
- *   <li><a href="http://developer.java.sun.com/developer/bugParade/bugs/4461243.html">Math.acos is very slow</a></li>
- * </ul>
+ * Simple mathematical functions.
  *
  * @since 2.0
  * @source $URL$
@@ -48,6 +41,8 @@ public final class XMath {
     /**
      * Table of some integer powers of 10. Used
      * for fast computation of {@link #pow10(int)}.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     private static final double[] POW10 = {
         1E+00, 1E+01, 1E+02, 1E+03, 1E+04, 1E+05, 1E+06, 1E+07, 1E+08, 1E+09,
@@ -82,48 +77,22 @@ public final class XMath {
 
     /**
      * Computes 10 power <var>x</var>.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static double pow10(final double x) {
-        final int ix = (int) x;
-        if (ix == x) {
-            return pow10(ix);
-        } else {
-            return Math.pow(10, x);
-        }
+        return org.geotools.math.XMath.pow10(x);
     }
 
     /**
      * Computes <var>x</var> to the power of 10. This computation is very fast
      * for small power of 10 but has some rounding error issues (see
      * http://developer.java.sun.com/developer/bugParade/bugs/4358794.html).
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static strictfp double pow10(final int x) {
-        if (x >= 0) {
-            if (x < POW10.length) {
-                return POW10[x];
-            }
-        } else if (x != Integer.MIN_VALUE) {
-            final int nx = -x;
-            if (nx < POW10.length) {
-                return 1 / POW10[nx];
-            }
-        }
-        try {
-            /*
-             * Note: Method 'Math.pow(10,x)' has rounding errors: it doesn't
-             *       always return the closest IEEE floating point
-             *       representation. Method 'Double.parseDouble("1E"+x)' gives
-             *       as good or better numbers for ALL integer powers, but is
-             *       much slower.  The difference is usually negligible, but
-             *       powers of 10 are a special case since they are often
-             *       used for scaling axes or formatting human-readable output.
-             *       We hope that the current workaround is only temporary.
-             *       (see http://developer.java.sun.com/developer/bugParade/bugs/4358794.html).
-             */
-            return Double.parseDouble("1E" + x);
-        } catch (NumberFormatException exception) {
-            return StrictMath.pow(10, x);
-        }
+        return org.geotools.math.XMath.pow10(x);
     }
 
     /**
@@ -133,11 +102,11 @@ public final class XMath {
      *    +1 if <var>x</var> is positive.
      *
      * @see Math#signum(double)
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static int sgn(final double x) {
-        if (x > 0) return +1;
-        if (x < 0) return -1;
-        else       return  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -147,11 +116,11 @@ public final class XMath {
      *    +1 if <var>x</var> is positive.
      *
      * @see Math#signum(float)
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static int sgn(final float x) {
-        if (x > 0) return +1;
-        if (x < 0) return -1;
-        else       return  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -159,11 +128,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static int sgn(long x) {
-        if (x > 0) return +1;
-        if (x < 0) return -1;
-        else       return  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -171,11 +140,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static int sgn(int x) {
-        if (x > 0) return +1;
-        if (x < 0) return -1;
-        else       return  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -183,11 +152,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static short sgn(short x) {
-        if (x > 0) return (short) +1;
-        if (x < 0) return (short) -1;
-        else       return (short)  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -195,11 +164,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static byte sgn(byte x) {
-        if (x > 0) return (byte) +1;
-        if (x < 0) return (byte) -1;
-        else       return (byte)  0;
+        return org.geotools.math.XMath.sgn(x);
     }
 
     /**
@@ -210,20 +179,11 @@ public final class XMath {
      * @param  value The value to round.
      * @param  flu The amount of floating point units.
      * @return The rounded value, of {@code value} if it was not close enough to an integer.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static double round(final double value, int flu) {
-        final double target = Math.rint(value);
-        if (value != target) {
-            final boolean pos = (value < target);
-            double candidate = value;
-            while (--flu >= 0) {
-                candidate = pos ? next(candidate) : previous(candidate);
-                if (candidate == target) {
-                    return target;
-                }
-            }
-        }
-        return value;
+        return org.geotools.math.XMath.roundIfAlmostInteger(value, flu);
     }
 
     /**
@@ -240,18 +200,11 @@ public final class XMath {
      * @param  n The minimum amount of fraction digits.
      * @return The fixed value, or the unchanged {@code value} if there is no small change
      *         that remove at least {@code n} fraction digits.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static double fixRoundingError(final double value, int n) {
-        double lower = value;
-        double upper = value;
-        n = countFractionDigits(value) - n;
-        if (n > 0) {
-            for (int i=0; i<4; i++) {
-                if (countFractionDigits(lower = previous(lower)) <= n) return lower;
-                if (countFractionDigits(upper = next    (upper)) <= n) return upper;
-            }
-        }
-        return value;
+        return org.geotools.math.XMath.trimDecimalFractionDigits(value, 4, n);
     }
 
     /**
@@ -259,20 +212,11 @@ public final class XMath {
      * the specified value. This method is equivalent to a call to
      * <code>{@linkplain Double#toString(double) Double#toString}(value)</code>
      * and counting the number of digits after the decimal separator.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static int countFractionDigits(final double value) {
-        final String asText = Double.toString(value);
-        final int exp = asText.indexOf('E');
-        int upper, power;
-        if (exp >= 0) {
-            upper = exp;
-            power = Integer.parseInt(asText.substring(exp+1));
-        } else {
-            upper = asText.length();
-            power = 0;
-        }
-        while ((asText.charAt(--upper)) == '0');
-        return Math.max(upper - asText.indexOf('.') - power, 0);
+        return org.geotools.math.XMath.countDecimalFractionDigits(value);
     }
 
     /**
@@ -438,17 +382,11 @@ public final class XMath {
      * @param  index The index, from -2097152 to 2097151 inclusive.
      * @return One of the legal {@link Float#NaN NaN} values as a float.
      * @throws IndexOutOfBoundsException if the specified index is out of bounds.
+     *
+     * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
     public static float toNaN(int index) throws IndexOutOfBoundsException {
-        index += 0x200000;
-        if (index>=0 && index<=0x3FFFFF) {
-            final float value = Float.intBitsToFloat(0x7FC00000 + index);
-            assert Float.isNaN(value) : value;
-            return value;
-        }
-        else {
-            throw new IndexOutOfBoundsException(Integer.toHexString(index));
-        }
+        return org.geotools.math.XMath.toNaN(index);
     }
 
     /**
@@ -538,13 +476,13 @@ public final class XMath {
         if (value == null) {
             return null;
         }
-        if (Double   .class.equals(type)) return (T) Double .valueOf(value);
-        if (Float    .class.equals(type)) return (T) Float  .valueOf(value);
-        if (Long     .class.equals(type)) return (T) Long   .valueOf(value);
-        if (Integer  .class.equals(type)) return (T) Integer.valueOf(value);
-        if (Short    .class.equals(type)) return (T) Short  .valueOf(value);
-        if (Byte     .class.equals(type)) return (T) Byte   .valueOf(value);
-        if (Boolean  .class.equals(type)) return (T) Boolean.valueOf(value);
+        if (Double .class.equals(type)) return (T) Double .valueOf(value);
+        if (Float  .class.equals(type)) return (T) Float  .valueOf(value);
+        if (Long   .class.equals(type)) return (T) Long   .valueOf(value);
+        if (Integer.class.equals(type)) return (T) Integer.valueOf(value);
+        if (Short  .class.equals(type)) return (T) Short  .valueOf(value);
+        if (Byte   .class.equals(type)) return (T) Byte   .valueOf(value);
+        if (Boolean.class.equals(type)) return (T) Boolean.valueOf(value);
         throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 }
