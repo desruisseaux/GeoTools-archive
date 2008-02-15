@@ -93,6 +93,21 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- no tests, they need a live db, and should be set up as online tests-->
+            <exclude>**/*Test.java</exclude>
+            <exclude>${online.skip.pattern}</exclude>
+            <exclude>${stress.skip.pattern}</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

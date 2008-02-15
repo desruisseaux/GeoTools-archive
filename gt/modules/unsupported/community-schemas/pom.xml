@@ -50,7 +50,6 @@
   <!-- =========================================================== -->
   <modules>
   	<module>fm</module>
-  	<module>sql-datastore</module>
   	<module>community-schema-ds</module>
   </modules>
   
