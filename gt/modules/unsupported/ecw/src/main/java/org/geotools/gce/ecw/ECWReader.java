@@ -47,12 +47,13 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.OverviewPolicy;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
@@ -144,7 +145,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 				// prevent the use from reordering axes
 				this.hints.add(hints);
 			}
-			this.coverageFactory = FactoryFinder
+			this.coverageFactory = CoverageFactoryFinder
 					.getGridCoverageFactory(this.hints);
 
 			// //
@@ -530,8 +531,8 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
-		String overviewPolicy=null;
-		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
+		OverviewPolicy overviewPolicy=null;
+		// USE JAI ImageRead -1==no, 0==unset 1==yes
 		int iUseJAI = 0;
 		if (params != null) {
 
@@ -557,7 +558,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 				}
 				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY.getName()
 						.toString())) {
-					overviewPolicy = param.stringValue();
+					overviewPolicy = (OverviewPolicy) param.getValue();
 					continue;
 				}
 			}
@@ -580,7 +581,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	 * @throws IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim, int iUseJAI, String overviewPolicy) throws IOException {
+			Rectangle requestedDim, int iUseJAI, OverviewPolicy overviewPolicy) throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
@@ -812,7 +813,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 				if (prj.exists()) {
 					projReader = new PrjFileReader(new FileInputStream(prj)
 							.getChannel());
-					crs = projReader.getCoodinateSystem();
+					crs = projReader.getCoordinateReferenceSystem();
 				}
 			} catch (FileNotFoundException e) {
 				// warn about the error but proceed, it is not fatal

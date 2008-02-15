@@ -598,7 +598,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					final FileChannel channel = new FileInputStream(prjFile)
 							.getChannel();
 					projReader = new PrjFileReader(channel);
-					crs = projReader.getCoodinateSystem();
+					crs = projReader.getCoordinateReferenceSystem();
 				} catch (FileNotFoundException e) {
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use

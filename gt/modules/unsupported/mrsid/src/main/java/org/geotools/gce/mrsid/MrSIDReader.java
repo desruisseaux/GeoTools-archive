@@ -546,7 +546,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		GeneralEnvelope readEnvelope = null;
 		OverviewPolicy overviewPolicy = null;
 		Rectangle requestedDim = null;
-		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
+		// USE JAI ImageRead -1==no, 0==unset 1==yes
 		int iUseJAI = 0;
 		if (params != null) {
 
@@ -1101,7 +1101,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				if (prj.exists()) {
 					projReader = new PrjFileReader(new FileInputStream(prj)
 							.getChannel());
-					crs = projReader.getCoodinateSystem();
+					crs = projReader.getCoordinateReferenceSystem();
 				}
 			} catch (FileNotFoundException e) {
 				// warn about the error but proceed, it is not fatal

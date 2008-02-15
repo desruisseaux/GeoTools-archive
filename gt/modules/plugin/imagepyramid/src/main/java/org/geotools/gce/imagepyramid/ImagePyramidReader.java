@@ -232,7 +232,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					crs.toWKT()).toString());
 		} else {
 			final CoordinateReferenceSystem tempcrs = crsReader
-					.getCoodinateSystem();
+					.getCoordinateReferenceSystem();
 			if (tempcrs == null) {
 				// use the default crs
 				crs = AbstractGridFormat.getDefaultCRS();

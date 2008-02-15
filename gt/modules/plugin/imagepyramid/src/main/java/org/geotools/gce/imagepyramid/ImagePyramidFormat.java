@@ -185,7 +185,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 				throw new DataSourceException(e);
 			}
-			CoordinateReferenceSystem tempcrs = crsReader.getCoodinateSystem();
+			CoordinateReferenceSystem tempcrs = crsReader.getCoordinateReferenceSystem();
 			if (tempcrs == null) {
 				// use the default crs
 				tempcrs = AbstractGridFormat.getDefaultCRS();
