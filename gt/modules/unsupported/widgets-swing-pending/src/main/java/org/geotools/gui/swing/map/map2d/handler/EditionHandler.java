@@ -30,21 +30,23 @@ public interface EditionHandler {
      */
     void install(EditableMap2D map2d);
 
-    public void installListeners(EditableMap2D map2d);
+    void installListeners(EditableMap2D map2d);
 
     /**
      * 
      */
     void uninstall();
 
-    public void uninstallListeners();
+    void uninstallListeners();
 
     /**
      * 
      * @return
      */
     boolean isInstalled();
-
+    
+    void cancelEdition();
+    
     String getTitle();
 
     ImageIcon getIcon();

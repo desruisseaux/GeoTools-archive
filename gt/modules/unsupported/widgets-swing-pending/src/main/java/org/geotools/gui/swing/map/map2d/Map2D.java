@@ -18,7 +18,6 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.Component;
-import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
@@ -29,7 +28,7 @@ import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
  * 
  * @author Johann Sorel
  */
-public interface Map2D extends Map{
+public interface Map2D {
    
     
     /**

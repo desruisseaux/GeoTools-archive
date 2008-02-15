@@ -120,7 +120,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         return editionStyle;
     }
 
-    
     private void adjusteContexts() {
         MapContext context = getRenderingStrategy().getContext();
 
@@ -140,8 +139,10 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         if (context != null && context.getAreaOfInterest() != null) {
             memoryMapContext.setAreaOfInterest(context.getAreaOfInterest());
         }
+                
+        memoryStrategy.refresh();
     }
-    
+
     private void fireEditLayerChanged(MapLayer oldone, MapLayer newone) {
         Map2DEditLayerEvent mce = new Map2DEditLayerEvent(this, oldone, newone);
 
@@ -169,6 +170,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         if (state == ACTION_STATE.EDIT) {
             editionHandler.installListeners(this);
         } else {
+            editionHandler.cancelEdition();
             editionHandler.uninstallListeners();
         }
 
@@ -178,12 +180,13 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     @Override
     protected void setRendering(boolean render) {
         super.setRendering(render);
-        memoryStrategy.refresh();
+        adjusteContexts();
     }
 
     @Override
     protected void mapAreaChanged(Map2DMapAreaEvent event) {
         super.mapAreaChanged(event);
+        adjusteContexts();
     }
 
     @Override
@@ -212,10 +215,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             throw new NullPointerException();
         } else if (handler != editionHandler) {
 
-            if (editionHandler.isInstalled()) {
-                editionHandler.uninstallListeners();                
-                editionHandler.uninstall();
-            }
+            editionHandler.cancelEdition();
+            editionHandler.uninstallListeners();
+            editionHandler.uninstall();
 
             editionHandler = handler;
 
@@ -224,8 +226,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             if (actionState == ACTION_STATE.EDIT) {
                 editionHandler.installListeners(this);
             }
-
-
 
             fireHandlerChanged(editionHandler);
         }
@@ -238,6 +238,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     public void setEditedMapLayer(MapLayer layer) {
 
         if (editionLayer != layer) {
+            editionHandler.cancelEdition();
+            
             fireEditLayerChanged(editionLayer, layer);
             editionLayer = layer;
         }
@@ -247,7 +249,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     public MapLayer getEditedMapLayer() {
         return editionLayer;
     }
+    
+    public void setMemoryLayers(MapLayer[] layers) {
+        memoryMapContext.clearLayerList();
+        memoryMapContext.addLayers(layers);
+        adjusteContexts();
+    }
 
+    public void repaintMemoryDecoration() {
+        adjusteContexts();
+    }
 
     public void addEditableMap2DListener(EditableMap2DListener listener) {
         MAP2DLISTENERS.add(EditableMap2DListener.class, listener);
@@ -304,16 +315,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         }
     }
 
-    public void setMemoryLayers(MapLayer[] layers) {
-        memoryMapContext.clearLayerList();
-        memoryMapContext.addLayers(layers);        
-        adjusteContexts();
-    }
-
-    public void repaintMemoryDecoration() {
-        adjusteContexts();
-        memoryStrategy.refresh();
-    }
-
+    
 }
 

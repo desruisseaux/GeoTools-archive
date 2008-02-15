@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -82,10 +83,8 @@ abstract class AbstractEditionHandler implements EditionHandler {
     protected EditableMap2D map2D = null;
     protected boolean installed = false;
     protected Cursor CUR_EDIT;
-    
     protected MapLayer memoryLayer;
     protected MapLayer edgesLayer;
-    protected final EditListen editListen = new EditListen();
 
     public AbstractEditionHandler() {
         buildCursors();
@@ -156,21 +155,16 @@ abstract class AbstractEditionHandler implements EditionHandler {
         }
         edgesLayer = layer;
 
-        map2D.setMemoryLayers(new MapLayer[]{memoryLayer,edgesLayer});
+        map2D.setMemoryLayers(new MapLayer[]{memoryLayer, edgesLayer});
     }
 
     public void installListeners(EditableMap2D map2d) {
-        map2D.addMap2DListener(editListen);
-        map2D.getRenderingStrategy().addStrategyListener(editListen);
-        map2D.addEditableMap2DListener(editListen);
+        map2D = map2d;
         map2D.getComponent().addMouseListener(mouseInputListener);
         map2D.getComponent().addMouseMotionListener(mouseInputListener);
     }
 
     public void uninstallListeners() {
-        map2D.removeMap2DListener(editListen);
-        map2D.getRenderingStrategy().removeStrategyListener(editListen);
-        map2D.removeEditableMap2DListener(editListen);
         map2D.getComponent().removeMouseListener(mouseInputListener);
         map2D.getComponent().removeMouseMotionListener(mouseInputListener);
     }
@@ -183,6 +177,12 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
     public boolean isInstalled() {
         return installed;
+    }
+
+    public void cancelEdition() {
+        clearMemoryLayer();
+        mouseInputListener.fireStateChange();
+        map2D.repaintMemoryDecoration();
     }
 
     public String getTitle() {
@@ -341,56 +341,68 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
     }
 
-    protected synchronized void validateModifiedGeometry(Geometry geo, String ID) {
+    protected synchronized void validateModifiedGeometry(final Geometry geo, final String ID) {
 
-        MapLayer editionLayer = map2D.getEditedMapLayer();
-
-        FeatureStore store;
-        if (editionLayer.getFeatureSource() instanceof FeatureStore) {
-
-            String name = editionLayer.getFeatureSource().getSchema().getTypeName();
-            try {
-                FeatureSource source = editionLayer.getFeatureSource().getDataStore().getFeatureSource(name);
-                store = (FeatureStore) source;
-            } catch (IOException e) {
-                store = (FeatureStore) editionLayer.getFeatureSource();
-            }
-
-            DefaultTransaction transaction = new DefaultTransaction("trans_maj");
-
-            store.setTransaction(transaction);
-            FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
-            Filter filter = ff.id(Collections.singleton(ff.featureId(ID)));
-
-
-            SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
-            AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
-
-            geo = map2D.projectGeometry(geo, editionLayer);
-
-            try {
-                store.modifyFeatures(geomAttribut, geo, filter);
-                transaction.commit();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                try {
-                    transaction.rollback();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } finally {
-                transaction.close();
-            }
-
-
-
+        if(geo == null || ID == null){
+            throw new NullPointerException();
         }
+        
+        
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+
+                MapLayer editionLayer = map2D.getEditedMapLayer();
+
+                FeatureStore store;
+                if (editionLayer.getFeatureSource() instanceof FeatureStore) {
+
+                    String name = editionLayer.getFeatureSource().getSchema().getTypeName();
+                    try {
+                        FeatureSource source = editionLayer.getFeatureSource().getDataStore().getFeatureSource(name);
+                        store = (FeatureStore) source;
+                    } catch (IOException e) {
+                        store = (FeatureStore) editionLayer.getFeatureSource();
+                    }
+
+                    store.getDataStore().dispose();
+//                    store = (FeatureStore) editionLayer.getFeatureSource();
+                    
+                    DefaultTransaction transaction = new DefaultTransaction("trans_maj");
+
+                    store.setTransaction(transaction);
+                    FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+                    Filter filter = ff.id(Collections.singleton(ff.featureId(ID)));
+
+
+                    SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
+                    AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
+
+                    Geometry geom = map2D.projectGeometry(geo, editionLayer);
+                    
+                    try {
+                        store.modifyFeatures(geomAttribut, geom, filter);
+                        transaction.commit();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        try {
+                            transaction.rollback();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } finally {
+                        transaction.close();
+                    }
+
+
+
+                }
+
+            }
+        });
 
     }
 
-    protected void stopEdition() {
-        mouseInputListener.fireStateChange();
-    }
 
     //---------------------Memory Layer-----------------------------------------
     protected synchronized void setMemoryLayerGeometry(List<Geometry> geoms) {
@@ -504,44 +516,11 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
         for (Geometry geo : geoms) {
             geomsOut.add(map2D.projectGeometry(geo, map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
-            //geomsOut.add(map2D.projectGeometry(geo, memoryMapContext.getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
+        //geomsOut.add(map2D.projectGeometry(geo, memoryMapContext.getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
         }
 
         clearMemoryLayer();
         setMemoryLayerGeometry(geomsOut);
 
-    }
-
-    
-
-    //----------------Private classes-------------------------------------------
-    protected class EditListen implements EditableMap2DListener, Map2DListener, StrategyListener {
-
-        public void mapEditLayerChanged(Map2DEditLayerEvent event) {
-            mouseInputListener.fireStateChange();
-            clearMemoryLayer();
-            stopEdition();
-        }
-
-        public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
-            if (oldStrategy != null) {
-                oldStrategy.removeStrategyListener(this);
-            }
-            if (newStrategy != null) {
-                newStrategy.addStrategyListener(this);
-            }
-        }
-
-        public void setRendering(boolean rendering) {
-        }
-
-        public void mapAreaChanged(Map2DMapAreaEvent event) {
-        }
-
-        public void mapContextChanged(Map2DContextEvent event) {
-        }
-
-        public void editionHandlerChanged(EditionHandler handler) {
-        }
     }
 }

@@ -22,7 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapLayer;
 
@@ -38,13 +38,13 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem {
     /** Creates a new instance
      * @param map 
      */
-    public LayerZoomItem(Map map) {
+    public LayerZoomItem(Map2D map) {
         this.setText(BUNDLE.getString("zoom_to_layer"));
         setMap(map);
         init();
     }
 
-    public void setMap(Map map) {
+    public void setMap(Map2D map) {
         if(map instanceof NavigableMap2D){
             this.map = (NavigableMap2D) map;
         }
