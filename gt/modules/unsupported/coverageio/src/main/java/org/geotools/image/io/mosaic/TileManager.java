@@ -20,11 +20,17 @@ import java.util.*; // We use really a lot of those imports.
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform; // For javadoc
+import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.Comparators;
 
 
@@ -32,13 +38,23 @@ import org.geotools.util.Comparators;
  * A collection of {@link Tile} objects to be given to {@link MosaicImageReader}. This base
  * class does not assume that the tiles are arranged in any particular order (especially grids).
  * But subclasses can make such assumption for better performances.
+ * <p>
+ * {@code TileManager}s are {@linkplain Serializable serializable} if all their tiles have a
+ * serializable {@linkplain Tile#getInput input}. The {@link ImageReaderSpi} doesn't need to
+ * be serializable, but its class must be known to {@link javax.imageio.spi.IIORegistry} at
+ * deserialization time.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TileManager {
+public class TileManager implements Serializable {
+    /**
+     * For cross-version compatibility during serialization.
+     */
+    private static final long serialVersionUID = -6070623930537957163L;
+
     /**
      * The tiles sorted by {@linkplain Tile#getInput input}) first, then by
      * {@linkplain Tile#getImageIndex image index}. If an iteration must be
@@ -49,13 +65,17 @@ public class TileManager {
 
     /**
      * All tiles wrapped in an unmodifiable list.
+     * <p>
+     * Consider this field as final. It is not because it needs to be set by {@link #readObject}.
+     * If this field become public or protected in a future version, then we should make it final
+     * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
-    private final Collection<Tile> allTiles;
+    private transient Collection<Tile> allTiles;
 
     /**
      * The tiles in the region of interest, or {@code null} if not yet computed.
      */
-    private Collection<Tile> tilesOfInterest;
+    private transient Collection<Tile> tilesOfInterest;
 
     /**
      * The {@linkplain #tiles} in a tree for faster access.
@@ -66,22 +86,26 @@ public class TileManager {
     /**
      * The subsampling used at the time {@link #tilesOfInterest} has been computed.
      */
-    private int xSubsampling, ySubsampling;
+    private transient int xSubsampling, ySubsampling;
 
     /**
      * The region of interest.
+     * <p>
+     * Consider this field as final. It is not because it needs to be set by {@link #readObject}.
+     * If this field become public or protected in a future version, then we should make it final
+     * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
-    private final Rectangle regionOfInterest;
+    private transient Rectangle regionOfInterest;
 
     /**
      * The region enclosing all tiles. Will be computed only when first needed.
      */
-    private Rectangle region;
+    private transient Rectangle region;
 
     /**
      * The tile dimensions. Will be computed only when first needed.
      */
-    private Dimension tileSize;
+    private transient Dimension tileSize;
 
     /**
      * The grid geometry, including the "<cite>grid to real world</cite>" transform.  This is
@@ -92,8 +116,12 @@ public class TileManager {
 
     /**
      * All image providers used as an unmodifiable set.
+     * <p>
+     * Consider this field as final. It is not because it needs to be set by {@link #readObject}.
+     * If this field become public or protected in a future version, then we should make it final
+     * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
-    private final Set<ImageReaderSpi> providers;
+    private transient Set<ImageReaderSpi> providers;
 
     /**
      * Creates a manager for the given tiles. This constructor is protected for subclassing,
@@ -430,5 +458,59 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     @Override
     public String toString() {
         return Tile.toString(allTiles);
+    }
+
+    /**
+     * Checks for file existence and image size of every tiles and reports any error found.
+     *
+     * @param out Where to report errors ({@code null} for default, which is the
+     *            {@linkplain System#out standard output stream}).
+     */
+    public void printErrors(PrintWriter out) {
+        if (out == null) {
+            out = new PrintWriter(System.out, true);
+        }
+        for (final Tile tile : tiles) {
+            final int imageIndex = tile.getImageIndex();
+            ImageReader reader = null;
+            String message = null;
+            try {
+                final Rectangle region = tile.getRegion();
+                reader = tile.getImageReader(null, true, true);
+                final int width  = reader.getWidth(imageIndex);
+                final int height = reader.getWidth(imageIndex);
+                if (width != region.width || height != region.height) {
+                    message = Errors.format(ErrorKeys.UNEXPECTED_IMAGE_SIZE);
+                }
+            } catch (IOException exception) {
+                message = exception.toString();
+            } catch (RuntimeException exception) {
+                message = exception.toString();
+            }
+            if (message != null) {
+                out.println(tile);
+                out.print("    ");
+                out.println(message);
+            }
+            if (reader != null) {
+                reader.dispose();
+            }
+        }
+    }
+
+    /**
+     * Invoked on deserialization. Restores the transient fields that are usuly computed at
+     * construction time. Doing so immediately instead of relying on lazy creation allows us
+     * to avoid synchronization.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        allTiles = UnmodifiableArrayList.wrap(tiles);
+        providers = new LinkedHashSet<ImageReaderSpi>(4);
+        for (final Tile tile : tiles) {
+            providers.add(tile.getImageReaderSpi());
+        }
+        providers = Collections.unmodifiableSet(providers);
+        regionOfInterest = new Rectangle();
     }
 }

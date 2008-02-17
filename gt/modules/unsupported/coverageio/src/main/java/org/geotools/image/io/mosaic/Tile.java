@@ -26,9 +26,13 @@ import java.net.URISyntaxException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.InvalidClassException;
 import java.util.Collection;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
@@ -99,20 +103,39 @@ import org.geotools.resources.i18n.Errors;
  * of a collection of tiles and instantiate {@link TileManager} subclasses optimized for
  * the layout geometry.
  * <p>
- * {@link Tile} can be considered as immutable after construction. However some properties
+ * {@code Tile}s can be considered as immutable after construction. However some properties
  * may be available only after this tile has been given to a {@link TileManagerFactory}.
+ * <p>
+ * {@code Tile}s are {@linkplain Serializable serializable} if their {@linkplain #getInput input}
+ * given at construction time are serializable too. The {@link ImageReaderSpi} doesn't need to be
+ * serializable, but its class must be known to {@link IIORegistry} at deserialization time.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Tile implements Comparable<Tile> {
+public class Tile implements Comparable<Tile>, Serializable {
+    /**
+     * For cross-version compatibility during serialization.
+     */
+    private static final long serialVersionUID = -6435605067578674902L;
+
     /**
      * The provider to use. The same provider is typically given to every {@code Tile} objects
      * to be given to the same {@link TileManager} instance, but this is not mandatory.
+     * <p>
+     * Consider this field as final. It is not because it needs to be set by {@link #readObject}.
+     * If this field become public or protected in a future version, then we should make it final
+     * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
-    private final ImageReaderSpi provider;
+    private transient ImageReaderSpi provider;
+
+    /**
+     * The {@linkplain #provider} itself if it is serializable, or its class otherwise.
+     * Used for serialization only.
+     */
+    private final Serializable serialProvider;
 
     /**
      * The input to be given to the image reader. If the reader can not read that input
@@ -151,8 +174,8 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * The "grid to real world" transform, used by {@link RegionCalculator} in order to compute
-     * the {@linkplain #getRegion region} for this tile. This field is set to {@code null} once
-     * {@link RegionCalculator} work is in progress, and set to a new value on completion.
+     * the {@linkplain #getRegion region} for this tile. This field is set to {@code null} when
+     * {@link RegionCalculator}'s work is in progress, and set to a new value on completion.
      * <p>
      * <b>Note:</b> {@link RegionCalculator} really needs a new instance for each tile.
      * No caching allowed.
@@ -199,6 +222,7 @@ public class Tile implements Comparable<Tile> {
         } else {
             xSubsampling = ySubsampling = 1;
         }
+        serialProvider = serial(provider);
     }
 
     /**
@@ -247,6 +271,7 @@ public class Tile implements Comparable<Tile> {
         } else {
             xSubsampling = ySubsampling = 1;
         }
+        serialProvider = serial(provider);
     }
 
     /**
@@ -293,6 +318,7 @@ public class Tile implements Comparable<Tile> {
             }
         }
         this.gridToCRS  = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
+        serialProvider = serial(provider);
     }
 
     /**
@@ -314,6 +340,13 @@ public class Tile implements Comparable<Tile> {
      */
     public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex, final Rectangle region) {
         this(provider, input, imageIndex, region, (Dimension) null);
+    }
+
+    /**
+     * Returns the given object itself if it is serializable, or its class otherwise.
+     */
+    private static Serializable serial(final Object object) {
+        return (object instanceof Serializable) ? (Serializable) object : Classes.getClass(object);
     }
 
     /**
@@ -1086,5 +1119,32 @@ public class Tile implements Comparable<Tile> {
         }
         table.nextLine(TableWriter.DOUBLE_HORIZONTAL_LINE);
         return table.toString();
+    }
+
+    /**
+     * Invoked on deserialization. If the {@linkplain #provider} was serializable, then it is
+     * restituted as-is. Otherwise the provider is fetch from currently registered providers
+     * in the {@link IIORegistry}. The search is performed by classname.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (serialProvider instanceof ImageReaderSpi) {
+            provider = (ImageReaderSpi) serialProvider;
+        } else {
+            final IIORegistry registry = IIORegistry.getDefaultInstance();
+            Class<?> type = serialProvider.getClass(); // Initialized in case of failure on next line.
+            try {
+                type = (Class<?>) serialProvider;
+                provider = (ImageReaderSpi) registry.getServiceProviderByClass(type);
+            } catch (ClassCastException cause) {
+                InvalidClassException e = new InvalidClassException(type.getName(),
+                        Errors.format(ErrorKeys.ILLEGAL_CLASS_$2, type, ImageReaderSpi.class));
+                e.initCause(cause);
+                throw e;
+            }
+            if (provider == null) {
+                throw new ClassNotFoundException(type.getName());
+            }
+        }
     }
 }

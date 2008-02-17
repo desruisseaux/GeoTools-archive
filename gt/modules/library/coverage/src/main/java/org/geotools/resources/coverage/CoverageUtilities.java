@@ -486,22 +486,22 @@ public final class CoverageUtilities {
         return ViewType.SAME;
     }
 
-		/**
-		 * Checks the transformation is a pure scale/translate instance (using the 
-		 * provided tolerance factor)
-		 * 
-		 * @param transform is the {@link MathTransform} to use for performing this check.
-		 * @param EPS is the tolerance factor to use.
-		 * @return <code>true</code> if the provided transformation is a simple scale and translate,
-		 *         <code>false</code> otherwise.
-		 */
-		public static boolean isScaleTranslate(MathTransform transform, double EPS) {
-			if (!(transform instanceof AffineTransform))
-				return false;
-			
-			AffineTransform at = (AffineTransform) transform;
-			final double scale=Math.abs(XAffineTransform.getRotation(at));
-			return !Double.isNaN(scale)&&scale < EPS ;
-	//		return at.getShearX() < EPS && at.getShearY() < EPS;
-		}
+    /**
+     * Checks if the transformation is a pure scale/translate instance (using the
+     * provided tolerance factor)
+     *
+     * @param transform The {@link MathTransform} to check.
+     * @param EPS The tolerance factor.
+     * @return {@code true} if the provided transformation is a simple scale and translate,
+     *         {@code false} otherwise.
+     */
+    public static boolean isScaleTranslate(final MathTransform transform, final double EPS) {
+        if (!(transform instanceof AffineTransform)) {
+            return false;
+        }
+        final AffineTransform at = (AffineTransform) transform;
+        final double scale = Math.abs(XAffineTransform.getRotation(at));
+        return scale < EPS; // This is enough for returning 'false' if 'scale' is NaN.
+//      return Math.abs(at.getShearX()) < EPS && Math.abs(at.getShearY()) < EPS;
+    }
 }

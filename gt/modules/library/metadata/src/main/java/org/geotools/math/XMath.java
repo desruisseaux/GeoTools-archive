@@ -43,8 +43,16 @@ public final class XMath {
 
     /**
      * The sequence of prime numbers computed so far. Will be expanded as needed.
+     * We limit ourself to 16 bits numbers because they are suffisient for computing
+     * divisors of any 32 bits number.
      */
-    private static volatile short[] primes = new short[] {2, 3};
+    private static short[] primes = new short[] {2, 3};
+
+    /**
+     * Maximum length allowed for the {@link #primes} array. This is the index
+     * of the first prime number that can not be stored as 16 bits unsigned.
+     */
+    private static final int MAX_PRIMES_LENGTH = 6542;
 
     /**
      * Do not allow instantiation of this class.
@@ -285,16 +293,16 @@ public final class XMath {
      *
      * @see java.math.BigInteger#isProbablePrime
      */
-    public static int primeNumber(final int index) throws IndexOutOfBoundsException {
+    public static synchronized int primeNumber(final int index) throws IndexOutOfBoundsException {
         // 6541 is the largest index returning a 16 bits unsigned prime number.
-        if (index < 0 || index > 6541) {
+        if (index < 0 || index >= MAX_PRIMES_LENGTH) {
             throw new IndexOutOfBoundsException(String.valueOf(index));
         }
-        short[] primes = XMath.primes; // Protect from concurrent changes.
+        short[] primes = XMath.primes;
         if (index >= primes.length) {
             int i = primes.length;
             int n = primes[i - 1] & 0xFFFF;
-            primes = XArray.resize(primes, index + 1);
+            primes = XArray.resize(primes, Math.min((index | 0xF) + 1, MAX_PRIMES_LENGTH));
             do {
 next:           while (true) {
                     n += 2;
@@ -307,8 +315,8 @@ next:           while (true) {
                     primes[i] = (short) n;
                     break;
                 }
-            } while (++i <= index);
-            XMath.primes = primes; // Stores only after computation is completed.
+            } while (++i < primes.length);
+            XMath.primes = primes;
         }
         return primes[index] & 0xFFFF;
     }

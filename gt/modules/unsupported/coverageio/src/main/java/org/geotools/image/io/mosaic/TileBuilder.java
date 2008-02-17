@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
@@ -30,6 +31,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.math.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.image.ImageUtilities;
 
 
 /**
@@ -50,9 +52,15 @@ public class TileBuilder {
     private static final String DEFAULT_PREFIX = "L";
 
     /**
-     * The default tile size.
+     * The default tile size in pixels.
      */
     private static final int DEFAULT_TILE_SIZE = 1024;
+
+    /**
+     * Minimum tile size when using {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA} without
+     * explicit subsamplings provided by user.
+     */
+    private static final int MIN_TILE_SIZE = 64;
 
     /**
      * The factory to use for creating {@link TileManager} instances.
@@ -322,42 +330,74 @@ public class TileBuilder {
             if (tileSize == null) {
                 return null;
             }
-            int nx, ny;
-            switch (layout) {
-                default: // A conservative choice for unknown tile layout.
-                case CONSTANT_GEOGRAPHIC_AREA: {
-                    nx = tileSize.width;
-                    ny = tileSize.height;
-                    break;
-                }
-                case CONSTANT_TILE_SIZE: {
-                    nx = untiledBounds.width;
-                    ny = untiledBounds.height;
-                    if (nx % tileSize.width  == 0) nx /= tileSize.width;
-                    if (ny % tileSize.height == 0) ny /= tileSize.height;
-                    break;
-                }
+            /*
+             * If the tile layout is CONSTANT_GEOGRAPHIC_AREA, increasing the subsampling will have
+             * the effect of reducing the tile size by the same amount, so we are better to choose
+             * subsamplings that are divisors of the tile size.
+             *
+             * If the tile layout is CONSTANT_TILE_SIZE, increasing the subsampling will have the
+             * effect of reducing the number of tiles required for covering the whole image. So we
+             * are better to choose subsamplings that are divisors of the number of tiles. However
+             * if the number of tiles are not integers, we can't do much.
+             *
+             * In the later case (non-integer amount of tiles) and in the case where the tile layout
+             * is unknown, we don't really know what to choose. We fallback on some values that seem
+             * reasonable, but our fallback may change in future version. It doesn't hurt any code
+             * in this module - the only consequence is that tiling may be suboptimal.
+             */
+            final boolean constantArea = TileLayout.CONSTANT_GEOGRAPHIC_AREA.equals(layout);
+            int nx = tileSize.width;
+            int ny = tileSize.height;
+            if (!constantArea) {
+                if (untiledBounds.width  % nx == 0) nx = untiledBounds.width  / nx;
+                if (untiledBounds.height % ny == 0) ny = untiledBounds.height / ny;
             }
-            final int[] width  = XMath.divisors(nx);
-            final int[] height = (nx == ny) ? width : XMath.divisors(ny);
-            int length = Math.min(width.length, height.length);
-            // Trims subsamplings which would produce tiles bigger than the image.
-            do {
-                if (length == 0) {
-                    return null;
+            int[] xSubsamplings = XMath.divisors(nx);
+            int[] ySubsamplings;
+            if (nx == ny) {
+                ySubsamplings = xSubsamplings;
+            } else {
+                ySubsamplings = XMath.divisors(ny);
+                /*
+                 * Subsamplings are different along x and y axis. We need at least arrays of the
+                 * same length.
+                 */
+                final int[] newX = new int[xSubsamplings.length + ySubsamplings.length];
+                final int[] newY = new int[xSubsamplings.length + ySubsamplings.length];
+                int ix=0, iy=0; nx=0; ny=0;
+                while (ix < xSubsamplings.length && iy < ySubsamplings.length) {
+                    final int sx = newX[nx++] = xSubsamplings[ix];
+                    final int sy = newY[ny++] = ySubsamplings[iy];
+                    if (sx <= sy) ix++;
+                    if (sy <= sx) iy++;
                 }
-                --length;
-            } while (width [length] * tileSize.width  > untiledBounds.width &&
-                     height[length] * tileSize.height > untiledBounds.height);
-            length++;
+                // TODO: we have reach this point for tonigh...
+            }
+            /*
+             * Trims the subsamplings which would produce tiles smaller than the minimum size
+             * (for CONSTANT_GEOGRAPHIC_AREA layoy) or which would produce more than one tile
+             * enclosing the whole image (for CONSTANT_TILE_SIZE layout). First, we calculate
+             * as (nx,ny) the maximum subsamplings expected (inclusive). Then we search those
+             * maximum in the actual subsampling and assign to (nx,ny) the new array length.
+             */
+            if (constantArea) {
+                nx = tileSize.width  / MIN_TILE_SIZE;
+                ny = tileSize.height / MIN_TILE_SIZE;
+            } else {
+                nx = (untiledBounds.width  - 1) / tileSize.width  + 1;
+                ny = (untiledBounds.height - 1) / tileSize.height + 1;
+            }
+            nx = Arrays.binarySearch(xSubsamplings, nx); if (nx < 0) nx = ~nx; else nx++;
+            ny = Arrays.binarySearch(ySubsamplings, ny); if (ny < 0) ny = ~ny; else ny++;
+            final int length = Math.min(nx, ny);
             subsamplings = new int[length * 2];
             int source = 0;
             for (int i=0; i<length; i++) {
-                subsamplings[source++] = width [i];
-                subsamplings[source++] = height[i];
+                subsamplings[source++] = xSubsamplings[i];
+                subsamplings[source++] = ySubsamplings[i];
             }
         }
-        final Dimension[] dimensions = new Dimension[subsamplings.length];
+        final Dimension[] dimensions = new Dimension[subsamplings.length / 2];
         int source = 0;
         for (int i=0; i<dimensions.length; i++) {
             dimensions[i] = new Dimension(subsamplings[source++], subsamplings[source++]);
@@ -434,11 +474,14 @@ public class TileBuilder {
             // TODO: We may try to detect automatically the Spi in a future version.
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_READER));
         }
-        untiledBounds = getUntiledImageBounds(); // Force computation, if any.
+        untiledBounds = getUntiledImageBounds(); // Forces computation, if any.
         if (untiledBounds == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
         }
-        tileSize = getTileSize(); // Force computation
+        tileSize = getTileSize(); // Forces computation
+        if (tileSize == null) {
+            tileSize = ImageUtilities.toTileSize(untiledBounds.getSize());
+        }
         /*
          * Selects an arbitrary prefix if none was explicitly defined. Then
          * selects the longuest file extension (e.g. "tiff" instead of "tif").
@@ -480,36 +523,29 @@ public class TileBuilder {
         final List<Tile> tiles       = new ArrayList<Tile>();
         final Rectangle  tileBounds  = new Rectangle(tileSize);
         final Rectangle  imageBounds = new Rectangle(untiledBounds);
-        final Dimension  subsampling = new Dimension(1,1);
-        /*
-         * Computes the number of overviews that we may expect. This loop is identical to the
-         * loop after minus the code related to Tile objects creation. More specifically, its
-         * stop condition must be identical.
-         */
-        int overview = 0;
-        do {
-            overview++;
-            tileBounds.setLocation(imageBounds.x, imageBounds.y);
-            if (tileBounds.contains(imageBounds)) {
-                break;
+        Dimension[] subsamplings = getSubsamplings();
+        if (subsamplings == null) {
+            final int n;
+            if (constantArea) {
+                n = Math.max(tileBounds.width, tileBounds.height) / MIN_TILE_SIZE;
+            } else {
+                n = Math.max(imageBounds.width  / tileBounds.width,
+                             imageBounds.height / tileBounds.height);
             }
-            nextSubsampling(subsampling);
+            subsamplings = new Dimension[n];
+            for (int i=1; i<=n; i++) {
+                subsamplings[i-1] = new Dimension(i,i);
+            }
+        }
+        overviewFieldSize = ((int) Math.log10(subsamplings.length)) + 1;
+        for (int overview=0; overview<subsamplings.length; overview++) {
+            final Dimension subsampling = subsamplings[overview];
             imageBounds.setRect(untiledBounds);
             divide(imageBounds, subsampling);
             if (constantArea) {
                 tileBounds.setSize(tileSize);
                 divide(tileBounds, subsampling);
             }
-        } while (isValidSize(tileBounds));
-        overviewFieldSize = ((int) Math.log10(overview)) + 1; // Really want rounding toward 0.
-        /*
-         * Now process to Tile objects creation.
-         */
-        tileBounds .setSize(tileSize);
-        imageBounds.setRect(untiledBounds);
-        subsampling.setSize(1,1);
-        overview = 0;
-        do {
             final int xmin = imageBounds.x;
             final int ymin = imageBounds.y;
             final int xmax = imageBounds.x + imageBounds.width;
@@ -527,30 +563,9 @@ public class TileBuilder {
                 }
                 y++;
             }
-            overview++;
-            tileBounds.setLocation(xmin, ymin);
-            if (tileBounds.contains(imageBounds)) {
-                break;
-            }
-            nextSubsampling(subsampling);
-            imageBounds.setRect(untiledBounds);
-            divide(imageBounds, subsampling);
-            if (constantArea) {
-                tileBounds.setSize(tileSize);
-                divide(tileBounds, subsampling);
-            }
-        } while (isValidSize(tileBounds));
+        }
         final TileManager[] managers = factory.create(tiles);
         return managers[0];
-    }
-
-    /**
-     * Returns {@code true} if the specified rectangle has a size equals or greater than the
-     * minimum tile size.
-     */
-    private boolean isValidSize(final Rectangle bounds) {
-        throw new UnsupportedOperationException("Unfinished work"); // TODO
-//        return bounds.width >= minimumTileSize.width || bounds.height >= minimumTileSize.height;
     }
 
     /**
@@ -564,45 +579,6 @@ public class TileBuilder {
     }
 
     /**
-     * Searchs for a subsampling which is close to a multiple of
-     * {@linkplain #getPreferredSubsampling preferred subsampling}.
-     * The subsampling dimension is updated in-place.
-     */
-    private void nextSubsampling(final Dimension subsampling) {
-        throw new UnsupportedOperationException("Unfinished work"); // TODO
-    }
-
-    /**
-     * Returns a divisor for the specified size which is close to the specified subsampling.
-     * This method verifies that the given size is divisible by the given subsampling. If not,
-     * it tries to add or substract 1 to the subsampling, in order to search an appropriate
-     * divisor. This method is applied on the width and the height.
-     *
-     * @param  size A size for the raster. It could be the width or height value.
-     * @param  subsampling The preferred subsampling for divising the size.
-     * @param  lower The minimal subsampling, exclusive.
-     * @return The proposed subsampling value.
-     */
-    private static int nextSubsampling(final int size, int subsampling, final int lower) {
-        if (subsampling <= lower) {
-            subsampling = lower + 1;
-        }
-        if (size % subsampling != 0) {
-            for (int i=1; i<=5; i++) {
-                int candidate = subsampling - i;
-                if (candidate > lower && size % candidate == 0) {
-                    return candidate;
-                }
-                candidate = subsampling + i;
-                if (size % candidate == 0) {
-                    return candidate;
-                }
-            }
-        }
-        return subsampling;
-    }
-
-    /**
      * Computes the values for {@link #columnFieldSize} and {@link #rowFieldSize}.
      * They will be used by {@link #generateFilename}.
      */
@@ -613,24 +589,6 @@ public class TileBuilder {
         buffer.setLength(0);
         format10(buffer, imageBounds.height / tileBounds.height, 0);
         rowFieldSize = buffer.length();
-    }
-
-    /**
-     * Generates a name, for the current tile, based on the position of this tile in the raster.
-     * For example, a tile at the first level of overview, which is localized on the 5th column
-     * and 2nd row will have the name "L1_E2".
-     *
-     * @param  overview  The level of overview. First overview is 0.
-     * @param  column    The index of columns. First column is 0.
-     * @param  row       The index of rows. First row is 0.
-     * @return A name based on the position of the tile in the whole raster.
-     */
-    private String generateFilename(final int overview, final int column, final int row) {
-        final StringBuilder buffer = new StringBuilder(prefix);
-        format10(buffer, overview, overviewFieldSize); buffer.append('_');
-        format26(buffer, column,   columnFieldSize);
-        format10(buffer, row,      rowFieldSize);
-        return buffer.append('.').append(extension).toString();
     }
 
     /**
@@ -668,15 +626,36 @@ public class TileBuilder {
      * The mosaic image writer to be used by {@link TileBuilder#writeFromUntiledImage}.
      */
     private final class Writer extends MosaicImageWriter {
-        /** Index of the untiled image to read. */
+        /**
+         * Index of the untiled image to read.
+         */
         private final int inputIndex;
 
-        /** The tiles created by {@link TileBuilder#createTileManager}. Will be set by {@link #filter}. */
+        /**
+         * {@code true} if tiles should be written.
+         */
+        private final boolean writeTiles;
+
+        /**
+         * The tiles created by {@link TileBuilder#createTileManager}.
+         * Will be set by {@link #filter} and read by {@link TileBuilder}.
+         */
         TileManager tiles;
 
-        /** Creates a writer for an untiled image to be read at the given index. */
-        Writer(final int inputIndex) {
+        /**
+         * Creates a writer for an untiled image to be read at the given index.
+         */
+        Writer(final int inputIndex, final boolean writeTiles) {
             this.inputIndex = inputIndex;
+            this.writeTiles = writeTiles;
+        }
+
+        /**
+         * Returns {@code true} if tiles should be written.
+         */
+        @Override
+        boolean isWriteEnabled() {
+            return writeTiles;
         }
 
         /**
@@ -705,14 +684,22 @@ public class TileBuilder {
     }
 
     /**
-     * Creates a tile manager from an untiled image and write the tiles. The image bounds and
-     * reader SPI are inferred from the input, unless they were explicitly specified.
+     * Creates a tile manager from an untiled image. The {@linkplain #getUntiledImageBounds
+     * untiled image bounds} and {@linkplain #getTileReaderSpi tile reader SPI} are inferred
+     * from the input, unless they were explicitly specified.
+     * <p>
+     * Optionnaly if {@code writeTiles} is {@code true}, then pixel values are read from the
+     * untiled images, organized in tiles as specified by the {@link TileManager} to be returned
+     * and saved to disk. This work is done using a default {@link MosaicImageWriter}.
      *
-     * @param input The untiled image input, typically as a {@link File}.
+     * @param input      The untiled image input, typically as a {@link File}.
      * @param inputIndex Index of image to read, typically 0.
+     * @param writeTiles If {@code true}, tiles are created and saved to disk.
+     * @throws IOException if an error occured while reading the untiled image or (only if
+     *         {@code writeTiles} is {@code true}) while writting the tiles to disk.
      */
-    public TileManager writeFromUntiledImage(final Object input, final int inputIndex)
-            throws IOException
+    public TileManager createTileManager(final Object input, final int inputIndex,
+                                         final boolean writeTiles) throws IOException
     {
         if (prefix == null) {
             String filename;
@@ -736,8 +723,28 @@ public class TileBuilder {
             }
             prefix = filename.substring(0, i);
         }
-        final Writer writer = new Writer(inputIndex);
+        final Writer writer = new Writer(inputIndex, writeTiles);
         writer.writeFromInput(input, inputIndex, 0);
         return writer.tiles;
+    }
+
+    /**
+     * Generates a filename for the current tile based on the position of this tile in the raster.
+     * For example, a tile in the first overview level, which is localized on the 5th column and
+     * 2nd row may have a name like "{@code L1_E2.png}".
+     * <p>
+     * Subclasses may override this method if they want more control on generated tile filenames.
+     *
+     * @param  overview  The level of overview. First overview is 0.
+     * @param  column    The index of columns. First column is 0.
+     * @param  row       The index of rows. First row is 0.
+     * @return A filename based on the position of the tile in the whole raster.
+     */
+    protected String generateFilename(final int overview, final int column, final int row) {
+        final StringBuilder buffer = new StringBuilder(prefix);
+        format10(buffer, overview, overviewFieldSize); buffer.append('_');
+        format26(buffer, column,   columnFieldSize);
+        format10(buffer, row,      rowFieldSize);
+        return buffer.append('.').append(extension).toString();
     }
 }

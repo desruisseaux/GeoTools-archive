@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -176,7 +177,12 @@ public class MosaicImageWriter extends ImageWriter {
         if (managers == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
         }
-        final Collection<Tile> tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
+        final Collection<Tile> tiles;
+        if (isWriteEnabled()) {
+            tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
+        } else {
+            tiles = Collections.emptyList();
+        }
         while (!tiles.isEmpty()) {
             /*
              * Loads the image for some initial tile from the list. We will write as many tiles as
@@ -382,6 +388,14 @@ public class MosaicImageWriter extends ImageWriter {
     private static boolean isDivisor(final Dimension numerator, final Dimension denominator) {
         return (numerator.width  % denominator.width ) == 0 &&
                (numerator.height % denominator.height) == 0;
+    }
+
+    /**
+     * Returns {@code true} if writting is enabled. It should always be {@code true} except
+     * in some cases for {@link TileBuilder} convenience only, which override this method.
+     */
+    boolean isWriteEnabled() {
+        return true;
     }
 
     /**
