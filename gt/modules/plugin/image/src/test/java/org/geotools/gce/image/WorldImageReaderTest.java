@@ -255,7 +255,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
         // PARAMETER
         //
         ///////////////////////////////////////////////////////////////////////
-        //parameter ovverrides hints
+        //parameter overrides hints
         hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
         wiReader = new WorldImageReader(file, hints);
 		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
