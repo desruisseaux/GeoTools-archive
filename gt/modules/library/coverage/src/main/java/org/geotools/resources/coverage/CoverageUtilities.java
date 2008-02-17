@@ -17,6 +17,7 @@
 package org.geotools.resources.coverage;
 
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
@@ -33,6 +34,7 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -47,6 +49,7 @@ import org.geotools.coverage.grid.ViewType;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -482,4 +485,23 @@ public final class CoverageUtilities {
         }
         return ViewType.SAME;
     }
+
+		/**
+		 * Checks the transformation is a pure scale/translate instance (using the 
+		 * provided tolerance factor)
+		 * 
+		 * @param transform is the {@link MathTransform} to use for performing this check.
+		 * @param EPS is the tolerance factor to use.
+		 * @return <code>true</code> if the provided transformation is a simple scale and translate,
+		 *         <code>false</code> otherwise.
+		 */
+		public static boolean isScaleTranslate(MathTransform transform, double EPS) {
+			if (!(transform instanceof AffineTransform))
+				return false;
+			
+			AffineTransform at = (AffineTransform) transform;
+			final double scale=Math.abs(XAffineTransform.getRotation(at));
+			return !Double.isNaN(scale)&&scale < EPS ;
+	//		return at.getShearX() < EPS && at.getShearY() < EPS;
+		}
 }

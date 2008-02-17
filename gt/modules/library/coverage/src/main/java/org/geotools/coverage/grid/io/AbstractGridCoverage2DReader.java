@@ -24,7 +24,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DefaultResourceInfo;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
@@ -54,9 +52,9 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.GridCoverage;
@@ -92,7 +90,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	private final static Logger LOGGER = Logging
 			.getLogger("org.geotools.data.coverage.grid");
 
-	protected static final double EPS = 1E-6;
+	public static final double EPS = 1E-6;
 
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
@@ -161,6 +159,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	 */
 	protected GridCoverageFactory coverageFactory;
 
+	private ArrayList<Resolution> resolutionsLevels;
+
 	// -------------------------------------------------------------------------
 	//
 	// old support methods
@@ -211,7 +211,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// we are able to handle overviews properly only if the transformation
 		// is  an affine transform with pure scale and translation, no rotational
 		// components
-		if (raster2Model != null && !isScaleTranslate(raster2Model))
+		if (raster2Model != null && !CoverageUtilities.isScaleTranslate(raster2Model,AbstractGridCoverage2DReader.EPS))
 			return imageChoice;
 		
 		// //
@@ -357,12 +357,22 @@ public abstract class AbstractGridCoverage2DReader implements
         
         // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
         // keeping a reference to the original image choice
-        final List<Resolution> resolutions = new ArrayList<Resolution>();
-        resolutions.add(new Resolution(highestRes[0], highestRes[1], 0));
-        for (int i = 0; i < overViewResolutions.length; i++) {
-            resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i+1));
-        }
-        Collections.sort(resolutions);
+        synchronized (this) {
+        	if(resolutionsLevels==null){
+        	 resolutionsLevels = new ArrayList<Resolution>();
+        	 //note that we assume what follows:
+        	 // -highest resolution image is at level 0.
+        	 // -all the overviews share the same envelope
+        	 // -the aspect ratio for the overviews is constant
+        	 // -the provided resolutions are takne directly from the grid
+        	 resolutionsLevels.add(new Resolution(1,highestRes[0],highestRes[1], 0));
+             for (int i = 0; i < overViewResolutions.length; i++) {
+            	 resolutionsLevels.add(new Resolution(overViewResolutions[i][0]/highestRes[0],overViewResolutions[i][0],overViewResolutions[i][1] , i+1));
+             }
+             Collections.sort(resolutionsLevels);
+        	}
+		}
+       
 
         // Now search for the best matching resolution. 
         // Check also for the "perfect match"... unlikely in practice unless someone
@@ -372,25 +382,33 @@ public abstract class AbstractGridCoverage2DReader implements
         // the requested resolutions
         final double reqx = requestedRes[0];
         final double reqy = requestedRes[1];
+               
+        // requested scale factor for least reduced axis
+        final Resolution max = (Resolution) resolutionsLevels.get(0);
+		final double requestedScaleFactorX = reqx / max.resolutionX;
+		final double requestedScaleFactorY = reqy / max.resolutionY;
+		final int leastReduceAxis = requestedScaleFactorX <= requestedScaleFactorY ? 0
+				: 1;
+		final double requestedScaleFactor = leastReduceAxis == 0 ? requestedScaleFactorX
+				: requestedScaleFactorY;
         
-        // are we looking for a resolution even higher than the native one?
-        Resolution max = (Resolution) resolutions.get(0);
-        if(reqx < max.x && reqy < max.y ||
-               (Math.abs(reqx - max.x) < EPS && Math.abs(reqy - max.y) < EPS))
+        
+		// are we looking for a resolution even higher than the native one?
+        if(requestedScaleFactor<=1)
             return max.imageChoice;
         // are we looking for a resolution even lower than the smallest overview?
-        Resolution min = (Resolution) resolutions.get(resolutions.size() - 1);
-        if(reqx > min.x && reqy > min.y ||
-                (Math.abs(reqx - min.x) < EPS && Math.abs(reqy - min.y) < EPS))
+        final Resolution min = (Resolution) resolutionsLevels.get(resolutionsLevels.size() - 1);
+        if(requestedScaleFactor>=min.scaleFactor)
             return min.imageChoice;
         // Ok, so we know the overview is between min and max, skip the first
         // and search for an overview with a resolution lower than the one requested,
         // that one and the one from the previous step will bound the searched resolution
         Resolution prev = max;
-        for (int i = 1; i < resolutions.size(); i++) {
-            Resolution curr = (Resolution) resolutions.get(i);
+        final int size=resolutionsLevels.size();
+        for (int i = 1; i <size; i++) {
+            final Resolution curr = resolutionsLevels.get(i);
             // perfect match check
-            if((Math.abs(reqx - curr.x) < EPS && Math.abs(reqy - curr.y) < EPS)) {
+            if(curr.scaleFactor==requestedScaleFactor) {
                 return curr.imageChoice;
             }
             
@@ -399,51 +417,57 @@ public abstract class AbstractGridCoverage2DReader implements
             // the y by the one before the lowest (so the aspect ratio of the request is 
             // different than the one of the overviews), and we would end up going out of the loop
             // since not even the lowest can "top" the request for one axis 
-            if(curr.x > reqx && curr.y > reqy || i == resolutions.size() - 1) {
+            if(curr.scaleFactor>requestedScaleFactor|| i == size - 1) {
                 if(policy == Hints.VALUE_OVERVIEW_POLICY_QUALITY)
                     return prev.imageChoice;
                 else if(policy == Hints.VALUE_OVERVIEW_POLICY_SPEED)
                     return curr.imageChoice;
-                else if(reqx - prev.x < curr.x - reqx)
+                else if(requestedScaleFactor - prev.scaleFactor < curr.scaleFactor - requestedScaleFactor)
                     return prev.imageChoice;
                 else
                     return curr.imageChoice;
             }
             prev = curr;
         }
-        throw new RuntimeException("There is an error in the resolution lookup code");
+        //fallback
+        return max.imageChoice;
     }
 	
 	/**
 	 * Simple support class for sorting overview resolutions
 	 * @author Andrea Aime
+	 * @author Simone Giannecchini, GeoSolutions.
 	 * @since 2.5
 	 */
 	private static class Resolution implements Comparable<Resolution> {
-	    double x;
-	    double y;
+	    double scaleFactor;
+
+	    double  resolutionX;
+	    double resolutionY;
 	    int imageChoice;
 	    
-        public Resolution(double x, double y, int imageChoice) {
-            super();
-            this.x = x;
-            this.y = y;
+        public Resolution(
+        		final double scaleFactor,
+        		final double resolutionX,
+        		final double resolutionY,
+        		int imageChoice) {
+            this.scaleFactor = scaleFactor;
+            this.resolutionX=resolutionX;
+            this.resolutionY=resolutionY;
             this.imageChoice = imageChoice;
         }
 	    
 	    public int compareTo(Resolution other) {
-	        if(x > other.x)
+	        if(scaleFactor > other.scaleFactor)
 	            return 1;
-	        else if(x < other.x)
+	        else if(scaleFactor < other.scaleFactor)
 	            return -1;
-	        else if(y > other.y)
-                return 1;
-            else
-                return -1;
+	        else 
+	        	return 0;
 	    }
 	    
 	    public String toString() {
-	        return "Resolution[Choice=" + imageChoice + ",x=" + x + ",y=" + y + "]";
+	        return "Resolution[Choice=" + imageChoice + ",scaleFactor=" + scaleFactor + "]";
 	    }
 	}
 	
@@ -814,23 +838,6 @@ public abstract class AbstractGridCoverage2DReader implements
 	
 
 	/**
-	 * Checks the transformation is a pure scale/translate instance (using a
-	 * tolerance)
-	 * 
-	 * @param transform
-	 * @return
-	 */
-	protected final static boolean isScaleTranslate(MathTransform transform) {
-		if (!(transform instanceof AffineTransform))
-			return false;
-		
-		AffineTransform at = (AffineTransform) transform;
-		final double scale=Math.abs(XAffineTransform.getRotation(at));
-		return !Double.isNaN(scale)&&scale < EPS ;
-//		return at.getShearX() < EPS && at.getShearY() < EPS;
-	}
-
-   /**
     * Information about this source.
     * <p>
     * Subclasses should provide additional format specific information.
@@ -859,18 +866,18 @@ public abstract class AbstractGridCoverage2DReader implements
        return info;
    }
    
-   /**
-    * Information about the named gridcoveage.
-    * 
-    * @param subname Name indicing grid coverage to describe
-    * @return ResourceInfo describing grid coverage indicated
-    */
-   public ResourceInfo getInfo( String subname ){
-       DefaultResourceInfo info = new DefaultResourceInfo();
-       info.setName( subname );
-       info.setBounds( new ReferencedEnvelope( this.getOriginalEnvelope()));
-       info.setCRS( this.getCrs() );
-       info.setTitle( subname );
-       return info;
-   }
+//   /**
+//    * Information about the named gridcoveage.
+//    * 
+//    * @param subname Name indicing grid coverage to describe
+//    * @return ResourceInfo describing grid coverage indicated
+//    */
+//   public ResourceInfo getInfo( String subname ){
+//       DefaultResourceInfo info = new DefaultResourceInfo();
+//       info.setName( subname );
+//       info.setBounds( new ReferencedEnvelope( this.getOriginalEnvelope()));
+//       info.setCRS( this.getCrs() );
+//       info.setTitle( subname );
+//       return info;
+//   }
 }
