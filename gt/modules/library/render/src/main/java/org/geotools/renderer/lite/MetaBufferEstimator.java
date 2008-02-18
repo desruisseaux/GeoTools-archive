@@ -132,10 +132,14 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
             if (stroke.getWidth() != null) {
                 if (stroke.getWidth() instanceof Literal) {
                     Literal lw = (Literal) stroke.getWidth();
-                    int iw = (int) Math.ceil(((Number) lw.evaluate(null, Double.class))
-                            .doubleValue());
-                    if (iw > buffer)
-                        buffer = iw;
+                    final Number val = (Number) lw.evaluate(null, Double.class);
+                    if(val != null) {
+                        int iw = (int) Math.ceil(val.doubleValue());
+                        if (iw > buffer)
+                            buffer = iw;
+                    } else {
+                        estimateAccurate = false;
+                    }
                 } else {
                     estimateAccurate = false;
                 }
@@ -231,15 +235,18 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
      */
     public void visit(Graphic gr) {
         try {
-            if (gr.getSize() != null) {
-                if (gr.getSize() instanceof Literal) {
-                    Literal lw = (Literal) gr.getSize();
-                    int iw = (int) Math.ceil(((Number) lw.evaluate(null, Double.class)).doubleValue());
+            if (gr.getSize() instanceof Literal) {
+                Literal lw = (Literal) gr.getSize();
+                final Number val = (Number) lw.evaluate(null, Double.class);
+                if(val != null) {
+                    int iw = (int) Math.ceil((val).doubleValue());
                     if (iw > buffer)
                         buffer = iw;
                 } else {
                     estimateAccurate = false;
                 }
+            } else {
+                estimateAccurate = false;
             }
         } catch (ClassCastException e) {
             estimateAccurate = false;

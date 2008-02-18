@@ -43,6 +43,18 @@ public class RenderingBufferExtractorTest extends TestCase {
         assertEquals(15, rbe.getBuffer());
         assertTrue(rbe.isEstimateAccurate());
     }
+    
+    public void testNpePreventionGraphic() {
+        PointSymbolizer ps = sb.createPointSymbolizer(sb.createGraphic(null, sb
+                .createMark(sb.MARK_CIRCLE), null));
+        ps.getGraphic().setSize(sb.literalExpression(null));
+        Style style = sb.createStyle(ps);
+
+        MetaBufferEstimator rbe = new MetaBufferEstimator();
+        rbe.visit(style);
+        assertEquals(0, rbe.getBuffer());
+        assertFalse(rbe.isEstimateAccurate());
+    }
 
     public void testNonIntegerStroke() {
         Style style = sb.createStyle(sb.createLineSymbolizer(sb.createStroke(10.8)));
@@ -80,6 +92,15 @@ public class RenderingBufferExtractorTest extends TestCase {
         rbe.visit(style);
         assertEquals(10, rbe.getBuffer());
         assertTrue(rbe.isEstimateAccurate());
+    }
+    
+    public void testNpePreventionStroke() {
+        Style style = sb.createStyle(sb.createLineSymbolizer(sb.createStroke(sb
+                .colorExpression(Color.BLACK), sb.literalExpression(null))));
+        MetaBufferEstimator rbe = new MetaBufferEstimator();
+        rbe.visit(style);
+        assertEquals(0, rbe.getBuffer());
+        assertFalse(rbe.isEstimateAccurate());
     }
     
     public void testLiteralParseGraphics() {
