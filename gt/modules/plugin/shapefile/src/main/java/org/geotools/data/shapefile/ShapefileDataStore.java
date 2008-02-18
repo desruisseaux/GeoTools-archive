@@ -99,6 +99,8 @@ import com.vividsolutions.jts.geom.Polygon;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/src/main/java/org/geotools/data/shapefile/ShapefileDataStore.java $
  */
 public class ShapefileDataStore extends AbstractFileDataStore {
+    
+    // This is the default character as specified by the DBF specification
     public static final Charset DEFAULT_STRING_CHARSET = Charset
             .forName("ISO-8859-1");
 
@@ -366,7 +368,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         return super.getFeatureReader(typeName, query);
     }
 
-    protected FeatureReader createFeatureReader(String typeName,
+    protected org.geotools.data.FIDFeatureReader createFeatureReader(String typeName,
             ShapefileAttributeReader reader, SimpleFeatureType readerSchema)
             throws SchemaException {
 

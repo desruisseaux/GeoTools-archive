@@ -110,7 +110,7 @@ public class DbaseFileReader implements FileReader {
 
     protected boolean useMemoryMappedBuffer;
 
-    protected final boolean randomAccessEnabled;
+    protected boolean randomAccessEnabled;
 
     protected int currentOffset = 0;
     private StreamLogging streamLogger = new StreamLogging("Dbase File Reader");
@@ -127,7 +127,17 @@ public class DbaseFileReader implements FileReader {
      */
     public DbaseFileReader(ShpFiles shapefileFiles,
             boolean useMemoryMappedBuffer, Charset charset) throws IOException {
-        this.channel = shapefileFiles.getReadChannel(ShpFileType.DBF, this);
+        ReadableByteChannel dbfChannel = shapefileFiles.getReadChannel(ShpFileType.DBF, this);
+        init(dbfChannel, useMemoryMappedBuffer, charset);
+    }
+
+    public DbaseFileReader(ReadableByteChannel readChannel, boolean useMemoryMappedBuffer, Charset charset) throws IOException {
+        init(readChannel, useMemoryMappedBuffer, charset);
+    }
+
+    private void init(ReadableByteChannel dbfChannel, boolean useMemoryMappedBuffer,
+            Charset charset) throws IOException {
+        this.channel = dbfChannel;
         this.stringCharset = charset;
         this.charset = Charset.forName("ISO-8859-1"); // charset;
 
@@ -137,7 +147,44 @@ public class DbaseFileReader implements FileReader {
         header = new DbaseFileHeader();
         header.readHeader(channel);
 
-        init();
+        // create the ByteBuffer
+        // if we have a FileChannel, lets map it
+        if (channel instanceof FileChannel && this.useMemoryMappedBuffer) {
+            FileChannel fc = (FileChannel) channel;
+            buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            buffer.position((int) fc.position());
+            this.currentOffset = 0;
+        } else {
+            // Force useMemoryMappedBuffer to false
+            this.useMemoryMappedBuffer = false;
+            // Some other type of channel
+            // start with a 8K buffer, should be more than adequate
+            int size = 8 * 1024;
+            // if for some reason its not, resize it
+            size = header.getRecordLength() > size ? header.getRecordLength()
+                    : size;
+            buffer = ByteBuffer.allocateDirect(size);
+            // fill it and reset
+            fill(buffer, channel);
+            buffer.flip();
+            this.currentOffset = header.getHeaderLength();
+        }
+        
+        // The entire file is in little endian
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        
+        // Set up some buffers and lookups for efficiency
+        fieldTypes = new char[header.getNumFields()];
+        fieldLengths = new int[header.getNumFields()];
+        for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
+            fieldTypes[i] = header.getFieldType(i);
+            fieldLengths[i] = header.getFieldLength(i);
+        }
+        
+        charBuffer = CharBuffer.allocate(header.getRecordLength() - 1);
+        decoder = charset.newDecoder();
+        
+        row = new Row();
     }
 
     protected int fill(ByteBuffer buffer, ReadableByteChannel channel)
@@ -174,47 +221,6 @@ public class DbaseFileReader implements FileReader {
             offset += fieldLengths[i];
         }
         return offset;
-    }
-
-    private void init() throws IOException {
-        // create the ByteBuffer
-        // if we have a FileChannel, lets map it
-        if (channel instanceof FileChannel && this.useMemoryMappedBuffer) {
-            FileChannel fc = (FileChannel) channel;
-            buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            buffer.position((int) fc.position());
-            this.currentOffset = 0;
-        } else {
-            // Force useMemoryMappedBuffer to false
-            this.useMemoryMappedBuffer = false;
-            // Some other type of channel
-            // start with a 8K buffer, should be more than adequate
-            int size = 8 * 1024;
-            // if for some reason its not, resize it
-            size = header.getRecordLength() > size ? header.getRecordLength()
-                    : size;
-            buffer = ByteBuffer.allocateDirect(size);
-            // fill it and reset
-            fill(buffer, channel);
-            buffer.flip();
-            this.currentOffset = header.getHeaderLength();
-        }
-
-        // The entire file is in little endian
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        // Set up some buffers and lookups for efficiency
-        fieldTypes = new char[header.getNumFields()];
-        fieldLengths = new int[header.getNumFields()];
-        for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
-            fieldTypes[i] = header.getFieldType(i);
-            fieldLengths[i] = header.getFieldLength(i);
-        }
-
-        charBuffer = CharBuffer.allocate(header.getRecordLength() - 1);
-        decoder = charset.newDecoder();
-
-        row = new Row();
     }
 
     /**

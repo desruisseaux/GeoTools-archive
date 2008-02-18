@@ -33,17 +33,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.geotools.data.AbstractFeatureLocking;
-import org.geotools.data.AbstractFeatureSource;
-import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FIDReader;
-import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
@@ -85,9 +79,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Ian Schneider
  * @author Tommaso Nolli
- * @author jesse
+ * @author jesse eichar
  * 
- * @todo fix file creation bug
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/constantTimeFid/src/org/geotools/data/shapefile/indexed/IndexedShapefileDataStore.java $
  */
