@@ -36,7 +36,7 @@ import org.geotools.test.TestData;
  * 
  * @author Simone Giannecchini
  */
-public class RendererBaseTest {
+public abstract class RendererBaseTest {
 
 	public RendererBaseTest() {
 

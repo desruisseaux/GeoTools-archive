@@ -29,6 +29,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.geotools.filter.function.math.FilterFunction_abs;
 import org.geotools.test.TestData;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -36,6 +37,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.Not;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -412,4 +414,33 @@ public class SLDStyleTest extends TestCase {
         assertEquals("fid.4", fids[4]);
     }
     
+    public void testParseKmlExtensions() throws IOException {
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+        java.net.URL surl = TestData.getResource(this, "kmlSymbolizer.sld");
+        SLDParser stylereader = new SLDParser(factory, surl);
+
+        // basic checks
+        Style[] styles = stylereader.readXML();
+        assertEquals(1, styles.length);
+        assertEquals(1, styles[0].getFeatureTypeStyles().length);
+        assertEquals(1, styles[0].getFeatureTypeStyles()[0].getRules().length);
+        final Rule rule = styles[0].getFeatureTypeStyles()[0].getRules()[0];
+        assertEquals(1, rule.getSymbolizers().length);
+        TextSymbolizer2 ts = (TextSymbolizer2) rule.getSymbolizers()[0];
+        
+        // abstract == property name
+        assertEquals("propertyOne", ((PropertyName) ts.getAbstract()).getPropertyName());
+        
+        // abstract == mixed literal + propertyName
+        Expression desc = ts.getDescription();
+        assertTrue(desc instanceof Function);
+        assertEquals("strConcat", ((Function) desc).getName());
+        assertEquals(2, ((Function) desc).getParameters().size());
+        assertTrue(((Function) desc).getParameters().get(0) instanceof Literal);
+        assertTrue(((Function) desc).getParameters().get(1) instanceof PropertyName);
+        
+        // other text -> target & literal
+        assertEquals("extrude", ts.getOtherText().getTarget());
+        assertTrue(ts.getOtherText().getText() instanceof Literal);
+    }
 }

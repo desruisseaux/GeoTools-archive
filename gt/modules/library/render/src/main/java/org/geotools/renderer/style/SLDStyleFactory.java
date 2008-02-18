@@ -572,9 +572,13 @@ public class SLDStyleFactory {
             LOGGER.finer("geomName = " + geomName);
         }
 
-        // extract label
-        Object obj = symbolizer.getLabel().evaluate(feature);
-        String label = obj == null ? "" : obj.toString();
+        // extract label (from ows5 extensions, we could have the label element empty)
+        String label = "";
+        if(symbolizer.getLabel() != null) {
+            Object obj = symbolizer.getLabel().evaluate(feature);
+            if(obj != null)
+                label = obj.toString();
+        }
 
         if (LOGGER.isLoggable(Level.FINER)) {
             LOGGER.finer("label is " + label);

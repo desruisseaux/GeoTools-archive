@@ -52,6 +52,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent
     private Graphic graphic = null;
     private Expression priority = null;
     private HashMap optionsMap = null; //null=nothing in it
+    private Expression abxtract = null;
+    private Expression description = null;
+    private OtherText otherText = null;
 
     protected TextSymbolizerImpl() {
         this( CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints()) );
@@ -412,4 +415,23 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         buf.append( this.fonts );
         return buf.toString();
     }
+    public Expression getAbstract() {
+        return abxtract;
+    }
+    public void setAbstract(Expression abxtract) {
+        this.abxtract = abxtract;
+    }
+    public Expression getDescription() {
+        return description;
+    }
+    public void setDescription(Expression description) {
+        this.description = description;
+    }
+    public OtherText getOtherText() {
+        return otherText;
+    }
+    public void setOtherText(OtherText otherText) {
+        this.otherText = otherText;
+    }
+    
 }

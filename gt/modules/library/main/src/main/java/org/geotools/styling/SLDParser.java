@@ -997,7 +997,7 @@ public class SLDParser {
 	 * @return the TextSymbolizer
 	 */
 	private TextSymbolizer parseTextSymbolizer(Node root) {
-		TextSymbolizer symbol = factory.createTextSymbolizer();
+	    TextSymbolizer symbol = factory.createTextSymbolizer();
 		symbol.setFill(null);
 
 		ArrayList fonts = new ArrayList();
@@ -1044,14 +1044,30 @@ public class SLDParser {
 				symbol.setHalo(parseHalo(child));
 			}
 			if (childName.equalsIgnoreCase("Graphic")) {
-				if (LOGGER.isLoggable(Level.FINEST)) {
-					LOGGER.finest("Parsing non-standard Graphic in TextSymbolizer");
-				}
+			    LOGGER.finest("Parsing non-standard Graphic in TextSymbolizer");
 				if (symbol instanceof TextSymbolizer2)
 				{
 					((TextSymbolizer2)symbol).setGraphic(parseGraphic(child));
 				}
 			}
+			
+			if (childName.equalsIgnoreCase("Abstract")) {
+			    LOGGER.finest("Parsing non-standard Abstract in TextSymbolizer");
+			    if(symbol instanceof TextSymbolizer2)
+			        ((TextSymbolizer2)symbol).setAbstract(parseCssParameter(child, false));
+			}
+			
+			if (childName.equalsIgnoreCase("Description")) {
+                LOGGER.finest("Parsing non-standard Description in TextSymbolizer");
+                if(symbol instanceof TextSymbolizer2)
+                    ((TextSymbolizer2)symbol).setDescription(parseCssParameter(child, false));
+            }
+			
+			if (childName.equalsIgnoreCase("OtherText")) {
+                LOGGER.finest("Parsing non-standard OtherText in TextSymbolizer");
+                if(symbol instanceof TextSymbolizer2)
+                    ((TextSymbolizer2)symbol).setOtherText(parseOtherText(child));
+            }
 			
 			
 			if (childName.equalsIgnoreCase("priority")) 
@@ -1069,6 +1085,21 @@ public class SLDParser {
 
 		return symbol;
 	}
+	
+	private OtherText parseOtherText(Node root) {
+	    // TODO: add methods to the factory to create OtherText instances
+	    OtherText ot = new OtherTextImpl();
+	    final Node targetAttribute = root.getAttributes().getNamedItem("target");
+	    if(targetAttribute == null)
+	        throw new IllegalArgumentException("OtherLocation does not have the " +
+	        		"required 'target' attribute");
+        String target = targetAttribute.getNodeValue();
+        Expression text = parseCssParameter(root, true);
+        ot.setTarget(target);
+        ot.setText(text);
+        return ot;
+	}
+	
 
 	/**
 	 *   adds the key/value pair from the node ("<VendorOption name="...">...</VendorOption>").

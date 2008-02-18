@@ -15,6 +15,8 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.expression.Expression;
+
 
 /**
  * Contains label shield hack
@@ -34,4 +36,30 @@ public interface TextSymbolizer2 extends TextSymbolizer {
      * @param graphic - the Graphic object which will be rendered under the label text
      */
     public void setGraphic(Graphic graphic);
+    
+    /**
+     * Abstract is used by text oriented renderers such as KML and RSS to specify
+     * an abstract (RSS) or a snippet (KML)
+     * @return
+     */
+    public Expression getAbstract();
+    
+    public void setAbstract(Expression expression);
+    
+    /**
+     * Description is used by text oriented renders such as KML and RSS to specify
+     * a feature's description
+     * @return
+     */
+    public Expression getDescription();
+    
+    public void setDescription(Expression description);
+    
+    /**
+     * Other text can be used to allow open ended extensions on text oriented output formats
+     * @return
+     */
+    public OtherText getOtherText();
+    
+    public void setOtherText(OtherText otherText);
 }
