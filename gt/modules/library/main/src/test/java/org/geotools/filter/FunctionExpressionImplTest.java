@@ -277,7 +277,7 @@ public class FunctionExpressionImplTest extends TestCase {
 
     private List loadFunctionClasses() throws IOException,
             ClassNotFoundException {
-        final String spiDefinitionResource = "/META-INF/services/org.geotools.filter.FunctionExpression";
+        final String spiDefinitionResource = "/META-INF/services/org.opengis.filter.expression.Function";
         InputStream in = getClass().getResourceAsStream(spiDefinitionResource);
         if (in == null) {
             throw new FileNotFoundException(spiDefinitionResource);
