@@ -1472,7 +1472,7 @@ public final class StreamingRenderer implements GTRenderer {
             {
                 // if the datastore is producing null CRS, we recode.
                 // if the datastore's CRS != real CRS, then we recode
-                if ((rCS == null) || (!rCS.equals(sourceCrs))) {
+                if ((rCS == null) || !CRS.equalsIgnoreMetadata(rCS, sourceCrs)) {
                     // need to retag the features
                     try {
                         return new ForceCoordinateSystemFeatureResults( features, sourceCrs );
