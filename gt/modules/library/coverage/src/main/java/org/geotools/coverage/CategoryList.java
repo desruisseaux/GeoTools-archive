@@ -282,7 +282,7 @@ class CategoryList extends AbstractList<Category>
             }
         }
         this.main = main;
-        this.last = main;
+        this.last = (main != null || categories.length == 0) ? main : categories[0];
         /*
          * Search for the fallback if {@link #getCategory(double)} is invoked with a sample
          * value greater than all ranges of sample values. This is the last category to have
@@ -816,7 +816,7 @@ class CategoryList extends AbstractList<Category>
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        last = main;
+        last = (main != null || categories.length == 0) ? main : categories[0];
     }
 
 

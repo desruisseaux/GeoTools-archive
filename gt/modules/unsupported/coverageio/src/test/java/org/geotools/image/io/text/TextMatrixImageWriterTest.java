@@ -78,6 +78,7 @@ public class TextMatrixImageWriterTest extends TestCase {
     /**
      * Creates the image to test.
      */
+    @Override
     protected void setUp() throws IOException {
         if (image != null) {
             return;

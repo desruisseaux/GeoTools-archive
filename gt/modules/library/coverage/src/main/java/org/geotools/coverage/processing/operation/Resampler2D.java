@@ -165,7 +165,7 @@ final class Resampler2D extends GridCoverage2D {
      * @param targetGG
      *          The target grid geometry, or {@code null} for default.
      * @param interpolation
-     *          The interpolation to use.
+     *          The interpolation to use, or {@code null} if none.
      * @param hints
      *          The rendering hints. This is usually provided by {@link AbstractProcessor}.
      *          This method will looks for {@link Hints#COORDINATE_OPERATION_FACTORY} and
@@ -490,7 +490,7 @@ final class Resampler2D extends GridCoverage2D {
                 XAffineTransform.isIdentity((AffineTransform) allSteps, EPS)))
         {
             /*
-             * Since there is not interpolation to perform, use the native view (which may be
+             * Since there is no interpolation to perform, use the native view (which may be
              * packed or geophysics - it is just the view which is closest to original data).
              */
             sourceCoverage = sourceCoverage.view(ViewType.NATIVE);

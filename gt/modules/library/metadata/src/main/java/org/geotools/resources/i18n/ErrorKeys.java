@@ -946,7 +946,12 @@ public final class ErrorKeys {
     public static final int UNKNOW_AXIS_DIRECTION_$1 = 152;
 
     /**
-     * Interpolation "{0}" is unknow.
+     * Image format "{0}" is unknown.
+     */
+    public static final int UNKNOW_IMAGE_FORMAT_$1 = 203;
+
+    /**
+     * Interpolation "{0}" is unknown.
      */
     public static final int UNKNOW_INTERPOLATION_$1 = 132;
 

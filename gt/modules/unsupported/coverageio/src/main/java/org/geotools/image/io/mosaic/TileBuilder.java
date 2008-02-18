@@ -25,10 +25,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Iterator;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.math.XMath;
+import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
@@ -202,6 +205,30 @@ public class TileBuilder {
     }
 
     /**
+     * Sets the {@linkplain ImageReader image reader} provider by name. This convenience method
+     * searchs a provider for the given name in the default {@link IIORegistry} and delegates to
+     * {@link #setTileReaderSpi(ImageReaderSpi)}.
+     *
+     * @throws IllegalArgumentException if no provider was found for the given name.
+     */
+    public void setTileReaderSpi(String provider) throws IllegalArgumentException {
+        ImageReaderSpi spi = null;
+        if (provider != null) {
+            provider = provider.trim();
+            final IIORegistry registry = IIORegistry.getDefaultInstance();
+            final Iterator<ImageReaderSpi> it=registry.getServiceProviders(ImageReaderSpi.class, true);
+            do {
+                if (!it.hasNext()) {
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.UNKNOW_IMAGE_FORMAT_$1, provider));
+                }
+                spi = it.next();
+            } while (!XArray.contains(spi.getFormatNames(), provider));
+        }
+        setTileReaderSpi(spi);
+    }
+
+    /**
      * Returns the bounds of the untiled image, or {@code null} if not set. In the later case, the
      * bounds will be inferred from the input image when {@link #writeFromUntiledImage} is invoked.
      */
@@ -360,18 +387,58 @@ public class TileBuilder {
                 ySubsamplings = XMath.divisors(ny);
                 /*
                  * Subsamplings are different along x and y axis. We need at least arrays of the
-                 * same length.
+                 * same length. First (as a help for further processing) computes the union of all
+                 * subsamplings, together with subsamplings that are common to both axis.
                  */
-                final int[] newX = new int[xSubsamplings.length + ySubsamplings.length];
-                final int[] newY = new int[xSubsamplings.length + ySubsamplings.length];
-                int ix=0, iy=0; nx=0; ny=0;
-                while (ix < xSubsamplings.length && iy < ySubsamplings.length) {
-                    final int sx = newX[nx++] = xSubsamplings[ix];
-                    final int sy = newY[ny++] = ySubsamplings[iy];
-                    if (sx <= sy) ix++;
-                    if (sy <= sx) iy++;
+                final int[] union  = new int[xSubsamplings.length + ySubsamplings.length];
+                final int[] common = new int[union.length];
+                int nu=0, nc=0, no;
+                for (int ix=0, iy=0;;) {
+                    if (ix == xSubsamplings.length) {
+                        no = ySubsamplings.length - iy;
+                        System.arraycopy(ySubsamplings, iy, union, nu, no);
+                        break;
+                    }
+                    if (iy == ySubsamplings.length) {
+                        no = xSubsamplings.length - ix;
+                        System.arraycopy(xSubsamplings, ix, union, nu, no);
+                        break;
+                    }
+                    final int sx = xSubsamplings[ix];
+                    final int sy = ySubsamplings[iy];
+                    int s = 0;
+                    if (sx <= sy) {s = sx; ix++;}
+                    if (sy <= sx) {s = sy; iy++;}
+                    if (sx == sy) common[nc++] = s;
+                    union[nu++] = s;
                 }
-                // TODO: we have reach this point for tonigh...
+                /*
+                 * If there is a fair amount of subsampling values that are common in both axis
+                 * (the threshold is totally arbitrary in current implementation), retains only
+                 * the common values. Otherwise we will try some merge.
+                 */
+                if (nc >= nu / 2) {
+                    ySubsamplings = xSubsamplings = new int[nc + no];
+                    System.arraycopy(common, 0, xSubsamplings,  0, nc);
+                    System.arraycopy(union, nu, xSubsamplings, nc, no);
+                } else {
+                    nu += no;
+                    int j = 0;
+                    final int[] newX = new int[nu];
+                    final int[] newY = new int[nu];
+                    for (int i=0; i<nu; i++) {
+                        final int s  = union[i];
+                        final int sx = closest(xSubsamplings, s);
+                        final int sy = closest(ySubsamplings, s);
+                        if (j == 0 || newX[j-1] != sx || newY[j-1] != sy) {
+                            newX[j] = sx;
+                            newY[j] = sy;
+                            j++;
+                        }
+                    }
+                    xSubsamplings = XArray.resize(newX, j);
+                    ySubsamplings = XArray.resize(newY, j);
+                }
             }
             /*
              * Trims the subsamplings which would produce tiles smaller than the minimum size
@@ -389,7 +456,7 @@ public class TileBuilder {
             }
             nx = Arrays.binarySearch(xSubsamplings, nx); if (nx < 0) nx = ~nx; else nx++;
             ny = Arrays.binarySearch(ySubsamplings, ny); if (ny < 0) ny = ~ny; else ny++;
-            final int length = Math.min(nx, ny);
+            final int length = Math.max(nx, ny); // 'max' is safe if arrays have the same length.
             subsamplings = new int[length * 2];
             int source = 0;
             for (int i=0; i<length; i++) {
@@ -576,6 +643,25 @@ public class TileBuilder {
         bounds.y      /= subsampling.height;
         bounds.width  /= subsampling.width;
         bounds.height /= subsampling.height;
+    }
+
+    /**
+     * Returns the value from the specified array which is the closest to the specified value.
+     * If the specified value is out of upper bounds, then it is returned unchanged. The array
+     * values must be sorted in increasing order.
+     */
+    private static int closest(final int[] subsamplings, final int s) {
+        int i = Arrays.binarySearch(subsamplings, s);
+        if (i < 0) {
+            i = ~i;
+            if (i == subsamplings.length) {
+                return s;
+            }
+            if (i != 0 && (s - subsamplings[i-1]) <= (subsamplings[i] - s)) {
+                i--;
+            }
+        }
+        return subsamplings[i];
     }
 
     /**

@@ -477,8 +477,8 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             try {
                 final Rectangle region = tile.getRegion();
                 reader = tile.getImageReader(null, true, true);
-                final int width  = reader.getWidth(imageIndex);
-                final int height = reader.getWidth(imageIndex);
+                final int width  = reader.getWidth (imageIndex);
+                final int height = reader.getHeight(imageIndex);
                 if (width != region.width || height != region.height) {
                     message = Errors.format(ErrorKeys.UNEXPECTED_IMAGE_SIZE);
                 }

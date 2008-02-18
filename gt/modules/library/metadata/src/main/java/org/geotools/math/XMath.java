@@ -310,6 +310,9 @@ next:           while (true) {
                         if (n % (primes[j] & 0xFFFF) == 0) {
                             continue next;
                         }
+                        // We could stop the search at the first value greater than sqrt(n), but
+                        // given that the array is relatively short (because we limit ourself to
+                        // 16 bits prime numbers), it probably doesn't worth.
                     }
                     assert n < 0xFFFF : i;
                     primes[i] = (short) n;

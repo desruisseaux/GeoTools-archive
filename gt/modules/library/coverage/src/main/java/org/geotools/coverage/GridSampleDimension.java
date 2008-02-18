@@ -564,7 +564,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 
     /** Constructs a list of categories. Used by constructors only. */
     private static CategoryList list(final Category[] categories, final Unit units) {
-        if (categories == null) {
+        if (categories == null || categories.length == 0) {
             return null;
         }
         final CategoryList list = new CategoryList(categories, units);

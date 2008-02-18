@@ -421,11 +421,15 @@ public final class ImageUtilities {
      * Returns the interpolation name for the specified interpolation object.
      * This method tries to infer the name from the object's class name.
      *
-     * @param Interpolation The interpolation object.
+     * @param Interpolation The interpolation object, or {@code null} for "nearest"
+     *        (which is an other way to say "no interpolation").
      */
-    public static String getInterpolationName(final Interpolation interp) {
+    public static String getInterpolationName(Interpolation interp) {
+        if (interp == null) {
+            interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+        }
         final String prefix = "Interpolation";
-        for (Class classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
+        for (Class<?> classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
             String name = Classes.getShortName(classe);
             int index = name.lastIndexOf(prefix);
             if (index >= 0) {

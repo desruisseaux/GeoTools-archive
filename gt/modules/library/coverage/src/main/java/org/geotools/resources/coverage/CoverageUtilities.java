@@ -356,10 +356,10 @@ public final class CoverageUtilities {
      * the operation on the non-geophysics view, which is usually much faster. Users may ignore
      * this advice.
      *
-     * @param coverage to check for the action to take.
-     * @param interpolation to use for the action to take.
-     * @param hasFilter if the operation we will apply is going to use a filter.
-     * @param hints to use when applying a certain operation.
+     * @param coverage The coverage to check for the action to take.
+     * @param interpolation The interpolation to use for the action to take, or {@code null} if none.
+     * @param hasFilter {@code true} if the operation we will apply is going to use a filter.
+     * @param hints The hints to use when applying a certain operation.
      * @return {@link ViewType#SAME} if nothing has to be done on the provided coverage,
      *         {@link ViewType.PHOTOGRAPHIC} if a color expansion has to be provided,
      *         {@link ViewType#GEOPHYSICS} if we need to employ the geophysics view of
