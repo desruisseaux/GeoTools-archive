@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.UnaliasSQLEncoder;
 import org.opengis.feature.simple.SimpleFeatureType;
