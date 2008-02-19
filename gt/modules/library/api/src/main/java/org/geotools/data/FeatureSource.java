@@ -19,7 +19,11 @@ import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -43,11 +47,11 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * been moved to an external object, and the locking api has been intergrated.
  * </li>
  * <li>
- * FeatureCollection has been replaced with FeatureResult as we do not wish to
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> has been replaced with FeatureResult as we do not wish to
  * indicate that results can be stored in memory.
  * </li>
  * <li>
- * FeatureSource has been split into three interfaces, the intention is to use
+ * FeatureSource<SimpleFeatureType, SimpleFeature> has been split into three interfaces, the intention is to use
  * the instanceof opperator to check capabilities rather than the previous
  * DataSourceMetaData.
  * </li>
@@ -61,7 +65,9 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureSource {
+public interface FeatureSource<T extends FeatureType, F extends Feature>{
+    
+    Name getName();
     
     /**
      * Information describing the contents of this resoruce.
@@ -79,7 +85,7 @@ public interface FeatureSource {
      *
      * @return DataStore implementing this FeatureStore
      */
-    DataStore getDataStore();
+    DataAccess<T, F> getDataStore();
 
     /**
      * Adds a listener to the list that's notified each time a change to the
@@ -110,7 +116,7 @@ public interface FeatureSource {
      *
      * @see Query
      */
-    FeatureCollection getFeatures(Query query) throws IOException;
+    FeatureCollection<T, F> getFeatures(Query query) throws IOException;
 
     /**
      * Loads features from the datasource into the returned FeatureResults,
@@ -123,7 +129,7 @@ public interface FeatureSource {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection getFeatures(Filter filter) throws IOException;
+    FeatureCollection<T, F> getFeatures(Filter filter) throws IOException;
 
     /**
      * Loads all features from the datasource into the return FeatureResults.
@@ -137,7 +143,7 @@ public interface FeatureSource {
      *
      * @throws IOException For all data source errors.
      */
-    FeatureCollection getFeatures() throws IOException;
+    FeatureCollection<T, F> getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource
@@ -160,9 +166,7 @@ public interface FeatureSource {
      * @task REVISIT: we could also just use DataStore to capture multi
      *       FeatureTypes?
      */
-
-    //FeatureType getSchema();
-    SimpleFeatureType getSchema();
+    T getSchema();
 
     /**
      * Gets the bounding box of this datasource.
@@ -198,7 +202,7 @@ public interface FeatureSource {
      *
      * <p>
      * This method is needed if we are to stream features to a gml out, since a
-     * FeatureCollection must have a boundedBy element.
+     * FeatureCollection<SimpleFeatureType, SimpleFeature> must have a boundedBy element.
      * </p>
      *
      * <p>

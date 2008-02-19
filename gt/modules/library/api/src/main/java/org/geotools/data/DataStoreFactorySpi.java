@@ -74,7 +74,7 @@ import org.geotools.factory.Factory;
  * registry.addDataStore("leeds", params);
  *
  * DataStore postgis = registry.getDataStore( "leeds" );
- * FeatureSource = postgis.getFeatureSource( "table" );
+ * FeatureSource<SimpleFeatureType, SimpleFeature> = postgis.getFeatureSource( "table" );
  * </code></pre>
  * </p>
  * <h2>

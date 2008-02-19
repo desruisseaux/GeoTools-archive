@@ -17,8 +17,12 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.identity.FeatureId;
 import org.geotools.feature.FeatureCollection;
 
 
@@ -31,7 +35,7 @@ import org.geotools.feature.FeatureCollection;
  * </p>
  *
  * <p>
- * This is a prototype DataSource replacement please see FeatureSource for more
+ * This is a prototype DataSource replacement please see FeatureSource<SimpleFeatureType, SimpleFeature> for more
  * information.
  * </p>
  *
@@ -42,7 +46,7 @@ import org.geotools.feature.FeatureCollection;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureStore extends FeatureSource {
+public interface FeatureStore<T extends FeatureType, F extends Feature> extends FeatureSource<T, F> {
     /**
      * Adds all features from the passed feature collection to the datasource.
      *
@@ -51,7 +55,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @throws IOException if anything goes wrong.
      */
-    Set addFeatures(FeatureCollection collection) throws IOException;
+    Set<String> addFeatures(FeatureCollection<T, F> collection) throws IOException;
 
     /**
      * Removes all of the features specificed by the passed filter from the
@@ -108,7 +112,7 @@ public interface FeatureStore extends FeatureSource {
      *
      * @throws IOException if there are any datasource errors.
      */
-    void setFeatures(FeatureReader reader) throws IOException;
+    void setFeatures(FeatureReader<T, F> reader) throws IOException;
 
     /**
      * Provides a transaction for commit/rollback control of this FeatureStore.

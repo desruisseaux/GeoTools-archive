@@ -32,7 +32,7 @@ package org.geotools.event;
  * <li>This design is similar to EMF, or JFace use (aka borrow code examples)
  * <li>Not specific to Documents, the Catalog api will use these events
  * <li>We do try and match the document structure perfectly for Feature/FeatureCollection/GML
- * (so that the same XPath expressions can be respected). FeatureCollection and
+ * (so that the same XPath expressions can be respected). FeatureCollection<SimpleFeatureType, SimpleFeature> and
  * Feature have their own well explored structure and issues and will not be using
  * this event system. Given the size of FeatureCollections it is not practicle for each
  * child to "know" its parent.

@@ -17,9 +17,12 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
+
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -38,14 +41,14 @@ import org.geotools.util.ProgressListener;
  * optional to implement, and may throw an UnsupportedOperationException.
  * </p>
  * <p>
- * FeatureCollection house rules:
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> house rules:
  * <ul>
  * <li>FeatureCollection.close( iterator ) must be called (see example below)
- * <li>Features are not specifically ordered within the FeatureCollection (see FeatureList)
+ * <li>Features are not specifically ordered within the FeatureCollection<SimpleFeatureType, SimpleFeature> (see FeatureList)
  * <li>Two instances cannot exist with the same Feature ID (Feature contract)
  * <li>(unsure) the same Instance can be in the collection more then once
  * </ul>
- * In programmer speak a FeatureCollection is a "Bag" with an index based ID.
+ * In programmer speak a FeatureCollection<SimpleFeatureType, SimpleFeature> is a "Bag" with an index based ID.
  * </p>
  * <p>
  * <h3>Life Cycle of Iterator</h3>
@@ -73,7 +76,7 @@ import org.geotools.util.ProgressListener;
  * to release resources at when the iterator has reached the end of its contents
  * this is not something you should rely on.
  * </p>
- * <h2>Notes for FeatureCollection Implementors</h2>
+ * <h2>Notes for FeatureCollection<SimpleFeatureType, SimpleFeature> Implementors</h2>
  * <p>
  * Many users will be treating this as a straight forward Collection,
  * there code will break often enough due to latency - try and close
@@ -97,9 +100,9 @@ import org.geotools.util.ProgressListener;
  * @version $Id$
  *
  */
-public interface FeatureCollection extends ResourceCollection, SimpleFeature {
+public interface FeatureCollection<T extends FeatureType, F extends Feature> extends ResourceCollection<F>, SimpleFeature {
     /**
-     * Obtain a FeatureIterator of the Features within this collection.
+     * Obtain a FeatureIterator<SimpleFeature> of the Features within this collection.
      * <p>
      * The implementation of Collection must adhere to the rules of
      * fail-fast concurrent modification. In addition (to allow for
@@ -115,7 +118,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * </ul>
      * </p>
      * Example (safe) use:<pre><code>
-     * FeatureIterator iterator=collection.features();
+     * FeatureIterator<SimpleFeature> iterator=collection.features();
      * try {
      *     while( iterator.hasNext()  ){
      *          Feature feature = iterator.next();
@@ -136,7 +139,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      *
      * @return A FeatureIterator.
      */
-    FeatureIterator features();
+    FeatureIterator<F> features();
 
     /**
      * Clean up any resources assocaited with this iterator in a manner similar to JDO collections.
@@ -151,13 +154,13 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * Note: Because of FeatureReader using an interator internally,
      * there is only one implementation of this method that makes
      * any sense:<pre><code>
-     * <b>public void</b> close( FeatureIterator iterator) {
+     * <b>public void</b> close( FeatureIterator<SimpleFeature> iterator) {
      *     <b>if</b>( iterator != null ) iterator.close();
      * }
      * </code></pre>
      * </p>
      */
-    public void close(FeatureIterator close);
+    public void close(FeatureIterator<F> close);
 
     /**
      * Clean up after any resources assocaited with this itterator in a manner similar to JDO collections.
@@ -177,7 +180,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * </p>
      * @param close
      */
-    public void close(Iterator close);
+    public void close(Iterator<F> close);
 
     /**
      * Adds a listener for collection events.
@@ -266,9 +269,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      *  </p>
      * @return FeatureType describing the "common" schema to all child features of this collection
      */
-
-    //org.geotools.feature.FeatureType getSchema();
-    SimpleFeatureType getSchema();
+    T getSchema();
 
     /**
      * Will visit the contents of the feature collection.
@@ -296,15 +297,15 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
         org.opengis.util.ProgressListener progress) throws IOException;
 
     /**
-     * FeatureCollection "view" indicated by provided filter.
+     * FeatureCollection<SimpleFeatureType, SimpleFeature> "view" indicated by provided filter.
      * <p>
-     * The contents of the returned FeatureCollection are determined by
+     * The contents of the returned FeatureCollection<SimpleFeatureType, SimpleFeature> are determined by
      * applying the provider Filter to the entire contents of this
      * FeatureCollection. The result is "live" and modifications will
      * be shared.
      * <p>
      * This method is used cut down on the number of filter based methods
-     * required for a useful FeatureCollection construct. The FeatureCollections
+     * required for a useful FeatureCollection<SimpleFeatureType, SimpleFeature> construct. The FeatureCollections
      * returned really should be considered as a temporary "view" used to
      * control the range of a removeAll, or modify operation.
      * <p>
@@ -323,16 +324,16 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * </p>
      * @see FeatureList
      * @param filter
-     * @return FeatureCollection identified as subset.
+     * @return FeatureCollection<SimpleFeatureType, SimpleFeature> identified as subset.
      */
-    public FeatureCollection subCollection(Filter filter);
+    public FeatureCollection<T, F> subCollection(Filter filter);
 
     /**
      * collection.subCollection( myFilter ).sort( {"foo","bar"} );
      * collection.subCollection( myFilter ).sort( "bar" ).sort("foo")
      * @param order
      */
-    public FeatureCollection sort(SortBy order);
+    public FeatureCollection<T, F> sort(SortBy order);
 
     /**
      * Get the total bounds of this collection which is calculated by doing a

@@ -129,7 +129,7 @@ public interface Transaction {
      *
      * <p>
      * This may be used to provide hints to DataStore implementations, it
-     * operates as a blackboard for client, FeatureSource communication.
+     * operates as a blackboard for client, FeatureSource<SimpleFeatureType, SimpleFeature> communication.
      * </p>
      *
      * <p>
@@ -155,7 +155,7 @@ public interface Transaction {
     Set getAuthorizations();
 
     /**
-     * Allows FeatureSource to squirel away information( and callbacks ) for
+     * Allows FeatureSource<SimpleFeatureType, SimpleFeature> to squirel away information( and callbacks ) for
      * later.
      *
      * <p>
@@ -295,7 +295,7 @@ public interface Transaction {
      * Provides a Transaction property for this Transasction.
      *
      * <p>
-     * All proceeding FeatureSource (for FeatureReader/Writer) operations may
+     * All proceeding FeatureSource<SimpleFeatureType, SimpleFeature> (for FeatureReader/Writer) operations may
      * make use of the provided property.
      * </p>
      */

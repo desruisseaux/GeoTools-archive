@@ -17,6 +17,9 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -28,9 +31,9 @@ import org.opengis.filter.Filter;
  * or reserved from modification through this interface.
  * </p>
  * <p>
- * To use please cast your FeatureSource to this interface.
+ * To use please cast your FeatureSource<SimpleFeatureType, SimpleFeature> to this interface.
  * <pre><code>
- * FeatureSource source = dataStore.getFeatureSource("roads");
+ * FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource("roads");
  * if( source instanceof FeatureLocking ) {
  *     FeatureLocking locking = (FeatureLocking) source;
  *     ...
@@ -43,7 +46,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureLocking extends FeatureStore {
+public interface FeatureLocking<T extends FeatureType, F extends Feature> extends FeatureStore<T, F> {
     /**
      * All locking operations will operate against the provided
      * <code>lock</code>.

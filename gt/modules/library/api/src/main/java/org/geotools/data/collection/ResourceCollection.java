@@ -30,7 +30,7 @@ import java.util.Iterator;
  * @since GeoTools 2.2
  * @source $URL$
  */
-public interface ResourceCollection extends Collection {
+public interface ResourceCollection<R> extends Collection<R> {
     /**
      * An iterator over this collection, which must be closeed after use.
      * <p>
@@ -58,7 +58,7 @@ public interface ResourceCollection extends Collection {
      * </p>
      * @return Iterator
      */
-    public Iterator iterator();
+    public Iterator<R> iterator();
 
     /**
      * Clean up after any resources assocaited with this itterator in a manner similar to JDO collections.
@@ -78,7 +78,7 @@ public interface ResourceCollection extends Collection {
      * </p>
      * @param close
      */
-    public void close(Iterator close);
+    public void close(Iterator<R> close);
 
     /**
      * Close any outstanding resources released by this resources.

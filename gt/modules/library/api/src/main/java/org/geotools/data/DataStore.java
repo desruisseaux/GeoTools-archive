@@ -16,6 +16,8 @@
 package org.geotools.data;
 
 import java.io.IOException;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
@@ -68,21 +70,8 @@ import org.geotools.feature.SchemaException;
  * @source $URL$
  * @version $Id$
  */
-public interface DataStore {
-    /**
-     * Creates storage for a new <code>featureType</code>.
-     *
-     * <p>
-     * The provided <code>featureType</code> we be accessable by the typeName
-     * provided by featureType.getTypeName().
-     * </p>
-     *
-     * @param featureType FetureType to add to DataStore
-     *
-     * @throws IOException If featureType cannot be created
-     */
-    void createSchema(SimpleFeatureType featureType) throws IOException;
-
+public interface DataStore extends DataAccess<SimpleFeatureType, SimpleFeature>{
+   
     /**
      * Used to force namespace and CS info into a persistent change.
      * <p>
@@ -126,18 +115,6 @@ public interface DataStore {
      * @return typeNames for available FeatureTypes.
      */
     String[] getTypeNames() throws IOException;
-
-    /**
-     * Information about this service.
-     * <p>
-     * This method offers access to a summary of header or metadata
-     * information describing the service.
-     * </p>
-     * Subclasses may return a specific ServiceInfo instance that has
-     * additional information (such as FilterCapabilities). 
-     * @return SeviceInfo
-     */
-    ServiceInfo getInfo();
     
     /**
      * Retrieve FeatureType metadata by <code>typeName</code>.
@@ -152,15 +129,14 @@ public interface DataStore {
      *
      * @throws IOException If typeName cannot be found
      */
-    //FeatureType getSchema(String typeName) throws IOException;
     SimpleFeatureType getSchema(String typeName) throws IOException;
 
     /**
-     * Access a FeatureSource for Query providing a high-level API.
+     * Access a FeatureSource<SimpleFeatureType, SimpleFeature> for Query providing a high-level API.
      * <p>
      * The provided Query does not need to completely cover the existing
      * schema for Query.getTypeName(). The result will mostly likely only be
-     * a FeatureSource and probably wont' allow write access by the
+     * a FeatureSource<SimpleFeatureType, SimpleFeature> and probably wont' allow write access by the
      * FeatureStore method.
      * </p>
      * <p>
@@ -178,21 +154,22 @@ public interface DataStore {
      * </p>
      * @param query Query.getTypeName() locates FeatureType being viewed
      *
-     * @return FeatureSource providing operations for featureType
-     * @throws IOException If FeatureSource is not available
+     * @return FeatureSource<SimpleFeatureType, SimpleFeature> providing operations for featureType
+     * @throws IOException If FeatureSource<SimpleFeatureType, SimpleFeature> is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
-    FeatureSource getView(Query query) throws IOException, SchemaException;
+    FeatureSource<SimpleFeatureType, SimpleFeature> getView(Query query) throws IOException,
+            SchemaException;
 
     /**
-     * Access a FeatureSource for typeName providing a high-level API.
+     * Access a FeatureSource<SimpleFeatureType, SimpleFeature> for typeName providing a high-level API.
      *
      * <p>
-     * The resulting FeatureSource may implment more functionality:
+     * The resulting FeatureSource<SimpleFeatureType, SimpleFeature> may implment more functionality:
      * </p>
      * <pre><code>
      *
-     * FeatureSource fsource = dataStore.getFeatureSource( "roads" );
+     * FeatureSource<SimpleFeatureType, SimpleFeature> fsource = dataStore.getFeatureSource( "roads" );
      * FeatureStore fstore = null;
      * if( fsource instanceof FeatureLocking ){
      *     fstore = (FeatureStore) fs;
@@ -205,9 +182,10 @@ public interface DataStore {
      *
      * @param typeName
      *
-     * @return FeatureSource (or subclass) providing operations for typeName
+     * @return FeatureSource<SimpleFeatureType, SimpleFeature> (or subclass) providing operations for typeName
      */
-    FeatureSource getFeatureSource(String typeName) throws IOException;
+    FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName)
+            throws IOException;
 
     /**
      * Access a FeatureReader providing access to Feature information.
@@ -296,7 +274,7 @@ public interface DataStore {
      *  FeatureReader reader = new DefaultFeatureReader( getAttributeReaders(), schema );
      *
      *  if (filter != Filter.INCLUDE) {
-     *      reader = new FilteringFeatureReader(reader, filter);
+     *      reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
      *  }
      *
      *  if (transaction != Transaction.AUTO_COMMIT) {
@@ -319,8 +297,8 @@ public interface DataStore {
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureReader getFeatureReader(Query query, Transaction transaction)
-        throws IOException;
+    FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query,
+            Transaction transaction) throws IOException;
 
     /**
      * Access FeatureWriter for modification of existing DataStore contents.
@@ -376,8 +354,8 @@ public interface DataStore {
      *
      * @return FeatureWriter Allows Sequential Modification of featureType
      */
-    FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
-        throws IOException;
+    FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
+            Filter filter, Transaction transaction) throws IOException;
 
     /**
      * Access FeatureWriter for modification of the DataStore typeName.
@@ -398,8 +376,8 @@ public interface DataStore {
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
-    FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
-        throws IOException;
+    FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
+            Transaction transaction) throws IOException;
 
     /**
      * Aquire a FeatureWriter for adding new content to a FeatureType.
@@ -417,8 +395,8 @@ public interface DataStore {
      *
      * @throws IOException
      */
-    FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
-        throws IOException;
+    FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
+            Transaction transaction) throws IOException;
 
     /**
      * Retrieve a per featureID based locking service from this DataStore.
@@ -439,18 +417,4 @@ public interface DataStore {
      */
     LockingManager getLockingManager();
 
-    /**
-     * Disposes of this data store and releases any resource that it is using.
-     * <p>
-     * A <code>DataStore</code> cannot be used after <code>dispose</code> has
-     * been called, neither can any data access object it helped create, such
-     * as {@link FeatureReader}, {@link FeatureSource} or {@link FeatureCollection}.
-     * <p>
-     * This operation can be called more than once without side effects.
-     * <p>
-     * There is no thread safety assurance associated with this method. For example,
-     * client code will have to make sure this method is not called while retrieving/saving data
-     * from/to the storage, or be prepared for the consequences.
-     */
-    void dispose();
 }

@@ -16,6 +16,10 @@
 package org.geotools.data;
 
 import java.util.EventObject;
+
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 
@@ -24,7 +28,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * <p>
  * The "Source" for FeatureEvents is taken to be a <code>FeatureSource</code>,
- * rather than <code>DataStore</code>. The is due to FeatureSource having a
+ * rather than <code>DataStore</code>. The is due to FeatureSource<SimpleFeatureType, SimpleFeature> having a
  * hold of Transaction information.
  * </p>
  *
@@ -151,7 +155,7 @@ public class FeatureEvent extends EventObject {
          * <p>
          * This EventType is used when FeatureWriter.close() is called when
          * <p>
-         * The use of FeatureStore addFeatures( FeatureCollection ) is recommended,
+         * The use of FeatureStore addFeatures( FeatureCollection<SimpleFeatureType, SimpleFeature> ) is recommended,
          * and will issue a single FeatureEvent with getType() ADDED.
          * <p> 
          * For a more hands on experience FeatureWriter can be used to create
@@ -195,24 +199,26 @@ public class FeatureEvent extends EventObject {
     /**
      * Constructs a new FeatureEvent.
      *
-     * @param featureSource The DataStore that fired the event
+     * @param FeatureSource<SimpleFeatureType, SimpleFeature> The DataStore that fired the event
      * @param eventType One of FEATURE_CHANGED, FEATURE_REMOVED or
      *        FEATURE_ADDED
      * @param bounds The area modified by this change
      */
-    public FeatureEvent(FeatureSource featureSource, int eventType, Envelope bounds) {
+    public FeatureEvent(FeatureSource<? extends FeatureType, ? extends Feature> featureSource,
+            int eventType, Envelope bounds) {
         super(featureSource);
         this.type = eventType;
         this.bounds = bounds;
     }
 
     /**
-     * Provides access to the FeatureSource which fired the event.
+     * Provides access to the FeatureSource<SimpleFeatureType, SimpleFeature> which fired the event.
      *
-     * @return The FeatureSource which was the event's source.
+     * @return The FeatureSource<SimpleFeatureType, SimpleFeature> which was the event's source.
      */
-    public FeatureSource getFeatureSource() {
-        return (FeatureSource) source;
+    @SuppressWarnings("unchecked")
+    public FeatureSource<? extends FeatureType, ? extends Feature> getFeatureSource() {
+        return (FeatureSource<? extends FeatureType, ? extends Feature>) source;
     }
 
     /**
