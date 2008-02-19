@@ -46,7 +46,7 @@ import org.geotools.util.logging.Logging;
  */
 final class RegionCalculator {
     /**
-     * Small number for floating point comparaisons.
+     * Small number for floating point comparisons.
      */
     private static final double EPS = 1E-10;
 
@@ -125,7 +125,7 @@ final class RegionCalculator {
      * <p>
      * <strong>Invoking this method flush the collection</strong>. On return, this instance
      * is in the same state as if {@link #clear} has been invoked. This is because current
-     * implementation modify its workspace directly for efficienty.
+     * implementation modify its workspace directly for efficiently.
      */
     public Map<ImageGeometry,Tile[]> tiles() {
         final Map<ImageGeometry,Tile[]> results = new HashMap<ImageGeometry,Tile[]>(4);
@@ -270,9 +270,9 @@ final class RegionCalculator {
      * AffineTransform#getScaleY scale Y} coefficients in absolute value. This transform is
      * given a dimension of (1,1) and stored in an {@linkplain IdentityHashMap identity hash
      * map}. Other transforms are stored in the same map with their dimension relative to the
-     * first one, or discarted if the scale ratio is not an integer. In the later case, the
-     * transforms that were discarted from the first pass will be put in a new map to be added
-     * as the second element in the returned list. A new pass is run, discarted transforms from
+     * first one, or discarded if the scale ratio is not an integer. In the later case, the
+     * transforms that were discarded from the first pass will be put in a new map to be added
+     * as the second element in the returned list. A new pass is run, discarded transforms from
      * the second pass are put in the third element of the list, <cite>etc</cite>.
      *
      * @param  gridToCRS The <cite>grid to CRS</cite> affine transforms computed from the
@@ -288,7 +288,7 @@ final class RegionCalculator {
         List<Map<AffineTransform,Dimension>> results = null;
         /*
          * First, computes the pyramid levels along the X axis. Hash map will be created
-         * when needed. Transforms that we were unable to classify will be discarted from
+         * when needed. Transforms that we were unable to classify will be discarded from
          * the first run and put in a subsequent run.
          */
         AffineTransform[] transforms = gridToCRS.toArray(new AffineTransform[gridToCRS.size()]);
