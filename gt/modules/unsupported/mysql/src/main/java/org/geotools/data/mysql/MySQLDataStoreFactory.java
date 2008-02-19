@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
@@ -53,7 +54,7 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
             "localhost");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", Integer.class, "mysql connection port", true, "3306");
+    static final Param PORT = new Param("port", Integer.class, "mysql connection port", false, "3306");
 
     /** Param, package visibiity for JUnit tests */
     static final Param DATABASE = new Param("database", String.class, "msyql database");
@@ -73,9 +74,13 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
     /** Param, package visibiity for JUnit tests */
     static final Param NAMESPACE = new Param("namespace", String.class, "namespace prefix used",
             false);
+    
+    public static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
+            "set to true if Well Known Binary should be used to read PostGIS "
+            + "data (experimental)", false, new Boolean(true));
 
     /** Array with all of the params */
-    static final Param[] arrayParameters = { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE };
+    static final Param[] arrayParameters = { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD,  NAMESPACE, WKBENABLED };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -149,6 +154,7 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
         int port = ((Integer) PORT.lookUp(params)).intValue();
         String database = (String) DATABASE.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
+        Boolean wkbEnabled = (Boolean) WKBENABLED.lookUp(params);
 
         if (!canProcess(params)) {
             // Do this as a last sanity check.
@@ -162,16 +168,22 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
         DataSource ds = getDefaultDataSource(host, user, passwd, port, database, maxActive,
                 maxIdle, validate);
 
+        MySQLDataStore store;
         if (namespace != null) {
-            return new MySQLDataStore(ds, null, namespace);
+            store = new MySQLDataStore(ds, null, namespace);
         } else {
-            return new MySQLDataStore(ds);
+            store =new MySQLDataStore(ds);
         }
+        if(wkbEnabled != null)
+            store.setWKBEnabled(wkbEnabled.booleanValue());
+        return store;
     }
 
     public static ManageableDataSource getDefaultDataSource(String host, String user,
         String passwd, int port, String database, int maxActive, int minIdle, boolean validate)
         throws DataSourceException {
+        // this one will have to wait for another iteration over the code
+//        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useCursorFetch=true&defaultFetchSize=100";
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
         String driver = "com.mysql.jdbc.Driver";
 

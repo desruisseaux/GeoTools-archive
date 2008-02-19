@@ -32,6 +32,8 @@ import org.geotools.filter.SQLEncoder;
  * @source $URL$
  */
 public class MySQLSQLBuilder extends DefaultSQLBuilder {
+    private boolean wkbEnabled;
+
     /**
      * @deprecated please use MySQLSQLBuilder(encoder, ft)
      * @param encoder
@@ -77,8 +79,12 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
             String colName = attributes[i].getLocalName();
 
             if (attributes[i] instanceof GeometryDescriptor) {
-                sql.append("AsText(" + attributes[i].getLocalName() + ") AS "
-                    + attributes[i].getLocalName());
+                if(wkbEnabled)
+                    sql.append("AsBinary(");
+                else
+                    sql.append("AsText(");
+                sql.append(attributes[i].getLocalName() + ") AS "
+                        + attributes[i].getLocalName());
             } else {
                 sql.append(colName);
             }
@@ -87,5 +93,23 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
                 sql.append(", ");
             }
         }
+    }
+    
+    /**
+     * Returns true if the WKB format is used to transfer geometries, false
+     * otherwise
+     *
+     */
+    public boolean isWKBEnabled() {
+        return wkbEnabled;
+    }
+
+    /**
+     * If turned on, WKB will be used to transfer geometry data instead of  WKT
+     *
+     * @param enabled
+     */
+    public void setWKBEnabled(boolean enabled) {
+        wkbEnabled = enabled;
     }
 }

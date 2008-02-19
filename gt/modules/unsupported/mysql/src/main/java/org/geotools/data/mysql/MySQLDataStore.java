@@ -16,20 +16,18 @@
 package org.geotools.data.mysql;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.sql.DataSource;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.opengis.feature.type.AttributeDescriptor;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -40,11 +38,23 @@ import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.geotools.data.jdbc.attributeio.WKBAttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
+import org.opengis.feature.type.AttributeDescriptor;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -64,6 +74,12 @@ import org.geotools.filter.SQLEncoderMySQL;
 public class MySQLDataStore extends JDBCDataStore {
     /** The logger for the mysql module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.mysql");
+    
+    
+    /**
+     * When true wkb encoding will be used to transfer geometries over the wire
+     */
+    protected boolean wkbEnabled;
 
     /**
      * Basic constructor for MySQLDataStore.
@@ -256,7 +272,10 @@ public class MySQLDataStore extends JDBCDataStore {
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
     protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
-        return new WKTAttributeIO();
+        if(wkbEnabled)
+            return new WKBAttributeIO(queryData.getHints());
+        else
+            return new WKTAttributeIO();
     }
 
     protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
@@ -264,5 +283,38 @@ public class MySQLDataStore extends JDBCDataStore {
         LOGGER.fine("returning jdbc feature writer");
 
         return new MySQLFeatureWriter(reader, queryData);
+    }
+    
+    private static final Set MYSQL_HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED, Hints.JTS_COORDINATE_SEQUENCE_FACTORY, 
+            Hints.JTS_GEOMETRY_FACTORY})));
+
+    @Override
+    public Set getSupportedHints() {
+        return MYSQL_HINTS;
+    }
+    
+    @Override
+    protected void setAutoCommit(boolean forWrite, Connection conn) throws SQLException {
+        // override, do nothing
+    }
+    
+    /**
+     * Returns true if the WKB format is used to transfer geometries, false
+     * otherwise
+     *
+     */
+    public boolean isWKBEnabled() {
+        return wkbEnabled;
+    }
+
+    /**
+     * If turned on, WKB will be used to transfer geometry data instead of  WKT
+     *
+     * @param enabled
+     */
+    public void setWKBEnabled(boolean enabled) {
+        wkbEnabled = enabled;
     }
 }

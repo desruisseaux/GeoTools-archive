@@ -1030,20 +1030,5 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         return retEnv;
     }	
     
-    private static final Set BASE_HINTS = Collections.unmodifiableSet(
-            new HashSet(Arrays.asList(new Object[] {
-            Hints.FEATURE_DETACHED})));
-    private static final Set WKB_HINTS = Collections.unmodifiableSet(
-            new HashSet(Arrays.asList(new Object[] {
-            Hints.FEATURE_DETACHED, 
-            Hints.JTS_COORDINATE_SEQUENCE_FACTORY, 
-            Hints.JTS_GEOMETRY_FACTORY})));
-    public Set getSupportedHints() {
-        PostgisDataStore ds = (PostgisDataStore) getDataStore();
-        if(ds.isWKBEnabled()) {
-            return WKB_HINTS;
-        } else {
-            return BASE_HINTS;
-        }
-    }
+    
 }

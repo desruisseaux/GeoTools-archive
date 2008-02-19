@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1940,5 +1941,23 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return dbInfo;
     }
     
+    /**
+     * The hints supported by this datastore depending on the configuration
+     */
+    private static final Set BASE_HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED})));
+    private static final Set WKB_HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED, 
+            Hints.JTS_COORDINATE_SEQUENCE_FACTORY, 
+            Hints.JTS_GEOMETRY_FACTORY})));
+    public Set getSupportedHints() {
+        if(isWKBEnabled()) {
+            return WKB_HINTS;
+        } else {
+            return BASE_HINTS;
+        }
+    }
 }
 

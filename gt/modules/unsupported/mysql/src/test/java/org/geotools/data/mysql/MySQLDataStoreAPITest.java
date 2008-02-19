@@ -373,7 +373,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             Statement s = conn.createStatement();
 
             s.execute(
-                "CREATE TABLE road (fid varchar(255) PRIMARY KEY, id int, geom LINESTRING, name varchar(255) )");
+                "CREATE TABLE road (fid varchar(255) PRIMARY KEY, id int, geom LINESTRING not null, name varchar(255), spatial index(geom) ) engine = myisam");
 
             for (int i = 0; i < roadFeatures.length; i++) {
                 SimpleFeature f = roadFeatures[i];
