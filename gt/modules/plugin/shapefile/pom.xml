@@ -182,6 +182,7 @@
             <!-- The following test throw an exception similar to the one below:
                  java.io.IOException: Unable to delete original file: .../Temp/test-shp51284.prj -->
             <exclude>**/ShapefileReadWriteTest.java</exclude>
+            <exclude>**/*ShapefileDataStoreTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
