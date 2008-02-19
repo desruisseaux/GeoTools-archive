@@ -21,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -213,6 +214,27 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
         return toMapCoord(mx, my, width, height, bounds);
+    }
+    
+    public Point toComponentCoord(Coordinate coord){
+        
+        Envelope mapArea = renderingStrategy.getMapArea();
+        Rectangle bounds = getBounds();
+        
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        
+        double xval = bounds.width/width;
+        double yval = bounds.height/height;
+        
+        double minX = coord.x - mapArea.getMinX();
+        double minY = coord.y - mapArea.getMinY();
+        
+        int x = (int)(minX*xval);
+        int y = (int)(minY*yval);
+        
+        return new Point(x,y);
+        
     }
 
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {

@@ -56,6 +56,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private final EventListenerList listeners = new EventListenerList();
     private MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private GTRenderer renderer = new ShapefileRenderer();
+    private Envelope oldCompMapArea = new Envelope(0, 0, 1, 1);
     private Envelope compMapArea = new Envelope(0, 0, 1, 1);
     private ReferencedEnvelope oldAreaOfInterest = null;
     private Rectangle oldRect = null;
@@ -206,6 +207,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     }
 
     private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
+        
         Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
 
         StrategyListener[] lst = getStrategyListeners();
@@ -279,7 +281,13 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     public void refresh() {
         try {
+            oldCompMapArea = compMapArea;
             compMapArea = fixAspectRatio(comp.getBounds(), compMapArea);
+            
+            if(!oldCompMapArea.equals(compMapArea)){
+                fireMapAreaChanged(oldCompMapArea, compMapArea);
+                oldCompMapArea = compMapArea;
+            }
         } catch (Exception e) {
         }
 
@@ -319,7 +327,7 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     }
 
     public void setMapArea(Envelope area) {
-
+        
         if (area == null) {
             throw new NullPointerException("Area can't be null.");
         }

@@ -18,6 +18,7 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.Component;
+import java.awt.Point;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
@@ -77,6 +78,8 @@ public interface Map2D {
      * @return JTS Coordinate
      */
     public Coordinate toMapCoord(int mx, int my);
+    
+    public Point toComponentCoord(Coordinate coord);
     
         
     //----------------------Over/Sub/information layers-------------------------
