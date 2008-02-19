@@ -429,15 +429,11 @@ public class JDBCFeatureSource implements FeatureSource {
         JDBCUtils.close(statement);
     }
     
-    private static final Set BASE_HINTS = Collections.unmodifiableSet(
-            new HashSet(Arrays.asList(new Object[] {
-            Hints.FEATURE_DETACHED})));
-    
     /**
      * By default, only detached feature is supported
      */
     
      public Set getSupportedHints() {
-            return BASE_HINTS;
+            return dataStore.getSupportedHints();
      }
 }

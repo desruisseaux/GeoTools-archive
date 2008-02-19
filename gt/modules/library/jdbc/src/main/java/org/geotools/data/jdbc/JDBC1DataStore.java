@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1301,6 +1302,9 @@ public abstract class JDBC1DataStore implements DataStore {
 				AttributeTypeBuilder atb = new AttributeTypeBuilder();
 				atb.setName(columnName);
 				atb.setBinding(type);
+				atb.setMinOccurs(min);
+				atb.setMaxOccurs(1);
+				atb.setNillable(nillable);
 				return atb.buildDescriptor(columnName);
 			}
 		} catch (SQLException e) {
@@ -1728,5 +1732,13 @@ public abstract class JDBC1DataStore implements DataStore {
      */
     public Envelope getEnvelope( String typeName ){
     	return null;
+    }
+    
+    private static final Set BASE_HINTS = Collections.unmodifiableSet(
+            new HashSet(Arrays.asList(new Object[] {
+            Hints.FEATURE_DETACHED})));
+
+    public Set getSupportedHints() {
+        return BASE_HINTS;
     }
 }
