@@ -121,25 +121,19 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     private void adjusteContexts() {
-        MapContext context = getRenderingStrategy().getContext();
+        MapContext context = renderingStrategy.getContext();
 
-        if (context != null && context.getCoordinateReferenceSystem() != null) {
-
-            if (!context.getCoordinateReferenceSystem().equals(memoryMapContext.getCoordinateReferenceSystem())) {
-                try {
-                    memoryMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-                } catch (TransformException ex) {
-                    ex.printStackTrace();
-                } catch (FactoryException ex) {
-                    ex.printStackTrace();
-                }
+        if (!context.getCoordinateReferenceSystem().equals(memoryMapContext.getCoordinateReferenceSystem())) {
+            try {
+                memoryMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
             }
         }
 
-        if (context != null && context.getAreaOfInterest() != null) {
-            memoryMapContext.setAreaOfInterest(context.getAreaOfInterest());
-        }
-                
+        memoryStrategy.setMapArea(renderingStrategy.getMapArea());
         memoryStrategy.refresh();
     }
 
@@ -191,21 +185,10 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     @Override
     protected void mapContextChanged(Map2DContextEvent event) {
-
-        if (event.getPreviousContext() != null) {
-            event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-        }
-
-        if (event.getNewContext() != null) {
-            event.getNewContext().addMapLayerListListener(mapLayerListlistener);
-        }
-
         super.mapContextChanged(event);
-    }
-
-    @Override
-    public void setRenderingStrategy(RenderingStrategy stratege) {
-        super.setRenderingStrategy(stratege);
+        
+        event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
+        event.getNewContext().addMapLayerListListener(mapLayerListlistener);
     }
 
 
@@ -239,7 +222,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         if (editionLayer != layer) {
             editionHandler.cancelEdition();
-            
+
             fireEditLayerChanged(editionLayer, layer);
             editionLayer = layer;
         }
@@ -249,7 +232,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     public MapLayer getEditedMapLayer() {
         return editionLayer;
     }
-    
+
     public void setMemoryLayers(MapLayer[] layers) {
         memoryMapContext.clearLayerList();
         memoryMapContext.addLayers(layers);
@@ -314,7 +297,5 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             return null;
         }
     }
-
-    
 }
 

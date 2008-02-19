@@ -36,10 +36,10 @@ public final class SelectionTreeTableColumn extends TreeTableColumn {
     
     /**
      * column with checkbox for jcontexttree
+     * @param map 
      */
     public SelectionTreeTableColumn(SelectableMap2D map) {
-        this.map = map;
-        
+                
         setCellEditor( new DefaultCellEditor(renderComp));
         setCellRenderer( new DefaultCellRenderer(editComp));
                 
@@ -54,6 +54,8 @@ public final class SelectionTreeTableColumn extends TreeTableColumn {
         setWidth(25);
         
         setEditableOnMouseOver(true);
+        
+        setMap(map);
     }
          
     public void setMap(SelectableMap2D map){

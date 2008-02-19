@@ -32,7 +32,7 @@ public interface RenderingStrategy {
     
     /**
      * set the GTRenderer used
-     * @param renderer : GTRenderer to use, should never be null
+     * @param renderer : GTRenderer to use, can not be null
      */
     public void setRenderer(GTRenderer renderer);
     
@@ -64,7 +64,7 @@ public interface RenderingStrategy {
 
     /**
      * set the MapContext
-     * @param context : use null to remove the mapcontext 
+     * @param context : can not be null 
      */
     public void setContext(MapContext context);
     
@@ -76,7 +76,7 @@ public interface RenderingStrategy {
     
     /**
      * set the maparea to look at
-     * @param area
+     * @param area : can not be null 
      */
     public void setMapArea(Envelope area);
     

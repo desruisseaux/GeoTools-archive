@@ -56,7 +56,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     /**
      * Rendering Strategy of the map2d widget, should never be null
      */
-    protected RenderingStrategy renderingStrategy;
+    protected RenderingStrategy renderingStrategy = new SingleBufferedImageStrategy();
     private static final MapDecoration[] EMPTY_OVERLAYER_ARRAY = {};
     private final InformationDecoration informationDecoration = new InformationDecoration();
     private final List<MapDecoration> userDecorations = new ArrayList<MapDecoration>();
@@ -84,7 +84,11 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mainDecorationPane.add(mapDecorationPane, new Integer(1));
 
         add(BorderLayout.CENTER, mainDecorationPane);
-        setRenderingStrategy(new SingleBufferedImageStrategy());
+        
+        renderingStrategy.addStrategyListener(strategylisten);        
+        
+        mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
+        mapDecorationPane.revalidate();
 
 
         setOpaque(false);
@@ -101,7 +105,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //----------------------Use as extend for subclasses------------------------
-
     protected void mapAreaChanged(Map2DMapAreaEvent event) {
 
     }
@@ -128,7 +131,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //----------------------Over/Sub/information layers-------------------------
-
     public InformationDecoration getInformationLayer() {
         return informationDecoration;
     }
@@ -204,7 +206,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //-----------------------------MAP2D----------------------------------------
-    
     public Coordinate toMapCoord(int mx, int my) {
         Envelope mapArea = renderingStrategy.getMapArea();
 
@@ -221,58 +222,37 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
     }
-    
 
-    public void setRenderingStrategy(RenderingStrategy stratege) {
+    public void setRenderingStrategy(RenderingStrategy strategy) {
 
-        if (stratege == null) {
+        if (strategy == null) {
             throw new NullPointerException();
         }
 
-        if (stratege != null) {
+        RenderingStrategy oldStrategy = renderingStrategy;
 
+        //removing old strategy
+        GTRenderer ren = renderingStrategy.getRenderer();
+        MapContext context = renderingStrategy.getContext();
+        mapDecorationPane.remove(renderingStrategy.getComponent());        
+        renderingStrategy.removeStrategyListener(strategylisten);
+        
+        //adding new strategy
+        renderingStrategy = strategy;
+        renderingStrategy.addStrategyListener(strategylisten);
+        renderingStrategy.setRenderer(ren);
+        renderingStrategy.setContext(context);
+        
+        
+        mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
+        mapDecorationPane.revalidate();
 
-            fireStrategyChanged(renderingStrategy, stratege);
+        fireStrategyChanged(oldStrategy, renderingStrategy);
 
-            GTRenderer ren = null;
-            MapContext context = null;
-
-            if (renderingStrategy != null) {
-                ren = renderingStrategy.getRenderer();
-                context = renderingStrategy.getContext();
-
-                if (context != null) {
-                    context.removePropertyChangeListener(crslisten);
-                }
-
-                renderingStrategy.setContext(null);
-                mapDecorationPane.remove(renderingStrategy.getComponent());
-                renderingStrategy.removeStrategyListener(strategylisten);
-            }
-            renderingStrategy = stratege;
-            renderingStrategy.addStrategyListener(strategylisten);
-
-            if (ren != null) {
-                renderingStrategy.setRenderer(ren);
-            }
-            renderingStrategy.setContext(context);
-
-            if (context != null) {
-                context.addPropertyChangeListener(crslisten);
-            }
-
-            mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
-            mapDecorationPane.revalidate();
-            
-        }
     }
 
     public RenderingStrategy getRenderingStrategy() {
         return renderingStrategy;
-    }
-
-    public void refresh() {
-    //getRenderingStrategy().reset();
     }
 
     public JPanel getComponent() {
@@ -292,8 +272,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //---------------------- PRIVATE CLASSES------------------------------------    
-
-
     private class CRSLsiten implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent arg0) {

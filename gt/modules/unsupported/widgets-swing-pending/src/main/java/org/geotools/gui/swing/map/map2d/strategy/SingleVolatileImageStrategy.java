@@ -28,7 +28,6 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
@@ -38,13 +37,14 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * use a single volatileImage. fast.
@@ -55,9 +55,9 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
     private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
     private final EventListenerList listeners = new EventListenerList();
-    private MapContext context = null;
-    private GTRenderer renderer = null;
-    private Envelope compMapArea = null;
+    private MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+    private GTRenderer renderer = new ShapefileRenderer();
+    private Envelope compMapArea = new Envelope(0, 0, 1, 1);
     private ReferencedEnvelope oldAreaOfInterest = null;
     private Rectangle oldRect = null;
     private final DrawingThread thread = new DrawingThread();
@@ -70,49 +70,37 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     private boolean isRendering = false;
 
     /**
-     * create a default SingleVolatileImageStrategy
+     * create a default SingleBufferedImageStrategy
      */
     public SingleVolatileImageStrategy() {
         this(new ShapefileRenderer());
     }
 
+
     private void opimizeRenderer() {
 
-        if (renderer != null) {
-            Map rendererParams = new HashMap();
-            rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
-            rendererParams.put("maxFiltersToSendToDatastore", new Integer(20));
-            //rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
-            // rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
-            rendererParams.put(ShapefileRenderer.SCALE_COMPUTATION_METHOD_KEY, ShapefileRenderer.SCALE_OGC);
-            renderer.setRendererHints(rendererParams);
+        Map rendererParams = new HashMap();
+        rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
+        rendererParams.put("maxFiltersToSendToDatastore", new Integer(20));
+        //rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
+        // rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
+        rendererParams.put(ShapefileRenderer.SCALE_COMPUTATION_METHOD_KEY, ShapefileRenderer.SCALE_OGC);
+        renderer.setRendererHints(rendererParams);
 
-            RenderingHints rh;
-            rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            rh.add(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
-            rh.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
-            rh.add(new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED));
-            rh.add(new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
-            rh.add(new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE));
-            renderer.setJava2DHints(rh);
-        }
+        RenderingHints rh;
+        rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        rh.add(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
+        rh.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
+        rh.add(new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED));
+        rh.add(new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+        rh.add(new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE));
+        renderer.setJava2DHints(rh);
+
 
     }
 
-    private Envelope fixAspectRatio(Rectangle rect, Envelope area, MapContext context) {
-
-        if (area == null && context != null) {
-            try {
-                area = context.getLayerBounds();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (area == null) {
-            return null;
-        }
-
+    private Envelope fixAspectRatio(Rectangle rect, Envelope area) {
+        
         double mapWidth = area.getWidth(); /* get the extent of the map */
         double mapHeight = area.getHeight();
         double scaleX = rect.getWidth() / area.getWidth(); /*
@@ -141,15 +129,6 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         return new Envelope(ll, ur);
     }
 
-    private void fitMapArea() {
-        try {
-            if (context != null && context.getAreaOfInterest() != null) {
-                setMapArea(context.getAreaOfInterest());
-            }
-        } catch (Exception e) {
-        }
-    }
-
     private void fit() {
 
         if (checkAspect()) {
@@ -168,25 +147,29 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
         Rectangle newRect = comp.getBounds();
 
-        ReferencedEnvelope newAreaOfInterest = null;
-        if (context != null) {
-            try {
-                newAreaOfInterest = context.getAreaOfInterest();
-            } catch (Exception e) {
-            }
+        ReferencedEnvelope newAreaOfInterest = new ReferencedEnvelope(compMapArea, context.getCoordinateReferenceSystem());
 
-            if (newAreaOfInterest != null && (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest))) {
-                changed = true;
-                oldRect = newRect;
-                oldAreaOfInterest = newAreaOfInterest;
-            }
-
+        if (!newRect.equals(oldRect) || !newAreaOfInterest.equals(oldAreaOfInterest)) {
+            changed = true;
+            oldRect = newRect;
+            oldAreaOfInterest = newAreaOfInterest;
         }
 
         return changed;
     }
+    private boolean lock = false;
+
+    public void setLock(boolean val) {
+        lock = val;
+    }
+
+    public boolean isLock() {
+        return lock;
+    }
 
     //------------------TRIGGERS------------------------------------------------
+    
+
     private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
         Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
 
@@ -212,23 +195,21 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     //-----------------------RenderingStrategy----------------------------------
     public synchronized BufferedImage createBufferImage(MapLayer layer) {
 
-        if (context != null) {
-            try {
-                buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-            } catch (Exception e) {
-            }
-
-            buffercontext.addLayer(layer);
-            BufferedImage buf = createBufferImage(buffercontext);
-            buffercontext.clearLayerList();
-            return buf;
-        } else {
-            return null;
+        try {
+            buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+        } catch (Exception e) {
         }
+
+        buffercontext.addLayer(layer);
+        BufferedImage buf = createBufferImage(buffercontext);
+        buffercontext.clearLayerList();
+        return buf;
 
     }
 
     public synchronized BufferedImage createBufferImage(MapContext context) {
+
+
         synchronized (renderer) {
             Rectangle newRect = comp.getBounds();
             Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
@@ -237,18 +218,20 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
                 //NOT OPTIMIZED
 //            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
 //            Graphics2D ig = buf.createGraphics();
-                //GC ACCELERATION 
+                //GraphicsConfiguration ACCELERATION 
                 BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
                 Graphics2D ig = buf.createGraphics();
 
                 renderer.stopRendering();
                 renderer.setContext(context);
                 renderer.paint((Graphics2D) ig, mapRectangle, compMapArea);
+
                 return buf;
             } else {
                 return null;
             }
         }
+
     }
 
     public BufferedImage getBufferImage() {
@@ -269,20 +252,20 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
     public void setContext(MapContext context) {
 
+        if (context == null) {
+            throw new NullPointerException("Context can't be null");
+        }
+
+
         if (this.context != context) {
-            if (this.context != null) {
-                this.context.removeMapLayerListListener(mapLayerListlistener);
-            }
+            this.context.removeMapLayerListListener(mapLayerListlistener);
 
             MapContext oldContext = this.context;
             this.context = context;
-            fireMapContextChanged(oldContext, this.context);
-
-            if (context != null) {
-                this.context.addMapLayerListListener(mapLayerListlistener);
-            }
-
+            this.context.addMapLayerListListener(mapLayerListlistener);
             fit();
+            
+            fireMapContextChanged(oldContext, this.context);
         }
     }
 
@@ -291,23 +274,22 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     }
 
     public void setMapArea(Envelope area) {
-        if (context != null) {
-            Envelope oldenv = context.getAreaOfInterest();
-            Envelope env = fixAspectRatio(comp.getBounds(), area, context);
-            CoordinateReferenceSystem crs = context.getCoordinateReferenceSystem();
-            if (env != null && crs != null) {
-                context.setAreaOfInterest(env, crs);
-            }
-            fit();
-            fireMapAreaChanged(oldenv, env);
+        
+        if(area == null){
+            throw new NullPointerException("Area can't be null.");
         }
+        
+        Envelope oldenv = compMapArea;
+        Envelope env = fixAspectRatio(comp.getBounds(), area);
+        compMapArea = env;
+        
+        fit();
+        fireMapAreaChanged(oldenv, env);
+
     }
 
     public Envelope getMapArea() {
-        if (context == null) {
-            return null;
-        }
-        return context.getAreaOfInterest();
+        return compMapArea;
     }
 
     public void addStrategyListener(StrategyListener listener) {
@@ -337,10 +319,11 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
     public boolean isAutoRefresh() {
         return autorefresh;
     }
-    
+
     public boolean isPainting() {
         return isRendering;
     }
+
     
     ////////////////////////////////////////////////////////////////////////////
     // ------------- different from SingleBufferedImageStrategy --------------//
@@ -360,14 +343,14 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         comp.addComponentListener(new ComponentListener() {
 
             public void componentResized(ComponentEvent arg0) {
-                fitMapArea();
+                setMapArea(compMapArea);
             }
 
             public void componentMoved(ComponentEvent arg0) {
             }
 
             public void componentShown(ComponentEvent arg0) {
-                fitMapArea();
+                setMapArea(compMapArea);
             }
 
             public void componentHidden(ComponentEvent arg0) {
@@ -394,10 +377,10 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
-        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (mapRectangle.width > 0 && mapRectangle.height > 0) {
             getRenderer().setContext(context);
             try {
-                getRenderer().paint((Graphics2D) ig, mapRectangle, context.getAreaOfInterest());
+                getRenderer().paint((Graphics2D) ig, mapRectangle, compMapArea);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -410,7 +393,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
 
 
-        if (context != null && context.getAreaOfInterest() != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (mapRectangle.width > 0 && mapRectangle.height > 0) {
             return GC.createCompatibleVolatileImage(mapRectangle.width, mapRectangle.height, VolatileImage.TRANSLUCENT);
         } else {
             return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
@@ -419,7 +402,7 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
 
     public void refresh() {
         try {
-            compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest(), context);
+            compMapArea = fixAspectRatio(comp.getBounds(), context.getAreaOfInterest());
         } catch (Exception e) {
         }
 
@@ -457,11 +440,10 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
                 if (mustupdate) {
                     mustupdate = false;
                     fireRenderingEvent(true);
-                    if (context != null && compMapArea != null) {
                         VolatileImage img = createBackBuffer();
                         comp.setBuffer(img);
                         renderOn(img.createGraphics());
-                    }
+                    
                     fireRenderingEvent(false);
                 }
 

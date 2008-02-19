@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
@@ -36,18 +37,18 @@ public class ZoomAllAction extends AbstractAction {
     public void actionPerformed(ActionEvent arg0) {
         if (map != null) {
 
-            
-            MapContext context = map.getRenderingStrategy().getContext();
-            
-            if(context != null ){
-                try {
-                    map.getRenderingStrategy().setMapArea(context.getLayerBounds());
-                } catch (IOException ex) {
-                    Logger.getLogger(ZoomAllAction.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            
 
+            MapContext context = map.getRenderingStrategy().getContext();
+
+            try {
+                ReferencedEnvelope env = context.getLayerBounds();
+
+                if (env != null) {
+                    map.getRenderingStrategy().setMapArea(env);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

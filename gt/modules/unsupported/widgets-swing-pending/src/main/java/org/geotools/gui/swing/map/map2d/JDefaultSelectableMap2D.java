@@ -198,7 +198,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     public Geometry projectGeometry(Geometry geom, MapLayer layer) {
         MathTransform transform = null;
 
-        MapContext context = getRenderingStrategy().getContext();
+        MapContext context = renderingStrategy.getContext();
         CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
         CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
 
@@ -254,8 +254,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      */
     public Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
         MathTransform transform = null;
-
-        MapContext context = getRenderingStrategy().getContext();
 
         if (outCRS == null) {
             outCRS = inCRS;
@@ -405,9 +403,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         for (FeatureTypeStyle fts : style.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
-
-                Filter nf = STYLE_BUILDER.getFilterFactory().and(r.getFilter(), f);
-
                 r.setFilter(f);
             }
         }
@@ -450,32 +445,32 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     //---------------------MAP2D OVERLOAD---------------------------------------  
     @Override
     public void setActionState(ACTION_STATE state) {
-
+        super.setActionState(state);
+        
         if (state == ACTION_STATE.SELECT && !selectionHandler.isInstalled()) {
             selectionHandler.install(this);
         } else if (selectionHandler.isInstalled()) {
             selectionHandler.uninstall();
         }
 
-        super.setActionState(state);
+        
     }
 
     @Override
     protected void mapAreaChanged(Map2DMapAreaEvent event) {
         super.mapAreaChanged(event);
 
-        MapContext context = getRenderingStrategy().getContext();
+        MapContext context = renderingStrategy.getContext();
 
-        if (context != null && context.getCoordinateReferenceSystem() != null) {
 
-            try {
-                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-            } catch (TransformException ex) {
-                ex.printStackTrace();
-            } catch (FactoryException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+        } catch (TransformException ex) {
+            ex.printStackTrace();
+        } catch (FactoryException ex) {
+            ex.printStackTrace();
         }
+
 
 
         selectionStrategy.setMapArea(event.getNewMapArea());
@@ -483,23 +478,26 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     @Override
     protected void crsChanged(PropertyChangeEvent arg0) {
+        super.crsChanged(arg0);
+        
+        MapContext context = renderingStrategy.getContext();
 
-        MapContext context = getRenderingStrategy().getContext();
-
-        if (context != null && context.getCoordinateReferenceSystem() != null) {
-            try {
-                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-            } catch (TransformException ex) {
-                ex.printStackTrace();
-            } catch (FactoryException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+        } catch (TransformException ex) {
+            ex.printStackTrace();
+        } catch (FactoryException ex) {
+            ex.printStackTrace();
         }
+        
+        selectionStrategy.refresh();
+
     }
 
     @Override
     protected void mapContextChanged(Map2DContextEvent event) {
-
+        super.mapContextChanged(event);
+                
         if (event.getNewContext() != oldMapcontext) {
             oldMapcontext = event.getNewContext();
 
@@ -508,40 +506,30 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
             MapContext context = event.getNewContext();
 
-            if (context != null && context.getCoordinateReferenceSystem() != null) {
-                try {
-                    selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-                    if (context.getAreaOfInterest() != null) {
-                        selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
-                    }
-                } catch (TransformException ex) {
-                    ex.printStackTrace();
-                } catch (FactoryException ex) {
-                    ex.printStackTrace();
-                }
+            try {
+                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+                selectionStrategy.setMapArea(renderingStrategy.getMapArea());
+
+            } catch (TransformException ex) {
+                ex.printStackTrace();
+            } catch (FactoryException ex) {
+                ex.printStackTrace();
             }
 
-            if (event.getPreviousContext() != null) {
-                event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-            }
-
-            if (event.getNewContext() != null) {
-                event.getNewContext().addMapLayerListListener(mapLayerListlistener);
-            }
+            event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
+            event.getNewContext().addMapLayerListListener(mapLayerListlistener);
         }
 
-
-        super.mapContextChanged(event);
     }
 
     @Override
     public void setRenderingStrategy(RenderingStrategy stratege) {
-
-        if (actionState == ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
+        ACTION_STATE oldAction = actionState;
+        super.setRenderingStrategy(stratege);
+        
+        if (oldAction == ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
             selectionHandler.uninstall();
         }
-
-        super.setRenderingStrategy(stratege);
 
         if (actionState == ACTION_STATE.SELECT) {
             selectionHandler.install(this);
@@ -553,22 +541,17 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     protected void setRendering(boolean render) {
         super.setRendering(render);
 
-        MapContext context = getRenderingStrategy().getContext();
+        MapContext context = renderingStrategy.getContext();
 
-        if (context != null && context.getCoordinateReferenceSystem() != null) {
-            try {
-                selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-            } catch (TransformException ex) {
-                ex.printStackTrace();
-            } catch (FactoryException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+        } catch (TransformException ex) {
+            ex.printStackTrace();
+        } catch (FactoryException ex) {
+            ex.printStackTrace();
         }
 
-        if (context != null && context.getAreaOfInterest() != null) {
-            selectionMapContext.setAreaOfInterest(context.getAreaOfInterest());
-        }
-
+        selectionStrategy.setMapArea(renderingStrategy.getMapArea());
         selectionStrategy.refresh();
 
     }
@@ -676,13 +659,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     public void doSelection(Geometry geometry) {
-
         selectionGeometrie = geometry;
 
-        MapContext context = renderingStrategy.getContext();
         Filter f = null;
 
-        if ((context == null) || (selectionMapContext.getLayerCount() == 0)) {
+        if (selectionMapContext.getLayerCount() == 0) {
             return;
         }
 
@@ -734,28 +715,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     private class BufferComponent extends JComponent implements MapDecoration {
 
-        private BufferedImage img;
-        private Rectangle oldone = null;
-        private Rectangle newone = null;
-
         public BufferComponent() {
             setLayout(new BorderLayout());
             add(selectionStrategy.getComponent());
         }
 
-//        public void setBuffer(BufferedImage buf) {
-//            img = buf;
-//            repaint();
-//        }
-
-//        @Override
-//        public void paintComponent(Graphics g) {
-//            newone = getBounds();
-//            if (img != null) {
-//                g.drawImage(img, 0, 0, this);
-//            }
-//
-//        }
         public void refresh() {
         }
 

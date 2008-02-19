@@ -40,8 +40,8 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem {
      */
     public LayerZoomItem(Map2D map) {
         this.setText(BUNDLE.getString("zoom_to_layer"));
+        init();        
         setMap(map);
-        init();
     }
 
     public void setMap(Map2D map) {

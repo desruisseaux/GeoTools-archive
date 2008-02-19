@@ -18,7 +18,6 @@ package org.geotools.gui.swing.map.map2d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Cursor;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -27,7 +26,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.event.MouseInputListener;
@@ -108,6 +106,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     @Override
     protected void mapContextChanged(Map2DContextEvent event) {
         super.mapContextChanged(event);
+        
         mapAreas.clear();
 
         lastMapArea = getRenderingStrategy().getMapArea();
@@ -243,8 +242,6 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
             Envelope mapArea = renderingStrategy.getMapArea();
 
-            if (mapArea != null) {
-
                 if ((x1 == x2) && (y1 == y2)) {
                     return;
                 }
@@ -347,7 +344,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
                     renderingStrategy.setMapArea(new Envelope(ll, ur));
 
-                }
+                
             }
         }
 
@@ -357,7 +354,6 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
             Envelope mapArea = renderingStrategy.getMapArea();
 
-            if (mapArea != null) {
                 Rectangle bounds = getBounds();
                 double x = (double) (e.getX());
                 double y = (double) (e.getY());
@@ -425,7 +421,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
 
 
 
-            }
+            
 
         }
 
