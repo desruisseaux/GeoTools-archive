@@ -215,8 +215,7 @@ public class MySQLDataStore extends JDBCDataStore {
 
         try {
             int dataType = rs.getInt(DATA_TYPE);
-
-            if (dataType == Types.OTHER) {
+            if (dataType == Types.OTHER || dataType == Types.BINARY) {
                 //this is MySQL-specific; handle it
                 String typeName = rs.getString(TYPE_NAME);
                 String typeNameLower = typeName.toLowerCase();
@@ -264,8 +263,9 @@ public class MySQLDataStore extends JDBCDataStore {
         //SQLEncoder encoder = new SQLEncoder();
         SQLEncoderMySQL encoder = new SQLEncoderMySQL();
         encoder.setFIDMapper(getFIDMapper(typeName));
-
-        return new MySQLSQLBuilder(encoder, getSchema(typeName));
+        MySQLSQLBuilder builder = new MySQLSQLBuilder(encoder, getSchema(typeName));
+        builder.setWKBEnabled(wkbEnabled);
+        return builder;
     }
 
     /**

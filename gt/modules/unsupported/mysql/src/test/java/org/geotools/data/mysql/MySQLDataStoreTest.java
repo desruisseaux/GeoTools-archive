@@ -132,6 +132,7 @@ public class MySQLDataStoreTest extends TestCase {
         dstore = new MySQLDataStore(connPool, namespace);
         dstore.setFIDMapper("testset",
             new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
+        dstore.setWKBEnabled(true);
         schema = dstore.getSchema(FEATURE_TABLE);
     }
 
