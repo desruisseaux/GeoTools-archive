@@ -71,6 +71,7 @@ import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.ImageDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
+import org.geotools.gui.swing.map.map2d.minimap.JMiniMap;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
 import org.geotools.gui.swing.toolbox.widgettool.WidgetToolListener;
@@ -96,6 +97,7 @@ public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private final JDefaultEditableMap2D map;
+    private final JMiniMap minimap;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -120,12 +122,13 @@ public class DemoAll extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         map = new JDefaultEditableMap2D();
+        minimap = new JMiniMap();
 
         final MapContext context = buildContext();
         initTree(tree, map);
 
-        pan_mappane.setLayout(new GridLayout(1, 1));
-        pan_mappane.add(map);
+        pan_mappane.add(BorderLayout.CENTER,map);
+        pan_minimap.add(BorderLayout.CENTER,minimap);
 
         tree.addContext(context);
 
@@ -225,6 +228,7 @@ public class DemoAll extends javax.swing.JFrame {
         });
 
         map.getRenderingStrategy().setContext(context);
+        minimap.setRelatedMap2D(map);
 
 
     }
@@ -324,9 +328,11 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane = new javax.swing.JPanel();
         gui_map2dinfo = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
         jPanel4 = new javax.swing.JPanel();
+        jSplitPane2 = new javax.swing.JSplitPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
         pantoolbox = new javax.swing.JPanel();
+        pan_minimap = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
@@ -435,18 +441,7 @@ public class DemoAll extends javax.swing.JFrame {
         jpanel8.setLayout(new java.awt.BorderLayout());
 
         pan_mappane.setOpaque(false);
-
-        org.jdesktop.layout.GroupLayout pan_mappaneLayout = new org.jdesktop.layout.GroupLayout(pan_mappane);
-        pan_mappane.setLayout(pan_mappaneLayout);
-        pan_mappaneLayout.setHorizontalGroup(
-            pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 486, Short.MAX_VALUE)
-        );
-        pan_mappaneLayout.setVerticalGroup(
-            pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 456, Short.MAX_VALUE)
-        );
-
+        pan_mappane.setLayout(new java.awt.BorderLayout());
         jpanel8.add(pan_mappane, java.awt.BorderLayout.CENTER);
 
         gui_map2dinfo.setFloatable(false);
@@ -454,20 +449,28 @@ public class DemoAll extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jpanel8);
 
+        jSplitPane2.setDividerLocation(300);
+        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
         jTabbedPane1.addTab("ContextTree", tree);
 
         pantoolbox.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("ToolBox", pantoolbox);
 
+        jSplitPane2.setTopComponent(jTabbedPane1);
+
+        pan_minimap.setLayout(new java.awt.BorderLayout());
+        jSplitPane2.setRightComponent(pan_minimap);
+
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
@@ -1046,12 +1049,14 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
+    private javax.swing.JPanel pan_minimap;
     private javax.swing.JPanel pantoolbox;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
