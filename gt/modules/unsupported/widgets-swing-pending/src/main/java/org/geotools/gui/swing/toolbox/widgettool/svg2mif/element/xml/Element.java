@@ -5,8 +5,8 @@
  */
 
 package org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml;
-import java.util.StringTokenizer;
 import java.util.Hashtable;
+import java.util.StringTokenizer;
 /**
  *
  * @author  Carmen Delessio 

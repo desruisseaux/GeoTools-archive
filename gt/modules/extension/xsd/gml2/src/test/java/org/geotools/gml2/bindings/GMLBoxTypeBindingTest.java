@@ -15,11 +15,12 @@
  */
 package org.geotools.gml2.bindings;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.gml2.GML;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {

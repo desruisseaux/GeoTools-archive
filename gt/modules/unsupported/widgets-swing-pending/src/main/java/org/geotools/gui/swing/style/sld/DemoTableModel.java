@@ -17,8 +17,8 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.io.InputStream;
-
 import java.util.ResourceBundle;
+
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 

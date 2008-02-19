@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </code>
  * </p>
  * <p>
- * On the bright side this means we can "fix" all the FeatureCollection implementations
+ * On the bright side this means we can "fix" all the FeatureCollection<SimpleFeatureType, SimpleFeature> implementations
  * in one fell-swoop.
  * </p>
  * 
@@ -64,7 +64,7 @@ public abstract class FeatureState {
         data = collection;
     }
 	//
-	// FeatureCollection Event Support
+	// FeatureCollection<SimpleFeatureType, SimpleFeature> Event Support
 	//
 
     /**
@@ -130,10 +130,10 @@ public abstract class FeatureState {
     
     public abstract String getId();
     
-    public FeatureCollection getParent(){
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent(){
         return null;        
     }
-    public void setParent( FeatureCollection parent ){
+    public void setParent( FeatureCollection<SimpleFeatureType, SimpleFeature> parent ){
         throw new UnsupportedOperationException();
     }
     public Object[] getAttributes( Object[] attributes ) {

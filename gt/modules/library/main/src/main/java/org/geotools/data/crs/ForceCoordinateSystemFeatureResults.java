@@ -24,6 +24,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.feature.collection.AbstractResourceCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -59,7 +60,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @version $Id$
  */
 public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollection {
-    FeatureCollection results;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> results;
     //FeatureType schema;
     
     public ForceCoordinateSystemFeatureResults(FeatureCollection results,
@@ -75,7 +76,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         setResourceCollection(createResourceCollection());
     }
     
-    private static SimpleFeatureType origionalType( FeatureCollection results ){
+    private static SimpleFeatureType origionalType( FeatureCollection<SimpleFeatureType, SimpleFeature> results ){
         while( true ){
             if ( results instanceof ReprojectFeatureResults ) {
                 results = ((ReprojectFeatureResults) results).getOrigin();
@@ -138,11 +139,11 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
     /**
      * @see org.geotools.data.FeatureResults#collection()
      */
-//    public FeatureCollection collection() throws IOException {
-//        FeatureCollection collection = FeatureCollections.newCollection();
+//    public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
+//        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 //
 //        try {
-//            FeatureReader reader = reader();
+//             FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader();
 //
 //            while (reader.hasNext()) {
 //                collection.add(reader.next());
@@ -161,7 +162,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
      * ForceCoordinateSystemFeatureResults
      *
      */
-    public FeatureCollection getOrigin() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getOrigin() {
         return results;
     }
 }

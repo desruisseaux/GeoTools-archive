@@ -18,11 +18,13 @@ package org.geotools.gui.swing.map.map2d.control;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JToolBar;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;

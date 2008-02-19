@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.contexttree;
 
 import java.util.EventListener;
+
 import javax.swing.event.TreeSelectionEvent;
 
 /**

@@ -7,17 +7,17 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 /**
- * Decorates a FeatureIterator  with one that filters content.
+ * Decorates a FeatureIterator<SimpleFeature>  with one that filters content.
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class FilteringFeatureIterator implements FeatureIterator {
+public class FilteringFeatureIterator implements FeatureIterator<SimpleFeature> {
 
     /**
      * delegate iterator
      */
-    protected FeatureIterator delegate;
+    protected FeatureIterator<SimpleFeature> delegate;
     /**
      * The Filter
      */
@@ -27,7 +27,7 @@ public class FilteringFeatureIterator implements FeatureIterator {
      */
     protected SimpleFeature next;
     
-    public FilteringFeatureIterator( FeatureIterator delegate, Filter filter ) {
+    public FilteringFeatureIterator( FeatureIterator<SimpleFeature> delegate, Filter filter ) {
         this.delegate = delegate;
         this.filter = filter;
     }

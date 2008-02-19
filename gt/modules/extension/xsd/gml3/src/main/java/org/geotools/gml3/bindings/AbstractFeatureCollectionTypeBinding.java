@@ -16,11 +16,15 @@
 package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
-import org.opengis.feature.simple.SimpleFeature;
+
 import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.GML;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -75,7 +79,7 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        FeatureCollection featureCollection = DefaultFeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = DefaultFeatureCollections.newCollection();
 
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="gml:featureMember"/&gt;
         featureCollection.addAll(node.getChildValues(SimpleFeature.class));
@@ -95,7 +99,7 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
     public Object getProperty(Object object, QName name) {
         //just return the features themselves
         if (GML.featureMembers.equals(name)) {
-            FeatureCollection fc = (FeatureCollection) object;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) object;
 
             return fc;
 

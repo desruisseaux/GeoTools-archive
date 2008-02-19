@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
 public class ReprojectFeatureResults extends AbstractFeatureCollection {
-    FeatureCollection results;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> results;
     MathTransform transform;
 
     /**
@@ -126,7 +126,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
     	};
     }
 
-    private static FeatureCollection origionalCollection( FeatureCollection results ){
+    private static FeatureCollection<SimpleFeatureType, SimpleFeature> origionalCollection( FeatureCollection<SimpleFeatureType, SimpleFeature> results ){
         while( true ){
             if ( results instanceof ReprojectFeatureResults ) {
                 results = ((ReprojectFeatureResults) results).getOrigin();
@@ -138,7 +138,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         }
         return results;
     }
-    private static SimpleFeatureType origionalType( FeatureCollection results ){
+    private static SimpleFeatureType origionalType( FeatureCollection<SimpleFeatureType, SimpleFeature> results ){
         while( true ){
             if ( results instanceof ReprojectFeatureResults ) {
                 results = ((ReprojectFeatureResults) results).getOrigin();
@@ -179,7 +179,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        FeatureIterator r = features();
+        FeatureIterator<SimpleFeature> r = features();
         try {            
             Envelope newBBox = new Envelope();
             Envelope internal;
@@ -207,11 +207,11 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
     /**
      * @see org.geotools.data.FeatureResults#collection()
      *
-    public FeatureCollection collection() throws IOException {
-        FeatureCollection collection = FeatureCollections.newCollection();
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 
         try {
-            FeatureReader reader = reader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader();
 
             while (reader.hasNext()) {
                 collection.add(reader.next());
@@ -229,7 +229,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
      * Returns the feature results wrapped by this reprojecting feature results
      *
      */
-    public FeatureCollection getOrigin() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getOrigin() {
         return results;
     }
 }

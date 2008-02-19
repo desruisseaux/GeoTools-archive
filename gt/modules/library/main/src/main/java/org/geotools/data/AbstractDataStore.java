@@ -16,8 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -27,7 +29,9 @@ import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -49,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * FeatureType getSchema(String typeName)
  * </li>
  * <li>
- * FeatureReader getFeatureReader( typeName )
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader( typeName )
  * </li>
  * <li>
  * FeatureWriter getFeatureWriter( typeName )
@@ -63,7 +67,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Filter getUnsupportedFilter(String typeName, Filter filter)
  * </li>
  * <li>
- * FeatureReader getFeatureReader(String typeName, Query query)
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
  * </li>
  * </ul>
  *
@@ -85,7 +89,7 @@ public abstract class AbstractDataStore implements DataStore {
     /** The logger for the filter module. */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
-    /** Manages listener lists for FeatureSource implementation */
+    /** Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementation */
     public FeatureListenerManager listenerManager = new FeatureListenerManager();
 
     /**
@@ -180,10 +184,10 @@ public abstract class AbstractDataStore implements DataStore {
      *
      * @param typeName
      *
-     * @return FeatureReader over contents of typeName
+     * @return  FeatureReader<SimpleFeatureType, SimpleFeature> over contents of typeName
      * 
      */
-    protected abstract FeatureReader getFeatureReader(String typeName)
+    protected abstract  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
         throws IOException;
     /**
      * Subclass can implement this to provide writing support.
@@ -240,7 +244,7 @@ public abstract class AbstractDataStore implements DataStore {
 
     // Jody - This is my recomendation for DataStore
     // in order to support CS reprojection and override
-    public FeatureSource getView(final Query query)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query)
         throws IOException, SchemaException {
         return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
     }        
@@ -253,7 +257,7 @@ public abstract class AbstractDataStore implements DataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(final String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName)
         throws IOException {
         final SimpleFeatureType featureType = getSchema(typeName);
 
@@ -318,7 +322,7 @@ public abstract class AbstractDataStore implements DataStore {
 
     // Jody - Recomend moving to the following
     // When we are ready for CoordinateSystem support
-    public FeatureReader getFeatureReader(Query query,Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query,Transaction transaction) throws IOException {
         Filter filter = query.getFilter();
         String typeName = query.getTypeName();
         String propertyNames[] = query.getPropertyNames();
@@ -349,7 +353,7 @@ public abstract class AbstractDataStore implements DataStore {
             }
         }
         if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
-            return new EmptyFeatureReader(featureType);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(featureType);
         }
         //GR: allow subclases to implement as much filtering as they can,
         //by returning just it's unsupperted filter
@@ -376,13 +380,13 @@ public abstract class AbstractDataStore implements DataStore {
         // All other functionality will be built as a reader around
         // this class
         //
-        FeatureReader reader = getFeatureReader(typeName, query);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(typeName, query);
 
         if( diff!=null )
-            reader = new DiffFeatureReader(reader, diff, query.getFilter());
+            reader = new DiffFeatureReader<SimpleFeatureType, SimpleFeature>(reader, diff, query.getFilter());
 
         if (!filter.equals( Filter.INCLUDE ) ) {
-            reader = new FilteringFeatureReader(reader, filter);
+            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
         }
 
         if (!featureType.equals(reader.getFeatureType())) {
@@ -391,7 +395,7 @@ public abstract class AbstractDataStore implements DataStore {
         }
 
         if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-			    reader = new MaxFeatureReader(reader, query.getMaxFeatures());
+			    reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, query.getMaxFeatures());
         }
 
         return reader;
@@ -399,7 +403,7 @@ public abstract class AbstractDataStore implements DataStore {
 
     /**
      * GR: this method is called from inside getFeatureReader(Query ,Transaction )
-     * to allow subclasses return an optimized FeatureReader wich supports the
+     * to allow subclasses return an optimized  FeatureReader<SimpleFeatureType, SimpleFeature> wich supports the
      * filter and attributes truncation specified in <code>query</code>
      * <p>
      * A subclass that supports the creation of such an optimized FeatureReader
@@ -407,7 +411,7 @@ public abstract class AbstractDataStore implements DataStore {
      * <code>getFeatureReader(typeName)</code>
      * <p>
      */
-    protected FeatureReader getFeatureReader(String typeName, Query query)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
     throws IOException
     {
       return getFeatureReader(typeName);
@@ -595,5 +599,54 @@ public abstract class AbstractDataStore implements DataStore {
      */
     public void dispose() {
         // nothing to do
+    }
+        
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
     }
 }

@@ -17,6 +17,8 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class MapServerWFSStrategyOnlineTest extends TestCase {
     private static final String TYPE_NAME = "hospitals"; //$NON-NLS-1$
@@ -49,9 +51,9 @@ public class MapServerWFSStrategyOnlineTest extends TestCase {
         
         Query query=new DefaultQuery(TYPE_NAME, filter);
         
-        FeatureCollection features = ds.getFeatureSource(TYPE_NAME).getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = ds.getFeatureSource(TYPE_NAME).getFeatures(query);
         
-        FeatureIterator iter = features.features();
+        FeatureIterator<SimpleFeature> iter = features.features();
         try{
             int count=0;
             while(iter.hasNext()){
@@ -65,9 +67,9 @@ public class MapServerWFSStrategyOnlineTest extends TestCase {
     }
 
     public void testFilterNONE() throws Exception {
-        FeatureSource source=ds.getFeatureSource(TYPE_NAME);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source=ds.getFeatureSource(TYPE_NAME);
 
-        FeatureCollection reader = source.getFeatures(Query.ALL);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> reader = source.getFeatures(Query.ALL);
         assertCorrectSize(reader);
 
         reader = source.getFeatures(Filter.NONE);
@@ -77,8 +79,8 @@ public class MapServerWFSStrategyOnlineTest extends TestCase {
         assertCorrectSize(reader);
 }
 
-    private void assertCorrectSize( FeatureCollection collection ) throws Exception{
-        FeatureIterator iter = collection.features();
+    private void assertCorrectSize( FeatureCollection<SimpleFeatureType, SimpleFeature> collection ) throws Exception{
+        FeatureIterator<SimpleFeature> iter = collection.features();
         
         try{
             int count=0;

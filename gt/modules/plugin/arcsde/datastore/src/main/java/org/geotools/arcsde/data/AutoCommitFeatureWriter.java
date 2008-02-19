@@ -8,6 +8,7 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -22,7 +23,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
 
     public AutoCommitFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader filteredContent, final ArcSDEPooledConnection connection,
+            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcSDEPooledConnection connection,
             FeatureListenerManager listenerManager) throws NoSuchElementException, IOException {
 
         super(fidReader, featureType, filteredContent, connection, listenerManager);

@@ -1,6 +1,7 @@
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.FIX;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +16,7 @@ import org.geotools.data.shapefile.ShpFileType;
 import org.geotools.data.shapefile.ShpFiles;
 import org.geotools.data.shapefile.StorageFile;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * A FeatureWriter for ShapefileDataStore. Uses a write and annotate technique
@@ -33,7 +35,7 @@ class IndexedShapefileFeatureWriter extends ShapefileFeatureWriter implements
 
     public IndexedShapefileFeatureWriter(String typeName, ShpFiles shpFiles,
             IndexedShapefileAttributeReader attsReader,
-            FeatureReader featureReader, IndexedShapefileDataStore datastore)
+             FeatureReader<SimpleFeatureType, SimpleFeature> featureReader, IndexedShapefileDataStore datastore)
             throws IOException {
         super(typeName, shpFiles, attsReader, featureReader);
         this.indexedShapefileDataStore = datastore;

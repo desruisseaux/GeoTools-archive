@@ -28,8 +28,10 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Contains;
@@ -42,7 +44,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * A FeatureReader that considers differences.
+ * A  FeatureReader that considers differences.
  * <p>
  * Used to implement In-Process Transaction support. This implementation will need to peek ahead in
  * order to check for deletetions.
@@ -52,19 +54,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/data/DiffFeatureReader.java $
  */
-public class DiffFeatureReader implements FeatureReader {
-    FeatureReader reader;
+public class DiffFeatureReader<T extends FeatureType, F extends Feature> implements  FeatureReader<T, F> {
+    FeatureReader<T, F> reader;
     Diff diff;
 
     /** Next value as peeked by hasNext() */
-    SimpleFeature next = null;
+    F next = null;
     private Filter filter;
     private Set encounteredFids;
 
-	private Iterator addedIterator;
-	private Iterator modifiedIterator;
+	private Iterator<F> addedIterator;
+	private Iterator<F> modifiedIterator;
 	private int fidIndex=0;
-	private Iterator spatialIndexIterator;
+	private Iterator<F> spatialIndexIterator;
 	
 	private boolean indexedGeometryFilter = false;
 	private boolean fidFilter = false;
@@ -79,7 +81,7 @@ public class DiffFeatureReader implements FeatureReader {
      * @param reader
      * @param diff2 Differences of Feature by FID
      */
-    public DiffFeatureReader( FeatureReader reader, Diff diff2 ) {
+    public DiffFeatureReader(FeatureReader<T, F> reader, Diff diff2 ) {
         this(reader, diff2, Filter.INCLUDE);
     }
 
@@ -93,7 +95,7 @@ public class DiffFeatureReader implements FeatureReader {
      * @param reader
      * @param diff2 Differences of Feature by FID
      */
-    public DiffFeatureReader( FeatureReader reader, Diff diff2, Filter filter ) {
+    public DiffFeatureReader(FeatureReader<T, F> reader, Diff diff2, Filter filter ) {
         this.reader = reader;
         this.diff = diff2;
         this.filter = filter;
@@ -117,16 +119,16 @@ public class DiffFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public SimpleFeatureType getFeatureType() {
+    public T getFeatureType() {
         return reader.getFeatureType();
     }
 
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+    public F next() throws IOException, IllegalAttributeException, NoSuchElementException {
         if (hasNext()) {
-        	SimpleFeature live = next;
+        	F live = next;
         	next = null;
 
             return live;
@@ -143,7 +145,7 @@ public class DiffFeatureReader implements FeatureReader {
             // We found it already
             return true;
         }
-        SimpleFeature peek;
+        F peek;
 
         if( filter==Filter.EXCLUDE)
             return false;
@@ -162,7 +164,7 @@ public class DiffFeatureReader implements FeatureReader {
             encounteredFids.add(fid);
 
             if (diff.modified2.containsKey(fid)) {
-                SimpleFeature changed = (SimpleFeature) diff.modified2.get(fid);
+                F changed = (F) diff.modified2.get(fid);
                 if (changed == TransactionStateDiff.NULL || !filter.evaluate(changed) ) {
                     continue;
                 } else {
@@ -208,7 +210,7 @@ public class DiffFeatureReader implements FeatureReader {
 
 	protected void querySpatialIndex() {
 		while( spatialIndexIterator.hasNext() && next == null ){
-		    SimpleFeature f = (SimpleFeature) spatialIndexIterator.next();
+		    F f = (F) spatialIndexIterator.next();
 			if( encounteredFids.contains(f.getID()) || !filter.evaluate(f)){
 				continue;
 			}
@@ -218,7 +220,7 @@ public class DiffFeatureReader implements FeatureReader {
     
 	protected void queryAdded() {
 		while( addedIterator.hasNext() && next == null ){
-			next = (SimpleFeature) addedIterator.next();
+			next = (F) addedIterator.next();
 			if( encounteredFids.contains(next.getID()) || !filter.evaluate(next)){
 				next = null;
 			}
@@ -227,7 +229,7 @@ public class DiffFeatureReader implements FeatureReader {
 	
 	protected void queryModified() {
 		while( modifiedIterator.hasNext() && next == null ){
-			next = (SimpleFeature) modifiedIterator.next();
+			next = (F) modifiedIterator.next();
 			if( next==TransactionStateDiff.NULL || encounteredFids.contains(next.getID()) || !filter.evaluate(next) ){
 				next = null;
 			}
@@ -245,9 +247,9 @@ public class DiffFeatureReader implements FeatureReader {
 		    	fidIndex++;
 		    	continue;
 		    }
-			next = (SimpleFeature) diff.modified2.get(fid);
+			next = (F) diff.modified2.get(fid);
 		    if( next==null ){
-		    	next = (SimpleFeature) diff.added.get(fid);
+		    	next = (F) diff.added.get(fid);
 		    }
 		    fidIndex++;
 		}

@@ -15,15 +15,16 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
 import org.geotools.gml2.TestConfiguration;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
+import org.opengis.feature.simple.SimpleFeature;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class GMLAbstractFeatureTypeBindingTest extends GMLTestSupport {

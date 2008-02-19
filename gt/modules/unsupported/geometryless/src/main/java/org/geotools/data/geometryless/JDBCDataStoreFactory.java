@@ -18,16 +18,14 @@ package org.geotools.data.geometryless;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import javax.sql.DataSource;
-// import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
-import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.sql.ViewRegisteringFactoryHelper;
 import org.geotools.factory.AbstractFactory;
 

@@ -33,12 +33,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * FeatureCollection decorator that reprojects the default geometry.
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> decorator that reprojects the default geometry.
  * 
  * @author Justin
  */
-public class ReprojectingFeatureCollection extends DecoratingFeatureCollection 
-	implements FeatureCollection {
+public class ReprojectingFeatureCollection extends DecoratingFeatureCollection <SimpleFeatureType, SimpleFeature>
+	implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
 
     /**
      * The transform to the target coordinate reference system
@@ -71,9 +71,9 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
     }
     
     public ReprojectingFeatureCollection(
-		FeatureCollection delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target
-	) {
-    	super(delegate);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> delegate,
+            CoordinateReferenceSystem source, CoordinateReferenceSystem target) {
+        super(delegate);
         this.target = target;
         SimpleFeatureType schema = delegate.getSchema();
         this.schema = reType(schema, target);
@@ -116,11 +116,11 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         }
     }
 
-    public FeatureReader reader() throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
         return new DelegateFeatureReader(getSchema(), features());
     }
 
-    public FeatureIterator features() {
+    public FeatureIterator<SimpleFeature> features() {
         return new DelegateFeatureIterator(this, iterator());
     }
 
@@ -149,7 +149,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         return this.schema;
     }
 
-    public FeatureCollection subCollection(Filter filter) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
         Filter unFilter = unFilter(filter);
         return new ReprojectingFeatureCollection(delegate
                 .subCollection(unFilter), target);
@@ -172,7 +172,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         return filter;
     }
 
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
         // return new ReprojectingFeatureList( delegate.sort( order ), target );
         throw new UnsupportedOperationException("Not yet");
     }
@@ -195,7 +195,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         }
     }
 
-    public boolean add(Object o) {
+    public boolean add(SimpleFeature o) {
         // must back project any geometry attributes
         throw new UnsupportedOperationException("Not yet");
         // return delegate.add( o );
@@ -212,7 +212,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        FeatureIterator r = features();
+        FeatureIterator<SimpleFeature> r = features();
         try {
             Envelope newBBox = new Envelope();
             Envelope internal;

@@ -16,15 +16,13 @@
 package org.geotools.gui.swing.contexttree.node;
 
 import javax.swing.Icon;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
+
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
-import org.geotools.data.ServiceInfo;
 import org.geotools.data.jdbc.JDBC1DataStore;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
-import org.geotools.gui.swing.contexttree.ContextTreeModel;
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.LightContextTreeModel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
@@ -41,7 +39,7 @@ public class SourceGroup implements SubNodeGroup {
 
     public void installInNode(final LightContextTreeModel model, ContextTreeNode parentnode) {
         final MapLayer layer = (MapLayer) parentnode.getUserObject();
-        final DataStore ds = layer.getFeatureSource().getDataStore();
+        final DataStore ds = (DataStore) layer.getFeatureSource().getDataStore();
 
         ContextTreeNode node = new ContextTreeNode(model) {
 
@@ -83,7 +81,7 @@ public class SourceGroup implements SubNodeGroup {
 //                }catch(Exception e){}
 
 
-                if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+                if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
                     return "unknown raster : ";
                 } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
 
@@ -107,7 +105,7 @@ public class SourceGroup implements SubNodeGroup {
         node.setUserObject(ds);
 
         String tooltip = null;
-        if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+        if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
 //                    return "unknown raster : " ;
         } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
 

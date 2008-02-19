@@ -15,8 +15,8 @@
  */
 package org.geotools.gml2;
 
-import org.picocontainer.MutablePicoContainer;
 import org.geotools.xml.Configuration;
+import org.picocontainer.MutablePicoContainer;
 
 
 public class TestConfiguration extends Configuration {

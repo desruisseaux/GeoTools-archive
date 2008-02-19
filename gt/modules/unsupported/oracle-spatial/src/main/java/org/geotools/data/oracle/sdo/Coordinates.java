@@ -19,7 +19,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;

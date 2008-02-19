@@ -21,9 +21,8 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.data.jdbc.JDBCFeatureLocking;
-import org.opengis.feature.simple.SimpleFeatureType;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class OracleFeatureLocking extends JDBCFeatureLocking {
 

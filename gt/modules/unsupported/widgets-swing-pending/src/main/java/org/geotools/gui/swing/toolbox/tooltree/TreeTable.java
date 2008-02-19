@@ -15,14 +15,16 @@
  */
 package org.geotools.gui.swing.toolbox.tooltree;
 
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreePath;
+
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;

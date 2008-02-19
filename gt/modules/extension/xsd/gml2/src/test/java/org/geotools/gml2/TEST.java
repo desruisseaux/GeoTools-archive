@@ -16,7 +16,9 @@
 package org.geotools.gml2;
 
 import java.util.Set;
+
 import javax.xml.namespace.QName;
+
 import org.geotools.xml.XSD;
 
 

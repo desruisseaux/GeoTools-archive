@@ -16,7 +16,9 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
+
 import org.geotools.data.FeatureStore;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;

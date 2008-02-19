@@ -15,19 +15,14 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import javax.xml.namespace.QName;
-import org.opengis.feature.Association;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.Name;
+
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.feature.Association;
 
 
 /**

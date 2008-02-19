@@ -21,8 +21,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.shapefile.ShapefileDataStore;

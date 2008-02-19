@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 
@@ -99,7 +100,7 @@ public class VPFFileStore extends AbstractDataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
      */
-    protected FeatureReader getFeatureReader(String pathName)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String pathName)
         throws IOException {
         return new VPFFileFeatureReader((VPFFile) getSchema(pathName));
     }

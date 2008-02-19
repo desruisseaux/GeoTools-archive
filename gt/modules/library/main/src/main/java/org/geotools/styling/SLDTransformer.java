@@ -15,22 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureSource;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureCollection;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.expression.Expression;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.filter.FilterTransformer;
-import org.geotools.gml.producer.FeatureTransformer;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.xml.transform.TransformerBase;
-import org.geotools.xml.transform.Translator;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -40,6 +24,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.FilterTransformer;
+import org.geotools.gml.producer.FeatureTransformer;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.xml.transform.TransformerBase;
+import org.geotools.xml.transform.Translator;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 
 /**
@@ -590,8 +592,8 @@ public class SLDTransformer extends TransformerBase {
             start("InlineFeature");
             try {
                 final String ftName = featureType.getTypeName();
-                final FeatureSource fs = dataStore.getFeatureSource(ftName);
-                final FeatureCollection fc = fs.getFeatures();
+                final FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource(ftName);
+                final FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fs.getFeatures();
                 final FeatureTransformer ftrax = new FeatureTransformer();
                 ftrax.setCollectionNamespace(null);
                 ftrax.setCollectionPrefix(null);

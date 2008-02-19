@@ -24,8 +24,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * UniqueFIDIntegrityValidation purpose.
@@ -188,8 +187,8 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 		
 		while (it.hasNext())// for each layer
 		{
-			FeatureSource featureSource = (FeatureSource) it.next();
-			FeatureIterator features = featureSource.getFeatures().features();
+			FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource) it.next();
+			FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
 			try {
 				 
 				while (features.hasNext())	// for each feature

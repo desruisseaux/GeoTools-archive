@@ -23,6 +23,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -31,10 +32,11 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
+import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.contexttree.renderer.DefaultContextTreeHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
-import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;

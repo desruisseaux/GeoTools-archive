@@ -18,8 +18,10 @@ package org.geotools.gui.swing.toolbox.widgettool.clipping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
+
 import org.geotools.map.MapLayer;
 
 /**

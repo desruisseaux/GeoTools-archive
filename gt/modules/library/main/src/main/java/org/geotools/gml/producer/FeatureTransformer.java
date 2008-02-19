@@ -56,7 +56,7 @@ import java.util.logging.Logger;
  * (hopefully) valid gml. This is a work in progress, so please be patient. A
  * simple example of how to use this class follows:
  * <pre>
- *    FeatureCollection collection; // can also use FeatureReader!!
+ *    FeatureCollection<SimpleFeatureType, SimpleFeature> collection; // can also use FeatureReader!!
  *   OutputStream out;
  *    FeatureTransformer ft = new FeatureTransformer();
  *    // set the indentation to 4 spaces
@@ -412,7 +412,7 @@ public class FeatureTransformer extends TransformerBase {
         public void encode(Object o) throws IllegalArgumentException {
             try {
                 if (o instanceof FeatureCollection) {
-                    FeatureCollection fc = (FeatureCollection) o;
+                    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) o;
                     FeatureCollectionIteration.iteration(this, fc);
                 } else if (o instanceof FeatureCollection[]) {
                     //Did FeatureResult[] so that we are sure they're all the same type.
@@ -437,7 +437,7 @@ public class FeatureTransformer extends TransformerBase {
                     endFeatureCollection();
                 } else if (o instanceof FeatureReader) {
                     // THIS IS A HACK FOR QUICK USE
-                    FeatureReader r = (FeatureReader) o;
+                     FeatureReader<SimpleFeatureType, SimpleFeature> r = (FeatureReader) o;
 
                     startFeatureCollection();
 
@@ -504,7 +504,7 @@ public class FeatureTransformer extends TransformerBase {
             }
         }
         
-        public void handleFeatureReader(FeatureReader reader)
+        public void handleFeatureReader(FeatureReader <SimpleFeatureType, SimpleFeature> reader)
             throws IOException {
             try {
                 while (reader.hasNext() && running) {

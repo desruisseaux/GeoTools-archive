@@ -13,7 +13,6 @@ import org.geotools.gpx.bean.WptType;
 import org.geotools.xml.Encoder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.xml.sax.SAXException;
 
 public class GpxFeatureWriter implements FeatureWriter {
 

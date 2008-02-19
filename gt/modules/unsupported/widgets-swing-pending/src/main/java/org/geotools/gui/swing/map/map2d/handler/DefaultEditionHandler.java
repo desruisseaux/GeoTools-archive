@@ -15,11 +15,6 @@
  */
 package org.geotools.gui.swing.map.map2d.handler;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,14 +24,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.swing.ImageIcon;
+
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *
@@ -131,15 +135,15 @@ public class DefaultEditionHandler extends AbstractEditionHandler {
             Geometry geo = mousePositionToGeometry(mx, my);
             Filter flt = map2D.createFilter(geo, map2D.getEditedMapLayer());
 
-            FeatureCollection editgeoms = null;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> editgeoms = null;
             try {
-                editgeoms = map2D.getEditedMapLayer().getFeatureSource().getFeatures(flt);
+                editgeoms = (FeatureCollection<SimpleFeatureType, SimpleFeature>) map2D.getEditedMapLayer().getFeatureSource().getFeatures(flt);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             if (editgeoms != null) {
-                FeatureIterator fi = editgeoms.features();
+                FeatureIterator<SimpleFeature> fi = editgeoms.features();
                 if (fi.hasNext()) {
                     SimpleFeature sf = fi.next();
                     Object obj = sf.getDefaultGeometry();

@@ -16,6 +16,7 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.RenderingHints;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.strategy.MergeBufferedImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;

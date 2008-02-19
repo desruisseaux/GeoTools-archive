@@ -19,6 +19,7 @@
 package org.geotools.gui.swing.contexttree;
 
 import javax.swing.Icon;
+
 import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 

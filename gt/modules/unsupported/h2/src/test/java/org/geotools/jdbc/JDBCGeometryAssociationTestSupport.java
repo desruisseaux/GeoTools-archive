@@ -22,6 +22,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.identity.GmlObjectId;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -44,7 +45,7 @@ public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport
         query.setTypeName("ga");
         query.setHints(hints);
 
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
 
         SimpleFeature feature = (SimpleFeature) reader.next();
@@ -67,7 +68,7 @@ public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport
         query.setTypeName("ga");
         query.setHints(hints);
 
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
         reader.next();
 
@@ -113,7 +114,7 @@ public abstract class JDBCGeometryAssociationTestSupport extends JDBCTestSupport
         query.setTypeName("ga");
         query.setHints(hints);
 
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
         reader.next();
         assertTrue(reader.hasNext());

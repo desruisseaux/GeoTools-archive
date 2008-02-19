@@ -16,15 +16,18 @@
 
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.map.MapLayer;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * interface for map2d widget how handle Selection

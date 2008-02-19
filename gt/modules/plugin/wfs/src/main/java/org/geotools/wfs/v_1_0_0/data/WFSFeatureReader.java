@@ -70,7 +70,7 @@ public class WFSFeatureReader extends FCBuffer {
      * @return WFSFeatureReader
      * @throws SAXException
      */
-    public static FeatureReader getFeatureReader(URI document, int capacity,
+    public static  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(URI document, int capacity,
         int timeout, WFSTransactionState transaction, SimpleFeatureType ft) throws SAXException {
         HttpURLConnection hc;
 

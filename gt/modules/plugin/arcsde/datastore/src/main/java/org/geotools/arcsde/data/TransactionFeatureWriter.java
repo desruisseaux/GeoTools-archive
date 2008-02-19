@@ -9,6 +9,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -40,7 +41,7 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @throws IOException
      */
     public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader filteredContent, final ArcTransactionState state,
+            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcTransactionState state,
             final FeatureListenerManager listenerManager) throws NoSuchElementException,
             IOException {
 

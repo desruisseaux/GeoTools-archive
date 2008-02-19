@@ -27,13 +27,14 @@ import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.CountVisitor;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
- * Calculates the count value of an attribute for a given FeatureCollection and
+ * Calculates the count value of an attribute for a given FeatureCollection<SimpleFeatureType, SimpleFeature> and
  * Expression.
  * 
  * @author Cory Horner
@@ -125,7 +126,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl{
 		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}
-		FeatureCollection featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

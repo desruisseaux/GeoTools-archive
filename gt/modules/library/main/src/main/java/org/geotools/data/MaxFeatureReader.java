@@ -19,20 +19,20 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.feature.IllegalAttributeException;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
- * Basic support for a FeatureReader that limits itself to the number of
+ * Basic support for a  FeatureReader<SimpleFeatureType, SimpleFeature> that limits itself to the number of
  * features passed in.
  *
  * @author Chris Holmes
  * @source $URL$
  * @version $Id$
  */
-public class MaxFeatureReader implements FeatureReader {
-    protected final FeatureReader featureReader;
+public class MaxFeatureReader<T extends FeatureType, F extends Feature> implements FeatureReader<T, F> {
+    protected final  FeatureReader<T, F> featureReader;
     protected final int maxFeatures;
     protected int counter = 0;
 
@@ -42,12 +42,12 @@ public class MaxFeatureReader implements FeatureReader {
      * @param featureReader FeatureReader being maxed
      * @param maxFeatures DOCUMENT ME!
      */
-    public MaxFeatureReader(FeatureReader featureReader, int maxFeatures) {
+    public MaxFeatureReader(FeatureReader<T, F> featureReader, int maxFeatures) {
         this.featureReader = featureReader;
         this.maxFeatures = maxFeatures;
     }
 
-    public SimpleFeature next()
+    public F next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (hasNext()) {
             counter++;
@@ -62,7 +62,7 @@ public class MaxFeatureReader implements FeatureReader {
         featureReader.close();
     }
 
-    public SimpleFeatureType getFeatureType() {
+    public T getFeatureType() {
         return featureReader.getFeatureType();
     }
 

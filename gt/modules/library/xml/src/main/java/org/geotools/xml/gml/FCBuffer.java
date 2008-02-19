@@ -33,14 +33,14 @@ import org.xml.sax.SAXException;
 
 /**
  * <p>
- * Feature Buffer ... acts as a FeatureReader by making itself as a seperate
+ * Feature Buffer ... acts as a  FeatureReader<SimpleFeatureType, SimpleFeature> by making itself as a seperate
  * thread prior starting execution with the SAX Parser.
  * </p>
  *
  * @author dzwiers
  * @source $URL$
  */
-public class FCBuffer extends Thread implements FeatureReader {
+public class FCBuffer extends Thread implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     /** Last feature is in the buffer */
     public static final int FINISH = -1;
     
@@ -171,23 +171,23 @@ public class FCBuffer extends Thread implements FeatureReader {
      *
      * @throws SAXException
      */
-    public static FeatureReader getFeatureReader(URI document, int capacity)
+    public static  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(URI document, int capacity)
         throws SAXException {
         return getFeatureReader(document,capacity,1000,null);
     }
     
-    public static FeatureReader getFeatureReader(URI document, int capacity, SimpleFeatureType ft)
+    public static  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(URI document, int capacity, SimpleFeatureType ft)
     throws SAXException {
         return getFeatureReader(document,capacity,1000,ft);
 }
 
-    public static FeatureReader getFeatureReader(URI document, int capacity,
+    public static  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(URI document, int capacity,
         int timeout) throws SAXException {
 
         return getFeatureReader(document,capacity,timeout,null);
     }
 
-    public static FeatureReader getFeatureReader(URI document, int capacity,
+    public static  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(URI document, int capacity,
         int timeout, SimpleFeatureType ft) throws SAXException {
         FCBuffer fc = new FCBuffer(document, capacity, timeout,ft);
         fc.start(); // calls run

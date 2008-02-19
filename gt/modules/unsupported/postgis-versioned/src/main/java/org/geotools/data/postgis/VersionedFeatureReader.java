@@ -34,13 +34,13 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @since 2.4
  * 
  */
-class VersionedFeatureReader implements FeatureReader {
+class VersionedFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
 
-    private FeatureReader wrapped;
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> wrapped;
 
     private VersionedFIDMapper fidMapper;
 
-    public VersionedFeatureReader(FeatureReader wrapped, VersionedFIDMapper fidMapper) {
+    public VersionedFeatureReader(FeatureReader <SimpleFeatureType, SimpleFeature> wrapped, VersionedFIDMapper fidMapper) {
         this.wrapped = wrapped;
         this.fidMapper = fidMapper;
     }

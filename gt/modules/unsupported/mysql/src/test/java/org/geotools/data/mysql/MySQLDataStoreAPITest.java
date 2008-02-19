@@ -198,7 +198,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      */
     protected void updateRoadFeaturesFixture() throws Exception {
         Connection conn = pool.getConnection();
-        FeatureReader reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
                 Transaction.AUTO_COMMIT);
 
         ReferencedEnvelope bounds = new ReferencedEnvelope();
@@ -268,7 +268,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      */
     protected void updateRiverFeaturesFixture() throws Exception {
         Connection conn = pool.getConnection();
-        FeatureReader reader = data.getFeatureReader(new DefaultQuery("river", Filter.INCLUDE),
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = data.getFeatureReader(new DefaultQuery("river", Filter.INCLUDE),
                 Transaction.AUTO_COMMIT);
 
         ReferencedEnvelope bounds = new ReferencedEnvelope();
@@ -599,7 +599,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         }
     }
 
-    void assertCovers(String msg, FeatureCollection c1, FeatureCollection c2) {
+    void assertCovers(String msg, FeatureCollection<SimpleFeatureType, SimpleFeature> c1, FeatureCollection<SimpleFeatureType, SimpleFeature> c2) {
         if (c1 == c2) {
             return;
         }
@@ -610,13 +610,13 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         SimpleFeature f;
 
-        for (FeatureIterator i = c1.features(); i.hasNext();) {
+        for (FeatureIterator<SimpleFeature> i = c1.features(); i.hasNext();) {
             f = i.next();
             assertTrue(msg + " " + f.getID(), c2.contains(f));
         }
     }
 
-    public FeatureReader reader(String typeName) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader(String typeName) throws IOException {
         SimpleFeatureType type = data.getSchema(typeName);
 
         return data.getFeatureReader(type, Filter.INCLUDE, Transaction.AUTO_COMMIT);
@@ -632,7 +632,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeatureReaderMutability() throws IOException, IllegalAttributeException {
-        FeatureReader reader = reader("road");
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader("road");
         SimpleFeature feature;
 
         while (reader.hasNext()) {
@@ -660,9 +660,9 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeatureReaderConcurancy()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureReader reader1 = reader("road");
-        FeatureReader reader2 = reader("road");
-        FeatureReader reader3 = reader("river");
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader1 = reader("road");
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader2 = reader("road");
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader3 = reader("river");
 
         SimpleFeature feature1;
         SimpleFeature feature2;
@@ -722,7 +722,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     public void testGetFeatureReaderFilterAutoCommit()
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeatureType type = data.getSchema("road");
-        FeatureReader reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
 
         reader = data.getFeatureReader(type, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         assertFalse(reader instanceof FilteringFeatureReader);
@@ -747,7 +747,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     //        throws NoSuchElementException, IOException, IllegalAttributeException {
     //        Transaction t = new DefaultTransaction();
     //        FeatureType type = data.getSchema("road");
-    //        FeatureReader reader;
+    //         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     //
     //        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
     //        assertTrue(reader instanceof EmptyFeatureReader);
@@ -803,7 +803,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    void assertCovered(SimpleFeature[] features, FeatureReader reader)
+    void assertCovered(SimpleFeature[] features,  FeatureReader<SimpleFeatureType, SimpleFeature> reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -831,7 +831,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      *
      * @throws Exception DOCUMENT ME!
      */
-    void assertMatched(SimpleFeature[] array, FeatureReader reader)
+    void assertMatched(SimpleFeature[] array,  FeatureReader<SimpleFeatureType, SimpleFeature> reader)
         throws Exception {
         SimpleFeature feature;
         int count = 0;
@@ -871,7 +871,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     /**
-     * Ensure that FeatureReader reader contains extactly the contents of
+     * Ensure that  FeatureReader<SimpleFeatureType, SimpleFeature> reader contains extactly the contents of
      * array.
      *
      * @param reader DOCUMENT ME!
@@ -883,7 +883,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    boolean covers(FeatureReader reader, SimpleFeature[] array)
+    boolean covers(FeatureReader <SimpleFeatureType, SimpleFeature> reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;
@@ -905,7 +905,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         return count == array.length;
     }
 
-    boolean covers(FeatureIterator reader, SimpleFeature[] array)
+    boolean covers(FeatureIterator<SimpleFeature> reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;
@@ -927,7 +927,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         return count == array.length;
     }
 
-    boolean coversLax(FeatureReader reader, SimpleFeature[] array)
+    boolean coversLax(FeatureReader <SimpleFeatureType, SimpleFeature> reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;
@@ -949,7 +949,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         return count == array.length;
     }
 
-    void dump(String message, FeatureReader reader)
+    void dump(String message,  FeatureReader<SimpleFeatureType, SimpleFeature> reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;
@@ -1010,7 +1010,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeatureWriterRemove() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -1025,7 +1025,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeatureWriterRemoveAll() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         try {
@@ -1087,7 +1087,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      * @throws IOException We could not use reader
      * @throws IllegalAttributeException if attributeName did not match schema
      */
-    public SimpleFeature findFeature(FeatureReader reader, String attributeName, Object value)
+    public SimpleFeature findFeature(FeatureReader <SimpleFeatureType, SimpleFeature> reader, String attributeName, Object value)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature f;
 
@@ -1118,7 +1118,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public SimpleFeature feature(String typeName, String fid)
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureReader reader = reader(typeName);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader(typeName);
         SimpleFeature f;
 
         try {
@@ -1137,7 +1137,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeaturesWriterModify() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -1222,7 +1222,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     //        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
     //
     //        FeatureType road = data.getSchema("road");
-    //        FeatureReader reader;
+    //         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     //        Feature feature;
     //        Feature[] ORIGIONAL = roadFeatures;
     //        Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
@@ -1348,7 +1348,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     // Feature Source Testing
     public void testGetFeatureSourceRoad() throws IOException {
-        FeatureSource road = data.getFeatureSource("road");
+        FeatureSource<SimpleFeatureType, SimpleFeature> road = data.getFeatureSource("road");
 
         assertEquals(roadType, road.getSchema());
         assertSame(data, road.getDataStore());
@@ -1359,16 +1359,16 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         Envelope bounds = road.getBounds(Query.ALL);
         assertTrue((bounds == null) || bounds.equals(roadBounds));
 
-        FeatureCollection all = road.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> all = road.getFeatures();
         assertEquals(3, all.size());
         assertEquals(roadBounds, all.getBounds());
 
-        FeatureCollection expected = DataUtilities.collection(roadFeatures);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(roadFeatures);
 
         assertCovers("all", expected, all);
         assertEquals(roadBounds, all.getBounds());
 
-        FeatureCollection some = road.getFeatures(rd12Filter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> some = road.getFeatures(rd12Filter);
         assertEquals(2, some.size());
 
         Envelope e = new Envelope();
@@ -1379,11 +1379,11 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         DefaultQuery query = new DefaultQuery("road", rd12Filter, new String[] { "name" });
 
-        FeatureCollection half = road.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> half = road.getFeatures(query);
         assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
-        FeatureIterator reader = half.features();
+        FeatureIterator<SimpleFeature> reader = half.features();
         SimpleFeatureType type = half.getSchema();
         reader.close();
 
@@ -1407,17 +1407,17 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeatureSourceRiver()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureSource river = data.getFeatureSource("river");
+        FeatureSource<SimpleFeatureType, SimpleFeature> river = data.getFeatureSource("river");
 
         assertEquals(riverType, river.getSchema());
         assertSame(data, river.getDataStore());
 
-        FeatureCollection all = river.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> all = river.getFeatures();
         assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
         assertTrue("rivers", covers(all.features(), riverFeatures));
 
-        FeatureCollection expected = DataUtilities.collection(riverFeatures);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);
         assertEquals(riverBounds, all.getBounds());
     }
@@ -1434,7 +1434,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         AttributeDescriptor name = roadType.getAttribute("id");
         road.modifyFeatures(name, changed, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = road.getFeatures(rd1Filter);
         assertEquals(changed, results.features().next().getAttribute("id"));
     }
 
@@ -1447,7 +1447,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         AttributeDescriptor name = roadType.getAttribute("name");
         road.modifyFeatures(new AttributeDescriptor[] { name, }, new Object[] { "changed", }, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("name"));
     }
 
@@ -1468,7 +1468,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeatureStoreSetFeatures()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureReader reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
 
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
@@ -1536,7 +1536,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     //        // road2 adds road.rd4 on t2
     //        // ----------------------------
     //        // - tests transaction independence from each other
-    //        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
+    //         FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new Feature[] { newRoad, });
     //        road2.addFeatures(reader);
     //
     //        // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD

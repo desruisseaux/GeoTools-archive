@@ -158,7 +158,7 @@ public class GazetteerNameValidation extends DefaultFeatureValidation {
 
         Element elem = serviceDoc.getDocumentElement();
 
-        // elem == featureCollection at this point
+        // elem == FeatureCollection<SimpleFeatureType, SimpleFeature> at this point
         elem = getChildElement(elem, "queryInfo");
 
         if (elem == null) {

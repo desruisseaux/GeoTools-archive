@@ -15,12 +15,13 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.GMLObjectTypeListType;
+import javax.xml.namespace.QName;
+
 import net.opengis.wfs.GMLObjectTypeType;
 import net.opengis.wfs.WfsFactory;
-import javax.xml.namespace.QName;
+
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexEMFBinding;
 
 
 /**

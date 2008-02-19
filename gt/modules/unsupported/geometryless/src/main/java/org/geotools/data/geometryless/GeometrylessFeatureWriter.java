@@ -21,6 +21,8 @@ import java.io.IOException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -52,7 +54,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 public class GeometrylessFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();
 
-    public GeometrylessFeatureWriter(FeatureReader fReader, QueryData queryData)
+    public GeometrylessFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader, QueryData queryData)
         throws IOException {
         super(fReader, queryData);
     }

@@ -16,7 +16,6 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +26,6 @@ import javax.sql.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.DataStoreFactorySpi.Param;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /**

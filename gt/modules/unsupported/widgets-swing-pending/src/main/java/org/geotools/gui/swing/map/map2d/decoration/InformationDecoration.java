@@ -22,9 +22,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.Map2D;
 

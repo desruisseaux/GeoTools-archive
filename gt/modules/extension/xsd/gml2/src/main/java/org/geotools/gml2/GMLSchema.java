@@ -18,6 +18,17 @@ package org.geotools.gml2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.geotools.feature.Name;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
+import org.geotools.feature.type.FeatureTypeImpl;
+import org.geotools.feature.type.SchemaImpl;
+import org.geotools.xs.XSSchema;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -30,15 +41,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
-import org.geotools.feature.Name;
-import org.geotools.feature.type.AttributeDescriptorImpl;
-import org.geotools.feature.type.AttributeTypeImpl;
-import org.geotools.feature.type.FeatureTypeImpl;
-import org.geotools.feature.type.SchemaImpl;
-import org.geotools.xs.XSSchema;
 
 
 public class GMLSchema extends SchemaImpl {

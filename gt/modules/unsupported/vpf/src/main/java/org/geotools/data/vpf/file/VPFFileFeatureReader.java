@@ -32,7 +32,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  * @source $URL$
  */
-public class VPFFileFeatureReader implements FeatureReader {
+public class VPFFileFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
     private final VPFFile featureType;
     private SimpleFeature currentFeature;
 

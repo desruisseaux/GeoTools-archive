@@ -28,11 +28,11 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
- * Experimental FeatureReader that always takes the first column of the
+ * Experimental  FeatureReader<SimpleFeatureType, SimpleFeature> that always takes the first column of the
  * attributeReader as the FeatureID.  I want to get this working with postgis,
  * but then will consider other options, for those who want featureIDs created
  * automatically.  Perhaps a constructor param or a method to say that you
- * would just like to have the FeatureReader increment one for each feature,
+ * would just like to have the  FeatureReader<SimpleFeatureType, SimpleFeature> increment one for each feature,
  * prepending the typeName.  I'm also don't really like the one argument
  * constructor defaulting to the xxx typename.  I feel that it should perhaps
  * take a typename.  If people deliberately set to null then we could use xxx
@@ -51,7 +51,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public class FIDFeatureReader implements FeatureReader {
+public class FIDFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     /** The logger for the data module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     private final AttributeReader attributeReader;

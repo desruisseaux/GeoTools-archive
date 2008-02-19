@@ -19,8 +19,8 @@ package org.geotools.gui.swing.datachooser;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
 
 import org.geotools.gui.swing.icon.IconBundle;

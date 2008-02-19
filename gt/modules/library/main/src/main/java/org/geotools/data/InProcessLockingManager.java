@@ -295,7 +295,7 @@ public class InProcessLockingManager implements LockingManager {
      *
      * @return FeatureWriter with lock checking
      */
-    public FeatureWriter checkedWriter(final FeatureWriter writer,
+    public FeatureWriter checkedWriter(final FeatureWriter<SimpleFeatureType, SimpleFeature> writer,
         final Transaction transaction) {
         SimpleFeatureType featureType = writer.getFeatureType();
         final String typeName = featureType.getTypeName();

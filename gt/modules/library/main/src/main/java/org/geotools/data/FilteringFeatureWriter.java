@@ -39,7 +39,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  */
 public class FilteringFeatureWriter implements FeatureWriter {
-    FeatureWriter writer;
+    FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
     Filter filter;
     SimpleFeature next = null; // next feature as peeked by hasNext()
     SimpleFeature current = null; // holds current Feature returned to user

@@ -82,7 +82,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
                 final DefaultQuery geomQuery = new DefaultQuery(this.query);
                 geomQuery.setPropertyNames(new String[] { defaultgeom.getLocalPart() });
 
-                FeatureReader reader;
+                 FeatureReader<SimpleFeatureType, SimpleFeature> reader;
                 reader = protocolHandler.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
                 bounds = new ReferencedEnvelope(contentType.getCRS());
                 try {
@@ -117,7 +117,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
      * {@link WFS110ProtocolHandler#getCount(Query)} returns {@code -1}.
      * </p>
      * 
-     * @return the FeatureCollection size.
+     * @return the FeatureCollection<SimpleFeatureType, SimpleFeature> size.
      * @see DataFeatureCollection#getCount()
      * @see WFS110ProtocolHandler#getCount(Query)
      */
@@ -137,7 +137,7 @@ class WFSFeatureCollection extends DataFeatureCollection {
     @SuppressWarnings("unchecked")
     @Override
     protected Iterator<SimpleFeature> openIterator() throws IOException {
-        FeatureReader reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         reader = protocolHandler.getFeatureReader(query, Transaction.AUTO_COMMIT);
         return new FeatureReaderIterator(reader);
     }

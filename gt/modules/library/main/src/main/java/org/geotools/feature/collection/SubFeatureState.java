@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  */
 public class SubFeatureState extends FeatureState {
-	final FeatureCollection collection;
+	final FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
     
     final CollectionListener listener = new CollectionListener(){        
         public void collectionChanged( CollectionEvent tce ) {
@@ -50,7 +50,7 @@ public class SubFeatureState extends FeatureState {
         }        
     };
     
-	public SubFeatureState( FeatureCollection collection, FeatureCollection sub ){
+	public SubFeatureState( FeatureCollection<SimpleFeatureType, SimpleFeature> collection, FeatureCollection<SimpleFeatureType, SimpleFeature> sub ){
         super( sub );
 		this.collection = collection; 
         collection.addListener( listener );
@@ -64,7 +64,7 @@ public class SubFeatureState extends FeatureState {
     }
 
 	//
-	// FeatureCollection Event Support
+	// FeatureCollection<SimpleFeatureType, SimpleFeature> Event Support
 	//
 
     /**

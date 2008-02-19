@@ -19,12 +19,12 @@ import java.io.IOException;
 
 
 /**
- * FeatureReader customized for FeatureID handling.
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> customized for FeatureID handling.
  * 
  * <p>
  * An experimental method for doing FIDs.   I'd like to see it and
  * AttributeReader extend a similar base.  Perhaps BaseReader or something?
- * And perhaps have FeatureReader extend it too? This reader just returns an
+ * And perhaps have  FeatureReader<SimpleFeatureType, SimpleFeature> extend it too? This reader just returns an
  * incrementing index.  May be sufficient for files, representing rows in a
  * file.  For jdbc datasources another fid reader should be used.
  * </p>

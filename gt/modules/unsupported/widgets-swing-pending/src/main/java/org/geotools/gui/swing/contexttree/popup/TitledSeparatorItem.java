@@ -20,8 +20,8 @@ import java.awt.Component;
 
 import javax.swing.Icon;
 import javax.swing.SwingConstants;
-
 import javax.swing.tree.TreePath;
+
 import org.jdesktop.swingx.JXTitledSeparator;
 
 /**

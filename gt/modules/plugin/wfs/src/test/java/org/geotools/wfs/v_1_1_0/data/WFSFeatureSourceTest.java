@@ -16,7 +16,6 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -33,6 +32,7 @@ import org.geotools.test.TestData;
 import org.geotools.wfs.protocol.ConnectionFactory;
 import org.geotools.wfs.protocol.DefaultConnectionFactory;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
@@ -148,9 +148,9 @@ public class WFSFeatureSourceTest extends DataTestSupport {
      */
     @SuppressWarnings("unchecked")
     public void testGetFeatures() throws IOException {
-        FeatureCollection features = statesSource.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = statesSource.getFeatures();
         assertNotNull(features);
-        Iterator<Feature> iterator = features.iterator();
+        Iterator<SimpleFeature> iterator = features.iterator();
         assertTrue(iterator.hasNext());
         try {
             Feature feature;
@@ -180,11 +180,11 @@ public class WFSFeatureSourceTest extends DataTestSupport {
     }
 
     @SuppressWarnings("unchecked")
-    private void testGetFeaturesQueryProperties(final FeatureSource source, final String typeName,
+    private void testGetFeaturesQueryProperties(final FeatureSource<SimpleFeatureType, SimpleFeature> source, final String typeName,
             final String[] propertyNames) throws IOException {
 
         Query query = new DefaultQuery(typeName, Filter.INCLUDE, propertyNames);
-        FeatureCollection features = source.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures(query);
         assertNotNull(features);
 
         SimpleFeatureType contentType = features.getSchema();
@@ -192,7 +192,7 @@ public class WFSFeatureSourceTest extends DataTestSupport {
         Collection<PropertyDescriptor> properties = contentType.getProperties();
         assertEquals(expectedPropertyCount, properties.size());
 
-        Iterator<Feature> iterator = features.iterator();
+        Iterator<SimpleFeature> iterator = features.iterator();
         assertTrue(iterator.hasNext());
         try {
             Feature feature;

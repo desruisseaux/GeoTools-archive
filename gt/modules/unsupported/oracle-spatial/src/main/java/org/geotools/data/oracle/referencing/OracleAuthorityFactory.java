@@ -25,7 +25,6 @@ import javax.sql.DataSource;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.referencing.JDBCAuthorityFactory;
 import org.geotools.referencing.CRS;

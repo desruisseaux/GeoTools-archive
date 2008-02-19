@@ -19,10 +19,10 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
-import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class ArcSdeFeatureSource implements FeatureSource {
+public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
@@ -43,6 +43,19 @@ public class ArcSdeFeatureSource implements FeatureSource {
         this.dataStore = dataStore;
     }
     
+
+    /**
+     * Returns the same name than the feature type (ie,
+     * {@code getSchema().getName()} to honor the simple feature land common
+     * practice of calling the same both the Features produces and their types
+     * 
+     * @since 2.5
+     * @see FeatureSource#getName()
+     */
+    public Name getName() {
+        return getSchema().getName();
+    }
+
     public ResourceInfo getInfo() {
         return new ResourceInfo(){
             final Set<String> words = new HashSet<String>();
@@ -250,16 +263,16 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getFeatures(Query)
      */
-    public final FeatureCollection getFeatures(final Query query) throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
-        FeatureCollection collection = new ArcSdeFeatureCollection(this, namedQuery);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new ArcSdeFeatureCollection(this, namedQuery);
         return collection;
     }
 
     /**
      * @see FeatureSource#getFeatures(Filter)
      */
-    public final FeatureCollection getFeatures(final Filter filter) throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Filter filter) throws IOException {
         DefaultQuery query = new DefaultQuery(typeInfo.getFeatureTypeName(), filter);
         return getFeatures(query);
     }
@@ -267,7 +280,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getFeatures()
      */
-    public final FeatureCollection getFeatures() throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
         return getFeatures(Filter.INCLUDE);
     }
 
@@ -285,5 +298,4 @@ public class ArcSdeFeatureSource implements FeatureSource {
     public final Set getSupportedHints() {
         return Collections.EMPTY_SET;
     }
-
 }

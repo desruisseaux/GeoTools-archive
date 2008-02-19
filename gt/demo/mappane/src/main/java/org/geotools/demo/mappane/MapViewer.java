@@ -50,6 +50,8 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.StyleFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -135,7 +137,7 @@ public class MapViewer implements ActionListener{
     public void load(URL shape, URL sld)throws Exception{
         ShapefileDataStore ds = new ShapefileDataStore(shape);
 
-        FeatureSource fs = ds.getFeatureSource();
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource();
         com.vividsolutions.jts.geom.Envelope env = fs.getBounds();
         mp.setMapArea(env);
         StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);

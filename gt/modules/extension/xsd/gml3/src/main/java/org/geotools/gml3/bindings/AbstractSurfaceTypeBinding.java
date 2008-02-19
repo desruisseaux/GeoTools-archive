@@ -16,8 +16,11 @@
 package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.gml3.GML;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**

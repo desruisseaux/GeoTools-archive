@@ -34,8 +34,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.test.TestData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -112,7 +113,7 @@ public class UserLayerTest extends TestCase {
         final SimpleFeatureType schema = ftb.buildFeatureType();
 
         // create a feature collection ----------------------------------------
-        final FeatureCollection fc = new MemoryFeatureCollection(schema);
+        final FeatureCollection<SimpleFeatureType, SimpleFeature> fc = new MemoryFeatureCollection(schema);
 
         // populate the collection --------------------------------------------
         final PrecisionModel pm = new PrecisionModel(PrecisionModel.FLOATING);

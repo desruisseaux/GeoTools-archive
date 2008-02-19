@@ -19,13 +19,10 @@ package org.geotools.data.geometryless.filter;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-
 import org.geotools.data.DataSourceException;
-import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.UnaliasSQLEncoder;
 import org.opengis.filter.ExcludeFilter;
-import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
@@ -34,12 +31,11 @@ import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-// import org.geotools.filter.LiteralExpression;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
-import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.UnaliasSQLEncoder;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Encodes a filter into a SQL WHERE statement for generic SQL. This class adds

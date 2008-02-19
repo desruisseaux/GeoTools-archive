@@ -95,7 +95,7 @@ public class GMLInheritanceTest extends TestCase {
                
         //remaining slot (s) should be feature(s)
         assertTrue("Requires atleast one feature",doc.size()>0);  //bbox + feature
-        FeatureIterator i = doc.features();
+        FeatureIterator<SimpleFeature> i = doc.features();
         int j = 1;
         while(i.hasNext()){
             SimpleFeature ft = i.next();

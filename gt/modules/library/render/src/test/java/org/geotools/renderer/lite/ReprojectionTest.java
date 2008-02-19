@@ -51,7 +51,7 @@ public class ReprojectionTest extends TestCase {
 		pointFeautureType = builder.buildFeatureType();
 	}
 
-	public FeatureCollection createLineCollection() throws Exception {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> createLineCollection() throws Exception {
 		FeatureCollection fc = FeatureCollections.newCollection();
 		fc.add(createLine(-177, 0, -177, 10));
 		fc.add(createLine(-177, 0, -200, 0));

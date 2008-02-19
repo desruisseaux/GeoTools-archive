@@ -12,7 +12,7 @@ import org.geotools.gpx.bean.WptType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-public class GpxFeatureReader implements FeatureReader {
+public class GpxFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     
     private final SimpleFeatureType featureType;
     private final FeatureTranslator translator;

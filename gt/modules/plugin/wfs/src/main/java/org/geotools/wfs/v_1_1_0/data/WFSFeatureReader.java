@@ -20,7 +20,7 @@ import org.opengis.feature.type.FeatureType;
  * @see WFS110ProtocolHandler#getFeatureReader(org.geotools.data.Query,
  *      org.geotools.data.Transaction)
  */
-class WFSFeatureReader implements FeatureReader {
+class WFSFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
 
     private SimpleFeature next;
 

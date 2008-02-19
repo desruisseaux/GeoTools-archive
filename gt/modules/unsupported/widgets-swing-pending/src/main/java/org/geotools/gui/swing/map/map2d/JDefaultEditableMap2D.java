@@ -15,13 +15,11 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.BorderLayout;
 import java.awt.Color;
+
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
@@ -51,6 +49,11 @@ import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Default implementation of EditableMap2D

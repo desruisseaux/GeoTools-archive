@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Element;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Parser;
 

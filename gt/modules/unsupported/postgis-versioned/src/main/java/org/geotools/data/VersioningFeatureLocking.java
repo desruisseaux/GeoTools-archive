@@ -16,6 +16,9 @@
 
 package org.geotools.data;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 /**
  * Feature locking with versioning capabilities. <p>See {@link VersioningFeatureStore} and
  * {@link VersioningFeatureSource} for actual extra capabilities compared to a basic
@@ -23,6 +26,7 @@ package org.geotools.data;
  * 
  * @author Andrea Aime, TOPP
  */
-public interface VersioningFeatureLocking extends VersioningFeatureStore, FeatureLocking {
+public interface VersioningFeatureLocking extends VersioningFeatureStore,
+        FeatureLocking<SimpleFeatureType, SimpleFeature> {
 
 }

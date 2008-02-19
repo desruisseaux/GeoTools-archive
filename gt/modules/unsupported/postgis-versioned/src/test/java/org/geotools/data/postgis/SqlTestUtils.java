@@ -21,7 +21,6 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCUtils;
 
 /**

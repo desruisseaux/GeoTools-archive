@@ -33,7 +33,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public class DefaultFeatureReader implements FeatureReader {
+public class DefaultFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     private final AttributeReader attributeReader;
     private final SimpleFeatureType schema;
     protected final Object[] attributes;

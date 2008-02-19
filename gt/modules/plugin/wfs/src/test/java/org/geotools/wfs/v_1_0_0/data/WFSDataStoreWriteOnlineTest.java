@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -57,7 +58,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
 //        FeatureType ft = ds.getSchema("states");
 //        Feature f = ds.getFeatureReader("states").next();
 //        doDelete(ds,ft,FilterFactoryFinder.createFilterFactory().createFidFilter(f.getID()));
-//        FeatureCollection fc = DefaultFeatureCollections.newCollection();
+//        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = DefaultFeatureCollections.newCollection();
 //        fc.add(f);
 //        doInsert(ds,ft,(new CollectionDataStore(fc)).getFeatureReader("states"));
     }
@@ -193,7 +194,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     
     public static void doUpdate(DataStore ds,SimpleFeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryRegistryException, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
-    	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
+    	FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
     	AttributeDescriptor at = ft.getAttribute(attributeToChange);
@@ -204,7 +205,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
                 .literal(newValue));
 
     	System.out.println("Update Read 1");
-    	FeatureIterator fr = fs.getFeatures(f).features();
+    	FeatureIterator<SimpleFeature> fr = fs.getFeatures(f).features();
     	
     	int count1 = 0;
     	Object oldValue=null;

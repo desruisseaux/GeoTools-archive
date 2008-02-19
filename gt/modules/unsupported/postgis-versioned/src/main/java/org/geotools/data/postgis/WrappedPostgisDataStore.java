@@ -24,7 +24,6 @@ import javax.sql.DataSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.FeatureTypeHandler;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;

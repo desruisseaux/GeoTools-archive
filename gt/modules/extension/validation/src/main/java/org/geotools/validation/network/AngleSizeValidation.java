@@ -60,7 +60,7 @@ public class AngleSizeValidation extends DefaultIntegrityValidation {
      * Detailed description...
      * </p>
      *
-     * @param layers Map of FeatureSource by "dataStoreID:typeName"
+     * @param layers Map of FeatureSource<SimpleFeatureType, SimpleFeature> by "dataStoreID:typeName"
      * @param envelope The bounding box that encloses the unvalidated data
      * @param results Used to coallate results information
      *

@@ -15,13 +15,16 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 /**
  * An IndexedFeatureCollection extends the functionality of FeatureCollection
  * by allowing FeatureIndex attachement.
  * @author  Ian Schneider
  * @source $URL$
  */
-public interface IndexedFeatureCollection extends FeatureCollection {
+public interface IndexedFeatureCollection extends FeatureCollection<SimpleFeatureType, SimpleFeature> {
   
   /** Adds a FeatureIndex to this collection.
    * @param index The FeatureIndex to add.

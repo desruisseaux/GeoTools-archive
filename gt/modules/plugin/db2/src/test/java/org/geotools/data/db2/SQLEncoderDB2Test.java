@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.factory.CommonFactoryFinder;
-
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.referencing.CRS;

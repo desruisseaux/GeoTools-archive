@@ -110,7 +110,7 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
     protected String attemptRead(String table) throws Exception {
         //addFeature(table);
         Query query = new DefaultQuery(table);
-        FeatureReader fr = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(fr.hasNext());
         SimpleFeature feature = fr.next();
         String id = feature.getID();

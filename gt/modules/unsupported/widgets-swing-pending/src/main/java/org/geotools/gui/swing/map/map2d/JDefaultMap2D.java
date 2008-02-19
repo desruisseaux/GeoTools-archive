@@ -15,29 +15,31 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import java.beans.PropertyChangeEvent;
-import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
+
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.GTRenderer;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Default implementation of Map2D

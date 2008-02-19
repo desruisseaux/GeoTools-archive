@@ -201,11 +201,12 @@ public class ShapeRendererTest extends TestCase {
         ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
         System.out.println("Count: " + ds.getFeatureSource().getCount(Query.ALL));
         Style st = TestUtilites.createTestStyle(null, typename);
-        final FeatureStore store = (FeatureStore) ds.getFeatureSource();
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
-        FeatureCollection collection = store.getFeatures();
-        FeatureIterator iter = collection.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = store.getFeatures();
+        FeatureIterator<SimpleFeature> iter = collection.features();
         FidFilter createFidFilter = TestUtilites.filterFactory.createFidFilter(iter
                         .next().getID());
         collection.close(iter);
@@ -262,8 +263,8 @@ public class ShapeRendererTest extends TestCase {
         FeatureStore store = (FeatureStore) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
-        FeatureCollection collection = store.getFeatures();
-        FeatureIterator iter = collection.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = store.getFeatures();
+        FeatureIterator<SimpleFeature> iter = collection.features();
         final SimpleFeature feature = iter.next();
         collection.close(iter);
 

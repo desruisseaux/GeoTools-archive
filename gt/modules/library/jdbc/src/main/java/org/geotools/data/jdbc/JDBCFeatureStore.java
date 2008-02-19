@@ -58,20 +58,20 @@ import org.opengis.filter.Filter;
  *       SwingUtilities.runLater...
  * @source $URL$
  */
-public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore {
+public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<SimpleFeatureType, SimpleFeature> {
     
    /** The logger for the postgis module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
 
-/** Current Transaction this FeatureSource is opperating against */
+/** Current Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is opperating against */
     protected Transaction transaction = Transaction.AUTO_COMMIT;
 
     public JDBCFeatureStore(JDBC1DataStore jdbcDataStore, SimpleFeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
 
-    /* Retrieve the Transaction this FeatureSource is opperating against. */
+    /* Retrieve the Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is opperating against. */
     public Transaction getTransaction() {
         return transaction;
     }
@@ -106,7 +106,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         Set fids = new HashSet();
         String typeName = getSchema().getTypeName();        
         DefaultQuery query = new DefaultQuery( typeName, filter, Integer.MAX_VALUE, Query.ALL_NAMES, "fids" );
-        FeatureReader reader =
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader =
             getJDBCDataStore().getFeatureReader( query, getTransaction() );
         try {
             while( reader.hasNext() ){
@@ -234,7 +234,9 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
             modifyFeatures( type, value, writer );            
         }
     }
-    protected void modifyFeatures( AttributeDescriptor[] type, Object[] value, FeatureWriter writer ) throws DataSourceException, IOException{
+    protected void modifyFeatures(AttributeDescriptor[] type, Object[] value,
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer) throws DataSourceException,
+            IOException {
         SimpleFeature feature;        
         try {
         	while (writer.hasNext()) {
@@ -281,7 +283,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * </pre>
      * 
      * <p>
-     * (If you don't have a FeatureReader handy DataUtilities.reader() may be
+     * (If you don't have a  FeatureReader<SimpleFeatureType, SimpleFeature> handy DataUtilities.reader() may be
      * able to help out)
      * </p>
      * 
@@ -298,7 +300,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      *
      * @see org.geotools.data.FeatureStore#addFeatures(org.geotools.data.FeatureReader)
      */
-    public Set addFeatures(FeatureReader reader) throws IOException {
+    public Set addFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
@@ -335,8 +337,8 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         return addedFids;
     }
 
-    public Set addFeatures(FeatureCollection collection) throws IOException {
-        Set addedFids = new HashSet();
+    public Set<String> addFeatures(FeatureCollection collection) throws IOException {
+        Set<String> addedFids = new HashSet<String>();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
         SimpleFeature newFeature;
@@ -412,7 +414,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      */
     public void removeFeatures(Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
-        FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(typeName,
                 filter, getTransaction());
         SimpleFeature feature;
 
@@ -460,10 +462,10 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      *
      * @throws IOException
      */
-    public void setFeatures(FeatureReader reader) throws IOException {
+    public void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         String typeName = getSchema().getTypeName();
-        FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
-                getTransaction());
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(
+                typeName, getTransaction());
         SimpleFeature feature;
         SimpleFeature newFeature;
 

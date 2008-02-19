@@ -16,11 +16,13 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.EmptyFeatureWriter;
@@ -34,10 +36,11 @@ import org.geotools.data.Query;
 import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
-
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 
@@ -54,7 +57,7 @@ import org.opengis.filter.Filter;
  * Set getContents() - set of TypeEntry
  * </li>
  * <li>
- * FeatureReader getFeatureReader( typeName )
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader( typeName )
  * </li>
  * </ul>
  * 
@@ -73,7 +76,7 @@ import org.opengis.filter.Filter;
  * To support custom query optimizations:
  * <ul>
  * <li> Filter getUnsupportedFilter(String typeName, Filter filter)
- * <li> FeatureReader getFeatureReader(String typeName, Query query)
+ * <li>  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
  * </ul>
  *
  * To provide high-level writing optimizations:
@@ -152,7 +155,7 @@ public class AbstractDataStore2 implements DataStore {
      * </p>
      * <p>
      * This method is lazyly called to create a List of ActiveTypeEntry for
-     * each FeatureCollection in this DataStore.
+     * each FeatureCollection<SimpleFeatureType, SimpleFeature> in this DataStore.
      * </p>
      * @return List<ActiveTypeEntry>.
      */
@@ -216,30 +219,30 @@ public class AbstractDataStore2 implements DataStore {
 
     // Jody - This is my recomendation for DataStore in order to support CS reprojection and override
     /**
-     * Create a FeatureSource that represents your Query.
+     * Create a FeatureSource<SimpleFeatureType, SimpleFeature> that represents your Query.
      * <p>
      * If we can make this part of the public API, we can phase out FeatureResults.
      * (and reduce the number of classes people need to know about).
      * </p>
      */
-    public FeatureSource getView(final Query query)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query)
         throws IOException, SchemaException {
         return new DefaultView( getFeatureSource( query.getTypeName() ), query );
     }
     /**
-     * Aqure FeatureSource for indicated typeName.
+     * Aqure FeatureSource<SimpleFeatureType, SimpleFeature> for indicated typeName.
      * <p>
      * Note this API is not sufficient; Namespace needs to be used as well.
      * </p>
      */
-    public FeatureSource getFeatureSource( final String typeName )
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource( final String typeName )
         throws IOException {        
         return entry( typeName ).createFeatureSource();        
     }
     
         
     /**
-     * Access a FeatureReader providing access to Feature information.
+     * Access a  FeatureReader<SimpleFeatureType, SimpleFeature> providing access to Feature information.
      * <p>
      * This implementation passes off responsibility to the following overrideable methods:
      * <ul>
@@ -254,7 +257,7 @@ public class AbstractDataStore2 implements DataStore {
      * </ul>
      * </p>
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction transaction) throws IOException {
 		if( query.getTypeName() == null ){
 		      throw new NullPointerException(
 		          "getFeatureReader requires typeName: "
@@ -333,5 +336,55 @@ public class AbstractDataStore2 implements DataStore {
      */
     public void dispose() {
         // nothing to do
+    }
+
+    
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
     }
 }

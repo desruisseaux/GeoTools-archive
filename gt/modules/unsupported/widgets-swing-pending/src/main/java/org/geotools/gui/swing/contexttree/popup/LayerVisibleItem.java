@@ -21,8 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
-
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.map.MapLayer;
 

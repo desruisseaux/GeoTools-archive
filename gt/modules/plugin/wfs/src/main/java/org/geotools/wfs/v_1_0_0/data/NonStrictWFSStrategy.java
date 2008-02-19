@@ -33,6 +33,8 @@ import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxF
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
@@ -58,7 +60,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
         this.store = store;
     }
 
-    public FeatureReader getFeatureReader(Query query2, Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query2, Transaction transaction) throws IOException {
         Query query = new DefaultQuery(query2);
         Filter processedFilter = store.processFilter(query.getFilter());
         // process the filter to update fidfilters using the transaction.
@@ -75,7 +77,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
         CoordinateReferenceSystem dataCRS = clipBBox(query, serverFilter);
 
         ((DefaultQuery) query).setFilter(serverFilter);
-        FeatureReader reader = createFeatureReader(transaction, query);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = createFeatureReader(transaction, query);
 
         if (reader.hasNext()) { // opportunity to throw exception
 
@@ -87,18 +89,18 @@ class NonStrictWFSStrategy implements WFSStrategy {
             throw new IOException("There are features but no feature type ... odd");
         }
 
-        return new EmptyFeatureReader(store.getSchema(query.getTypeName()));
+        return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(store.getSchema(query.getTypeName()));
     }
 
-    protected FeatureReader wrapWithFilteringFeatureReader(Filter postFilter, FeatureReader reader,
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> wrapWithFilteringFeatureReader(Filter postFilter,  FeatureReader<SimpleFeatureType, SimpleFeature> reader,
             Filter processedFilter) {
         if (!postFilter.equals(Filter.INCLUDE)) {
-            return new FilteringFeatureReader(reader, postFilter);
+            return new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, postFilter);
         }
         return reader;
     }
 
-    protected FeatureReader createFeatureReader(Transaction transaction, Query query)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> createFeatureReader(Transaction transaction, Query query)
             throws IOException {
         Data data;
         data = createFeatureReaderPOST(query, transaction);
@@ -150,9 +152,9 @@ class NonStrictWFSStrategy implements WFSStrategy {
         return data;
     }
 
-    protected FeatureReader applyReprojectionDecorator(FeatureReader reader, Query query,
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> applyReprojectionDecorator(FeatureReader <SimpleFeatureType, SimpleFeature> reader, Query query,
             CoordinateReferenceSystem dataCRS) {
-        FeatureReader tmp = reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> tmp = reader;
         if (query.getCoordinateSystem() != null
                 && !query.getCoordinateSystem().equals(reader.getFeatureType().getCRS())) {
             try {
@@ -221,7 +223,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
 
         SAXException saxException;
 
-        FeatureReader reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     }
 
 }

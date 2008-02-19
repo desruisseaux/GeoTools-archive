@@ -9,31 +9,36 @@
 
 package org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.svg;
 
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-
-import java.awt.geom.GeneralPath;
+import java.awt.BasicStroke;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Shape;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
+import javax.swing.JFrame;
 
-
-import javax.swing.*;
-import java.awt.event.*;
-
-
-// XML basics
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Element;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Parser;
-//import com.ibm.xml.parser.*;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Utility;
-//import org.w3c.dom.*;
 
 class svgImage extends Canvas{
 

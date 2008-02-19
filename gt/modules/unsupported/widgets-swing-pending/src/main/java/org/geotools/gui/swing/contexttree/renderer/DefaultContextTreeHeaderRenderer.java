@@ -16,16 +16,11 @@
 
 package org.geotools.gui.swing.contexttree.renderer;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
+
 import javax.swing.JTable;
-import javax.swing.OverlayLayout;
 import javax.swing.SwingConstants;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 

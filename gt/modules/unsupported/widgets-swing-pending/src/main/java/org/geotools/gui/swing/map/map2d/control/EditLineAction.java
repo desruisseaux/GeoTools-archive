@@ -15,9 +15,10 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import com.vividsolutions.jts.geom.LineString;
 import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
+
 import org.geotools.data.FeatureStore;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
@@ -26,6 +27,8 @@ import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
 import org.geotools.gui.swing.map.map2d.handler.LineCreationHandler;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.map.MapLayer;
+
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  *

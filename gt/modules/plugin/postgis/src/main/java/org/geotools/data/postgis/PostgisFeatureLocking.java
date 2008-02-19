@@ -58,7 +58,7 @@ import org.opengis.filter.Filter;
  * @version $Id$
  */
 public class PostgisFeatureLocking extends PostgisFeatureStore
-    implements FeatureLocking {
+    implements FeatureLocking<SimpleFeatureType, SimpleFeature> {
     /** The logger for the postgis module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.postgis");
@@ -162,7 +162,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
         // Good idea, but it's not working right now, so we're just using the query passed in.
         Query optimizedQuery = new DefaultQuery(typeName, query.getFilter(),
                 query.getMaxFeatures(), Query.NO_NAMES, query.getHandle());
-        FeatureIterator reader = getFeatures(query).features();
+        FeatureIterator<SimpleFeature> reader = getFeatures(query).features();
         SimpleFeature feature;
         int count = 0;
         LOGGER.info("got reader from query " + optimizedQuery
@@ -276,7 +276,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureIterator reader = getFeatures(query).features();
+        FeatureIterator<SimpleFeature> reader = getFeatures(query).features();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature;
 

@@ -16,13 +16,13 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureReader;
@@ -37,6 +37,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.FeatureTypeFactory;
@@ -366,7 +367,7 @@ public abstract class ContentDataStore implements DataStore {
      * in a {@link FeatureReader}.
      * </p>
      */
-    public final FeatureReader getFeatureReader(Query query, Transaction tx)
+    public final  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction tx)
         throws IOException {
         
         if ( query.getTypeName() == null ) {
@@ -445,7 +446,7 @@ public abstract class ContentDataStore implements DataStore {
         return lockingManager;
     }
 
-    public final FeatureSource getView(Query query) throws IOException, SchemaException {
+    public final FeatureSource<SimpleFeatureType, SimpleFeature> getView(Query query) throws IOException, SchemaException {
         throw new UnsupportedOperationException();
     }
 
@@ -589,9 +590,59 @@ public abstract class ContentDataStore implements DataStore {
      * Subclasses should override method to return a specific instance of 
      * {@link Transaction.State}.
      * </p>
-     * @param featureSource The feature source / store for the new transaction
+     * @param FeatureSource<SimpleFeatureType, SimpleFeature> The feature source / store for the new transaction
      * state.
      */
-//    protected abstract Transaction.State createTransactionState(ContentFeatureSource featureSource)
+//    protected abstract Transaction.State createTransactionState(ContentFeatureSource<SimpleFeatureType, SimpleFeature> featureSource)
 //        throws IOException;
+
+    
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
+    }
 }

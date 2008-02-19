@@ -56,19 +56,19 @@ public class JoinExample {
         connect.put("url", file.toURI().toURL());
         DataStore shapefile = DataStoreFinder.getDataStore(connect);
         String typeName = shapefile.getTypeNames()[0];
-        FeatureSource shapes = shapefile.getFeatureSource( typeName );
+        FeatureSource<SimpleFeatureType, SimpleFeature> shapes = shapefile.getFeatureSource( typeName );
         
         Map<String,Object> connect2 = new HashMap<String,Object>();
         connect.put("url", file2.toURI().toURL());
         DataStore shapefile2 = DataStoreFinder.getDataStore(connect);
         String typeName2 = shapefile2.getTypeNames()[0];
-        FeatureSource shapes2 = shapefile2.getFeatureSource( typeName2 );
+        FeatureSource<SimpleFeatureType, SimpleFeature> shapes2 = shapefile2.getFeatureSource( typeName2 );
         
         joinExample( shapes, shapes2);
         System.exit(0);
     }
 
-    private static void joinExample( FeatureSource shapes, FeatureSource shapes2 ) throws Exception {
+    private static void joinExample( FeatureSource<SimpleFeatureType, SimpleFeature> shapes, FeatureSource<SimpleFeatureType, SimpleFeature> shapes2 ) throws Exception {
         SimpleFeatureType schema = shapes.getSchema();
         String typeName = schema.getTypeName();
         String geomName = schema.getDefaultGeometry().getLocalName();
@@ -79,8 +79,8 @@ public class JoinExample {
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);        
         
         DefaultQuery outerGeometry = new DefaultQuery( typeName, Filter.INCLUDE, new String[]{ geomName } );        
-        FeatureCollection outerFeatures = shapes.getFeatures( outerGeometry );
-        FeatureIterator iterator = outerFeatures.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> outerFeatures = shapes.getFeatures( outerGeometry );
+        FeatureIterator<SimpleFeature> iterator = outerFeatures.features();
         int max = 0;
         try {
             while( iterator.hasNext() ){
@@ -97,7 +97,7 @@ public class JoinExample {
                     //Filter innerFilter = ff.not( ff.disjoint(ff.property(geomName2), ff.literal( geometry )) );
                     
                     DefaultQuery innerQuery = new DefaultQuery( typeName2, innerFilter, DefaultQuery.NO_NAMES );
-                    FeatureCollection join = shapes2.getFeatures( innerQuery );
+                    FeatureCollection<SimpleFeatureType, SimpleFeature> join = shapes2.getFeatures( innerQuery );
                     int size = join.size();                
                     max = Math.max( max, size );
                 }

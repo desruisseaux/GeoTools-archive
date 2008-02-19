@@ -30,6 +30,7 @@ import org.geotools.data.collection.ResourceList;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -211,7 +212,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
      * is maintained and only indexed once.
      * </p>
      */
-    public FeatureCollection subList(Filter subfilter) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subList(Filter subfilter) {
         return new SubFeatureCollection( this, subfilter );
     }
     //

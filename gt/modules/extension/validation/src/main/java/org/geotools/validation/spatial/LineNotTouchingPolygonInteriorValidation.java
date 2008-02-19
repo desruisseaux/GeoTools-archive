@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -59,7 +60,7 @@ public class LineNotTouchingPolygonInteriorValidation
     /**
      * Check that the line is not touching the interior of the polygon.
      *
-     * @param layers Map of FeatureSource by "dataStoreID:typeName"
+     * @param layers Map of FeatureSource<SimpleFeatureType, SimpleFeature> by "dataStoreID:typeName"
      * @param envelope The bounding box that encloses the unvalidated data
      * @param results Used to coallate results information
      *
@@ -71,20 +72,20 @@ public class LineNotTouchingPolygonInteriorValidation
         ValidationResults results) throws Exception {
     	boolean r = true;
     	
-        FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
         if(fsLine == null)
         	return true;
-        FeatureCollection fcLine = fsLine.getFeatures();
-        FeatureIterator fLine = fcLine.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
+        FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
         if(fsPoly == null)
         	return true;
-        FeatureCollection fcPoly = fsPoly.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcPoly = fsPoly.getFeatures();
                 
         while(fLine.hasNext()){
         	SimpleFeature line = fLine.next();
-        	FeatureIterator fPoly = fcPoly.features();
+        	FeatureIterator<SimpleFeature> fPoly = fcPoly.features();
         	Geometry lineGeom = (Geometry) line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison

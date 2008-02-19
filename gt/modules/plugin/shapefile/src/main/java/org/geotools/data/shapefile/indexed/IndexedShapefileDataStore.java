@@ -15,7 +15,11 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import static org.geotools.data.shapefile.ShpFileType.*;
+import static org.geotools.data.shapefile.ShpFileType.DBF;
+import static org.geotools.data.shapefile.ShpFileType.FIX;
+import static org.geotools.data.shapefile.ShpFileType.QIX;
+import static org.geotools.data.shapefile.ShpFileType.SHP;
+import static org.geotools.data.shapefile.ShpFileType.SHX;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +71,7 @@ import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.RTree;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -286,7 +291,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String,
      *      org.geotools.data.Query)
      */
-    protected FeatureReader getFeatureReader(String typeName, Query query)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
             throws IOException {
         if (query.getFilter() == Filter.EXCLUDE)
             return new EmptyFeatureReader(getSchema());
@@ -328,7 +333,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         }
     }
 
-    protected FeatureReader createFeatureReader(String typeName,
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> createFeatureReader(String typeName,
             IndexedShapefileAttributeReader r, SimpleFeatureType readerSchema)
             throws SchemaException, IOException {
 
@@ -731,7 +736,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
             Transaction transaction) throws IOException {
         typeCheck(typeName);
 
-        FeatureReader featureReader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
         IndexedShapefileAttributeReader attReader = getAttributesReader(true,
                 true, null);
         try {
@@ -824,7 +829,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      *
-    public FeatureSource getFeatureSource(final String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName)
             throws IOException {
         final SimpleFeatureType featureType = getSchema(typeName);
 

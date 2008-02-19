@@ -17,7 +17,6 @@ package org.geotools.gui.swing.map.map2d;
 
 import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
-import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
 

@@ -16,8 +16,6 @@
 
 package org.geotools.wfs.v_1_1_0.data;
 
-import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFSConfiguration;
-import org.geotools.wfs.v_1_0_0.data.CubewerksOnlineTest;
 import org.geotools.xml.Configuration;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**

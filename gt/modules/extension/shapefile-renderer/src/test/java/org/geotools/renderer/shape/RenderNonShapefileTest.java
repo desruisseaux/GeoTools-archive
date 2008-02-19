@@ -27,6 +27,8 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -42,11 +44,11 @@ public class RenderNonShapefileTest extends TestCase {
 		
 		IndexedShapefileDataStore polys = TestUtilites.getPolygons();
 		
-		FeatureCollection featureCollection = polys.getFeatureSource().getFeatures();
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = polys.getFeatureSource().getFeatures();
 		store.createSchema(polys.getSchema());
 		
-		FeatureSource target = store.getFeatureSource(store.getTypeNames()[0]);
-		((FeatureStore)target).addFeatures(featureCollection);
+		FeatureSource<SimpleFeatureType, SimpleFeature> target = store.getFeatureSource(store.getTypeNames()[0]);
+		((FeatureStore<SimpleFeatureType, SimpleFeature>)target).addFeatures(featureCollection);
 		
 		Style testStyle = TestUtilites.createTestStyle(target.getSchema().getTypeName(), null);
         MapLayer layer=new DefaultMapLayer(target,testStyle);

@@ -15,25 +15,28 @@
  */
 package org.geotools.gml3;
 
-import junit.framework.TestCase;
-import org.apache.xerces.parsers.SAXParser;
-import org.eclipse.xsd.XSDSchema;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+
+import junit.framework.TestCase;
+
+import org.apache.xerces.parsers.SAXParser;
+import org.eclipse.xsd.XSDSchema;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.bindings.TEST;
 import org.geotools.gml3.bindings.TestConfiguration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
-import org.geotools.xml.SchemaLocator;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 public class GML3EncodingTest extends TestCase {
@@ -60,7 +63,7 @@ public class GML3EncodingTest extends TestCase {
 
         //first parse in test data
         Parser parser = new Parser(configuration);
-        FeatureCollection fc = (FeatureCollection) parser.parse(TestConfiguration.class
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parser.parse(TestConfiguration.class
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 
@@ -117,7 +120,7 @@ public class GML3EncodingTest extends TestCase {
 
         //first parse in test data
         Parser parser = new Parser(configuration);
-        FeatureCollection fc = (FeatureCollection) parser.parse(TestConfiguration.class
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parser.parse(TestConfiguration.class
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 

@@ -14,6 +14,8 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
@@ -23,51 +25,51 @@ import org.opengis.filter.sort.SortBy;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class FilteringFeatureCollection extends DecoratingFeatureCollection implements FeatureCollection {
+public class FilteringFeatureCollection<T extends FeatureType, F extends Feature> extends DecoratingFeatureCollection<T, F> implements FeatureCollection<T, F> {
 
 	/**
 	 * The original feature collection.
 	 */
-	FeatureCollection delegate;
+	FeatureCollection<T, F> delegate;
 	/**
 	 * the filter
 	 */
 	Filter filter;
 	
-	public FilteringFeatureCollection( FeatureCollection delegate, Filter filter ) {
+	public FilteringFeatureCollection( FeatureCollection<T, F> delegate, Filter filter ) {
 		super(delegate);
 		this.delegate = delegate;
 		this.filter = filter;
 	}
 	
-	public FeatureIterator features() {
-		return new DelegateFeatureIterator( this, iterator() );
+	public FeatureIterator<F> features() {
+		return new DelegateFeatureIterator<F>( this, iterator() );
 	}
 
-	public void close(FeatureIterator close) {
+	public void close(FeatureIterator<F> close) {
 		close.close();
 	}
 
-	public Iterator iterator() {
-		return new FilteringIterator( delegate.iterator(), filter );
+	public Iterator<F> iterator() {
+		return new FilteringIterator<F>( delegate.iterator(), filter );
 	}
 	
-	public void close(Iterator close) {
-		FilteringIterator filtering = (FilteringIterator) close;
+	public void close(Iterator<F> close) {
+		FilteringIterator<F> filtering = (FilteringIterator<F>) close;
 		delegate.close( filtering.getDelegate() );
 	}
 
-	public FeatureCollection subCollection(Filter filter) {
+	public FeatureCollection<T, F> subCollection(Filter filter) {
 		throw new UnsupportedOperationException();
 	}
 
-	public FeatureCollection sort(SortBy order) {
+	public FeatureCollection<T, F> sort(SortBy order) {
 		throw new UnsupportedOperationException();
 	}
 
 	public int size() {
 		int count = 0;
-		Iterator i = iterator();
+		Iterator<F> i = iterator();
 		try {
 			while( i.hasNext() ) {
 				count++; i.next();
@@ -103,7 +105,7 @@ public class FilteringFeatureCollection extends DecoratingFeatureCollection impl
 		}
 	}
 	
-	public boolean add(Object o) {
+	public boolean add(F o) {
 		if ( !filter.evaluate( o ) ) {
 			return false;
 		}
@@ -118,7 +120,7 @@ public class FilteringFeatureCollection extends DecoratingFeatureCollection impl
 	public boolean addAll(Collection c) {
 		boolean changed = false;
 		
-		for ( Iterator i = c.iterator(); i.hasNext(); ) {
+		for ( Iterator<F> i = c.iterator(); i.hasNext(); ) {
 			changed = changed | add( i.next() );
 		}
 		
@@ -135,8 +137,8 @@ public class FilteringFeatureCollection extends DecoratingFeatureCollection impl
 		return true;
 	}
 
-	public FeatureReader reader() throws IOException {
-		return new DelegateFeatureReader( getSchema(), features() );
+	public  FeatureReader<T, F> reader() throws IOException {
+		return new DelegateFeatureReader<T, F>( getSchema(), features() );
 	}
 
 	public ReferencedEnvelope getBounds() {

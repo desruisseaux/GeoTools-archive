@@ -16,10 +16,14 @@
 package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.gml3.GML;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.gml3.GML;
-import org.geotools.xml.*;
 
 
 /**

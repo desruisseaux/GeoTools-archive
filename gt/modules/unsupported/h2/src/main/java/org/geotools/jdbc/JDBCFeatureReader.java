@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author Justin Deoliveira, The Open Plannign Project.
  *
  */
-public class JDBCFeatureReader implements FeatureReader {
+public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
 
     /**
      * the datastore
@@ -471,7 +471,7 @@ public class JDBCFeatureReader implements FeatureReader {
                                         // grab a reader and get the feature, there should
                                         // only
                                         // be one
-                                        FeatureReader r = dataStore.getFeatureReader(query, tx);
+                                         FeatureReader<SimpleFeatureType, SimpleFeature> r = dataStore.getFeatureReader(query, tx);
                                         try {
                                             r.hasNext();
 

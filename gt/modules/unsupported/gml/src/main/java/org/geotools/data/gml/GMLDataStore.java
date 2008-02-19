@@ -26,6 +26,7 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -136,7 +137,7 @@ public class GMLDataStore extends AbstractDataStore {
 	 * 
 	 * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
 	 */
-	protected FeatureReader getFeatureReader(String typeName)
+	protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
 			throws IOException {
 		return getFileDataStore(typeName).getFeatureReader(typeName);
 	}

@@ -44,7 +44,9 @@ import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.util.logging.Logging;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -57,7 +59,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/wfs/src/main/java/org/geotools/wfs/v_1_0_0/data/WFSFeatureSource.java $
  */
-public class WFSFeatureSource extends AbstractFeatureSource implements org.geotools.data.wfs.WFSFeatureSource{
+public class WFSFeatureSource extends AbstractFeatureSource implements
+        org.geotools.data.wfs.WFSFeatureSource<SimpleFeatureType, SimpleFeature> {
     private static final Logger LOGGER = Logging.getLogger("org.geotools.data.wfs");
 
     protected WFS_1_0_0_DataStore ds;
@@ -71,6 +74,14 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
         this.fname = fname;
         this.featureSetDescription = WFSCapabilities.getFeatureSetDescription(ds.getCapabilities(),
                 fname);
+    }
+
+    /**
+     * @since 2.5
+     * @see FeatureSource#getName()
+     */
+    public Name getName() {
+       throw new UnsupportedOperationException("not yet implemented");
     }
 
     /**
@@ -192,7 +203,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
      * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureCollection getFeatures() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), Filter.INCLUDE));
     }
 
@@ -200,7 +211,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
 
@@ -208,7 +219,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query query) throws IOException {
         SimpleFeatureType schema = getSchema();
         String typeName = schema.getTypeName();
 
@@ -265,7 +276,7 @@ public class WFSFeatureSource extends AbstractFeatureSource implements org.geoto
          * 
          * @see org.geotools.data.FeatureResults#reader()
          */
-        public FeatureReader reader() throws IOException {
+        public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
             return fs.ds.getFeatureReader(query, fs.getTransaction());
         }
 

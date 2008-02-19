@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * An iterator that wraps around a FeatureReader.  
@@ -31,14 +33,14 @@ import org.geotools.data.FeatureReader;
  * @author jeichar
  * @source $URL$
  */
-public class FeatureReaderIterator implements Iterator {
+public class FeatureReaderIterator<F extends Feature> implements Iterator<F> {
 
-	private FeatureReader reader;
+	private  FeatureReader<? extends FeatureType, F> reader;
 
 	/**
 	 * 
 	 */
-	public FeatureReaderIterator(FeatureReader reader) {
+	public FeatureReaderIterator(FeatureReader <? extends FeatureType, F> reader) {
 		this.reader=reader;
 	}
 	
@@ -56,7 +58,7 @@ public class FeatureReaderIterator implements Iterator {
 	/* (non-Javadoc)
 	 * @see java.util.Iterator#next()
 	 */
-	public Object next() {
+	public F next() {
 		try{
 			return reader.next();
 		}catch (Exception e) {

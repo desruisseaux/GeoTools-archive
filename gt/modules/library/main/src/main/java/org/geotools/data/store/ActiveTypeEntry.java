@@ -173,7 +173,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
 //    protected Envelope createBounds() {
 //        Envelope bbox;
 //        try {
-//            FeatureSource source = getFeatureSource();
+//            FeatureSource<SimpleFeatureType, SimpleFeature> source = getFeatureSource();
 //            bbox = source.getBounds();
 //            if( bbox == null ){
 //                bbox = source.getFeatures().getBounds();
@@ -199,7 +199,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
 //    public int getCount() {
 //        if( count != -1 ) return count;
 //        try {
-//            FeatureSource source = getFeatureSource();
+//            FeatureSource<SimpleFeatureType, SimpleFeature> source = getFeatureSource();
 //            count = source.getCount( Query.ALL );
 //            if( count == -1 ){
 //                count = source.getFeatures().size();
@@ -244,7 +244,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
         return Collections.unmodifiableMap( metadata );
     }
     
-    /** Manages listener lists for FeatureSource implementation */
+    /** Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementation */
     public FeatureListenerManager listenerManager = new FeatureListenerManager();
     
     //
@@ -272,11 +272,11 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * 
      * @return FeatureLocking allowing access to content.
      */
-//    public FeatureSource getFeatureSource() throws IOException {        
+//    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource() throws IOException {        
 //        return createFeatureSource();
 //    }
     /**
-     * Access a FeatureReader providing access to Feature information.
+     * Access a  FeatureReader<SimpleFeatureType, SimpleFeature> providing access to Feature information.
      * <p>
      * This implementation passes off responsibility to the following overrideable methods:
      * <ul>
@@ -291,7 +291,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * </ul>
      * </p>
      */
-    public FeatureReader reader(Query query, Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader(Query query, Transaction transaction) throws IOException {
 
     	if ( transaction == null ) {
     		throw new NullPointerException( "Transaction null, did you mean Transaction.AUTO_COMMIT" );
@@ -352,10 +352,10 @@ public abstract class ActiveTypeEntry implements TypeEntry {
 //        // All other functionality will be built as a reader around
 //        // this class
 //        //
-//        FeatureReader reader = createReader( query);
+//         FeatureReader<SimpleFeatureType, SimpleFeature> reader = createReader( query);
 //
 //        if (!filter.equals( Filter.INCLUDE ) ) {
-//            reader = new FilteringFeatureReader(reader, filter);
+//            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
 //        }
 //
 //        if (transaction != Transaction.AUTO_COMMIT) {
@@ -406,14 +406,14 @@ public abstract class ActiveTypeEntry implements TypeEntry {
     //
     // Start of Overrides
     //    
-    public abstract FeatureSource createFeatureSource();
+    public abstract FeatureSource<SimpleFeatureType, SimpleFeature> createFeatureSource();
     
     /**
      * Override to provide readonly access
      * @param schema
-     * @return FeatureSource backed by this TypeEntry.
+     * @return FeatureSource<SimpleFeatureType, SimpleFeature> backed by this TypeEntry.
      */
-//    protected FeatureSource createFeatureSource() {
+//    protected FeatureSource<SimpleFeatureType, SimpleFeature> createFeatureSource() {
 //        return new AbstractFeatureSource() {
 //            public DataStore getDataStore() {
 //                return parent;
@@ -436,7 +436,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * Default implementation makes use of DataStore getReader( ... ), and listenerManager.
      * </p>
      */
-    protected FeatureSource createFeatureSource( final SimpleFeatureType featureType ) {
+    protected FeatureSource<SimpleFeatureType, SimpleFeature> createFeatureSource( final SimpleFeatureType featureType ) {
         return new AbstractFeatureSource() {
             public DataStore getDataStore() {
                 return parent;
@@ -519,15 +519,15 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * </p>
      * @param typeName
      * @param query
-     * @return FeatureReader for all content
+     * @return  FeatureReader<SimpleFeatureType, SimpleFeature> for all content
      */
-    public FeatureReader createReader() {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> createReader() {
         return new EmptyFeatureReader( schema );
     }
 
     /**
      * GR: this method is called from inside getFeatureReader(Query ,Transaction )
-     * to allow subclasses return an optimized FeatureReader wich supports the
+     * to allow subclasses return an optimized  FeatureReader<SimpleFeatureType, SimpleFeature> wich supports the
      * filter and attributes truncation specified in <code>query</code>
      * <p>
      * A subclass that supports the creation of such an optimized FeatureReader
@@ -535,7 +535,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * <code>getFeatureReader(typeName)</code>
      * <p>
      */
-    protected FeatureReader createReader(Query query)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> createReader(Query query)
     throws IOException
     {
       return createReader();

@@ -37,6 +37,8 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.sql.BypassSqlFeatureTypeHandler;
 import org.geotools.data.sql.BypassSqlSQLBuilder;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
@@ -237,7 +239,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
         return new PointXYAttributeIO();
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData)
             throws IOException {
         LOGGER.fine("returning jdbc feature writer");
 

@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * An iterator wrapper for a FeatureWriter - for use with
@@ -30,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * to work with a custom iterator need just that - a custom iterator.
  * <p>
  * <p>
- * The use of this class against a FeatureSource not backed by
+ * The use of this class against a FeatureSource<SimpleFeatureType, SimpleFeature> not backed by
  * a Transaction may *really* cut into performance. Consider if
  * you will the overhead involved in writing out each feature into
  * a temporary file (when the user may not even modify anything).
@@ -39,8 +40,8 @@ import org.opengis.feature.simple.SimpleFeature;
  * @since 2.1.RC0
  * @source $URL$
  */
-final class FeatureWriterFeatureIterator implements FeatureIterator {
-    FeatureWriter writer;    
+final class FeatureWriterFeatureIterator implements FeatureIterator<SimpleFeature> {
+    FeatureWriter<SimpleFeatureType, SimpleFeature> writer;    
     public FeatureWriterFeatureIterator( FeatureWriter writer ){
         this.writer = writer;
     }

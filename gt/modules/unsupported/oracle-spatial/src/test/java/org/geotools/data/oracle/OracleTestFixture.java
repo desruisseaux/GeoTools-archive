@@ -15,15 +15,12 @@
  */
 package org.geotools.data.oracle;
 
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.sql.DataSource;
+import oracle.jdbc.OracleConnection;
 
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
-
-import oracle.jdbc.OracleConnection;
 
 /**
  * Capture in one spot the location of *your* oracle instance.

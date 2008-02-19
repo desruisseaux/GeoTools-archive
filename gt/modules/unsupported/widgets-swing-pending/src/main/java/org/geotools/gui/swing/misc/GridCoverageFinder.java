@@ -21,8 +21,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;

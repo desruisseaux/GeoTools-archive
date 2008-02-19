@@ -27,6 +27,8 @@ import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -108,7 +110,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         return new RangedClassifier(localMin, localMax);
     }
     
-    private RangedClassifier calculateNonNumerical(int classNum, FeatureCollection featureCollection) throws IOException {
+    private RangedClassifier calculateNonNumerical(int classNum, FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) throws IOException {
         //obtain of list of unique values, so we can enumerate
         UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
         featureCollection.accepts(uniqueVisit, null);

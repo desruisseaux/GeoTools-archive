@@ -14,10 +14,13 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -28,20 +31,21 @@ import com.vividsolutions.jts.geom.Geometry;
  * A FeatureCollection which completley delegates to another FeatureCollection.
  * <p>
  * This class should be subclasses by classes which must somehow decorate 
- * another FeatureCollection and override the relevant methods. 
+ * another FeatureCollection<SimpleFeatureType, SimpleFeature> and override the relevant methods. 
  * </p>
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  * @since 2.5
  *
  */
-public class DecoratingFeatureCollection implements FeatureCollection {
+public class DecoratingFeatureCollection<T extends FeatureType, F extends Feature> implements
+        FeatureCollection<T, F> {
 
     /**
      * the delegate
      */
-	protected FeatureCollection delegate;
+	protected FeatureCollection<T, F> delegate;
 
-	protected DecoratingFeatureCollection(FeatureCollection delegate) {
+	protected DecoratingFeatureCollection(FeatureCollection<T, F> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -54,7 +58,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
             org.opengis.util.ProgressListener progress) {
     }
     
-    public boolean add(Object o) {
+    public boolean add(F o) {
         return delegate.add(o);
     }
 
@@ -71,11 +75,11 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         delegate.clear();
     }
 
-    public void close(FeatureIterator close) {
+    public void close(FeatureIterator<F> close) {
         delegate.close(close);
     }
 
-    public void close(Iterator close) {
+    public void close(Iterator<F> close) {
         delegate.close(close);
     }
 
@@ -91,7 +95,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.equals(o);
     }
 
-    public FeatureIterator features() {
+    public FeatureIterator<F> features() {
         return delegate.features();
     }
 
@@ -167,7 +171,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.getProperty(name);
     }
 
-    public SimpleFeatureType getSchema() {
+    public T getSchema() {
         return delegate.getSchema();
     }
 
@@ -265,11 +269,11 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.size();
     }
 
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<T, F> sort(SortBy order) {
         return delegate.sort(order);
     }
 
-    public FeatureCollection subCollection(Filter filter) {
+    public FeatureCollection<T, F> subCollection(Filter filter) {
         return delegate.subCollection(filter);
     }
 

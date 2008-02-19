@@ -17,14 +17,13 @@
 package org.geotools.gui.swing.crschooser;
 
 // J2SE dependencies
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.swing.ComboBoxModel;
+import java.util.List;
+
 import javax.swing.AbstractListModel;
 
-// OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 

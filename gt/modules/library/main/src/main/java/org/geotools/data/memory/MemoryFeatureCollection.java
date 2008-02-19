@@ -28,10 +28,10 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
- * Implement a FeatureCollection by burning memory!
+ * Implement a FeatureCollection<SimpleFeatureType, SimpleFeature> by burning memory!
  * <p>
  * Contents are maintained in a sorted TreeMap by FID, this serves as a reference implementation
- * when exploring the FeatureCollection api.
+ * when exploring the FeatureCollection<SimpleFeatureType, SimpleFeature> api.
  * </p>
  * <p>
  * This is similar to DefaultFeatureCollection, although additional methods are

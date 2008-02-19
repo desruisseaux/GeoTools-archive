@@ -4679,7 +4679,7 @@ public class GMLComplexTypes {
             return false;
         }
 
-        private FeatureCollection getCollection(Attributes attrs, ElementValue[] value) {
+        private FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection(Attributes attrs, ElementValue[] value) {
         	
         	String id = "";
         	id = attrs.getValue("", "ID");
@@ -4692,7 +4692,7 @@ public class GMLComplexTypes {
 
 
             for (int i = 1; i < value.length; i++) // bbox is slot 0
-                fc.add(value[i].getValue());
+                fc.add((SimpleFeature) value[i].getValue());
 
             return fc;
         }
@@ -4769,7 +4769,7 @@ public class GMLComplexTypes {
                     null);
             }
 
-            FeatureCollection fc = (FeatureCollection) value;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) value;
 
             if (fc.getBounds() != null) {
                 BoundingShapeType.getInstance().encode(null, fc.getBounds(),
@@ -4778,7 +4778,7 @@ public class GMLComplexTypes {
             	throw new IOException("Bounding box required for the FeatureCollection");
             }
 
-            FeatureIterator i = fc.features();
+            FeatureIterator<SimpleFeature> i = fc.features();
             Element e = null;
 
             while (i.hasNext()) {

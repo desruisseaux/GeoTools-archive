@@ -71,14 +71,14 @@ public class SVGTest extends TestCase {
             GenerateSVG gen = new GenerateSVG();
             File testFile = TestData.file( this, gmlfile );
             // DataSource ds = new GMLDataSource(url);            
-            // FeatureCollection fc = ds.getFeatures(Query.ALL);
+            // FeatureCollection<SimpleFeatureType, SimpleFeature> fc = ds.getFeatures(Query.ALL);
             
             URI uri = testFile.toURI();            
             Map hints = new HashMap();
             Object obj = DocumentFactory.getInstance( uri, hints );
             System.out.println( "what is this:"+obj );
 
-            FeatureCollection fc = null;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = null;
             File f = TestData.file( this, stylefile );
 
             MapContext mapContext = new DefaultMapContext();

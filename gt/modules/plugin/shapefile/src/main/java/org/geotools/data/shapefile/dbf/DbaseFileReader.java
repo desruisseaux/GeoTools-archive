@@ -439,6 +439,7 @@ public class DbaseFileReader implements FileReader {
                 // line....
                 int start = fieldOffset;
                 int end = fieldOffset + fieldLen - 1;
+                charBuffer.limit(charBuffer.capacity());
                 // trim off whitespace and 'zero' chars
                 while (start < end) {
                     char c = charBuffer.get(start);

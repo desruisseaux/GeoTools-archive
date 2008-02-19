@@ -38,8 +38,8 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.FeatureTypeHandler;
+import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.JDBCUtils;
@@ -49,18 +49,15 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
-
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.UnaliasSQLEncoder;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.Filter;
-// import org.geotools.filter.SQLEncoder;
-// import org.geotools.data.geometryless.filter.GeometrylessSQLEncoder;
-import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.sql.BypassSqlFeatureTypeHandler;
 import org.geotools.data.sql.RsMd2DbMdResultSet;
 import org.geotools.data.sql.SqlDataStore;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.UnaliasSQLEncoder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 
 /**
  * An implementation of the GeoTools Data Store API for a generic non-spatial
@@ -284,7 +281,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
         return new WKTAttributeIO();
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData)
             throws IOException {
         LOGGER.fine("returning jdbc feature writer");
 

@@ -73,6 +73,7 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -686,7 +687,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final SimpleFeatureType requestType,
         final Filter filter, final Transaction transaction)
         throws IOException {
         String typeName = requestType.getTypeName();
@@ -716,7 +717,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             return new EmptyFeatureReader(requestType);
         }
         
-        FeatureReader reader = getFeatureReader(query, transaction);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query, transaction);
         
         if (compare == 1) {
             reader = new ReTypeFeatureReader(reader, requestType, false);
@@ -1639,7 +1640,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName)
         throws IOException {
         if (!typeHandler.getFIDMapper(typeName).isVolatile()
                 || allowWriteOnVolatileFIDs) {
@@ -1687,7 +1688,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @throws IOException DOCUMENT ME!
      */
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader,
         QueryData queryData) throws IOException {
     	PostgisSQLBuilder sqlBuilder = 
     		(PostgisSQLBuilder) getSqlBuilder(fReader.getFeatureType().getTypeName());

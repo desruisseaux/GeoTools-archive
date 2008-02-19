@@ -781,7 +781,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * Default visibility for testing purposes
 	 */
 	
-	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource source,
+	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource<SimpleFeatureType, SimpleFeature> source,
 			SimpleFeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
 			CoordinateReferenceSystem featCrs, Rectangle screenSize,
@@ -1107,7 +1107,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            the <code>MapLayer</code> to determine the needed attributes
 	 *            from
 	 * @param schema
-	 *            the <code>layer</code>'s featuresource schema
+	 *            the <code>layer</code>'s FeatureSource<SimpleFeatureType, SimpleFeature> schema
 	 * @return the minimun set of attribute names needed to render
 	 *         <code>layer</code>
 	 */
@@ -1437,7 +1437,7 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
     /**
-     * Prepair a FeatureCollection for display, this method formally ensured that a FeatureReader
+     * Prepair a FeatureCollection<SimpleFeatureType, SimpleFeature> for display, this method formally ensured that a FeatureReader
      * produced the correct CRS and has now been updated to work with FeatureCollection.
      * <p>
      * What is really going on is the need to set up for reprojection; but *after* decimation has
@@ -1446,9 +1446,9 @@ public final class StreamingRenderer implements GTRenderer {
      *  
      * @param features
      * @param sourceCrs
-     * @return FeatureCollection that produces results with the correct CRS
+     * @return FeatureCollection<SimpleFeatureType, SimpleFeature> that produces results with the correct CRS
      */
-    private FeatureCollection prepFeatureCollection( FeatureCollection features, CoordinateReferenceSystem sourceCrs ) {
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> prepFeatureCollection( FeatureCollection<SimpleFeatureType, SimpleFeature> features, CoordinateReferenceSystem sourceCrs ) {
         // DJB: dont do reprojection here - do it after decimation
         // but we ensure that the reader is producing geometries with
         // the correct CRS
@@ -1537,7 +1537,7 @@ public final class StreamingRenderer implements GTRenderer {
 		// /////////////////////////////////////////////////////////////////////
 		final FeatureTypeStyle[] featureStylers = currLayer.getStyle().getFeatureTypeStyles();
 		
-        final FeatureSource featureSource = currLayer.getFeatureSource();
+        final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) currLayer.getFeatureSource();
         
         final Collection result;
         final CoordinateReferenceSystem sourceCrs;
@@ -1552,7 +1552,7 @@ public final class StreamingRenderer implements GTRenderer {
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine(new StringBuffer("processing ").append(
 						featureStylers.length).append(" stylers for ").append(
-						currLayer.getFeatureSource().getSchema().getTypeName())
+						currLayer.getFeatureSource().getSchema().getName())
 						.toString());
 			}
 			// transformMap = new HashMap();

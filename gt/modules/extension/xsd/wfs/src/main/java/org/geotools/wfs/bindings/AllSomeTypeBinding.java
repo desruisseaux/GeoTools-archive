@@ -15,11 +15,14 @@
  */
 package org.geotools.wfs.bindings;
 
+import javax.xml.namespace.QName;
+
 import net.opengis.wfs.AllSomeType;
 import net.opengis.wfs.WfsFactory;
-import javax.xml.namespace.QName;
+
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.impl.AttributeImpl;
 
 /**

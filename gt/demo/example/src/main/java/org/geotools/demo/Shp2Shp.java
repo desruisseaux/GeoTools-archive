@@ -47,7 +47,7 @@ public class Shp2Shp {
 		File file = getCSVFile(args);
 		SimpleFeatureType type = DataUtilities.createType("Location", "location:Point,name:String");
 
-		FeatureCollection collection = FeatureCollections.newCollection();
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 		BufferedReader reader = new BufferedReader( new FileReader( file ));
 		try {
 			String line = reader.readLine();
@@ -82,7 +82,7 @@ public class Shp2Shp {
 		
 		Transaction transaction = new DefaultTransaction("create");
 		String typeName = newDataStore.getTypeNames()[0];
-		FeatureStore featureStore = (FeatureStore) newDataStore.getFeatureSource( typeName );
+		FeatureStore<SimpleFeatureType, SimpleFeature> featureStore = (FeatureStore) newDataStore.getFeatureSource( typeName );
 		featureStore.setTransaction(transaction);
 		try {			
 			featureStore.addFeatures(collection);

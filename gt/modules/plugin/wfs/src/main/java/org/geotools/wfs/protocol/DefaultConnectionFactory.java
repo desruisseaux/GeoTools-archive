@@ -10,13 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import org.geotools.util.logging.Logging;
-
-import sun.rmi.log.LogInputStream;
 
 /**
  * Handles setting up connections to a WFS based on a WFS capabilities document,

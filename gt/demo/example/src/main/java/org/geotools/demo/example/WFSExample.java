@@ -22,6 +22,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -70,7 +71,7 @@ public class WFSExample {
 		System.out.println( "Schema Attributes:"+schema.getAttributeCount() );
 		
 		// Step 4 - target
-		FeatureSource source = data.getFeatureSource( typeName );
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = data.getFeatureSource( typeName );
 		System.out.println( "Metadata Bounds:"+ source.getBounds() );
 
 		// Step 5 - query
@@ -82,10 +83,10 @@ public class WFSExample {
         Intersects filter = ff.intersects( ff.property( geomName ), ff.literal( polygon ) );
 		
 		Query query = new DefaultQuery( typeName, filter, new String[]{ geomName } );
-		FeatureCollection features = source.getFeatures( query );
+		FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures( query );
 
 		ReferencedEnvelope bounds = new ReferencedEnvelope();
-		Iterator iterator = features.iterator();
+		Iterator<SimpleFeature> iterator = features.iterator();
 		try {
 			while( iterator.hasNext() ){
 				Feature feature = (Feature) iterator.next();				
@@ -114,7 +115,7 @@ public class WFSExample {
 		System.out.println( "Schema Attributes:"+schema.getAttributeCount() );
 		
 		// Step 4 - target
-		FeatureSource source = data.getFeatureSource( typeName );
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = data.getFeatureSource( typeName );
 		System.out.println( "Metadata Bounds:"+ source.getBounds() );
 
 		// Step 5 - query
@@ -122,10 +123,10 @@ public class WFSExample {
 		
 		DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE );
 		query.setMaxFeatures(2);
-		FeatureCollection features = source.getFeatures( query );
+		FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures( query );
 
 		String fid = null;
-		Iterator iterator = features.iterator();
+		Iterator<SimpleFeature> iterator = features.iterator();
 		try {
 			while( iterator.hasNext() ){
 				Feature feature = (Feature) iterator.next();

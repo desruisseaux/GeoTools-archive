@@ -16,10 +16,10 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
-import org.geotools.gui.swing.map.MapConstants;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 
 /**
  *

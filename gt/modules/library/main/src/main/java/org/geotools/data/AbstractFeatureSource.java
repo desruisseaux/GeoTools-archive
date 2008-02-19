@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -31,22 +30,19 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
- * This is a starting point for providing your own FeatureSource implementation.
+ * This is a starting point for providing your own FeatureSource<SimpleFeatureType, SimpleFeature> implementation.
  *
  * <p>
  * Subclasses must implement:
@@ -68,7 +64,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </ul>
  *
  * <p>
- * You may find a FeatureSource implementations that is more specific to your needs - such as
+ * You may find a FeatureSource<SimpleFeatureType, SimpleFeature> implementations that is more specific to your needs - such as
  * JDBCFeatureSource.
  * </p>
  *
@@ -79,7 +75,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett, Refractions Research Inc
  * @source $URL$
  */
-public abstract class AbstractFeatureSource implements FeatureSource {
+public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /** The logger for the filter module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     
@@ -87,6 +83,23 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     
     public AbstractFeatureSource() {
         // just to keep the default constructor around
+    }
+    
+    /**
+     * Overrides to explicitly type narrow the return type to {@link DataStore}
+     */
+    public abstract DataStore getDataStore();
+    
+    /**
+     * Returns the same name than the feature type (ie,
+     * {@code getSchema().getName()} to honor the simple feature land common
+     * practice of calling the same both the Features produces and their types
+     * 
+     * @since 2.5
+     * @see FeatureSource#getName()
+     */
+    public Name getName() {
+        return getSchema().getName();
     }
     
     /**
@@ -150,13 +163,13 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         };
     }
     /**
-     * Retrieve the Transaction this FeatureSource is operating against.
+     * Retrieve the Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is operating against.
      *
      * <p>
-     * For a plain FeatureSource that cannot modify this will always be Transaction.AUTO_COMMIT.
+     * For a plain FeatureSource<SimpleFeatureType, SimpleFeature> that cannot modify this will always be Transaction.AUTO_COMMIT.
      * </p>
      *
-     * @return Transacstion FeatureSource is operating against
+     * @return Transacstion FeatureSource<SimpleFeatureType, SimpleFeature> is operating against
      */
     public Transaction getTransaction() {
         return Transaction.AUTO_COMMIT;
@@ -174,7 +187,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query query) throws IOException {
     	SimpleFeatureType schema = getSchema();        
         String typeName = schema.getTypeName();
         
@@ -186,7 +199,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
             return new EmptyFeatureCollection( schema );
         }
         
-        FeatureCollection collection = new DefaultFeatureResults(this, query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new DefaultFeatureResults(this, query);
         if( collection.getDefaultGeometry() == null ){
             return collection; // no geometry no reprojection needed
         }
@@ -221,7 +234,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException If results could not be obtained
      */
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
     
@@ -232,7 +245,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException If features could not be obtained
      */
-    public FeatureCollection getFeatures() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
         return getFeatures(Filter.INCLUDE);
     }
     
@@ -334,7 +347,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
             return 0;
         }
         
-        DataStore dataStore = getDataStore();
+        DataStore dataStore = (DataStore) getDataStore();
         if ((dataStore == null) || !(dataStore instanceof AbstractDataStore)) {
             // too expensive
             return -1;

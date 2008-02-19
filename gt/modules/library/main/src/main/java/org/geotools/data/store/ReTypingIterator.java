@@ -92,7 +92,7 @@ public class ReTypingIterator implements Iterator {
 
         if (target.getAttributeCount() > original.getAttributeCount()) {
             throw new IllegalArgumentException(
-                "Unable to retype FeatureReader (origional does not cover requested type)");
+                "Unable to retype  FeatureReader<SimpleFeatureType, SimpleFeature> (origional does not cover requested type)");
         }
 
         String xpath;
@@ -105,7 +105,7 @@ public class ReTypingIterator implements Iterator {
 
             if (!attrib.equals(original.getAttribute(xpath))) {
                 throw new IllegalArgumentException(
-                    "Unable to retype FeatureReader (origional does not cover "
+                    "Unable to retype  FeatureReader<SimpleFeatureType, SimpleFeature> (origional does not cover "
                     + xpath + ")");
             }
         }

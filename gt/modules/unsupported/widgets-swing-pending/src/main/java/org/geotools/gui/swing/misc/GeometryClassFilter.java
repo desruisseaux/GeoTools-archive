@@ -17,6 +17,7 @@ package org.geotools.gui.swing.misc;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;

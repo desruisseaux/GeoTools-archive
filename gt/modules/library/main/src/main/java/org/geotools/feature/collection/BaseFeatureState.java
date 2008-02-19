@@ -39,7 +39,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </code>
  * </p>
  * <p>
- * On the bright side this means we can "fix" all the FeatureCollection implementations
+ * On the bright side this means we can "fix" all the FeatureCollection<SimpleFeatureType, SimpleFeature> implementations
  * in one fell-swoop.
  * </p>
  * 
@@ -90,7 +90,7 @@ public class BaseFeatureState extends FeatureState {
 		this.schema = schema;
 	}
 	//
-	// FeatureCollection Event Support
+	// FeatureCollection<SimpleFeatureType, SimpleFeature> Event Support
 	//
 
     /**

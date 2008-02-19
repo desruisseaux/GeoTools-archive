@@ -14,6 +14,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -68,7 +69,7 @@ public class ShapefileRead2 {
 
 		System.out.println("Reading content " + typeName);
 
-		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
+		FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
 		FeatureCollection collection = featureSource.getFeatures();
 		
 		Iterator iterator = collection.iterator();

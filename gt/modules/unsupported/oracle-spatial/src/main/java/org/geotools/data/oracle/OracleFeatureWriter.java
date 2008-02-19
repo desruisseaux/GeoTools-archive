@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,11 +34,10 @@ import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.sdo.GeometryConverter;
-import org.geotools.filter.SQLEncoderOracle;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -64,7 +62,7 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
 	
 	GeometryConverter converter;
 	
-    public OracleFeatureWriter(FeatureReader fReader, QueryData queryData )
+    public OracleFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader, QueryData queryData )
         throws IOException {
         super(fReader, queryData);
         Connection conn = queryData.getConnection();

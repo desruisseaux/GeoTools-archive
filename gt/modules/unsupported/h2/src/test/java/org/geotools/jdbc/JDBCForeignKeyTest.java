@@ -51,7 +51,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         query.setTypeName("fk");
         query.setHints(hints);
 
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
 
         SimpleFeature feature = reader.next();
@@ -74,7 +74,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         query.setTypeName("fk");
         query.setHints(hints);
 
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
 
         SimpleFeature feature = reader.next();

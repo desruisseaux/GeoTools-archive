@@ -548,7 +548,7 @@ public class TestData {
     } // End method insertData
 
     /**
-     * Creates a FeatureCollection with features whose schema adheres to the one
+     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with features whose schema adheres to the one
      * created in <code>createTestData()</code> and returns it.
      * 
      * <p>
@@ -580,9 +580,9 @@ public class TestData {
      *             a feature with the given attribute values.
      * @throws SeException
      */
-    public FeatureCollection createTestFeatures(Class jtsGeomType, int numFeatures)
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(Class jtsGeomType, int numFeatures)
             throws IOException, IllegalAttributeException, SeException {
-        FeatureCollection col = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections.newCollection();
         SimpleFeatureType type = getDataStore().getSchema(getTemp_table());
         Object[] values = new Object[type.getAttributeCount()];
 

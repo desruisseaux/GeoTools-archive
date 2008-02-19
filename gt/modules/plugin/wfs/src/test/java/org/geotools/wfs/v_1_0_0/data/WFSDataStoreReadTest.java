@@ -110,7 +110,7 @@ public class WFSDataStoreReadTest extends TestCase {
         
         if(post){
         // 	post
-            FeatureReader ft = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> ft = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
             assertNotNull("FeatureType was null",ft);
             assertTrue("must have 1 feature -- fair assumption",ft.hasNext() && ft.getFeatureType()!=null && ft.next()!=null);
             // disable for now
@@ -119,7 +119,7 @@ public class WFSDataStoreReadTest extends TestCase {
         }
         if(get){
         // 	get
-            FeatureReader ft = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> ft = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
             assertNotNull("FeatureType was null",ft);
             assertTrue("must have 1 feature -- fair assumption",ft.hasNext() && ft.getFeatureType()!=null && ft.next()!=null);
             // disable for now
@@ -148,7 +148,7 @@ public class WFSDataStoreReadTest extends TestCase {
         String fid=null;
         if(get){
             // 	get
-            FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
             try{
                 assertNotNull("FeatureType was null",ft);
                 
@@ -175,7 +175,7 @@ public class WFSDataStoreReadTest extends TestCase {
         }if(post){
             // 	post
 
-            FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
             try{
                 assertNotNull("FeatureType was null",ft);
                 SimpleFeatureType featureType = fr.getFeatureType();
@@ -203,7 +203,7 @@ public class WFSDataStoreReadTest extends TestCase {
         // test fid filter 
         query.setFilter(FilterFactoryFinder.createFilterFactory().createFidFilter(fid));
         if( get ){
-            FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
             try{
                 assertNotNull("FeatureType was null",ft);
                 int j=0;while(fr.hasNext()){ assertEquals(fid,fr.next().getID());j++;}
@@ -212,7 +212,7 @@ public class WFSDataStoreReadTest extends TestCase {
                 fr.close();
             }
         }if (post){
-            FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
             try{
                 assertNotNull("FeatureType was null",ft);
                 int j=0;while(fr.hasNext()){ assertEquals(fid,fr.next().getID());j++;}
@@ -252,7 +252,7 @@ public class WFSDataStoreReadTest extends TestCase {
         //query.setMaxFeatures(3);
         if(get){
             //  get
-            FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
             assertNotNull("FeatureType was null",ft);
             assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
             int j=0;while(fr.hasNext()){fr.next();j++;}
@@ -261,7 +261,7 @@ public class WFSDataStoreReadTest extends TestCase {
         }if(post){
             //  post
 
-            FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
             assertNotNull("FeatureType was null",ft);
             assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
             int j=0;while(fr.hasNext()){fr.next();j++;}

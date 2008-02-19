@@ -16,12 +16,14 @@
 package org.geotools.gml2;
 
 import junit.framework.TestCase;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
+
 import org.geotools.feature.FeatureCollections;
 import org.geotools.xlink.XLINKConfiguration;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
+
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 public class GMLConfigurationTest extends TestCase {

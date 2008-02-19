@@ -77,7 +77,7 @@ public class DefaultFeature extends SimpleFeatureImpl
 //    private Envelope bounds;
 
     /** The collection that this Feature is a member of */
-    private FeatureCollection parent;
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> parent;
     
 //    private static final Pattern NON_WORD_PATTERN = Pattern.compile(":");
 
@@ -588,7 +588,7 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @return the collection that is the parent of this feature.
      */
-    public FeatureCollection getParent() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent() {
         return parent;
     }
 

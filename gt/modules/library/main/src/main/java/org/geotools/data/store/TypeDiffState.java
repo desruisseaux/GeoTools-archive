@@ -32,8 +32,7 @@ import org.geotools.data.Transaction.State;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -222,12 +221,12 @@ public class TypeDiffState implements State {
      * Constructs a DiffFeatureReader that works against this Transaction.
      * </p>
      *
-     * @return FeatureReader the mask orgional contents with against the
+     * @return  FeatureReader<SimpleFeatureType, SimpleFeature> the mask orgional contents with against the
      *         current Differences recorded by the Tansasction State
      *
      * @throws IOException If typeName is not Manged by this Tansaction State
      */
-    public synchronized FeatureReader reader() throws IOException {
+    public synchronized  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
     	
         return new DiffFeatureReader( entry.reader( Query.ALL, transaction ), diffMap );
     }
@@ -247,7 +246,7 @@ public class TypeDiffState implements State {
     public synchronized FeatureWriter writer()
         throws IOException {
         Diff diff = new Diff();
-        FeatureReader reader = entry.createReader();
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = entry.createReader();
 
         return new DiffFeatureWriter(reader, diff) {
             protected void fireNotification(int eventType, ReferencedEnvelope bounds) {

@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.TestData;
-
 import junit.framework.TestCase;
+
+import org.geotools.TestData;
 
 public class DirectoryDataStoreTest extends TestCase {
 

@@ -22,8 +22,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
-
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.ContextGeneralPanel;

@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class FunctionTestSupport extends TestCase {
     
-    protected FeatureCollection featureCollection;
+    protected FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection;
     protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
     protected ExpressionBuilder builder = new ExpressionBuilder();

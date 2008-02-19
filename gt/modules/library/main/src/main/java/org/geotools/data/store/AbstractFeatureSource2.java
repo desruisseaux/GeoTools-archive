@@ -15,14 +15,12 @@ import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-
-public abstract class AbstractFeatureSource2 implements FeatureSource {
+public abstract class AbstractFeatureSource2 implements FeatureSource<SimpleFeatureType, SimpleFeature> {
 
 	/** The logger for the data module. */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
@@ -48,7 +46,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 		entry.listenerManager.removeFeatureListener( this, listener );
 	}
 
-	public FeatureCollection getFeatures(Query query) throws IOException {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query query) throws IOException {
 		 SimpleFeatureType featureType = entry.getFeatureType();
 		 
 		 Filter filter = query.getFilter();
@@ -70,7 +68,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 //         }
          
          //filter
-         FeatureCollection features = getFeatures( filter );
+         FeatureCollection<SimpleFeatureType, SimpleFeature> features = getFeatures( filter );
          
          //retyping
          if( propertyNames != null || query.getCoordinateSystem() != null ){
@@ -108,7 +106,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
          return features;
 	}
 
-	public FeatureCollection getFeatures(Filter filter) throws IOException {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         //filter
         if ( filter != null && !filter.equals( Filter.INCLUDE ) ) {
             return new FilteringFeatureCollection( getFeatures() , filter );
@@ -143,7 +141,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 	 * 
 	 * @return the reprojected feature collection.
 	 */
-	protected FeatureCollection reproject( FeatureCollection features, CoordinateReferenceSystem source, CoordinateReferenceSystem target ) {
+	protected FeatureCollection<SimpleFeatureType, SimpleFeature> reproject( FeatureCollection<SimpleFeatureType, SimpleFeature> features, CoordinateReferenceSystem source, CoordinateReferenceSystem target ) {
 		return new ReprojectingFeatureCollection( features, source, target );
 	}
 	

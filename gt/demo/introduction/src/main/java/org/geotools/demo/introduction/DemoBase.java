@@ -122,7 +122,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * This tutorial shows the following elements: 
  * 
- *     (1) FeatureSource creation:
+ *     (1) FeatureSource<SimpleFeatureType, SimpleFeature> creation:
  *           This creates, through several approaches, the handles which are
  *           used later for the manipulation of data.
  *           
@@ -237,7 +237,7 @@ public class DemoBase {
         
         /* Create a Point Feature representing London as a FeatureCollection.*/
         SimpleFeature london = createLondonPointFeatureFromScratch();
-        FeatureCollection londonCollection = makeLondonFeatureCollection(london);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> londonCollection = makeLondonFeatureCollection(london);
         loadLondonFeatureCollectionIntoList(londonCollection);
         demoGUI.textArea.append(" Done: Created London from scratch.\n");
         
@@ -284,15 +284,15 @@ public class DemoBase {
         demoGUI.initialize_JMapPane();
         demoGUI.textArea.append(" Done: Initialized the MapPane.\n");
         
-        /* Add the London featureCollection as one layer in the map. */
-        FeatureCollection lfc = 
+        /* Add the London FeatureCollection<SimpleFeatureType, SimpleFeature> as one layer in the map. */
+        FeatureCollection<SimpleFeatureType, SimpleFeature> lfc = 
                    (FeatureCollection) demoData.theFeatureCollectionList.get(0);
         Style lsty = (Style) demoData.theStyleMap.get("londstyl");
         MapLayer m0 = new DefaultMapLayer(lfc,lsty);
         demoGUI.context.addLayer(m0);
         
-        /* Add the Shapefile FeatureSource below the first layer. */
-        FeatureSource shpFS = getAShapefileFeatureSourceFromCatalog();
+        /* Add the Shapefile FeatureSource<SimpleFeatureType, SimpleFeature> below the first layer. */
+        FeatureSource<SimpleFeatureType, SimpleFeature> shpFS = getAShapefileFeatureSourceFromCatalog();
         Style shpsty = (Style) demoData.theStyleMap.get("shpstyl");
         MapLayer m1 = new DefaultMapLayer(shpFS,shpsty);
         demoGUI.context.addLayer(0,m1);
@@ -404,9 +404,9 @@ public class DemoBase {
         return ptF;
     }
     
-    public FeatureCollection makeLondonFeatureCollection(SimpleFeature f){
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> makeLondonFeatureCollection(SimpleFeature f){
         
-        FeatureCollection fc = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = FeatureCollections.newCollection();
         fc.add(f);
         return fc;
     }
@@ -530,7 +530,7 @@ public class DemoBase {
     }
     
     /**
-     * Gets a FeatureCollection with the shapefile from the catalog.
+     * Gets a FeatureCollection<SimpleFeatureType, SimpleFeature> with the shapefile from the catalog.
      * <p>
      * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog(String)}.
      * </p>
@@ -538,8 +538,8 @@ public class DemoBase {
      * 
      * @throws IOException Any I/O errors that occur accessing the shapefile resource.
      */
-    public FeatureSource getAShapefileFeatureSourceFromCatalog(){
-//    public FeatureCollection getFeatureCollectionForShapefile() throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getAShapefileFeatureSourceFromCatalog(){
+//    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionForShapefile() throws IOException {
         
         //lookup service, should be only one
         List serviceList = demoData.localCatalog.find( SHAPEFILEURI, null );
@@ -554,7 +554,7 @@ public class DemoBase {
         }
         GeoResource resource = (GeoResource) resourceList.get( 0 );
         
-        FeatureSource shpFS = null;
+        FeatureSource<SimpleFeatureType, SimpleFeature> shpFS = null;
         try{
             shpFS = (FeatureSource) resource.resolve( FeatureSource.class, null );
         } catch (IOException ioex){
@@ -569,7 +569,7 @@ public class DemoBase {
     
 //    
 //    /**
-//     * Gets a FeatureCollection with the shapefile from the catalog.
+//     * Gets a FeatureCollection<SimpleFeatureType, SimpleFeature> with the shapefile from the catalog.
 //     * <p>
 //     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog()}.
 //     * </p>
@@ -577,8 +577,8 @@ public class DemoBase {
 //     * 
 //     * @throws IOException Any I/O errors that occur accessing the shapefile resource.
 //     */
-//    public FeatureCollection getFeatureCollectionForShapefile(){
-////    public FeatureCollection getFeatureCollectionForShapefile() throws IOException {
+//    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionForShapefile(){
+////    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionForShapefile() throws IOException {
 //        
 //        //create the uri to lookup
 //        URI uri = null;
@@ -604,7 +604,7 @@ public class DemoBase {
 //        GeoResource resource = (GeoResource) resourceList.get( 0 );
 //
 ////        return (FeatureSource) resource.resolve( FeatureSource.class, null );
-//        FeatureCollection shpFC = null;
+//        FeatureCollection<SimpleFeatureType, SimpleFeature> shpFC = null;
 //        try {
 //            shpFC = (FeatureCollection) resource.resolve( FeatureCollection.class, null );
 //        } catch (IOException ioex){
@@ -644,7 +644,7 @@ public class DemoBase {
         for ( Iterator r = resources.iterator(); r.hasNext(); ) {
             GeoResource resource = (GeoResource) r.next();
             if ( resource.canResolve( FeatureSource.class ) ) {
-                FeatureSource featureSource = 
+                FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = 
                     (FeatureSource) resource.resolve( FeatureSource.class, null );
                 featureSources.add( featureSource );
             }

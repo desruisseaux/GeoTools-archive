@@ -48,16 +48,16 @@ public class StyleGeneratorTest extends DataTestCase {
         super(arg0);
     }
 
-    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs, String attribName)
+    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource<SimpleFeatureType, SimpleFeature> fs, String attribName)
         throws IOException {
         for (int i = 0; i < rule.length; i++) {
             Filter filter = rule[i].getFilter();
-            FeatureCollection filteredCollection = fs.getFeatures(filter);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> filteredCollection = fs.getFeatures(filter);
             assertTrue(filteredCollection.size() > 0);
 
             String filterInfo = "Filter \"" + filter.toString() + "\" contains "
                 + filteredCollection.size() + " element(s) (";
-            FeatureIterator it = filteredCollection.features();
+            FeatureIterator<SimpleFeature> it = filteredCollection.features();
 
             while (it.hasNext()) {
                 SimpleFeature feature = (SimpleFeature) it.next();
@@ -82,8 +82,8 @@ public class StyleGeneratorTest extends DataTestCase {
         MathExpression expr2 = null;
         SimpleFeatureType type = roadType;
         String attribName = type.getAttribute(0).getLocalName();
-        FeatureCollection fc = DataUtilities.collection(roadFeatures);
-        FeatureSource fs = DataUtilities.source(fc);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = DataUtilities.collection(roadFeatures);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = DataUtilities.source(fc);
 
         try {
             expr = ff.createMathExpression(MathExpression.MATH_MULTIPLY);

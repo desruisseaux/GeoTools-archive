@@ -13,6 +13,7 @@ import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -29,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.5
  */
 public abstract class BaseFeatureCollection extends SimpleFeatureImpl 
-    implements FeatureCollection {
+    implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
 
 	/**
 	 * logger

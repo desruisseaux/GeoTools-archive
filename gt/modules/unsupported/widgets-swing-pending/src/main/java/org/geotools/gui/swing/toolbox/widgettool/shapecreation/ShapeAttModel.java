@@ -18,7 +18,9 @@ package org.geotools.gui.swing.toolbox.widgettool.shapecreation;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
+
 import org.geotools.gui.swing.toolbox.widgettool.shapecreation.Data.TYPE;
 
 

@@ -45,6 +45,8 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -278,7 +280,7 @@ public class MySQLDataStore extends JDBCDataStore {
             return new WKTAttributeIO();
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData)
         throws IOException {
         LOGGER.fine("returning jdbc feature writer");
 

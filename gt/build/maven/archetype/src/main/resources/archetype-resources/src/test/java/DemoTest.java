@@ -26,7 +26,7 @@ public class DemoTest extends TestCase {
         Feature f = demoBase.createLondonPointFeatureFromScratch();
         assertNotNull(f);
         
-        FeatureCollection fc = demoBase.makeLondonFeatureCollection(f);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = demoBase.makeLondonFeatureCollection(f);
         assertNotNull(fc);
         assertFalse( fc.isEmpty() );
         
@@ -46,9 +46,9 @@ public class DemoTest extends TestCase {
     public void testLoadShapefileFeatureSource() throws IOException {
         
         demoBase.loadShapefileIntoCatalog(demoBase.SHAPEFILENAME);
-        FeatureSource featureSource = 
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = 
                                demoBase.getAShapefileFeatureSourceFromCatalog();
-        assertNotNull( featureSource );
+        assertNotNull( FeatureSource<SimpleFeatureType, SimpleFeature> );
         assertFalse( featureSource.getFeatures().isEmpty() );
         
     }

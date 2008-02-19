@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author dzwiers 
  * @source $URL$
  */
-public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
+public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore<SimpleFeatureType, SimpleFeature> {
     protected Transaction trans = Transaction.AUTO_COMMIT;
 
     /**
@@ -74,7 +74,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         return trans;
     }
 
-    public Set addFeatures(final FeatureReader reader) throws IOException {
+    public Set addFeatures(final  FeatureReader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
         List features=new ArrayList();
         while(reader.hasNext()){
             try {
@@ -112,7 +112,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         }
         
         List<AttributeDescriptor> atrs = schema.getAttributes();
-        FeatureIterator iter=collection.features();
+        FeatureIterator<SimpleFeature> iter=collection.features();
         try{
             ReferencedEnvelope bounds=null;
             
@@ -287,7 +287,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
      * 
      * @see org.geotools.data.FeatureStore#setFeatures(org.geotools.data.FeatureReader)
      */
-    public void setFeatures(FeatureReader reader) throws IOException {
+    public void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         WFSTransactionState ts = null;
 
         if (trans == Transaction.AUTO_COMMIT) {

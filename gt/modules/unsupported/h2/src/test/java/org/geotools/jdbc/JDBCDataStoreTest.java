@@ -99,7 +99,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
     }
 
     public void testGetFeatureSource() throws Exception {
-        FeatureSource featureSource = dataStore.getFeatureSource("ft1");
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource("ft1");
         assertNotNull(featureSource);
     }
 
@@ -107,7 +107,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         GeometryFactory gf = dataStore.getGeometryFactory();
 
         DefaultQuery query = new DefaultQuery("ft1");
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
 
         for (int i = 0; i < 3; i++) {
             assertTrue(reader.hasNext());
@@ -155,7 +155,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
     }
 
     public void testGetFeatureWriter() throws IOException {
-        FeatureWriter writer = dataStore.getFeatureWriter("ft1", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter("ft1", Transaction.AUTO_COMMIT);
 
         while (writer.hasNext()) {
             SimpleFeature feature = writer.next();
@@ -166,7 +166,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         writer.close();
 
         DefaultQuery query = new DefaultQuery("ft1");
-        FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
 
         while (reader.hasNext()) {
@@ -181,12 +181,12 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         FilterFactory ff = dataStore.getFilterFactory();
 
         Filter f = ff.equals(ff.property("intProperty"), ff.literal(100));
-        FeatureCollection features = dataStore.getFeatureSource("ft1").getFeatures(f);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dataStore.getFeatureSource("ft1").getFeatures(f);
         assertEquals(0, features.size());
 
         f = ff.equals(ff.property("intProperty"), ff.literal(1));
 
-        FeatureWriter writer = dataStore.getFeatureWriter("ft1", f, Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter("ft1", f, Transaction.AUTO_COMMIT);
 
         while (writer.hasNext()) {
             SimpleFeature feature = writer.next();
@@ -202,7 +202,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
     }
 
     public void testGetFeatureWriterAppend() throws IOException {
-        FeatureWriter writer = dataStore.getFeatureWriterAppend("ft1", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriterAppend("ft1", Transaction.AUTO_COMMIT);
 
         for (int i = 3; i < 6; i++) {
             SimpleFeature feature = writer.next();
@@ -212,7 +212,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 
         writer.close();
 
-        FeatureCollection features = dataStore.getFeatureSource("ft1").getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals(6, features.size());
     }
 }

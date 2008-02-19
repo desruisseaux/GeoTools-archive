@@ -16,6 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.gml2.GML;

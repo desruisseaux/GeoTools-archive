@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class CollectionDataStore extends AbstractDataStore {
     SimpleFeatureType featureType;
-    FeatureCollection collection;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
     /**
      * Builds a data store wrapper on top of a feature collection
@@ -90,7 +90,7 @@ public class CollectionDataStore extends AbstractDataStore {
     }
 
     /**
-     * Provides FeatureReader over the entire contents of <code>typeName</code>.
+     * Provides  FeatureReader<SimpleFeatureType, SimpleFeature> over the entire contents of <code>typeName</code>.
      * 
      * <p>
      * Implements getFeatureReader contract for AbstractDataStore.
@@ -104,7 +104,7 @@ public class CollectionDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureReader getFeatureReader(final String typeName)
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final String typeName)
         throws IOException {
     	return new DelegateFeatureReader( getSchema(typeName), collection.features() );
     }
@@ -113,7 +113,7 @@ public class CollectionDataStore extends AbstractDataStore {
      * Returns the feature collection held by this data store
      *
      */
-    public FeatureCollection getCollection() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection() {
         return collection;
     }
 
@@ -135,7 +135,7 @@ public class CollectionDataStore extends AbstractDataStore {
      * @param query
      */
     protected ReferencedEnvelope getBoundsInternal(Query query) {
-        FeatureIterator iterator = collection.features();
+        FeatureIterator<SimpleFeature> iterator = collection.features();
         Envelope envelope = null;
 
         if (iterator.hasNext()) {
@@ -167,7 +167,7 @@ public class CollectionDataStore extends AbstractDataStore {
             throw new SchemaNotFoundException(featureTypeName);
         }
             int count = 0;
-            FeatureIterator iterator = collection.features();
+            FeatureIterator<SimpleFeature> iterator = collection.features();
 
             Filter filter = query.getFilter();
 

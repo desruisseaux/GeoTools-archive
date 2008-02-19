@@ -66,7 +66,9 @@ public class createTestData {
 
         FeatureStore store = (FeatureStore) datastore.getFeatureSource(
                 "test_lines");
-        FeatureCollection collection = DataUtilities.collection(new FeatureReader() {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
+        collection = DataUtilities
+                .collection(new FeatureReader<SimpleFeatureType, SimpleFeature>() {
             public SimpleFeatureType getFeatureType() {
                 return featureType;
             }

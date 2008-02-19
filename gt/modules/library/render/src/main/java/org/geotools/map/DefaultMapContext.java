@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryRegistryException;
@@ -45,6 +44,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -269,7 +270,7 @@ public class DefaultMapContext implements MapContext {
 	 * @param style
 	 *            DOCUMENT ME!
 	 */
-	public void addLayer(FeatureSource featureSource, Style style) {
+	public void addLayer(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, Style style) {
 		this.addLayer(new DefaultMapLayer(featureSource, style, ""));
 	}
     

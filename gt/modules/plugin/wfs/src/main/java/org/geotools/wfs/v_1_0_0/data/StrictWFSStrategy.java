@@ -54,18 +54,18 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
         super(store);
     }
 
-    protected FeatureReader wrapWithFilteringFeatureReader(Filter postFilter, FeatureReader reader, Filter processedFilter) {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> wrapWithFilteringFeatureReader(Filter postFilter,  FeatureReader<SimpleFeatureType, SimpleFeature> reader, Filter processedFilter) {
         FilterEncodingPreProcessor visitor = new FilterEncodingPreProcessor(COMPLIANCE_LEVEL);
         Filters.accept( processedFilter, visitor);
         
         if( visitor.requiresPostProcessing() )
-            return new FilteringFeatureReader(reader, processedFilter);
+            return new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, processedFilter);
         else
-            return new FilteringFeatureReader(reader, postFilter);
+            return new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, postFilter);
             
     }
 
-    protected FeatureReader createFeatureReader(Transaction transaction, Query query) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> createFeatureReader(Transaction transaction, Query query) throws IOException {
         return new StrictFeatureReader(transaction, query, 
                 COMPLIANCE_LEVEL);
     }
@@ -76,9 +76,9 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
      *  
      * @author Jesse
      */
-    protected class StrictFeatureReader implements FeatureReader{
+    protected class StrictFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature>{
 
-        private FeatureReader delegate;
+        private FeatureReader<SimpleFeatureType, SimpleFeature> delegate;
         protected Filter filter;
         private Query query;
         private Transaction transaction;
@@ -156,14 +156,14 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
             return next!=null;
         }
 
-        private FeatureReader nextReader() throws IOException {
+        private  FeatureReader<SimpleFeatureType, SimpleFeature> nextReader() throws IOException {
             if( filter==null || filter==Filter.EXCLUDE )
                 return null;
 
             DefaultQuery query2=new DefaultQuery(query);
             query2.setFilter(filter);
             
-            FeatureReader nextReader = StrictWFSStrategy.super.createFeatureReader(transaction, query2);
+             FeatureReader<SimpleFeatureType, SimpleFeature> nextReader = StrictWFSStrategy.super.createFeatureReader(transaction, query2);
 
             filter=null;
             return nextReader;

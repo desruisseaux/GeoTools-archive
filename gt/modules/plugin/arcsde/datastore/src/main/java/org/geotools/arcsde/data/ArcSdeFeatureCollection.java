@@ -14,12 +14,13 @@ import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * FeatureCollection implementation that works over an
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> implementation that works over an
  * {@link ArcSDEFeatureReader} or one of the decorators over it returned by
  * {@link ArcSDEDataStore#getFeatureReader(Query, ArcSDEPooledConnection, boolean)}.
  * 
@@ -58,7 +59,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
                 final ArcSDEDataStore dataStore = featureSource.getDataStore();
                 DefaultQuery query = new DefaultQuery(this.query);
                 query.setFilter(Filter.EXCLUDE);
-                final FeatureReader reader = dataStore.getFeatureReader(query, conn, false);
+                final  FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, conn, false);
                 this.childrenSchema = reader.getFeatureType();
                 reader.close();
             } catch (IOException e) {
@@ -109,7 +110,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
         final ArcSDEDataStore dataStore = featureSource.getDataStore();
         final ArcSDEPooledConnection connection = getConnection();
         
-        final FeatureReader reader = dataStore.getFeatureReader(query, connection, false);
+        final  FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, connection, false);
         // slight optimization here: store the child features schema if not yet
         // done
         if (this.childrenSchema == null) {

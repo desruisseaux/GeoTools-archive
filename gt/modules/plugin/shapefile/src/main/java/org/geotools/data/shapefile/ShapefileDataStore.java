@@ -73,6 +73,7 @@ import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.StyleAttributeExtractor;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
@@ -213,7 +214,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
     
     /**
-     * Used by FeatureSource / FeatureStore / FeatureLocking to 
+     * Used by FeatureSource<SimpleFeatureType, SimpleFeature> / FeatureStore / FeatureLocking to 
      * access a single ResourceInfo.
      * 
      * @param typeName
@@ -301,7 +302,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
 
     /**
-     * Create a FeatureReader for the provided type name.
+     * Create a  FeatureReader<SimpleFeatureType, SimpleFeature> for the provided type name.
      * 
      * @param typeName
      *                The name of the FeatureType to create a reader for.
@@ -311,14 +312,14 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @throws IOException
      *                 If an error occurs during creation
      */
-    protected FeatureReader getFeatureReader(String typeName)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
             throws IOException {
         typeCheck(typeName);
 
         return getFeatureReader();
     }
 
-    protected FeatureReader getFeatureReader() throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader() throws IOException {
         try {
             return createFeatureReader(getSchema().getTypeName(),
                     getAttributesReader(true), schema);
@@ -335,7 +336,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String,
      *      org.geotools.data.Query)
      */
-    protected FeatureReader getFeatureReader(String typeName, Query query)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
             throws IOException {
         String[] propertyNames = query.getPropertyNames();
         String defaultGeomName = schema.getDefaultGeometry().getLocalName();
@@ -560,7 +561,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             Transaction transaction) throws IOException {
         typeCheck(typeName);
 
-        FeatureReader featureReader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
         ShapefileAttributeReader attReader = getAttributesReader(true);
         try {
             SimpleFeatureType schema = getSchema();
@@ -934,7 +935,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(final String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName)
             throws IOException {
         final SimpleFeatureType featureType = getSchema(typeName);
 

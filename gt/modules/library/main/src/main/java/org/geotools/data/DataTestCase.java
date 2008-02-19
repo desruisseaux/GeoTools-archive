@@ -364,7 +364,7 @@ public class DataTestCase extends TestCase {
      * This method will close the reader.
      * </p>
      */
-    protected int count( FeatureReader reader ) throws IOException {
+    protected int count(  FeatureReader<SimpleFeatureType, SimpleFeature> reader ) throws IOException {
         if( reader == null) {
             return -1;
         }

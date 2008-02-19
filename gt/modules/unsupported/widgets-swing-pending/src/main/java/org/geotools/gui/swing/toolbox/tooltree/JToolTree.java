@@ -16,15 +16,14 @@
 
 package org.geotools.gui.swing.toolbox.tooltree;
 
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
-import java.util.ResourceBundle;
+
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.ScrollPaneConstants;
+
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 
 /**
  * 

@@ -16,7 +16,6 @@
 
 package org.geotools.gui.swing.toolbox.widgettool;
 
-import org.geotools.gui.swing.toolbox.tooltree.*;
 import javax.swing.JComponent;
 
 /**

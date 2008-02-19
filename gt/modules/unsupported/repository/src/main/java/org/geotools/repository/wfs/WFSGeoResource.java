@@ -38,6 +38,7 @@ import org.geotools.repository.defaults.DefaultResolveChangeEvent;
 import org.geotools.repository.defaults.DefaultResolveDelta;
 import org.geotools.util.ProgressListener;
 import org.geotools.wfs.v_1_0_0.data.WFS_1_0_0_DataStore;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -119,7 +120,7 @@ public class WFSGeoResource extends AbstractGeoResource {
         }
 
         if (adaptee.isAssignableFrom(FeatureStore.class)) {
-            FeatureSource fs = parent.getDS().getFeatureSource(typename);
+            FeatureSource<SimpleFeatureType, SimpleFeature> fs = parent.getDS().getFeatureSource(typename);
 
             if (fs instanceof FeatureStore) {
                 return fs;

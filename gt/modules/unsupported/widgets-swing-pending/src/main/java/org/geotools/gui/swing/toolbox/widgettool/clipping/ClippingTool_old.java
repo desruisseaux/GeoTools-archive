@@ -15,15 +15,6 @@
  */
 package org.geotools.gui.swing.toolbox.widgettool.clipping;
 
-import org.geotools.gui.swing.misc.Render.LayerListRenderer;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -35,8 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -58,6 +51,7 @@ import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
+import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
@@ -71,6 +65,15 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *
@@ -151,7 +154,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
     private MapLayer[] filterLayers(MapLayer[] layers) {
         List<MapLayer> lst = new ArrayList<MapLayer>();
         for (MapLayer layer : layers) {
-            if (!layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+            if (!layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
                 lst.add(layer);
             }
         }
@@ -159,7 +162,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
     }
 
     private boolean verify() {
-        if (outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage") && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+        if (outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage") && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
 
             Class jtsClass = clipLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
@@ -248,7 +251,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
         return myData;
     }
 
-    private void fillLayer(FeatureCollection lstFeatures, FeatureSource datastore) {
+    private void fillLayer(FeatureCollection lstFeatures, FeatureSource<SimpleFeatureType, SimpleFeature> datastore) {
         FeatureStore store;
 
         if (datastore instanceof FeatureStore) {
@@ -276,7 +279,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
     private void clip(
             CoordinateReferenceSystem inCRS,
             CoordinateReferenceSystem clipCRS,
-            FeatureCollection outCol,
+            FeatureCollection<SimpleFeatureType, SimpleFeature> outCol,
             SimpleFeature inSF,
             SimpleFeatureType outType)
             throws IllegalArgumentException {
@@ -317,16 +320,16 @@ public class ClippingTool_old extends AbstractWidgetTool {
             //FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
             //Filter filter = ff.intersects(ff.property(geoAtt), ff.literal(env));
 
-            FeatureCollection clipCol = null;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> clipCol = null;
             try {
-                clipCol = clipLayer.getFeatureSource().getFeatures();
+                clipCol = (FeatureCollection<SimpleFeatureType, SimpleFeature>) clipLayer.getFeatureSource().getFeatures();
             } catch (IOException e) {
                 throw new IllegalArgumentException();
             }
 
 
             if (clipCol != null) {
-                FeatureIterator ite = clipCol.features();
+                FeatureIterator<SimpleFeature> ite = clipCol.features();
 
                 //we create the clipped geometry
                 Geometry outGeom = null;
@@ -637,7 +640,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
             gui_ok.setEnabled(false);
             gui_progress.setValue(0);
 
-            FeatureSource inFS = inLayer.getFeatureSource();
+            FeatureSource<SimpleFeatureType, SimpleFeature> inFS = (FeatureSource<SimpleFeatureType, SimpleFeature>) inLayer.getFeatureSource();
             SimpleFeatureType inType = inFS.getSchema();
             CoordinateReferenceSystem inCRS = inLayer.getFeatureSource().getSchema().getCRS();
 
@@ -655,10 +658,10 @@ public class ClippingTool_old extends AbstractWidgetTool {
             try {
                 SimpleFeatureType outType = outStore.getSchema(outStore.getTypeNames()[0]);
 
-                FeatureCollection inCol = inFS.getFeatures(filter);
-                FeatureIterator ite = inCol.features();
+                FeatureCollection<SimpleFeatureType, SimpleFeature> inCol = inFS.getFeatures(filter);
+                FeatureIterator<SimpleFeature> ite = inCol.features();
 
-                FeatureCollection outCol = FeatureCollections.newCollection();
+                FeatureCollection<SimpleFeatureType, SimpleFeature> outCol = FeatureCollections.newCollection();
                 max = inCol.size();
                 gui_progress.setMaximum(max);
 
@@ -679,7 +682,7 @@ public class ClippingTool_old extends AbstractWidgetTool {
                 }
 
                 String name = outStore.getTypeNames()[0];
-                FeatureSource source = outStore.getFeatureSource(name);
+                FeatureSource<SimpleFeatureType, SimpleFeature> source = outStore.getFeatureSource(name);
                 fillLayer(outCol, source);
 
                 fireObjectCreation(new Object[]{outStore});

@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -81,9 +82,9 @@ public class LineNoPseudoNodeValidation extends LineAbstractValidation {
 
     	boolean r = true;
     	
-        FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
-        FeatureCollection fcLine = fsLine.getFeatures();
-        FeatureIterator fLine = fcLine.features();
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
+        FeatureIterator<SimpleFeature> fLine = fcLine.features();
                 
         while(fLine.hasNext()){
         	SimpleFeature line = fLine.next();

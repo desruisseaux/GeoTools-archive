@@ -25,6 +25,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -45,7 +46,7 @@ public class MapServerWFSStrategy extends StrictWFSStrategy implements WFSStrate
         super(store);
     }
     
-    protected FeatureReader createFeatureReader(Transaction transaction, Query query) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> createFeatureReader(Transaction transaction, Query query) throws IOException {
         return new MapServerWFSFeatureReader(transaction, query, 
                 COMPLIANCE_LEVEL);
     }

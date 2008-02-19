@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.toolbox.widgettool;
 
 import java.util.Map;
+
 import org.geotools.gui.swing.toolbox.Parameter;
 
 /**

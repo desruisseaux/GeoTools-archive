@@ -293,15 +293,15 @@ public class TransactionStateDiff implements State {
      *
      * @param typeName TypeName to aquire a Reader on
      *
-     * @return FeatureReader the mask orgional contents with against the
+     * @return  FeatureReader<SimpleFeatureType, SimpleFeature> the mask orgional contents with against the
      *         current Differences recorded by the Tansasction State
      *
      * @throws IOException If typeName is not Manged by this Tansaction State
      */
-    public synchronized FeatureReader reader(String typeName)
+    public synchronized  FeatureReader<SimpleFeatureType, SimpleFeature> reader(String typeName)
         throws IOException {
         Diff diff = diff(typeName);
-        FeatureReader reader = store.getFeatureReader(typeName);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = store.getFeatureReader(typeName);
 
         return new DiffFeatureReader(reader, diff);
     }
@@ -324,7 +324,7 @@ public class TransactionStateDiff implements State {
     public synchronized FeatureWriter writer(final String typeName, Filter filter)
         throws IOException {
         Diff diff = diff(typeName);
-        FeatureReader reader = new FilteringFeatureReader(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);
 
         return new DiffFeatureWriter(reader, diff, filter) {
                 public void fireNotification(int eventType, ReferencedEnvelope bounds) {

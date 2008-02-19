@@ -25,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-
 import com.vividsolutions.jts.geom.Geometry;
 
 /**

@@ -15,9 +15,10 @@
  */
 package org.geotools.gui.swing.contexttree.node;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.LightContextTreeModel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;

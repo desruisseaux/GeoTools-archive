@@ -62,7 +62,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * need to be forwarded through this collection api to simplier code
      * such as renderers.
      */
-    protected FeatureSource featureSource;
+    protected FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
     protected MathTransform transform;
     
@@ -74,13 +74,14 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * </p>
      * <p>
      * Really? I think it would be, it would just reflect the
-     * same query against the featuresource using AUTO_COMMIT.
+     * same query against the FeatureSource<SimpleFeatureType, SimpleFeature> using AUTO_COMMIT.
      * </p>
      * 
      * @param source
      * @param query
      */
-    public DefaultFeatureResults(FeatureSource source, Query query) throws IOException {
+    public DefaultFeatureResults(FeatureSource<SimpleFeatureType, SimpleFeature> source, Query query)
+            throws IOException {
     	super(null,getSchemaInternal(source,query));
     	this.featureSource = source;        
         
@@ -124,7 +125,8 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         }
     }
 
-    static SimpleFeatureType getSchemaInternal( FeatureSource featureSource, Query query ) {
+    static SimpleFeatureType getSchemaInternal(
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, Query query) {
     	SimpleFeatureType origionalType = featureSource.getSchema();
     	SimpleFeatureType schema = null;
     	
@@ -179,14 +181,15 @@ public class DefaultFeatureResults extends DataFeatureCollection {
     }
 
     /**
-     * Returns transaction from featureSource (if it is a FeatureStore), or
+     * Returns transaction from FeatureSource<SimpleFeatureType, SimpleFeature> (if it is a FeatureStore), or
      * Transaction.AUTO_COMMIT if it is not.
      *
      * @return Transacstion this FeatureResults opperates against
      */
     protected Transaction getTransaction() {
         if (featureSource instanceof FeatureStore) {
-            FeatureStore featureStore = (FeatureStore) featureSource;
+            FeatureStore<SimpleFeatureType, SimpleFeature> featureStore;
+            featureStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) featureSource;
 
             return featureStore.getTransaction();
         } else {
@@ -195,19 +198,20 @@ public class DefaultFeatureResults extends DataFeatureCollection {
     }
 
     /**
-     * Retrieve a FeatureReader for this Query
+     * Retrieve a  FeatureReader<SimpleFeatureType, SimpleFeature> for this Query
      *
-     * @return FeatureReader for this Query
+     * @return  FeatureReader<SimpleFeatureType, SimpleFeature> for this Query
      *
      * @throws IOException If results could not be obtained
      */
-    public FeatureReader reader() throws IOException {
-        FeatureReader reader = featureSource.getDataStore().getFeatureReader(query,
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        reader = ((DataStore) featureSource.getDataStore()).getFeatureReader(query,
                 getTransaction());
         
         int maxFeatures = query.getMaxFeatures();
         if (maxFeatures != Integer.MAX_VALUE) {
-            reader = new MaxFeatureReader(reader, maxFeatures);
+            reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, maxFeatures);
         }        
         if( transform != null ){
             reader = new ReprojectFeatureReader( reader, getSchema(), transform );
@@ -217,9 +221,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
 
     
     /**
-     * Retrieve a FeatureReader for the geometry attributes only, designed for bounds computation
+     * Retrieve a  FeatureReader<SimpleFeatureType, SimpleFeature> for the geometry attributes only, designed for bounds computation
      */
-    protected FeatureReader boundsReader() throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> boundsReader() throws IOException {
         List attributes = new ArrayList();
         SimpleFeatureType schema = featureSource.getSchema();
         for (int i = 0; i < schema.getAttributeCount(); i++) {
@@ -230,14 +234,14 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         
         DefaultQuery q = new DefaultQuery(query);
         q.setPropertyNames(attributes);
-        FeatureReader reader = featureSource.getDataStore().getFeatureReader(q,
-                getTransaction());
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = ((DataStore) featureSource
+                .getDataStore()).getFeatureReader(q, getTransaction());
         int maxFeatures = query.getMaxFeatures();
 
         if (maxFeatures == Integer.MAX_VALUE) {
             return reader;
         } else {
-            return new MaxFeatureReader(reader, maxFeatures);
+            return new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, maxFeatures);
         }
     }
 
@@ -246,7 +250,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      *
      * <p>
      * This implementation will generate the correct results from reader() if
-     * the provided FeatureSource does not provide an optimized result via
+     * the provided FeatureSource<SimpleFeatureType, SimpleFeature> does not provide an optimized result via
      * FeatureSource.getBounds( Query ).
      * </p>
      * If the feature has no geometry, then an empty envelope is returned.
@@ -270,7 +274,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
 	            SimpleFeature feature;
 	            bounds = new ReferencedEnvelope();
 	
-	            FeatureReader reader = boundsReader();
+	             FeatureReader<SimpleFeatureType, SimpleFeature> reader = boundsReader();
 	
 	            while (reader.hasNext()) {
 	                feature = reader.next();
@@ -294,7 +298,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      *
      * <p>
      * This implementation will generate the correct results from reader() if
-     * the provided FeatureSource does not provide an optimized result via
+     * the provided FeatureSource<SimpleFeatureType, SimpleFeature> does not provide an optimized result via
      * FeatureSource.getCount( Query ).
      * </p>
      *
@@ -319,7 +323,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         try {
             count = 0;
 
-            FeatureReader reader = reader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader();
 
             for (; reader.hasNext(); count++) {
                 reader.next();
@@ -333,11 +337,11 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         }
     }
 
-    public FeatureCollection collection() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
         try {
-            FeatureCollection collection = FeatureCollections.newCollection();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
             //Feature feature;
-            FeatureReader reader = reader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> reader = reader();
             //SimpleFeatureType type = reader.getFeatureType();
             while (reader.hasNext()) {
                 collection.add(reader.next());

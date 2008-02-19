@@ -9,6 +9,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 
@@ -38,7 +39,7 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         
         //grabbing a reader should be no problem
         DefaultQuery query = new DefaultQuery( "ft1" );
-        FeatureReader reader = dataStore.getFeatureReader(query,tx);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query,tx);
         
         int count = 0;
         while( reader.hasNext() ) {
@@ -49,7 +50,7 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         reader.close();
         
         //grab a writer
-        FeatureWriter writer = dataStore.getFeatureWriter("ft1", tx );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter("ft1", tx );
         assertTrue( writer.hasNext() );
         SimpleFeature feature = writer.next();
         
@@ -90,7 +91,7 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         assertEquals( 1, locked );
         
         //grabbing a reader should be no problem
-        FeatureWriter writer = dataStore.getFeatureWriter("ft1", tx);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter("ft1", tx);
         boolean failure = false;
         while( writer.hasNext() ) {
             SimpleFeature feature = (SimpleFeature) writer.next();
@@ -124,7 +125,7 @@ public abstract class JDBCFeatureLockingTest extends JDBCTestSupport {
         
         store.lockFeatures();
         
-        FeatureWriter writer = dataStore.getFeatureWriter("ft1", tx );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter("ft1", tx );
         assertTrue( writer.hasNext() );
         SimpleFeature feature = writer.next();
         feature.setAttribute( "intProperty", new Integer(100) );

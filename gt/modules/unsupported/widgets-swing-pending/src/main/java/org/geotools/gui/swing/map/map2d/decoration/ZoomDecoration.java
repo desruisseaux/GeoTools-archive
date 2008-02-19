@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d.decoration;
 
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**

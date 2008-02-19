@@ -58,7 +58,7 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         
         MemoryDataStore ds = createDatastore(crs, p);
         
-        FeatureReader original = ds.getFeatureReader(FEATURE_TYPE_NAME);
+         FeatureReader<SimpleFeatureType, SimpleFeature> original = ds.getFeatureReader(FEATURE_TYPE_NAME);
         
         ForceCoordinateSystemFeatureReader modified = new ForceCoordinateSystemFeatureReader(ds.getFeatureReader(FEATURE_TYPE_NAME), crs);
         
@@ -80,7 +80,7 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         
         MemoryDataStore ds = createDatastore(srcCRS, p);
         
-        FeatureReader original = ds.getFeatureReader(FEATURE_TYPE_NAME);
+         FeatureReader<SimpleFeatureType, SimpleFeature> original = ds.getFeatureReader(FEATURE_TYPE_NAME);
         
         CoordinateReferenceSystem destCRS=DefaultEngineeringCRS.CARTESIAN_2D;
         ForceCoordinateSystemFeatureReader modified = new ForceCoordinateSystemFeatureReader(
@@ -124,7 +124,7 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         
         MemoryDataStore ds = createDatastore(srcCRS, p);
         
-        FeatureReader original = ds.getFeatureReader(FEATURE_TYPE_NAME);
+         FeatureReader<SimpleFeatureType, SimpleFeature> original = ds.getFeatureReader(FEATURE_TYPE_NAME);
         
         CoordinateReferenceSystem destCRS=DefaultEngineeringCRS.CARTESIAN_2D;
         ForceCoordinateSystemFeatureReader modified = new ForceCoordinateSystemFeatureReader(

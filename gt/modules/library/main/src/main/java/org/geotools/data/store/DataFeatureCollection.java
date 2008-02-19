@@ -76,7 +76,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.1.RC0
  * @source $URL$
  */
-public abstract class DataFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
+public abstract class DataFeatureCollection extends BaseFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
 	/** logger */
 	static Logger LOGGER = org.geotools.util.logging.Logging.getLogger( "org.geotools.data" );
@@ -120,8 +120,8 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         fireChange(features, type);
     }
     
-    public FeatureReader reader() throws IOException {
-    	return new DelegateFeatureReader( getSchema(), features() );
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
+    	return new DelegateFeatureReader<SimpleFeatureType, SimpleFeature>( getSchema(), features() );
     }
     
     //
@@ -137,7 +137,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
 
     public abstract int getCount() throws IOException;;
 
-    //public abstract FeatureCollection collection() throws IOException;
+    //public abstract FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException;
 
     //
     // Additional Subclass "hooks"
@@ -156,7 +156,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         throw new UnsupportedOperationException( "Modification of this collection is not supported" );
     }
     //
-    // FeatureCollection methods
+    // FeatureCollection<SimpleFeatureType, SimpleFeature> methods
     // 
     // implemented in terms of feature results
     //
@@ -168,12 +168,12 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     private final Set open = new HashSet();
 
     /**
-     * FeatureIterator is entirely based on iterator().
+     * FeatureIterator<SimpleFeature> is entirely based on iterator().
      * <p>
      * So when we implement FeatureCollection.iterator() this will work
      * out of the box.
      */
-    public FeatureIterator features() {
+    public FeatureIterator<SimpleFeature> features() {
     	FeatureIterator iterator = new DelegateFeatureIterator( this, iterator() );
         open.add( iterator );
         return iterator;
@@ -182,8 +182,8 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     /**
      * Iterator may (or may) not support modification.
      */
-    final public Iterator iterator() {
-    	Iterator iterator;
+    final public Iterator<SimpleFeature> iterator() {
+    	Iterator<SimpleFeature> iterator;
 		try {
 			iterator = openIterator();
 		} 
@@ -246,7 +246,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         }
     }
     
-    public void close( FeatureIterator iterator) {
+    public void close( FeatureIterator<SimpleFeature> iterator) {
     	iterator.close();
         open.remove( iterator );        
     }
@@ -292,7 +292,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * </p>
      */
     public boolean isEmpty() {
-        FeatureReader reader = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
         try {
             reader = reader();
             try {
@@ -319,7 +319,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         SimpleFeature value = (SimpleFeature) o;
         String ID = value.getID();
         
-        FeatureReader reader = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
         try {
             reader = reader();
             try {
@@ -370,7 +370,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         return list.toArray( array );
     }
 
-    public boolean add( Object arg0 ) {
+    public boolean add( SimpleFeature arg0 ) {
         return false;
     }
 
@@ -415,7 +415,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     // Remember the FT model is baed on the idea of a single AttributeType
     // of FeatureAttributeType with the value of getSchema
     //
-    private FeatureCollection parent;
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> parent;
     //private final String ID;
     /** The featureType of this actual colletion */
     //FeatureType featureType;
@@ -442,7 +442,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
 //        return featureType;
 //    }
     
-    public FeatureCollection getParent() {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent() {
         return parent; // TODO deal with listeners?        
     }
     public void setParent(FeatureCollection collection) {
@@ -465,7 +465,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     
     public Object getValue( int index ) {
         if(index == 0){
-            FeatureReader reader = null;
+             FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
             try {
                 reader = reader();
                 SimpleFeatureType schema = getSchema();
@@ -501,7 +501,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
             Collection list = (Collection)val;
             if( !FeatureState.isFeatures( list )) return;
             
-            FeatureWriter writer = null;
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
             try {
                 writer = writer();  // will error out if readOnly
                 while( writer.hasNext() ){
@@ -616,7 +616,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * @param filter Filter used to determine sub collection.
      * @since GeoTools 2.2, Filter 1.1
      */
-    public FeatureCollection subCollection(Filter filter) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
         if( filter == Filter.INCLUDE ){
             return this;
         }        
@@ -638,7 +638,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * @return FeatureList sorted according to provided order
 
      */
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
     	if( order instanceof SortBy2){
     		SortBy2 advanced = (SortBy2) order;
     		return sort( advanced );
@@ -655,7 +655,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * @param order GeoTools SortBy
      * @return FeatureList sorted according to provided order
      */
-    public FeatureCollection sort(SortBy2 order ){
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy2 order ){
     	return null;
     }    
 }

@@ -33,6 +33,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -324,7 +325,7 @@ public class DefaultRepository implements Repository {
     public Map getDataStores() {
     	return Collections.unmodifiableMap( datastores );
     }
-    public FeatureSource source( String dataStoreId, String typeName ) throws IOException{
+    public FeatureSource<SimpleFeatureType, SimpleFeature> source( String dataStoreId, String typeName ) throws IOException{
 		DataStore ds = datastore( dataStoreId );
 		return  ds.getFeatureSource( typeName );
     }

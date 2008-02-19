@@ -21,14 +21,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.data.collection.ResourceCollection;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.NullProgressListener;
 import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
@@ -37,32 +32,29 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.util.ProgressListener;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-
 /**
  * Implement a feature collection just based on provision of iterator.
  * @author Jody Garnett, Refractions Research Inc
  */
-public abstract class AdaptorFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
+public abstract class AdaptorFeatureCollection extends BaseFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
  
     public AdaptorFeatureCollection( String id, SimpleFeatureType memberType ) {
         super( id, memberType );
     }
     
     //
-    // FeatureCollection - Feature Access
+    // FeatureCollection<SimpleFeatureType, SimpleFeature> - Feature Access
     // 
-    public FeatureIterator features() {
-        FeatureIterator iter = new DelegateFeatureIterator( this, openIterator() );
+    public FeatureIterator<SimpleFeature> features() {
+        FeatureIterator<SimpleFeature> iter = new DelegateFeatureIterator( this, openIterator() );
         open.add( iter );
         return iter; 
     }
-    public void close( FeatureIterator close ) {     
+    public void close( FeatureIterator<SimpleFeature> close ) {     
         closeIterator( close );
         open.remove( close );
     }
-    public void closeIterator( FeatureIterator close ) {
+    public void closeIterator( FeatureIterator<SimpleFeature> close ) {
         DelegateFeatureIterator iter = (DelegateFeatureIterator) close;
         closeIterator( iter.delegate );
         iter.close(); 
@@ -99,18 +91,18 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
     //
     // Feature Collections API
     //
-    public FeatureCollection subList( Filter filter ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subList( Filter filter ) {
         return new SubFeatureList(this, filter );
     }
     
-    public FeatureCollection subCollection( Filter filter ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection( Filter filter ) {
         if( filter == Filter.INCLUDE ){
             return this;
         }        
         return new SubFeatureCollection( this, filter );
     }
 
-    public FeatureCollection sort( SortBy order ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort( SortBy order ) {
         return new SubFeatureList(this, order );
     }
 
@@ -216,7 +208,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
      * @throws IllegalArgumentException if some aspect of this element
      *         prevents it from being added to this collection.
      */
-    public boolean add(Object o) {
+    public boolean add(SimpleFeature o) {
         throw new UnsupportedOperationException();
     }
 
@@ -296,7 +288,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
      */
     public boolean addAll(Collection c) {
         boolean modified = false;
-        Iterator e = c.iterator();
+        Iterator<SimpleFeature> e = c.iterator();
         try {
             while (e.hasNext()) {
                 if (add(e.next()))
@@ -542,7 +534,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
                 }
             }
             else if ( resource instanceof FeatureIterator ){
-                FeatureIterator resourceIterator = (FeatureIterator) resource;
+                FeatureIterator<SimpleFeature> resourceIterator = (FeatureIterator) resource;
                 try {
                     closeIterator( resourceIterator );
                 }

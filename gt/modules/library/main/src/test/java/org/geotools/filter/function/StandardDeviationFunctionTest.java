@@ -78,7 +78,7 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
         FunctionExpression func = fac.createFunctionExpression("StandardDeviation");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = featureCollection.features();
+        FeatureIterator<SimpleFeature> list = featureCollection.features();
         //feature 1
         SimpleFeature f = list.next();
         int slot = ((Number)func.getValue(f)).intValue();

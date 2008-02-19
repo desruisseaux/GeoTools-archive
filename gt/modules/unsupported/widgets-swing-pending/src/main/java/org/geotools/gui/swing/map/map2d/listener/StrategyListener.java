@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d.listener;
 
 import java.util.EventListener;
+
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 

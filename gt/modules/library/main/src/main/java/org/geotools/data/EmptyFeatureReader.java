@@ -17,8 +17,10 @@ package org.geotools.data;
 
 import java.util.NoSuchElementException;
 
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -27,22 +29,22 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class EmptyFeatureReader implements FeatureReader {
-	SimpleFeatureType featureType;
+public class EmptyFeatureReader<T extends FeatureType, F extends Feature> implements  FeatureReader<T, F> {
+	T featureType;
 
     /**
-     * An Empty FeatureReader of the provided <code>featureType</code>.
+     * An Empty  FeatureReader<SimpleFeatureType, SimpleFeature> of the provided <code>featureType</code>.
      *
      * @param featureType
      */
-    public EmptyFeatureReader(SimpleFeatureType featureType) {
+    public EmptyFeatureReader(T featureType) {
         this.featureType = featureType;
     }
 
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public SimpleFeatureType getFeatureType() {
+    public T getFeatureType() {
         return featureType;
     }
 
@@ -55,7 +57,7 @@ public class EmptyFeatureReader implements FeatureReader {
      *
      * @see org.geotools.data.FeatureReader#next()
      */
-    public SimpleFeature next() throws NoSuchElementException {
+    public F next() throws NoSuchElementException {
         throw new NoSuchElementException("FeatureReader is empty");
     }
 

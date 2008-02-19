@@ -26,7 +26,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @source $URL$
  */
-class TestReader implements FeatureReader{
+class TestReader implements FeatureReader<SimpleFeatureType, SimpleFeature>{
 
     /**
 	 * 

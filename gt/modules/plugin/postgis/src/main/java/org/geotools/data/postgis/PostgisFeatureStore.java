@@ -157,7 +157,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 //     *       sure that each of these actions is atomic if we're not working
 //     *       against a Transaction.
 //     */
-//    public Set addFeatures(FeatureReader reader) throws IOException {
+//    public Set addFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
 //        boolean fail = false;
 //        Set curFids = null;
 //        Set newFids = null;
@@ -522,11 +522,11 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         query.setPropertyNames(new String[0]);
         query.setFilter(unEncodableFilter);
 
-        FeatureCollection features = getFeatures(unEncodableFilter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = getFeatures(unEncodableFilter);
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         FidFilter fidFilter = ff.createFidFilter();
-        FeatureIterator it = features.features();
+        FeatureIterator<SimpleFeature> it = features.features();
         try {
             while( it.hasNext() ) {
                 SimpleFeature feature = (SimpleFeature) it.next();

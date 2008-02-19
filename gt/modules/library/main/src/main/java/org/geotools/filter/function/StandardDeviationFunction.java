@@ -25,7 +25,7 @@ import org.geotools.feature.visitor.StandardDeviationVisitor;
 import org.geotools.util.NullProgressListener;
 
 /**
- * Breaks a FeatureCollection into classes using the standard deviation classification method.
+ * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes using the standard deviation classification method.
  * 
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$

@@ -17,7 +17,9 @@ package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import javax.swing.JComboBox;
+
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;

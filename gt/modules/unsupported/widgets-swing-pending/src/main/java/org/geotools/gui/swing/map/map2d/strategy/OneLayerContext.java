@@ -15,12 +15,12 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
@@ -33,9 +33,13 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * A MapContext with only one layer
@@ -218,7 +222,7 @@ final class OneLayerContext implements MapContext {
         return true;
     }
 
-    public void addLayer(FeatureSource featureSource, Style style) {
+    public void addLayer(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, Style style) {
     }
 
     public void addLayer(FeatureCollection collection, Style style) {

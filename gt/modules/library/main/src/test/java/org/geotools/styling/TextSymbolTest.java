@@ -114,7 +114,7 @@ public class TextSymbolTest extends TestCase {
         }
 
         String typeName = data.getTypeNames()[0];
-        FeatureCollection ft = data.getFeatureSource(typeName).getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> ft = data.getFeatureSource(typeName).getFeatures();
 
         //REVISIT: Removed since it is deprecated, not sure what this test is
         //is doing, what should replace it.  If someone with more knowledge of

@@ -35,6 +35,7 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
@@ -73,7 +74,9 @@ import org.opengis.filter.Filter;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public abstract class ContentFeatureStore extends ContentFeatureSource implements FeatureStore, FeatureLocking {
+public abstract class ContentFeatureStore extends ContentFeatureSource implements
+        FeatureStore<SimpleFeatureType, SimpleFeature>,
+        FeatureLocking<SimpleFeatureType, SimpleFeature> {
 
     /**
      * writer flags
@@ -182,7 +185,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
         //gather up id's
         Set<String> ids = new TreeSet<String>();
         
-        FeatureWriter writer = getWriter( Filter.INCLUDE, WRITER_ADD );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( Filter.INCLUDE, WRITER_ADD );
         try {
             for ( Iterator f = collection.iterator(); f.hasNext(); ) {
                 SimpleFeature feature = (SimpleFeature) f.next();
@@ -231,12 +234,12 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * feature writer and writing all features from <tt>reader</tt> to it.
      * </p>
      */
-    public final void setFeatures(FeatureReader reader) throws IOException {
+    public final void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         //remove features
         removeFeatures( Filter.INCLUDE );
         
         //grab a feature writer for insert
-        FeatureWriter writer = getWriter( Filter.INCLUDE, WRITER_ADD );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( Filter.INCLUDE, WRITER_ADD );
         try {
             while( reader.hasNext() ) {
                 SimpleFeature feature = reader.next();
@@ -279,7 +282,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
         }
         
         //grab a feature writer
-        FeatureWriter writer = getWriter( filter, WRITER_UPDATE );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( filter, WRITER_UPDATE );
         try {
             while( writer.hasNext() ) {
                 SimpleFeature toWrite = writer.next();
@@ -374,7 +377,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
         
         String typeName = getSchema().getTypeName(); 
         
-        FeatureReader reader = getReader(filter);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(filter);
         try {
             int locked = 0;
             while( reader.hasNext() ) {
@@ -430,7 +433,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
     public final void unLockFeatures(Filter filter) throws IOException {
         String typeName = getSchema().getTypeName(); 
         
-        FeatureReader reader = getReader(filter);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader(filter);
         try {
             while( reader.hasNext() ) {
                 SimpleFeature feature = reader.next();

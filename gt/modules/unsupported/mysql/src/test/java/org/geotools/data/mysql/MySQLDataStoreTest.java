@@ -79,7 +79,7 @@ public class MySQLDataStoreTest extends TestCase {
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
-    private FeatureCollection collection = FeatureCollections.newCollection();
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
     private SimpleFeatureType schema;
     private int srid = -1;
     private MySQLDataStore dstore;
@@ -227,7 +227,7 @@ public class MySQLDataStoreTest extends TestCase {
         String testTable = FEATURE_TABLE;
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE,
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
@@ -248,7 +248,7 @@ public class MySQLDataStoreTest extends TestCase {
         }
 
         Query query = new DefaultQuery(FEATURE_TABLE, test1);
-        FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
     }
 
@@ -259,11 +259,11 @@ public class MySQLDataStoreTest extends TestCase {
         gf.addRightGeometry(right);
         gf.addLeftGeometry(filterFac.createAttributeExpression(schema, "the_geom"));
 
-        FeatureReader reader = dstore.getFeatureReader(schema, gf, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, gf, Transaction.AUTO_COMMIT);
         assertEquals("Number of geom filtered features off:", 2, count(reader));
     }
 
-    int count(FeatureReader reader)
+    int count(FeatureReader <SimpleFeatureType, SimpleFeature> reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -332,7 +332,7 @@ public class MySQLDataStoreTest extends TestCase {
     }
 
     public void testOptimizedBounds() throws Exception {
-        FeatureSource source = dstore.getFeatureSource(FEATURE_TABLE);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = dstore.getFeatureSource(FEATURE_TABLE);
         CompareFilter test1 = null;
 
         try {
@@ -353,7 +353,7 @@ public class MySQLDataStoreTest extends TestCase {
         Envelope fBounds = source.getBounds();
         LOGGER.info("Bounds of source is " + fBounds);
 
-        FeatureCollection results = source.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = source.getFeatures(query);
         LOGGER.info("bounds from feature results is " + results.getBounds());
     }
 
@@ -362,7 +362,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int attKeyPos = 0;
         Integer attKey = new Integer(10);
         String attName = "name";
@@ -381,7 +381,7 @@ public class MySQLDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -403,7 +403,7 @@ public class MySQLDataStoreTest extends TestCase {
     }
 
     public void testGetFeaturesWriterModifyGeometry() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         SimpleFeature feature;
         Coordinate[] points = {
@@ -430,7 +430,7 @@ public class MySQLDataStoreTest extends TestCase {
 
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         SimpleFeature feature;
         Coordinate[] points = {
@@ -461,7 +461,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int count = 0;
 
         while (writer.hasNext()) {
@@ -481,7 +481,7 @@ public class MySQLDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -513,9 +513,9 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);

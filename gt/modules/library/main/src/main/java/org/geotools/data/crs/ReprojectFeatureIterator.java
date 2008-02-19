@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version $Id$
  */
 public class ReprojectFeatureIterator implements Iterator {
-    FeatureIterator reader;
+    FeatureIterator<SimpleFeature> reader;
     SimpleFeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 

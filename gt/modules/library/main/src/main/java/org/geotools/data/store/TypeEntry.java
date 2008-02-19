@@ -110,7 +110,7 @@ public interface TypeEntry {
      * @throws IOException
      */
     //FeatureSource getFeatureSource() throws IOException;
-    FeatureSource createFeatureSource() throws IOException;
+    FeatureSource<SimpleFeatureType, SimpleFeature> createFeatureSource() throws IOException;
     
     /**
      * Change notifcation

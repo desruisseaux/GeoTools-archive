@@ -2,25 +2,27 @@ package org.geotools.data.store;
 
 import java.util.Iterator;
 
+import org.opengis.feature.Feature;
+
 /**
  * Iterator wrapper which caps the number of returned features;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class MaxFeaturesIterator implements Iterator {
+public class MaxFeaturesIterator<F extends Feature> implements Iterator<F> {
 
-	Iterator delegate;
+	Iterator<F> delegate;
 	long max;
 	long counter;
 	
-	public MaxFeaturesIterator( Iterator delegate, long max ) {
+	public MaxFeaturesIterator( Iterator<F> delegate, long max ) {
 		this.delegate = delegate;
 		this.max = max;
 		counter = 0;
 	}
 	
-	public Iterator getDelegate() {
+	public Iterator<F> getDelegate() {
 		return delegate;
 	}
 	
@@ -32,7 +34,7 @@ public class MaxFeaturesIterator implements Iterator {
 		return delegate.hasNext() && counter < max; 
 	}
 
-	public Object next() {
+	public F next() {
 		if ( counter++ <= max ) {
 			return delegate.next();
 		}

@@ -24,11 +24,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.test.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.geotools.test.TestData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -98,7 +100,7 @@ public class LabelingTest extends TestCase {
     public void testPolyLabelingZoomedOut() throws Exception {
         ShapefileDataStore ds = (ShapefileDataStore) TestUtilites.getDataStore(
                 "smallMultiPoly.shp");
-        FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = ds.getFeatureSource(ds.getTypeNames()[0]);
 
         Style style = loadStyle("PolyStyle.sld");
         assertNotNull(style);

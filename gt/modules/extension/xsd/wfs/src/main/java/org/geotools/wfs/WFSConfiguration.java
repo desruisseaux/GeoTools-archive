@@ -16,8 +16,7 @@
 package org.geotools.wfs;
 
 import net.opengis.wfs.WfsFactory;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.picocontainer.MutablePicoContainer;
+
 import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.ows.OWSConfiguration;
 import org.geotools.wfs.bindings.ActionTypeBinding;
@@ -62,6 +61,7 @@ import org.geotools.wfs.bindings.UpdateElementTypeBinding;
 import org.geotools.wfs.bindings.WFS_CapabilitiesTypeBinding;
 import org.geotools.wfs.bindings._XlinkPropertyNameBinding;
 import org.geotools.xml.Configuration;
+import org.picocontainer.MutablePicoContainer;
 
 
 /**

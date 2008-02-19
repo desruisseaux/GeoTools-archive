@@ -7,8 +7,10 @@
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
+
 import javax.swing.SpinnerNumberModel;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.styling.Rule;
 

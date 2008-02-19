@@ -16,6 +16,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -53,8 +55,8 @@ public class ShapefileRead {
 
 		System.out.println("Reading content " + typeName);
 
-		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
-		FeatureCollection collection = featureSource.getFeatures();
+		FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSource.getFeatures();
 		
 		class DistanceVisitor extends AbstractFeatureVisitor {
 			int length =0;

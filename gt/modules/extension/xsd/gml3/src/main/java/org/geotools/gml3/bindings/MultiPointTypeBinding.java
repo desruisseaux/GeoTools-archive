@@ -16,12 +16,17 @@
 package org.geotools.gml3.bindings;
 
 import java.util.ArrayList;
+
 import javax.xml.namespace.QName;
+
+import org.geotools.gml3.GML;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.gml3.GML;
-import org.geotools.xml.*;
 
 
 /**

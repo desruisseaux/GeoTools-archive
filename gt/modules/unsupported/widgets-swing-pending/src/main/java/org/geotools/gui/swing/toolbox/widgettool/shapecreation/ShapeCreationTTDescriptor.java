@@ -18,10 +18,11 @@ package org.geotools.gui.swing.toolbox.widgettool.shapecreation;
 
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import org.geotools.gui.swing.toolbox.Parameter;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeConstants;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
 
 /**
  *

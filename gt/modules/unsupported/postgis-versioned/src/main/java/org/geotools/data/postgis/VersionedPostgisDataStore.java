@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -58,7 +59,6 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
-import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
@@ -66,14 +66,13 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterVisitorFilterWrapper;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
@@ -142,7 +141,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      */
     protected Map versionedMap = new HashMap();
 
-    /** Manages listener lists for FeatureSource implementations */
+    /** Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementations */
     protected FeatureListenerManager listenerManager = new FeatureListenerManager();
 
     public VersionedPostgisDataStore(DataSource dataSource, String schema, String namespace,
@@ -233,7 +232,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // TODO: implement updateSchema when the postgis data store does it
     }
 
-    public FeatureReader getFeatureReader(Query query, Transaction trans) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction trans) throws IOException {
         if (!isVersioned(query.getTypeName())) {
             return wrapped.getFeatureReader(query, trans);
         }
@@ -242,7 +241,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // that extracts it
         DefaultQuery versionedQuery = buildVersionedQuery(query);
 
-        FeatureReader reader = wrapped.getFeatureReader(versionedQuery, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = wrapped.getFeatureReader(versionedQuery, trans);
         VersionedFIDMapper mapper = (VersionedFIDMapper) getFIDMapper(query.getTypeName());
         return new VersionedFeatureReader(reader, mapper);
     }
@@ -319,11 +318,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         return getFeatureWriterInternal(typeName, Filter.EXCLUDE, transaction, true);
     }
 
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName) throws IOException {
         if (isVersioned(typeName))
             return new VersionedPostgisFeatureStore(getSchema(typeName), this);
 
-        FeatureSource source = wrapped.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = wrapped.getFeatureSource(typeName);
         
         // changesets should be read only for the outside world
         if(TBL_CHANGESETS.equals(typeName))
@@ -338,7 +337,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             return new WrappingPostgisFeatureSource((FeatureSource) source, this);
     }
 
-    public FeatureSource getView(Query query) throws IOException, SchemaException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(Query query) throws IOException, SchemaException {
         throw new UnsupportedOperationException("At the moment getView(Query) is not supported");
     }
 
@@ -699,7 +698,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         
 
         // query the underlying datastore
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         Set matched = new HashSet();
         Set createdBefore = new HashSet();
         Set expiredAfter = new HashSet();
@@ -806,7 +805,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // again, here we could filter with a join on the feature type we're investigating, but...
         Query query = new DefaultQuery(VersionedPostgisDataStore.TBL_CHANGESETS, userFilter, new String[] {"revision"});
         Set revisions = new HashSet();
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         try  {
             fr = wrapped.getFeatureReader(query, transaction);
             while(fr.hasNext()) {
@@ -1550,5 +1549,55 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             wrapped.dispose();
             wrapped = null;
         }
+    }
+
+    
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
     }
 }

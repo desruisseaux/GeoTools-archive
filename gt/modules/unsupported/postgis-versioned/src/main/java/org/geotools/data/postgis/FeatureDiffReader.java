@@ -48,9 +48,9 @@ public class FeatureDiffReader {
 	/** The logger for the postgis module. */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
-    private FeatureReader fvReader;
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> fvReader;
 
-    private FeatureReader tvReader;
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> tvReader;
 
     private RevisionInfo fromVersion;
 
@@ -62,9 +62,9 @@ public class FeatureDiffReader {
 
     private VersionedPostgisDataStore store;
 
-    private FeatureReader deletedReader;
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> deletedReader;
 
-    private FeatureReader createdReader;
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> createdReader;
 
     private SimpleFeatureType externalFeatureType;
 
@@ -127,7 +127,7 @@ public class FeatureDiffReader {
      * @return
      * @throws IOException
      */
-    FeatureReader readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids,
+     FeatureReader<SimpleFeatureType, SimpleFeature> readerFromIdsRevision(FilterFactory ff, VersionedFIDMapper mapper, Set fids,
             RevisionInfo ri) throws IOException {
         if (fids != null && !fids.isEmpty()) {
             Filter fidFilter = store.buildFidFilter(ff, fids);
@@ -211,7 +211,7 @@ public class FeatureDiffReader {
      * @return
      * @throws IllegalAttributeException
      */
-    private SimpleFeature gatherNextUnversionedFeature(final FeatureReader fr) throws IOException {
+    private SimpleFeature gatherNextUnversionedFeature(final  FeatureReader<SimpleFeatureType, SimpleFeature> fr) throws IOException {
         try {
             final SimpleFeature f = fr.next();
             final Object[] attributes = new Object[externalFeatureType.getAttributeCount()];

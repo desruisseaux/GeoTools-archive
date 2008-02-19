@@ -70,6 +70,10 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -180,12 +184,12 @@ public class JMapPane extends JPanel implements MouseListener,
     /**
      * the collections of features to be selected or highlighted
      */
-    FeatureCollection selection;
+    FeatureCollection<? extends FeatureType, ? extends Feature> selection;
 
     /**
      * the collections of features to be selected or highlighted
      */
-    FeatureCollection highlightFeature;
+    FeatureCollection<? extends FeatureType, ? extends Feature> highlightFeature;
 
     private int state = ZoomIn;
 
@@ -660,7 +664,7 @@ public class JMapPane extends JPanel implements MouseListener,
 
             /*// f.addLeftGeometry(ff.property(name));
             // System.out.println("looking with " + f);
-            FeatureCollection fc = layer.getFeatureSource().getFeatures(f);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = layer.getFeatureSource().getFeatures(f);
 
 
 
@@ -1103,11 +1107,11 @@ public class JMapPane extends JPanel implements MouseListener,
         // TODO Auto-generated method stub
     }
 
-    public FeatureCollection getSelection() {
+    public FeatureCollection<? extends FeatureType, ? extends Feature> getSelection() {
         return selection;
     }
 
-    public void setSelection(FeatureCollection selection) {
+    public void setSelection(FeatureCollection<? extends FeatureType, ? extends Feature> selection) {
         this.selection = selection;
         repaint();
     }

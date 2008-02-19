@@ -15,16 +15,6 @@
  */
 package org.geotools.gui.swing.map.map2d.handler;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -32,8 +22,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -49,25 +41,24 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.TempMemoryDataStore;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
-import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
-import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
-import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
-import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *
@@ -126,7 +117,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
         if (featureType != null) {
             try {
                 mds.createSchema(featureType);
-                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
+                FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
                 layer = new DefaultMapLayer(fs, map2D.createStyle());
             } catch (IOException se) {
                 se.printStackTrace();
@@ -147,7 +138,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
         if (featureType != null) {
             try {
                 mds.createSchema(featureType);
-                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
+                FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
                 layer = new DefaultMapLayer(fs, map2D.createPointStyle());
             } catch (IOException se) {
                 se.printStackTrace();
@@ -274,8 +265,8 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
             for (Geometry geom : geoms) {
 
-                SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
-                FeatureCollection collection = FeatureCollections.newCollection();
+                SimpleFeatureType featureType = (SimpleFeatureType) editionLayer.getFeatureSource().getSchema();
+                FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
                 Object[] values = new Object[featureType.getAttributeCount()];
 
                 AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
@@ -297,23 +288,24 @@ abstract class AbstractEditionHandler implements EditionHandler {
                 collection.add(sf);
 
                 //commit in shape
-                DataStore data = editionLayer.getFeatureSource().getDataStore();
+                DataStore data = (DataStore) editionLayer.getFeatureSource().getDataStore();
 
                 DefaultTransaction transaction = null;
-                FeatureStore store = null;
+                FeatureStore<SimpleFeatureType, SimpleFeature> store = null;
                 try {
                     String featureName = data.getTypeNames()[0]; // there is only one in a shapefile
 
                     // Create the DefaultTransaction Object
                     transaction = new DefaultTransaction();
 
-                    String name = editionLayer.getFeatureSource().getSchema().getTypeName();
+                    String name = editionLayer.getFeatureSource().getName().getLocalPart();
                     try {
-                        FeatureSource source = editionLayer.getFeatureSource().getDataStore().getFeatureSource(name);
-                        store = (FeatureStore) source;
+                        //GR: question: why not just editionLayer.getFeatureSource()?
+                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore)editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
+                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
                     } catch (IOException e) {
                         // Tell it the name of the shapefile it should look for in our DataStore
-                        store = (FeatureStore) data.getFeatureSource(featureName);
+                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource(featureName);
                     }
 
 
@@ -354,12 +346,13 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
                 MapLayer editionLayer = map2D.getEditedMapLayer();
 
-                FeatureStore store;
+                FeatureStore<SimpleFeatureType, SimpleFeature> store;
                 if (editionLayer.getFeatureSource() instanceof FeatureStore) {
 
-                    String name = editionLayer.getFeatureSource().getSchema().getTypeName();
+                    String name = editionLayer.getFeatureSource().getName().getLocalPart();
                     try {
-                        FeatureSource source = editionLayer.getFeatureSource().getDataStore().getFeatureSource(name);
+                        //GR question: why not just editionLayer.getFeatureSource()?
+                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore)editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
                         store = (FeatureStore) source;
                     } catch (IOException e) {
                         store = (FeatureStore) editionLayer.getFeatureSource();
@@ -375,7 +368,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
                     Filter filter = ff.id(Collections.singleton(ff.featureId(ID)));
 
 
-                    SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
+                    SimpleFeatureType featureType = (SimpleFeatureType) editionLayer.getFeatureSource().getSchema();
                     AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
 
                     Geometry geom = map2D.projectGeometry(geo, editionLayer);
@@ -410,12 +403,12 @@ abstract class AbstractEditionHandler implements EditionHandler {
         if (memoryLayer != null) {
 
             //memory layer--------------------------
-            FeatureCollection collection = FeatureCollections.newCollection();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 
             for (Geometry geom : geoms) {
 
                 //geom = projectGeometry(geom, memoryLayer);
-                SimpleFeatureType featureType = memoryLayer.getFeatureSource().getSchema();
+                SimpleFeatureType featureType = (SimpleFeatureType) memoryLayer.getFeatureSource().getSchema();
                 Object[] values = new Object[featureType.getAttributeCount()];
                 AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
                 List<AttributeDescriptor> lst = featureType.getAttributes();
@@ -431,7 +424,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
 
             //commit
-            FeatureStore store = (FeatureStore) memoryLayer.getFeatureSource();
+            FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore) memoryLayer.getFeatureSource();
             try {
                 store.addFeatures(collection);
             } catch (Exception eek) {
@@ -447,7 +440,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
                 for (Coordinate coord : coords) {
 
                     //geom = projectGeometry(geom, memoryLayer);
-                    SimpleFeatureType featureType = edgesLayer.getFeatureSource().getSchema();
+                    SimpleFeatureType featureType = (SimpleFeatureType) edgesLayer.getFeatureSource().getSchema();
                     Object[] values = new Object[featureType.getAttributeCount()];
                     AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
 
@@ -502,8 +495,8 @@ abstract class AbstractEditionHandler implements EditionHandler {
         List<Geometry> geomsOut = new ArrayList<Geometry>();
 
         try {
-            FeatureCollection col = memoryLayer.getFeatureSource().getFeatures();
-            FeatureIterator ite = col.features();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> col = (FeatureCollection<SimpleFeatureType, SimpleFeature>) memoryLayer.getFeatureSource().getFeatures();
+            FeatureIterator<SimpleFeature> ite = col.features();
 
             while (ite.hasNext()) {
                 SimpleFeature sf = ite.next();

@@ -28,10 +28,11 @@ import org.geotools.feature.visitor.BoundsVisitor;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -46,7 +47,7 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl{
     /** The logger for the filter module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.function");
-    FeatureCollection previousFeatureCollection = null;
+    FeatureCollection<FeatureType, Feature> previousFeatureCollection = null;
     Object bounds = null;
 
     /**
@@ -70,7 +71,9 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl{
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateBounds(FeatureCollection collection) throws IllegalFilterException, IOException {
+    public static CalcResult calculateBounds(
+            FeatureCollection<? extends FeatureType, ? extends Feature> collection)
+            throws IllegalFilterException, IOException {
         BoundsVisitor boundsVisitor = new BoundsVisitor();
         collection.accepts(boundsVisitor, null);
 
@@ -125,11 +128,12 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl{
             });
     }
 
+    @SuppressWarnings("unchecked")
     public Object evaluate(Object feature) {
 		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}
-		FeatureCollection featureCollection = (FeatureCollection) feature;
+		FeatureCollection<FeatureType, Feature> featureCollection = (FeatureCollection<FeatureType, Feature>) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

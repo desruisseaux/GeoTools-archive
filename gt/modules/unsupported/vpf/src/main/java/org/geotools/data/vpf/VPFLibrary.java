@@ -387,9 +387,9 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
      */
-    protected FeatureReader getFeatureReader(String typeName){
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName){
         // Find the appropriate feature type, make a reader for it, and reset its stream
-        FeatureReader result = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> result = null;
         VPFFeatureType featureType = (VPFFeatureType)getSchema(typeName);
         ((VPFFile)featureType.getFileList().get(0)).reset();
         result = new VPFFeatureReader(featureType);

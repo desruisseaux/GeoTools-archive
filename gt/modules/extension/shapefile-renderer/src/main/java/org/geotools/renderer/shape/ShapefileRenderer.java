@@ -802,7 +802,7 @@ public class ShapefileRenderer implements GTRenderer {
      * 
      * @param query DOCUMENT ME!
      * @param style the <code>Style</code> to determine the needed attributes from
-     * @param schema the featuresource schema
+     * @param schema the FeatureSource<SimpleFeatureType, SimpleFeature> schema
      * @return the minimun set of attribute names needed to render <code>layer</code>
      */
     private String[] findStyleAttributes( final Query query, Style style, SimpleFeatureType schema ) {
@@ -1221,7 +1221,7 @@ public class ShapefileRenderer implements GTRenderer {
         layerIndexInfo = new IndexInfo[layers.length];
 
         for( int i = 0; i < layers.length; i++ ) {
-            DataStore ds = layers[i].getFeatureSource().getDataStore();
+            DataStore ds = (DataStore) layers[i].getFeatureSource().getDataStore();
             if( ds instanceof ShapefileDataStore ){
 
 	            ShapefileDataStore sds = (ShapefileDataStore) ds;

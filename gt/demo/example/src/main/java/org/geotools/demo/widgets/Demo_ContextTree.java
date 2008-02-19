@@ -20,6 +20,7 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -31,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
+
 import org.apache.commons.collections.map.SingletonMap;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -55,6 +57,8 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
@@ -204,7 +208,7 @@ public class Demo_ContextTree extends JPanel {
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
             DataStore store = DataStoreFinder.getDataStore(new SingletonMap("url", Demo_ContextTree.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp")));
-            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+            FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");

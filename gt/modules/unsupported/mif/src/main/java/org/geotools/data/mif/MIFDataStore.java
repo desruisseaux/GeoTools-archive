@@ -24,6 +24,7 @@ import java.util.Map;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 
@@ -209,7 +210,7 @@ public class MIFDataStore extends AbstractDataStore {
     }
 
     /**
-     * Gets a FeatureReader from a MIFFile object
+     * Gets a  FeatureReader<SimpleFeatureType, SimpleFeature> from a MIFFile object
      *
      * @param typeName name of the FeatureType
      *
@@ -217,7 +218,7 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @throws IOException
      */
-    protected FeatureReader getFeatureReader(String typeName)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
         throws IOException {
         return getMIFFile(typeName).getFeatureReader();
     }

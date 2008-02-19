@@ -21,9 +21,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;

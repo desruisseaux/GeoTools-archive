@@ -26,6 +26,7 @@ import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -66,7 +67,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	}
 
 	public void testFidFilter() throws SQLEncoderException, IOException {
-		FeatureSource fs = dataStore.getFeatureSource("Places");
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource("Places");
 		SimpleFeatureType ft = fs.getSchema();
 		FilterFactory ff2 = CommonFactoryFinder.getFilterFactory(null);
 
@@ -110,7 +111,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 
 	public void testCompareFilter() throws SQLEncoderException, IOException {
 		String typeName = "Places";
-		FeatureSource fs = dataStore.getFeatureSource("Places");
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource("Places");
 		SimpleFeatureType ft = fs.getSchema();
 		org.opengis.filter.FilterFactory ff = CommonFactoryFinder
 				.getFilterFactory(null);
@@ -154,7 +155,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 
 	public void testLikeFilter() throws SQLEncoderException, IOException {
 		String typeName = "Places";
-		FeatureSource fs = dataStore.getFeatureSource("Places");
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs = dataStore.getFeatureSource("Places");
 		SimpleFeatureType ft = fs.getSchema();
 
 		org.opengis.filter.FilterFactory ff = CommonFactoryFinder

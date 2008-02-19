@@ -20,10 +20,14 @@ import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.model.FeatureSourceModel;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellEditor;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellRenderer;
@@ -31,12 +35,10 @@ import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import org.geotools.data.Query;
-import org.geotools.gui.swing.icon.IconBundle;
 
 /**
  *
@@ -45,7 +47,7 @@ import org.geotools.gui.swing.icon.IconBundle;
 public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements PropertyPanel {
 
     private MapLayer layer = null;
-    private FeatureSource source = null;
+    private FeatureSource<SimpleFeatureType, SimpleFeature> source = null;
     private boolean editable = false;
 
     /** Creates new form DefaultMapLayerTablePanel */
@@ -196,7 +198,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         if (target instanceof MapLayer) {
             source = null;
             layer = (MapLayer) target;
-            source = layer.getFeatureSource();
+            source = (FeatureSource<SimpleFeatureType, SimpleFeature>) layer.getFeatureSource();
 
             if (source instanceof FeatureStore) {
                 editable = true;

@@ -15,10 +15,6 @@
  */
 package org.geotools.gml2;
 
-import org.picocontainer.MutablePicoContainer;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.gml2.bindings.GMLAbstractFeatureCollectionBaseTypeBinding;
 import org.geotools.gml2.bindings.GMLAbstractFeatureCollectionTypeBinding;
@@ -55,6 +51,11 @@ import org.geotools.gml2.bindings.GMLPolygonTypeBinding;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
+import org.picocontainer.MutablePicoContainer;
+
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 
 
 /**

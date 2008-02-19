@@ -7,6 +7,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -18,7 +19,7 @@ import com.vividsolutions.jts.geom.Point;
 public class FeatureCollectionWrapperTestSupport extends TestCase {
 
 	protected CoordinateReferenceSystem crs;
-	protected FeatureCollection delegate;
+	protected FeatureCollection<SimpleFeatureType, SimpleFeature> delegate;
 	
 	protected void setUp() throws Exception {
 		crs = CRS.parseWKT( 

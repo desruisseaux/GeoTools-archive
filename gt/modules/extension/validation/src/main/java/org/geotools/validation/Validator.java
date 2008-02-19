@@ -110,7 +110,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void featureValidation(String dsid, FeatureCollection features, ValidationResults results )
+	public void featureValidation(String dsid, FeatureCollection<SimpleFeatureType, SimpleFeature> features, ValidationResults results )
 		throws IOException, Exception//, WfsTransactionException 
 	{
 		//LOGGER.finer("FeatureValidation called on "+dsid+":"+type.getTypeName() ); 
@@ -257,7 +257,7 @@ public class Validator
 				sources.put( typeRef, source );                                                
 			}
 		}
-		LOGGER.finer( "Total of "+sources.size()+" featureSource marshalled for testing" );
+		LOGGER.finer( "Total of "+sources.size()+" FeatureSource<SimpleFeatureType, SimpleFeature> marshalled for testing" );
 		final Map failed = new TreeMap();
 		
 		try {

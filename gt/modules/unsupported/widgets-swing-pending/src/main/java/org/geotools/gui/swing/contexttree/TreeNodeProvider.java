@@ -15,19 +15,13 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Font;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import org.geotools.data.AbstractFileDataStore;
-import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 
@@ -114,7 +108,7 @@ public final class TreeNodeProvider extends ComponentProvider<JLabel> {
 //                //choose icon from datastoretype
 //                DataStore ds = layer.getFeatureSource().getDataStore();
 //
-//                if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+//                if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
 //                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE);
 //                } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
 //                    rendererComponent.setIcon((layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE);

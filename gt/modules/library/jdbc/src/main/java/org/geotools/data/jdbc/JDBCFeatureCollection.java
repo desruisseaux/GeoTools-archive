@@ -45,6 +45,8 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.util.NullProgressListener;
 
 import org.opengis.feature.FeatureVisitor;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
@@ -80,13 +82,13 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public FeatureReader reader() throws IOException {
-        FeatureReader reader = getDataStore().getFeatureReader(query,
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getDataStore().getFeatureReader(query,
                 getTransaction());
 
         int maxFeatures = query.getMaxFeatures();
         if (maxFeatures != Integer.MAX_VALUE) {
-            reader = new MaxFeatureReader(reader, maxFeatures);
+            reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, maxFeatures);
         }        
         if( transform != null ){
             reader = new ReprojectFeatureReader( reader, getSchema(), transform );

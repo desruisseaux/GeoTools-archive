@@ -15,21 +15,22 @@
  */
 package org.geotools.gui.swing.map.map2d.handler;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
-import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionDecoration;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 
 /**
  *

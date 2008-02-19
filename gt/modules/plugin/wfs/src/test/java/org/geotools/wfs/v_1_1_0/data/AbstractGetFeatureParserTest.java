@@ -29,9 +29,7 @@ import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.GEOS_ARCHSITES_DATA;
 import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.GEOS_ARCHSITES_SCHEMA;
 import static org.geotools.wfs.v_1_1_0.data.DataTestSupport.GEOS_ARCHSITES_TYPENAME;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;

@@ -14,53 +14,57 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
 /**
- * FeatureCollection wrapper which limits the number of features returned.
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> wrapper which limits the number of features returned.
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class MaxFeaturesFeatureCollection extends DecoratingFeatureCollection 
-	implements FeatureCollection {
+public class MaxFeaturesFeatureCollection<T extends FeatureType, F extends Feature> extends
+        DecoratingFeatureCollection<T, F> implements FeatureCollection<T, F> {
 
-	FeatureCollection delegate;
+	FeatureCollection<T, F> delegate;
 	long max;
 	
-	public MaxFeaturesFeatureCollection( FeatureCollection delegate, long max ) {
+	public MaxFeaturesFeatureCollection( FeatureCollection<T, F> delegate, long max ) {
 		super(delegate);
 		this.delegate = delegate;
 		this.max = max;
 	}
 	
-	public FeatureReader reader() throws IOException {
-		return new DelegateFeatureReader( getSchema(), features() );
+	public  FeatureReader<T, F> reader() throws IOException {
+		return new DelegateFeatureReader<T, F>( getSchema(), features() );
 	}
 	
-	public FeatureIterator features() {
-		return new DelegateFeatureIterator( this, iterator() );
+	public FeatureIterator<F> features() {
+		return new DelegateFeatureIterator<F>( this, iterator() );
 	}
 
-	public void close(FeatureIterator close) {
+	public void close(FeatureIterator<F> close) {
 		close.close();
 	}
 
-	public Iterator iterator() {
-		return new MaxFeaturesIterator( delegate.iterator(), max );
+	public Iterator<F> iterator() {
+		return new MaxFeaturesIterator<F>( delegate.iterator(), max );
 	}
 	
-	public void close(Iterator close) {
-		Iterator iterator = ((MaxFeaturesIterator)close).getDelegate();
+	public void close(Iterator<F> close) {
+		Iterator<F> iterator = ((MaxFeaturesIterator<F>)close).getDelegate();
 		delegate.close( iterator );
 	}
 
-	public FeatureCollection subCollection(Filter filter) {
+	public FeatureCollection<T, F> subCollection(Filter filter) {
 		throw new UnsupportedOperationException();
 	}
 
-	public FeatureCollection sort(SortBy order) {
+	public FeatureCollection<T, F> sort(SortBy order) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -91,7 +95,7 @@ public class MaxFeaturesFeatureCollection extends DecoratingFeatureCollection
 		}
 	}
 	
-	public boolean add(Object o) {
+	public boolean add(F o) {
 		long size = delegate.size();
 		if ( size < max ) {
 			return delegate.add( o );	
@@ -103,7 +107,7 @@ public class MaxFeaturesFeatureCollection extends DecoratingFeatureCollection
 	public boolean addAll(Collection c) {
 		boolean changed = false;
 		
-		for ( Iterator i = c.iterator(); i.hasNext(); ) {
+		for ( Iterator<F> i = c.iterator(); i.hasNext(); ) {
 			changed = changed | add( i.next() );
 		}
 		

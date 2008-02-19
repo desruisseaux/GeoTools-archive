@@ -17,14 +17,13 @@
 package org.geotools.gui.swing.toolbox.tooltree;
 
 
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
-import org.geotools.gui.swing.contexttree.*;
 import java.awt.Font;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 

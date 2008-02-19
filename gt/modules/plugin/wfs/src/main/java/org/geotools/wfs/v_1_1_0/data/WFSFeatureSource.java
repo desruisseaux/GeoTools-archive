@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
@@ -11,10 +13,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
-public class WFSFeatureSource implements FeatureSource, org.geotools.data.wfs.WFSFeatureSource {
+public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature>,
+        org.geotools.data.wfs.WFSFeatureSource<SimpleFeatureType, SimpleFeature> {
 
     private String typeName;
 
@@ -32,6 +37,11 @@ public class WFSFeatureSource implements FeatureSource, org.geotools.data.wfs.WF
         this.featureType = dataStore.getSchema(typeName);
     }
 
+    public Name getName(){
+        QName name = protocolHandler.getFeatureTypeInfo(typeName).getName();
+        return new org.geotools.feature.Name(name.getNamespaceURI(), name.getLocalPart());
+    }
+    
     /**
      * @see FeatureSource#getDataStore()
      */

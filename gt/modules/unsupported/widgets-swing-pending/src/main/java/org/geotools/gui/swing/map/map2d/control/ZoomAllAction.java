@@ -17,13 +17,11 @@ package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapContext;
 
 /**

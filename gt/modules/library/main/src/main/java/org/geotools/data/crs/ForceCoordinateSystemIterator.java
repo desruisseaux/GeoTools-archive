@@ -61,7 +61,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @version $Id$
  */
 public class ForceCoordinateSystemIterator implements Iterator {
-    protected FeatureIterator reader;
+    protected FeatureIterator<SimpleFeature> reader;
     protected SimpleFeatureType schema;
 
     /**

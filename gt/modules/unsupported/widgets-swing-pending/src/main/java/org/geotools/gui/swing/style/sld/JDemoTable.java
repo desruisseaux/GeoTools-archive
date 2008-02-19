@@ -20,8 +20,8 @@ import java.awt.Color;
 
 import javax.swing.ListSelectionModel;
 
-import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.geotools.gui.swing.contexttree.column.StyleComponent;
+import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.jdesktop.swingx.JXTable;
 
 /**

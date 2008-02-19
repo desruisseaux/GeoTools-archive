@@ -22,6 +22,8 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
@@ -34,17 +36,17 @@ import org.opengis.filter.Filter;
  * 
  */
 class WrappingPostgisFeatureStore extends WrappingPostgisFeatureSource
-        implements FeatureStore {
+        implements FeatureStore<SimpleFeatureType, SimpleFeature> {
 
-    private FeatureStore wrappedStore;
+    private FeatureStore<SimpleFeatureType, SimpleFeature> wrappedStore;
 
-    public WrappingPostgisFeatureStore(FeatureStore wrapped,
+    public WrappingPostgisFeatureStore(FeatureStore<SimpleFeatureType, SimpleFeature> wrapped,
             VersionedPostgisDataStore store) {
         super(wrapped, store);
         this.wrappedStore = wrapped;
     }
 
-    public Set addFeatures(FeatureCollection collection) throws IOException {
+    public Set addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) throws IOException {
         return wrappedStore.addFeatures(collection);
     }
 
@@ -66,7 +68,7 @@ class WrappingPostgisFeatureStore extends WrappingPostgisFeatureSource
         wrappedStore.removeFeatures(filter);
     }
 
-    public void setFeatures(FeatureReader reader) throws IOException {
+    public void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         wrappedStore.setFeatures(reader);
     }
 

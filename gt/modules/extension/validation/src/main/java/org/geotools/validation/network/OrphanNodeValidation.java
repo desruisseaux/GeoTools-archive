@@ -28,6 +28,7 @@ import org.geotools.graph.structure.Graph;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -43,7 +44,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @version $Id$
  */
 public class OrphanNodeValidation extends DefaultIntegrityValidation {
-    /** the FeatureSource name datastoreId:typename */
+    /** the FeatureSource<SimpleFeatureType, SimpleFeature> name datastoreId:typename */
     private String typeName;
 
     /**
@@ -74,7 +75,7 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
      * Detailed description...
      * </p>
      *
-     * @param layers Map of FeatureSource by "dataStoreID:typeName"
+     * @param layers Map of FeatureSource<SimpleFeatureType, SimpleFeature> by "dataStoreID:typeName"
      * @param envelope The bounding box that encloses the unvalidated data
      * @param results Used to coallate results information
      *
@@ -87,9 +88,9 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
     	
       LineStringGraphGenerator lgb = new LineStringGraphGenerator();
     	FeatureSource fs = (FeatureSource) layers.get(typeName);
-        FeatureCollection fr = fs.getFeatures();
-      FeatureCollection fc = fr;
-      FeatureIterator f = fc.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fr = fs.getFeatures();
+      FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fr;
+      FeatureIterator<SimpleFeature> f = fc.features();
 
       while (f.hasNext()) {
           SimpleFeature ft = f.next();
@@ -110,10 +111,10 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
 //    public boolean validate_old(Map layers, Envelope envelope,
 //        final ValidationResults results) throws Exception {
 //        LineGraphBuilder lgb = new LineGraphBuilder();
-//        FeatureSource fs = (FeatureSource) layers.get(typeName);
+//        FeatureSource<SimpleFeatureType, SimpleFeature> fs = (FeatureSource) layers.get(typeName);
 //        FeatureResults fr = fs.getFeatures();
-//        FeatureCollection fc = fr.collection();
-//        FeatureIterator f = fc.features();
+//        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fr.collection();
+//        FeatureIterator<SimpleFeature> f = fc.features();
 //
 //        while (f.hasNext()) {
 //            Feature ft = f.next();

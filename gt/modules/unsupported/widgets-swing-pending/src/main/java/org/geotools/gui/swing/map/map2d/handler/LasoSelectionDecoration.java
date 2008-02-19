@@ -16,13 +16,15 @@
 
 package org.geotools.gui.swing.map.map2d.handler;
 
-import org.geotools.gui.swing.map.map2d.decoration.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.List;
+
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 
 /**
  *

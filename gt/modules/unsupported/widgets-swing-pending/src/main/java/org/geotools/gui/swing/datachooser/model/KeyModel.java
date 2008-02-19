@@ -16,8 +16,8 @@
 package org.geotools.gui.swing.datachooser.model;
 
 import java.util.HashMap;
-
 import java.util.Map;
+
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;

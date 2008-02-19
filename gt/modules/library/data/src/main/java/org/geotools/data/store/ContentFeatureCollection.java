@@ -34,7 +34,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
-public class ContentFeatureCollection implements FeatureCollection {
+public class ContentFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
     /**
      * feature store the collection originated from.
@@ -65,7 +65,7 @@ public class ContentFeatureCollection implements FeatureCollection {
         public void changed(FeatureEvent featureEvent) {
             if( listeners.isEmpty() ) return;
 
-            FeatureCollection collection = (FeatureCollection) ContentFeatureCollection.this;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection = (FeatureCollection) ContentFeatureCollection.this;
             CollectionEvent event = new CollectionEvent( collection, featureEvent );
 
             CollectionListener[] notify = (CollectionListener[]) listeners.toArray( new CollectionListener[ listeners.size() ]);
@@ -117,7 +117,7 @@ public class ContentFeatureCollection implements FeatureCollection {
             org.opengis.util.ProgressListener progress) throws IOException {
         if( progress == null ) progress = new NullProgressListener();
         
-        FeatureReader reader = featureSource.getReader(query);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = featureSource.getReader(query);
         try{
             float size = size();
             float position = 0;            
@@ -160,11 +160,11 @@ public class ContentFeatureCollection implements FeatureCollection {
     }
     
     // Iterators
-    public static class WrappingFeatureIterator implements FeatureIterator {
+    public static class WrappingFeatureIterator implements FeatureIterator<SimpleFeature> {
        
-        FeatureReader delegate;
+         FeatureReader<SimpleFeatureType, SimpleFeature> delegate;
         
-        public WrappingFeatureIterator( FeatureReader delegate ) {
+        public WrappingFeatureIterator(  FeatureReader<SimpleFeatureType, SimpleFeature> delegate ) {
             this.delegate = delegate;
         }
         
@@ -198,7 +198,7 @@ public class ContentFeatureCollection implements FeatureCollection {
         }
     }
     
-    public FeatureIterator features(){
+    public FeatureIterator<SimpleFeature> features(){
         try {
             return new WrappingFeatureIterator( featureSource.getReader(query) );    
         }
@@ -207,15 +207,15 @@ public class ContentFeatureCollection implements FeatureCollection {
         }
     }
     
-    public void close( FeatureIterator iterator ) {
+    public void close( FeatureIterator<SimpleFeature> iterator ) {
         iterator.close();
     }
     
     public static class WrappingIterator implements Iterator {
     
-        FeatureReader delegate;
+         FeatureReader<SimpleFeatureType, SimpleFeature> delegate;
         
-        public  WrappingIterator( FeatureReader delegate ) {
+        public  WrappingIterator(  FeatureReader<SimpleFeatureType, SimpleFeature> delegate ) {
             this.delegate = delegate;
         }
         
@@ -283,7 +283,7 @@ public class ContentFeatureCollection implements FeatureCollection {
         return size() == 0;
     }
 
-    public boolean add(Object o) {
+    public boolean add(SimpleFeature o) {
         return addAll(Collections.singletonList(o));
     }
 
@@ -319,11 +319,11 @@ public class ContentFeatureCollection implements FeatureCollection {
         //do nothing
     }
     
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
         return sort( (org.opengis.filter.sort.SortBy) order );
     }
     
-    public FeatureCollection sort(org.opengis.filter.sort.SortBy sort) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(org.opengis.filter.sort.SortBy sort) {
         Query query = new DefaultQuery();
         ((DefaultQuery)query).setSortBy( new org.opengis.filter.sort.SortBy[]{sort});
 
@@ -331,7 +331,7 @@ public class ContentFeatureCollection implements FeatureCollection {
         return new ContentFeatureCollection( featureSource, query );    
     }
     
-    public FeatureCollection subCollection(Filter filter) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
         Query query = new DefaultQuery();
         ((DefaultQuery)query).setFilter( filter );
         

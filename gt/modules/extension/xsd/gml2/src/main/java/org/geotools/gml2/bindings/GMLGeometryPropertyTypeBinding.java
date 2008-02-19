@@ -16,11 +16,13 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Geometry;
+
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

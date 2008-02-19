@@ -282,7 +282,7 @@ public class ValidationProcessor {
     }
 
     /**
-     * runFeatureTests  Change: Uses a FeatureIterator now instead of a
+     * runFeatureTests  Change: Uses a FeatureIterator<SimpleFeature> now instead of a
      * FeatureCollection.
      * 
      * <p>
@@ -298,8 +298,8 @@ public class ValidationProcessor {
      * When all the validation tests have been gathered, each test is iterated
      * through then run on each Feature, with the ValidationResults coming
      * along for the ride, collecting error information.  Parameter
-     * "FeatureCollection collection" should be changed later to take in a
-     * FeatureSource so not everything is loaded into memory.
+     * "FeatureCollection<SimpleFeatureType, SimpleFeature> collection" should be changed later to take in a
+     * FeatureSource<SimpleFeatureType, SimpleFeature> so not everything is loaded into memory.
      * </p>
      *
      * @param dsID data Store id.
@@ -310,7 +310,7 @@ public class ValidationProcessor {
      *
      * @throws Exception FeatureValidations throw Exceptions
      */
-    public void runFeatureTests(String dsID, FeatureCollection collection, ValidationResults results)
+    public void runFeatureTests(String dsID, FeatureCollection<SimpleFeatureType, SimpleFeature> collection, ValidationResults results)
         throws Exception {
     	SimpleFeatureType type = collection.getSchema();
         
@@ -335,7 +335,7 @@ public class ValidationProcessor {
 
         if (tests != null) // if we found some tests to be performed on this FeatureTypeInfo
          {
-             FeatureIterator features = collection.features();
+             FeatureIterator<SimpleFeature> features = collection.features();
              try {
             	 while (features.hasNext()) // iterate through each feature and run the test on it
                  {
@@ -366,7 +366,7 @@ public class ValidationProcessor {
      * Performs a lookup on the FeatureTypeInfo name to determine what
      * IntegrityTests need to be performed. Once these tests are gathered,
      * they are run on the collection  features in the Envelope, defined by a
-     * FeatureSource (not a FeatureCollection!). The first validation test
+     * FeatureSource<SimpleFeatureType, SimpleFeature> (not a FeatureCollection!). The first validation test
      * lookup checks to see if there are any validations that are to be
      * performed on every FeatureTypeInfo. An example of this could be a
      * uniqueID() test on a unique column value in all FeatureTypes. Once

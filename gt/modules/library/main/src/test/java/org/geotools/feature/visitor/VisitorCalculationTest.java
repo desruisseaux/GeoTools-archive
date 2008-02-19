@@ -43,11 +43,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class VisitorCalculationTest extends DataTestCase {
-    FeatureCollection fc;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc;
     SimpleFeatureType ft;
-    FeatureCollection fc2;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc2;
     SimpleFeatureType ft2;
-    FeatureCollection fc3;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc3;
     SimpleFeatureType ft3;
 
     public VisitorCalculationTest(String arg0) {

@@ -53,6 +53,7 @@ import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -395,7 +396,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName)
         throws IOException {
         if (!this.typeHandler.getFIDMapper(typeName).isVolatile()
                 || this.allowWriteOnVolatileFIDs) {
@@ -485,7 +486,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      *      org.geotools.data.jdbc.QueryData)
      */
     protected JDBCFeatureWriter createFeatureWriter(
-        FeatureReader featureReader, QueryData queryData)
+         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader, QueryData queryData)
         throws IOException {
         String featureName = queryData.getFeatureType().getTypeName();
 
@@ -508,7 +509,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
 	 * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
 	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
 	 */
-	public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final SimpleFeatureType requestType,
 			final Filter filter, final Transaction transaction)
 			throws IOException {
 		String typeName = requestType.getTypeName();

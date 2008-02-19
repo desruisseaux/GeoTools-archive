@@ -32,6 +32,7 @@ import org.geotools.xml.gml.GMLFeatureCollection;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.SAXException;
 
 
@@ -73,7 +74,7 @@ public class GMLParserTest extends TestCase {
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
             
-            FeatureCollection collection=(FeatureCollection) doc;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection=(FeatureCollection) doc;
             assertEquals(0, collection.size());
             
     }
@@ -209,7 +210,7 @@ public class GMLParserTest extends TestCase {
                
         //remaining slot (s) should be feature(s)
         assertTrue("Requires atleast one feature",doc.size()>0);  //bbox + feature
-        FeatureIterator i = doc.features();
+        FeatureIterator<SimpleFeature> i = doc.features();
         int j = 1;
         while(i.hasNext()){
             SimpleFeature ft = i.next();

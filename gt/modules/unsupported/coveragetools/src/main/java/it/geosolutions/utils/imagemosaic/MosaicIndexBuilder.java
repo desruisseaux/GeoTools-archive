@@ -286,7 +286,7 @@ public class MosaicIndexBuilder extends BaseArgumentsManager implements
 		numFiles = files.size();
 		String validFileName = null;
 		final Iterator<File> filesIt = files.iterator();
-		FeatureWriter fw = null;
+		FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
 		boolean doneSomething = false;
 		for (int i = 0; i < numFiles; i++) {
 

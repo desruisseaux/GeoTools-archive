@@ -30,6 +30,8 @@ import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.gpx.GpxDataStore;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 public class GpxTest extends TestCase {
@@ -49,10 +51,10 @@ public class GpxTest extends TestCase {
         assertTrue("track type should be supported", typeSet.contains(GpxDataStore.TYPE_NAME_TRACK));
         assertTrue("track type should be supported", typeSet.contains(GpxDataStore.TYPE_NAME_ROUTE));
         
-        FeatureSource points = ds.getFeatureSource(GpxDataStore.TYPE_NAME_POINT);
+        FeatureSource<SimpleFeatureType, SimpleFeature> points = ds.getFeatureSource(GpxDataStore.TYPE_NAME_POINT);
 
         // exactly 1 "point" in thest file;
-        FeatureIterator it = points.getFeatures().features();
+        FeatureIterator<SimpleFeature> it = points.getFeatures().features();
 
         int cnt = 0;
 

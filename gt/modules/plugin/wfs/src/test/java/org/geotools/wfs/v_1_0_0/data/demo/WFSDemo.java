@@ -28,6 +28,8 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * <p> 
@@ -51,7 +53,7 @@ public class WFSDemo {
 
             DataStore wfs = (new WFSDataStoreFactory()).createNewDataStore(m);
             Query query = new DefaultQuery(wfs.getTypeNames()[1]);
-            FeatureReader ft = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
+             FeatureReader<SimpleFeatureType, SimpleFeature> ft = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
             int count = 0;
             while(ft.hasNext())
                 if(ft.next()!=null)

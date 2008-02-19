@@ -17,7 +17,9 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
+
 import javax.swing.JColorChooser;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Fill;

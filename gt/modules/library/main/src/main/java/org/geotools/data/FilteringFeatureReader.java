@@ -19,13 +19,15 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
 
 /**
- * Basic support for a FeatureReader that does filtering.  I think that
+ * Basic support for a  FeatureReader<SimpleFeatureType, SimpleFeature> that does filtering.  I think that
  * filtering should perhaps be done in the AttributeReader.  I'm still having
  * a bit of trouble with the split between attributeReader and featureReader
  * as to where the hooks for advanced processing like filtering should take
@@ -42,10 +44,10 @@ import org.opengis.filter.Filter;
  * @source $URL$
  * @version $Id$
  */
-public class FilteringFeatureReader implements FeatureReader {
-    protected final FeatureReader featureReader;
+public class FilteringFeatureReader<T extends FeatureType, F extends Feature> implements FeatureReader<T, F> {
+    protected final FeatureReader<T, F> featureReader;
     protected final Filter filter;
-    protected SimpleFeature next;
+    protected F next;
 
     /**
      * Creates a new instance of AbstractFeatureReader
@@ -55,10 +57,10 @@ public class FilteringFeatureReader implements FeatureReader {
      * not filtering and EmptyFeatureReader instead)
      * </p>
      *
-     * @param featureReader FeatureReader being filtered
+     * @param featureReader  FeatureReader<SimpleFeatureType, SimpleFeature> being filtered
      * @param filter Filter used to limit the results of featureReader
      */
-    public FilteringFeatureReader(FeatureReader featureReader, Filter filter) {
+    public FilteringFeatureReader(FeatureReader<T, F> featureReader, Filter filter) {
         this.featureReader = featureReader;
         this.filter = filter;
         next = null;
@@ -67,13 +69,13 @@ public class FilteringFeatureReader implements FeatureReader {
     /**
      * @return THe delegate reader.
      */
-    public FeatureReader getDelegate() {
+    public  FeatureReader<T, F> getDelegate() {
     	return featureReader;
     }
     
-    public SimpleFeature next()
+    public F next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        SimpleFeature f = null;
+        F f = null;
 
         if (hasNext()) {
             // hasNext() ensures that next != null
@@ -90,7 +92,7 @@ public class FilteringFeatureReader implements FeatureReader {
         featureReader.close();
     }
 
-    public SimpleFeatureType getFeatureType() {
+    public T getFeatureType() {
         return featureReader.getFeatureType();
     }
 
@@ -119,7 +121,7 @@ public class FilteringFeatureReader implements FeatureReader {
             return true;
         }
         try {
-            SimpleFeature peek;
+            F peek;
 
             while (featureReader.hasNext()) {
                 peek = featureReader.next();

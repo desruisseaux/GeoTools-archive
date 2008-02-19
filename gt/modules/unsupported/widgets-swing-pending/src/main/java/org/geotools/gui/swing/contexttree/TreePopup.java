@@ -17,8 +17,10 @@ package org.geotools.gui.swing.contexttree;
 
 import java.awt.Component;
 import java.awt.Point;
+
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;

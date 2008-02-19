@@ -15,13 +15,6 @@
  */
 package org.geotools.gui.swing.toolbox.widgettool.clipping;
 
-import org.geotools.gui.swing.misc.Render.LayerListRenderer;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -33,8 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
@@ -42,17 +36,13 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
+import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.gui.swing.toolbox.process.ClipProcess;
 import org.geotools.gui.swing.toolbox.process.ProcessListener;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
@@ -60,9 +50,14 @@ import org.geotools.map.MapLayer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *
@@ -142,7 +137,7 @@ public class ClippingTool extends AbstractWidgetTool {
     private MapLayer[] filterLayers(MapLayer[] layers) {
         List<MapLayer> lst = new ArrayList<MapLayer>();
         for (MapLayer layer : layers) {
-            if (!layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+            if (!layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
                 lst.add(layer);
             }
         }
@@ -150,7 +145,7 @@ public class ClippingTool extends AbstractWidgetTool {
     }
 
     private boolean verify() {
-        if (outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage") && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+        if (outFile != null && inLayer != null && !inLayer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage") && clipLayer != null && !clipLayer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
 
             Class jtsClass = clipLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
@@ -461,7 +456,8 @@ public class ClippingTool extends AbstractWidgetTool {
 
 
 
-        FeatureSource inFS = inLayer.getFeatureSource();
+        FeatureSource<SimpleFeatureType, SimpleFeature> inFS = (FeatureSource<SimpleFeatureType, SimpleFeature>) inLayer
+                .getFeatureSource();
         SimpleFeatureType inType = inFS.getSchema();
 
         DataStore outStore = createShapeFile(outFile, inType, inType.getCRS(), inLayer.getTitle());
@@ -474,8 +470,8 @@ public class ClippingTool extends AbstractWidgetTool {
         }
 
         try {
-            FeatureCollection source = inLayer.getFeatureSource().getFeatures();
-            FeatureCollection clip = clipLayer.getFeatureSource().getFeatures();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> source = (FeatureCollection<SimpleFeatureType, SimpleFeature>) inLayer.getFeatureSource().getFeatures();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> clip = (FeatureCollection<SimpleFeatureType, SimpleFeature>) clipLayer.getFeatureSource().getFeatures();
             FeatureStore out = (FeatureStore) outStore.getFeatureSource(outStore.getTypeNames()[0]);
 
 

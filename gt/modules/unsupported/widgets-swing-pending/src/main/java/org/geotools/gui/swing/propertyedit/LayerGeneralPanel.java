@@ -19,7 +19,9 @@ import java.awt.Component;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.swing.ImageIcon;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.ServiceInfo;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
@@ -210,7 +212,7 @@ public class LayerGeneralPanel extends javax.swing.JPanel implements PropertyPan
         if (layer != null) {
             gui_jtf_name.setText(layer.getTitle());
 
-            DataStore store = layer.getFeatureSource().getDataStore();
+            DataStore store = (DataStore) layer.getFeatureSource().getDataStore();
 
             if (store instanceof IndexedShapefileDataStore) {
                 ServiceInfo info = ((IndexedShapefileDataStore) store).getInfo();

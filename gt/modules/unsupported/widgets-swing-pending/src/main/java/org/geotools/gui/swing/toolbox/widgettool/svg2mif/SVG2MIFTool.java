@@ -11,7 +11,9 @@ import java.io.FileWriter;
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+
 import javax.swing.JFileChooser;
+
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreMifMid;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreSVG;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;

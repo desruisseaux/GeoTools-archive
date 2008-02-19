@@ -19,13 +19,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.ImageIcon;
-
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.geotools.data.FeatureStore;
+
 import org.geotools.gui.swing.crschooser.JCRSList;
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.resources.Classes;
@@ -33,8 +31,6 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  *

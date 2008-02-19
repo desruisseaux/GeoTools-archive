@@ -15,8 +15,6 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -27,8 +25,10 @@ import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.MouseInputListener;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
@@ -37,6 +37,9 @@ import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Default implementation of NavigableMap2D

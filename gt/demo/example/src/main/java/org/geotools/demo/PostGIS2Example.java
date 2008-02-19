@@ -32,6 +32,7 @@ import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -46,7 +47,7 @@ public class PostGIS2Example {
 		String typeName = typeNames[0];
 
 		System.out.println("Reading content " + typeName);
-		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
+		FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
 
 		SimpleFeatureType simpleFeatureType = featureSource.getSchema();
 		System.out.println("Header: "+DataUtilities.spec( simpleFeatureType ));
@@ -147,7 +148,7 @@ public class PostGIS2Example {
 				public void actionPerformed(ActionEvent e){
 					try {
 						String text = query.getText();
-						FeatureCollection features = filter( text );	
+						FeatureCollection<SimpleFeatureType, SimpleFeature> features = filter( text );	
 						display( features );
 					} catch (Throwable t ){
 						display( t );
@@ -260,7 +261,7 @@ public class PostGIS2Example {
 			show.setText( buf.toString() );
 		}
 
-		public FeatureCollection filter(String text ) throws Exception {
+		public FeatureCollection<SimpleFeatureType, SimpleFeature> filter(String text ) throws Exception {
 			Filter filter; 
 			filter = CQL.toFilter( text );
 			
@@ -269,7 +270,7 @@ public class PostGIS2Example {
 			return table.getFeatures(filter);
 		}
 		
-		protected void display(FeatureCollection features) throws Exception {
+		protected void display(FeatureCollection<SimpleFeatureType, SimpleFeature> features) throws Exception {
 			if( features == null ){
 				show.setText("");
 				return;

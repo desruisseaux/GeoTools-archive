@@ -15,21 +15,19 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.geometry.BoundingBox;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.BoundingBox;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

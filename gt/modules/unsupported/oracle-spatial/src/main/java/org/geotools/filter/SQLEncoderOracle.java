@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.geotools.data.oracle.sdo.SDO;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.oracle.sdo.SDO;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;

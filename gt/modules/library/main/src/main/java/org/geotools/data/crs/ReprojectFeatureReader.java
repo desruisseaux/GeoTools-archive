@@ -71,19 +71,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  * @version $Id$
  */
-public class ReprojectFeatureReader implements FeatureReader {
-    FeatureReader reader;
+public class ReprojectFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
+     FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     SimpleFeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
-    public ReprojectFeatureReader(FeatureReader reader, SimpleFeatureType schema,
+    public ReprojectFeatureReader(FeatureReader <SimpleFeatureType, SimpleFeature> reader, SimpleFeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
         transformer.setMathTransform((MathTransform2D)transform);
     }
 
-    public ReprojectFeatureReader(FeatureReader reader,
+    public ReprojectFeatureReader(FeatureReader<SimpleFeatureType, SimpleFeature> reader,
         CoordinateReferenceSystem cs)
         throws SchemaException, OperationNotFoundException, NoSuchElementException, FactoryException{
         if (cs == null) {

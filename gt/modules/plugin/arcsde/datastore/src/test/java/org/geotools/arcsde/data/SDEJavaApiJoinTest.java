@@ -240,7 +240,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * SimpleFeatureType type = (SimpleFeatureType) store.getSchema(typeName);
      * assertNotNull(type);
      * 
-     * FeatureSource fs = store.getFeatureSource(typeName); assertNotNull(fs);
+     * FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(typeName); assertNotNull(fs);
      * int count = fs.getCount(Query.ALL); final int expected = 16479;
      * assertEquals(expected, count); }
      */
@@ -357,7 +357,7 @@ public class SDEJavaApiJoinTest extends TestCase {
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
         assertNotNull(fs);
         Envelope bounds = fs.getBounds();
         assertNotNull(bounds);
@@ -372,7 +372,7 @@ public class SDEJavaApiJoinTest extends TestCase {
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
@@ -393,7 +393,7 @@ public class SDEJavaApiJoinTest extends TestCase {
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
         assertNotNull(fs);
         int count = fs.getCount(Query.ALL);
         final int expected = 7;
@@ -405,7 +405,7 @@ public class SDEJavaApiJoinTest extends TestCase {
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
@@ -422,11 +422,11 @@ public class SDEJavaApiJoinTest extends TestCase {
                 .parseSqlQuery(InProcessViewSupportTestData.masterChildSql);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
 
         DefaultQuery query = new DefaultQuery(InProcessViewSupportTestData.typeName,
                 Filter.INCLUDE, null);
-        FeatureCollection fc = fs.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fs.getFeatures(query);
         int fcCount = fc.size();
         int itCount = 0;
         final int expectedCount = 7;
@@ -450,8 +450,8 @@ public class SDEJavaApiJoinTest extends TestCase {
         Filter filter = (Filter) CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(InProcessViewSupportTestData.typeName, filter);
 
-        FeatureSource fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
-        FeatureCollection fc = fs.getFeatures(query);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(InProcessViewSupportTestData.typeName);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fs.getFeatures(query);
         int fcCount = fc.size();
         int itCount = 0;
         final int expectedCount = 3;

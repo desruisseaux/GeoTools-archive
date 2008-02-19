@@ -15,15 +15,16 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.geotools.gml2.GML;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
-import org.geotools.gml2.GML;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {

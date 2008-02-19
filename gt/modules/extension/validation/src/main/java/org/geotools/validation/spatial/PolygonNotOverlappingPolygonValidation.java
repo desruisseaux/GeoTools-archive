@@ -22,6 +22,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -80,19 +81,19 @@ public class PolygonNotOverlappingPolygonValidation
     	
     	LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
     	String typeRef1 = getPolygonTypeRef();
-    	LOGGER.finer( typeRef1 +": looking up FeatureSource " );    	
-        FeatureSource polySource1 = (FeatureSource) layers.get( typeRef1 );
+    	LOGGER.finer( typeRef1 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );    	
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource1 = (FeatureSource) layers.get( typeRef1 );
         LOGGER.finer( typeRef1 +": found "+polySource1.getSchema().getTypeName() );
         
-        FeatureCollection collection1 = polySource1.getFeatures(); // limit with envelope
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection1 = polySource1.getFeatures(); // limit with envelope
         Object[] poly1 = collection1.toArray();
 
         String typeRef2 = getRestrictedPolygonTypeRef();
-        LOGGER.finer( typeRef2 +": looking up FeatureSource " );        
-        FeatureSource polySource2 = (FeatureSource) layers.get( typeRef2 );
+        LOGGER.finer( typeRef2 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );        
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource2 = (FeatureSource) layers.get( typeRef2 );
         LOGGER.finer( typeRef2 +": found "+polySource2.getSchema().getTypeName() );
         
-        FeatureCollection collection2 = polySource2.getFeatures(); // limit with envelope
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection2 = polySource2.getFeatures(); // limit with envelope
         Object[] poly2 = collection2.toArray();
         
 /*        if (!envelope.contains(collection1.getBounds())) {

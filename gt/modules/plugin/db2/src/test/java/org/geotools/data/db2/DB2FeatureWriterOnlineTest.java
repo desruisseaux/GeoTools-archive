@@ -22,6 +22,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -54,7 +55,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             trans = new DefaultTransaction("trans1");
 
             //			fs.setTransaction(trans);
-            FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = this.dataStore.getFeatureWriter("Roads", trans);
 
             if (fw.hasNext()) {
                 SimpleFeature f = fw.next();
@@ -76,7 +77,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             trans = new DefaultTransaction("trans1");
 
             //			fs.setTransaction(trans);
-            FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = this.dataStore.getFeatureWriter("Roads", trans);
 
             if (fw.hasNext()) {
                 SimpleFeature f = fw.next();
@@ -108,7 +109,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
                     "Places");
             Transaction trans = null;
             trans = new DefaultTransaction("trans1");
-            FeatureWriter fw = this.dataStore.getFeatureWriter("Places", trans);
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = this.dataStore.getFeatureWriter("Places", trans);
 
             if (fw.hasNext()) {
                 SimpleFeature f = fw.next();
@@ -136,7 +137,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
     public void testAppend() throws IOException {
         try {
 
-            FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Roads",
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = this.dataStore.getFeatureWriterAppend("Roads",
                     Transaction.AUTO_COMMIT);
             boolean hasNext = fw.hasNext();
             SimpleFeature f = fw.next();
@@ -161,7 +162,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
     public void testAppendPlaces() throws IOException {
         try {
 
-            FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Places",
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = this.dataStore.getFeatureWriterAppend("Places",
                     Transaction.AUTO_COMMIT);
             boolean hasNext = fw.hasNext();
             SimpleFeature f = fw.next();

@@ -16,7 +16,6 @@
 
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
-import org.geotools.gui.swing.style.SymbolizerPanel;
 import java.awt.BorderLayout;
 
 import javax.swing.ImageIcon;
@@ -24,10 +23,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.gui.swing.style.JLineSymbolizerPanel;
 import org.geotools.gui.swing.style.JPointSymbolizerPanel;
 import org.geotools.gui.swing.style.JPolygonSymbolizerPanel;
 import org.geotools.gui.swing.style.JRasterSymbolizerPanel;
+import org.geotools.gui.swing.style.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -36,7 +37,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
 
 /**
  *
@@ -107,7 +107,7 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
 
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
-                if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+                if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
                     detail = new JRasterSymbolizerPanel(layer);
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {

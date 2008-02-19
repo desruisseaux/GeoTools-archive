@@ -41,21 +41,21 @@ import org.opengis.filter.sort.SortBy;
  *
  * @source $URL$
  */
-public class SubFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
+public class SubFeatureCollection extends BaseFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
 	/** Filter */
     protected Filter filter;
     
     /** Origional Collection */
-	protected FeatureCollection collection;    
+	protected FeatureCollection<SimpleFeatureType, SimpleFeature> collection;    
     //protected FeatureState state;
     protected FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
     
     protected AbstractResourceCollection rc; 
     
-    public SubFeatureCollection(FeatureCollection collection ) {
+    public SubFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection ) {
         this( collection, null );
     }
-	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
+	public SubFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Filter subfilter ){
 		super(null,collection.getSchema());
 		
 		if (subfilter != null && subfilter.equals(Filter.EXCLUDE)) {
@@ -79,7 +79,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
 	AbstractResourceCollection createResourceCollection() {
 		return new AbstractResourceCollection() {
 			public Iterator openIterator() {
-    			return new FilteredIterator( collection, filter() );
+    			return new FilteredIterator<SimpleFeature>( collection, filter() );
     		}
 
     		public void closeIterator(Iterator iterator) {
@@ -117,19 +117,19 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
         return Filter.INCLUDE;
     }
     
-	public FeatureIterator features() {
-		return new DelegateFeatureIterator( this, iterator() );		
+	public FeatureIterator<SimpleFeature> features() {
+		return new DelegateFeatureIterator<SimpleFeature>( this, iterator() );		
 	}	
 	
 	
-	public void close(FeatureIterator close) {
+	public void close(FeatureIterator<SimpleFeature> close) {
 		if( close != null ) close.close();
 	}
 
     //
     //
     //
-	public FeatureCollection subCollection(Filter filter) {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
 		if (filter.equals(Filter.INCLUDE)) {
 			return this;
 		}
@@ -178,19 +178,19 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
         }
 	}	
 
-	public FeatureReader reader() throws IOException {
-		return new DelegateFeatureReader( getSchema(), features() );
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
+		return new DelegateFeatureReader<SimpleFeatureType, SimpleFeature>( getSchema(), features() );
 	}
 
 	public int getCount() throws IOException {
 		return size();
 	}
 
-	public FeatureCollection collection() throws IOException {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
 		return this;
 	}
 
-	public FeatureCollection sort(SortBy order) {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
 		return null;
 	}
 
@@ -203,7 +203,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
 	public Iterator iterator() {
 		return rc.iterator();
 	}
-	public boolean add(Object o) {
+	public boolean add(SimpleFeature o) {
 		return rc.add(o); 
 	}
 	public boolean addAll(Collection c) {

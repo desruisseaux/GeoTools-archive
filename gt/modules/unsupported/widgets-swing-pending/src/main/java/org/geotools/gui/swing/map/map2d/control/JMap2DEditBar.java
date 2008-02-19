@@ -24,7 +24,6 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**

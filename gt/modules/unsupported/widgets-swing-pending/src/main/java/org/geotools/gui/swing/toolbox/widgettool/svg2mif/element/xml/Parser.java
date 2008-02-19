@@ -12,8 +12,13 @@
 
 package org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Stack;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 
 public class Parser {

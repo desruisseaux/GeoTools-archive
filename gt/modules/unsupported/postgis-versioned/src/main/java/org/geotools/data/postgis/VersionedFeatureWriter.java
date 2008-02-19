@@ -49,13 +49,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.4
  * 
  */
-class VersionedFeatureWriter implements FeatureWriter {
+class VersionedFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     private static Long NON_EXPIRED = new Long(Long.MAX_VALUE);
 
-    private FeatureWriter updateWriter;
+    private FeatureWriter<SimpleFeatureType, SimpleFeature> updateWriter;
 
-    private FeatureWriter appendWriter;
+    private FeatureWriter<SimpleFeatureType, SimpleFeature> appendWriter;
 
     private SimpleFeatureType featureType;
 
@@ -84,7 +84,8 @@ class VersionedFeatureWriter implements FeatureWriter {
      * @param autoCommit
      *            if true, the transaction need to be committed once the writer is closed
      */
-    public VersionedFeatureWriter(FeatureWriter updateWriter, FeatureWriter appendWriter,
+    public VersionedFeatureWriter(FeatureWriter<SimpleFeatureType, SimpleFeature> updateWriter,
+            FeatureWriter<SimpleFeatureType, SimpleFeature> appendWriter,
             SimpleFeatureType featureType, VersionedJdbcTransactionState state,
             VersionedFIDMapper mapper, boolean autoCommit) {
         this.updateWriter = updateWriter;

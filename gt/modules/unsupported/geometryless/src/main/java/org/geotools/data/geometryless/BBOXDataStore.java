@@ -28,17 +28,16 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.geometryless.attributeio.BBOXAttributeIO;
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.geometryless.filter.SQLEncoderBBOX;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
-
-import org.opengis.feature.type.AttributeDescriptor;
- import org.opengis.filter.Filter;
-//import org.geotools.filter.SQLEncoder;
-import org.geotools.data.geometryless.filter.SQLEncoderBBOX;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -218,7 +217,7 @@ public class BBOXDataStore extends org.geotools.data.geometryless.JDBCDataStore 
         return new BBOXAttributeIO();
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData)
         throws IOException {
         LOGGER.fine("returning jdbc feature writer");
 

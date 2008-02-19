@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d.event;
 
 import java.util.EventObject;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.map.MapLayer;
 

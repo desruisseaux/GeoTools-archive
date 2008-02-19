@@ -15,12 +15,11 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
+
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.JDBC1DataStore;
-import org.geotools.gui.swing.contexttree.*;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 
@@ -55,9 +54,9 @@ public final class LayerContextTreeNode extends ContextTreeNode {
         MapLayer layer = (MapLayer) getUserObject();
 
         //choose icon from datastoretype
-        DataStore ds = layer.getFeatureSource().getDataStore();
+        DataStore ds = (DataStore) layer.getFeatureSource().getDataStore();
 
-        if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+        if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
             return ((layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE);
         } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
             return((layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE);

@@ -15,21 +15,13 @@
  */
 package org.geotools.gui.swing.toolbox.process;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -51,8 +43,16 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
-import org.opengis.util.ProgressListener;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  *
@@ -64,21 +64,28 @@ public class ClipProcess extends AbstractProcess {
     private int x = 0;
     private int max = 1;
     private boolean running = false;
-    private final FeatureCollection inSource;
-    private final FeatureCollection clipSource;
-    private final FeatureStore outStore;
+    private final FeatureCollection<SimpleFeatureType, SimpleFeature> inSource;
+    private final FeatureCollection<SimpleFeatureType, SimpleFeature> clipSource;
+    private final FeatureStore<SimpleFeatureType, SimpleFeature> outStore;
     private final Map<String, String> attributMapping;
     private final String geoAttributName;
 
-    public ClipProcess(FeatureCollection source, FeatureCollection clip, FeatureStore out) {
+    public ClipProcess(FeatureCollection<SimpleFeatureType, SimpleFeature> source,
+            FeatureCollection<SimpleFeatureType, SimpleFeature> clip,
+            FeatureStore<SimpleFeatureType, SimpleFeature> out) {
         this(source, clip, out, null, null);
     }
 
-    public ClipProcess(FeatureCollection source, FeatureCollection clip, FeatureStore out, Map<String, String> mapping) {
+    public ClipProcess(FeatureCollection<SimpleFeatureType, SimpleFeature> source,
+            FeatureCollection<SimpleFeatureType, SimpleFeature> clip,
+            FeatureStore<SimpleFeatureType, SimpleFeature> out, Map<String, String> mapping) {
         this(source, clip, out, mapping, null);
     }
 
-    public ClipProcess(FeatureCollection source, FeatureCollection clip, FeatureStore out, Map<String, String> mapping, String geoAttributName) {
+    public ClipProcess(FeatureCollection<SimpleFeatureType, SimpleFeature> source,
+            FeatureCollection<SimpleFeatureType, SimpleFeature> clip,
+            FeatureStore<SimpleFeatureType, SimpleFeature> out, Map<String, String> mapping,
+            String geoAttributName) {
         inSource = source;
         clipSource = clip;
         outStore = out;
@@ -188,7 +195,7 @@ public class ClipProcess extends AbstractProcess {
     private void clip(
             CoordinateReferenceSystem inCRS,
             CoordinateReferenceSystem clipCRS,
-            FeatureCollection outCol,
+            FeatureCollection<SimpleFeatureType, SimpleFeature> outCol,
             SimpleFeature inSF,
             SimpleFeatureType outType)
             throws FactoryException, MismatchedDimensionException, TransformException {
@@ -215,7 +222,7 @@ public class ClipProcess extends AbstractProcess {
 
 
             if (clipSource != null) {
-                FeatureIterator ite = clipSource.features();
+                FeatureIterator<SimpleFeature> ite = clipSource.features();
 
                 //we create the clipped geometry
 
@@ -337,10 +344,10 @@ public class ClipProcess extends AbstractProcess {
         try {
             SimpleFeatureType outType = outStore.getSchema();
 
-            FeatureCollection inCol = inSource.subCollection(filter);
-            FeatureIterator ite = inCol.features();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> inCol = inSource.subCollection(filter);
+            FeatureIterator<SimpleFeature> ite = inCol.features();
 
-            FeatureCollection outCol = FeatureCollections.newCollection();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> outCol = FeatureCollections.newCollection();
             max = inCol.size();
             fireProcessChanged(x, max, "");
 

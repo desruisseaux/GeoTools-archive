@@ -92,7 +92,7 @@ public final class FeatureUtilities {
      * @return a feature with the grid coverage envelope as the geometry and the
      *         grid coverage itself in the "grid" attribute.
      */
-    public static FeatureCollection wrapGridCoverage(final GridCoverage2D coverage)
+    public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverage(final GridCoverage2D coverage)
             throws TransformException, SchemaException, IllegalAttributeException
     {
         final Polygon bounds = getPolygon(coverage.getEnvelope2D());
@@ -107,7 +107,7 @@ public final class FeatureUtilities {
         // create the feature
         SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, coverage }, null);
 
-        final FeatureCollection collection = FeatureCollections.newCollection();
+        final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
         collection.add(feature);
 
         return collection;
@@ -123,7 +123,7 @@ public final class FeatureUtilities {
      *
      * @deprecated Please use FeatureUtilities#wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader, GeneralParameterValue[] params)
      */
-    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader)
+    public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader)
     	throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 				// create surrounding polygon
 				final PrecisionModel pm = new PrecisionModel();
@@ -157,7 +157,7 @@ public final class FeatureUtilities {
 		        // create the feature
 		        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader }, null);
 
-				final FeatureCollection collection = FeatureCollections.newCollection();
+				final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 				collection.add(feature);
 
 				return collection;
@@ -171,7 +171,7 @@ public final class FeatureUtilities {
      * @return a feature with the grid coverage envelope as the geometry and the
      *         grid coverage itself in the "grid" attribute.
      */
-    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader,
+    public static FeatureCollection<SimpleFeatureType, SimpleFeature> wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader,
 			GeneralParameterValue[] params) throws TransformException,
 			FactoryRegistryException, SchemaException,
 			IllegalAttributeException {
@@ -211,7 +211,7 @@ public final class FeatureUtilities {
         SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader, params }, null);
 
 
-		final FeatureCollection collection = FeatureCollections.newCollection();
+		final FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 		collection.add(feature);
 
 		return collection;

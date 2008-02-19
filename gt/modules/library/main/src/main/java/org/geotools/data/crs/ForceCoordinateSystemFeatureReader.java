@@ -61,8 +61,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL$
  * @version $Id$
  */
-public class ForceCoordinateSystemFeatureReader implements FeatureReader {
-    protected FeatureReader reader;
+public class ForceCoordinateSystemFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     protected SimpleFeatureType schema;
     protected SimpleFeatureBuilder builder;
     
@@ -71,7 +71,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
      * @param reader
      * @param schema
      */
-    ForceCoordinateSystemFeatureReader(FeatureReader reader, SimpleFeatureType schema) {
+    ForceCoordinateSystemFeatureReader(FeatureReader<SimpleFeatureType, SimpleFeature> reader, SimpleFeatureType schema) {
         this.reader = reader;
         this.schema = schema;
     }
@@ -86,7 +86,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public ForceCoordinateSystemFeatureReader(FeatureReader reader,
+    public ForceCoordinateSystemFeatureReader(FeatureReader<SimpleFeatureType, SimpleFeature> reader,
         CoordinateReferenceSystem cs) throws SchemaException {
         this(reader, cs, false);
     }
@@ -101,7 +101,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public ForceCoordinateSystemFeatureReader(FeatureReader reader,
+    public ForceCoordinateSystemFeatureReader(FeatureReader<SimpleFeatureType, SimpleFeature> reader,
         CoordinateReferenceSystem cs, boolean forceOnlyMissing) throws SchemaException {
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");

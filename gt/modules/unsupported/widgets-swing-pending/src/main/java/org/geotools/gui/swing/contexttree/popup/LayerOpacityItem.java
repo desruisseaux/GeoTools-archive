@@ -17,7 +17,9 @@
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
+
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.column.OpacityComponent;
 import org.geotools.map.MapLayer;

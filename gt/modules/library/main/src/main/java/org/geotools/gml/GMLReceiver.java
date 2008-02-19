@@ -17,6 +17,7 @@ package org.geotools.gml;
 
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 
@@ -28,12 +29,12 @@ import org.xml.sax.helpers.XMLFilterImpl;
  */
 public class GMLReceiver extends XMLFilterImpl implements GMLHandlerFeature {
     /** */
-    private FeatureCollection featureCollection;
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection;
 
     /**
      * Creates a new instance of GMLReceiver
      *
-     * @param featureCollection sets the FeatureCollection
+     * @param FeatureCollection<SimpleFeatureType, SimpleFeature> sets the FeatureCollection
      */
     public GMLReceiver(FeatureCollection featureCollection) {
         this.featureCollection = featureCollection;

@@ -93,7 +93,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
     }
 
     public void testGetFeatures() throws Exception {
-        FeatureCollection features = featureSource.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures();
         assertEquals(3, features.size());
     }
 
@@ -101,7 +101,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         FilterFactory ff = dataStore.getFilterFactory();
         PropertyIsEqualTo filter = ff.equals(ff.property("stringProperty"), ff.literal("one"));
 
-        FeatureCollection features = featureSource.getFeatures(filter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(filter);
         assertEquals(1, features.size());
 
         Iterator iterator = features.iterator();
@@ -120,7 +120,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         query.setPropertyNames(new String[] { "doubleProperty", "intProperty" });
         query.setFilter(filter);
 
-        FeatureCollection features = featureSource.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(query);
         assertEquals(1, features.size());
 
         Iterator iterator = features.iterator();
@@ -139,7 +139,7 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         DefaultQuery query = new DefaultQuery();
         query.setSortBy(new SortBy[] { sort });
 
-        FeatureCollection features = featureSource.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(query);
         assertEquals(3, features.size());
 
         Iterator iterator = features.iterator();

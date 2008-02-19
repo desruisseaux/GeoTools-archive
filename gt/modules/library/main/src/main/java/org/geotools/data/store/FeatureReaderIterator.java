@@ -21,9 +21,13 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
- * An iterator wrapper for a FeatureReader - for use with
+ * An iterator wrapper for a  FeatureReader<SimpleFeatureType, SimpleFeature> - for use with
  * an AbstractFeatureCollection.
  * <p>
  * There is no reason modify this class, subclasses that wish
@@ -33,9 +37,11 @@ import org.geotools.feature.IllegalAttributeException;
  * @since 2.1.RC0
  * @source $URL$
  */
-final class FeatureReaderIterator implements Iterator {
-    FeatureReader reader;
-    public FeatureReaderIterator( FeatureReader reader ){
+final class FeatureReaderIterator<T extends FeatureType, F extends Feature> implements Iterator<F> {
+    
+    FeatureReader<T, F> reader;
+     
+    public FeatureReaderIterator( FeatureReader<T, F> reader ){
         this.reader = reader;
     }
     public boolean hasNext() {
@@ -56,7 +62,7 @@ final class FeatureReaderIterator implements Iterator {
         }        
     }
 
-    public Object next() {
+    public F next() {
         if( reader == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }

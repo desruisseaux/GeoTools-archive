@@ -47,7 +47,7 @@ import org.opengis.geometry.BoundingBox;
 
 
 /**
- * A basic implementation of FeatureCollection which use a {@link TreeMap} for
+ * A basic implementation of FeatureCollection<SimpleFeatureType, SimpleFeature> which use a {@link TreeMap} for
  * its internal storage.
  * <p>
  * This should be considered a MemoryFeatureCollection.
@@ -57,7 +57,7 @@ import org.opengis.geometry.BoundingBox;
  * @source $URL$
  * @version $Id$
  */
-public class DefaultFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
+public class DefaultFeatureCollection extends BaseFeatureCollection implements FeatureCollection<SimpleFeatureType, SimpleFeature> {
     
 	
     /**
@@ -79,9 +79,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
 
     /**
      * This constructor should not be used by client code.
-     * @param collection FeatureCollection to copy into memory
+     * @param collection FeatureCollection<SimpleFeatureType, SimpleFeature> to copy into memory
      */
-    public DefaultFeatureCollection( FeatureCollection collection ) {
+    public DefaultFeatureCollection( FeatureCollection<SimpleFeatureType, SimpleFeature> collection ) {
         this( collection.getID(), collection.getFeatureType() );
         addAll(collection);
     }
@@ -195,8 +195,8 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      *
      * @return <tt>true</tt> if this collection changed as a result of the call
      */
-    public boolean add(Object o) {
-        return add((SimpleFeature)o,true);
+    public boolean add(SimpleFeature o) {
+        return add(o, true);
     }
     protected boolean add(SimpleFeature feature, boolean fire) {
         
@@ -369,12 +369,12 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
     }
 
     /**
-     * Gets a FeatureIterator of this feature collection.  This allows
+     * Gets a FeatureIterator<SimpleFeature> of this feature collection.  This allows
      * iteration without having to cast.
      *
-     * @return the FeatureIterator for this collection.
+     * @return the FeatureIterator<SimpleFeature> for this collection.
      */
-    public FeatureIterator features() {
+    public FeatureIterator<SimpleFeature> features() {
         return new FeatureIteratorImpl(this);
     }
 
@@ -565,11 +565,11 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         return contents.values().toArray(a != null ? a : new Object[ contents.size() ]);
     }
 
-	private FeatureCollection parent;
+	private FeatureCollection<SimpleFeatureType, SimpleFeature> parent;
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#getParent()
 	 */
-	public FeatureCollection getParent() {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent() {
 		// TODO deal with listeners?
 		return parent;
 	}
@@ -650,7 +650,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
 		throw new UnsupportedOperationException("Not Supported");
 	}
 	
-	public void close( FeatureIterator close ) {
+	public void close( FeatureIterator<SimpleFeature> close ) {
         if( close instanceof FeatureIteratorImpl){
         	FeatureIteratorImpl wrapper = (FeatureIteratorImpl) close;
         	wrapper.close();
@@ -661,9 +661,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         // nop
     }
 
-    public FeatureReader reader() throws IOException {
-        final FeatureIterator iterator = features(); 
-        return new FeatureReader(){
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
+        final FeatureIterator<SimpleFeature> iterator = features(); 
+        return new FeatureReader<SimpleFeatureType, SimpleFeature>(){
             public SimpleFeatureType getFeatureType() {
                 return getSchema();
             }
@@ -685,10 +685,10 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         return contents.size();
     }
 
-    public FeatureCollection collection() throws IOException {
-        FeatureCollection copy = new DefaultFeatureCollection( null, getFeatureType() );
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> copy = new DefaultFeatureCollection( null, getFeatureType() );
         List list = new ArrayList( contents.size() );
-        for( FeatureIterator iterator = features(); iterator.hasNext(); ){
+        for( FeatureIterator<SimpleFeature> iterator = features(); iterator.hasNext(); ){
             SimpleFeature feature = iterator.next();
             SimpleFeature duplicate;
             try {                
@@ -748,7 +748,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @param filter Filter used to determine sub collection.
      * @since GeoTools 2.2, Filter 1.1
      */
-	public FeatureCollection subCollection(Filter filter) {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
 		if( filter == Filter.INCLUDE ){
 			return this;
 		}		
@@ -772,7 +772,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @return FeatureList sorted according to provided order
      * 
      */
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
     	if( order == SortBy.NATURAL_ORDER ){
     		return this;
     	}
@@ -792,7 +792,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @param order GeoTools SortBy
      * @return FeatureList sorted according to provided order
      */
-    public FeatureCollection sort(SortBy2 order ){
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy2 order ){
     	if( order == SortBy.NATURAL_ORDER ){
     		return this;
     	}

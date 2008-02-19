@@ -20,9 +20,11 @@ import java.awt.Component;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;

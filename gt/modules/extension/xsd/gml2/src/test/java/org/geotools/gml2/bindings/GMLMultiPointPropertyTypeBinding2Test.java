@@ -15,10 +15,11 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.w3c.dom.Document;
-import com.vividsolutions.jts.geom.MultiPoint;
 import org.geotools.gml2.GML;
 import org.geotools.xml.Binding;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.MultiPoint;
 
 
 public class GMLMultiPointPropertyTypeBinding2Test extends GMLTestSupport {

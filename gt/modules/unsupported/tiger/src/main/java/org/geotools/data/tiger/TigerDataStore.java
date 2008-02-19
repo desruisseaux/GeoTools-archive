@@ -25,8 +25,9 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -136,7 +137,7 @@ public class TigerDataStore extends AbstractDataStore {
      *
      * @throws IOException
      */
-    protected FeatureReader getFeatureReader(String typeName)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
         throws IOException {
         return new TigerFeatureReader(directory, typeName);
     }

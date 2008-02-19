@@ -46,14 +46,14 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	int count;
 	private Envelope queryBounds;
 
-	public IndexedFeatureResults(FeatureCollection results) throws IOException,
+	public IndexedFeatureResults(FeatureCollection<SimpleFeatureType, SimpleFeature> results) throws IOException,
 			IllegalAttributeException {
 		// copy results attributes
 		super(null,results.getSchema());
 		
 				
 		// load features into the index
-		FeatureIterator reader = null;
+		FeatureIterator<SimpleFeature> reader = null;
 		bounds = new Envelope();
 		count = 0;
 		try {
@@ -76,11 +76,11 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	/**
 	 * @see org.geotools.data.FeatureResults#reader()
 	 */
-	public FeatureReader reader(Envelope envelope) throws IOException {
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> reader(Envelope envelope) throws IOException {
 		List results = index.query(envelope);
 		final Iterator resultsIterator = results.iterator();
 		
-		return new FeatureReader() {
+		return new FeatureReader<SimpleFeatureType, SimpleFeature>() {
 			/**
 			 * @see org.geotools.data.FeatureReader#getFeatureType()
 			 */
@@ -128,7 +128,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	/**
 	 * @see org.geotools.data.FeatureResults#collection()
 	 */
-	public FeatureCollection collection() throws IOException {
+	public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
 		FeatureCollection fc = FeatureCollections.newCollection();
 		List results = index.query(bounds);
 		for (Iterator it = results.iterator(); it.hasNext();) {
@@ -141,7 +141,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	/**
 	 * @see org.geotools.data.FeatureResults#reader()
 	 */
-	public FeatureReader reader() throws IOException {
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
 		if(queryBounds != null)
 			return reader(queryBounds);
 		else

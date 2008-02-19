@@ -64,7 +64,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
     /**
      * Reader for streamed access to filtered content this writer acts upon.
      */
-    protected FeatureReader filteredContent;
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent;
     /**
      * Builder for new Features this writer creates when next() is called and
      * hasNext() == false
@@ -97,7 +97,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
     protected final FeatureListenerManager listenerManager;
 
     public ArcSdeFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader filteredContent, final ArcSDEPooledConnection connection,
+            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcSDEPooledConnection connection,
             final FeatureListenerManager listenerManager) {
         assert fidReader != null;
         assert featureType != null;

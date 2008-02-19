@@ -16,14 +16,15 @@
  */
 package org.geotools.data.db2;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 
 /**

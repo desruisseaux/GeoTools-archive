@@ -62,18 +62,18 @@ public final class MemorySpatialIndex {
 		if (features == null) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER
-						.warning("The provided FeatureCollection is null, it's impossible to create an index!");
+						.warning("The provided FeatureCollection<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an index!");
 			throw new IllegalArgumentException(
-					"The provided FeatureCollection is null, it's impossible to create an index!");
+					"The provided FeatureCollection<SimpleFeatureType, SimpleFeature> is null, it's impossible to create an index!");
 
 		}
-		final FeatureIterator it = features.features();
+		final FeatureIterator<SimpleFeature> it = features.features();
 		if (!it.hasNext()) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER
-						.warning("The provided FeatureCollection  or empty, it's impossible to create an index!");
+						.warning("The provided FeatureCollection<SimpleFeatureType, SimpleFeature>  or empty, it's impossible to create an index!");
 			throw new IllegalArgumentException(
-					"The provided FeatureCollection  or empty, it's impossible to create an index!");
+					"The provided FeatureCollection<SimpleFeatureType, SimpleFeature>  or empty, it's impossible to create an index!");
 		}
 		index = new com.vividsolutions.jts.index.strtree.STRtree();
 		while (it.hasNext()) {

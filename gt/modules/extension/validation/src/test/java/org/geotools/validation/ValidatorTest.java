@@ -89,9 +89,9 @@ public class ValidatorTest extends TestCase {
     	assertEquals( "lakes test", 0, results.error.size() );
     }
     public SimpleFeature createInvalidLake() throws Exception {
-    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureSource<SimpleFeatureType, SimpleFeature> lakes = fixture.repository.source( "LAKES", "lakes" );
     	
-    	FeatureIterator features = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).features();
+    	FeatureIterator<SimpleFeature> features = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).features();
     	SimpleFeature feature = features.next();
     	features.close();
     	

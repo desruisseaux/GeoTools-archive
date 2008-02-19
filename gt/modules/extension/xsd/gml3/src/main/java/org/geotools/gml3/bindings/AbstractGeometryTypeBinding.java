@@ -15,14 +15,15 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.List;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.geotools.gml3.GML;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

@@ -48,7 +48,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
  * @source $URL$
  * @version 1.0
  */
-public class TigerFeatureReader implements FeatureReader {
+public class TigerFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     /** DOCUMENT ME! */
     private TigerAttributeReader reader;
 

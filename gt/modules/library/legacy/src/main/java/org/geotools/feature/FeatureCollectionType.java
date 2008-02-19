@@ -19,7 +19,7 @@ package org.geotools.feature;
 /**
  * A SimpleFeatureCollectionType indicating that the contents are stored using the
  * deprecated GeoTools FeatureType. This FeatureCollectionType indicates that *no*
- * attribtues are stored at the FeatureCollection level.
+ * attribtues are stored at the FeatureCollection<SimpleFeatureType, SimpleFeature> level.
  * <p>
  * The only useful information is available via:
  * <ul>
@@ -28,7 +28,7 @@ package org.geotools.feature;
  */
 public interface FeatureCollectionType extends FeatureType {
     /**
-     * Explicitly documents the FeatureCollection as containing this FeatureType.
+     * Explicitly documents the FeatureCollection<SimpleFeatureType, SimpleFeature> as containing this FeatureType.
      */
     public SimpleFeatureType getMemberType();
 }

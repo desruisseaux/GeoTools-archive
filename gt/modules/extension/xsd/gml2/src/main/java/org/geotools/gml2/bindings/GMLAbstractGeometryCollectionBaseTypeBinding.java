@@ -16,12 +16,14 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.GeometryCollection;
 
 
 /**

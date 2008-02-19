@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.map.map2d.decoration;
 
 import java.awt.Color;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**

@@ -20,6 +20,8 @@ import java.io.IOException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -30,5 +32,6 @@ import org.geotools.data.Transaction;
  * @author Jesse
  */
 interface WFSStrategy {
-    FeatureReader getFeatureReader( Query query, Transaction transaction ) throws IOException;
+     FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query,
+            Transaction transaction) throws IOException;
 }

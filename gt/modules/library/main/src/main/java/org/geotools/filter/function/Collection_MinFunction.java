@@ -17,6 +17,12 @@
  */
 package org.geotools.filter.function;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.MinVisitor;
@@ -26,11 +32,8 @@ import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -45,7 +48,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
     /** The logger for the filter module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.function");
-    FeatureCollection previousFeatureCollection = null;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> previousFeatureCollection = null;
     Object min = null;
 
     /**
@@ -124,7 +127,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
 			return new Integer(0); // no features were visited in the making of this answer
 		}
                 Expression expr = (Expression) getExpression(0);
-		FeatureCollection featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

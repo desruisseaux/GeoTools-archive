@@ -209,8 +209,8 @@ public class CustomGlyphRenderer implements GlyphRenderer {
 //chorner: feature.getParent is no more... is this needed?        
 //        if (!maxFound){
 //            maxFound = true;
-//            FeatureCollection fc = feature.getParent();
-//            FeatureIterator features = fc.features();
+//            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = feature.getParent();
+//            FeatureIterator<SimpleFeature> features = fc.features();
 //            while (features.hasNext()){
 //                Feature next = features.next();
 //                Expression tempExp = (Expression) list.getPropertyValue("bar height");

@@ -35,6 +35,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.ServiceInfo;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -113,7 +114,7 @@ public class PropertyDataStore extends AbstractDataStore {
         }        
         return null;        
     }
-    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName) throws IOException {
         return new PropertyFeatureReader( directory, typeName );        
     }
     protected FeatureWriter getFeatureWriter(String typeName) throws IOException {
@@ -130,7 +131,7 @@ public class PropertyDataStore extends AbstractDataStore {
     //
     // Access to Optimizations
     //
-    public FeatureSource getFeatureSource(final String typeName) throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName) throws IOException {
         return new PropertyFeatureSource( this, typeName );
     }        
 }

@@ -59,7 +59,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     }
 
     public void testGetBounds() throws Exception {
-        FeatureSource featureSource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
         Envelope env;
         String coordString = null;
         DefaultQuery query;
@@ -93,8 +93,8 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     }
 
     private void checkFidTable(String featureName, String testValue) throws IOException {
-        FeatureSource featureSource;
-        FeatureCollection features;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
         Iterator it;
 
         featureSource = dataStore.getFeatureSource(featureName);
@@ -125,7 +125,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     }
     
     public void testGetCount() throws Exception {
-        FeatureSource featureSource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
         int count;
 
         // Check "Roads"
@@ -149,7 +149,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     }
 
     public void testCRS() throws IOException {
-        FeatureSource featureSource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
         CoordinateReferenceSystem crs;
 
         // Check "Roads"
@@ -169,7 +169,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     }
 
     public void testSchema() throws IOException {
-        FeatureSource featureSource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
         CoordinateReferenceSystem crs;
         featureSource = dataStore.getFeatureSource("Roads");
 
@@ -179,7 +179,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
         assertEquals("schema mismatch", schemaCompare, schemaFound);
     }
 
-    private BBOX getBBOXFilter(FeatureSource featureSource,
+    private BBOX getBBOXFilter(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource,
         Envelope env) throws IllegalFilterException {
     	
     	double xmin = env.getMinX();
@@ -192,7 +192,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
         return bbox;
     }
 
-    private DefaultQuery getBBOXQuery(FeatureSource featureSource, Envelope env)
+    private DefaultQuery getBBOXQuery(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, Envelope env)
         throws IllegalFilterException {
         BBOX bbox = getBBOXFilter(featureSource, env);
         SimpleFeatureType ft = featureSource.getSchema();

@@ -33,6 +33,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -79,7 +80,7 @@ public class FeatureSourceModel implements TableModel {
         }
         
         try {
-            FeatureIterator fi = layer.getFeatureSource().getFeatures(query.getFilter()).features();            
+            FeatureIterator<SimpleFeature> fi = (FeatureIterator<SimpleFeature>) layer.getFeatureSource().getFeatures(query.getFilter()).features();            
             while (fi.hasNext()) {
                 features.add(fi.next());
             }

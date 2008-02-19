@@ -16,8 +16,10 @@
 package org.geotools.gui.swing.crschooser;
 
 import java.awt.BorderLayout;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;

@@ -33,6 +33,7 @@ import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -54,9 +55,11 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import com.esri.sde.sdk.client.SeException;
@@ -75,7 +78,10 @@ public class ArcSDEDataStore implements DataStore {
 
     private static final Logger LOGGER = Logger.getLogger("org.geotools.arcsde.data");
 
-    /** Manages listener lists for FeatureSource implementation */
+    /**
+     * Manages listener lists for FeatureSource<SimpleFeatureType,
+     * SimpleFeature> implementation
+     */
     final FeatureListenerManager listenerManager = new FeatureListenerManager();
 
     private final ArcSDEConnectionPool connectionPool;
@@ -167,11 +173,11 @@ public class ArcSDEDataStore implements DataStore {
 
     public ServiceInfo getInfo() {
         DefaultServiceInfo info = new DefaultServiceInfo();
-        info.setDescription("Features from ArcSDE" );
-        info.setSchema( FeatureTypes.DEFAULT_NAMESPACE );        
+        info.setDescription("Features from ArcSDE");
+        info.setSchema(FeatureTypes.DEFAULT_NAMESPACE);
         return info;
     }
-    
+
     /**
      * TODO: implement dispose()!
      */
@@ -194,8 +200,8 @@ public class ArcSDEDataStore implements DataStore {
      * @see DataStore#getFeatureReader(Query, Transaction)
      * @return {@link ArcSDEFeatureReader} aware of the transaction state
      */
-    public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
-            throws IOException {
+    public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
+            final Transaction transaction) throws IOException {
         assert query != null;
         assert query.getTypeName() != null;
         assert query.getFilter() != null;
@@ -215,7 +221,8 @@ public class ArcSDEDataStore implements DataStore {
         // indicates the feature reader should close the connection when done
         // if it's not inside a transaction.
         final boolean handleConnection = true;
-        FeatureReader reader = getFeatureReader(query, connection, handleConnection);
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query,
+                connection, handleConnection);
 
         return reader;
     }
@@ -233,8 +240,8 @@ public class ArcSDEDataStore implements DataStore {
      *            the Query containing the request criteria
      * @param connection
      *            the connection to use to retrieve content. It'll be closed by
-     *            the returned FeatureReader only if the connection does not has
-     *            a
+     *            the returned FeatureReader<SimpleFeatureType, SimpleFeature>
+     *            only if the connection does not has a
      *            {@link ArcSDEPooledConnection#isTransactionActive() transaction in progress}.
      * @param readerClosesConnection
      *            flag indicating whether the reader should auto-close the
@@ -244,8 +251,9 @@ public class ArcSDEDataStore implements DataStore {
      * @return
      * @throws IOException
      */
-    FeatureReader getFeatureReader(final Query query, final ArcSDEPooledConnection connection,
-            final boolean readerClosesConnection) throws IOException {
+    FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
+            final ArcSDEPooledConnection connection, final boolean readerClosesConnection)
+            throws IOException {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
@@ -267,7 +275,7 @@ public class ArcSDEDataStore implements DataStore {
             }
         }
         if (filter == Filter.EXCLUDE || filter.equals(Filter.EXCLUDE)) {
-            return new EmptyFeatureReader(featureType);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(featureType);
         }
 
         if (typeInfo.isInProcessView()) {
@@ -280,12 +288,12 @@ public class ArcSDEDataStore implements DataStore {
             sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy);
         }
 
-        ///sdeQuery.execute();
+        // /sdeQuery.execute();
 
         // this is the one which's gonna close the connection when done
         final ArcSDEAttributeReader attReader;
         attReader = new ArcSDEAttributeReader(sdeQuery, connection, readerClosesConnection);
-        FeatureReader reader;
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         try {
             reader = new ArcSDEFeatureReader(attReader);
         } catch (SchemaException e) {
@@ -295,7 +303,7 @@ public class ArcSDEDataStore implements DataStore {
 
         filter = getUnsupportedFilter(typeInfo, filter, connection);
         if (!filter.equals(Filter.INCLUDE)) {
-            reader = new FilteringFeatureReader(reader, filter);
+            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
         }
 
         if (!featureType.equals(reader.getFeatureType())) {
@@ -304,7 +312,8 @@ public class ArcSDEDataStore implements DataStore {
         }
 
         if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-            reader = new MaxFeatureReader(reader, query.getMaxFeatures());
+            reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, query
+                    .getMaxFeatures());
         }
 
         return reader;
@@ -315,10 +324,11 @@ public class ArcSDEDataStore implements DataStore {
      * @return {@link FeatureSource} or {@link FeatureStore} depending on if the
      *         user has write permissions over <code>typeName</code>
      */
-    public FeatureSource getFeatureSource(final String typeName) throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName)
+            throws IOException {
         final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
 
-        FeatureSource fsource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsource;
         if (typeInfo.isWritable()) {
             fsource = new ArcSdeFeatureStore(typeInfo, this);
         } else {
@@ -368,19 +378,22 @@ public class ArcSDEDataStore implements DataStore {
             final DefaultQuery query = new DefaultQuery(typeName, filter);
             // don't let the reader close the connection as the writer needs it
             final boolean closeConnection = false;
-            final FeatureReader reader = getFeatureReader(query, connection, closeConnection);
+            final FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query,
+                    connection, closeConnection);
 
-            FeatureWriter writer;
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
             final FIDReader fidReader = typeInfo.getFidStrategy();
 
             final FeatureListenerManager listenerManager = this.listenerManager;
             if (Transaction.AUTO_COMMIT == transaction) {
-                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection, listenerManager);
+                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection,
+                        listenerManager);
             } else {
                 // if there's a transaction, the reader and the writer will
                 // share the connection held in the transaction state
-                writer = new TransactionFeatureWriter(fidReader, featureType, reader, state, listenerManager);
+                writer = new TransactionFeatureWriter(fidReader, featureType, reader, state,
+                        listenerManager);
             }
             return writer;
         } catch (IOException e) {
@@ -424,7 +437,8 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * @see DataStore#getView(Query)
      */
-    public FeatureSource getView(final Query query) throws IOException, SchemaException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query)
+            throws IOException, SchemaException {
         return new DefaultView(this.getFeatureSource(query.getTypeName()), query);
     }
 
@@ -437,6 +451,55 @@ public class ArcSDEDataStore implements DataStore {
     public void updateSchema(final String typeName, final SimpleFeatureType featureType)
             throws IOException {
         throw new UnsupportedOperationException("Schema modification not supported");
+    }
+
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
     }
 
     // ////// NON API Methods /////////

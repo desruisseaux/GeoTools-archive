@@ -15,12 +15,14 @@
  */
 package org.geotools.data.mif;
 
-import com.vividsolutions.jts.io.ParseException;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import com.vividsolutions.jts.io.ParseException;
 
 
 /**

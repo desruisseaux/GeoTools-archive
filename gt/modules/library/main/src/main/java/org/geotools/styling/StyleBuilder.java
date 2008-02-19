@@ -1713,7 +1713,7 @@ public class StyleBuilder {
      * @throws IllegalFilterException DOCUMENT ME!
      */
     public Style buildClassifiedStyle(
-        FeatureCollection fc,
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc,
         String name,
         String[] colors,
         SimpleFeatureType schema)

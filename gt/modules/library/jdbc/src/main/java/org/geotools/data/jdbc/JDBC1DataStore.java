@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -68,8 +69,10 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -185,7 +188,7 @@ public abstract class JDBC1DataStore implements DataStore {
 
 	private BasicAttributeIO basicAttributeIO;
 
-	/** Manages listener lists for FeatureSource implementations */
+	/** Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementations */
 	public FeatureListenerManager listenerManager = new FeatureListenerManager();
 
 	private LockingManager lockingManager = createLockingManager();
@@ -385,7 +388,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	}
 
 	// This is the *better* implementation of getview from AbstractDataStore
-	public FeatureSource getView(final Query query) throws IOException,
+	public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query) throws IOException,
 			SchemaException {
 		return new DefaultView(this.getFeatureSource(query.getTypeName()),
 				query);
@@ -393,7 +396,7 @@ public abstract class JDBC1DataStore implements DataStore {
 
 	/*
 	 * // Jody - This is my recomendation for DataStore // in order to support
-	 * CS reprojection and override public FeatureSource getView(final Query
+	 * CS reprojection and override public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query
 	 * query) throws IOException, SchemaException { String typeName =
 	 * query.getTypeName(); FeatureType origionalType = getSchema(typeName);
 	 * //CoordinateSystem cs = query.getCoordinateSystem(); //final FeatureType
@@ -418,7 +421,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
 	 */
-	public FeatureSource getFeatureSource(String typeName) throws IOException {
+	public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName) throws IOException {
 		if (!typeHandler.getFIDMapper(typeName).isVolatile()
 				|| allowWriteOnVolatileFIDs) {
 			if (getLockingManager() != null) {
@@ -449,7 +452,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * </p>
 	 * (non-Javadoc)
 	 */
-	public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final SimpleFeatureType requestType,
 			final Filter filter, final Transaction transaction)
 			throws IOException {
 		String typeName = requestType.getTypeName();
@@ -549,17 +552,17 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * </p>
 	 *
 	 * @param query
-	 *            The Query to get a FeatureReader for.
+	 *            The Query to get a  FeatureReader<SimpleFeatureType, SimpleFeature> for.
 	 * @param trans
 	 *            The transaction this read operation is being performed in.
 	 *
-	 * @return A FeatureReader that contains features defined by the query.
+	 * @return A  FeatureReader<SimpleFeatureType, SimpleFeature> that contains features defined by the query.
 	 *
 	 * @throws IOException
 	 *             If an error occurs executing the query.
 	 * @throws DataSourceException
 	 */
-	public FeatureReader getFeatureReader(Query query, Transaction trans)
+	public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction trans)
 			throws IOException {
 		String typeName = query.getTypeName();
 		SimpleFeatureType featureType = getSchema(typeName);
@@ -672,7 +675,7 @@ public abstract class JDBC1DataStore implements DataStore {
 
         // chorner: this is redundant, since we've already created the reader with the post filter attached		
         // if (postFilter != null && !postFilter.equals(Filter.INCLUDE)) {
-        //     reader = new FilteringFeatureReader(reader, postFilter);
+        //     reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, postFilter);
         // }
 		
 		return reader;
@@ -734,7 +737,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	}
 
 	/**
-	 * Create a new FeatureReader based on attributeReaders.
+	 * Create a new  FeatureReader<SimpleFeatureType, SimpleFeature> based on attributeReaders.
 	 *
 	 * <p>
 	 * The provided <code>schema</code> describes the attributes in the
@@ -756,7 +759,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @throws IOException
 	 */
-	protected FeatureReader createFeatureReader(SimpleFeatureType schema,
+	protected  FeatureReader<SimpleFeatureType, SimpleFeature> createFeatureReader(SimpleFeatureType schema,
 			org.opengis.filter.Filter postFilter, QueryData queryData) throws IOException {
         
         // Thanks Shaun Forbes moving excludes check earlier
@@ -764,10 +767,10 @@ public abstract class JDBC1DataStore implements DataStore {
             return new EmptyFeatureReader(schema);
         }
         
-        FeatureReader fReader = getJDBCFeatureReader(queryData);
+         FeatureReader<SimpleFeatureType, SimpleFeature> fReader = getJDBCFeatureReader(queryData);
 
 		if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
-			fReader = new FilteringFeatureReader(fReader, postFilter);
+			fReader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(fReader, postFilter);
 		}
 
 		
@@ -1581,7 +1584,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		return writer;
 	}
 
-	protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader,
+	protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader,
 			QueryData queryData) throws IOException {
 		LOGGER.fine("returning jdbc feature writer");
 
@@ -1741,4 +1744,53 @@ public abstract class JDBC1DataStore implements DataStore {
     public Set getSupportedHints() {
         return BASE_HINTS;
     }
+
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
+    }    
 }

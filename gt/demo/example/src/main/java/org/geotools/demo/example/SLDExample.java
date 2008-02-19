@@ -26,6 +26,8 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
@@ -49,12 +51,12 @@ public class SLDExample {
 		org.geotools.util.logging.Logging.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
 	}
 	public static void localSLD() throws Exception {
-		FeatureSource source = demoFeatureSource();
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = demoFeatureSource();
 		Style style = demoStyle( source.getSchema().getTypeName() );
 
 		show( source, style );
 	}
-	static FeatureSource demoFeatureSource() throws Exception {
+	static FeatureSource<SimpleFeatureType, SimpleFeature> demoFeatureSource() throws Exception {
 		String getCapabilities =
 			"http://localhost:8080/geoserver/wfs?service=WFS&request=GetCapabilities";
 		
@@ -90,7 +92,7 @@ public class SLDExample {
 		
 		return style;
 	}
-	public static void show(FeatureSource source, Style style) throws Exception {
+	public static void show(FeatureSource<SimpleFeatureType, SimpleFeature> source, Style style) throws Exception {
 		    JFrame frame = new JFrame("FOSS4G");
 	        frame.setBounds(20,20,450,200);
 	        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

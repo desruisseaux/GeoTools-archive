@@ -17,14 +17,16 @@ package org.geotools.gml2.bindings;
 
 import java.util.Iterator;
 import java.util.Map;
-import com.vividsolutions.jts.geom.Geometry;
+
+import org.geotools.metadata.iso.citation.Citations;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.geotools.metadata.iso.citation.Citations;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

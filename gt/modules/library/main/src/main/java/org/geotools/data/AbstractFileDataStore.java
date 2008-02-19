@@ -18,6 +18,7 @@ package org.geotools.data;
 import java.io.IOException;
 
 import org.opengis.filter.Filter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 
@@ -47,7 +48,7 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureReader(java.lang.String)
      */
-    protected abstract FeatureReader getFeatureReader()
+    protected abstract  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader()
         throws IOException;
 
     /**
@@ -64,7 +65,7 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource() throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource() throws IOException {
         return getFeatureSource(getSchema().getTypeName());
     }
 

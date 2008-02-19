@@ -18,12 +18,14 @@ package org.geotools.gui.swing.toolbox.widgettool.shapecreation;
 
 import java.awt.Component;
 import java.util.EventObject;
+
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.TableCellEditor;
+
 import org.geotools.gui.swing.toolbox.widgettool.shapecreation.Data.TYPE;
 
 /**

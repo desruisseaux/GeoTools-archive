@@ -71,8 +71,8 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 	public void XtestValidate() {
 		class TestFeature implements SimpleFeature {
 			Map attrs = new HashMap();
-			public FeatureCollection getParent(){return null;}
-			public void setParent(FeatureCollection collection){}
+			public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent(){return null;}
+			public void setParent(FeatureCollection<SimpleFeatureType, SimpleFeature> collection){}
 			public SimpleFeatureType getFeatureType(){return null;}
 			public String getID(){return "";}
 			public Object[] getAttributes(Object[] attributes){return attrs.entrySet().toArray();}
@@ -294,7 +294,7 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 			Document serviceDoc = dfactory.newDocumentBuilder().parse(gazetteerInputSource);
 			Element elem = serviceDoc.getDocumentElement();
 			
-			// elem == featureCollection at this point
+			// elem == FeatureCollection<SimpleFeatureType, SimpleFeature> at this point
 			
 			elem = getChildElement(elem,"queryInfo");
 			if(elem==null)

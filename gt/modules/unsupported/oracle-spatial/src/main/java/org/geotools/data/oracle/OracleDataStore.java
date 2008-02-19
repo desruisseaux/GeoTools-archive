@@ -58,16 +58,17 @@ import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.data.oracle.referencing.OracleAuthorityFactory;
 import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.data.oracle.sdo.TT;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderOracle;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -351,7 +352,7 @@ public class OracleDataStore extends JDBCDataStore {
      *             FeatureWriter - Jody thinks it will go faster.  It will
      *             need to be debugged, however, as it would not work.
      */ 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader,
         QueryData queryData) throws IOException {
         return new OracleFeatureWriter(fReader, queryData);
     }
@@ -431,7 +432,7 @@ public class OracleDataStore extends JDBCDataStore {
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName) throws IOException {
         if (!typeHandler.getFIDMapper(typeName).isVolatile()
                 || allowWriteOnVolatileFIDs) {
             if (getLockingManager() != null) {

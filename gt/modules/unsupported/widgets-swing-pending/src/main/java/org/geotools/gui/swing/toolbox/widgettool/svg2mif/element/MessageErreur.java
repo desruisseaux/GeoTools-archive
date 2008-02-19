@@ -1,7 +1,8 @@
 package org.geotools.gui.swing.toolbox.widgettool.svg2mif.element;
 
-import java.io.*;
-import javax.swing.*;
+import java.io.PrintStream;
+
+import javax.swing.JOptionPane;
 
 public class MessageErreur extends PrintStream {
 	

@@ -5,12 +5,14 @@
  */
 package org.geotools.gui.swing.map.map2d.decoration;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.Map2D;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  *

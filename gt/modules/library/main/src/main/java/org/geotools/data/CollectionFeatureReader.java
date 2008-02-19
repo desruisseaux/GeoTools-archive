@@ -28,14 +28,14 @@ import java.util.NoSuchElementException;
 
 
 /**
- * FeatureReader that reads features from a java.util.collection of features,
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> that reads features from a java.util.collection of features,
  * an array of features or a FeatureCollection.
  *
  * @author jones
  * @source $URL$
  */
-public class CollectionFeatureReader implements FeatureReader {
-    private FeatureCollection collection;
+public class CollectionFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
     private Iterator features;
     private SimpleFeatureType type;
     private boolean closed = false;

@@ -46,7 +46,7 @@ import org.geotools.util.ProgressListener;
  *         Resolve resolve = ....
  *         ProgressListener listener = ....
  *
- *         FeatureSource featureSource = resolve.resolve(FeatureSource.class,listener);
+ *         FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = resolve.resolve(FeatureSource.class,listener);
  *         if (featureSource != null) {
  *                 //do something
  *         }

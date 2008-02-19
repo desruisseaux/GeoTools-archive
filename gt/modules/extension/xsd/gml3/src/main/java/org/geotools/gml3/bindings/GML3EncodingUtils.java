@@ -18,26 +18,23 @@ package org.geotools.gml3.bindings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.gml2.bindings.GML2EncodingUtils;
+import org.geotools.gml3.GML;
+import org.geotools.xlink.XLINK;
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.Encoder;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.metadata.Identifier;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.gml2.bindings.GML2EncodingUtils;
-import org.geotools.gml3.GML;
-import org.geotools.referencing.CRS;
-import org.geotools.xlink.XLINK;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.Encoder;
 
 
 /**

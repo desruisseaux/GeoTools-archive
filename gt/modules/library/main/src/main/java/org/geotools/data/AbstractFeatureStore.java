@@ -24,6 +24,7 @@ import java.util.Set;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
@@ -35,8 +36,8 @@ import org.opengis.filter.Filter;
  * @source $URL$
  */
 public abstract class AbstractFeatureStore extends AbstractFeatureSource
-    implements FeatureStore {
-    /** Current Transaction this FeatureSource is opperating against */
+    implements FeatureStore<SimpleFeatureType, SimpleFeature> {
+    /** Current Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is opperating against */
     protected Transaction transaction = Transaction.AUTO_COMMIT;
     
     public AbstractFeatureStore() {
@@ -52,9 +53,9 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
     }
 
     /**
-     * Retrieve the Transaction this FeatureSource is opperating against.
+     * Retrieve the Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is opperating against.
      *
-     * @return Transaction FeatureSource is operating against
+     * @return Transaction FeatureSource<SimpleFeatureType, SimpleFeature> is operating against
      */
     public Transaction getTransaction() {
         return transaction;
@@ -134,8 +135,8 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
     public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
         Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
-        FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
-                filter, getTransaction());
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = ((DataStore) getDataStore())
+                .getFeatureWriter(typeName, filter, getTransaction());
         SimpleFeature feature;
 
         try {
@@ -184,7 +185,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * </pre>
      * 
      * <p>
-     * (If you don't have a FeatureReader handy DataUtilities.reader() may be
+     * (If you don't have a  FeatureReader<SimpleFeatureType, SimpleFeature> handy DataUtilities.reader() may be
      * able to help out)
      * </p>
      * 
@@ -202,13 +203,13 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      *
      * @see org.geotools.data.FeatureStore#addFeatures(org.geotools.data.FeatureReader)
      */
-    public Set addFeatures(FeatureReader reader) throws IOException {
-        Set addedFids = new HashSet();
+    public Set<String> addFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
+        Set<String> addedFids = new HashSet<String>();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
         SimpleFeature newFeature;
-        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
-                getTransaction());
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore()
+                .getFeatureWriterAppend(typeName, getTransaction());
 
         try {
             while (reader.hasNext()) {
@@ -240,13 +241,14 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         return addedFids;
     }
 
-    public Set addFeatures(FeatureCollection collection) throws IOException {
-    	Set addedFids = new HashSet();
+    public Set<String> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+            throws IOException {
+    	Set<String> addedFids = new HashSet<String>();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
         SimpleFeature newFeature;
-        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
-                getTransaction());
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore()
+                .getFeatureWriterAppend(typeName, getTransaction());
 
         Iterator iterator = collection.iterator();
         try {
@@ -347,9 +349,9 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * @throws IOException if anything goes wrong during replacement
      * @throws DataSourceException See IOException
      */
-    public void setFeatures(FeatureReader reader) throws IOException {
+    public void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         String typeName = getSchema().getTypeName();
-        FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(typeName,
                 getTransaction());
         SimpleFeature feature;
         SimpleFeature newFeature;

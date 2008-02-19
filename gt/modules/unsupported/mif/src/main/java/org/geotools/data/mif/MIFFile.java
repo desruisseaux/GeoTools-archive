@@ -62,7 +62,7 @@ import com.vividsolutions.jts.io.ParseException;
 /**
  * <p>
  * MIFFile class allows sequential reading and writing of Features in MapInfo
- * MIF/MID text file format with a FeatureReader and FeatureWriter.
+ * MIF/MID text file format with a  FeatureReader<SimpleFeatureType, SimpleFeature> and FeatureWriter.
  * </p>
  * 
  * <p>
@@ -222,7 +222,7 @@ public class MIFFile {
      *   params.put(MIFFile.PARAM_GEOMTYPE, "typed");
      *   MIFFile mf = new MIFFile("c:/some_path/file.mif",params);
      *   FeatureType ft = mf.getSchema();
-     *   FeatureReader fr = mf.getFeatureReader();	
+     *    FeatureReader<SimpleFeatureType, SimpleFeature> fr = mf.getFeatureReader();	
      *   while (fr.hasNext()) {
      *   	Feature in = fr.next();
      *   	doSomethingWithFeature(in);
@@ -470,21 +470,21 @@ public class MIFFile {
 
     /**
      * <p>
-     * Opens the MIF file for input and returns a FeatureReader for accessing
+     * Opens the MIF file for input and returns a  FeatureReader<SimpleFeatureType, SimpleFeature> for accessing
      * the features.
      * </p>
      * 
      * <p>
      * TODO Concurrent file access is still not handled. MUST LOCK FILE and
-     * return an error if another FeatureReader is open - Handle concurrent
+     * return an error if another  FeatureReader<SimpleFeatureType, SimpleFeature> is open - Handle concurrent
      * access with synchronized(mif) / or Filesystem locking is enough?
      * </p>
      *
-     * @return A FeatureReader for reading features from MIF/MID file
+     * @return A  FeatureReader<SimpleFeatureType, SimpleFeature> for reading features from MIF/MID file
      *
      * @throws IOException
      */
-    public FeatureReader getFeatureReader() throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader() throws IOException {
         MIFFileTokenizer mifTokenizer = null;
         MIFFileTokenizer midTokenizer = null;
 
@@ -1189,10 +1189,10 @@ public class MIFFile {
 
     /**
      * <p>
-     * Private FeatureReader inner class for reading Features from the MIF file
+     * Private  FeatureReader<SimpleFeatureType, SimpleFeature> inner class for reading Features from the MIF file
      * </p>
      */
-    private class Reader implements FeatureReader {
+    private class Reader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
         private MIFFileTokenizer mif = null;
         private MIFFileTokenizer mid = null;
         private boolean mifEOF = false;
@@ -1638,7 +1638,7 @@ public class MIFFile {
     private class Writer implements FeatureWriter {
         private PrintStream outMif = null;
         private PrintStream outMid = null;
-        private FeatureReader innerReader = null;
+        private  FeatureReader<SimpleFeatureType, SimpleFeature> innerReader = null;
         private MIFValueSetter[] fieldValueSetters;
         private SimpleFeature editFeature = null;
         private SimpleFeature originalFeature = null;

@@ -16,6 +16,13 @@
 package org.geotools.data.mysql;
 
 import java.io.IOException;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.data.jdbc.JDBCTextFeatureWriter;
+import org.geotools.data.jdbc.QueryData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -25,9 +32,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTWriter;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.jdbc.JDBCTextFeatureWriter;
-import org.geotools.data.jdbc.QueryData;
 
 
 /**
@@ -48,7 +52,7 @@ import org.geotools.data.jdbc.QueryData;
 public class MySQLFeatureWriter extends JDBCTextFeatureWriter {
     private static WKTWriter geometryWriter = new WKTWriter();
 
-    public MySQLFeatureWriter(FeatureReader fReader, QueryData queryData)
+    public MySQLFeatureWriter(FeatureReader<SimpleFeatureType, SimpleFeature> fReader, QueryData queryData)
         throws IOException {
         super(fReader, queryData);
     }

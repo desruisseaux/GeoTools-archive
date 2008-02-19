@@ -37,6 +37,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.operation.TransformException;
@@ -168,7 +169,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         if (!dirtyTypes.isEmpty()) {
             // first write down modified envelope
             SimpleFeature f = null;
-            FeatureWriter writer = null;
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
             try {
                 // build filter to extract the appropriate changeset record
                 FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
@@ -271,7 +272,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
      */
     protected long writeRevision(Transaction t, ReferencedEnvelope bbox) throws IOException {
         SimpleFeature f = null;
-        FeatureWriter writer = null;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
         String author = (String) t.getProperty(VersionedPostgisDataStore.AUTHOR);
         String message = (String) t.getProperty(VersionedPostgisDataStore.MESSAGE);
         try {

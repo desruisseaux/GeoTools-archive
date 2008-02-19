@@ -20,7 +20,10 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * A feature iterator that completely delegates to a normal
@@ -34,24 +37,24 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public class DelegateFeatureIterator implements FeatureIterator {
-	Iterator delegate;
-	private FeatureCollection collection;
+public class DelegateFeatureIterator<F extends Feature> implements FeatureIterator<F> {
+	Iterator<F> delegate;
+	private FeatureCollection<? extends FeatureType, F> collection;
 	/**
 	 * Wrap the provided iterator up as a FeatureIterator.
 	 * 
 	 * @param iterator Iterator to be used as a delegate.
 	 */
-	public DelegateFeatureIterator( FeatureCollection collection, Iterator iterator ){
+	public DelegateFeatureIterator( FeatureCollection<? extends FeatureType, F> collection, Iterator<F> iterator ){
 		delegate = iterator;
 		this.collection=collection;
 	}
 	public boolean hasNext() {
 		return delegate != null && delegate.hasNext();
 	}
-	public SimpleFeature next() throws NoSuchElementException {
+	public F next() throws NoSuchElementException {
 		if( delegate == null ) throw new NoSuchElementException();
-		return (SimpleFeature) delegate.next();
+		return  delegate.next();
 	}
 	public void close() {
 		if( collection!=null && delegate!=null)

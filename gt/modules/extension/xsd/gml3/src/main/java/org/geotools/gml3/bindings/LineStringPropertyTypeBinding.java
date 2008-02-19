@@ -17,13 +17,14 @@ package org.geotools.gml3.bindings;
 
 import java.util.List;
 
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.LineString;
+
 import org.geotools.gml3.GML;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**

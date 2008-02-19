@@ -90,7 +90,7 @@ public class TransactionTest extends TestCase {
 
 	private void count(FeatureStore store, int expected) throws IOException, IllegalAttributeException {
 		int i=0;
-        for( FeatureIterator reader=store.getFeatures().features();
+        for( FeatureIterator<SimpleFeature> reader=store.getFeatures().features();
         reader.hasNext();){
             reader.next();
             i++;

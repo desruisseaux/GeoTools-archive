@@ -15,9 +15,8 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import javax.swing.ImageIcon;
-import org.geotools.gui.swing.contexttree.LightContextTreeModel;
+
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 

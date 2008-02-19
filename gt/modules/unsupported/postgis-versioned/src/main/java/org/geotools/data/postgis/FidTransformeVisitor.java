@@ -28,7 +28,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
 import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.spatial.Equals;
 
 /**
  * Takes a filter that eventually contains a fid filter and builds a new filter that does not have

@@ -15,14 +15,19 @@
  */
 package org.geotools.wfs.bindings;
 
+import javax.xml.namespace.QName;
+
 import net.opengis.wfs.FeatureCollectionType;
 import net.opengis.wfs.WfsFactory;
-import javax.xml.namespace.QName;
-import org.opengis.feature.simple.SimpleFeature;
+
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexEMFBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -103,7 +108,7 @@ public class FeatureCollectionTypeBinding extends AbstractComplexEMFBinding {
         SimpleFeature[] features = (SimpleFeature[]) node.getChildValue(SimpleFeature[].class);
 
         if (features != null) {
-            FeatureCollection fc = new DefaultFeatureCollection(null, null) {
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = new DefaultFeatureCollection(null, null) {
                 };
 
             for (int i = 0; i < features.length; i++) {

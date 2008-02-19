@@ -464,7 +464,7 @@ public class WFS110ProtocolHandlerTest extends DataTestSupport {
         DefaultQuery query = new DefaultQuery(typeName);
         query.setMaxFeatures(queryMaxFeatures);
         Transaction transaction = Transaction.AUTO_COMMIT;
-        FeatureReader reader = protocolHandler.getFeatureReader(query, transaction);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = protocolHandler.getFeatureReader(query, transaction);
         assertNotNull(reader);
         assertEquals(contentType, reader.getFeatureType());
 

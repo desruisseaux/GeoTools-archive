@@ -22,6 +22,10 @@ import java.util.Map;
 import javax.swing.event.EventListenerList;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * This class is used by DataStore implementations to provide FeatureListener
@@ -36,8 +40,8 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  * @source $URL$
  */
 public class FeatureListenerManager {
-    /** EvenListenerLists by FeatureSource */
-    Map listenerMap = new HashMap();
+    /** EvenListenerLists by FeatureSource<SimpleFeatureType, SimpleFeature> */
+    Map<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList> listenerMap = new HashMap<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList>();
 
     /**
      * Used by FeaureSource implementations to provide listener support.
@@ -45,19 +49,19 @@ public class FeatureListenerManager {
      * @param featureSource
      * @param featureListener
      */
-    public void addFeatureListener(FeatureSource featureSource,
+    public void addFeatureListener(FeatureSource<? extends FeatureType, ? extends Feature> featureSource,
         FeatureListener featureListener) {
         eventListenerList(featureSource).add(FeatureListener.class,
             featureListener);
     }
 
     /**
-     * Used by FeatureSource implementations to provide listener support.
+     * Used by FeatureSource<SimpleFeatureType, SimpleFeature> implementations to provide listener support.
      *
      * @param featureSource
      * @param featureListener
      */
-    public void removeFeatureListener(FeatureSource featureSource,
+    public void removeFeatureListener(FeatureSource<? extends FeatureType, ? extends Feature> featureSource,
         FeatureListener featureListener) {
         EventListenerList list = eventListenerList(featureSource);
         list.remove(FeatureListener.class, featureListener);
@@ -68,7 +72,7 @@ public class FeatureListenerManager {
             cleanListenerList(featureSource);
     }
 
-    public EventListenerList eventListenerList(FeatureSource featureSource) {
+    public EventListenerList eventListenerList(FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
         synchronized (listenerMap) {
             if (listenerMap.containsKey(featureSource)) {
                 return (EventListenerList) listenerMap.get(featureSource);
@@ -81,18 +85,18 @@ public class FeatureListenerManager {
         }
     }
     
-    public void cleanListenerList(FeatureSource featureSource) {
+    public void cleanListenerList(FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
         synchronized (listenerMap) {
             listenerMap.remove(featureSource);
         }
     }
 
     /**
-     * Returns a Map of FeatureListener[] by FeatureSource for all matches with
+     * Returns a Map of FeatureListener[] by FeatureSource<SimpleFeatureType, SimpleFeature> for all matches with
      * featureType and transaction.
      * 
      * <p>
-     * A FeatureSource is considered a match when typeName and Transaction
+     * A FeatureSource<SimpleFeatureType, SimpleFeature> is considered a match when typeName and Transaction
      * agree.  Transaction.AUTO_COMMIT will match with any change.
      * </p>
      *
@@ -103,7 +107,7 @@ public class FeatureListenerManager {
     Map getListeners(String typeName, Transaction transaction) {
         Map map = new HashMap();
         Map.Entry entry;
-        FeatureSource featureSource;
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
         EventListenerList listenerList;
         FeatureListener[] listeners;
 
@@ -112,7 +116,7 @@ public class FeatureListenerManager {
                 entry = (Map.Entry) i.next();
                 featureSource = (FeatureSource) entry.getKey();
 
-                if (!featureSource.getSchema().getTypeName().equals(typeName)) {
+                if (!featureSource.getName().getLocalPart().equals(typeName)) {
                     continue; // skip as typeName does not match
                 }
 
@@ -136,14 +140,18 @@ public class FeatureListenerManager {
         return map;
     }
 
-    private static boolean hasTransaction(FeatureSource featureSource) {
+    private static boolean hasTransaction(
+            FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
         return featureSource instanceof FeatureStore
-        && (((FeatureStore) featureSource).getTransaction() != null);
+                && (((FeatureStore<? extends FeatureType, ? extends Feature>) featureSource)
+                        .getTransaction() != null);
     }
 
-    private static Transaction getTransaction(FeatureSource featureSource) {
+    private static Transaction getTransaction(
+            FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
         if (hasTransaction(featureSource)) {
-            return ((FeatureStore) featureSource).getTransaction();
+            return ((FeatureStore<? extends FeatureType, ? extends Feature>) featureSource)
+                    .getTransaction();
         }
 
         return Transaction.AUTO_COMMIT;
@@ -161,12 +169,12 @@ public class FeatureListenerManager {
      * <li>
      * FeatureWriter.next() with FeatureWriter.hasNext() == false<br>
      * - when an existing Feature is removed with Tranasaction.AUTO_COMMIT all
-     * listeners registered with FeatureSource of typeName will be notified.
+     * listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName will be notified.
      * </li>
      * <li>
      * FeatureWriter.next()with FeatureWriter.hasNext() == false<br>
      * - when an existing Feature is removed with a Transaction all listeners
-     * registered with FeatureSource of typeName and with the same Transaction
+     * registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName and with the same Transaction
      * will be notified.
      * </li>
      * </ul>
@@ -203,13 +211,13 @@ public class FeatureListenerManager {
      * <li>
      * FeatureWriter.next() with FeatureWriter.hasNext() == true <br>
      * - when an existing Feature is modified with Tranasaction.AUTO_COMMIT
-     * all listeners registered with FeatureSource of typeName will be
+     * all listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName will be
      * notified.
      * </li>
      * <li>
      * FeatureWriter.next()with FeatureWriter.hasNext() == true <br>
      * - when an existing Feature is modified, with a Transaction all
-     * listeners registered with FeatureSource of typeName and with the same
+     * listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName and with the same
      * Transaction will be notified.
      * </li>
      * </ul>
@@ -247,12 +255,12 @@ public class FeatureListenerManager {
      * <ul>
      * <li>
      * Transaction.commit()<br> - when changes have occured on a Transaction
-     * all listeners registered with FeatureSource of typeName will be
+     * all listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName will be
      * notified except those with the Same Transaction
      * </li>
      * <li>
      * Transaction.rollback()<br> - when changes have been reverted only those
-     * listeners registered with FeatureSource of typeName and with the same
+     * listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName and with the same
      * Transaction will be notified.
      * </li>
      * </ul>
@@ -266,7 +274,7 @@ public class FeatureListenerManager {
     public void fireChanged(String typeName, Transaction transaction,
         boolean commit) {
         Map.Entry entry;
-        FeatureSource featureSource;
+        FeatureSource<? extends FeatureType, ? extends Feature> featureSource;
         FeatureListener[] listeners;
         FeatureEvent event;
         if (commit) {
@@ -284,14 +292,14 @@ public class FeatureListenerManager {
      */
     private void fireCommit( String typeName, Transaction transaction, int type, ReferencedEnvelope bounds) {
         Map.Entry entry;
-        FeatureSource featureSource;
+        FeatureSource<? extends FeatureType, ? extends Feature> featureSource;
         FeatureListener[] listeners;
         FeatureEvent event;
         Map map = getListeners(typeName, Transaction.AUTO_COMMIT);
 
         for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
             entry = (Map.Entry) i.next();
-            featureSource = (FeatureSource) entry.getKey();
+            featureSource = (FeatureSource<? extends FeatureType, ? extends Feature>) entry.getKey();
             listeners = (FeatureListener[]) entry.getValue();
 
             if (hasTransaction(featureSource)
@@ -310,7 +318,7 @@ public class FeatureListenerManager {
 
     private void fireEvent( String typeName, Transaction transaction, int type, ReferencedEnvelope bounds) {
         Map.Entry entry;
-        FeatureSource featureSource;
+        FeatureSource<? extends FeatureType, ? extends Feature> featureSource;
         FeatureListener[] listeners;
         FeatureEvent event;
         Map map = getListeners(typeName, transaction);
@@ -339,12 +347,12 @@ public class FeatureListenerManager {
      * <ul>
      * <li>
      * FeatureWrtier.remove() - when an existing Feature is removed with
-     * Tranasaction.AUTO_COMMIT all listeners registered with FeatureSource of
+     * Tranasaction.AUTO_COMMIT all listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of
      * typeName will be notified.
      * </li>
      * <li>
      * FeatureWrtier.remove() - when an existing Feature is removed with a
-     * Transaction all listeners registered with FeatureSource of typeName and
+     * Transaction all listeners registered with FeatureSource<SimpleFeatureType, SimpleFeature> of typeName and
      * with the same Transaction will be notified.
      * </li>
      * </ul>

@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Jody Garnett
  */
 public class FeatureCollectionExampleTest extends TestCase {
-    private FeatureCollection features;
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> features;
     private SimpleFeature feature1;
     
     @Override
@@ -76,10 +76,10 @@ public class FeatureCollectionExampleTest extends TestCase {
      * implementation we can make available.
      */
     public void testNewDefaultFeatureCollection(){
-        FeatureCollection collection = new DefaultFeatureCollection("internal", null );        
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new DefaultFeatureCollection("internal", null );        
     }
     public void testFeatureCollectionsNewCollection(){
-        FeatureCollection collection = FeatureCollections.newCollection("internal");
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection("internal");
     }
     
     public void testAddingContentToYourFeatureCollection() throws Exception{
@@ -87,7 +87,7 @@ public class FeatureCollectionExampleTest extends TestCase {
         Point point1 = geomFactory.createPoint( new Coordinate(40,50));
         Point point2 = geomFactory.createPoint( new Coordinate(30,45));
         
-        FeatureCollection collection = FeatureCollections.newCollection("internal");
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection("internal");
         
         SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String");
         final SimpleFeature feature1 = SimpleFeatureBuilder.build( type, new Object[]{ point1, "name1" }, null );
@@ -146,7 +146,7 @@ public class FeatureCollectionExampleTest extends TestCase {
         CoordinateReferenceSystem crs = features.getSchema().getCRS();
         BoundingBox bounds = new ReferencedEnvelope( crs );
         
-        Iterator iterator = features.iterator();
+        Iterator<SimpleFeature> iterator = features.iterator();
         try {
             while( iterator.hasNext()){
                 SimpleFeature feature = (SimpleFeature) iterator.next();
@@ -161,11 +161,11 @@ public class FeatureCollectionExampleTest extends TestCase {
     /** Important when working with real data */
     public void testIteratorSafe(){
         int count = 0;
-        Iterator iterator = features.iterator();
+        Iterator<SimpleFeature> iterator = features.iterator();
         try {
             while( iterator.hasNext()){
                 try {
-                    SimpleFeature feature = (SimpleFeature) iterator.next();
+                    SimpleFeature feature = iterator.next();
                     count++;
                 }
                 catch( RuntimeException dataProblem ){
@@ -181,11 +181,11 @@ public class FeatureCollectionExampleTest extends TestCase {
     }
     /** This example also works with Java 1.4 */
     public void testFeatureIterator(){
-        FeatureCollection collection = features;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = features;
         
         Envelope bounds = new Envelope();
         
-        FeatureIterator features = collection.features();
+        FeatureIterator<SimpleFeature> features = collection.features();
         try {
             while( features.hasNext()){
                 SimpleFeature feature = features.next();

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -43,7 +44,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 	
 	
 	//read only access
-	public boolean add(Object object) {
+	public boolean add(SimpleFeature object) {
 		return false;
 	}
 	
@@ -60,7 +61,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 	}
 	
 //	
-//	public FeatureIterator features() {
+//	public FeatureIterator<SimpleFeature> features() {
 //		return new IteratorFeatureIterator( iterator() );
 //	}
 //
@@ -103,7 +104,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 //
 //	}
 //
-//	public FeatureCollection subCollection(Filter filter) {
+//	public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
@@ -180,7 +181,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 //		return null;
 //	}
 //
-//	public FeatureReader reader() throws IOException {
+//	public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}

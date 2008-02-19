@@ -49,13 +49,13 @@ public class JDBCFeatureWriter implements FeatureWriter {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
     protected QueryData queryData;
-    protected FeatureReader reader;
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     protected SimpleFeature live; // current for FeatureWriter
     protected SimpleFeature current; // copy of live returned to user
     protected boolean closed;
     protected Object[] fidAttributes;
 
-    public JDBCFeatureWriter(FeatureReader reader, QueryData queryData) {
+    public JDBCFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData) {
         this.reader = reader;
         this.queryData = queryData;        
     }

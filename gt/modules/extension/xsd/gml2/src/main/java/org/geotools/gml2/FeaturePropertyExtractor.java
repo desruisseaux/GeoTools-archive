@@ -15,24 +15,22 @@
  */
 package org.geotools.gml2;
 
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDParticle;
-import org.eclipse.xsd.XSDTypeDefinition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.namespace.QName;
-import org.opengis.feature.Attribute;
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDParticle;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**

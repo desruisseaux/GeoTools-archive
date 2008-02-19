@@ -15,8 +15,10 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
+
+import net.opengis.wfs.WfsFactory;
+
 import org.geotools.wfs.WFS;
 import org.geotools.xml.AbstractComplexEMFBinding;
 

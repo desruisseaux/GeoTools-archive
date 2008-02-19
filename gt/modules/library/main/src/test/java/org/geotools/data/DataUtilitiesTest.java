@@ -519,19 +519,19 @@ public class DataUtilitiesTest extends DataTestCase {
     
 
     public void testCollection() {
-        FeatureCollection collection = DataUtilities.collection( roadFeatures );
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = DataUtilities.collection( roadFeatures );
         assertEquals( roadFeatures.length,  collection.size() );                
     }
 
     public void testReaderFeatureArray() throws Exception {
-        FeatureReader reader = DataUtilities.reader( roadFeatures );
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader( roadFeatures );
         assertEquals( roadFeatures.length,  count( reader ) );
     }
     public void testReaderCollection() throws Exception {
-        FeatureCollection collection = DataUtilities.collection( roadFeatures );
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = DataUtilities.collection( roadFeatures );
         assertEquals( roadFeatures.length,  collection.size() );
                 
-        FeatureReader reader = DataUtilities.reader( collection );
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader( collection );
         assertEquals( roadFeatures.length,  count( reader ) );
     }    
     public void testCreateType() {
@@ -546,7 +546,7 @@ public class DataUtilitiesTest extends DataTestCase {
         //      TODO impelment test
     }
     public void testSource() throws Exception {
-        FeatureSource s = DataUtilities.source( roadFeatures );
+        FeatureSource<SimpleFeatureType, SimpleFeature> s = DataUtilities.source( roadFeatures );
         assertEquals( -1, s.getCount( Query.ALL ) );
         assertEquals( 3, s.getFeatures().size() );
         assertEquals( 3, s.getFeatures( Query.ALL ).size() );

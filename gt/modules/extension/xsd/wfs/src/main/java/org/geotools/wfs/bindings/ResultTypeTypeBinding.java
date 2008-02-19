@@ -15,11 +15,14 @@
  */
 package org.geotools.wfs.bindings;
 
+import javax.xml.namespace.QName;
+
 import net.opengis.wfs.ResultTypeType;
 import net.opengis.wfs.WfsFactory;
-import javax.xml.namespace.QName;
+
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 /**
  * Binding object for the type http://www.opengis.net/wfs:ResultTypeType.

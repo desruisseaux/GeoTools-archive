@@ -16,11 +16,13 @@
 package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.MultiPolygon;
+
 import org.geotools.gml3.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 /**

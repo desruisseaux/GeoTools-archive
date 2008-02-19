@@ -15,14 +15,18 @@
  */
 package org.geotools.gml3.bindings;
 
-import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.namespace.QName;
+
+import org.geotools.gml3.GML;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import org.geotools.gml3.GML;
-import org.geotools.xml.*;
 
 
 /**

@@ -2,7 +2,7 @@ package org.geotools.data.store;
 
 import java.util.Iterator;
 
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.Feature;
 import org.opengis.filter.Filter;
 
 /**
@@ -12,12 +12,12 @@ import org.opengis.filter.Filter;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class FilteringIterator implements Iterator {
+public class FilteringIterator<F extends Feature> implements Iterator<F> {
 
 	/**
 	 * Delegate iterator
 	 */
-	Iterator delegate;
+	Iterator<F> delegate;
 	/**
 	 * The Filter
 	 */
@@ -25,14 +25,14 @@ public class FilteringIterator implements Iterator {
 	/**
 	 * Next feature
 	 */
-	SimpleFeature next;
+	F next;
 	
-	public FilteringIterator( Iterator delegate, Filter filter ) {
+	public FilteringIterator( Iterator<F> delegate, Filter filter ) {
 		this.delegate = delegate;
 		this.filter = filter;
 	}
 	
-	public Iterator getDelegate() {
+	public Iterator<F> getDelegate() {
 		return delegate;
 	}
 	
@@ -46,7 +46,7 @@ public class FilteringIterator implements Iterator {
 		}
 		
 		while( delegate.hasNext() ) {
-			SimpleFeature peek = (SimpleFeature) delegate.next();
+			F peek =  delegate.next();
 			if ( filter.evaluate( peek ) ) {
 				next = peek;
 				break;
@@ -56,8 +56,8 @@ public class FilteringIterator implements Iterator {
 		return next != null;
 	}
 
-	public Object next() {
-		SimpleFeature f = next;
+	public F next() {
+		F f = next;
 		next = null;
 		return f;
 	}

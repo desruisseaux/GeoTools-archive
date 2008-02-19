@@ -50,9 +50,9 @@ public class DefaultViewTest extends TestCase {
 
     public void testGetFeatures() throws Exception {
 
-        FeatureSource view = getView();
+        FeatureSource<SimpleFeatureType, SimpleFeature> view = getView();
         
-        FeatureIterator features = view.getFeatures().features();
+        FeatureIterator<SimpleFeature> features = view.getFeatures().features();
         int count=0;
         while( features.hasNext() ){
             count++;
@@ -64,9 +64,9 @@ public class DefaultViewTest extends TestCase {
 
     public void testGetFeaturesQuery() throws Exception {
 
-        FeatureSource view = getView();
+        FeatureSource<SimpleFeatureType, SimpleFeature> view = getView();
         
-        FeatureIterator features = view.getFeatures(getQuery()).features();
+        FeatureIterator<SimpleFeature> features = view.getFeatures(getQuery()).features();
         int count=0;
         while( features.hasNext() ){
             count++;
@@ -77,9 +77,9 @@ public class DefaultViewTest extends TestCase {
     }
     public void testGetFeaturesFilter() throws Exception {
 
-        FeatureSource view = getView();
+        FeatureSource<SimpleFeatureType, SimpleFeature> view = getView();
         Filter f = getFilter();
-        FeatureIterator features = view.getFeatures(f).features();
+        FeatureIterator<SimpleFeature> features = view.getFeatures(f).features();
         int count=0;
         while( features.hasNext() ){
             count++;
@@ -90,7 +90,7 @@ public class DefaultViewTest extends TestCase {
     }
   
     public void testGetCount() throws Exception {
-        FeatureSource view = getView();
+        FeatureSource<SimpleFeatureType, SimpleFeature> view = getView();
         
         DefaultQuery defaultQuery = getQuery();
         int count = view.getCount(defaultQuery);
@@ -109,11 +109,11 @@ public class DefaultViewTest extends TestCase {
         return f;
     }
 
-    private FeatureSource getView() throws IllegalFilterException, IOException, SchemaException {
+    private FeatureSource<SimpleFeatureType, SimpleFeature> getView() throws IllegalFilterException, IOException, SchemaException {
         FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
         Filter f = fac.less(fac.property("id"), fac.literal(3));
 
-        FeatureSource view = ds.getView(new DefaultQuery(typeName, f));
+        FeatureSource<SimpleFeatureType, SimpleFeature> view = ds.getView(new DefaultQuery(typeName, f));
         return view;
     }
 

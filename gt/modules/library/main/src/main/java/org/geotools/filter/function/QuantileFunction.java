@@ -28,7 +28,7 @@ import org.geotools.feature.visitor.QuantileListVisitor;
 import org.geotools.util.NullProgressListener;
 
 /**
- * Breaks a FeatureCollection into classes with an equal number of items in each.
+ * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes with an equal number of items in each.
  * 
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$

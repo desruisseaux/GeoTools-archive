@@ -15,13 +15,16 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JComponent;
+
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.renderer.GTRenderer;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Rendering Strategy is used to specify a memory management

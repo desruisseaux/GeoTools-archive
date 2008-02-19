@@ -97,9 +97,9 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
         DataStore s1 = createDataStore(fac, TestData.url(TestCaseSupport.class, "shapes/stream.shp"), true);
         String typeName = s1.getTypeNames()[0];
-        FeatureSource source = s1.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = s1.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
-        FeatureCollection one = source.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> one = source.getFeatures();
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
 
@@ -116,7 +116,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         return createDataStore;
     }
 
-    private void doubleWrite( SimpleFeatureType type, FeatureCollection one, File tmp,
+    private void doubleWrite( SimpleFeatureType type, FeatureCollection<SimpleFeatureType, SimpleFeature> one, File tmp,
             ShapefileDataStoreFactory maker, boolean memorymapped ) throws IOException,
             MalformedURLException {
         DataStore s;
@@ -137,16 +137,16 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         // JAR.
         DataStore s = createDataStore(new ShapefileDataStoreFactory(), file.toURL(), true);
         String typeName = s.getTypeNames()[0];
-        FeatureSource source = s.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
-        FeatureCollection one = source.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> one = source.getFeatures();
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
         test(type, one, getTempFile(), maker, false);
         test(type, one, getTempFile(), maker, true);
     }
 
-    private void test( SimpleFeatureType type, FeatureCollection one, File tmp,
+    private void test( SimpleFeatureType type, FeatureCollection<SimpleFeatureType, SimpleFeature> one, File tmp,
             ShapefileDataStoreFactory maker, boolean memorymapped ) throws IOException,
             MalformedURLException, Exception {
         DataStore s;
@@ -162,12 +162,12 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         s = createDataStore(new ShapefileDataStoreFactory(), tmp.toURL(), true);
         typeName = s.getTypeNames()[0];
 
-        FeatureCollection two = s.getFeatureSource(typeName).getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> two = s.getFeatureSource(typeName).getFeatures();
 
         compare(one.features(), two.features());
     }
 
-    static void compare( FeatureIterator fs1, FeatureIterator fs2 ) throws Exception {
+    static void compare( FeatureIterator<SimpleFeature> fs1, FeatureIterator<SimpleFeature> fs2 ) throws Exception {
         try {
             while( fs1.hasNext() ) {
                 SimpleFeature f1 = fs1.next();
@@ -229,9 +229,9 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 
         FeatureId featureId = ff.featureId("streams.84");
         Id filter = ff.id(Collections.singleton(featureId));
-        FeatureCollection features = ds.getFeatureSource().getFeatures(filter);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = ds.getFeatureSource().getFeatures(filter);
 
-        FeatureIterator iter = features.features();
+        FeatureIterator<SimpleFeature> iter = features.features();
         ReferencedEnvelope bounds;
         try {
             bounds = new ReferencedEnvelope(iter.next().getBounds());

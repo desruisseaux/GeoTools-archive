@@ -15,18 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
-import java.util.List;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+
+import org.geotools.gml3.GML;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.geometry.DirectPosition;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.gml3.GML;
-import org.geotools.xml.*;
 
 
 /**

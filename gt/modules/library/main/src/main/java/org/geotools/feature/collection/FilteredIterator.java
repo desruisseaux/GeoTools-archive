@@ -19,7 +19,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.feature.FeatureCollection;
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
 /**
@@ -40,20 +41,21 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public class FilteredIterator implements Iterator {
+public class FilteredIterator<F extends Feature> implements Iterator<F> {
 	/** Used to close the delgate, or null */
-	private FeatureCollection collection;
-	private Iterator delegate;
+	private FeatureCollection<? extends FeatureType, F> collection;
+	private Iterator<F> delegate;
 	private Filter filter;
 
-	private Object next;
+	private F next;
 	
-	public FilteredIterator(Iterator iterator, Filter filter) {
+	public FilteredIterator(Iterator<F> iterator, Filter filter) {
 		this.collection = null;
 		this.delegate = iterator;
 		this.filter = filter;
 	}
-	public FilteredIterator(FeatureCollection collection, Filter filter) {
+	
+	public FilteredIterator(FeatureCollection<? extends FeatureType, F> collection, Filter filter) {
 		this.collection = collection;
 		this.delegate = collection.iterator();
 		this.filter = filter;
@@ -71,10 +73,10 @@ public class FilteredIterator implements Iterator {
 		next = null;
 	}
 	
-	private Object getNext() {
-		Object item = null;
+	private F getNext() {
+		F item = null;
 		while (delegate.hasNext()) {
-			item = (SimpleFeature) delegate.next();
+			item = delegate.next();
 			if (filter.evaluate( item )){
 				return item;
 			}
@@ -86,11 +88,11 @@ public class FilteredIterator implements Iterator {
 		return next != null;
 	}
 
-	public Object next() {
+	public F next() {
 		if(next == null){
 			throw new NoSuchElementException();
 		}
-		Object current = next;
+		F current = next;
 		next = getNext();
 		return current;
 	}

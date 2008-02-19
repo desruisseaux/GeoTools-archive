@@ -78,7 +78,7 @@ public class GMLDataStoreTest extends AbstractGMLTestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testGetFeatureReader() throws Exception {
-        FeatureReader reader = ds.getFeatureReader(new DefaultQuery(name),
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = ds.getFeatureReader(new DefaultQuery(name),
                 Transaction.AUTO_COMMIT);
 
         try {

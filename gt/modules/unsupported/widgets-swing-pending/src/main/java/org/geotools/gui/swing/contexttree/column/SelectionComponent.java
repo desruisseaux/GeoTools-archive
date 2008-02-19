@@ -16,11 +16,13 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
-import java.awt.event.ActionEvent;
-import org.geotools.gui.swing.contexttree.renderer.*;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBox;
+
+import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapLayer;
 

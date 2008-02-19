@@ -15,10 +15,11 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.w3c.dom.Document;
-import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.gml2.GML;
 import org.geotools.xml.Binding;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.MultiLineString;
 
 
 public class GMLMultiLineStringPropertyTypeBinding2Test extends GMLTestSupport {

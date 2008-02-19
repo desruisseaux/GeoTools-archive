@@ -16,6 +16,7 @@
 package org.geotools.gml2;
 
 import java.util.HashMap;
+
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 

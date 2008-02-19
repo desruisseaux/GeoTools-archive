@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.AbstractFileDataStore;
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultServiceInfo;
 import org.geotools.data.FeatureLock;
@@ -42,7 +44,9 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 
@@ -77,7 +81,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
     }
 
     // This is the *better* implementation of getview from AbstractDataStore
-    public FeatureSource getView(final Query query)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query)
         throws IOException, SchemaException {
         return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
     }
@@ -193,7 +197,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
     /**
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName)
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName)
         throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 
@@ -208,7 +212,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
      *      org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction)
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction transaction)
         throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(query
                 .getTypeName());
@@ -374,5 +378,54 @@ public class DirectoryDataStore implements DataStore, LockingManager {
             }
             dataStores = null;
         }
+    }
+
+    /**
+     * Delegates to {@link #getFeatureSource(String)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return getFeatureSource(typeName.getLocalPart());
+    }
+
+    /**
+     * Returns the same list of names than {@link #getTypeNames()} meaning the
+     * returned Names have no namespace set.
+     * 
+     * @since 2.5
+     * @see DataAccess#getNames()
+     */
+    public List<Name> getNames() throws IOException {
+        String[] typeNames = getTypeNames();
+        List<Name> names = new ArrayList<Name>(typeNames.length);
+        for (String typeName : typeNames) {
+            names.add(new org.geotools.feature.Name(typeName));
+        }
+        return names;
+    }
+
+    /**
+     * Delegates to {@link #getSchema(String)} with {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getSchema(Name)
+     */
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return getSchema(name.getLocalPart());
+    }
+
+    /**
+     * Delegates to {@link #updateSchema(String, SimpleFeatureType)} with
+     * {@code name.getLocalPart()}
+     * 
+     * @since 2.5
+     * @see DataAccess#getFeatureSource(Name)
+     */
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        updateSchema(typeName.getLocalPart(), featureType);
     }
 }

@@ -82,8 +82,8 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 			filter.addLeftGeometry(ff.createAttributeExpression(type,"geom"));
 			filter.addRightGeometry(ff.createBBoxExpression(box));
 			
-			FeatureReader reader = 
-                            ((PostgisDataStore) data).getFeatureReader(type,filter,Transaction.AUTO_COMMIT);
+			FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+            reader = ((PostgisDataStore) data).getFeatureReader(type,filter,Transaction.AUTO_COMMIT);
 			boolean found = false;
 			for (; reader.hasNext();) {
 				SimpleFeature f = reader.next();

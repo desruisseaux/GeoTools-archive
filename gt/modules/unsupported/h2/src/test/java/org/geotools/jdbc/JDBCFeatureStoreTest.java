@@ -60,7 +60,7 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         Set fids = featureStore.addFeatures(collection);
         assertEquals(3, fids.size());
 
-        FeatureCollection features = featureStore.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
         assertEquals(6, features.size());
 
         FilterFactory ff = dataStore.getFilterFactory();
@@ -94,10 +94,10 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
             collection.add(b.buildFeature(null));
         }
 
-        FeatureReader reader = new CollectionFeatureReader(collection, collection.getSchema());
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = new CollectionFeatureReader(collection, collection.getSchema());
         featureStore.setFeatures(reader);
 
-        FeatureCollection features = featureStore.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
         assertEquals(3, features.size());
 
         Iterator iterator = features.iterator();
@@ -120,7 +120,7 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         featureStore.modifyFeatures(new AttributeDescriptor[] { t.getAttribute("intProperty") },
             new Object[] { new Integer(100) }, Filter.INCLUDE);
 
-        FeatureCollection features = featureStore.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
         Iterator i = features.iterator();
 
         assertTrue(i.hasNext());
@@ -137,7 +137,7 @@ public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
         FilterFactory ff = dataStore.getFilterFactory();
         Filter filter = ff.equals(ff.property("intProperty"), ff.literal(1));
 
-        FeatureCollection features = featureStore.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureStore.getFeatures();
         assertEquals(3, features.size());
 
         featureStore.removeFeatures(filter);

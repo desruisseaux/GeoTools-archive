@@ -29,6 +29,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -63,8 +64,8 @@ public class DisjointIntegrity extends RelationIntegrity {
 	{
 		LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
 		String typeRef1 = getGeomTypeRefA();
-		LOGGER.finer( typeRef1 +": looking up FeatureSource " );    	
-		FeatureSource geomSource1 = (FeatureSource) layers.get( typeRef1 );
+		LOGGER.finer( typeRef1 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );    	
+		FeatureSource<SimpleFeatureType, SimpleFeature> geomSource1 = (FeatureSource) layers.get( typeRef1 );
 		LOGGER.finer( typeRef1 +": found "+ geomSource1.getSchema().getTypeName() );
 		
 		String typeRef2 = getGeomTypeRefB();
@@ -72,8 +73,8 @@ public class DisjointIntegrity extends RelationIntegrity {
 			return validateSingleLayer(geomSource1, isExpected(), results, envelope);
 		else
 		{
-			LOGGER.finer( typeRef2 +": looking up FeatureSource " );        
-			FeatureSource geomSource2 = (FeatureSource) layers.get( typeRef2 );
+			LOGGER.finer( typeRef2 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );        
+			FeatureSource<SimpleFeatureType, SimpleFeature> geomSource2 = (FeatureSource) layers.get( typeRef2 );
 			LOGGER.finer( typeRef2 +": found "+ geomSource2.getSchema().getTypeName() );
 			return validateMultipleLayers(geomSource1, geomSource2, isExpected(), results, envelope);
 		}	
@@ -93,7 +94,7 @@ public class DisjointIntegrity extends RelationIntegrity {
 	 * <p>
 	 * The function filters the FeatureSources using the given bounding box.
 	 * It creates iterators over both filtered FeatureSources. It calls disjoint() using the
-	 * geometries in the FeatureSource layers. Tests the results of the method call against
+	 * geometries in the FeatureSource<SimpleFeatureType, SimpleFeature> layers. Tests the results of the method call against
 	 * the given expected results. Returns true if the returned results and the expected results 
 	 * are true, false otherwise.
 	 * 
@@ -101,16 +102,16 @@ public class DisjointIntegrity extends RelationIntegrity {
 	 * 
 	 * Author: bowens<br>
 	 * Created on: Apr 27, 2004<br>
-	 * @param featureSourceA - the FeatureSource to pull the original geometries from. This geometry is the one that is tested for disjoint with the other
-	 * @param featureSourceB - the FeatureSource to pull the other geometries from - these geometries will be those that may be disjoint with the first geometry
+	 * @param featureSourceA - the FeatureSource<SimpleFeatureType, SimpleFeature> to pull the original geometries from. This geometry is the one that is tested for disjoint with the other
+	 * @param featureSourceB - the FeatureSource<SimpleFeatureType, SimpleFeature> to pull the other geometries from - these geometries will be those that may be disjoint with the first geometry
 	 * @param expected - boolean value representing the user's expected outcome of the test
 	 * @param results - ValidationResults
 	 * @param bBox - Envelope - the bounding box within which to perform the disjoint()
 	 * @return boolean result of the test
 	 * @throws Exception - IOException if iterators improperly closed
 	 */
-	private boolean validateMultipleLayers(	FeatureSource featureSourceA, 
-											FeatureSource featureSourceB, 
+	private boolean validateMultipleLayers(	FeatureSource<SimpleFeatureType, SimpleFeature> featureSourceA, 
+											FeatureSource<SimpleFeatureType, SimpleFeature> featureSourceB, 
 											boolean expected, 
 											ValidationResults results, 
 											Envelope bBox) 
@@ -124,11 +125,11 @@ public class DisjointIntegrity extends RelationIntegrity {
 		//JD: fix this !!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureCollection FeatureCollectionA = featureSourceA.getFeatures(filter);
-		FeatureCollection FeatureCollectionB = featureSourceB.getFeatures(filter);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> FeatureCollectionA = featureSourceA.getFeatures(filter);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> FeatureCollectionB = featureSourceB.getFeatures(filter);
 		
-		FeatureIterator fr1 = null;
-		FeatureIterator fr2 = null;
+		FeatureIterator<SimpleFeature> fr1 = null;
+		FeatureIterator<SimpleFeature> fr2 = null;
 		try 
 		{
 			fr1 = FeatureCollectionA.features();
@@ -173,23 +174,23 @@ public class DisjointIntegrity extends RelationIntegrity {
 	 * 
 	 * <b>Description:</b><br>
 	 * <p>
-	 * The function filters the FeatureSource using the given bounding box.
+	 * The function filters the FeatureSource<SimpleFeatureType, SimpleFeature> using the given bounding box.
 	 * It creates iterators over the filtered FeatureSource. It calls disjoint() using the
-	 * geometries in the FeatureSource layer. Tests the results of the method call against
+	 * geometries in the FeatureSource<SimpleFeatureType, SimpleFeature> layer. Tests the results of the method call against
 	 * the given expected results. Returns true if the returned results and the expected results 
 	 * are true, false otherwise.
 	 * 
 	 * </p>	 * 
 	 * Author: bowens<br>
 	 * Created on: Apr 27, 2004<br>
-	 * @param featureSourceA - the FeatureSource to pull the original geometries from. This geometry is the one that is tested for being disjoint with itself
+	 * @param featureSourceA - the FeatureSource<SimpleFeatureType, SimpleFeature> to pull the original geometries from. This geometry is the one that is tested for being disjoint with itself
 	 * @param expected - boolean value representing the user's expected outcome of the test
 	 * @param results - ValidationResults
 	 * @param bBox - Envelope - the bounding box within which to perform the disjoint()
 	 * @return boolean result of the test
 	 * @throws Exception - IOException if iterators improperly closed
 	 */
-	private boolean validateSingleLayer(FeatureSource featureSourceA, 
+	private boolean validateSingleLayer(FeatureSource<SimpleFeatureType, SimpleFeature> featureSourceA, 
 										boolean expected, 
 										ValidationResults results, 
 										Envelope bBox) 
@@ -203,10 +204,10 @@ public class DisjointIntegrity extends RelationIntegrity {
 		//JD: fix this!!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureCollection collection = featureSourceA.getFeatures(filter);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSourceA.getFeatures(filter);
 		
-		FeatureIterator fr1 = null;
-		FeatureIterator fr2 = null;
+		FeatureIterator<SimpleFeature> fr1 = null;
+		FeatureIterator<SimpleFeature> fr2 = null;
 		try 
 		{
 			fr1 = collection.features();

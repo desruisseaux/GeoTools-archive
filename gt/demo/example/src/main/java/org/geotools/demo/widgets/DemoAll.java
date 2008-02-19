@@ -21,8 +21,8 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
+
 import javax.swing.JDialog;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -39,6 +39,8 @@ import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.node.SourceGroup;
+import org.geotools.gui.swing.contexttree.node.StyleGroup;
 import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
 import org.geotools.gui.swing.contexttree.popup.ContextPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.CopyItem;
@@ -50,13 +52,10 @@ import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
-import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
-import org.geotools.gui.swing.contexttree.node.SourceGroup;
-import org.geotools.gui.swing.contexttree.node.StyleGroup;
 import org.geotools.gui.swing.contexttree.popup.RuleMaxScaleItem;
 import org.geotools.gui.swing.contexttree.popup.RuleMinScaleItem;
+import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.datachooser.DataPanel;
-import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
@@ -73,12 +72,12 @@ import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.minimap.JMiniMap;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolListener;
-import org.geotools.gui.swing.toolbox.widgettool.clipping.ClippingTTDescriptor;
 import org.geotools.gui.swing.toolbox.tooltree.JToolTree;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeListener;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
 import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
+import org.geotools.gui.swing.toolbox.widgettool.WidgetToolListener;
+import org.geotools.gui.swing.toolbox.widgettool.clipping.ClippingTTDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.shapecreation.ShapeCreationTTDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.SVG2MIFTTDescriptor;
 import org.geotools.gui.swing.toolbox.widgettool.vdem2csv.VDem2CSVTTDescriptor;
@@ -88,6 +87,8 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
@@ -204,7 +205,7 @@ public class DemoAll extends javax.swing.JFrame {
 
                                 try {
                                     String name = store.getTypeNames()[0];
-                                    FeatureSource source = store.getFeatureSource(name);
+                                    FeatureSource<SimpleFeatureType, SimpleFeature> source = store.getFeatureSource(name);
                                     MapLayer layer = new DefaultMapLayer(source, rsf.createRandomVectorStyle(source));
 
                                     if (tree.getActiveContext() != null) {
@@ -240,7 +241,7 @@ public class DemoAll extends javax.swing.JFrame {
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
             DataStore store = DataStoreFinder.getDataStore(new SingletonMap("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp")));
-            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+            FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");

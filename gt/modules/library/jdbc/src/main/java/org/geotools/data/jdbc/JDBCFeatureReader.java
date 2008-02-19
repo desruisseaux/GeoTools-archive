@@ -32,12 +32,12 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * JDBCDataStore specific implementation of the FeatureReader interface
+ * JDBCDataStore specific implementation of the  FeatureReader<SimpleFeatureType, SimpleFeature> interface
  *
  * @author aaime
  * @source $URL$
  */
-public class JDBCFeatureReader implements FeatureReader {
+public class JDBCFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
     SimpleFeatureType featureType;
     QueryData queryData;
     Object[] attributes;

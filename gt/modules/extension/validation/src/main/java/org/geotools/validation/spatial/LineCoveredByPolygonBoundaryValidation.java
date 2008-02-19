@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -79,18 +80,18 @@ public class LineCoveredByPolygonBoundaryValidation
 
     	boolean r = true;
     	
-        FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
         
-        FeatureCollection fcLine = fsLine.getFeatures();
-        FeatureIterator fLine = fcLine.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
+        FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
          
-        FeatureCollection fcPoly = fsPoly.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcPoly = fsPoly.getFeatures();
                 
         while(fLine.hasNext()){
         	SimpleFeature line = fLine.next();
-            FeatureIterator fPoly = fcPoly.features();
+            FeatureIterator<SimpleFeature> fPoly = fcPoly.features();
             Geometry lineGeom = (Geometry) line.getDefaultGeometry();
             if(envelope.contains(lineGeom.getEnvelopeInternal())){
             	// 	check for valid comparison

@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class FeatureCollectionTest extends TestCase {
   
-  FeatureCollection features;
+  FeatureCollection<SimpleFeatureType, SimpleFeature> features;
   
   public FeatureCollectionTest(String testName){
     super(testName);
@@ -104,7 +104,7 @@ public class FeatureCollectionTest extends TestCase {
     
     SimpleFeatureType t = tb.buildFeatureType();
     
-    FeatureCollection fc = FeatureCollections.newCollection();
+    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = FeatureCollections.newCollection();
     SimpleFeatureBuilder b = new SimpleFeatureBuilder(t);
     
     for (int i = 0; i < g.length; i++) {
@@ -152,7 +152,7 @@ public class FeatureCollectionTest extends TestCase {
   }
   
   public void testAssorted() {
-    FeatureCollection copy = FeatureCollections.newCollection();
+    FeatureCollection<SimpleFeatureType, SimpleFeature> copy = FeatureCollections.newCollection();
     copy.addAll(features);
     copy.clear();
     assertTrue(copy.isEmpty());
@@ -165,13 +165,13 @@ public class FeatureCollectionTest extends TestCase {
     for (int i = 0; i < f1.length; i++) {
       assertSame(f1[i], f2[i]);
     }
-    FeatureIterator copyIterator = copy.features();
-    FeatureIterator featuresIterator = features.features();
+    FeatureIterator<SimpleFeature> copyIterator = copy.features();
+    FeatureIterator<SimpleFeature> featuresIterator = features.features();
     while (copyIterator.hasNext() && featuresIterator.hasNext()) {
       assertEquals(copyIterator.next(),featuresIterator.next());
     }
     
-    FeatureCollection listen = FeatureCollections.newCollection();
+    FeatureCollection<SimpleFeatureType, SimpleFeature> listen = FeatureCollections.newCollection();
     ListenerProxy counter = new ListenerProxy();
     listen.addListener(counter);
     listen.addAll(features);

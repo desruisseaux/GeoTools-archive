@@ -18,12 +18,12 @@ package org.geotools.jdbc;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
-    FeatureCollection collection;
+    FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -87,7 +87,7 @@ public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
         FilterFactory ff = dataStore.getFilterFactory();
         Filter f = ff.equals(ff.property("intProperty"), ff.literal(1));
 
-        FeatureCollection sub = collection.subCollection(f);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> sub = collection.subCollection(f);
         assertNotNull(sub);
 
         assertEquals(1, sub.size());

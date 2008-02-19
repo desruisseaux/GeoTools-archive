@@ -22,9 +22,10 @@ import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
- * An iterator wrapper for a FeatureReader - for use with
+ * An iterator wrapper for a  FeatureReader<SimpleFeatureType, SimpleFeature> - for use with
  * an AbstractFeatureCollection.
  * <p>
  * There is no reason modify this class, subclasses that wish
@@ -34,9 +35,9 @@ import org.opengis.feature.simple.SimpleFeature;
  * @since 2.1.RC0
  * @source $URL$
  */
-final class FeatureReaderFeatureIterator implements FeatureIterator {
-    FeatureReader reader;
-    public FeatureReaderFeatureIterator( FeatureReader reader ){
+final class FeatureReaderFeatureIterator implements FeatureIterator<SimpleFeature> {
+     FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+    public FeatureReaderFeatureIterator(  FeatureReader<SimpleFeatureType, SimpleFeature> reader ){
         this.reader = reader;
     }
     public boolean hasNext() {

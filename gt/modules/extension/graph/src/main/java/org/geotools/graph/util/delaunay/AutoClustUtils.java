@@ -102,7 +102,7 @@ public class AutoClustUtils {
     }
     
     public static DelaunayNode[] featureCollectionToNodeArray(FeatureCollection fc){
-        FeatureIterator iter = fc.features();
+        FeatureIterator<SimpleFeature> iter = fc.features();
         int size = fc.size();
         DelaunayNode[] nodes = new DelaunayNode[size];
         int index = 0;

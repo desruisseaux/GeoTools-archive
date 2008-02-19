@@ -22,11 +22,13 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 /**
- * A FeatureReader that wraps up a normal FeatureIterator.
+ * A  FeatureReader that wraps up a normal FeatureIterator.
  * <p>
  * This class is useful for faking (and testing) the Resource based
  * API against in memory datastructures. You are warned that to
@@ -36,24 +38,25 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public class DelegateFeatureReader implements FeatureReader {
-	FeatureIterator delegate;
-	SimpleFeatureType schema;
-	public DelegateFeatureReader( SimpleFeatureType featureType, FeatureIterator features ){
+public class DelegateFeatureReader<T extends FeatureType, F extends Feature> implements FeatureReader<T, F> {
+	FeatureIterator<F> delegate;
+	T schema;
+	
+	public DelegateFeatureReader( T featureType, FeatureIterator<F> features ){
 		this.schema = featureType;
 		this.delegate = features;
 	}
 	
-	public SimpleFeatureType getFeatureType() {
+	public T getFeatureType() {
 		return schema;
 	}
 
-	public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+	public F next() throws IOException, IllegalAttributeException, NoSuchElementException {
 		if (delegate == null) {
             throw new IOException("Feature Reader has been closed");
         }		
         try {
-        	SimpleFeature feature = delegate.next();
+        	F feature = delegate.next();
         	// obj = schema.duplicate( obj );
         	return feature;        	
         } catch (NoSuchElementException end) {

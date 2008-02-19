@@ -15,7 +15,27 @@
  */
 package org.geotools.wfs;
 
-import junit.extensions.TestSetup;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import junit.framework.TestCase;
 import net.opengis.ows.DCPType;
 import net.opengis.ows.KeywordsType;
@@ -27,40 +47,22 @@ import net.opengis.wfs.FeatureCollectionType;
 import net.opengis.wfs.FeatureTypeListType;
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.WFSCapabilitiesType;
+
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
-import org.w3c.dom.Document;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.capability.FilterCapabilities;
-import org.opengis.filter.capability.SpatialOperators;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.xml.Parser;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.StreamingParser;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.SpatialOperators;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.Point;
 
 public class WFSParsingTest extends TestCase {
     WFSConfiguration configuration;
@@ -254,10 +256,10 @@ public class WFSParsingTest extends TestCase {
         List featureCollections = fc.getFeature();
         assertEquals(1, featureCollections.size());
 
-        FeatureCollection featureCollection = (FeatureCollection) featureCollections.get(0);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) featureCollections.get(0);
         assertEquals(5, featureCollection.size());
 
-        FeatureIterator features = featureCollection.features();
+        FeatureIterator<SimpleFeature> features = featureCollection.features();
 
         try {
             assertTrue(features.hasNext());

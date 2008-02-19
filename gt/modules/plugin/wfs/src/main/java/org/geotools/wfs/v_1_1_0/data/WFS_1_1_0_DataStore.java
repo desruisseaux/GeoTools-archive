@@ -17,6 +17,7 @@
 package org.geotools.wfs.v_1_1_0.data;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
@@ -30,7 +31,9 @@ import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSServiceInfo;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 /**
@@ -93,7 +96,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
      *      org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction transaction) throws IOException {
         return protocolHandler.getFeatureReader(query, transaction);
     }
 
@@ -116,9 +119,9 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @see org.geotools.data.DataStore#getView(org.geotools.data.Query)
      * @see DefaultView
      */
-    public FeatureSource getView(final Query query) throws IOException, SchemaException {
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getView(final Query query) throws IOException, SchemaException {
         final String typeName = query.getTypeName();
-        final FeatureSource featureSource = this.getFeatureSource(typeName);
+        final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = this.getFeatureSource(typeName);
         return new DefaultView(featureSource, query);
     }
 
@@ -178,5 +181,22 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      */
     public void createSchema(SimpleFeatureType featureType) throws IOException {
         throw new UnsupportedOperationException("WFS DataStore does not support createSchema");
+    }
+
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public List<Name> getNames() throws IOException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
+        throw new UnsupportedOperationException();
     }
 }

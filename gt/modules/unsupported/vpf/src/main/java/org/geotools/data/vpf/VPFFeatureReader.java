@@ -45,7 +45,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * @source $URL$
  */
 public class VPFFeatureReader
-    implements FeatureReader, FCode {
+    implements FeatureReader<SimpleFeatureType, SimpleFeature>, FCode {
     private boolean hasNext = true;
     private boolean nextCalled = true;
     private SimpleFeature currentFeature = null;

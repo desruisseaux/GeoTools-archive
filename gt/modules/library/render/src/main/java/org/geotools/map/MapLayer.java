@@ -21,6 +21,8 @@ import org.geotools.data.memory.CollectionSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -39,7 +41,7 @@ public interface MapLayer {
      * @return The features for this layer, null if not yet set 
      *         or if {@link Source} is used.
      */
-    FeatureSource getFeatureSource();
+    FeatureSource<? extends FeatureType, ? extends Feature> getFeatureSource();
 
     /**
      * Get the data source for this layer.

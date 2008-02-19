@@ -16,8 +16,8 @@
 package org.geotools.gui.swing.contexttree;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
+
 import javax.swing.JPopupMenu;
 
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;

@@ -50,7 +50,7 @@ public class Csv2Shape {
 		File file = getCSVFile(args);
 		final SimpleFeatureType TYPE = DataUtilities.createType("Location", "location:Point,name:String"); // see createFeatureType();
 
-		FeatureCollection collection = FeatureCollections.newCollection();
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
 		BufferedReader reader = new BufferedReader( new FileReader( file ));
 		try {
 			String line = reader.readLine();
@@ -86,7 +86,7 @@ public class Csv2Shape {
 		
 		Transaction transaction = new DefaultTransaction("create");
 		String typeName = newDataStore.getTypeNames()[0];
-		FeatureStore featureStore = (FeatureStore) newDataStore.getFeatureSource( typeName );
+		FeatureStore<SimpleFeatureType, SimpleFeature> featureStore = (FeatureStore) newDataStore.getFeatureSource( typeName );
 		featureStore.setTransaction(transaction);
 		try {			
 			featureStore.addFeatures(collection);

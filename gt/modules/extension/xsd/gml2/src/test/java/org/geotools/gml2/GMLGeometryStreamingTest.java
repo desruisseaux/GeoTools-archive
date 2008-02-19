@@ -15,13 +15,16 @@
  */
 package org.geotools.gml2;
 
-import junit.framework.TestCase;
 import java.io.InputStream;
+
+import junit.framework.TestCase;
+
+import org.geotools.xml.Configuration;
+import org.geotools.xml.StreamingParser;
+
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.StreamingParser;
 
 
 public class GMLGeometryStreamingTest extends TestCase {

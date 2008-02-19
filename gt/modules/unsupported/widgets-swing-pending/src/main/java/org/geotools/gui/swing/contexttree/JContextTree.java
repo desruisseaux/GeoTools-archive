@@ -18,16 +18,18 @@ package org.geotools.gui.swing.contexttree;
 
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
+
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
+
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
 import org.geotools.gui.swing.contexttree.popup.ContextPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.CopyItem;
@@ -40,7 +42,6 @@ import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
-import org.geotools.gui.swing.contexttree.node.SubNodeGroup;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapContext;

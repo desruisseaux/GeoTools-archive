@@ -14,24 +14,22 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.gui.swing.map.map2d.strategy;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import java.awt.event.ComponentEvent;
-import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
@@ -44,6 +42,9 @@ import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Not optimize Strategy, use a single bufferedImage. slow.

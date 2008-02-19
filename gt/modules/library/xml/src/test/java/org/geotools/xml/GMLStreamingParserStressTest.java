@@ -22,10 +22,11 @@ import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.FeatureReader;
 import org.geotools.TestData;
+import org.geotools.data.FeatureReader;
 import org.geotools.xml.gml.FCBuffer;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -40,7 +41,7 @@ import org.opengis.feature.simple.SimpleFeature;
 public class GMLStreamingParserStressTest extends TestCase {
 
 //    public void testOSDNFFeatures() throws SAXException, IOException {
-//        FeatureReader fr = null;
+//         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
 //        try {
 //
 //            String path = "/home/dzwiers/testData/sample-master-map.xml";
@@ -75,7 +76,7 @@ public class GMLStreamingParserStressTest extends TestCase {
     public void skippedtestGTRoadsFeatures() throws IOException {
     	if(!TestData.isExtensiveTest())
     		return;
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         try {
 
             String path = "xml/geoserver/roads.xml";
@@ -113,7 +114,7 @@ public class GMLStreamingParserStressTest extends TestCase {
     public void testFMERoadsFeatures() throws IOException {
     	if(!TestData.isExtensiveTest())
     		return;
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         try {
             String path = "xml/fme/roads/roads.xml";
             File f = TestData.copy(this,path);
@@ -146,7 +147,7 @@ public class GMLStreamingParserStressTest extends TestCase {
     public void testFMELakesFeatures() throws IOException {
     	if(!TestData.isExtensiveTest())
     		return;
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         try {
             String path = "xml/fme/lakes/lakes.xml";
             File f = TestData.copy(this,path);
@@ -179,8 +180,8 @@ public class GMLStreamingParserStressTest extends TestCase {
     public void testFME2StreamsFeatures() throws IOException {
     	if(!TestData.isExtensiveTest())
     		return;
-        FeatureReader fr1 = null;
-        FeatureReader fr2 = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr1 = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr2 = null;
         try {
             String path = "xml/fme/lakes/lakes.xml";
             File f = TestData.copy(this,path);

@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * 
  * <p>
- * The api has been implemented in terms of FeatureReader to make explicit that
+ * The api has been implemented in terms of  FeatureReader<SimpleFeatureType, SimpleFeature> to make explicit that
  * no Features are writen out by this Class.
  * </p>
  *
@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public abstract class DiffFeatureWriter implements FeatureWriter {
-    protected FeatureReader reader;
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     protected Diff diff;
     SimpleFeature next; // next value aquired by hasNext()
     SimpleFeature live; // live value supplied by FeatureReader
@@ -59,7 +59,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @param reader
      * @param diff
      */
-    public DiffFeatureWriter(FeatureReader reader, Diff diff) {
+    public DiffFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, Diff diff) {
         this(reader, diff, Filter.INCLUDE);
     }
 
@@ -70,7 +70,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @param diff
      * @param filter
      */
-    public DiffFeatureWriter(FeatureReader reader, Diff diff, Filter filter) {
+    public DiffFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, Diff diff, Filter filter) {
         this.reader = new DiffFeatureReader(reader, diff, filter);
         this.diff = diff;
     }
@@ -228,12 +228,12 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * 
      * <p>
      * Notification requirements for modifications against a Transaction should
-     * only be issued to FeatureSource instances that opperate against the
+     * only be issued to FeatureSource<SimpleFeatureType, SimpleFeature> instances that opperate against the
      * same typeName and Transaction.
      * </p>
      * 
      * <p>
-     * Other FeatureSource instances with the same typeName will be notified
+     * Other FeatureSource<SimpleFeatureType, SimpleFeature> instances with the same typeName will be notified
      * when the Transaction is committed.
      * </p>
      *

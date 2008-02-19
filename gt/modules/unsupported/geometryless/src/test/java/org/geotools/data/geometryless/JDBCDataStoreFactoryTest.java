@@ -156,7 +156,7 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         this.local = params;
         DataStore ds = testRegisterViews(factory);
         assertTrue(ds instanceof LocationsXYDataStore);
-        FeatureSource fs = ds.getFeatureSource("ViewType1");
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource("ViewType1");
         assertNotNull(fs);
         SimpleFeatureType schema = fs.getSchema();
         assertNotNull(schema);
@@ -164,9 +164,9 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         assertNotNull("No default geometry: " + schema.toString(), defaultGeometry);
         assertEquals("location", defaultGeometry.getName().getLocalPart());
         
-        FeatureCollection features = fs.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = fs.getFeatures();
         assertNotNull(features);
-        FeatureIterator iterator = features.features();
+        FeatureIterator<SimpleFeature> iterator = features.features();
         while(iterator.hasNext()){
             SimpleFeature next = iterator.next();
             assertNotNull(next);
@@ -197,13 +197,13 @@ public class JDBCDataStoreFactoryTest extends TestCase {
      * DataStore ds = DataStoreFinder.getDataStore(params); assertNotNull(ds);
      * assertTrue(ds instanceof LocationsXYDataStore);
      * 
-     * FeatureSource fs = ds.getFeatureSource("wq_derived"); assertNotNull(fs);
+     * FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource("wq_derived"); assertNotNull(fs);
      * FeatureType schema = fs.getSchema(); assertNotNull(schema);
      * assertNotNull(schema.toString(), schema.getDefaultGeometry());
      * assertEquals("location",
      * schema.getDefaultGeometry().getName().getLocalPart());
      * 
-     * FeatureCollection fc = fs.getFeatures(Query.ALL); assertNotNull(fc);
+     * FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fs.getFeatures(Query.ALL); assertNotNull(fc);
      * Iterator features = fc.features(); assertNotNull(features);
      * assertTrue(features.hasNext()); Feature f =(Feature) features.next();
      * 

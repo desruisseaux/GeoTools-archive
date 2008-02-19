@@ -19,8 +19,10 @@ package org.geotools.gui.swing.style.sld;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.type.PropertyDescriptor;

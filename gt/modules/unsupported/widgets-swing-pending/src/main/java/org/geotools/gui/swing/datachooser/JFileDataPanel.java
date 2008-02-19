@@ -22,15 +22,14 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -44,6 +43,8 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -132,7 +133,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
             Object source = getDataStore(f);
             if (source != null) {
                 try {
-                    FeatureSource fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
+                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
                     Style style = rsf.createRandomVectorStyle(fs);
                     MapLayer layer = new DefaultMapLayer(fs, style);
                     layer.setTitle(f.getName());

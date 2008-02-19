@@ -16,12 +16,12 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
-import org.geotools.gui.swing.contexttree.renderer.*;
 import java.awt.Graphics;
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+
+import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;

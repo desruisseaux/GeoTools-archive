@@ -19,11 +19,11 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import java.util.List;
-import javax.swing.JMenuItem;
 
+import javax.swing.JMenuItem;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerCRSPropertyPanel;

@@ -20,7 +20,7 @@ import org.geotools.jdbc.JDBCTestSetup;
 
 
 /**
- * FeatureCollection test for MySQL.
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> test for MySQL.
  *
  * @author Justin Deoliveira, The Open Planning Project
  *

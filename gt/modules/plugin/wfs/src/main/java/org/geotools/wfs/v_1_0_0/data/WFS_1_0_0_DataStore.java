@@ -51,6 +51,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
@@ -80,7 +81,9 @@ import org.geotools.xml.gml.WFSFeatureTypeTransformer;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -436,7 +439,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     // protected for testing
-    protected FeatureReader getFeatureReaderGet(Query request, Transaction transaction)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderGet(Query request, Transaction transaction)
             throws UnsupportedEncodingException, IOException, SAXException {
         URL getUrl = capabilities.getGetFeature().getGet();
 
@@ -645,7 +648,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
     }
 
     // protected for testing
-    protected FeatureReader getFeatureReaderPost(Query query, Transaction transaction)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReaderPost(Query query, Transaction transaction)
             throws SAXException, IOException {
         URL postUrl = capabilities.getGetFeature().getPost();
 
@@ -703,11 +706,11 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
             return ft;
     }
 
-    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName) throws IOException {
         return getFeatureReader(typeName, new DefaultQuery(typeName));
     }
 
-    protected FeatureReader getFeatureReader(String typeName, Query query) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query) throws IOException {
         if ((query.getTypeName() == null) || !query.getTypeName().equals(typeName)) {
             Query q = new DefaultQuery(query);
             ((DefaultQuery) q).setTypeName(typeName);
@@ -722,7 +725,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
      *      org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query, Transaction transaction) throws IOException {
         return strategy.getFeatureReader(query, transaction);
     }
 
@@ -872,5 +875,21 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
 
     public WFSCapabilities getCapabilities() {
         return capabilities;
+    }
+
+    public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(Name typeName)
+            throws IOException {
+        return null;
+    }
+
+    public List<Name> getNames() throws IOException {
+        return null;
+    }
+
+    public SimpleFeatureType getSchema(Name name) throws IOException {
+        return null;
+    }
+
+    public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
     }
 }

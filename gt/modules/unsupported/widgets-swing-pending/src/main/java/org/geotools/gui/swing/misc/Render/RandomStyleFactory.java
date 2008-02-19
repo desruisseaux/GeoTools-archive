@@ -137,7 +137,7 @@ public class RandomStyleFactory {
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
                                 
                 
-                if ( layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")){
+                if ( layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")){
                     bi = Glyph.grid(Color.RED,Color.GREEN,Color.BLUE,Color.YELLOW);
                 } else if( val.equals(Polygon.class) || val.equals(MultiPolygon.class) ){
                     bi = Glyph.Polygon( fts[0].getRules()[0] );

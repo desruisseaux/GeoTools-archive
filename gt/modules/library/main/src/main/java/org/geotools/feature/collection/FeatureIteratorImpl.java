@@ -17,7 +17,8 @@ package org.geotools.feature.collection;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 /**
  * A convenience class for dealing with FeatureCollection Iterators. DOES NOT
@@ -29,18 +30,18 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Ian Schneider
  * @source $URL$
  */
-public class FeatureIteratorImpl implements FeatureIterator {
-    /** The iterator from the FeatureCollection to return features from. */
-     java.util.Iterator iterator;
-     FeatureCollection collection;
+public class FeatureIteratorImpl<T extends FeatureType, F extends Feature> implements FeatureIterator<F> {
+    /** The iterator from the FeatureCollection<SimpleFeatureType, SimpleFeature> to return features from. */
+     java.util.Iterator<F> iterator;
+     FeatureCollection<T, F> collection;
      
     /**
-     * Create a new FeatureIterator using the Iterator from the given
+     * Create a new FeatureIterator<SimpleFeature> using the Iterator from the given
      * FeatureCollection.
      *
-     * @param collection The FeatureCollection to perform the iteration on.
+     * @param collection The FeatureCollection<SimpleFeatureType, SimpleFeature> to perform the iteration on.
      */
-    public FeatureIteratorImpl(FeatureCollection collection) {
+    public FeatureIteratorImpl(FeatureCollection<T, F> collection) {
         this.collection = collection;
         this.iterator = collection.iterator();
     }
@@ -63,11 +64,11 @@ public class FeatureIteratorImpl implements FeatureIterator {
      *
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
-    public SimpleFeature next() throws java.util.NoSuchElementException {
-        return (SimpleFeature) iterator.next();
+    public F next() throws java.util.NoSuchElementException {
+        return (F) iterator.next();
     }
     /**
-     * Required so FeatureCollection classes can implement close( FeatureIterator ).
+     * Required so FeatureCollection<SimpleFeatureType, SimpleFeature> classes can implement close( FeatureIterator<SimpleFeature> ).
      */
     public void close(){
         if( iterator != null ){

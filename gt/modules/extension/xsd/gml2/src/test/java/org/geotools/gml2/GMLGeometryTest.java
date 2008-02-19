@@ -15,14 +15,17 @@
  */
 package org.geotools.gml2;
 
-import junit.framework.TestCase;
 import javax.xml.parsers.SAXParserFactory;
+
+import junit.framework.TestCase;
+
+import org.geotools.xml.Configuration;
+import org.geotools.xml.Parser;
+
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.Parser;
 
 
 public class GMLGeometryTest extends TestCase {

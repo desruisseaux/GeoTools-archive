@@ -85,7 +85,7 @@ public class MIFFileTest extends TestCase {
             assertEquals(Double.class,
                 schema.getAttribute("LENGTH").getType().getBinding());
 
-            FeatureReader fr = mif.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = mif.getFeatureReader();
             int tot = 0;
 
             while (fr.hasNext()) {
@@ -114,9 +114,9 @@ public class MIFFileTest extends TestCase {
         }
         MIFFile in = null;
         MIFFile out = null;
-        FeatureReader inFR = null;
-        FeatureReader outFR = null;
-        FeatureWriter outFW = null;
+        FeatureReader<SimpleFeatureType, SimpleFeature> inFR = null;
+        FeatureReader<SimpleFeatureType, SimpleFeature> outFR = null;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> outFW = null;
         int maxAttr = 0;
 
         try {
@@ -211,7 +211,7 @@ public class MIFFileTest extends TestCase {
 
             MIFFile in = new MIFFile(MIFTestUtils.fileName("mixed_wri"), // .mif
                     MIFTestUtils.getParams("", "", null));
-            FeatureWriter fw = in.getFeatureWriter();
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = in.getFeatureWriter();
 
             SimpleFeature f;
             int counter = 0;
@@ -246,7 +246,7 @@ public class MIFFileTest extends TestCase {
             fw.write();
             fw.close(); // should rewrite all other features
 
-            FeatureReader fr = in.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = in.getFeatureReader();
             counter = 0;
 
             while (fr.hasNext()) {
@@ -286,13 +286,13 @@ public class MIFFileTest extends TestCase {
             MIFFile mif2 = new MIFFile(MIFTestUtils.fileName("grafo"), // .mif
                     MIFTestUtils.getParams("", "", null));
 
-            FeatureReader fr1 = mif1.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr1 = mif1.getFeatureReader();
 
             fr1.next();
 
             SimpleFeature f1 = fr1.next();
 
-            FeatureReader fr2 = mif2.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr2 = mif2.getFeatureReader();
 
             fr2.next();
 
@@ -322,7 +322,7 @@ public class MIFFileTest extends TestCase {
 
             assertEquals(ft.getDefaultGeometry().getType().getBinding(), Geometry.class);
 
-            FeatureReader fr = mif.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = mif.getFeatureReader();
 
             while (fr.hasNext()) {
                 SimpleFeature f = fr.next();
@@ -434,7 +434,7 @@ public class MIFFileTest extends TestCase {
 
             assertEquals(geomClass, ft.getDefaultGeometry().getType().getBinding());
 
-            FeatureReader fr = mif.getFeatureReader();
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = mif.getFeatureReader();
 
             try {
                 SimpleFeature f = fr.next();

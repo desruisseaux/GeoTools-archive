@@ -45,7 +45,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
     private String typeName;
     private Throwable msg;
     private GeoResourceInfo info;
-    private FeatureSource featureSource;
+    private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
     ShapefileGeoResource(ShapefileService parent, String typeName) {
         this.parent = parent;
@@ -78,7 +78,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
         }
 
         if (adaptee.isAssignableFrom(FeatureStore.class)) {
-            FeatureSource featureSource = getFeatureSource(monitor);
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = getFeatureSource(monitor);
 
             if (featureSource instanceof FeatureStore) {
                 return featureSource;
@@ -122,7 +122,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
 
                         if (bounds == null) {
                             bounds = new ReferencedEnvelope(new Envelope(), crs);
-                            FeatureIterator reader = getFeatureSource(monitor)
+                            FeatureIterator<SimpleFeature> reader = getFeatureSource(monitor)
                                     .getFeatures().features();
                             try {
                                 while (reader.hasNext()) {
@@ -159,7 +159,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
         return info;
     }
 
-    protected FeatureSource getFeatureSource(ProgressListener monitor)
+    protected FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(ProgressListener monitor)
             throws IOException {
         if (featureSource == null) {
             synchronized (parent.getDataStore(monitor)) {
@@ -170,8 +170,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                         DataStore dataStore = parent.getDataStore(monitor);
 
                         if (dataStore != null) {
-                            featureSource = dataStore
-                                    .getFeatureSource(typeName);
+                            featureSource = dataStore.getFeatureSource(typeName);
                         }
                     } catch (IOException ioe) {
                         msg = ioe;

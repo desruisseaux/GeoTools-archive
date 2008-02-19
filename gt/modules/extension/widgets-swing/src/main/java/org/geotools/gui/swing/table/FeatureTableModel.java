@@ -39,7 +39,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
     /**
      * Holds the feature table that will be represented by this model.
      */
-    private FeatureCollection featureTable;
+    private FeatureCollection<SimpleFeatureType, SimpleFeature> featureTable;
 
     /**
      * {@link #featureTable} as an array. Will be created only when first needed.
@@ -55,7 +55,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
     /**
      * Creates a new instance of FeatureTableModel based on the feature collection provided.
      */
-    public FeatureTableModel(final FeatureCollection features) {
+    public FeatureTableModel(final FeatureCollection<SimpleFeatureType, SimpleFeature> features) {
         setFeatureCollection(features);
     }
 
@@ -65,7 +65,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
      * @param features The featureTable to represent. This could fire
      *        a Table Structure Changed event.
      */
-    public void setFeatureCollection(final FeatureCollection features) {
+    public void setFeatureCollection(final FeatureCollection<SimpleFeatureType, SimpleFeature> features) {
         featureArray = null;
         featureTable = features;
         fireTableStructureChanged();

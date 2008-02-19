@@ -41,6 +41,7 @@ import org.geotools.validation.dto.TestSuiteDTO;
 import org.geotools.validation.xml.ValidationException;
 import org.geotools.validation.xml.XMLReader;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -180,7 +181,7 @@ public class BatchValidator {
                 ss[j] = ss[j].trim();
 
                 try {
-                    FeatureSource fs = ds.getFeatureSource(ss[j]);
+                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = ds.getFeatureSource(ss[j]);
                     sources.put(ss, fs);
 
                     //BatchValidationResults vr = new BatchValidationResults();

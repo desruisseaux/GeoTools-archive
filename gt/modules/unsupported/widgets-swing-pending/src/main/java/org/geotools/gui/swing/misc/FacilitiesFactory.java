@@ -15,10 +15,13 @@
  */
 package org.geotools.gui.swing.misc;
 
+import org.geotools.data.FeatureSource;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
@@ -81,7 +84,7 @@ public class FacilitiesFactory {
 
         if (layer != null) {
 
-            MapLayer copy = new DefaultMapLayer(layer.getFeatureSource(), layer.getStyle(), layer.getTitle());
+            MapLayer copy = new DefaultMapLayer((FeatureSource<SimpleFeatureType, SimpleFeature>) layer.getFeatureSource(), layer.getStyle(), layer.getTitle());
             copy.setQuery(layer.getQuery());
             copy.setVisible(layer.isVisible());
 

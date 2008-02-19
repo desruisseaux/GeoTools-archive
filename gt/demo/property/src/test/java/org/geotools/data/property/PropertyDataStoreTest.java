@@ -116,7 +116,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testGetFeaturesFeatureTypeFilterTransaction1() throws Exception {
         SimpleFeatureType type = store.getSchema( "road" );
         Query roadQuery = new DefaultQuery("road");
-        FeatureReader reader = store.getFeatureReader( roadQuery, Transaction.AUTO_COMMIT );
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = store.getFeatureReader( roadQuery, Transaction.AUTO_COMMIT );
         int count = 0;
         try {
             while( reader.hasNext() ){
@@ -152,10 +152,10 @@ public class PropertyDataStoreTest extends TestCase {
         assertEquals( "[fid1, fid2, fid3, fid4]", list.toString() );        
     }
     /*
-     * Test for FeatureReader getFeatureReader(String)
+     * Test for  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String)
      */
     public void testGetFeatureReaderString() throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureReader reader = store.getFeatureReader("road");
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = store.getFeatureReader("road");
         int count = 0;
         try {
             while( reader.hasNext() ){
@@ -168,7 +168,7 @@ public class PropertyDataStoreTest extends TestCase {
         }
         assertEquals( 4, count );
     }
-    private int count( FeatureReader reader ) throws Exception {
+    private int count(  FeatureReader<SimpleFeatureType, SimpleFeature> reader ) throws Exception {
         int count = 0;
         try {
             while( reader.hasNext() ){
@@ -315,9 +315,9 @@ public class PropertyDataStoreTest extends TestCase {
         assertEquals( 4, count( "road" ));                    
     }
     public void testGetFeatureSource() throws Exception {
-        FeatureSource road = store.getFeatureSource( "road" );
-        FeatureCollection features = road.getFeatures();
-        FeatureIterator reader = features.features();
+        FeatureSource<SimpleFeatureType, SimpleFeature> road = store.getFeatureSource( "road" );
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = road.getFeatures();
+        FeatureIterator<SimpleFeature> reader = features.features();
         List list = new ArrayList();
         try {
             while( reader.hasNext() ){

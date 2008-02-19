@@ -320,7 +320,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                 int count = 0;
 
                 //grab a reader
-                FeatureReader reader = getReader( query );
+                 FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReader( query );
                 try {
                     while (reader.hasNext()) {
                         reader.next();
@@ -358,7 +358,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                 ReferencedEnvelope bounds = new ReferencedEnvelope(getSchema().getCRS());
 
                 //grab a reader
-                FeatureReader i = getReader(postFilter);
+                 FeatureReader<SimpleFeatureType, SimpleFeature> i = getReader(postFilter);
                 try {
                     if (i.hasNext()) {
                         SimpleFeature f = (SimpleFeature) i.next();
@@ -394,7 +394,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         return true;
     }
     
-    protected FeatureReader getReaderInternal(Query query) throws IOException {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
         
         Filter[] split = splitFilter(query.getFilter());
         Filter preFilter = split[0];
@@ -408,7 +408,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         Connection cx = getDataStore().getConnection(getState());
         
         //create the reader
-        FeatureReader reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         try {
             reader = new JDBCFeatureReader( sql, cx, this, query.getHints() );
         } catch (SQLException e) {
@@ -417,7 +417,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
 
         //if post filter, wrap it
         if (postFilter != null && postFilter != Filter.INCLUDE) {
-            reader = new FilteringFeatureReader(reader,postFilter);
+            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader,postFilter);
         }
 
         return reader;

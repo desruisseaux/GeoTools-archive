@@ -16,6 +16,7 @@
 package org.geotools.gui.swing.map.map2d.handler;
 
 import javax.swing.ImageIcon;
+
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 
 /**

@@ -39,6 +39,7 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -49,7 +50,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Abstract implementation of FeatureSource.
  * <p>
  * This feature source works off of operations provided by {@link FeatureCollection}.
- * Individual FeatureCollection implementations are provided by subclasses:
+ * Individual FeatureCollection<SimpleFeatureType, SimpleFeature> implementations are provided by subclasses:
  * <ul>
  *   {@link #all(ContentState)}: Access to entire dataset
  *   {@link #filtered(ContentState, Filter)}: Access to filtered dataset
@@ -70,7 +71,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  */
-public abstract class ContentFeatureSource implements FeatureSource {
+public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /**
      * The entry for the feature source.
      */
@@ -236,6 +237,18 @@ public abstract class ContentFeatureSource implements FeatureSource {
             }
             
         };
+    }
+    
+    /**
+     * Returns the same name than the feature type (ie,
+     * {@code getSchema().getName()} to honor the simple feature land common
+     * practice of calling the same both the Features produces and their types
+     * 
+     * @since 2.5
+     * @see FeatureSource#getName()
+     */
+    public Name getName() {
+        return getSchema().getName();
     }
     
     /**
@@ -416,7 +429,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * This method calls through to {@link #getReader(Query)}.
      * </p>
      */
-    public final FeatureReader getReader() throws IOException {
+    public final  FeatureReader<SimpleFeatureType, SimpleFeature> getReader() throws IOException {
         return getReader(Query.ALL);
     }
     
@@ -471,10 +484,10 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * Returns a reader for the features specified by a query.
      * 
      */
-    public final FeatureReader getReader(Query query) throws IOException {
+    public final  FeatureReader<SimpleFeatureType, SimpleFeature> getReader(Query query) throws IOException {
         query = joinQuery( query );
         
-        FeatureReader reader = getReaderInternal( query );
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getReaderInternal( query );
         
         //
         //apply wrappers based on subclass capabilities
@@ -482,7 +495,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
         //filtering
         if ( !canFilter() ) {
             if (query.getFilter() != null && query.getFilter() != Filter.INCLUDE ) {
-                reader = new FilteringFeatureReader( reader, query.getFilter() );
+                reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>( reader, query.getFilter() );
             }    
         }
         
@@ -546,7 +559,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * </p>
      * 
      */
-    protected abstract FeatureReader getReaderInternal( Query query ) throws IOException;
+    protected abstract  FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal( Query query ) throws IOException;
     
     /**
      * Determines if the datastore can natively perform reprojection..
@@ -688,7 +701,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * This method calls through to {@link #getReader(Query)}.
      * </p>
      */
-    public final FeatureReader getReader(Filter filter) throws IOException {
+    public final  FeatureReader<SimpleFeatureType, SimpleFeature> getReader(Filter filter) throws IOException {
         return getReader( new DefaultQuery( getSchema().getTypeName(), filter ));
     }
 
@@ -838,7 +851,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
     //protected abstract FeatureList sorted(ContentState state, Filter filter, List order);
 
     /**
-     * FeatureCollection optimized for read-only access.
+     * FeatureCollection<SimpleFeatureType, SimpleFeature> optimized for read-only access.
      * <p>
      * Available via getView( filter ):
      * <ul>
@@ -854,5 +867,5 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * @return readonly access
      */
 
-    //protected abstract FeatureCollection readonly(ContentState state, Filter filter);
+    //protected abstract FeatureCollection<SimpleFeatureType, SimpleFeature> readonly(ContentState state, Filter filter);
 }

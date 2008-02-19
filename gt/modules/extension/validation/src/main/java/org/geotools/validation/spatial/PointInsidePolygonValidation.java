@@ -22,6 +22,7 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -73,8 +74,8 @@ public class PointInsidePolygonValidation extends PointPolygonAbstractValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource pointSource = (FeatureSource) layers.get(getPointTypeRef());
-        FeatureSource polySource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource) layers.get(getPointTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
 
         Object[] polys = polySource.getFeatures().toArray();
         Object[] points = pointSource.getFeatures().toArray();

@@ -8,8 +8,10 @@ package org.geotools.gui.swing.datachooser;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JTabbedPane;
+
 import org.geotools.gui.swing.datachooser.model.DataModel;
 import org.geotools.map.MapLayer;
 

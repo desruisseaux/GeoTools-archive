@@ -43,6 +43,7 @@ import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -204,7 +205,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
             if (typeNames.length <= 0)
                 return false;
             final String typeName = typeNames[0];
-            final FeatureSource featureSource = tileIndexStore.getFeatureSource(typeName);
+            final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = tileIndexStore.getFeatureSource(typeName);
             final SimpleFeatureType schema = featureSource.getSchema();
             // looking for the location attribute
             if (schema.getAttribute("location") == null)

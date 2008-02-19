@@ -34,7 +34,7 @@ public class CollectionUtil {
      * Navigate the collection and call vistor.visit( Feature ) for each
      * element in the collection.
      *
-     * @param collection the featureCollection containing the features we want to visit
+     * @param collection the FeatureCollection<SimpleFeatureType, SimpleFeature> containing the features we want to visit
      * @param visitor the visitor which already knows which attributes it wants to meet
      */
     static void accept(FeatureCollection collection, FeatureVisitor visitor) {

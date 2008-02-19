@@ -32,6 +32,10 @@ import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -47,7 +51,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
     /** The logger for the filter module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.function");
-    FeatureCollection previousFeatureCollection = null;
+    FeatureCollection<? extends FeatureType, ? extends Feature> previousFeatureCollection = null;
     Object median = null;
 
     /**
@@ -127,7 +131,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
 			return new Integer(0); // no features were visited in the making of this answer
 		}
                 Expression expr = (Expression) getExpression(0);
-		FeatureCollection featureCollection = (FeatureCollection) feature;
+		FeatureCollection<? extends FeatureType, ? extends Feature> featureCollection = (FeatureCollection) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

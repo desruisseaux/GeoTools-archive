@@ -54,8 +54,8 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class ShapefileFeatureWriter implements FeatureWriter {
 
-    // the FeatureReader to obtain the current Feature from
-    protected FeatureReader featureReader;
+    // the  FeatureReader<SimpleFeatureType, SimpleFeature> to obtain the current Feature from
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
 
     // the AttributeReader
     protected ShapefileAttributeReader attReader;
@@ -97,7 +97,7 @@ public class ShapefileFeatureWriter implements FeatureWriter {
     private FileChannel dbfChannel;
 
     public ShapefileFeatureWriter(String typeName, ShpFiles shpFiles,
-            ShapefileAttributeReader attsReader, FeatureReader featureReader)
+            ShapefileAttributeReader attsReader,  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader)
             throws IOException {
         this.shpFiles = shpFiles;
         // set up reader

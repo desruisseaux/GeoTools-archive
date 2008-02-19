@@ -44,29 +44,23 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
-//import org.opengis.filter.BinaryComparisonOperator;
+import org.geotools.filter.IllegalFilterException;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.PropertyIsEqualTo;
-
-import org.opengis.filter.expression.Expression;
- import org.opengis.filter.Filter;
-
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-//import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Test for Geometryless generic JDBC Data store.  Must use a locally available instance of JDBC database.
@@ -84,7 +78,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     private static String GEOM_NAME = "location";
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
-    //private FeatureCollection collection = FeatureCollections.newCollection();
+    //private FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
     private SimpleFeatureType schema;
     //private int srid = -1;
     private JDBCConnectionFactory connFactory;
@@ -270,7 +264,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         String testTable = FEATURE_TABLE;
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
-        FeatureReader reader =
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader =
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
@@ -294,7 +288,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         }
 
  //       Query query = new DefaultQuery(FEATURE_TABLE, test1);
-        FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
        //  reader.close(); done in count()
     }
@@ -303,7 +297,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         String testTable = FEATURE_TABLE;
         LOGGER.info("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
-        FeatureReader reader =
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader =
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
 	SimpleFeature feature = reader.next();
     reader.close();
@@ -339,13 +333,13 @@ public class LocationsXYDataStoreTest extends TestCase {
 	Query geomQuery = new DefaultQuery(testTable, Filter.INCLUDE, 500,
 					   propNames, "geomFirst");
 					   
-        FeatureReader reader =
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader =
             dstore.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
 	Feature feature = reader.next();
 	LOGGER.info("feature is: " + feature);
 	}*/
 
-    int count(FeatureReader reader)
+    int count(FeatureReader <SimpleFeatureType, SimpleFeature> reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -415,7 +409,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     }
 /*
     public void testOptimizedBounds() throws Exception {
-        FeatureSource source = dstore.getFeatureSource(FEATURE_TABLE);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = dstore.getFeatureSource(FEATURE_TABLE);
         CompareFilter test1 = null;
 
         try {
@@ -464,7 +458,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -571,7 +565,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -609,7 +603,7 @@ public class LocationsXYDataStoreTest extends TestCase {
 
         FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);

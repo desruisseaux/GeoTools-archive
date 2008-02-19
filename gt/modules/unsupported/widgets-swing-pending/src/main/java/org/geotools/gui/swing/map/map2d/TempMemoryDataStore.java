@@ -16,11 +16,13 @@
 package org.geotools.gui.swing.map.map2d;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -40,8 +42,6 @@ import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is an example implementation of a DataStore used for testing.
@@ -82,7 +82,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
         addFeatures(array);
     }
 
-    public TempMemoryDataStore(FeatureReader reader) throws IOException {
+    public TempMemoryDataStore(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         addFeatures(reader);
     }
 
@@ -98,7 +98,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
      * @throws IOException If problems are encountered while adding
      * @throws DataSourceException See IOException
      */
-    public synchronized void addFeatures(FeatureReader reader) throws IOException {
+    public synchronized void addFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
             // use an order preserving map, so that features are returned in the same
@@ -111,7 +111,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
             feature = reader.next();
 
             if (feature == null) {
-                throw new IllegalArgumentException("Provided FeatureReader is closed");
+                throw new IllegalArgumentException("Provided  FeatureReader<SimpleFeatureType, SimpleFeature> is closed");
             }
 
             featureType = feature.getFeatureType();
@@ -141,7 +141,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
      * @throws IOException If problems are encountered while adding
      * @throws DataSourceException See IOException
      */
-    public synchronized void addFeatures(FeatureIterator reader) throws IOException {
+    public synchronized void addFeatures(FeatureIterator<SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
             Map featureMap = new ConcurrentHashMap();
@@ -151,7 +151,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
             feature = reader.next();
 
             if (feature == null) {
-                throw new IllegalArgumentException("Provided FeatureReader is closed");
+                throw new IllegalArgumentException("Provided  FeatureReader<SimpleFeatureType, SimpleFeature> is closed");
             }
 
             featureType = feature.getFeatureType();
@@ -184,7 +184,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
      */
     public void addFeatures(Collection collection) {
         if ((collection == null) || collection.isEmpty()) {
-            throw new IllegalArgumentException("Provided FeatureCollection is empty");
+            throw new IllegalArgumentException("Provided FeatureCollection<SimpleFeatureType, SimpleFeature> is empty");
         }
 
         synchronized (memory) {
@@ -347,7 +347,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
     }
 
     /**
-     * Provides FeatureReader over the entire contents of <code>typeName</code>.
+     * Provides  FeatureReader<SimpleFeatureType, SimpleFeature> over the entire contents of <code>typeName</code>.
      * 
      * <p>
      * Implements getFeatureReader contract for AbstractDataStore.
@@ -361,9 +361,9 @@ public class TempMemoryDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public synchronized FeatureReader getFeatureReader(final String typeName)
+    public synchronized  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final String typeName)
             throws IOException {
-        return new FeatureReader() {
+        return new FeatureReader<SimpleFeatureType, SimpleFeature>() {
 
             SimpleFeatureType featureType = getSchema(typeName);
             

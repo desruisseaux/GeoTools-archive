@@ -6,8 +6,10 @@
 
 package org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.svg;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.util.StringTokenizer;
+
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.xml.Utility;
 
 public class Style {

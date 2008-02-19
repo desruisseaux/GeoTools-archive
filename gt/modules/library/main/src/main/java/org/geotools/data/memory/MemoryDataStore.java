@@ -16,17 +16,22 @@
 package org.geotools.data.memory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.AbstractDataStore;
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
@@ -38,6 +43,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -83,7 +89,7 @@ public class MemoryDataStore extends AbstractDataStore {
         addFeatures(array);
     }
 
-    public MemoryDataStore(FeatureReader reader) throws IOException {
+    public MemoryDataStore(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         addFeatures(reader);
     }
     public MemoryDataStore(FeatureIterator reader) throws IOException {
@@ -98,7 +104,7 @@ public class MemoryDataStore extends AbstractDataStore {
      * @throws IOException If problems are encountered while adding
      * @throws DataSourceException See IOException
      */
-    public void addFeatures(FeatureReader reader) throws IOException {
+    public void addFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
             // use an order preserving map, so that features are returned in the same
@@ -111,7 +117,7 @@ public class MemoryDataStore extends AbstractDataStore {
             feature = reader.next();
 
             if (feature == null) {
-                throw new IllegalArgumentException("Provided FeatureReader is closed");
+                throw new IllegalArgumentException("Provided  FeatureReader<SimpleFeatureType, SimpleFeature> is closed");
             }
 
             featureType = feature.getFeatureType();
@@ -142,7 +148,7 @@ public class MemoryDataStore extends AbstractDataStore {
      * @throws IOException If problems are encountered while adding
      * @throws DataSourceException See IOException
      */
-    public void addFeatures(FeatureIterator reader) throws IOException {
+    public void addFeatures(FeatureIterator<SimpleFeature> reader) throws IOException {
         try {
             SimpleFeatureType featureType;
             Map featureMap = new HashMap();
@@ -152,7 +158,7 @@ public class MemoryDataStore extends AbstractDataStore {
             feature = reader.next();
 
             if (feature == null) {
-                throw new IllegalArgumentException("Provided FeatureReader is closed");
+                throw new IllegalArgumentException("Provided  FeatureReader<SimpleFeatureType, SimpleFeature> is closed");
             }
 
             featureType = feature.getFeatureType();
@@ -185,7 +191,7 @@ public class MemoryDataStore extends AbstractDataStore {
      */
     public void addFeatures(Collection collection) {
         if ((collection == null) || collection.isEmpty()) {
-            throw new IllegalArgumentException("Provided FeatureCollection is empty");
+            throw new IllegalArgumentException("Provided FeatureCollection<SimpleFeatureType, SimpleFeature> is empty");
         }
 
         synchronized (memory) {
@@ -348,7 +354,7 @@ public class MemoryDataStore extends AbstractDataStore {
     }
 
     /**
-     * Provides FeatureReader over the entire contents of <code>typeName</code>.
+     * Provides  FeatureReader<SimpleFeatureType, SimpleFeature> over the entire contents of <code>typeName</code>.
      * 
      * <p>
      * Implements getFeatureReader contract for AbstractDataStore.
@@ -362,9 +368,9 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureReader getFeatureReader(final String typeName)
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final String typeName)
         throws IOException {
-        return new FeatureReader() {
+        return new FeatureReader<SimpleFeatureType, SimpleFeature>() {
                 SimpleFeatureType featureType = getSchema(typeName);
                 Iterator iterator = features(typeName).values().iterator();
 
@@ -599,4 +605,5 @@ public class MemoryDataStore extends AbstractDataStore {
 
         return count;
     }
+
 }

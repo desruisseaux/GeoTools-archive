@@ -15,15 +15,14 @@
  */
 package org.geotools.gui.swing.datachooser;
 
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
-
 import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
@@ -39,6 +38,8 @@ import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
@@ -278,7 +279,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                 try {
                     DBModel model = (DBModel) tab_table.getModel();
                     String name = (String) model.getValueAt(tab_table.getSelectedRows()[i], 0);
-                    FeatureSource fs = store.getFeatureSource(name);
+                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(name);
                     Style style = rsf.createRandomVectorStyle(fs);
 
                     MapLayer layer = new DefaultMapLayer(fs, style);

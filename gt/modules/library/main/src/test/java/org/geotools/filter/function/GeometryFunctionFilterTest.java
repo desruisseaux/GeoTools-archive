@@ -15,7 +15,7 @@ public class GeometryFunctionFilterTest extends FunctionTestSupport {
     public void testBasicTest() throws Exception {
         FunctionExpression exp = fac.createFunctionExpression("geometryType");
         exp.setArgs(new Expression[]{ fac.createAttributeExpression("geom") });
-        FeatureIterator iter=featureCollection.features();
+        FeatureIterator<SimpleFeature> iter=featureCollection.features();
         while( iter.hasNext() ){
             SimpleFeature feature = iter.next();
             assertEquals( "Point", exp.getValue(feature) );
@@ -27,7 +27,7 @@ public class GeometryFunctionFilterTest extends FunctionTestSupport {
     public void testNullTest() throws Exception {
         FunctionExpression exp = fac.createFunctionExpression("geometryType");
         exp.setArgs(new Expression[]{ fac.createAttributeExpression("geom") });
-        FeatureIterator iter=featureCollection.features();
+        FeatureIterator<SimpleFeature> iter=featureCollection.features();
         while( iter.hasNext() ){
         	SimpleFeature feature = iter.next();
             feature.setAttribute("geom",null);

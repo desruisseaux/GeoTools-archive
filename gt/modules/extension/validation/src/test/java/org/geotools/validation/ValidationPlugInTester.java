@@ -29,6 +29,7 @@ import org.geotools.validation.spatial.LineNoSelfIntersectValidation;
 import org.geotools.validation.spatial.LineNoSelfOverlappingValidation;
 import org.geotools.validation.spatial.LinesNotIntersectValidation;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * ValidationPlugInTester purpose.
@@ -151,9 +152,9 @@ public class ValidationPlugInTester extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 		
 		try {
-            FeatureReader reader = DataUtilities.reader(new SimpleFeature[] {this.newRoad});
+             FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] {this.newRoad});
             String typeName = reader.getFeatureType().getTypeName();            
-			FeatureCollection collection = DataUtilities.collection(new SimpleFeature[] {this.newRoad});
+			FeatureCollection<SimpleFeatureType, SimpleFeature> collection = DataUtilities.collection(new SimpleFeature[] {this.newRoad});
             processor.runFeatureTests("road", collection, roadValidationResults);
 			}
 		catch (Exception e1) {

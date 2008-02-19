@@ -18,12 +18,14 @@ package org.geotools.gui.swing.misc.Render;
 
 import java.awt.Color;
 import java.awt.Component;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
+
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.JDBC1DataStore;
@@ -66,9 +68,9 @@ public class LayerListRenderer implements ListCellRenderer{
     }
     
     private ImageIcon getIcon(MapLayer layer){
-        DataStore ds = layer.getFeatureSource().getDataStore();
+        DataStore ds = (DataStore) layer.getFeatureSource().getDataStore();
 
-        if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
+        if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
             return ICON_LAYER_FILE_RASTER_VISIBLE ;
         } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
             return ICON_LAYER_FILE_VECTOR_VISIBLE ;

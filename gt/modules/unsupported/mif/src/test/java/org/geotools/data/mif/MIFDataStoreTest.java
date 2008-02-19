@@ -272,7 +272,7 @@ public class MIFDataStoreTest extends TestCase {
         initDS("grafo"); // .mif
 
         try {
-            FeatureReader fr = getFeatureReader("grafo", "ID = 33755");
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = getFeatureReader("grafo", "ID = 33755");
             SimpleFeature arc = null;
             Integer id = new Integer(0);
 
@@ -304,10 +304,10 @@ public class MIFDataStoreTest extends TestCase {
 
             int maxAttr = newFT.getAttributeCount() - 1;
 
-            FeatureWriter fw = ds.getFeatureWriterAppend(outmif,
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = ds.getFeatureWriterAppend(outmif,
                     Transaction.AUTO_COMMIT);
             SimpleFeature f;
-            FeatureReader fr = getFeatureReader("grafo",
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = getFeatureReader("grafo",
                     "ID == 73690 || ID == 71045");
 
             int counter = 0;
@@ -378,7 +378,7 @@ public class MIFDataStoreTest extends TestCase {
             Transaction transaction = new DefaultTransaction("mif");
 
             try {
-                FeatureWriter fw = ds.getFeatureWriterAppend(outmif, transaction);
+                FeatureWriter<SimpleFeatureType, SimpleFeature> fw = ds.getFeatureWriterAppend(outmif, transaction);
 
                 f = fw.next();
                 f = fw.next();
@@ -402,7 +402,7 @@ public class MIFDataStoreTest extends TestCase {
                 transaction.close();
             }
 
-            FeatureReader fr = getFeatureReader(outmif,
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = getFeatureReader(outmif,
                     "ID > 80000 && ID <80003");
 
             int counter = 0;
@@ -435,7 +435,7 @@ public class MIFDataStoreTest extends TestCase {
 
         initDS(outmif);
 
-        FeatureSource fs = null;
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = null;
         SimpleFeatureType featureType = null;
 
         try {
@@ -467,7 +467,7 @@ public class MIFDataStoreTest extends TestCase {
         }
 
         try {
-            FeatureReader fr = getFeatureReader(outmif);
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = getFeatureReader(outmif);
 
             assertEquals(true, fr.hasNext());
 
@@ -487,7 +487,7 @@ public class MIFDataStoreTest extends TestCase {
     public void testSRID() {
         initDS("");
 
-        FeatureReader fr;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr;
 
         try {
             fr = getFeatureReader("grafo");
@@ -511,7 +511,7 @@ public class MIFDataStoreTest extends TestCase {
      *
      * @throws Exception
      */
-    protected FeatureReader getFeatureReader(String featureTypeName,
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String featureTypeName,
         String filter) throws Exception {
         DefaultQuery q = new DefaultQuery(featureTypeName,
                 MIFTestUtils.parseFilter(filter));
@@ -527,7 +527,7 @@ public class MIFDataStoreTest extends TestCase {
      *
      * @throws Exception
      */
-    protected FeatureReader getFeatureReader(String featureTypeName)
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String featureTypeName)
         throws Exception {
         return getFeatureReader(featureTypeName, "1=1");
     }

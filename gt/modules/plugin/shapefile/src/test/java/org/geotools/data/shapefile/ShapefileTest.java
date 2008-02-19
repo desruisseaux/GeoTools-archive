@@ -31,6 +31,7 @@ import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -135,7 +136,7 @@ public class ShapefileTest extends TestCaseSupport {
     public void testHolyPolygons() throws Exception {
         SimpleFeatureType type = DataUtilities.createType("junk",
                 "a:MultiPolygon");
-        FeatureCollection features = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = FeatureCollections.newCollection();
 
         File tmpFile = getTempFile();
         tmpFile.delete();
@@ -145,14 +146,14 @@ public class ShapefileTest extends TestCaseSupport {
         DataStore s = make.createDataStore(tmpFile.toURL());
         s.createSchema(type);
         String typeName = type.getTypeName();
-        FeatureStore store = (FeatureStore) s.getFeatureSource(typeName);
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(typeName);
 
         store.addFeatures(features);
 
         s = new ShapefileDataStore(tmpFile.toURL());
         typeName = s.getTypeNames()[0];
-        FeatureSource source = s.getFeatureSource(typeName);
-        FeatureCollection fc = source.getFeatures();
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = s.getFeatureSource(typeName);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = source.getFeatures();
 
         ShapefileReadWriteTest.compare(features, fc);
     }
@@ -176,7 +177,7 @@ public class ShapefileTest extends TestCaseSupport {
     public void testDuplicateColumnNames() throws Exception {
         File file = TestData.file(TestCaseSupport.class, "bad/state.shp");
         ShapefileDataStore dataStore = new ShapefileDataStore(file.toURL());
-        FeatureSource states = dataStore.getFeatureSource();
+        FeatureSource<SimpleFeatureType, SimpleFeature> states = dataStore.getFeatureSource();
         SimpleFeatureType schema = states.getSchema();
         assertEquals(6, schema.getAttributeCount());
         assertTrue(states.getCount(Query.ALL) > 0);

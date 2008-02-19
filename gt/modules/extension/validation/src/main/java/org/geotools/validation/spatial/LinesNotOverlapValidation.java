@@ -22,6 +22,7 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -71,8 +72,8 @@ public class LinesNotOverlapValidation extends LineLineAbstractValidation {
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource lineSource1 = (FeatureSource) layers.get(getLineTypeRef());
-        FeatureSource lineSource2 = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource1 = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource2 = (FeatureSource) layers.get(getRestrictedLineTypeRef());
 
         Object[] lines1 = lineSource1.getFeatures().toArray();
         Object[] lines2 = lineSource2.getFeatures().toArray();

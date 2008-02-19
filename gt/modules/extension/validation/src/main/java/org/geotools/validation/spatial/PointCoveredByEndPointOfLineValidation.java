@@ -22,6 +22,7 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -74,8 +75,8 @@ public class PointCoveredByEndPointOfLineValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource lineSource = (FeatureSource) layers.get(getRestrictedLineTypeRef());
-        FeatureSource pointSource = (FeatureSource) layers.get(getPointTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource) layers.get(getPointTypeRef());
 
         Object[] points = pointSource.getFeatures().toArray();
         Object[] lines = lineSource.getFeatures().toArray();

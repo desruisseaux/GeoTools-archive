@@ -26,8 +26,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -134,8 +133,8 @@ public class UniqueFIDValidation extends DefaultIntegrityValidation {
         //TODO: get the needed layers from the database and use them instead
         while (it.hasNext()) // for each layer
          {
-            FeatureSource featureSource = (FeatureSource) it.next();
-            FeatureIterator features = featureSource.getFeatures().features();
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource) it.next();
+            FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
 
             try {
                 while (features.hasNext()) // for each feature

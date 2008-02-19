@@ -102,7 +102,7 @@ public class FeatureTableModelTest extends TestBase {
         datastore.addFeature(testFeatures[1]);
         
         String typeName = datastore.getTypeNames()[0];
-        FeatureCollection table = datastore.getFeatureSource(typeName).getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> table = datastore.getFeatureSource(typeName).getFeatures();
         
         FeatureTableModel ftm = new FeatureTableModel();
         ftm.setFeatureCollection(table);

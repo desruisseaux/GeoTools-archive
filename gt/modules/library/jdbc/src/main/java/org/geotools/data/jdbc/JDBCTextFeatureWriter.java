@@ -87,7 +87,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @throws IOException
      */
-    public JDBCTextFeatureWriter(FeatureReader fReader, QueryData queryData)
+    public JDBCTextFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader, QueryData queryData)
         throws IOException {
         super(fReader, queryData);
         mapper = queryData.getMapper();

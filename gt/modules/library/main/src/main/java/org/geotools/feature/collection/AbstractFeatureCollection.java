@@ -35,7 +35,9 @@ import org.opengis.filter.sort.SortBy;
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
  */
-public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*extends AbstractResourceCollection*/ implements FeatureCollection, ResourceCollection {
+public abstract class AbstractFeatureCollection extends BaseFeatureCollection
+/* extends AbstractResourceCollection */implements
+        FeatureCollection<SimpleFeatureType, SimpleFeature>, ResourceCollection<SimpleFeature> {
     
 	AbstractResourceCollection rc;
 
@@ -53,18 +55,18 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
 	}
 	
     //
-    // FeatureCollection - Feature Access
+    // FeatureCollection<SimpleFeatureType, SimpleFeature> - Feature Access
     // 
-    public FeatureIterator features() {
-        FeatureIterator iter = new DelegateFeatureIterator( this, rc.openIterator() );
+    public FeatureIterator<SimpleFeature> features() {
+        FeatureIterator<SimpleFeature> iter = new DelegateFeatureIterator( this, rc.openIterator() );
         rc.getOpenIterators().add( iter );
         return iter; 
     }
-    public void close( FeatureIterator close ) {     
+    public void close( FeatureIterator<SimpleFeature> close ) {     
         closeIterator( close );
         rc.getOpenIterators().remove( close );
     }
-    public void closeIterator( FeatureIterator close ) {
+    public void closeIterator( FeatureIterator<SimpleFeature> close ) {
         DelegateFeatureIterator iter = (DelegateFeatureIterator) close;
         rc.closeIterator( iter.delegate );
         iter.close(); 
@@ -73,7 +75,7 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
         for( Iterator i = rc.getOpenIterators().iterator(); i.hasNext(); ){
             Object resource = i.next();
             if( resource instanceof FeatureIterator ){
-                FeatureIterator resourceIterator = (FeatureIterator) resource;
+                FeatureIterator<SimpleFeature> resourceIterator = (FeatureIterator) resource;
                 try {
                     closeIterator( resourceIterator );
                 }
@@ -101,7 +103,7 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
     	rc.close(close);
     };
     
-    final public boolean add(Object o) {
+    final public boolean add(SimpleFeature o) {
 		return rc.add(o);
 	}
 
@@ -172,18 +174,18 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
     //
     // Feature Collections API
     //
-    public FeatureCollection subList( Filter filter ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subList( Filter filter ) {
         return new SubFeatureList(this, filter );
     }
     
-    public FeatureCollection subCollection( Filter filter ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection( Filter filter ) {
         if( filter == Filter.INCLUDE ){
             return this;
         }        
         return new SubFeatureCollection( this, filter );
     }
 
-    public FeatureCollection sort( SortBy order ) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort( SortBy order ) {
         return new SubFeatureList(this, order );
     }
     

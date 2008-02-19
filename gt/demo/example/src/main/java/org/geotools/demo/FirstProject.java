@@ -23,8 +23,9 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.referencing.CRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class FirstProject {
     public static void main(String[] args) throws Exception {
@@ -40,7 +41,7 @@ public class FirstProject {
         String typeName = typeNames[0];
 
         System.out.println("Reading content " + typeName);
-        FeatureSource featureSource = dataStore.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
 
         SimpleFeatureType simpleFeatureType = featureSource.getSchema();
         System.out.println("Header: " + DataUtilities.spec( simpleFeatureType ));
@@ -59,7 +60,7 @@ public class FirstProject {
                 + file + " to:");
         query.setCoordinateSystemReproject(crs);
 
-        FeatureCollection collection = featureSource.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSource.getFeatures(query);
         File newFile = getNewShapeFile(file);
 
         DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
@@ -71,7 +72,7 @@ public class FirstProject {
 
         newDataStore.createSchema(collection.getSchema());
         Transaction transaction = new DefaultTransaction("Reproject");
-        FeatureStore featureStore = (FeatureStore) newDataStore
+        FeatureStore<SimpleFeatureType, SimpleFeature> featureStore = (FeatureStore) newDataStore
                 .getFeatureSource(typeName);
         featureStore.setTransaction(transaction);
         try {

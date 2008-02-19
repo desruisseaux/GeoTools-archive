@@ -21,14 +21,12 @@ package org.geotools.data.oracle.sdo;
 
 import java.sql.SQLException;
 
-import oracle.sql.Datum;
+import junit.framework.TestCase;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.oracle.OracleTestFixture;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import junit.framework.TestCase;
 
 /**
  * @author jgarnett

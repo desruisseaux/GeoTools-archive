@@ -52,7 +52,7 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
 	 * 
 	 * @throws IOException
 	 */
-	public DB2FeatureWriter(FeatureReader reader, QueryData queryData,
+	public DB2FeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> reader, QueryData queryData,
 			DB2SQLBuilder sqlBuilder) throws IOException {
 		super(reader, queryData);
 		this.sqlBuilder = sqlBuilder;

@@ -17,6 +17,9 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 /**
  *
  * @author  jamesm
@@ -27,10 +30,10 @@ public class MockFeatureCollections extends org.geotools.feature.FeatureCollecti
     /** Creates a new instance of MockFeatureCollections */
     public MockFeatureCollections() {
     }
-    protected FeatureCollection createCollection(String id) {
+    protected FeatureCollection<SimpleFeatureType, SimpleFeature> createCollection(String id) {
     	return new MockFeatureCollection();
     }
-    protected FeatureCollection createCollection() {
+    protected FeatureCollection<SimpleFeatureType, SimpleFeature> createCollection() {
         return new MockFeatureCollection();
     }
     

@@ -16,7 +16,6 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +25,6 @@ import javax.sql.DataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
 /**

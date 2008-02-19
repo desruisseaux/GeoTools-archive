@@ -74,7 +74,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
-import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -94,6 +93,7 @@ import org.geotools.wfs.protocol.WFSProtocolHandler;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -576,12 +576,12 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
      * 
      * @param query
      * @param transaction
-     * @return a FeatureReader correctly set up to return the contents as per
+     * @return a  FeatureReader<SimpleFeatureType, SimpleFeature> correctly set up to return the contents as per
      *         requested by the query
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
+    public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query, final Transaction transaction)
             throws IOException {
         final SimpleFeatureType contentType = getQueryType(query);
 
@@ -621,7 +621,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
             parser = new StreamingParserFeatureReader(configuration, responseStream, name,
                     describeFeatureTypeURL);
         }
-        FeatureReader reader = new WFSFeatureReader(parser);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = new WFSFeatureReader(parser);
 
         if (!reader.hasNext()) {
             return new EmptyFeatureReader(contentType);
@@ -635,12 +635,12 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         }
 
         if (Filter.EXCLUDE != unsupportedFilter) {
-            reader = new FilteringFeatureReader(reader, unsupportedFilter);
+            reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, unsupportedFilter);
         }
 
         if (this.maxFeaturesHardLimit.intValue() > 0 || query.getMaxFeatures() != Integer.MAX_VALUE) {
             int maxFeatures = Math.min(maxFeaturesHardLimit.intValue(), query.getMaxFeatures());
-            reader = new MaxFeatureReader(reader, maxFeatures);
+            reader = new MaxFeatureReader<SimpleFeatureType, SimpleFeature>(reader, maxFeatures);
         }
         return reader;
     }

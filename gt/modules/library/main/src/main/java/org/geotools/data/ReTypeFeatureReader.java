@@ -25,7 +25,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 
 
 /**
- * Supports on the fly retyping of FeatureReader contents.
+ * Supports on the fly retyping of  FeatureReader<SimpleFeatureType, SimpleFeature> contents.
  * <p>
  * This may be used to have a DataStore work with your own representation of
  * Feature information.
@@ -34,7 +34,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * Example Use:
  * </p>
  * <pre><code>
- * FeatureReader reader = dataStore.getFeatureReader( query, Transaction.AUTO_COMMIT );
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader( query, Transaction.AUTO_COMMIT );
  * reader = new ReTypeFeatureReader( reader, myFeatureType );
  * try {
  *   while( reader.hasNext() ){
@@ -50,8 +50,8 @@ import org.opengis.feature.type.AttributeDescriptor;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class ReTypeFeatureReader implements FeatureReader {
-    FeatureReader reader;
+public class ReTypeFeatureReader implements  FeatureReader<SimpleFeatureType, SimpleFeature> {
+     FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     SimpleFeatureType featureType;
     AttributeDescriptor[] types;
     boolean clone;
@@ -62,7 +62,7 @@ public class ReTypeFeatureReader implements FeatureReader {
      * @param reader Origional FeatureReader
      * @param featureType Target FeatureType
      */
-    public ReTypeFeatureReader(FeatureReader reader, SimpleFeatureType featureType) {
+    public ReTypeFeatureReader(FeatureReader<SimpleFeatureType, SimpleFeature> reader, SimpleFeatureType featureType) {
         this(reader, featureType, true);
     }
     
@@ -73,7 +73,7 @@ public class ReTypeFeatureReader implements FeatureReader {
      * @param featureType Target FeatureType
      * @since 2.3
      */
-    public ReTypeFeatureReader(FeatureReader reader, SimpleFeatureType featureType, boolean clone) {
+    public ReTypeFeatureReader(FeatureReader <SimpleFeatureType, SimpleFeature> reader, SimpleFeatureType featureType, boolean clone) {
         this.reader = reader;
         this.featureType = featureType;
         this.clone = clone;
@@ -103,7 +103,7 @@ public class ReTypeFeatureReader implements FeatureReader {
 
         if (target.getAttributeCount() > origional.getAttributeCount()) {
             throw new IllegalArgumentException(
-                "Unable to retype FeatureReader (origional does not cover requested type)");
+                "Unable to retype  FeatureReader<SimpleFeatureType, SimpleFeature> (origional does not cover requested type)");
         }
 
         String xpath;
@@ -116,7 +116,7 @@ public class ReTypeFeatureReader implements FeatureReader {
 
             if (!attrib.equals(origional.getAttribute(xpath))) {
                 throw new IllegalArgumentException(
-                    "Unable to retype FeatureReader (origional does not cover "
+                    "Unable to retype  FeatureReader<SimpleFeatureType, SimpleFeature> (origional does not cover "
                     + xpath + ")");
             }
         }

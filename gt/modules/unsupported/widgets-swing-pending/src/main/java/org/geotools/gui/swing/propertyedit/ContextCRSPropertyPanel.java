@@ -19,9 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.ImageIcon;
-
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.geotools.gui.swing.crschooser.JCRSList;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;

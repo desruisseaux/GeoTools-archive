@@ -145,9 +145,9 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         copyShapefiles(f); // Work on File rather than URL from JAR.
         ShapefileDataStore s = new ShapefileDataStore(TestData.url(TestCaseSupport.class, f));
         String typeName = s.getTypeNames()[0];
-        FeatureSource source = s.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = s.getFeatureSource(typeName);
         SimpleFeatureType type = source.getSchema();
-        FeatureCollection one = source.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> one = source.getFeatures();
         File tmp = getTempFile();
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
@@ -158,7 +158,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         test(type, one, tmp2, maker, false);
     }
 
-    private void test(SimpleFeatureType type, FeatureCollection original,
+    private void test(SimpleFeatureType type, FeatureCollection<SimpleFeatureType, SimpleFeature> original,
             File tmp, ShapefileDataStoreFactory maker, boolean memorymapped)
             throws IOException, MalformedURLException, Exception {
 
@@ -174,7 +174,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         store.addFeatures(original);
 
-        FeatureCollection copy = store.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> copy = store.getFeatures();
         compare(original, copy);
 
         if (true) {
@@ -182,15 +182,15 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
             ShapefileDataStore review = new ShapefileDataStore(tmp.toURL(), tmp
                     .toURI(), memorymapped);
             typeName = review.getTypeNames()[0];
-            FeatureSource featureSource = review.getFeatureSource(typeName);
-            FeatureCollection again = featureSource.getFeatures();
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = review.getFeatureSource(typeName);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> again = featureSource.getFeatures();
 
             compare(copy, again);
             compare(original, again);
         }
     }
 
-    static void compare(FeatureCollection one, FeatureCollection two)
+    static void compare(FeatureCollection one, FeatureCollection<SimpleFeatureType, SimpleFeature> two)
             throws Exception {
 
         if (one.size() != two.size()) {
@@ -198,8 +198,8 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
                     + " != " + two.size());
         }
 
-        FeatureIterator iterator1 = one.features();
-        FeatureIterator iterator2 = two.features();
+        FeatureIterator<SimpleFeature> iterator1 = one.features();
+        FeatureIterator<SimpleFeature> iterator2 = two.features();
 
         while (iterator1.hasNext()) {
             SimpleFeature f1 = iterator1.next();

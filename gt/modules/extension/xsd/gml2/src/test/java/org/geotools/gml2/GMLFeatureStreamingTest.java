@@ -15,12 +15,16 @@
  */
 package org.geotools.gml2;
 
-import junit.framework.TestCase;
 import java.io.InputStream;
+
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
+
+import junit.framework.TestCase;
+
 import org.geotools.xml.StreamingParser;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class GMLFeatureStreamingTest extends TestCase {

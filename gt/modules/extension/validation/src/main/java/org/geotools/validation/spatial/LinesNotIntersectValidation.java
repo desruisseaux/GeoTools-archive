@@ -24,6 +24,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -78,8 +79,8 @@ public class LinesNotIntersectValidation extends LineLineAbstractValidation {
 
         while (it.hasNext()) // for each layer
          {
-            FeatureSource featureSource = (FeatureSource) it.next();
-            FeatureIterator features = featureSource.getFeatures().features();
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource) it.next();
+            FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
 
             try {
                 while (features.hasNext()) // for each feature

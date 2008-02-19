@@ -255,7 +255,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
             String typeName = testData.getTemp_table();
 
-            FeatureSource source = ds.getFeatureSource(typeName);
+            FeatureSource<SimpleFeatureType, SimpleFeature> source = ds.getFeatureSource(typeName);
 
             assertEquals(initialAvailableCount, pool.getAvailableCount());
             assertEquals(initialPoolSize, pool.getPoolSize());
@@ -283,8 +283,8 @@ public class ArcSDEDataStoreTest extends TestCase {
             for (int i = 0; i < 20; i++) {
                 LOGGER.fine("Running iteration #" + i);
 
-                FeatureCollection res = source.getFeatures(bbox);
-                FeatureIterator reader = res.features();
+                FeatureCollection<SimpleFeatureType, SimpleFeature> res = source.getFeatures(bbox);
+                FeatureIterator<SimpleFeature> reader = res.features();
 
                 assertNotNull(reader.next());
 
@@ -438,7 +438,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         // build the query asking for a subset of attributes
         final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
-        FeatureReader reader = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
         SimpleFeatureType resultSchema;
         try {
             reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
@@ -486,7 +486,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         // build the query asking for a subset of attributes
         final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
-        FeatureReader reader;
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         try {
 
@@ -514,7 +514,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IllegalAttributeException
      *             DOCUMENT ME!
      */
-    private boolean testNext(FeatureReader r) throws IOException, IllegalAttributeException {
+    private boolean testNext(FeatureReader <SimpleFeatureType, SimpleFeature> r) throws IOException, IllegalAttributeException {
         if (r.hasNext()) {
             SimpleFeature f = r.next();
             assertNotNull(f);
@@ -541,9 +541,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private FeatureReader getReader(String typeName) throws IOException {
+    private  FeatureReader<SimpleFeatureType, SimpleFeature> getReader(String typeName) throws IOException {
         Query q = new DefaultQuery(typeName, Filter.INCLUDE);
-        FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
         SimpleFeatureType retType = reader.getFeatureType();
         assertNotNull(retType.getDefaultGeometry());
         assertTrue(reader.hasNext());
@@ -572,7 +572,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     public void testMixedQueries() throws Exception {
         final int EXPECTED_RESULT_COUNT = 1;
-        FeatureSource fs = store.getFeatureSource(testData.getTemp_table());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(testData.getTemp_table());
         Filter bboxFilter = getBBoxfilter(fs);
         Filter sqlFilter = CQL.toFilter("INT32_COL < 5");
         LOGGER.fine("Geometry filter: " + bboxFilter);
@@ -595,8 +595,8 @@ public class ArcSDEDataStoreTest extends TestCase {
             throw e;
         }
         // check that getBounds and size do function
-        FeatureIterator reader = null;
-        FeatureCollection results = fs.getFeatures(mixedFilter);
+        FeatureIterator<SimpleFeature> reader = null;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = fs.getFeatures(mixedFilter);
         Envelope bounds = results.getBounds();
         assertNotNull(bounds);
         LOGGER.fine("results bounds: " + bounds);
@@ -631,7 +631,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     public void testAttributeOnlyQuery() throws Exception {
         DataStore ds = testData.getDataStore();
-        FeatureSource fSource = ds.getFeatureSource(testData.getTemp_table());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fSource = ds.getFeatureSource(testData.getTemp_table());
         SimpleFeatureType type = fSource.getSchema();
         DefaultQuery attOnlyQuery = new DefaultQuery(type.getTypeName());
         List propNames = new ArrayList(type.getAttributeCount() - 1);
@@ -646,7 +646,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         attOnlyQuery.setPropertyNames(propNames);
 
-        FeatureCollection results = fSource.getFeatures(attOnlyQuery);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = fSource.getFeatures(attOnlyQuery);
         SimpleFeatureType resultSchema = results.getSchema();
         assertEquals(propNames.size(), resultSchema.getAttributeCount());
 
@@ -656,7 +656,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         // the problem described in GEOT-408 arises in attribute reader, so
         // we must to try fetching features
-        FeatureIterator iterator = results.features();
+        FeatureIterator<SimpleFeature> iterator = results.features();
         SimpleFeature feature = iterator.next();
         iterator.close();
         assertNotNull(feature);
@@ -685,7 +685,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         final String typeName = testData.getTemp_table();
 
         // grab some fids
-        FeatureReader reader = ds.getFeatureReader(new DefaultQuery(typeName),
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = ds.getFeatureReader(new DefaultQuery(typeName),
                 Transaction.AUTO_COMMIT);
         List fids = new ArrayList();
 
@@ -702,12 +702,12 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         Id filter = ff.id(new HashSet(fids));
 
-        FeatureSource source = ds.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = ds.getFeatureSource(typeName);
         Query query = new DefaultQuery(typeName, filter);
-        FeatureCollection results = source.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = source.getFeatures(query);
 
         assertEquals(fids.size(), results.size());
-        FeatureIterator iterator = results.features();
+        FeatureIterator<SimpleFeature> iterator = results.features();
 
         while (iterator.hasNext()) {
             String fid = iterator.next().getID();
@@ -722,7 +722,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         final String typeName = testData.getTemp_table();
 
         // grab some fids
-        FeatureReader reader = ds.getFeatureReader(new DefaultQuery(typeName),
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = ds.getFeatureReader(new DefaultQuery(typeName),
                 Transaction.AUTO_COMMIT);
         List fids = new ArrayList();
 
@@ -741,12 +741,12 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         Id filter = ff.id(new HashSet(fids));
 
-        FeatureSource source = ds.getFeatureSource(typeName);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = ds.getFeatureSource(typeName);
         Query query = new DefaultQuery(typeName, filter);
-        FeatureCollection results = source.getFeatures(query);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = source.getFeatures(query);
 
         assertEquals(1, results.size());
-        FeatureIterator iterator = results.features();
+        FeatureIterator<SimpleFeature> iterator = results.features();
 
         while (iterator.hasNext()) {
             String fid = iterator.next().getID();
@@ -782,14 +782,14 @@ public class ArcSDEDataStoreTest extends TestCase {
         final String table = testData.getTemp_table();
         LOGGER.fine("getting all features from " + table);
 
-        FeatureSource source = store.getFeatureSource(table);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = store.getFeatureSource(table);
         int expectedCount = 8;
         int fCount = source.getCount(Query.ALL);
         String failMsg = "Expected and returned result count does not match";
         assertEquals(failMsg, expectedCount, fCount);
 
-        FeatureCollection fresults = source.getFeatures();
-        FeatureCollection features = fresults;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fresults = source.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = fresults;
         failMsg = "FeatureResults.size and .collection().size thoes not match";
         assertEquals(failMsg, fCount, features.size());
         LOGGER.fine("fetched " + fCount + " features for " + table + " layer, OK");
@@ -804,7 +804,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void testSQLFilter() throws Exception {
         int expected = 4;
         Filter filter = CQL.toFilter("INT32_COL < 5");
-        FeatureSource fsource = store.getFeatureSource(testData.getTemp_table());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsource = store.getFeatureSource(testData.getTemp_table());
         testFilter(filter, fsource, expected);
     }
 
@@ -849,7 +849,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         assertEquals(fsource.getDataStore(), store);
         assertNotNull(fsource.getSchema());
 
-        FeatureCollection results = fsource.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> results = fsource.getFeatures();
         int count = results.size();
         assertTrue("size returns " + count, count > 0);
         LOGGER.fine("feature count: " + count);
@@ -866,7 +866,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         assertNotNull(env1);
         assertFalse(env1.isNull());
 
-        FeatureIterator reader = results.features();
+        FeatureIterator<SimpleFeature> reader = results.features();
         assertTrue(reader.hasNext());
 
         try {
@@ -892,12 +892,12 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private void testFilter(Filter filter, FeatureSource fsource, int expected) throws IOException {
-        FeatureCollection fc = fsource.getFeatures(filter);
+    private void testFilter(Filter filter, FeatureSource<SimpleFeatureType, SimpleFeature> fsource, int expected) throws IOException {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fsource.getFeatures(filter);
         int fCount = fc.size();
         LOGGER.info("collection size: " + fCount);
 
-        FeatureIterator fi = fc.features();
+        FeatureIterator<SimpleFeature> fi = fc.features();
         int numFeat = 0;
         while (fi.hasNext()) {
             fi.next();
@@ -921,7 +921,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      *             DOCUMENT ME!
      */
     private void testBBox(String table, int expected) throws Exception {
-        FeatureSource fs = store.getFeatureSource(table);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(table);
         Filter bboxFilter = getBBoxfilter(fs);
         testFilter(bboxFilter, fs, expected);
     }
@@ -937,7 +937,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
-    private Filter getBBoxfilter(FeatureSource fs) throws Exception {
+    private Filter getBBoxfilter(FeatureSource<SimpleFeatureType, SimpleFeature> fs) throws Exception {
         SimpleFeatureType schema = fs.getSchema();
         BBOX bbe = ff.bbox(schema.getDefaultGeometry().getLocalName(), -60, -55, -40, -20, schema
                 .getCRS().getName().getCode());

@@ -15,24 +15,19 @@
  */
 package org.geotools.gml2.bindings;
 
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import junit.framework.TestCase;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml2.GMLConfiguration;
@@ -44,6 +39,15 @@ import org.geotools.xml.Node;
 import org.geotools.xml.impl.AttributeImpl;
 import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xml.impl.NodeImpl;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 
 
 public class AbstractGMLBindingTest extends TestCase {

@@ -183,7 +183,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private final String typeName;
 
 	/** {@link FeatureSource} for the shape index. */
-	private final FeatureSource featureSource;
+	private final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
 	private boolean expandMe;
 

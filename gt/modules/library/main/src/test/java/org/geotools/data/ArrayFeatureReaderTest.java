@@ -54,7 +54,7 @@ public class ArrayFeatureReaderTest extends TestCase {
             SimpleFeatureBuilder.build( type, new Object[] { null }, "f6" )
         };
 
-        FeatureCollection collection = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
         List list = Arrays.asList(features);
         collection.addAll(list);
         arrayReader = new CollectionFeatureReader(features);
@@ -110,7 +110,7 @@ public class ArrayFeatureReaderTest extends TestCase {
         testHasNext(featureCollectionReader);
     }
 
-    private void testHasNext(FeatureReader arrayReader)
+    private void testHasNext(FeatureReader <SimpleFeatureType, SimpleFeature> arrayReader)
         throws IOException, IllegalAttributeException {
         assertTrue(arrayReader.hasNext());
         arrayReader.next();

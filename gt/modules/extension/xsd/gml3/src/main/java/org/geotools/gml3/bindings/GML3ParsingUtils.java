@@ -15,8 +15,19 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.eclipse.xsd.XSDElementDeclaration;
 import java.util.List;
+
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.geotools.gml2.FeatureTypeCache;
+import org.geotools.gml2.bindings.GML2ParsingUtils;
+import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
@@ -24,15 +35,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.gml2.FeatureTypeCache;
-import org.geotools.gml2.bindings.GML2ParsingUtils;
-import org.geotools.xml.BindingWalkerFactory;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**

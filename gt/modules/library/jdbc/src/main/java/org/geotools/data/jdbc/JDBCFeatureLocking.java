@@ -64,7 +64,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  */
 public class JDBCFeatureLocking extends JDBCFeatureStore
-    implements FeatureLocking {
+    implements FeatureLocking<SimpleFeatureType, SimpleFeature> {
     FeatureLock featureLock = FeatureLock.TRANSACTION;
 
     public JDBCFeatureLocking(JDBC1DataStore jdbcDataStore,
@@ -152,7 +152,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureIterator reader = getFeatures(query).features();
+        FeatureIterator<SimpleFeature> reader = getFeatures(query).features();
         String typeName = query.getTypeName();
         SimpleFeature feature;
         int count = 0;
@@ -226,7 +226,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureIterator reader = getFeatures(query).features();
+        FeatureIterator<SimpleFeature> reader = getFeatures(query).features();
         String typeName = query.getTypeName();
         SimpleFeature feature;
 

@@ -67,9 +67,6 @@
          <module>sql-datastore</module>
          <module>geometryless</module>
          <module>notifying-collections</module>
-         <module>ogr</module>
-         <module>gml3</module>
-         <module>tile</module>
        </modules>
      </profile>
 
@@ -83,6 +80,9 @@
          <module>hsql</module>
          <module>jpox</module>
          <module>geomedia</module>
+         <module>ogr</module>
+         <module>gml3</module>
+         <module>tile</module>
        </modules>
      </profile>
   </profiles>

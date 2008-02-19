@@ -498,10 +498,10 @@ public final class JDBCDataStore extends ContentDataStore
         query.setFilter( filter );
         query.setHints( hints );
         
-        FeatureCollection features = 
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = 
             getFeatureSource( featureTypeName ).getFeatures( query );  
         if ( !features.isEmpty() ) {
-            FeatureIterator fi = features.features();
+            FeatureIterator<SimpleFeature> fi = features.features();
             try {
                 if ( fi.hasNext() ) {
                     return fi.next();
@@ -529,7 +529,7 @@ public final class JDBCDataStore extends ContentDataStore
 //    /**
 //     * Creates a new instance of {@link JDBCTransactionState}.
 //     */
-//    protected State createTransactionState(ContentFeatureSource featureSource)
+//    protected State createTransactionState(ContentFeatureSource<SimpleFeatureType, SimpleFeature> featureSource)
 //        throws IOException {
 //        return new JDBCTransactionState((JDBCFeatureStore) featureSource);
 //    }

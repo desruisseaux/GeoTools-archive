@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.repository.defaults.DefaultGeoResourceInfo;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -200,7 +201,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 	 * 
 	 * @return The resource info.
 	 */
-	protected GeoResourceInfo createMetaData( FeatureSource source, ProgressListener monitor ) 
+	protected GeoResourceInfo createMetaData( FeatureSource<SimpleFeatureType, SimpleFeature> source, ProgressListener monitor ) 
 		throws IOException {
 
 		//calculate bounds
@@ -289,7 +290,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 		
 	}
 
-	protected FeatureSource featureSource( ProgressListener monitor ) {
+	protected FeatureSource<SimpleFeatureType, SimpleFeature> featureSource( ProgressListener monitor ) {
 		
 		if ( source == null ) {
 			DataStore dataStore = parent.dataStore( monitor );

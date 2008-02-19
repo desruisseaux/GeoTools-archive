@@ -28,12 +28,14 @@ public class PostgisFeatureStoreOnlineTest extends AbstractPostgisOnlineTestCase
         assertEquals(table6+".1002",attemptWrite(table6));
     }
     
+    @SuppressWarnings("unchecked")
     public String attemptWrite(String table) throws Exception {
         Transaction transaction = new DefaultTransaction("attemptWriteFS");
-        FeatureStore fs = (FeatureStore) ds.getFeatureSource(table);
+        FeatureStore<SimpleFeatureType, SimpleFeature> fs;
+        fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(table);
         fs.setTransaction(transaction);
         SimpleFeatureType ft = fs.getSchema();
-        FeatureCollection fc = FeatureCollections.newCollection();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = FeatureCollections.newCollection();
         SimpleFeature feature = SimpleFeatureBuilder.build(ft, new Object[] {"test"}, null);
         fc.add(feature);
         Set set = fs.addFeatures(fc);

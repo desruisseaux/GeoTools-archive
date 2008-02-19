@@ -43,6 +43,7 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -81,7 +82,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class JDBCFeatureSource implements FeatureSource {
+public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, SimpleFeature> {
     /** The logger for the filter module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
     
@@ -106,6 +107,18 @@ public class JDBCFeatureSource implements FeatureSource {
         SimpleFeatureType featureType) {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
+    }
+    
+    /**
+     * Returns the same name than the feature type (ie,
+     * {@code getSchema().getName()} to honor the simple feature land common
+     * practice of calling the same both the Features produces and their types
+     * 
+     * @since 2.5
+     * @see FeatureSource#getName()
+     */
+    public Name getName() {
+        return getSchema().getName();
     }
     
     public ResourceInfo getInfo() {
@@ -206,7 +219,7 @@ public class JDBCFeatureSource implements FeatureSource {
     }
 
     /**
-     * Retrieve the Transaction this FeatureSource is opperating against.
+     * Retrieve the Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is opperating against.
      * 
      * <p>
      * For a plain JDBCFeatureSource that cannot modify this will always be
@@ -234,7 +247,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query request) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query request) throws IOException {
         String typeName = featureType.getTypeName();
 
         if ((request.getTypeName() != null) && !typeName.equals(request.getTypeName())) {
@@ -256,7 +269,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
     }
 
@@ -267,7 +280,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public FeatureCollection getFeatures() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
         return getFeatures(Filter.INCLUDE);
     }
 

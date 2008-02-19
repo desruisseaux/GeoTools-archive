@@ -11,7 +11,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
- * FeatureReader optimized for ArcSDE access.
+ *  FeatureReader<SimpleFeatureType, SimpleFeature> optimized for ArcSDE access.
  * 
  * @author Gabriel Roldan (TOPP)
  * @version $Id$

@@ -15,13 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.w3c.dom.Document;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.gml2.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.Binding;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 public class GMLAbstractGeometryTypeBindingTest extends GMLTestSupport {

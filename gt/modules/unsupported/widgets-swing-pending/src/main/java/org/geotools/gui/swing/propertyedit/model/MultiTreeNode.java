@@ -18,6 +18,7 @@ package org.geotools.gui.swing.propertyedit.model;
 
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 
 /**

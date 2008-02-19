@@ -96,7 +96,7 @@ public class LabelingTest extends TestCase {
         return style;
 	}
 
-	private FeatureCollection createPointFeatureCollection() throws Exception {
+	private FeatureCollection<SimpleFeatureType, SimpleFeature> createPointFeatureCollection() throws Exception {
 		AttributeDescriptor[] types = new AttributeDescriptor[2];
 
         
@@ -144,7 +144,7 @@ public class LabelingTest extends TestCase {
 //        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
-	private FeatureCollection createLineFeatureCollection() throws Exception {
+	private FeatureCollection<SimpleFeatureType, SimpleFeature> createLineFeatureCollection() throws Exception {
         AttributeDescriptor[] types = new AttributeDescriptor[2];
 
         
@@ -192,7 +192,7 @@ public class LabelingTest extends TestCase {
 //        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
-	private FeatureCollection createPolyFeatureCollection() throws Exception {
+	private FeatureCollection<SimpleFeatureType, SimpleFeature> createPolyFeatureCollection() throws Exception {
         GeometryFactory geomFac=new GeometryFactory();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 

@@ -15,21 +15,25 @@
  */
 package org.geotools.gml2;
 
-import junit.framework.TestCase;
-import org.w3c.dom.Document;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
+
+import junit.framework.TestCase;
+
 import org.geotools.xml.Parser;
 import org.geotools.xml.StreamingParser;
+import org.opengis.feature.simple.SimpleFeature;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 public class GMLApplicationSchemaParsingTest extends TestCase {

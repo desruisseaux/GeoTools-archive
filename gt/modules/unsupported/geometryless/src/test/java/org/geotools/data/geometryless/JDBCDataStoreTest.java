@@ -39,21 +39,19 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
-//import org.geotools.filter.CompareFilter;
+import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.Expression;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -76,7 +74,7 @@ public class JDBCDataStoreTest extends TestCase {
     //private static GeometryFactory geomFac = new GeometryFactory();
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
-    //private FeatureCollection collection = FeatureCollections.newCollection();
+    //private FeatureCollection<SimpleFeatureType, SimpleFeature> collection = FeatureCollections.newCollection();
     private SimpleFeatureType schema;
     //private int srid = -1;
     private JDBCConnectionFactory connFactory;
@@ -268,7 +266,7 @@ public class JDBCDataStoreTest extends TestCase {
         String testTable = FEATURE_TABLE;
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
-        FeatureReader reader =
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader =
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
@@ -291,12 +289,12 @@ public class JDBCDataStoreTest extends TestCase {
         }
 
  //       Query query = new DefaultQuery(FEATURE_TABLE, test1);
-        FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
     }
 
 
-    int count(FeatureReader reader)
+    int count(FeatureReader <SimpleFeatureType, SimpleFeature> reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -366,7 +364,7 @@ public class JDBCDataStoreTest extends TestCase {
     }
 /*
     public void testOptimizedBounds() throws Exception {
-        FeatureSource source = dstore.getFeatureSource(FEATURE_TABLE);
+        FeatureSource<SimpleFeatureType, SimpleFeature> source = dstore.getFeatureSource(FEATURE_TABLE);
         CompareFilter test1 = null;
 
         try {
@@ -415,7 +413,7 @@ public class JDBCDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -522,7 +520,7 @@ public class JDBCDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -560,7 +558,7 @@ public class JDBCDataStoreTest extends TestCase {
 
         FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);

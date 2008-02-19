@@ -54,6 +54,7 @@ import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
 import org.geotools.xml.Parser;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
@@ -392,7 +393,7 @@ public class GpxDataStore extends AbstractDataStore {
     }
 
     @Override
-    protected FeatureReader getFeatureReader(String typeName) {
+    protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName) {
         return new GpxFeatureReader(this, typeName);
     }
 

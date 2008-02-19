@@ -17,7 +17,6 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
-import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,7 +28,6 @@ import java.util.TreeSet;
 import org.geotools.data.AbstractFeatureStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureListener;
@@ -38,7 +36,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
-import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.VersioningFeatureStore;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
@@ -47,14 +44,12 @@ import org.geotools.data.store.ReTypingFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
@@ -79,7 +74,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     private VersionedPostgisDataStore store;
 
-    private FeatureLocking locking;
+    private FeatureLocking<SimpleFeatureType, SimpleFeature> locking;
 
     private SimpleFeatureType schema;
 
@@ -87,7 +82,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
             throws IOException {
         this.store = store;
         this.schema = schema;
-        this.locking = (FeatureLocking) store.wrapped.getFeatureSource(schema.getTypeName());
+        this.locking = (FeatureLocking<SimpleFeatureType, SimpleFeature>) store.wrapped.getFeatureSource(schema.getTypeName());
     }
     
     // -----------------------------------------------------------------------------------------------
@@ -164,32 +159,32 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         store.listenerManager.fireFeaturesRemoved(schema.getTypeName(), t, bounds, false);
     }
 
-    public void setFeatures(FeatureReader reader) throws IOException {
+    public void setFeatures(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         // remove everything, then add back
         removeFeatures(Filter.INCLUDE);
         addFeatures(reader);
     }
 
-    public FeatureCollection getFeatures(Query query) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query query) throws IOException {
         // feature collection is writable unfortunately, we have to rely on the
         // default behaviour otherwise writes won't be versioned
         // TODO: build a versioned feature collection that can do better, if possible at all
         return super.getFeatures(query);
     }
 
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         // feature collection is writable unfortunately, we have to rely on the
         // default behaviour otherwise writes won't be versioned
         return super.getFeatures(filter);
     }
 
-    public FeatureCollection getFeatures() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
         // feature collection is writable unfortunately, we have to rely on the
         // default behaviour otherwise writes won't be versioned
         return super.getFeatures();
     }
     
-    public FeatureCollection getVersionedFeatures(Query query) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getVersionedFeatures(Query query) throws IOException {
         final SimpleFeatureType ft = getSchema();
         
         // check the feature type is the right one 
@@ -205,7 +200,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         DefaultQuery vq = new DefaultQuery(query);
         vq.setTypeName(VersionedPostgisDataStore.getVFCViewName(typeName));
         vq = store.buildVersionedQuery(vq);
-        FeatureCollection fc = store.wrapped.getFeatureSource(VersionedPostgisDataStore.getVFCViewName(typeName)).getFeatures(vq);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = store.wrapped.getFeatureSource(VersionedPostgisDataStore.getVFCViewName(typeName)).getFeatures(vq);
         final SimpleFeatureType fcSchema = fc.getSchema();
         // build a renamed feature type with the same attributes as the feature collection
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
@@ -215,11 +210,11 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         return new ReTypingFeatureCollection(fc, renamedFt);
     }
 
-    public FeatureCollection getVersionedFeatures(Filter filter) throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getVersionedFeatures(Filter filter) throws IOException {
         return getVersionedFeatures(new DefaultQuery(null, filter));
     }
 
-    public FeatureCollection getVersionedFeatures() throws IOException {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getVersionedFeatures() throws IOException {
         return getVersionedFeatures(new DefaultQuery(getSchema().getTypeName()));
     }
     
@@ -254,8 +249,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                     .getRevision();
             Filter recreateFilter = store.buildVersionedFilter(schema.getTypeName(), store
                     .buildFidFilter(ff, fidsToRecreate), new RevisionInfo(toVersion));
-            FeatureReader fr = null;
-            FeatureWriter fw = null;
+            FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
             try {
                 DefaultQuery q = new DefaultQuery(schema.getTypeName(), recreateFilter);
                 fr = store.wrapped.getFeatureReader(q, getTransaction());
@@ -291,8 +286,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
             Filter modifiedIdFilter = store.buildFidFilter(ff, mfids.getModified());
             Filter mifCurrent = store.buildVersionedFilter(schema.getTypeName(), modifiedIdFilter,
                     new RevisionInfo());
-            FeatureReader fr = null;
-            FeatureWriter fw = null;
+             FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
+            FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
             try {
                 fw = store.getFeatureWriter(schema.getTypeName(), mifCurrent, getTransaction());
                 while (fw.hasNext()) {
@@ -324,7 +319,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     }
 
-    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter, String[] userIds, int maxRows)
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> getLog(String fromVersion, String toVersion, Filter filter, String[] userIds, int maxRows)
             throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
@@ -372,7 +367,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // We just want the revision and expired, build a query against the real feature type
         DefaultQuery q = new DefaultQuery(schema.getTypeName(), versionFilter, new String[] {
                 "revision", "expired" });
-        FeatureReader fr = null;
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = null;
         SortedSet revisions = new TreeSet();
         try {
             fr = store.wrapped.getFeatureReader(q, getTransaction());
@@ -407,7 +402,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // time simply allow not include fid attributes in the insert queries (or provide a
         // "default"
         // value for them).
-        FeatureSource changesets = (FeatureSource) store
+        FeatureSource<SimpleFeatureType, SimpleFeature> changesets = (FeatureSource) store
                 .getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS);
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);

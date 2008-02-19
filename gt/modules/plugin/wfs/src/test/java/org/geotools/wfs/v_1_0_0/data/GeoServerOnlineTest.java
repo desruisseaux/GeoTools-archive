@@ -124,10 +124,10 @@ public class GeoServerOnlineTest extends TestCase {
             type.getTypeName();
             type.getName().getNamespaceURI();
             
-            FeatureSource source = wfs.getFeatureSource( typeName );
+            FeatureSource<SimpleFeatureType, SimpleFeature> source = wfs.getFeatureSource( typeName );
             source.getBounds();
             
-            FeatureCollection features = source.getFeatures();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures();
             features.getBounds();
             features.getSchema();
             features.getFeatureType();
@@ -141,7 +141,7 @@ public class GeoServerOnlineTest extends TestCase {
             }
             features.close(reader);
             
-            FeatureIterator iterator = features.features();
+            FeatureIterator<SimpleFeature> iterator = features.features();
             while( iterator.hasNext() ){
                 SimpleFeature feature = iterator.next();
             }
@@ -168,10 +168,10 @@ public class GeoServerOnlineTest extends TestCase {
             type.getTypeName();
             type.getName().getNamespaceURI();
             
-            FeatureSource source = wfs.getFeatureSource( typeName );
+            FeatureSource<SimpleFeatureType, SimpleFeature> source = wfs.getFeatureSource( typeName );
             source.getBounds();
             
-            FeatureCollection features = source.getFeatures();
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures();
             features.getBounds();
             features.getSchema();
             features.getFeatureType();
@@ -187,7 +187,7 @@ public class GeoServerOnlineTest extends TestCase {
             }
             features.close(reader);
             
-            FeatureIterator iterator = features.features();
+            FeatureIterator<SimpleFeature> iterator = features.features();
             while( iterator.hasNext() ){
                 SimpleFeature feature = iterator.next();
             }
@@ -249,7 +249,7 @@ public class GeoServerOnlineTest extends TestCase {
         Filter filter = fac.equals(fac.property("NAME"), fac.literal("E 58th St"));
         
         Query query=new DefaultQuery("tiger:tiger_roads", filter);
-        FeatureReader reader = wfs.getFeatureReader(query, new DefaultTransaction());
+         FeatureReader<SimpleFeatureType, SimpleFeature> reader = wfs.getFeatureReader(query, new DefaultTransaction());
         int expected=0;
         while (reader.hasNext()){
             expected++;
@@ -280,7 +280,7 @@ public class GeoServerOnlineTest extends TestCase {
         DataStore post = (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
         String typename = TO_EDIT_TYPE;
         SimpleFeatureType ft = post.getSchema( typename );
-        FeatureSource fs = post.getFeatureSource( typename );        
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = post.getFeatureSource( typename );        
         class Watcher implements FeatureListener {
             public int count=0;
             public void changed( FeatureEvent featureEvent ) {
@@ -301,7 +301,7 @@ public class GeoServerOnlineTest extends TestCase {
         PropertyName geometryAttributeExpression = filterFac.property(ft.getDefaultGeometry().getLocalName());
 		PropertyIsNull geomNullCheck = filterFac.isNull(geometryAttributeExpression);
 		Query query=new DefaultQuery(typename, filterFac.not(geomNullCheck), 1, Query.ALL_NAMES, null);
-        FeatureIterator inStore = fs.getFeatures(query).features();
+        FeatureIterator<SimpleFeature> inStore = fs.getFeatures(query).features();
         
         SimpleFeature f,f2;
         try{
@@ -318,11 +318,11 @@ public class GeoServerOnlineTest extends TestCase {
         }
         
         org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
-        FeatureCollection inserts = DataUtilities.collection(new SimpleFeature[] {f,f2});
+        FeatureCollection<SimpleFeatureType, SimpleFeature> inserts = DataUtilities.collection(new SimpleFeature[] {f,f2});
         Id fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
         
         /// okay now count ...
-        FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
+         FeatureReader<SimpleFeatureType, SimpleFeature> count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
         int i = 0;
         while(count.hasNext() && i<3){
             f = count.next();i++;

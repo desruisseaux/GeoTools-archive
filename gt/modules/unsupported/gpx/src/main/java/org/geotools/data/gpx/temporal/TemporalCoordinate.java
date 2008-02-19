@@ -15,8 +15,6 @@
  */
 package org.geotools.data.gpx.temporal;
 
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**

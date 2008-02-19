@@ -123,7 +123,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 	 * 
 	 * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
 	 */
-	protected FeatureReader getFeatureReader(String typeName)
+	protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName)
 			throws IOException {
 		//Q: FCBuffer never closed : memory leak?
 		//A: this is not a concern, as the http connection will clean up after itself, 

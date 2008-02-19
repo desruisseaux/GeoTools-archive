@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -80,18 +81,18 @@ public class LineIntersectsLineWithNodeValidation
         ValidationResults results) throws Exception {
     	boolean r = true;
     	
-        FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
         
-        FeatureCollection fcLine = fsLine.getFeatures();
-        FeatureIterator fLine = fcLine.features();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
+        FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource fsRLine = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsRLine = (FeatureSource) layers.get(getRestrictedLineTypeRef());
         
-        FeatureCollection fcRLine = fsRLine.getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fcRLine = fsRLine.getFeatures();
                 
         while(fLine.hasNext()){
         	SimpleFeature line = fLine.next();
-        	FeatureIterator fRLine = fcRLine.features();
+        	FeatureIterator<SimpleFeature> fRLine = fcRLine.features();
         	Geometry lineGeom = (Geometry) line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison

@@ -73,7 +73,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      *
      * @throws IOException
      */
-    public JDBCPSFeatureWriter(FeatureReader fReader, QueryData queryData)
+    public JDBCPSFeatureWriter(FeatureReader <SimpleFeatureType, SimpleFeature> fReader, QueryData queryData)
         throws IOException {
         super(fReader, queryData);
         mapper = queryData.getMapper();

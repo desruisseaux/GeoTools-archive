@@ -15,14 +15,14 @@
  */
 package org.geotools.gui.swing.contexttree.column;
 
-import javax.swing.event.ChangeEvent;
-import org.geotools.gui.swing.contexttree.renderer.*;
 import java.awt.GridLayout;
 
 import javax.swing.JSlider;
-
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.geotools.filter.Filters;
+import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;

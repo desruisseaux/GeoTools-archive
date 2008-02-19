@@ -20,6 +20,8 @@ import java.util.Iterator;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class MemoryFeatureCollectionTest extends DataTestCase {
     private MemoryFeatureCollection roads;
@@ -72,12 +74,12 @@ public class MemoryFeatureCollectionTest extends DataTestCase {
         }        
     }
     public void testSubCollection(){
-        FeatureCollection sub = roads.subCollection( rd12Filter );
+        FeatureCollection<SimpleFeatureType, SimpleFeature> sub = roads.subCollection( rd12Filter );
         assertEquals( 2, sub.size() );
     }
     public void testSubSubCollection(){
-        FeatureCollection sub = roads.subCollection( rd12Filter );        
-        FeatureCollection subsub = sub.subCollection( rd1Filter );
+        FeatureCollection<SimpleFeatureType, SimpleFeature> sub = roads.subCollection( rd12Filter );        
+        FeatureCollection<SimpleFeatureType, SimpleFeature> subsub = sub.subCollection( rd1Filter );
         assertEquals( 1, subsub.size() );        
     }
     public void XtestSort(){

@@ -26,6 +26,7 @@ import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 public abstract class JDBCTransactionTest extends JDBCTestSupport {
@@ -35,7 +36,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         Transaction tx = new DefaultTransaction();
 
         //tx.putState( fs, new JDBCTransactionState( fs ) );
-        FeatureWriter writer = dataStore.getFeatureWriterAppend("ft1", tx);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriterAppend("ft1", tx);
         SimpleFeature feature = writer.next();
         feature.setAttribute("intProperty", new Integer(100));
         writer.write();
@@ -43,7 +44,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         tx.commit();
         tx.close();
 
-        FeatureCollection fc = dataStore.getFeatureSource("ft1").getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals(4, fc.size());
     }
 
@@ -53,7 +54,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         Transaction tx = new DefaultTransaction();
 
         //tx.putState( fs, new JDBCTransactionState( fs ) );
-        FeatureWriter writer = dataStore.getFeatureWriterAppend("ft1", tx);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriterAppend("ft1", tx);
         SimpleFeature feature = writer.next();
         feature.setAttribute("intProperty", new Integer(100));
         writer.write();
@@ -61,7 +62,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         tx.rollback();
         tx.close();
 
-        FeatureCollection fc = dataStore.getFeatureSource("ft1").getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals(3, fc.size());
     }
 
@@ -74,8 +75,8 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         Transaction tx2 = new DefaultTransaction();
 
         //tx2.putState( fs, new JDBCTransactionState( fs ) );
-        FeatureWriter w1 = dataStore.getFeatureWriterAppend("ft1", tx1);
-        FeatureWriter w2 = dataStore.getFeatureWriterAppend("ft1", tx2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> w1 = dataStore.getFeatureWriterAppend("ft1", tx1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> w2 = dataStore.getFeatureWriterAppend("ft1", tx2);
 
         SimpleFeature f1 = w1.next();
         SimpleFeature f2 = w2.next();
@@ -92,17 +93,17 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         tx1.commit();
         tx2.commit();
 
-        FeatureCollection fc = dataStore.getFeatureSource("ft1").getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals(5, fc.size());
     }
     
     public void testSerialTransactions() throws IOException {
-        FeatureStore st = (FeatureStore) dataStore.getFeatureSource( "ft1" );
+        FeatureStore<SimpleFeatureType, SimpleFeature> st = (FeatureStore) dataStore.getFeatureSource( "ft1" );
         
         SimpleFeatureBuilder b = new SimpleFeatureBuilder(st.getSchema());
         b.set( "intProperty", new Integer(100));
         SimpleFeature f1 = b.buildFeature(null);
-        FeatureCollection features = new DefaultFeatureCollection(null,null);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = new DefaultFeatureCollection(null,null);
         features.add( f1 );
 
         Transaction tx1 = new DefaultTransaction();

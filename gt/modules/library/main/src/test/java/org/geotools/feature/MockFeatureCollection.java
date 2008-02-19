@@ -28,6 +28,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
@@ -65,7 +66,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public void close(Iterator close) {
     }
 
-    public FeatureIterator features() {
+    public FeatureIterator<SimpleFeature> features() {
         return null;
     }
 
@@ -77,11 +78,11 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
             throws NullPointerException {
     }
 
-    public FeatureCollection sort(SortBy order) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> sort(SortBy order) {
         return null;
     }
 
-    public FeatureCollection subCollection(Filter filter) {
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> subCollection(Filter filter) {
         return null;
     }
 

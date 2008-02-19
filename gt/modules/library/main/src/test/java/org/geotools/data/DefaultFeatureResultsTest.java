@@ -1,8 +1,12 @@
 package org.geotools.data;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 public class DefaultFeatureResultsTest extends TestCase {
@@ -14,7 +18,7 @@ public class DefaultFeatureResultsTest extends TestCase {
         // mock up the feature source so that it'll return a count of 20
         SimpleFeatureType type = DataUtilities.createType("roads",
                 "_=the_geom:Point,FID:String,NAME:String");
-        FeatureSource fs = createMock(FeatureSource.class);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = createMock(FeatureSource.class);
         expect(fs.getSchema()).andReturn(type).anyTimes();
         expect(fs.getCount(q)).andReturn(20);
         replay(fs);
@@ -30,7 +34,7 @@ public class DefaultFeatureResultsTest extends TestCase {
         // mock up the feature source so that it'll return a count of -1 (too
         // expensive)
         // and then will return a reader
-        FeatureReader fr = createNiceMock(FeatureReader.class);
+         FeatureReader<SimpleFeatureType, SimpleFeature> fr = createNiceMock(FeatureReader.class);
         expect(fr.hasNext()).andReturn(true).times(2).andReturn(false);
         replay(fr);
 
@@ -40,7 +44,7 @@ public class DefaultFeatureResultsTest extends TestCase {
 
         SimpleFeatureType type = DataUtilities.createType("roads",
                 "_=the_geom:Point,FID:String,NAME:String");
-        FeatureSource fs = createMock(FeatureSource.class);
+        FeatureSource<SimpleFeatureType, SimpleFeature> fs = createMock(FeatureSource.class);
         expect(fs.getSchema()).andReturn(type).anyTimes();
         expect(fs.getCount(q)).andReturn(-1);
         expect(fs.getDataStore()).andReturn(ds);
