@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.InvalidClassException;
+import java.util.Iterator;
 import java.util.Collection;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -38,10 +39,11 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.geotools.io.TableWriter;
 import org.geotools.util.logging.Logging;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -190,7 +192,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * @param provider
      *          The image reader provider to use. The same provider is typically given to every
      *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
-     *          this is not mandatory.
+     *          this is not mandatory. If {@code null}, the provider will be inferred from the
+     *          input. If it can't be inferred, then an exception is thrown.
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
@@ -202,10 +205,17 @@ public class Tile implements Comparable<Tile>, Serializable {
      *          if none. If non-null, width and height should be strictly positive. This argument
      *          if of {@linkplain Dimension dimension} kind because it can also be understood as
      *          relative "pixel size".
+     *
+     * @throws IllegalArgumentException
+     *          If a required argument is {@code null} or some argument has an invalid value.
      */
-    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
+    public Tile(ImageReaderSpi provider, final Object input, final int imageIndex,
                 final Point location, final Dimension subsampling)
+                throws IllegalArgumentException
     {
+        if (provider == null) {
+            provider = getImageReaderSpi(input);
+        }
         ensureNonNull("provider", provider);
         ensureNonNull("input",    input);
         ensureNonNull("location", location);
@@ -233,7 +243,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * @param provider
      *          The image reader provider to use. The same provider is typically given to every
      *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
-     *          this is not mandatory.
+     *          this is not mandatory. If {@code null}, the provider will be inferred from the
+     *          input. If it can't be inferred, then an exception is thrown.
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
@@ -246,10 +257,17 @@ public class Tile implements Comparable<Tile>, Serializable {
      *          if none. If non-null, width and height should be strictly positive. This argument
      *          if of {@linkplain Dimension dimension} kind because it can also be understood as
      *          relative "pixel size".
+     *
+     * @throws IllegalArgumentException
+     *          If a required argument is {@code null} or some argument has an invalid value.
      */
-    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
+    public Tile(ImageReaderSpi provider, final Object input, final int imageIndex,
                 final Rectangle region, final Dimension subsampling)
+                throws IllegalArgumentException
     {
+        if (provider == null) {
+            provider = getImageReaderSpi(input);
+        }
         ensureNonNull("provider", provider);
         ensureNonNull("input",    input);
         ensureNonNull("region",   region);
@@ -287,7 +305,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * @param provider
      *          The image reader provider to use. The same provider is typically given to every
      *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
-     *          this is not mandatory.
+     *          this is not mandatory. If {@code null}, the provider will be inferred from the
+     *          input. If it can't be inferred, then an exception is thrown.
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
@@ -298,10 +317,17 @@ public class Tile implements Comparable<Tile>, Serializable {
      *          computed when this tile will be given to a {@link TileManagerFactory}.
      * @param gridToCRS
      *          The "<cite>grid to real world</cite>" transform.
+     *
+     * @throws IllegalArgumentException
+     *          If a required argument is {@code null} or some argument has an invalid value.
      */
-    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex,
+    public Tile(ImageReaderSpi provider, final Object input, final int imageIndex,
                 final Rectangle region, final AffineTransform gridToCRS)
+                throws IllegalArgumentException
     {
+        if (provider == null) {
+            provider = getImageReaderSpi(input);
+        }
         ensureNonNull("provider",  provider);
         ensureNonNull("input",     input);
         ensureNonNull("gridToCRS", gridToCRS);
@@ -329,7 +355,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * @param provider
      *          The image reader provider to use. The same provider is typically given to every
      *          {@code Tile} objects to be given to the same {@link TileManager} instance, but
-     *          this is not mandatory.
+     *          this is not mandatory. If {@code null}, the provider will be inferred from the
+     *          input. If it can't be inferred, then an exception is thrown.
      * @param input
      *          The input to be given to the image reader.
      * @param imageIndex
@@ -337,8 +364,13 @@ public class Tile implements Comparable<Tile>, Serializable {
      * @param region
      *          The region in the destination image. The {@linkplain Rectangle#width width} and
      *          {@linkplain Rectangle#height height} should match the image size.
+     *
+     * @throws IllegalArgumentException
+     *          If a required argument is {@code null} or some argument has an invalid value.
      */
-    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex, final Rectangle region) {
+    public Tile(final ImageReaderSpi provider, final Object input, final int imageIndex, final Rectangle region)
+                throws IllegalArgumentException
+    {
         this(provider, input, imageIndex, region, (Dimension) null);
     }
 
@@ -519,12 +551,53 @@ public class Tile implements Comparable<Tile>, Serializable {
     }
 
     /**
+     * Returns a new reader created by the {@linkplain #getImageReaderSpi provider} and setup for
+     * reading the image from the {@linkplain #getInput input}. This method returns a new reader
+     * on each invocation.
+     *
+     * @return An image reader with its {@linkplain ImageReader#getInput input} set.
+     * @throws IOException if the image reader can't be initialized.
+     */
+    public ImageReader getImageReader() throws IOException {
+        return getImageReader(null, true, true);
+    }
+
+    /**
      * Returns the image reader provider (never {@code null}). This is the provider used for
      * creating the {@linkplain ImageReader image reader} to be used for reading this tile.
      *
      * @see ImageReaderSpi#createReaderInstance()
      */
     public ImageReaderSpi getImageReaderSpi() {
+        return provider;
+    }
+
+    /**
+     * Returns an image reader provider inferred from the given input,
+     * or {@code null} if none can be found without ambiguity.
+     */
+    private static ImageReaderSpi getImageReaderSpi(final Object input) {
+        ImageReaderSpi provider = null;
+        final String path = getInputName(input);
+        if (path != null) {
+            final int split = path.lastIndexOf('.', path.lastIndexOf('/') + 1);
+            if (split >= 0) {
+                final String suffix = path.substring(split + 1).trim();
+                final Iterator<ImageReaderSpi> it = IIORegistry.getDefaultInstance()
+                        .getServiceProviders(ImageReaderSpi.class, true);
+                while (it.hasNext()) {
+                    final ImageReaderSpi candidate = it.next();
+                    if (XArray.contains(candidate.getFileSuffixes(), suffix)) {
+                        if (provider != null) {
+                            // We have an ambiguity - Returns null so we don't make a choice.
+                            return null;
+                        }
+                        provider = candidate;
+                        // Continue the search for making sure that we don't have an ambiguity.
+                    }
+                }
+            }
+        }
         return provider;
     }
 
@@ -538,11 +611,33 @@ public class Tile implements Comparable<Tile>, Serializable {
     }
 
     /**
-     * Returns a short string representation of the {@linkplain #getInput input}.
-     * This is only informative and the string content may change.
+     * Returns a short string representation of the {@linkplain #getInput input}. The
+     * default implementation returns the following:
+     * <p>
+     * <ul>
+     *   <li>For {@linkplain CharSequence Character sequence}, returns the
+     *       {@linkplain CharSequence#toString string} form.</li>
+     *   <li>For {@linkplain File}, returns only the {@linkplain File#getName name} part.</li>
+     *   <li>For {@linkplain URL} or {@linkplain URI}, returns the path without the protocol or
+     *       query parts.</li>
+     *   <li>For other classes, returns {@code "class"} followed by the unqualified class name.</li>
+     * </ul>
+     *
+     * @param A short string representation of the input (never {@code null}).
      */
     public String getInputName() {
-        final Object input = getInput();
+        String name = getInputName(getInput());
+        if (name == null) {
+            name = "class " + Classes.getShortClassName(input);
+        }
+        return name;
+    }
+
+    /**
+     * Returns a short string representation of the given input,
+     * or {@code null} if the input can not be formatted.
+     */
+    private static String getInputName(final Object input) {
         if (input instanceof File) {
             return ((File) input).getName();
         }
@@ -555,10 +650,7 @@ public class Tile implements Comparable<Tile>, Serializable {
         if (input instanceof CharSequence) {
             return input.toString();
         }
-        if (input != null) {
-            return input.getClass().getSimpleName();
-        }
-        return Utilities.deepToString(input);
+        return null;
     }
 
     /**

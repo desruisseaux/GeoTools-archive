@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing.tree;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.ArrayList;
 import javax.swing.tree.TreeNode;
@@ -24,7 +23,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
 import org.w3c.dom.Node;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.OptionalDependencies;
@@ -58,11 +56,11 @@ public final class Trees {
      * @return The paths to the specified value, or an empty array if none.
      */
     public static TreePath[] getPathsToUserObject(final TreeModel model, final Object value) {
-        final List paths = new ArrayList(8);
+        final List<TreePath> paths = new ArrayList<TreePath>(8);
         final Object[] path = new Object[8];
         path[0] = model.getRoot();
         getPathsToUserObject(model, value, path, 1, paths);
-        return (TreePath[]) paths.toArray(new TreePath[paths.size()]);
+        return paths.toArray(new TreePath[paths.size()]);
     }
 
     /**
@@ -78,7 +76,7 @@ public final class Trees {
      * @return {@code path}, ou un nouveau tableau s'il a fallu l'agrandir.
      */
     private static Object[] getPathsToUserObject(final TreeModel model, final Object value,
-                                                 Object[] path, final int length, final List list)
+            Object[] path, final int length, final List<TreePath> list)
     {
         final Object parent = path[length-1];
         if (parent instanceof org.geotools.gui.swing.tree.TreeNode) {

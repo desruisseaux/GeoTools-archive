@@ -48,7 +48,7 @@ import org.geotools.resources.image.ImageUtilities;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
  */
-public class TileBuilder {
+public class MosaicBuilder {
     /**
      * Default value for {@link #prefix}. Current implementation uses "L" as in "Level".
      */
@@ -127,7 +127,7 @@ public class TileBuilder {
     /**
      * Generates tiles using the default factory.
      */
-    public TileBuilder() {
+    public MosaicBuilder() {
         this(null);
     }
 
@@ -137,7 +137,7 @@ public class TileBuilder {
      * @param factory The factory to use, or {@code null} for the
      *        {@linkplain TileManagerFactory#DEFAULT default} one.
      */
-    public TileBuilder(final TileManagerFactory factory) {
+    public MosaicBuilder(final TileManagerFactory factory) {
         this.factory = (factory != null) ? factory : TileManagerFactory.DEFAULT;
         layout = TileLayout.CONSTANT_TILE_SIZE;
     }
@@ -474,7 +474,7 @@ public class TileBuilder {
 
     /**
      * Sets the subsamplings for overview computations. The number of overview levels created
-     * by this {@code TileBuilder} will be equals to the {@code subsamplings} array length.
+     * by this {@code MosaicBuilder} will be equals to the {@code subsamplings} array length.
      * <p>
      * Subsamplings most be explicitly provided for {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA},
      * but is optional for {@link TileLayout#CONSTANT_TILE_SIZE}. In the later case subsamplings
@@ -709,7 +709,7 @@ public class TileBuilder {
     }
 
     /**
-     * The mosaic image writer to be used by {@link TileBuilder#writeFromUntiledImage}.
+     * The mosaic image writer to be used by {@link MosaicBuilder#writeFromUntiledImage}.
      */
     private final class Writer extends MosaicImageWriter {
         /**
@@ -723,8 +723,8 @@ public class TileBuilder {
         private final boolean writeTiles;
 
         /**
-         * The tiles created by {@link TileBuilder#createTileManager}.
-         * Will be set by {@link #filter} and read by {@link TileBuilder}.
+         * The tiles created by {@link MosaicBuilder#createTileManager}.
+         * Will be set by {@link #filter} and read by {@link MosaicBuilder}.
          */
         TileManager tiles;
 

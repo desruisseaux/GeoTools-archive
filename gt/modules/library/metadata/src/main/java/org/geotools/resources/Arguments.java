@@ -16,8 +16,6 @@
  */
 package org.geotools.resources;
 
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,13 +24,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Locale;
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -62,91 +57,56 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class Arguments {
     /**
-     * The preference name for default encoding.
-     */
-    private static final String ENCODING = "console.encoding";
-
-    /**
      * Command-line arguments. Elements are set to
      * {@code null} after they have been processed.
      */
     private final String[] arguments;
 
     /**
-     * Output stream to the console. This output stream will use
-     * encoding specified in the <code>"-encoding" argument, if
-     * present. Otherwise, encoding will be fetch from user's
-     * preference.
+     * Output stream to the console. This output stream may use encoding
+     * specified in the {@code "-encoding"} argument, if presents.
      */
     public final PrintWriter out;
 
     /**
-     * Error stream to the console. This output stream will use
-     * encoding specified in the <code>"-encoding" argument, if
-     * present. Otherwise, encoding will be fetch from user's
-     * preference.
+     * Error stream to the console. This output stream may use encoding
+     * specified in the {@code "-encoding"} argument, if presents.
      */
     public final PrintWriter err;
 
     /**
-     * The locale. Locale will be fetch from the <code>"-locale"</code>
-     * argument, if present. Otherwise, the default locale will be used.
+     * The locale. Locale will be fetch from the {@code "-locale"}
+     * argument, if presents. Otherwise, the default locale will be used.
      */
     public final Locale locale;
 
     /**
-     * Construct a console.
+     * The encoding, or {@code null} for the platform default.
+     */
+    private final String encoding;
+
+    /**
+     * Constructs a set of arguments.
      *
-     * @param args Command line arguments. Arguments "-encoding" and "-locale" will
-     *             be automatically parsed.
+     * @param args Command line arguments. Arguments {@code "-encoding"} and {@code "-locale"}
+     *             will be automatically parsed.
      */
     public Arguments(final String[] args) {
-        this.arguments     = args.clone();
-        this.locale        = getLocale(getOptionalString("-locale"));
-        String encoding    = getOptionalString("-encoding");
-        String destination = getOptionalString("-Xout"); // Non-supported parameter.
-        PrintWriter out    = null;
-        Exception error    = null;
-        try {
-            /*
-             * If a destination file was specified,  open the file using the platform
-             * default encoding or the specified encoding. Do not use encoding stored
-             * in preference since they were usually for console encoding.
-             */
-            if (destination != null) {
-                final Writer fileWriter;
-                if (encoding != null) {
-                    fileWriter = new OutputStreamWriter(new FileOutputStream(destination), encoding);
-                } else {
-                    fileWriter = new FileWriter(destination);
-                }
-                out = new PrintWriter(fileWriter);
-            } else {
-                /*
-                 * If output to screen and no encoding has been specified,
-                 * fetch the encoding from user's preferences.
-                 */
-                final Preferences prefs = Preferences.userNodeForPackage(Arguments.class);
-                boolean prefEnc = false;
-                if (encoding == null) {
-                    encoding = prefs.get(ENCODING, null);
-                    prefEnc  = true;
-                }
-                if (encoding != null) {
-                    out = new PrintWriter(new OutputStreamWriter(System.out, encoding), true);
-                    if (!prefEnc) {
-                        prefs.put(ENCODING, encoding);
-                    }
-                }
-            }
+        this.arguments  = args.clone();
+        this.locale     = getLocale(getOptionalString("-locale"));
+        this.encoding   = getOptionalString("-encoding");
+        PrintWriter out = null;
+        Exception error = null;
+        if (encoding != null) try {
+            out = new PrintWriter(new OutputStreamWriter(System.out, encoding), true);
         } catch (IOException exception) {
             error = exception;
         }
         if (out == null) {
-            out = new PrintWriter(System.out, true);
+            out = getPrintWriter(System.out);
         }
         this.out = out;
-        this.err = new PrintWriter(getWriter(System.err), true);
+        this.err = getPrintWriter(System.err);
         if (error != null) {
             illegalArgument(error);
         }
@@ -382,55 +342,51 @@ public class Arguments {
     }
 
     /**
-     * Gets a reader for the specified input stream. If the user specified an encoding
-     * in some previous run of {@link Arguments}, then this encoding will be used.
+     * Gets a reader for the specified input stream.
      *
      * @param  in The input stream to wrap.
-     * @return A {@link Reader} wrapping the specified input stream with the user's
-     *         prefered encoding.
+     * @return A {@link Reader} wrapping the specified input stream.
      */
     public static Reader getReader(final InputStream in) {
-        final String encoding;
-        encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
-        if (encoding != null) try {
-            return new InputStreamReader(in, encoding);
-        } catch (UnsupportedEncodingException exception) {
-            // Should not occurs, since the character encoding was supported in some previous run...
-            Logging.unexpectedException(Arguments.class, "getReader", exception);
+        if (in == System.in) {
+            final Reader candidate = Java6.consoleReader();
+            if (candidate != null) {
+                return candidate;
+            }
         }
         return new InputStreamReader(in);
     }
 
     /**
-     * Gets a writer for the specified output stream. If the user specified an encoding
-     * in some previous run of {@link Arguments}, then this encoding will be used.
+     * Gets a writer for the specified output stream.
      *
      * @param  out The output stream to wrap.
-     * @return A {@link Writer} wrapping the specified output stream with the user's
-     *         prefered encoding.
+     * @return A {@link Writer} wrapping the specified output stream.
      */
     public static Writer getWriter(final OutputStream out) {
-        final String encoding;
-        encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
-        if (encoding != null) try {
-            return new OutputStreamWriter(out, encoding);
-        } catch (UnsupportedEncodingException exception) {
-            // Should not occurs, since the character encoding was supported in some previous run...
-            Logging.unexpectedException(Arguments.class, "getWriter", exception);
+        if (out == System.out || out == System.err) {
+            final PrintWriter candidate = Java6.consoleWriter();
+            if (candidate != null) {
+                return candidate;
+            }
         }
         return new OutputStreamWriter(out);
     }
 
     /**
-     * Gets a print writer for the specified print stream. If the user specified an encoding
-     * in some previous run of {@link Arguments}, then this encoding will be used.
+     * Gets a print writer for the specified print stream.
      *
      * @param  out The print stream to wrap.
-     * @return A {@link PrintWriter} wrapping the specified print stream with the user's
-     *         prefered encoding.
+     * @return A {@link PrintWriter} wrapping the specified print stream.
      */
     public static PrintWriter getPrintWriter(final PrintStream out) {
-        return new PrintWriter(getWriter(out), true);
+        if (out == System.out || out == System.err) {
+            final PrintWriter candidate = Java6.consoleWriter();
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        return new PrintWriter(out, true);
     }
 
     /**

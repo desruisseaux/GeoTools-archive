@@ -18,15 +18,19 @@ package org.geotools.image.io.mosaic;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import javax.imageio.spi.ImageReaderSpi;
 
 import junit.framework.TestCase;
 
 
 /**
- * Tests {@link TileBuilder}.
+ * Tests {@link MosaicBuilder}.
  *
  * @source $URL$
  * @version $Id$
@@ -36,8 +40,8 @@ public class TileBuilderTest extends TestCase {
     /**
      * Tests with a set of files corresponding to a Blue Marble mosaic.
      */
-    public void testBlueMarble() throws IOException {
-        final TileBuilder builder = new TileBuilder();
+    public void testBlueMarble() throws IOException, ClassNotFoundException {
+        final MosaicBuilder builder = new MosaicBuilder();
 
         assertNull(builder.getTileReaderSpi());
         builder.setTileReaderSpi("png");
@@ -88,5 +92,19 @@ public class TileBuilderTest extends TestCase {
         assertEquals(4733, tileManager.getTiles().size());
         final String asText = tileManager.toString();
         assertFalse(asText.trim().length() == 0);
+
+        // Tests serialization
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final ObjectOutputStream out = new ObjectOutputStream(buffer);
+        out.writeObject(tileManager);
+        out.close();
+
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        final TileManager serialized = (TileManager) in.readObject();
+        in.close();
+
+        assertNotSame(tileManager, serialized);
+        assertEquals(tileManager, serialized);
+        assertEquals(tileManager.getImageReaderSpis(), serialized.getImageReaderSpis());
     }
 }

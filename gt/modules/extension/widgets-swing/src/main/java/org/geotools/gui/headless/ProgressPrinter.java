@@ -17,20 +17,18 @@
  */
 package org.geotools.gui.headless;
 
-// J2SE Input/output
 import java.io.PrintWriter;
 import java.text.BreakIterator;
 import java.text.NumberFormat;
 
-// Geotools dependencies
+import org.opengis.util.InternationalString;
+import org.opengis.util.ProgressListener;
+
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.AbstractInternationalString;
-import org.geotools.util.ProgressListener;
 import org.geotools.util.SimpleInternationalString;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -229,8 +227,8 @@ public class ProgressPrinter implements ProgressListener {
      * {@inheritDoc}
      */
     public synchronized void progress(float percent) {
-        if (percent<0  ) percent=0;
-        if (percent>100) percent=100;
+        if (percent < 0  ) percent = 0;
+        if (percent > 100) percent = 100;
         if (CR_supported) {
             /*
              * Si le périphérique de sortie supporte les retours chariot,
@@ -241,20 +239,20 @@ public class ProgressPrinter implements ProgressListener {
                 if (format == null) {
                     format = NumberFormat.getPercentInstance();
                 }
-                final String text = format.format(percent/100.0);
+                final String text = format.format(percent / 100.0);
                 int length = text.length();
                 percentPosition = 0;
                 if (description != null) {
                     out.print(description);
                     out.print(' ');
-                    length += (percentPosition=description.length())+1;
+                    length += (percentPosition=description.length()) + 1;
                 }
                 out.print('(');
                 out.print(text);
                 out.print(')');
                 length += 2;
                 carriageReturn(length);
-                lastPercent=percent;
+                lastPercent = percent;
             }
         } else {
             /*
@@ -263,14 +261,18 @@ public class ProgressPrinter implements ProgressListener {
              * après la description, comme dans "Lecture des données......"
              */
             completeBar(percent);
-            lastPercent=percent;
+            lastPercent = percent;
             out.flush();
         }
     }
 
+    /**
+     * Returns the current progress as a percent completed.
+     */
     public float getProgress() {
-        return this.lastPercent;
+        return lastPercent;
     }
+
     /**
      * Notifies this listener that the operation has finished. The progress indicator will
      * shows 100% or disaspears. If warning messages were pending, they will be printed now.
@@ -284,7 +286,7 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Release any resource hold by this object.
+     * Releases any resource hold by this object.
      */
     public void dispose() {
     }

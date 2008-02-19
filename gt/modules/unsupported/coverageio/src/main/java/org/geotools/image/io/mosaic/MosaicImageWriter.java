@@ -65,16 +65,10 @@ import org.geotools.util.logging.Logging;
  */
 public class MosaicImageWriter extends ImageWriter {
     /**
-     * Maximum amount of pixels allowed when reading more than one tile at once.
-     */
-    private int maximumPixelCount;
-
-    /**
      * Constructs an image writer with the default provider.
      */
     public MosaicImageWriter() {
         this(null);
-        maximumPixelCount = (int) Math.min(1024*1024*1024, Runtime.getRuntime().maxMemory()) / 16;
     }
 
     /**
@@ -183,7 +177,19 @@ public class MosaicImageWriter extends ImageWriter {
         } else {
             tiles = Collections.emptyList();
         }
+        int maximumPixelCount = 0; // To be computed after a runtime.gc() when first needed.
+        final Runtime runtime = Runtime.getRuntime();
         while (!tiles.isEmpty()) {
+            /*
+             * Before to attempt image loading, ask explicitly for a garbage collection cycle.
+             * In theory we should not do that, but experience suggests that it really prevent
+             * OutOfMemoryError when creating large images. If we still get OutOfMemoryError,
+             * we will try again with smaller value of 'maximumPixelCount'.
+             */
+            runtime.gc();
+            if (maximumPixelCount == 0) {
+                maximumPixelCount = (int) Math.min(1024*1024*1024, runtime.freeMemory()) / 4;
+            }
             /*
              * Loads the image for some initial tile from the list. We will write as many tiles as
              * we can using this single image. The tiles successfully written will be removed from
@@ -197,8 +203,21 @@ public class MosaicImageWriter extends ImageWriter {
             params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
             final Rectangle imageRegion = imageTile.getAbsoluteRegion();
             params.setSourceRegion(imageRegion);
-            System.gc(); // Experience shows that it really prevents OutOfMemoryError at this point.
-            final RenderedImage image = reader.readAsRenderedImage(inputIndex, params);
+            /*
+             * Now process to the image loading...
+             */
+            final RenderedImage image;
+            try {
+                image = reader.readAsRenderedImage(inputIndex, params);
+            } catch (OutOfMemoryError error) {
+                maximumPixelCount >>>= 1;
+                if (maximumPixelCount == 0) {
+                    throw error;
+                }
+                // We reduced the amount of memory allowed to ourself. Try again.
+                logger.log(getLogRecord(VocabularyKeys.ERROR_$1, error));
+                continue;
+            }
             /*
              * Searchs tiles inside the same region with a resolution which is equals or lower by
              * an integer ratio. If such tiles are found we can write them using the image loaded
@@ -260,8 +279,8 @@ public class MosaicImageWriter extends ImageWriter {
     /**
      * Returns a log message for the given tile.
      */
-    private static LogRecord getLogRecord(final int key, final Tile tile) {
-        final LogRecord record = Vocabulary.getResources(null).getLogRecord(Level.FINE, key, tile);
+    private static LogRecord getLogRecord(final int key, final Object arg) {
+        final LogRecord record = Vocabulary.getResources(null).getLogRecord(Level.FINE, key, arg);
         record.setSourceClassName(MosaicImageWriter.class.getName());
         record.setSourceMethodName("writeFromInput");
         return record;

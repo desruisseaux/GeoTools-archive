@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2004, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
@@ -25,12 +24,10 @@ import java.io.Writer;
 import java.text.Format;
 import java.text.ParseException;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Classes;
@@ -87,7 +84,7 @@ public abstract class AbstractConsole implements Runnable {
      * Set to {@code true} if {@link #stop()} was invoked.
      */
     private transient volatile boolean stop;
-    
+
     /**
      * Creates a new console instance using {@linkplain System#in standard input stream},
      * {@linkplain System#out standard output stream}, {@linkplain System#err error output stream}
@@ -98,7 +95,7 @@ public abstract class AbstractConsole implements Runnable {
     public AbstractConsole(final Format parser) {
         this(parser, new LineNumberReader(Arguments.getReader(System.in)));
     }
-    
+
     /**
      * Creates a new console instance using the specified input stream.
      *
@@ -112,7 +109,7 @@ public abstract class AbstractConsole implements Runnable {
          new PrintWriter(Arguments.getWriter(System.err), true),
                     System.getProperty("line.separator", "\n"));
     }
-    
+
     /**
      * Creates a new console instance using the specified streams and line separator.
      *
