@@ -695,10 +695,6 @@ public final class GridCoverageRenderer {
 			LOGGER.fine(new StringBuffer("Raster Symbolizer ").toString());
 		final RasterSymbolizerSupport rsp = new RasterSymbolizerSupport(
 				symbolizer);
-		final float alpha = rsp.getOpacity();
-		final Composite oldAlphaComposite = graphics.getComposite();
-		graphics.setComposite(AlphaComposite.getInstance(
-				AlphaComposite.SRC_OVER, alpha));
 		final GridCoverage2D recoloredGridCoverage = (GridCoverage2D) rsp
 				.recolorCoverage(preSymbolizer);
 		final RenderedImage finalImage = recoloredGridCoverage
@@ -745,8 +741,16 @@ public final class GridCoverageRenderer {
 					clonedFinalWorldToGrid.toString()).toString());
 
 		// it should be a simple translation TODO check
-		RenderingHints oldHints = graphics.getRenderingHints();
+		final RenderingHints oldHints = graphics.getRenderingHints();
 		graphics.setRenderingHints(this.hints);
+		
+		// //
+		// Opacity
+		// //
+		final float alpha = rsp.getOpacity();
+		final Composite oldAlphaComposite = graphics.getComposite();
+		graphics.setComposite(AlphaComposite.getInstance(
+				AlphaComposite.SRC_OVER, alpha));
 		try {
 			// //
 			// Drawing the Image
@@ -805,19 +809,11 @@ public final class GridCoverageRenderer {
 			}
 		}
 		
-		// //
-		// Opacity
-		// //
-        double opacity = SLD.opacity( symbolizer );        
-        
-		graphics.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_IN ) );
-		Color c = new Color(0.0f, 0.0f, 0.0f, (float) opacity);
-		graphics.setColor(c);
-		graphics.fillRect(0, 0, this.destinationSize.width, this.destinationSize.height);
+
 		
 		// ///////////////////////////////////////////////////////////////////
 		//
-		// Restore old composite
+		// Restore old elements
 		//
 		// ///////////////////////////////////////////////////////////////////
 		graphics.setComposite(oldAlphaComposite);
