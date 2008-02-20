@@ -256,7 +256,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         RenderingStrategy oldStrategy = renderingStrategy;
 
         //removing old strategy
-        GTRenderer ren = renderingStrategy.getRenderer();
         MapContext context = renderingStrategy.getContext();
         mapDecorationPane.remove(renderingStrategy.getComponent());        
         renderingStrategy.removeStrategyListener(strategylisten);
@@ -264,7 +263,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         //adding new strategy
         renderingStrategy = strategy;
         renderingStrategy.addStrategyListener(strategylisten);
-        renderingStrategy.setRenderer(ren);
         renderingStrategy.setContext(context);
         
         

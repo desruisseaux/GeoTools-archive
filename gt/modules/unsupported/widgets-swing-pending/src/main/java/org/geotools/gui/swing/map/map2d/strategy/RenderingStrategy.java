@@ -34,18 +34,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public interface RenderingStrategy {
     
     /**
-     * set the GTRenderer used
-     * @param renderer : GTRenderer to use, can not be null
-     */
-    public void setRenderer(GTRenderer renderer);
-    
-    /**
-     * get the GTRenderer used
-     * @return GTRenderer
-     */
-    public GTRenderer getRenderer();
-    
-    /**
      * create a BufferedImage of the layer, using the mapcontext CRS and MapArea
      * @param layer : Maplayer to make the BufferedImage
      * @return BufferedImage
@@ -117,18 +105,6 @@ public interface RenderingStrategy {
      * @return array of StrategyListener
      */
     public StrategyListener[] getStrategyListeners();
-    
-    /**
-     * set map rotation
-     * @param d
-     */
-    public void setRotation(double d);
-    
-    /**
-     * get map rotation
-     * @return double
-     */
-    public double getRotation();
     
     /**
      * to enable automatic refreshing of the map, if not you must call

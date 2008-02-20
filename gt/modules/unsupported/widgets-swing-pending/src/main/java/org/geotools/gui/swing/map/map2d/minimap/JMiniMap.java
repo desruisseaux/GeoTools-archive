@@ -30,6 +30,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -71,7 +72,7 @@ public class JMiniMap extends JComponent {
     private Map2D relatedMap = null;
     private MiniMapDecoration deco = new MiniMapDecoration();
     private MapContext activeContext = null;
-    private WeakHashMap<MapContext, List<MapLayer>> contexts = new WeakHashMap<MapContext, List<MapLayer>>();
+    private WeakHashMap<MapContext, WeakHashMap<MapLayer,Boolean>> contexts = new WeakHashMap<MapContext, WeakHashMap<MapLayer,Boolean>>();
     private final StrategyListener strategyListen = new StrategyListener() {
 
         public void setRendering(boolean rendering) {
@@ -116,18 +117,42 @@ public class JMiniMap extends JComponent {
 
 
         if (contexts.containsKey(context)) {
-            ctx.addLayers(contexts.get(context).toArray(EMPTY_LAYER_ARRAY));
+            WeakHashMap<MapLayer,Boolean> newmap = new WeakHashMap<MapLayer,Boolean>();
+            WeakHashMap<MapLayer,Boolean> map = contexts.get(context);            
+            Set<MapLayer> set = map.keySet();    
+            
+            MapLayer[] layers = context.getLayers();
+            for(MapLayer layer : set){
+                boolean exists = false;
+                for(MapLayer l : layers){
+                    if(layer == l){
+                        exists = true;
+                    }
+                }
+                
+                if(exists){
+                    newmap.put(layer,true);
+                }
+            }
+            
+            contexts.put(context, newmap);
+            
+            ctx.addLayers(newmap.keySet().toArray(EMPTY_LAYER_ARRAY));
         } else {
-            List<MapLayer> lst = new ArrayList<MapLayer>();
+            WeakHashMap<MapLayer,Boolean> map = new WeakHashMap<MapLayer,Boolean>();
+            Set<MapLayer> set = map.keySet();            
+            set.toArray(EMPTY_LAYER_ARRAY);
+            
+            
             MapLayer[] layers = context.getLayers();
 
             for (MapLayer layer : layers) {
-                lst.add(layer);
+                map.put(layer,true);
             }
 
-            contexts.put(context, lst);
+            contexts.put(context, map);
 
-            ctx.addLayers(context.getLayers());
+            ctx.addLayers(set.toArray(EMPTY_LAYER_ARRAY));
         }
 
 
@@ -178,18 +203,18 @@ public class JMiniMap extends JComponent {
                 if (activeContext != null) {
 
                     MapLayer[] layers = activeContext.getLayers();
-                    List<MapLayer> checkedLayers = contexts.get(activeContext);
+                    WeakHashMap<MapLayer,Boolean> checkedLayers = contexts.get(activeContext);
 
                     for (final MapLayer layer : layers) {
 
                         JCheckBoxMenuItem m = new JCheckBoxMenuItem(layer.getTitle());
-                        m.setSelected(checkedLayers.contains(layer));
+                        m.setSelected(checkedLayers.containsKey(layer));
 
                         m.addActionListener(new ActionListener() {
 
                             public void actionPerformed(ActionEvent e) {
                                 if (((JCheckBoxMenuItem) e.getSource()).isSelected()) {
-                                    contexts.get(activeContext).add(layer);
+                                    contexts.get(activeContext).put(layer,true);
                                 } else {
                                     contexts.get(activeContext).remove(layer);
                                 }
@@ -242,14 +267,14 @@ public class JMiniMap extends JComponent {
 
             addMouseListener(this);
             
-            JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2,2));
             panel.setOpaque(false);
 
             JButton but = new JButton(zoomAllAction);
             but.setContentAreaFilled(false);
             but.setOpaque(false);
             but.setBorder(null);
-            but.setMargin(new Insets(0, 0, 0, 0));
+            but.setMargin(new Insets(2,2,2,2));
             but.setBorderPainted(false);
             but.setIcon(ICON_ZOOM_ALL);
 
@@ -259,7 +284,7 @@ public class JMiniMap extends JComponent {
             but.setContentAreaFilled(false);
             but.setOpaque(false);
             but.setBorder(null);
-            but.setMargin(new Insets(0, 0, 0, 0));
+            but.setMargin(new Insets(2,2,2,2));
             but.setBorderPainted(false);
             but.setIcon(ICON_REFRESH);
 
@@ -269,7 +294,7 @@ public class JMiniMap extends JComponent {
             but.setContentAreaFilled(false);
             but.setOpaque(false);
             but.setBorder(null);
-            but.setMargin(new Insets(0, 0, 0, 0));
+            but.setMargin(new Insets(2,2,2,2));
             but.setBorderPainted(false);
             but.setIcon(ICON_LAYER_VISIBLE);
 
