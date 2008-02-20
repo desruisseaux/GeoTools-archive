@@ -234,6 +234,10 @@ public abstract class CompareFilterImpl extends BinaryComparisonAbstract
      * @return String representation of the compare filter.
      */
     public String toString() {
+        if (filterType == NULL) {
+        	return "[ " + expression1 + " IS NULL ]";
+        }
+        
         String operator = null;
 
         if (filterType == COMPARE_EQUALS) {
@@ -259,6 +263,7 @@ public abstract class CompareFilterImpl extends BinaryComparisonAbstract
         if (filterType == COMPARE_NOT_EQUALS) {
             operator = " != ";
         }
+        
         return "[ " + expression1 + operator + expression2 + " ]";
     }
 
