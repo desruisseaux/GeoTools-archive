@@ -102,14 +102,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     private static void determineJsdeVersion() {
         try {
-            // you need to uncomment line 2 and comment line 1 to make the
-            // tests run in Eclipse with the ArcSDE jarfiles on the classpath.
-            // 1)
-            // int i = com.esri.sde.sdk.GeoToolsDummyAPI.DUMMY_API_VERSION;
-
-            // 2)
-            if (1 == 1)
-                throw new Exception();
+        	//this class only exists in the dummy api...
+            Class.forName("com.esri.sde.sdk.GeoToolsDummyAPI");
             JSDE_CLIENT_VERSION = JSDE_VERSION_DUMMY;
         } catch (Throwable t) {
             // good, we're not using the Dummy API placeholder.
