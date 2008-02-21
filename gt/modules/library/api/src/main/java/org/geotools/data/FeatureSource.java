@@ -16,17 +16,19 @@
 package org.geotools.data;
 
 import java.awt.RenderingHints;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.Set;
-import com.vividsolutions.jts.geom.Envelope;
 
+import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 
 
 /**
@@ -67,6 +69,42 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
  */
 public interface FeatureSource<T extends FeatureType, F extends Feature>{
     
+    /**
+     * Returns the qualified name for the Features this FeatureSource serves.
+     * <p>
+     * Note this is different from {@code getSchema().getType().getName()} (that
+     * is, the feature type name), this name specifies the
+     * {@link PropertyDescriptor#getName() AttributeDescriptor name} for the
+     * Features served by this source. So,
+     * {@code FeatureSoruce.getName() ==  FeatureSource.getFeatures().next().getAttributeDescriptor().getName()}.
+     * </p>
+     * <p>
+     * Though it's a common practice when dealing with {@link SimpleFeatureType}
+     * and {@link SimpleFeature} to assume they're equal. There's no conflict
+     * (as per the dynamic typing system the {@code org.opengis.feature} package
+     * defines) in a Feature and its type sharing the same name, as well as in a
+     * GML schema an element declaration and a type definition may be named the
+     * same. Yet, the distinction becomes important as we get rid of that
+     * assumption and thus allow to reuse a type definition for different
+     * FeatureSoruces, decoupling the descriptor (homologous to the Feature
+     * element declaration in a GML schema) from its type definition.
+     * </p>
+     * <p>
+     * So, even if implementors are allowed to delegate to
+     * {@code getSchema().getName()} if they want to call the fatures and their
+     * type the same, client code asking a
+     * {@link DataAccess#getFeatureSource(Name)} shall use this name to request
+     * for a FeatureSource, rather than the type name, as used in pre 2.5
+     * versions of GeoTools. For example, if we have a FeatureSource named
+     * {@code Roads} and its type is named {@code Roads_Type}, the
+     * {@code DataAccess} shall be queried through {@code Roads}, not
+     * {@code Roads_Type}.
+     * </p>
+     * 
+     * @since 2.5
+     * @return the name of the AttributeDescriptor for the Features served by
+     *         this FeatureSource
+     */
     Name getName();
     
     /**
