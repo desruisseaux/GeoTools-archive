@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/test/java/org/geotools/feature/MockFeatureCollection.java $
  */
-public class MockFeatureCollection implements org.geotools.feature.FeatureCollection {
+public class MockFeatureCollection implements org.geotools.feature.FeatureCollection<SimpleFeatureType, SimpleFeature> {
 
     /** Creates a new instance of MockFeatureCollection */
     public MockFeatureCollection() {
@@ -60,7 +60,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
             throws NullPointerException {
     }
 
-    public void close(FeatureIterator close) {
+    public void close(FeatureIterator<SimpleFeature> close) {
     }
 
     public void close(Iterator close) {
@@ -93,7 +93,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public void purge() {
     }
 
-    public boolean add(Object o) {
+    public boolean add(SimpleFeature o) {
         return false;
     }
 

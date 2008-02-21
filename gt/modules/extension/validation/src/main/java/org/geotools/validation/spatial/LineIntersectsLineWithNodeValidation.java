@@ -81,12 +81,12 @@ public class LineIntersectsLineWithNodeValidation
         ValidationResults results) throws Exception {
     	boolean r = true;
     	
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getLineTypeRef());
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
         FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsRLine = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsRLine = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedLineTypeRef());
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcRLine = fsRLine.getFeatures();
                 

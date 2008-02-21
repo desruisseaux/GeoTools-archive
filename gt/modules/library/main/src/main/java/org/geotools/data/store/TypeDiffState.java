@@ -228,7 +228,7 @@ public class TypeDiffState implements State {
      */
     public synchronized  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
     	
-        return new DiffFeatureReader( entry.reader( Query.ALL, transaction ), diffMap );
+        return new DiffFeatureReader<SimpleFeatureType, SimpleFeature>( entry.reader( Query.ALL, transaction ), diffMap );
     }
 
     /**

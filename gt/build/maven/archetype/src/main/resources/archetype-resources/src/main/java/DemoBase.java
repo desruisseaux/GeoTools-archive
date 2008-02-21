@@ -271,7 +271,7 @@ public class DemoBase {
         
         /* Add the London FeatureCollection<SimpleFeatureType, SimpleFeature> as one layer in the map. */
         FeatureCollection<SimpleFeatureType, SimpleFeature> lfc = 
-                   (FeatureCollection) demoData.theFeatureCollectionList.get(0);
+                   (FeatureCollection<SimpleFeatureType, SimpleFeature>) demoData.theFeatureCollectionList.get(0);
         Style lsty = (Style) demoData.theStyleMap.get("londstyl");
         MapLayer m0 = new DefaultMapLayer(lfc,lsty);
         demoGUI.context.addLayer(m0);
@@ -554,7 +554,7 @@ public class DemoBase {
         
         FeatureSource<SimpleFeatureType, SimpleFeature> shpFS = null;
         try{
-            shpFS = (FeatureSource) resource.resolve( FeatureSource.class, null );
+            shpFS = (FeatureSource<SimpleFeatureType, SimpleFeature>) resource.resolve( FeatureSource.class, null );
         } catch (IOException ioex){
             System.err.println("IOException on resoloving shape resource to FeatureSource: " + ioex.getMessage() );
         }
@@ -601,10 +601,10 @@ public class DemoBase {
 //        }
 //        GeoResource resource = (GeoResource) resourceList.get( 0 );
 //
-////        return (FeatureSource) resource.resolve( FeatureSource.class, null );
+////        return (FeatureSource<SimpleFeatureType, SimpleFeature>) resource.resolve( FeatureSource.class, null );
 //        FeatureCollection<SimpleFeatureType, SimpleFeature> shpFC = null;
 //        try {
-//            shpFC = (FeatureCollection) resource.resolve( FeatureCollection.class, null );
+//            shpFC = (FeatureCollection<SimpleFeatureType, SimpleFeature>) resource.resolve( FeatureCollection.class, null );
 //        } catch (IOException ioex){
 //            System.err.println("An IOException occurred on resolving the resource: " + ioex.getMessage() );
 //        }
@@ -643,13 +643,13 @@ public class DemoBase {
             GeoResource resource = (GeoResource) r.next();
             if ( resource.canResolve( FeatureSource.class ) ) {
                 FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = 
-                    (FeatureSource) resource.resolve( FeatureSource.class, null );
+                    (FeatureSource<SimpleFeatureType, SimpleFeature>) resource.resolve( FeatureSource.class, null );
                 featureSources.add( FeatureSource<SimpleFeatureType, SimpleFeature> );
             }
         }
         
 //         Iterator r = featureSources.iterator();
-//         ((FeatureSource) r.next()).
+//         ((FeatureSource<SimpleFeatureType, SimpleFeature>) r.next()).
         return featureSources;
     }
 

@@ -453,14 +453,14 @@ public class MIFDataStoreTest extends TestCase {
         }
 
         try {
-            ((FeatureStore) fs).modifyFeatures(featureType.getAttribute(
+            ((FeatureStore<SimpleFeatureType, SimpleFeature>) fs).modifyFeatures(featureType.getAttribute(
                     "DESCRIPTION"), "FOO", Filter.INCLUDE);
         } catch (Exception e) {
             fail("Cannot update Features: " + e.getMessage());
         }
 
         try {
-            ((FeatureStore) fs).removeFeatures(MIFTestUtils.parseFilter(
+            ((FeatureStore<SimpleFeatureType, SimpleFeature>) fs).removeFeatures(MIFTestUtils.parseFilter(
                     "GEOMTYPE != 'NULL'"));
         } catch (IOException e) {
             fail("Cannot delete Features: " + e.getMessage());

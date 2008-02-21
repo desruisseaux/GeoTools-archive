@@ -368,7 +368,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                 "pool.maxConnections"));
         String[] typeNames = { testData.getTemp_table() };
 
-        FeatureReader[] readers = new FeatureReader[NUM_READERS];
+        FeatureReader<SimpleFeatureType, SimpleFeature>[] readers = new FeatureReader[NUM_READERS];
         int[] counts = new int[NUM_READERS];
 
         for (int i = 0; i < NUM_READERS;) {
@@ -850,7 +850,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private void testGetFeatureSource(FeatureSource fsource) throws IOException {
+    private void testGetFeatureSource(FeatureSource<SimpleFeatureType, SimpleFeature> fsource) throws IOException {
         assertNotNull(fsource);
         assertNotNull(fsource.getDataStore());
         assertEquals(fsource.getDataStore(), store);

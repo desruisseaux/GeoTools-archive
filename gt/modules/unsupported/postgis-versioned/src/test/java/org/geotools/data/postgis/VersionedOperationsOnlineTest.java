@@ -577,7 +577,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // setup a transaction
         Transaction t = createTransaction("gimbo", "double update");
-        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("tree");
         SimpleFeatureType treeSchema = ds.getSchema("tree");
         store.setTransaction(t);
         assertEquals(1, store.getFeatures(filter).size());
@@ -614,7 +614,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // setup a transaction
         Transaction t = createTransaction("gimbo", "double update");
-        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("tree");
         store.setTransaction(t);
         Set ids = store.addFeatures(DataUtilities.collection(tree));
         Filter filter = ff.id(Collections.singleton(ff.featureId((String) ids.iterator().next())));
@@ -645,7 +645,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // setup a transaction
         Transaction t = createTransaction("gimbo", "double update");
         SimpleFeatureType treeSchema = ds.getSchema("tree");
-        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("tree");
         store.setTransaction(t);
         Set ids = store.addFeatures(DataUtilities.collection(tree));
         Filter filter = ff.id(Collections.singleton(ff.featureId((String) ids.iterator().next())));
@@ -945,7 +945,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // try to get a feature store for an unversioned type, it should be a
         // plain feature store
         // not the versioned one
-        FeatureStore fs = (FeatureStore) ds.getFeatureSource("river");
+        FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("river");
         assertFalse(fs instanceof VersionedPostgisFeatureStore);
     }
 

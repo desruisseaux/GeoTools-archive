@@ -81,7 +81,7 @@ public class MemoryDataStore extends AbstractDataStore {
         super(true);
     }
 
-    public MemoryDataStore(FeatureCollection collection) {
+    public MemoryDataStore(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         addFeatures(collection);
     }
 
@@ -92,7 +92,7 @@ public class MemoryDataStore extends AbstractDataStore {
     public MemoryDataStore(FeatureReader <SimpleFeatureType, SimpleFeature> reader) throws IOException {
         addFeatures(reader);
     }
-    public MemoryDataStore(FeatureIterator reader) throws IOException {
+    public MemoryDataStore(FeatureIterator<SimpleFeature> reader) throws IOException {
         addFeatures(reader);
     }
 

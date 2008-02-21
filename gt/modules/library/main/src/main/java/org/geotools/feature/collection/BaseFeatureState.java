@@ -117,7 +117,7 @@ public class BaseFeatureState extends FeatureState {
     protected void fireChange(SimpleFeature[] features, int type) {
     	bounds = null; // must recalculate bounds
 
-        CollectionEvent cEvent = new CollectionEvent( (FeatureCollection) data, features, type);
+        CollectionEvent cEvent = new CollectionEvent( (FeatureCollection<SimpleFeatureType, SimpleFeature>) data, features, type);
         
         for (int i = 0, ii = listeners.size(); i < ii; i++) {
             ((CollectionListener) listeners.get(i)).collectionChanged(cEvent);

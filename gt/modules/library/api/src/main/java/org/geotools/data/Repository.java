@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 
 /**
  * Provides a Repository of available FeatureTypes allowing Catalog metadata queries.
@@ -93,7 +96,7 @@ public interface Repository {
      * @param dataStoreId
      * @param typeName
      */
-    FeatureSource source(String dataStoreId, String typeName)
+    FeatureSource<SimpleFeatureType, SimpleFeature> source(String dataStoreId, String typeName)
         throws IOException;
 
     /**

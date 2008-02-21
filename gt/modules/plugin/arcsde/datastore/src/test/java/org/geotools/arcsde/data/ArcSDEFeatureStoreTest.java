@@ -396,7 +396,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 .createTestFeatures(LineString.class, featureCount);
 
         final DataStore ds = testData.getDataStore();
-        final FeatureStore fStore = (FeatureStore) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> fStore;
+        fStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
         final Transaction transaction = new DefaultTransaction("testInsertTransactionAndQueryByFid");
         fStore.setTransaction(transaction);
         try {
@@ -536,8 +537,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         final String typeName = testData.getTemp_table();
         final DataStore ds = testData.getDataStore();
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore) ds
-                .getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
         final SimpleFeatureType schema = store.getSchema();
         final Filter oldValueFilter = CQL.toFilter("INT32_COL = 3");
         final Filter newValueFilter = CQL.toFilter("INT32_COL = -1000");
@@ -629,7 +630,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final ArcSDEDataStore dataStore = testData.getDataStore();
         // String[] typeNames = dataStore.getTypeNames();
         // System.err.println(typeNames);
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore) dataStore
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
                 .getFeatureSource(typeName);
         final SimpleFeatureType schema = store.getSchema();
         GeometryDescriptor defaultGeometry = schema.getDefaultGeometry();
@@ -987,7 +989,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTemp_table();
-        final FeatureStore<SimpleFeatureType, SimpleFeature> transFs = (FeatureStore) ds
+        final FeatureStore<SimpleFeatureType, SimpleFeature> transFs = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds
                 .getFeatureSource(typeName);
         final SimpleFeatureType schema = transFs.getSchema();
 
@@ -1108,7 +1110,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTemp_table();
 
-        final FeatureStore store = (FeatureStore) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
 
         final int initialCount = store.getCount(Query.ALL);
         assertTrue(initialCount > 0);
@@ -1128,7 +1130,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final String typeName = testData.getTemp_table();
 
         final Transaction transaction = new DefaultTransaction("testSetFeaturesTransaction handle");
-        final FeatureStore store = (FeatureStore) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
         store.setTransaction(transaction);
 
         final int initialCount = store.getCount(Query.ALL);
@@ -1175,7 +1177,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 .createTestFeatures(LineString.class, featureCount);
 
         final DataStore ds = testData.getDataStore();
-        final FeatureStore fStore = (FeatureStore) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> fStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
         final Transaction transaction = new DefaultTransaction("testTransactionMultithreadAccess");
         fStore.setTransaction(transaction);
 
@@ -1304,7 +1306,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             conn.close();
         }
 
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore) dataStore
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
                 .getFeatureSource("SDE.EDIT");
         final SimpleFeatureType schema = store.getSchema();
 

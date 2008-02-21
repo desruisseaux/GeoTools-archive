@@ -38,7 +38,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     private final Query query;
 
-    private final Set<FeatureReaderIterator> openIterators;
+    private final Set<FeatureReaderIterator<SimpleFeature>> openIterators;
 
     private ArcSDEPooledConnection connection;
 
@@ -48,8 +48,8 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
         this.featureSource = featureSource;
         this.query = namedQuery;
 
-        final Set<FeatureReaderIterator> iterators;
-        iterators = new HashSet<FeatureReaderIterator>();
+        final Set<FeatureReaderIterator<SimpleFeature>> iterators;
+        iterators = new HashSet<FeatureReaderIterator<SimpleFeature>>();
         this.openIterators = Collections.synchronizedSet(iterators);
     }
 
@@ -104,7 +104,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     @Override
     protected final void closeIterator(Iterator close) throws IOException {
-        FeatureReaderIterator iterator = (FeatureReaderIterator) close;
+        FeatureReaderIterator<SimpleFeature> iterator = (FeatureReaderIterator<SimpleFeature>) close;
         iterator.close(); // only needs package visability
     }
 
@@ -124,7 +124,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
             this.childrenSchema = reader.getFeatureType();
         }
 
-        final FeatureReaderIterator iterator = new FeatureReaderIterator(reader) {
+        final FeatureReaderIterator<SimpleFeature> iterator = new FeatureReaderIterator<SimpleFeature>(reader) {
             @Override
             public void close() {
                 super.close();

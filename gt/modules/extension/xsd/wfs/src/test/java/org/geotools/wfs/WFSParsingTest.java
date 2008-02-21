@@ -256,7 +256,7 @@ public class WFSParsingTest extends TestCase {
         List featureCollections = fc.getFeature();
         assertEquals(1, featureCollections.size());
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) featureCollections.get(0);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) featureCollections.get(0);
         assertEquals(5, featureCollection.size());
 
         FeatureIterator<SimpleFeature> features = featureCollection.features();

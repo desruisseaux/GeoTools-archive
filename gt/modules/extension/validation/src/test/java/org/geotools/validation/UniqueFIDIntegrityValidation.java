@@ -187,7 +187,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 		
 		while (it.hasNext())// for each layer
 		{
-			FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource) it.next();
+			FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) it.next();
 			FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
 			try {
 				 

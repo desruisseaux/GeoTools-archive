@@ -18,6 +18,8 @@ package org.geotools.data.store;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.opengis.feature.simple.SimpleFeature;
+
 /**
  * This iterator is used to indicate that contents could not be aquired.
  * <p>
@@ -35,7 +37,7 @@ import java.util.NoSuchElementException;
  * @since 2.1.RC0
  * @source $URL$
  */
-public class NoContentIterator implements Iterator {
+public class NoContentIterator implements Iterator<SimpleFeature> {
     Throwable origionalProblem;
     public NoContentIterator( Throwable t ){
         origionalProblem = t;
@@ -43,7 +45,7 @@ public class NoContentIterator implements Iterator {
     public boolean hasNext() {
         return origionalProblem != null;
     }
-    public Object next() {
+    public SimpleFeature next() {
         if( origionalProblem == null ){
             // you only get the real error on the first offense
             // (after that you are just silly)

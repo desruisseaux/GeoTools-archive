@@ -72,8 +72,8 @@ public class LinesNotOverlapValidation extends LineLineAbstractValidation {
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource1 = (FeatureSource) layers.get(getLineTypeRef());
-        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource2 = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource1 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource2 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedLineTypeRef());
 
         Object[] lines1 = lineSource1.getFeatures().toArray();
         Object[] lines2 = lineSource2.getFeatures().toArray();

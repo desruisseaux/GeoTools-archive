@@ -85,7 +85,7 @@ public interface MapContext {
 	 * @param collection
 	 *            a FeatureCollection<SimpleFeatureType, SimpleFeature> with the new layer that will be added.
 	 */
-	void addLayer(FeatureCollection collection, Style style);
+	void addLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style);
 
     /**
      * Add a new layer and trigger a {@link LayerListEvent}.

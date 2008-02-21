@@ -356,13 +356,13 @@ public class PropertyDataStoreTest extends TestCase {
         SimpleFeature chrisFeature =
             SimpleFeatureBuilder.build(ROAD, new Object[]{ new Integer(5), "chris"}, "fid5" );
         
-        FeatureStore roadAuto = (FeatureStore) store.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> roadAuto = (FeatureStore<SimpleFeatureType, SimpleFeature>) store.getFeatureSource("road");
         
-        FeatureStore roadFromClient1 = (FeatureStore) store.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> roadFromClient1 = (FeatureStore<SimpleFeatureType, SimpleFeature>) store.getFeatureSource("road");
         Transaction transaction1 = new DefaultTransaction("Transaction Used by Client 1");
         roadFromClient1.setTransaction( transaction1 );
         
-        FeatureStore roadFromClient2 = (FeatureStore) store.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> roadFromClient2 = (FeatureStore<SimpleFeatureType, SimpleFeature>) store.getFeatureSource("road");
         Transaction transaction2 = new DefaultTransaction("Transaction Used by Client 2");
         roadFromClient2.setTransaction( transaction2 );
 

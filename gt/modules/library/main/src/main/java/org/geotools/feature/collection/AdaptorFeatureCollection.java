@@ -46,7 +46,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
     // FeatureCollection<SimpleFeatureType, SimpleFeature> - Feature Access
     // 
     public FeatureIterator<SimpleFeature> features() {
-        FeatureIterator<SimpleFeature> iter = new DelegateFeatureIterator( this, openIterator() );
+        FeatureIterator<SimpleFeature> iter = new DelegateFeatureIterator<SimpleFeature>( this, openIterator() );
         open.add( iter );
         return iter; 
     }
@@ -55,7 +55,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
         open.remove( close );
     }
     public void closeIterator( FeatureIterator<SimpleFeature> close ) {
-        DelegateFeatureIterator iter = (DelegateFeatureIterator) close;
+        DelegateFeatureIterator<SimpleFeature> iter = (DelegateFeatureIterator<SimpleFeature>) close;
         closeIterator( iter.delegate );
         iter.close(); 
     }
@@ -534,7 +534,7 @@ public abstract class AdaptorFeatureCollection extends BaseFeatureCollection imp
                 }
             }
             else if ( resource instanceof FeatureIterator ){
-                FeatureIterator<SimpleFeature> resourceIterator = (FeatureIterator) resource;
+                FeatureIterator<SimpleFeature> resourceIterator = (FeatureIterator<SimpleFeature>) resource;
                 try {
                     closeIterator( resourceIterator );
                 }

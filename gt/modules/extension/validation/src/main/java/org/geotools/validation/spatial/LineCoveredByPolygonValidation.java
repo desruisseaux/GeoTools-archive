@@ -97,12 +97,12 @@ public class LineCoveredByPolygonValidation
 
     	boolean r = true;
     	
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getLineTypeRef());
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
         FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedPolygonTypeRef());
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcPoly = fsPoly.getFeatures();
                 

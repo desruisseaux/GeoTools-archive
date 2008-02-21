@@ -73,7 +73,7 @@ public class WithinIntegrity extends RelationIntegrity {
 		LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
 		String typeRef1 = getGeomTypeRefA();
 		LOGGER.finer( typeRef1 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );    	
-		FeatureSource<SimpleFeatureType, SimpleFeature> geomSource1 = (FeatureSource) layers.get( typeRef1 );
+		FeatureSource<SimpleFeatureType, SimpleFeature> geomSource1 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get( typeRef1 );
 		LOGGER.finer( typeRef1 +": found "+ geomSource1.getSchema().getTypeName() );
 		
 		String typeRef2 = getGeomTypeRefB();
@@ -82,7 +82,7 @@ public class WithinIntegrity extends RelationIntegrity {
 		else
 		{
 			LOGGER.finer( typeRef2 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );        
-			FeatureSource<SimpleFeatureType, SimpleFeature> geomSource2 = (FeatureSource) layers.get( typeRef2 );
+			FeatureSource<SimpleFeatureType, SimpleFeature> geomSource2 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get( typeRef2 );
 			LOGGER.finer( typeRef2 +": found "+ geomSource2.getSchema().getTypeName() );
 			return validateMultipleLayers(geomSource1, geomSource2, isExpected(), results, envelope);
 		}	

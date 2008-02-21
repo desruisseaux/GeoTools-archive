@@ -353,13 +353,13 @@ abstract class AbstractEditionHandler implements EditionHandler {
                     try {
                         //GR question: why not just editionLayer.getFeatureSource()?
                         FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore)editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
-                        store = (FeatureStore) source;
+                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
                     } catch (IOException e) {
-                        store = (FeatureStore) editionLayer.getFeatureSource();
+                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
                     }
 
                     store.getDataStore().dispose();
-//                    store = (FeatureStore) editionLayer.getFeatureSource();
+//                    store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
                     
                     DefaultTransaction transaction = new DefaultTransaction("trans_maj");
 
@@ -424,7 +424,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
 
             //commit
-            FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore) memoryLayer.getFeatureSource();
+            FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) memoryLayer.getFeatureSource();
             try {
                 store.addFeatures(collection);
             } catch (Exception eek) {
@@ -462,7 +462,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
                 }
 
                 //commit 
-                store = (FeatureStore) edgesLayer.getFeatureSource();
+                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) edgesLayer.getFeatureSource();
                 try {
                     store.addFeatures(collection);
                 } catch (Exception eek) {
@@ -478,9 +478,9 @@ abstract class AbstractEditionHandler implements EditionHandler {
     protected synchronized void clearMemoryLayer() {
 
         try {
-            FeatureStore fst = (FeatureStore) memoryLayer.getFeatureSource();
+            FeatureStore<SimpleFeatureType, SimpleFeature> fst = (FeatureStore<SimpleFeatureType, SimpleFeature>) memoryLayer.getFeatureSource();
             fst.removeFeatures(Filter.INCLUDE);
-            fst = (FeatureStore) edgesLayer.getFeatureSource();
+            fst = (FeatureStore<SimpleFeatureType, SimpleFeature>) edgesLayer.getFeatureSource();
             fst.removeFeatures(Filter.INCLUDE);
         } catch (Exception e) {
             e.printStackTrace();

@@ -37,11 +37,11 @@ import org.opengis.feature.type.FeatureType;
  * @since 2.1.RC0
  * @source $URL$
  */
-final class FeatureReaderIterator<T extends FeatureType, F extends Feature> implements Iterator<F> {
+final class FeatureReaderIterator<F extends Feature> implements Iterator<F> {
     
-    FeatureReader<T, F> reader;
+    FeatureReader<? extends FeatureType, F> reader;
      
-    public FeatureReaderIterator( FeatureReader<T, F> reader ){
+    public FeatureReaderIterator( FeatureReader<? extends FeatureType, F> reader ){
         this.reader = reader;
     }
     public boolean hasNext() {

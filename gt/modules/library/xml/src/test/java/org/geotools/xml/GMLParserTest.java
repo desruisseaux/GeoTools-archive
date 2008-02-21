@@ -74,7 +74,7 @@ public class GMLParserTest extends TestCase {
             Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
             
-            FeatureCollection<SimpleFeatureType, SimpleFeature> collection=(FeatureCollection) doc;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection=(FeatureCollection<SimpleFeatureType, SimpleFeature>) doc;
             assertEquals(0, collection.size());
             
     }
@@ -103,7 +103,7 @@ public class GMLParserTest extends TestCase {
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
-            checkFeatureCollection((FeatureCollection)doc);
+            checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
             
     }
     public void skippedtestMoreFeatures(){
@@ -132,7 +132,7 @@ public class GMLParserTest extends TestCase {
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
-            checkFeatureCollection((FeatureCollection)doc);
+            checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
             
         } catch (Throwable e) {
             e.printStackTrace();
@@ -165,7 +165,7 @@ public class GMLParserTest extends TestCase {
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
 
-            checkFeatureCollection((FeatureCollection)doc);
+            checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
             
         } catch (Throwable e) {
             e.printStackTrace();
@@ -198,7 +198,7 @@ public class GMLParserTest extends TestCase {
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
-            checkFeatureCollection((FeatureCollection)doc);
+            checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
             
         } catch (Throwable e) {
             e.printStackTrace();
@@ -206,7 +206,7 @@ public class GMLParserTest extends TestCase {
         }
     }
     
-    private void checkFeatureCollection(FeatureCollection doc){
+    private void checkFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> doc){
                
         //remaining slot (s) should be feature(s)
         assertTrue("Requires atleast one feature",doc.size()>0);  //bbox + feature
@@ -319,7 +319,7 @@ public class GMLParserTest extends TestCase {
            assertNotNull("Document missing", doc);
 //           System.out.println(doc);
            
-           checkFeatureCollection((FeatureCollection)doc);
+           checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
            fail("Didn't catch an exception :(");
        } catch (Throwable e) {
 //           e.printStackTrace();

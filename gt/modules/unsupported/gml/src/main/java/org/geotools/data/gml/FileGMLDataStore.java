@@ -139,7 +139,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 			throw new IOException("Feature type "+typeName+" does not exist.  This datastore only has "+getTypeNames()[0]);
 		
 		try{
-			return (FeatureReader)FCBuffer.getFeatureReader(uri,bufferSize,timeout);
+			return (FeatureReader<SimpleFeatureType, SimpleFeature>)FCBuffer.getFeatureReader(uri,bufferSize,timeout);
 		} catch (SAXException sxe){
 			sxe.printStackTrace();
 			return null;

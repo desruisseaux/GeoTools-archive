@@ -27,6 +27,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.UniqueVisitor;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -41,7 +43,7 @@ public class UniqueIntervalFunction extends ClassificationFunction {
         setName("UniqueInterval");
     }
 
-    private Object calculate(FeatureCollection featureCollection) {
+    private Object calculate(FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) {
         try {
             int classNum = getClasses();
         	//use a visitor to grab the unique values
@@ -123,7 +125,7 @@ public class UniqueIntervalFunction extends ClassificationFunction {
 		if (!(feature instanceof FeatureCollection)) {
 			return null;
 		}
-        return calculate((FeatureCollection) feature);
+        return calculate((FeatureCollection<SimpleFeatureType, SimpleFeature>) feature);
     }
 
     public int getArgCount() {

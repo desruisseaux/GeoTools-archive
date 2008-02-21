@@ -63,7 +63,7 @@ public class UniqueVisitor implements FeatureCalc {
         this.expr = expr;
     }
 
-    public void init(FeatureCollection collection) {
+    public void init(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
     	//do nothing
     }
     

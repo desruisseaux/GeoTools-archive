@@ -52,7 +52,7 @@ public class CollectionDataStore extends AbstractDataStore {
      *
      * @param collection
      */
-    public CollectionDataStore(FeatureCollection collection) {
+    public CollectionDataStore(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         this.collection = collection;
 
         if (collection.size() == 0) {
@@ -106,7 +106,7 @@ public class CollectionDataStore extends AbstractDataStore {
      */
     public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final String typeName)
         throws IOException {
-    	return new DelegateFeatureReader( getSchema(typeName), collection.features() );
+    	return new DelegateFeatureReader<SimpleFeatureType, SimpleFeature>( getSchema(typeName), collection.features() );
     }
 
     /**

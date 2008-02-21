@@ -216,13 +216,13 @@ public class Rendering2DTest extends TestCase {
 		return polysym;
 	}
 
-	FeatureCollection createTestFeatureCollection(
+	FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatureCollection(
 			CoordinateReferenceSystem crs, String typeName) throws Exception {
 		GeometryFactory geomFac = new GeometryFactory();
 		return createTestFeatureCollection(crs, geomFac, typeName);
 	}
 
-	FeatureCollection createTestFeatureCollection(
+	FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatureCollection(
 			CoordinateReferenceSystem crs, GeometryFactory geomFac,
 			String typeName) throws Exception {
 		
@@ -465,7 +465,7 @@ public class Rendering2DTest extends TestCase {
 		// //
 		GeometryFactory geomFac = new GeometryFactory(
 				PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-		FeatureCollection ft = createTestFeatureCollection(
+		FeatureCollection<SimpleFeatureType, SimpleFeature> ft = createTestFeatureCollection(
 				DefaultGeographicCRS.WGS84, geomFac, POLYGON);
 		Style style = createTestStyle();
 

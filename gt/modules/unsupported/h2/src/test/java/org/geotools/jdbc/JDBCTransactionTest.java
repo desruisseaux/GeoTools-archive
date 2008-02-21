@@ -98,7 +98,7 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
     }
     
     public void testSerialTransactions() throws IOException {
-        FeatureStore<SimpleFeatureType, SimpleFeature> st = (FeatureStore) dataStore.getFeatureSource( "ft1" );
+        FeatureStore<SimpleFeatureType, SimpleFeature> st = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource( "ft1" );
         
         SimpleFeatureBuilder b = new SimpleFeatureBuilder(st.getSchema());
         b.set( "intProperty", new Integer(100));

@@ -81,8 +81,8 @@ public class ValidatorTest extends TestCase {
     }
 
     public void testFeatureValidation() throws Exception {
-    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	FeatureCollection features = lakes.getFeatures();
+    	FeatureSource<SimpleFeatureType, SimpleFeature> lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> features = lakes.getFeatures();
 		DefaultFeatureResults results = new DefaultFeatureResults();    	
     	fixture.processor.runFeatureTests( "LAKES", features, results );
     		
@@ -118,10 +118,10 @@ public class ValidatorTest extends TestCase {
     	return SimpleFeatureBuilder.build(LAKE, array, "splash");
     }
     public void testFeatureValidation2() throws Exception {
-    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+        FeatureSource<SimpleFeatureType, SimpleFeature> lakes = fixture.repository.source( "LAKES", "lakes" );
     	SimpleFeature newFeature = createInvalidLake();
     	    	
-    	FeatureCollection add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
     	
     	DefaultFeatureResults results = new DefaultFeatureResults();    	
     	fixture.processor.runFeatureTests( "LAKES", add, results );
@@ -144,8 +144,8 @@ public class ValidatorTest extends TestCase {
     public void testValidator() throws Exception {
     	Validator validator = new Validator( fixture.repository, fixture.processor );
 
-    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	FeatureCollection features = lakes.getFeatures();
+    	FeatureSource<SimpleFeatureType, SimpleFeature> lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> features = lakes.getFeatures();
     	DefaultFeatureResults results = new DefaultFeatureResults();
     	validator.featureValidation( "LAKES", features, results );
     	
@@ -154,10 +154,10 @@ public class ValidatorTest extends TestCase {
     public void testValidator2() throws Exception {
     	Validator validator = new Validator( fixture.repository, fixture.processor );
     	
-    	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
+    	FeatureSource<SimpleFeatureType, SimpleFeature> lakes = fixture.repository.source( "LAKES", "lakes" );
     	SimpleFeature newFeature = createInvalidLake();
         
-    	FeatureCollection add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
     	DefaultFeatureResults results = new DefaultFeatureResults();
     	fixture.processor.runFeatureTests( "LAKES", add, results );
     	

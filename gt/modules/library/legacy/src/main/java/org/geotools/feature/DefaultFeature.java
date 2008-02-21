@@ -77,7 +77,7 @@ public class DefaultFeature extends SimpleFeatureImpl
 //    private Envelope bounds;
 
     /** The collection that this Feature is a member of */
-    private FeatureCollection<SimpleFeatureType, SimpleFeature> parent;
+    private FeatureCollection<SimpleFeatureType, org.opengis.feature.simple.SimpleFeature> parent;
     
 //    private static final Pattern NON_WORD_PATTERN = Pattern.compile(":");
 
@@ -588,7 +588,7 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @return the collection that is the parent of this feature.
      */
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent() {
+    public FeatureCollection<SimpleFeatureType, org.opengis.feature.simple.SimpleFeature> getParent() {
         return parent;
     }
 
@@ -598,7 +598,7 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @param collection the collection to be set as parent.
      */
-    public void setParent(FeatureCollection collection) {
+    public void setParent(FeatureCollection<SimpleFeatureType, org.opengis.feature.simple.SimpleFeature> collection) {
         if (parent == null) {
             parent = collection;
         }

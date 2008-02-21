@@ -76,7 +76,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateMedian(FeatureCollection collection,
+    public static CalcResult calculateMedian(FeatureCollection<? extends FeatureType, ? extends Feature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         MedianVisitor medianVisitor = new MedianVisitor(expression);
         collection.accepts(medianVisitor, null);
@@ -131,7 +131,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
 			return new Integer(0); // no features were visited in the making of this answer
 		}
                 Expression expr = (Expression) getExpression(0);
-		FeatureCollection<? extends FeatureType, ? extends Feature> featureCollection = (FeatureCollection) feature;
+		FeatureCollection<? extends FeatureType, ? extends Feature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

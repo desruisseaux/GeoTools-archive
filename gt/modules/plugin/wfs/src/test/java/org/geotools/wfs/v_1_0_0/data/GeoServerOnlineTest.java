@@ -334,14 +334,14 @@ public class GeoServerOnlineTest extends TestCase {
 //        assertFalse("events not fired", watcher.count == 0);
         }finally{
         	try{
-        	((FeatureStore)fs).removeFeatures(filterFac.not(startingFeatures));
+        	((FeatureStore<SimpleFeatureType, SimpleFeature>)fs).removeFeatures(filterFac.not(startingFeatures));
         	}catch (Exception e) {
         		System.out.println(e);
 			}
         }
     }
-	private Id createFidFilter(FeatureSource fs) throws IOException {
-		FeatureIterator iter = fs.getFeatures().features();
+	private Id createFidFilter(FeatureSource<SimpleFeatureType, SimpleFeature> fs) throws IOException {
+		FeatureIterator<SimpleFeature> iter = fs.getFeatures().features();
         FilterFactory2 ffac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
         Set fids = new HashSet();
 		try{

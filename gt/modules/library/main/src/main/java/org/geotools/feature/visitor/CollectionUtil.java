@@ -17,6 +17,7 @@ package org.geotools.feature.visitor;
 
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import java.util.Iterator;
 
@@ -37,7 +38,7 @@ public class CollectionUtil {
      * @param collection the FeatureCollection<SimpleFeatureType, SimpleFeature> containing the features we want to visit
      * @param visitor the visitor which already knows which attributes it wants to meet
      */
-    static void accept(FeatureCollection collection, FeatureVisitor visitor) {
+    static void accept(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, FeatureVisitor visitor) {
         Iterator iterator;
 
         for (iterator = collection.iterator(); iterator.hasNext();) {
@@ -48,7 +49,7 @@ public class CollectionUtil {
         collection.close(iterator);
     }
 
-    static void accept(FeatureCollection collection, FeatureVisitor[] visitors) {
+    static void accept(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, FeatureVisitor[] visitors) {
         Iterator iterator;
 
         for (iterator = collection.iterator(); iterator.hasNext();) {
@@ -63,7 +64,7 @@ public class CollectionUtil {
         collection.close(iterator);
     }
 
-    public static Object calc(FeatureCollection collection,
+    public static Object calc(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         FeatureCalc calculator) {
         accept(collection, calculator);
 

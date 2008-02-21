@@ -294,7 +294,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
     protected  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(String typeName, Query query)
             throws IOException {
         if (query.getFilter() == Filter.EXCLUDE)
-            return new EmptyFeatureReader(getSchema());
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(getSchema());
 
         String[] propertyNames = query.getPropertyNames() == null ? new String[0]
                 : query.getPropertyNames();
@@ -749,7 +749,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
 
         } catch (Exception e) {
 
-            featureReader = new EmptyFeatureReader(schema);
+            featureReader = new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(schema);
         }
 
         return new IndexedShapefileFeatureWriter(typeName, shpFiles, attReader,

@@ -69,7 +69,7 @@ public class ForceCoordinateSystemIterator implements Iterator {
      * @param reader
      * @param schema
      */
-    ForceCoordinateSystemIterator(FeatureIterator reader, SimpleFeatureType schema) {
+    ForceCoordinateSystemIterator(FeatureIterator<SimpleFeature> reader, SimpleFeatureType schema) {
         this.reader = reader;
         this.schema = schema;
     }
@@ -84,7 +84,7 @@ public class ForceCoordinateSystemIterator implements Iterator {
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public ForceCoordinateSystemIterator(FeatureIterator reader, SimpleFeatureType type,
+    public ForceCoordinateSystemIterator(FeatureIterator<SimpleFeature> reader, SimpleFeatureType type,
         CoordinateReferenceSystem cs) throws SchemaException {
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");

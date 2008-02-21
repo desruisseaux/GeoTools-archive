@@ -82,7 +82,7 @@ public class PolygonNotOverlappingPolygonValidation
     	LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
     	String typeRef1 = getPolygonTypeRef();
     	LOGGER.finer( typeRef1 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );    	
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource1 = (FeatureSource) layers.get( typeRef1 );
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource1 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get( typeRef1 );
         LOGGER.finer( typeRef1 +": found "+polySource1.getSchema().getTypeName() );
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection1 = polySource1.getFeatures(); // limit with envelope
@@ -90,7 +90,7 @@ public class PolygonNotOverlappingPolygonValidation
 
         String typeRef2 = getRestrictedPolygonTypeRef();
         LOGGER.finer( typeRef2 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );        
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource2 = (FeatureSource) layers.get( typeRef2 );
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource2 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get( typeRef2 );
         LOGGER.finer( typeRef2 +": found "+polySource2.getSchema().getTypeName() );
         
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection2 = polySource2.getFeatures(); // limit with envelope

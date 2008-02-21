@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -58,7 +59,7 @@ public final class MemorySpatialIndex {
 	 * 
 	 * @param features
 	 */
-	public MemorySpatialIndex(FeatureCollection features) {
+	public MemorySpatialIndex(FeatureCollection<SimpleFeatureType, SimpleFeature> features) {
 		if (features == null) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER

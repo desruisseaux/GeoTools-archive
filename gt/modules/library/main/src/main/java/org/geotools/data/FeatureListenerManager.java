@@ -114,7 +114,7 @@ public class FeatureListenerManager {
         synchronized (listenerMap) {
             for (Iterator i = listenerMap.entrySet().iterator(); i.hasNext();) {
                 entry = (Map.Entry) i.next();
-                featureSource = (FeatureSource) entry.getKey();
+                featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) entry.getKey();
 
                 if (!featureSource.getName().getLocalPart().equals(typeName)) {
                     continue; // skip as typeName does not match
@@ -325,7 +325,7 @@ public class FeatureListenerManager {
 
         for (Iterator i = map.entrySet().iterator(); i.hasNext();) {
             entry = (Map.Entry) i.next();
-            featureSource = (FeatureSource) entry.getKey();
+            featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) entry.getKey();
             listeners = (FeatureListener[]) entry.getValue();
 
             event = new FeatureEvent(featureSource,

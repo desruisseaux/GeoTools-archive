@@ -133,7 +133,7 @@ public class UniqueFIDValidation extends DefaultIntegrityValidation {
         //TODO: get the needed layers from the database and use them instead
         while (it.hasNext()) // for each layer
          {
-            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource) it.next();
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) it.next();
             FeatureIterator<SimpleFeature> features = featureSource.getFeatures().features();
 
             try {

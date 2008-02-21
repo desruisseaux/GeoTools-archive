@@ -72,7 +72,8 @@ public class FirstProject {
 
         newDataStore.createSchema(collection.getSchema());
         Transaction transaction = new DefaultTransaction("Reproject");
-        FeatureStore<SimpleFeatureType, SimpleFeature> featureStore = (FeatureStore) newDataStore
+        FeatureStore<SimpleFeatureType, SimpleFeature> featureStore;
+        featureStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) newDataStore
                 .getFeatureSource(typeName);
         featureStore.setTransaction(transaction);
         try {

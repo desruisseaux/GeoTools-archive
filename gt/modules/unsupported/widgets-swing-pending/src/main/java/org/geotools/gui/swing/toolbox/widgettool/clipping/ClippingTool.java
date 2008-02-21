@@ -472,7 +472,7 @@ public class ClippingTool extends AbstractWidgetTool {
         try {
             FeatureCollection<SimpleFeatureType, SimpleFeature> source = (FeatureCollection<SimpleFeatureType, SimpleFeature>) inLayer.getFeatureSource().getFeatures();
             FeatureCollection<SimpleFeatureType, SimpleFeature> clip = (FeatureCollection<SimpleFeatureType, SimpleFeature>) clipLayer.getFeatureSource().getFeatures();
-            FeatureStore out = (FeatureStore) outStore.getFeatureSource(outStore.getTypeNames()[0]);
+            FeatureStore<SimpleFeatureType, SimpleFeature> out = (FeatureStore<SimpleFeatureType, SimpleFeature>) outStore.getFeatureSource(outStore.getTypeNames()[0]);
 
 
             ClipProcess process = new ClipProcess(source, clip, out,attlink);

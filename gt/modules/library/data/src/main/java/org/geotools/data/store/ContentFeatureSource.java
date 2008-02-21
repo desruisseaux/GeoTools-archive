@@ -454,7 +454,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
 //        }
 //
 //        if (query.getMaxFeatures() != Integer.MAX_VALUE) {
-//            // features = (FeatureCollection) features.sort(
+//            // features = (FeatureCollection<SimpleFeatureType, SimpleFeature>) features.sort(
 //            //		SortBy.NATURAL_ORDER).subList(0, query.getMaxFeatures());
 //        }
 //

@@ -74,7 +74,7 @@ public class Collection_UniqueFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateUnique(FeatureCollection collection,
+    public static CalcResult calculateUnique(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         UniqueVisitor uniqueVisitor = new UniqueVisitor(expression);
         collection.accepts(uniqueVisitor, null);
@@ -128,7 +128,7 @@ public class Collection_UniqueFunction extends FunctionExpressionImpl
 		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}
-		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) feature;
                 Expression expr = (Expression) getExpression(0);
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {

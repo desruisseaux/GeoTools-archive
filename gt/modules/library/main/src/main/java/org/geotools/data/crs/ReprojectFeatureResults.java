@@ -89,7 +89,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException
      */
-    public ReprojectFeatureResults(FeatureCollection results,
+    public ReprojectFeatureResults(FeatureCollection<SimpleFeatureType, SimpleFeature> results,
         CoordinateReferenceSystem destinationCS)
         throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
         

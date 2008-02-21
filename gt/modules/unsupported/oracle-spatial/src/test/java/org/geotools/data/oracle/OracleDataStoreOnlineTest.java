@@ -438,7 +438,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         builder.add(point);
         SimpleFeature feature = builder.buildFeature("fid.1");
          
-        FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
+        FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.addFeatures(DataUtilities.collection(feature));
 
         // Select is directly from the DB
@@ -456,7 +456,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
     
     public void testRemoveFeatures() throws Exception {
     	if( conn == null ) return;    	
-        FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
+    	FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.removeFeatures(Filter.INCLUDE);
         FeatureCollection<SimpleFeatureType, SimpleFeature> fr = fs.getFeatures();
         assertEquals(0, fr.size());

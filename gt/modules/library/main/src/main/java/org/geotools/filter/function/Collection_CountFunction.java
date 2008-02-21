@@ -45,7 +45,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl{
 	/** The logger for the filter module. */
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter.function");
 
-	FeatureCollection previousFeatureCollection = null;
+	FeatureCollection<SimpleFeatureType, SimpleFeature> previousFeatureCollection = null;
 
 	Object count = null;
 
@@ -71,7 +71,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl{
 	 * @throws IllegalFilterException
 	 * @throws IOException
 	 */
-	public static CalcResult calculateCount(FeatureCollection collection)
+	public static CalcResult calculateCount(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
 			throws IllegalFilterException, IOException {
 		CountVisitor countVisitor = new CountVisitor();
 		collection.accepts(countVisitor, null);
@@ -126,7 +126,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl{
 		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}
-		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

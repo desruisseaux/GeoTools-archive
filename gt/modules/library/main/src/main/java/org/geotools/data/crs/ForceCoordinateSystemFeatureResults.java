@@ -63,12 +63,12 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
     FeatureCollection<SimpleFeatureType, SimpleFeature> results;
     //FeatureType schema;
     
-    public ForceCoordinateSystemFeatureResults(FeatureCollection results,
+    public ForceCoordinateSystemFeatureResults(FeatureCollection<SimpleFeatureType, SimpleFeature> results,
             CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
         this(results, forcedCS, false);
     }
 
-    public ForceCoordinateSystemFeatureResults(FeatureCollection results,            
+    public ForceCoordinateSystemFeatureResults(FeatureCollection<SimpleFeatureType, SimpleFeature> results,            
         CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing) throws IOException, SchemaException {
         super( forceType( origionalType( results ), forcedCS, forceOnlyMissing ));
         

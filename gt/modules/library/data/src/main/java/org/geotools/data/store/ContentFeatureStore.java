@@ -46,7 +46,7 @@ import org.opengis.filter.Filter;
  * of operations provided by {@link FeatureCollection}.
  * </p>
  * <p>
- * The {@link #addFeatures(FeatureCollection)} method is used to add features to
+ * The {@link #addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature>)} method is used to add features to
  * the feature store. The method should return the "persistent" feature id's 
  * which are generated after the feature has been added to persistent storage.
  * Often the persistent fid is different from the fid specified by the actual 
@@ -220,7 +220,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * This method calls through to {@link #addFeatures(Collection)}.
      * </p>
      */
-    public final Set<String> addFeatures(FeatureCollection collection)
+    public final Set<String> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
         throws IOException {
         
        return addFeatures( (Collection) collection );

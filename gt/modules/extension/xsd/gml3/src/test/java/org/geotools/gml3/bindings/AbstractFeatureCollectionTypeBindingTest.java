@@ -50,7 +50,7 @@ public class AbstractFeatureCollectionTypeBindingTest extends GML3TestSupport {
         feature = GML3MockData.feature(document, featureMember);
         feature.setAttributeNS(GML.NAMESPACE, "id", "fid.2");
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parse();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) parse();
         assertNotNull(fc);
 
         assertEquals(2, fc.size());
@@ -75,7 +75,7 @@ public class AbstractFeatureCollectionTypeBindingTest extends GML3TestSupport {
         feature = GML3MockData.feature(document, featureMember);
         feature.setAttributeNS(GML.NAMESPACE, "id", "fid.2");
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parse();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) parse();
         assertNotNull(fc);
 
         assertEquals(2, fc.size());

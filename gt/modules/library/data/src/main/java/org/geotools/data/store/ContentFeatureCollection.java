@@ -65,7 +65,8 @@ public class ContentFeatureCollection implements FeatureCollection<SimpleFeature
         public void changed(FeatureEvent featureEvent) {
             if( listeners.isEmpty() ) return;
 
-            FeatureCollection<SimpleFeatureType, SimpleFeature> collection = (FeatureCollection) ContentFeatureCollection.this;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
+            collection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) ContentFeatureCollection.this;
             CollectionEvent event = new CollectionEvent( collection, featureEvent );
 
             CollectionListener[] notify = (CollectionListener[]) listeners.toArray( new CollectionListener[ listeners.size() ]);

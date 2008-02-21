@@ -35,6 +35,8 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
@@ -75,7 +77,7 @@ public class RandomStyleFactory {
         return style;
     }
     
-    public Style createRandomVectorStyle(FeatureSource fs){
+    public Style createRandomVectorStyle(FeatureSource<SimpleFeatureType, SimpleFeature> fs){
         Style style = null;
         
         Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());

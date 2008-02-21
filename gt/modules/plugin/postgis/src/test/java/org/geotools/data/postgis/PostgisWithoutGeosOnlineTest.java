@@ -61,7 +61,7 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 //		get the bounding box for each feature
 		List bbox = new ArrayList();
 		List fids = new ArrayList();
-		FeatureCollection fc = data.getFeatureSource("road").getFeatures();
+		FeatureCollection<SimpleFeatureType, SimpleFeature> fc = data.getFeatureSource("road").getFeatures();
 		for (Iterator itr = fc.iterator(); itr.hasNext();) {
 			SimpleFeature f = (SimpleFeature)itr.next();
 			bbox.add(((Geometry) f.getDefaultGeometry()).getEnvelopeInternal());

@@ -123,7 +123,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         s = createDataStore(maker, tmp.toURL(), memorymapped);
 
         s.createSchema(type);
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(type.getTypeName());
 
         store.addFeatures(one);
         store.addFeatures(one);
@@ -155,7 +155,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 
         s.createSchema(type);
 
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(type.getTypeName());
 
         store.addFeatures(one);
 

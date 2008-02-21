@@ -172,7 +172,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
         testEnvelope(features, IndexType.NONE);
     }
 
-    private void testEnvelope(FeatureCollection features, IndexType treeType)
+    private void testEnvelope(FeatureCollection<SimpleFeatureType, SimpleFeature> features, IndexType treeType)
             throws MalformedURLException, IOException {
         IndexedShapefileDataStore s = new IndexedShapefileDataStore(TestData
                 .url(STATE_POP), null, true, true, treeType);
@@ -476,7 +476,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
 
         int idx = sds.getCount(Query.ALL);
 
-        FeatureStore store = (FeatureStore) sds.getFeatureSource(sds
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) sds.getFeatureSource(sds
                 .getTypeNames()[0]);
 
         Transaction transaction = new DefaultTransaction();

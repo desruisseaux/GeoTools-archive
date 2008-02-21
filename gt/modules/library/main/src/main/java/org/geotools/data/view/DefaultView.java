@@ -158,10 +158,10 @@ public class DefaultView implements FeatureSource<SimpleFeatureType, SimpleFeatu
             FeatureSource<SimpleFeatureType, SimpleFeature> source, Query query)
             throws SchemaException {
         if (source instanceof FeatureLocking) {
-            //  return new GeoServerFeatureLocking((FeatureLocking) source,
+            //  return new GeoServerFeatureLocking((FeatureLocking<SimpleFeatureType, SimpleFeature>) source,
             // schema, definitionQuery);
         } else if (source instanceof FeatureStore) {
-            //return new GeoServerFeatureStore((FeatureStore) source, schema,
+            //return new GeoServerFeatureStore((FeatureStore<SimpleFeatureType, SimpleFeature>) source, schema,
             // definitionQuery);
         }
         return new DefaultView(source, query);

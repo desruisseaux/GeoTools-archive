@@ -66,7 +66,7 @@ public class FidQueryTest extends FIDTestCase {
         ds = new IndexedShapefileDataStore(url, null, false, true,
                 IndexType.QIX);
         numFeatures = 0;
-        featureStore = (FeatureStore) ds.getFeatureSource();
+        featureStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
         {
             FeatureIterator<SimpleFeature> features = featureStore.getFeatures().features();
             try {

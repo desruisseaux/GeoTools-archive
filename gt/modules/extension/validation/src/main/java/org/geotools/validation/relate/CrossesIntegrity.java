@@ -115,7 +115,7 @@ public class CrossesIntegrity extends RelationIntegrity
 		else
 		{
 			LOGGER.finer( typeRef2 +": looking up FeatureSource<SimpleFeatureType, SimpleFeature> " );        
-			FeatureSource<SimpleFeatureType, SimpleFeature> geomSource2 = (FeatureSource) layers.get( typeRef2 );
+			FeatureSource<SimpleFeatureType, SimpleFeature> geomSource2 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get( typeRef2 );
 			LOGGER.finer( typeRef2 +": found "+ geomSource2.getSchema().getTypeName() );
 			return validateMultipleLayers(geomSource1, geomSource2, isExpected(), results, envelope);
 		}	
@@ -275,7 +275,7 @@ public class CrossesIntegrity extends RelationIntegrity
 				Filter filter2 = filterBBox(ReferencedEnvelope.reference(g1.getEnvelope().getEnvelopeInternal()), ft);
 
 				//FeatureResults featureResults2 = featureSourceA.getFeatures(filter2);
-				FeatureCollection featureResults2 = featureSourceA.getFeatures();
+				FeatureCollection<SimpleFeatureType, SimpleFeature> featureResults2 = featureSourceA.getFeatures();
 				fr2 = featureResults2.features();	
 				while (fr2 != null && fr2.hasNext())
 				{			

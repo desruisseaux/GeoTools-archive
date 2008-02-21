@@ -297,14 +297,14 @@ public abstract class ActiveTypeEntry implements TypeEntry {
     		throw new NullPointerException( "Transaction null, did you mean Transaction.AUTO_COMMIT" );
     	}
     	
-    	FeatureCollection features = createFeatureSource().getFeatures( query );
-    	FeatureReader reader = new DelegateFeatureReader(
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> features = createFeatureSource().getFeatures( query );
+    	FeatureReader<SimpleFeatureType, SimpleFeature> reader = new DelegateFeatureReader<SimpleFeatureType, SimpleFeature>(
 			features.getSchema(), features.features()
     	);
     	
     	//wrap in diff reader if transaction specified
     	if ( !transaction.equals( Transaction.AUTO_COMMIT) ) {
-    		reader = new DiffFeatureReader( reader, state( transaction ).diff() );
+    		reader = new DiffFeatureReader<SimpleFeatureType, SimpleFeature>( reader, state( transaction ).diff() );
     	}
     	
     	return reader;
@@ -459,7 +459,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
     /**
      * Create the FeatureStore, override for your own custom implementation.
      */
-    protected FeatureStore createFeatureStore() {
+    protected FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureStore() {
         
         // This implementation needs FeatureWriters to work
         // please provide your own override for a datastore that does not 
@@ -491,7 +491,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * You must override this method if you support your own locking system (like WFS).
      * <p>
      */
-    protected FeatureLocking createFeatureLocking() {
+    protected FeatureLocking<SimpleFeatureType, SimpleFeature> createFeatureLocking() {
         return new AbstractFeatureLocking() {
             public DataStore getDataStore() {
                 return parent;
@@ -522,7 +522,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * @return  FeatureReader<SimpleFeatureType, SimpleFeature> for all content
      */
     public  FeatureReader<SimpleFeatureType, SimpleFeature> createReader() {
-        return new EmptyFeatureReader( schema );
+        return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>( schema );
     }
 
     /**

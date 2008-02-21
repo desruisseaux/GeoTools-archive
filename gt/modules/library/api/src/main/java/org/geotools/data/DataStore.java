@@ -172,7 +172,7 @@ public interface DataStore extends DataAccess<SimpleFeatureType, SimpleFeature>{
      * FeatureSource<SimpleFeatureType, SimpleFeature> fsource = dataStore.getFeatureSource( "roads" );
      * FeatureStore fstore = null;
      * if( fsource instanceof FeatureLocking ){
-     *     fstore = (FeatureStore) fs;
+     *     fstore = (FeatureStore<SimpleFeatureType, SimpleFeature>) fs;
      * }
      * else {
      *     System.out.println("We do not have write access to roads");

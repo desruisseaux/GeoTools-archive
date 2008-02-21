@@ -169,7 +169,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
 
         shapefile.createSchema(type);
 
-        FeatureStore store = (FeatureStore) shapefile.getFeatureSource(type
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) shapefile.getFeatureSource(type
                 .getTypeName());
 
         store.addFeatures(original);
@@ -190,7 +190,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         }
     }
 
-    static void compare(FeatureCollection one, FeatureCollection<SimpleFeatureType, SimpleFeature> two)
+    static void compare(FeatureCollection<SimpleFeatureType, SimpleFeature> one, FeatureCollection<SimpleFeatureType, SimpleFeature> two)
             throws Exception {
 
         if (one.size() != two.size()) {

@@ -479,10 +479,10 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 
 		if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
-			return new EmptyFeatureReader(requestType);
+			return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(requestType);
 		}
 
-		FeatureReader reader = getFeatureReader(query, transaction);
+		FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query, transaction);
 
 		if (compare == 1) {
 			reader = new ReTypeFeatureReader(reader, requestType, false);
@@ -654,7 +654,7 @@ public abstract class JDBC1DataStore implements DataStore {
 					e);
 		}
 
-		FeatureReader reader;
+		FeatureReader<SimpleFeatureType, SimpleFeature> reader;
 		reader = createFeatureReader(schema, postFilter, queryData);
 
 		if (requestedNames.length < propertyNames.length) {
@@ -764,7 +764,7 @@ public abstract class JDBC1DataStore implements DataStore {
         
         // Thanks Shaun Forbes moving excludes check earlier
         if (postFilter == Filter.EXCLUDE) {
-            return new EmptyFeatureReader(schema);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(schema);
         }
         
          FeatureReader<SimpleFeatureType, SimpleFeature> fReader = getJDBCFeatureReader(queryData);
@@ -1566,7 +1566,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		QueryData queryData = executeQuery(typeHandler
 				.getFeatureTypeInfo(typeName), typeName, sqlQuery, transaction,
 				true, null);
-		FeatureReader reader = createFeatureReader(info.getSchema(),
+		FeatureReader<SimpleFeatureType, SimpleFeature> reader = createFeatureReader(info.getSchema(),
 				postFilter, queryData);
 		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = createFeatureWriter(reader, queryData);
 

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.graph.structure.Edge;
@@ -101,7 +102,7 @@ public class AutoClustUtils {
         return ret;
     }
     
-    public static DelaunayNode[] featureCollectionToNodeArray(FeatureCollection fc){
+    public static DelaunayNode[] featureCollectionToNodeArray(FeatureCollection<SimpleFeatureType, SimpleFeature> fc){
         FeatureIterator<SimpleFeature> iter = fc.features();
         int size = fc.size();
         DelaunayNode[] nodes = new DelaunayNode[size];

@@ -76,8 +76,8 @@ public class PolygonBoundaryCoveredByPolygonValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource = (FeatureSource) layers.get(getPolygonTypeRef());
-        FeatureSource<SimpleFeatureType, SimpleFeature> polyrSource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polyrSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedPolygonTypeRef());
 
         Object[] polys = polyrSource.getFeatures().toArray();
         Object[] polyRs = polySource.getFeatures().toArray();

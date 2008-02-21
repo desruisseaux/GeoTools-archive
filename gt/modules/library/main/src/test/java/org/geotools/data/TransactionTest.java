@@ -62,7 +62,7 @@ public class TransactionTest extends TestCase {
         SimpleFeature f1=SimpleFeatureBuilder.build(type,new Object[]{ "one",geom },null);
         SimpleFeature f2=SimpleFeatureBuilder.build(type,new Object[]{ "two", geom },null);
         
-        FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store=(FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
         store.addFeatures( DataUtilities.collection( f1 ) );
         store.addFeatures( DataUtilities.collection(f2) );
@@ -74,7 +74,7 @@ public class TransactionTest extends TestCase {
     public void testRemoveFeature() throws Exception{
         SimpleFeature f1=SimpleFeatureBuilder.build(type,new Object[]{ "one",geom },null);
         
-        FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store=(FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
         Set fid=store.addFeatures( DataUtilities.collection(f1) );
 
@@ -88,7 +88,7 @@ public class TransactionTest extends TestCase {
 //        assertEquals("Number of known feature as obtained from getCount",3, store.getCount(Query.ALL));
     }
 
-	private void count(FeatureStore store, int expected) throws IOException, IllegalAttributeException {
+	private void count(FeatureStore<SimpleFeatureType, SimpleFeature> store, int expected) throws IOException, IllegalAttributeException {
 		int i=0;
         for( FeatureIterator<SimpleFeature> reader=store.getFeatures().features();
         reader.hasNext();){

@@ -82,7 +82,7 @@ public class LineNoPseudoNodeValidation extends LineAbstractValidation {
 
     	boolean r = true;
     	
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getLineTypeRef());
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
         FeatureIterator<SimpleFeature> fLine = fcLine.features();
                 

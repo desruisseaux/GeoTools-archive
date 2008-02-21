@@ -74,7 +74,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
         super(true);
     }
 
-    public TempMemoryDataStore(FeatureCollection collection) {
+    public TempMemoryDataStore(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         addFeatures(collection);
     }
 
@@ -86,7 +86,7 @@ public class TempMemoryDataStore extends AbstractDataStore {
         addFeatures(reader);
     }
 
-    public TempMemoryDataStore(FeatureIterator reader) throws IOException {
+    public TempMemoryDataStore(FeatureIterator<SimpleFeature> reader) throws IOException {
         addFeatures(reader);
     }
 

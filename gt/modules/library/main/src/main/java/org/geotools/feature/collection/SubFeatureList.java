@@ -42,10 +42,10 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
     List sort; 
     List index;
     
-    public SubFeatureList(FeatureCollection list, Filter filter){
+    public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, Filter filter){
         this( list, filter, null );
     }
-    public SubFeatureList(FeatureCollection list, SortBy sort ){
+    public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, SortBy sort ){
         this( list, null, sort );
     }
     /**
@@ -54,7 +54,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
 	 * 
 	 * @param filter
 	 */
-	public SubFeatureList(FeatureCollection list, Filter filter, SortBy subSort) {
+	public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, Filter filter, SortBy subSort) {
 		super( list,  filter );
         if( subSort == null ){
             sort = Collections.EMPTY_LIST;
@@ -69,7 +69,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
         index = null;                
 	}
     
-    public SubFeatureList(FeatureCollection list, List order) {
+    public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, List order) {
         super( list );        
          
         index = order;

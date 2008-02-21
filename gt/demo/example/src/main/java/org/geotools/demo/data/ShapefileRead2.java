@@ -70,7 +70,7 @@ public class ShapefileRead2 {
 		System.out.println("Reading content " + typeName);
 
 		FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
-		FeatureCollection collection = featureSource.getFeatures();
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = featureSource.getFeatures();
 		
 		Iterator iterator = collection.iterator();
 		int length = 0;		

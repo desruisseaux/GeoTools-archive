@@ -63,7 +63,7 @@ public class GML3EncodingTest extends TestCase {
 
         //first parse in test data
         Parser parser = new Parser(configuration);
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parser.parse(TestConfiguration.class
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) parser.parse(TestConfiguration.class
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 
@@ -120,7 +120,7 @@ public class GML3EncodingTest extends TestCase {
 
         //first parse in test data
         Parser parser = new Parser(configuration);
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) parser.parse(TestConfiguration.class
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) parser.parse(TestConfiguration.class
                 .getResourceAsStream("test.xml"));
         assertNotNull(fc);
 

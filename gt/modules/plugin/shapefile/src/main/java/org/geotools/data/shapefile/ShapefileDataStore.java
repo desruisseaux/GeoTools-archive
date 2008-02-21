@@ -573,7 +573,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         } catch (Exception e) {
 
-            featureReader = new EmptyFeatureReader(schema);
+            featureReader = new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(schema);
         }
 
         return new ShapefileFeatureWriter(typeName, shpFiles, attReader,

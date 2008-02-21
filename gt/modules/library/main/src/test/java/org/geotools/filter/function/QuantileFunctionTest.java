@@ -149,7 +149,7 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     	MemoryDataStore store = new MemoryDataStore();
     	store.createSchema(ft);
     	store.addFeatures(testFeatures);
-    	FeatureCollection thisFC = store.getFeatureSource("nullnan").getFeatures();
+    	FeatureCollection<SimpleFeatureType, SimpleFeature> thisFC = store.getFeatureSource("nullnan").getFeatures();
 
     	//create the expression
         MathExpression divide = fac.createMathExpression(ExpressionType.MATH_DIVIDE);

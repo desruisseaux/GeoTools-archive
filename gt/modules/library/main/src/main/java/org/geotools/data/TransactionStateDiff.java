@@ -303,7 +303,7 @@ public class TransactionStateDiff implements State {
         Diff diff = diff(typeName);
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = store.getFeatureReader(typeName);
 
-        return new DiffFeatureReader(reader, diff);
+        return new DiffFeatureReader<SimpleFeatureType, SimpleFeature>(reader, diff);
     }
 
     /**

@@ -1370,7 +1370,7 @@ public class ShapefileRenderer implements GTRenderer {
                 Transaction transaction = Transaction.AUTO_COMMIT;
 
                 if (currLayer.getFeatureSource() instanceof FeatureStore) {
-                    transaction = ((FeatureStore) currLayer.getFeatureSource()).getTransaction();
+                    transaction = ((FeatureStore<SimpleFeatureType, SimpleFeature>) currLayer.getFeatureSource()).getTransaction();
                 }
 
                 DefaultQuery query = new DefaultQuery(currLayer.getQuery());

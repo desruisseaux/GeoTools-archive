@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.TestData;
 
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import junit.framework.TestCase;
 
@@ -62,7 +63,7 @@ public class GMLInheritanceTest extends TestCase {
         assertNotNull("Document missing", doc);
 //            System.out.println(doc);
         
-        checkFeatureCollection((FeatureCollection)doc);
+        checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
     }
     public void testMultiInheritance() throws Throwable {
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -88,10 +89,10 @@ public class GMLInheritanceTest extends TestCase {
         assertNotNull("Document missing", doc);
 //            System.out.println(doc);
         
-        checkFeatureCollection((FeatureCollection)doc);
+        checkFeatureCollection((FeatureCollection<SimpleFeatureType, SimpleFeature>)doc);
     }
     
-    private void checkFeatureCollection(FeatureCollection doc){
+    private void checkFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> doc){
                
         //remaining slot (s) should be feature(s)
         assertTrue("Requires atleast one feature",doc.size()>0);  //bbox + feature

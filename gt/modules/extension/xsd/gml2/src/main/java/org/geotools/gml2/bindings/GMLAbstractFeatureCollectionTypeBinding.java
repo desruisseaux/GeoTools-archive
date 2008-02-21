@@ -89,7 +89,7 @@ public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBind
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //call "super"
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) value;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) value;
 
         //add all feature member children
         fc.addAll(node.getChildValues(SimpleFeature.class));

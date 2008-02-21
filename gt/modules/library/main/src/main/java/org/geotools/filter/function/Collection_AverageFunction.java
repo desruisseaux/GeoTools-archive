@@ -75,7 +75,7 @@ public class Collection_AverageFunction extends FunctionExpressionImpl {
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateAverage(FeatureCollection collection,
+    public static CalcResult calculateAverage(FeatureCollection<? extends FeatureType, ? extends Feature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         AverageVisitor averageVisitor = new AverageVisitor(expression);
         collection.accepts(averageVisitor, null);

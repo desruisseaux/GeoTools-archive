@@ -108,7 +108,7 @@ public class ClipProcess extends AbstractProcess {
 
     }
 
-    private void fillLayer(FeatureCollection lstFeatures, FeatureStore store) throws IOException {
+    private void fillLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> lstFeatures, FeatureStore<SimpleFeatureType, SimpleFeature> store) throws IOException {
 
         DefaultTransaction transaction = new DefaultTransaction();
         store.setTransaction(transaction);

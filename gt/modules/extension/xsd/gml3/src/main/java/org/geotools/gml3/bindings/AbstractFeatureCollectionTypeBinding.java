@@ -99,7 +99,7 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
     public Object getProperty(Object object, QName name) {
         //just return the features themselves
         if (GML.featureMembers.equals(name)) {
-            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) object;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) object;
 
             return fc;
 

@@ -266,7 +266,7 @@ public class PostGIS2Example {
 			filter = CQL.toFilter( text );
 			
 			String typeName = (String) typeNameSelect.getSelectedItem();
-			FeatureSource table = dataStore.getFeatureSource( typeName );
+			FeatureSource<SimpleFeatureType, SimpleFeature> table = dataStore.getFeatureSource( typeName );
 			return table.getFeatures(filter);
 		}
 		

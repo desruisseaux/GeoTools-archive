@@ -263,7 +263,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         }
         finally {
             if( collection instanceof FeatureCollection ){
-                ((FeatureCollection)collection).close( iterator );
+                ((FeatureCollection<SimpleFeatureType, SimpleFeature>)collection).close( iterator );
             }
         }
     }
@@ -324,7 +324,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         }
         finally {
             if( collection instanceof FeatureCollection ){
-                ((FeatureCollection)collection).close( iterator );
+                ((FeatureCollection<SimpleFeatureType, SimpleFeature>)collection).close( iterator );
             }
         }
     }
@@ -375,7 +375,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @return the FeatureIterator<SimpleFeature> for this collection.
      */
     public FeatureIterator<SimpleFeature> features() {
-        return new FeatureIteratorImpl(this);
+        return new FeatureIteratorImpl<SimpleFeature>(this);
     }
 
     /**
@@ -439,7 +439,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         }
         finally {
             if( collection instanceof FeatureCollection ){
-                ((FeatureCollection)collection).close( iterator );
+                ((FeatureCollection<SimpleFeatureType, SimpleFeature>)collection).close( iterator );
             }
         }
     }
@@ -577,7 +577,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.Feature#setParent(org.geotools.feature.FeatureCollection)
 	 */
-	public void setParent(FeatureCollection collection) {
+	public void setParent(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
 		parent = collection;
 	}
 
@@ -652,7 +652,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
 	
 	public void close( FeatureIterator<SimpleFeature> close ) {
         if( close instanceof FeatureIteratorImpl){
-        	FeatureIteratorImpl wrapper = (FeatureIteratorImpl) close;
+        	FeatureIteratorImpl<SimpleFeature> wrapper = (FeatureIteratorImpl<SimpleFeature>) close;
         	wrapper.close();
         }
     }

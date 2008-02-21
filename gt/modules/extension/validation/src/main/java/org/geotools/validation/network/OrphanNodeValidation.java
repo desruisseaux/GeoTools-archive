@@ -87,8 +87,8 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
         final ValidationResults results) throws Exception {
     	
       LineStringGraphGenerator lgb = new LineStringGraphGenerator();
-    	FeatureSource fs = (FeatureSource) layers.get(typeName);
-        FeatureCollection<SimpleFeatureType, SimpleFeature> fr = fs.getFeatures();
+      FeatureSource<SimpleFeatureType, SimpleFeature> fs = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(typeName);
+      FeatureCollection<SimpleFeatureType, SimpleFeature> fr = fs.getFeatures();
       FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fr;
       FeatureIterator<SimpleFeature> f = fc.features();
 
@@ -111,7 +111,7 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
 //    public boolean validate_old(Map layers, Envelope envelope,
 //        final ValidationResults results) throws Exception {
 //        LineGraphBuilder lgb = new LineGraphBuilder();
-//        FeatureSource<SimpleFeatureType, SimpleFeature> fs = (FeatureSource) layers.get(typeName);
+//        FeatureSource<SimpleFeatureType, SimpleFeature> fs = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(typeName);
 //        FeatureResults fr = fs.getFeatures();
 //        FeatureCollection<SimpleFeatureType, SimpleFeature> fc = fr.collection();
 //        FeatureIterator<SimpleFeature> f = fc.features();

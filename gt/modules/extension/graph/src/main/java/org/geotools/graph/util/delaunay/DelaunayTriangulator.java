@@ -36,6 +36,7 @@ import org.geotools.graph.structure.line.BasicXYNode;
 import org.geotools.graph.structure.line.XYNode;
 import org.geotools.math.Line;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  *
@@ -60,7 +61,7 @@ public class DelaunayTriangulator {
         return nodes;
     }
     
-    public void setFeatureCollection(FeatureCollection data){
+    public void setFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> data){
         nodes = featuresToNodes(data);
     }
     
@@ -68,7 +69,7 @@ public class DelaunayTriangulator {
         return triangleList;
     }
     
-    public DelaunayNode[] featuresToNodes(FeatureCollection fc){
+    public DelaunayNode[] featuresToNodes(FeatureCollection<SimpleFeatureType, SimpleFeature> fc){
         FeatureIterator<SimpleFeature> iter = fc.features();
         int size = fc.size();
         DelaunayNode[] nodes = new DelaunayNode[size];

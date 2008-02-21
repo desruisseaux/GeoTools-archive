@@ -87,7 +87,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore<Si
         return addFeatures(DataUtilities.collection((SimpleFeature[]) features.toArray(new SimpleFeature[0])));
     }
 
-	public Set addFeatures(FeatureCollection collection) throws IOException {
+	public Set addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) throws IOException {
         WFSTransactionState ts = null;
 
         if (trans == Transaction.AUTO_COMMIT) {

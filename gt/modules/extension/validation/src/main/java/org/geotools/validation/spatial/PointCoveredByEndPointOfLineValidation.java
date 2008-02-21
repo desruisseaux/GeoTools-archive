@@ -75,8 +75,8 @@ public class PointCoveredByEndPointOfLineValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource = (FeatureSource) layers.get(getRestrictedLineTypeRef());
-        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource) layers.get(getPointTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> lineSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getPointTypeRef());
 
         Object[] points = pointSource.getFeatures().toArray();
         Object[] lines = lineSource.getFeatures().toArray();

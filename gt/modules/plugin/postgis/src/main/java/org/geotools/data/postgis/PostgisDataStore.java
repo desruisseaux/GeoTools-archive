@@ -714,7 +714,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
 
         if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
-            return new EmptyFeatureReader(requestType);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(requestType);
         }
         
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query, transaction);

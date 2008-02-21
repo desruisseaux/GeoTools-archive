@@ -26,6 +26,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.QuantileListVisitor;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes with an equal number of items in each.
@@ -43,14 +45,14 @@ public class QuantileFunction extends ClassificationFunction {
         return 2;
     }
     
-	private Object calculate(FeatureCollection featureCollection) {
+	private Object calculate(FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) {
 		// use a visitor to find the values in each bin
 		QuantileListVisitor quantileVisit = new QuantileListVisitor(getExpression(), getClasses());
 		if (progress == null) progress = new NullProgressListener();
 		try {
             featureCollection.accepts(quantileVisit, progress);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "QuantileFunction calculate(FeatureCollection) failed" , e);
+            LOGGER.log(Level.SEVERE, "QuantileFunction calculate(FeatureCollection<SimpleFeatureType, SimpleFeature>) failed" , e);
             return null;
         }
 		if (progress.isCanceled()) return null;
@@ -140,7 +142,7 @@ public class QuantileFunction extends ClassificationFunction {
 	    if (!(feature instanceof FeatureCollection)) {
 	        return null;
         }
-        return calculate((FeatureCollection) feature);
+        return calculate((FeatureCollection<SimpleFeatureType, SimpleFeature>) feature);
 	}
 
 }

@@ -65,7 +65,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 	/**
 	 * Cached feature source
 	 */
-	FeatureSource source;
+	FeatureSource<SimpleFeatureType, SimpleFeature> source;
 	/**
 	 * metadata object 
 	 */
@@ -238,7 +238,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 			//manually calculate the bounds
 			bounds = new ReferencedEnvelope(source.getSchema().getCRS());
 			
-			FeatureIterator itr = source.getFeatures().features();
+			FeatureIterator<SimpleFeature> itr = source.getFeatures().features();
 			while( itr.hasNext() ) {
 				BoundingBox more = itr.next().getBounds();
                 bounds.include( more );

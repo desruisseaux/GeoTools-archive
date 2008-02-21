@@ -73,7 +73,7 @@ public class ReprojectFeatureIterator implements Iterator {
     SimpleFeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
-    public ReprojectFeatureIterator(FeatureIterator reader, SimpleFeatureType schema,
+    public ReprojectFeatureIterator(FeatureIterator<SimpleFeature> reader, SimpleFeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;

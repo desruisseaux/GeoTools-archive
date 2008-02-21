@@ -129,9 +129,9 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 	 * @see org.geotools.data.FeatureResults#collection()
 	 */
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> collection() throws IOException {
-		FeatureCollection fc = FeatureCollections.newCollection();
-		List results = index.query(bounds);
-		for (Iterator it = results.iterator(); it.hasNext();) {
+	    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = FeatureCollections.newCollection();
+		List<SimpleFeature> results = index.query(bounds);
+		for (Iterator<SimpleFeature> it = results.iterator(); it.hasNext();) {
 			fc.add(it.next());
 		}
 		return fc;

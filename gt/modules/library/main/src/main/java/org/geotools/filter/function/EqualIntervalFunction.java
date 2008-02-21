@@ -45,7 +45,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         setName("EqualInterval");
     }
 
-    private RangedClassifier calculate(FeatureCollection featureCollection) {
+    private RangedClassifier calculate(FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) {
         int classNum = getClasses();
         Comparable globalMin;
         Comparable globalMax;
@@ -67,10 +67,10 @@ public class EqualIntervalFunction extends ClassificationFunction {
                 return calculateNonNumerical(classNum, featureCollection);
 			}
         } catch (IllegalFilterException e) { // accepts exploded
-            LOGGER.log(Level.SEVERE, "EqualIntervalFunction calculate(FeatureCollection) failed", e);
+            LOGGER.log(Level.SEVERE, "EqualIntervalFunction calculate(FeatureCollection<SimpleFeatureType, SimpleFeature>) failed", e);
             return null;
         } catch (IOException e) { // getResult().getValue() exploded
-            LOGGER.log(Level.SEVERE, "EqualIntervalFunction calculate(FeatureCollection) failed", e);
+            LOGGER.log(Level.SEVERE, "EqualIntervalFunction calculate(FeatureCollection<SimpleFeatureType, SimpleFeature>) failed", e);
             return null;
         }
 
@@ -160,7 +160,7 @@ public class EqualIntervalFunction extends ClassificationFunction {
         if (!(object instanceof FeatureCollection)) {
             return null;
         }
-        return calculate((FeatureCollection) object);
+        return calculate((FeatureCollection<SimpleFeatureType, SimpleFeature>) object);
     }
 
     public int getArgCount() {

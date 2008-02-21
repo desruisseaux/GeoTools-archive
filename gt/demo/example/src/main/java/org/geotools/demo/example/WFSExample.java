@@ -139,7 +139,7 @@ public class WFSExample {
 		// step 6 modify
 		Transaction t = new DefaultTransaction();
 
-		FeatureStore store = (FeatureStore) source;
+		FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
 		store.setTransaction( t );
 		Set<Identifier> ids = new HashSet<Identifier>();
 		ids.add( ff.featureId(fid) );

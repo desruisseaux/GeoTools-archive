@@ -277,7 +277,7 @@ public class DefaultMapContext implements MapContext {
     public void addLayer(CollectionSource source, Style style) {
         // JG: for later when feature source extends source
 //        if( source instanceof FeatureSource){
-//            addLayer( (FeatureSource) source, style);
+//            addLayer( (FeatureSource<SimpleFeatureType, SimpleFeature>) source, style);
 //        }
         this.addLayer(new DefaultMapLayer(source, style, ""));
     }
@@ -338,12 +338,12 @@ public class DefaultMapContext implements MapContext {
 	 * @param style
 	 *            DOCUMENT ME!
 	 */
-	public void addLayer(FeatureCollection collection, Style style) {
+	public void addLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style) {
 		this.addLayer(new DefaultMapLayer(collection, style, ""));
 	}
     public void addLayer(Collection collection, Style style) {
         if( collection instanceof FeatureCollection){
-            this.addLayer(new DefaultMapLayer((FeatureCollection)collection, style, ""));
+            this.addLayer(new DefaultMapLayer((FeatureCollection<SimpleFeatureType, SimpleFeature>)collection, style, ""));
             return;
         }
         this.addLayer(new DefaultMapLayer(collection, style, ""));
@@ -548,7 +548,7 @@ public class DefaultMapContext implements MapContext {
 
 		final int length = layerList.size();
 		MapLayer layer;
-		FeatureSource fs;
+		FeatureSource<SimpleFeatureType, SimpleFeature> fs;
 		ReferencedEnvelope env;
 		CoordinateReferenceSystem sourceCrs;
 		for (int i = 0; i < length; i++) {

@@ -74,8 +74,8 @@ public class PointInsidePolygonValidation extends PointPolygonAbstractValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource) layers.get(getPointTypeRef());
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> pointSource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getPointTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedPolygonTypeRef());
 
         Object[] polys = polySource.getFeatures().toArray();
         Object[] points = pointSource.getFeatures().toArray();

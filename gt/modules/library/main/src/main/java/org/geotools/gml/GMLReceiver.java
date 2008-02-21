@@ -36,7 +36,7 @@ public class GMLReceiver extends XMLFilterImpl implements GMLHandlerFeature {
      *
      * @param FeatureCollection<SimpleFeatureType, SimpleFeature> sets the FeatureCollection
      */
-    public GMLReceiver(FeatureCollection featureCollection) {
+    public GMLReceiver(FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) {
         this.featureCollection = featureCollection;
     }
 

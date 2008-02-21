@@ -146,7 +146,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param title
 	 *            DOCUMENT ME!
 	 */
-	public DefaultMapLayer(FeatureCollection collection, Style style,
+	public DefaultMapLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style,
 			String title) {
 		this(DataUtilities.source(collection), style, title);
 	}
@@ -164,7 +164,7 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param style
 	 *            the style used to represent this layer
 	 */
-	public DefaultMapLayer(FeatureCollection collection, Style style) {
+	public DefaultMapLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style) {
 		this(DataUtilities.source(collection), style, "");
 	}
 

@@ -18,6 +18,7 @@ package org.geotools.data.store;
 import java.util.Iterator;
 
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -27,19 +28,19 @@ import org.opengis.feature.simple.SimpleFeature;
  * @since 2.4
  *
  */
-public class FeatureIteratorIterator implements Iterator {
+public class FeatureIteratorIterator<F extends Feature> implements Iterator<F> {
 
 	/**
 	 * delegate feature iterator.
 	 */
-	FeatureIterator delegate;
+	FeatureIterator<F> delegate;
 	
 	/**
 	 * Creates the new iterator.
 	 * 
 	 * @param delegate The iterator to delegate to.
 	 */
-	public FeatureIteratorIterator( FeatureIterator<SimpleFeature> delegate ) {
+	public FeatureIteratorIterator( FeatureIterator<F> delegate ) {
 		this.delegate = delegate;
 	}
 	
@@ -53,7 +54,7 @@ public class FeatureIteratorIterator implements Iterator {
 	/**
 	 * Calls through to {@link FeatureIterator#next()}
 	 */
-	public Object next() {
+	public F next() {
 		return delegate.next();
 	}
 
@@ -67,7 +68,7 @@ public class FeatureIteratorIterator implements Iterator {
 	/**
 	 * @return The underlying delegate.
 	 */
-	public FeatureIterator<SimpleFeature> getDelegate() {
+	public FeatureIterator<F> getDelegate() {
 		return delegate;
 	}
 }

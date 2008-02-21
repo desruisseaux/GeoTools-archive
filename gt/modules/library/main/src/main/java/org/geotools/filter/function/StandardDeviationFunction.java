@@ -23,6 +23,8 @@ import org.geotools.feature.visitor.AverageVisitor;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.StandardDeviationVisitor;
 import org.geotools.util.NullProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Breaks a FeatureCollection<SimpleFeatureType, SimpleFeature> into classes using the standard deviation classification method.
@@ -40,7 +42,7 @@ public class StandardDeviationFunction extends ClassificationFunction {
         setName("StandardDeviation");
 	}
 
-	private Object calculate(FeatureCollection featureCollection) {
+	private Object calculate(FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection) {
         try {
             int classNum = getClasses();
     		// find the average
@@ -76,7 +78,7 @@ public class StandardDeviationFunction extends ClassificationFunction {
 		if (!(feature instanceof FeatureCollection)) {
 			return null;
 		}
-        return calculate((FeatureCollection) feature);
+        return calculate((FeatureCollection<SimpleFeatureType, SimpleFeature>) feature);
 	}
 
 	private Double getMin(int index, int numClasses, double average, double standardDeviation) {

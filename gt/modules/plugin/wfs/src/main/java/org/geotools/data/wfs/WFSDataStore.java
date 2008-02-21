@@ -18,6 +18,9 @@ package org.geotools.data.wfs;
 import java.io.IOException;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * {@link DataStore} extension interface to provide WFS specific extra
@@ -40,5 +43,5 @@ public interface WFSDataStore extends DataStore {
      * Overrides getFeatureSource to return WFSFeatureSource while the standard
      * API does not defines a getInfo method
      */
-    WFSFeatureSource getFeatureSource(String typeName) throws IOException;
+    WFSFeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(String typeName) throws IOException;
 }

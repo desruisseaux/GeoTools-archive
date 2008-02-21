@@ -251,11 +251,11 @@ public class ClippingTool_old extends AbstractWidgetTool {
         return myData;
     }
 
-    private void fillLayer(FeatureCollection lstFeatures, FeatureSource<SimpleFeatureType, SimpleFeature> datastore) {
-        FeatureStore store;
+    private void fillLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> lstFeatures, FeatureSource<SimpleFeatureType, SimpleFeature> datastore) {
+        FeatureStore<SimpleFeatureType, SimpleFeature> store;
 
         if (datastore instanceof FeatureStore) {
-            store = (FeatureStore) datastore;
+            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) datastore;
 
             DefaultTransaction transaction = new DefaultTransaction();
             store.setTransaction(transaction);

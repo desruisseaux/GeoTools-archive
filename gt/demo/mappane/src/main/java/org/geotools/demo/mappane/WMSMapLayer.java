@@ -80,7 +80,7 @@ public class WMSMapLayer extends DefaultMapLayer implements MapLayer, MapBoundsL
     private String exceptions = "application/vnd.ogc.se_inimage";
 
     public WMSMapLayer(WebMapServer wms, Layer layer) {
-        super((FeatureSource) null, null, "");
+        super((FeatureSource<SimpleFeatureType, SimpleFeature>) null, null, "");
         this.layer = layer;
         this.wms = wms;
         setDefaultStyle();

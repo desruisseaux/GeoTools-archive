@@ -781,7 +781,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * Default visibility for testing purposes
 	 */
 	
-	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource<SimpleFeatureType, SimpleFeature> source,
+	FeatureCollection<SimpleFeatureType, SimpleFeature> queryLayer(MapLayer currLayer, FeatureSource<SimpleFeatureType, SimpleFeature> source,
 			SimpleFeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
 			CoordinateReferenceSystem featCrs, Rectangle screenSize,
@@ -789,7 +789,7 @@ public final class StreamingRenderer implements GTRenderer {
             AffineTransform worldToScreenTransform)
 			throws IllegalFilterException, IOException,
 			IllegalAttributeException {
-		FeatureCollection results = null;
+	    FeatureCollection<SimpleFeatureType, SimpleFeature> results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
 		String[] attributes;
@@ -913,7 +913,7 @@ public final class StreamingRenderer implements GTRenderer {
 		// anyways See GEOS-631 and related issues. -ch
 		/*
 		 * if ((source instanceof FeatureStore) && (doesntHaveFIDFilter(query))) {
-		 * try { FeatureStore fs = (FeatureStore) source;
+		 * try { FeatureStore fs = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
 		 * 
 		 * if (fs.getTransaction() == Transaction.AUTO_COMMIT) { // play it
 		 * safe, only update the transaction info if its an // auto_commit // it
@@ -1431,7 +1431,7 @@ public final class StreamingRenderer implements GTRenderer {
 			CoordinateReferenceSystem sourceCrs) throws IOException {
         if( collection instanceof FeatureCollection){
             // will force content into correct CRS if needed
-            return prepFeatureCollection( (FeatureCollection) collection, sourceCrs );
+            return prepFeatureCollection( (FeatureCollection<SimpleFeatureType, SimpleFeature>) collection, sourceCrs );
         }
         return collection;
 	}

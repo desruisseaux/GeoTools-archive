@@ -66,8 +66,8 @@ public class PolygonNotOverlappingLineValidation
      */
     public boolean validate(Map layers, Envelope envelope,
         ValidationResults results) throws Exception {
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource1 = (FeatureSource) layers.get(getPolygonTypeRef());
-        FeatureSource<SimpleFeatureType, SimpleFeature> polySource2 = (FeatureSource) layers.get(getRestrictedLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource1 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> polySource2 = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedLineTypeRef());
 
         Object[] poly1 = polySource1.getFeatures().toArray();
         Object[] poly2 = polySource2.getFeatures().toArray();

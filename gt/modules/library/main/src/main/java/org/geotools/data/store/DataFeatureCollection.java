@@ -166,7 +166,6 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     //
     /** Set of open resource iterators & featureIterators */
     private final Set open = new HashSet();
-
     /**
      * FeatureIterator<SimpleFeature> is entirely based on iterator().
      * <p>
@@ -174,7 +173,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * out of the box.
      */
     public FeatureIterator<SimpleFeature> features() {
-    	FeatureIterator iterator = new DelegateFeatureIterator( this, iterator() );
+    	FeatureIterator<SimpleFeature> iterator = new DelegateFeatureIterator<SimpleFeature>( this, iterator() );
         open.add( iterator );
         return iterator;
     }
@@ -204,7 +203,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * 
      * @return Iterator, should be closed closeIterator 
      */
-    protected Iterator openIterator() throws IOException
+    protected Iterator<SimpleFeature> openIterator() throws IOException
     {    	
     	try {
             return new FeatureWriterIterator( writer() );
@@ -215,13 +214,13 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         catch( UnsupportedOperationException readOnly ){
         }
         try {
-            return new FeatureReaderIterator( reader() );
+            return new FeatureReaderIterator<SimpleFeature>( reader() );
         } catch (IOException e) {
             return new NoContentIterator( e );
         }        
     }
 
-    final public void close( Iterator close ) {
+    final public void close( Iterator<SimpleFeature> close ) {
     	try {
 			closeIterator( close );
 		} 
@@ -231,13 +230,13 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     	open.remove( close );
     }   
     
-    protected void closeIterator( Iterator close ) throws IOException
+    protected void closeIterator( Iterator<SimpleFeature> close ) throws IOException
     {
     	if( close == null ){
             // iterator probably failed during consturction !
         }
         else if( close instanceof FeatureReaderIterator ){
-            FeatureReaderIterator iterator = (FeatureReaderIterator) close;
+            FeatureReaderIterator<SimpleFeature> iterator = (FeatureReaderIterator<SimpleFeature>) close;
             iterator.close(); // only needs package visability
         }
         else if( close instanceof FeatureWriterIterator ){
@@ -271,7 +270,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     				closeIterator( (Iterator) iterator );
     			}
     			if( iterator instanceof FeatureIterator){
-    				( (FeatureIterator) iterator ).close();
+    				( (FeatureIterator<SimpleFeature>) iterator ).close();
     			}
     		}
     		catch( Throwable e){
@@ -445,7 +444,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     public FeatureCollection<SimpleFeatureType, SimpleFeature> getParent() {
         return parent; // TODO deal with listeners?        
     }
-    public void setParent(FeatureCollection collection) {
+    public void setParent(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         parent = collection;
     }    
    

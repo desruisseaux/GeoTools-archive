@@ -50,7 +50,7 @@ public class CollectionFeatureReader implements  FeatureReader<SimpleFeatureType
         assert !featuresArg.isEmpty();
 
         if (featuresArg instanceof FeatureCollection) {
-            collection = (FeatureCollection) featuresArg;
+            collection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) featuresArg;
         }
 
         this.features = featuresArg.iterator();
@@ -63,7 +63,7 @@ public class CollectionFeatureReader implements  FeatureReader<SimpleFeatureType
      * @param featuresArg a FeatureCollection.  <b>All features must be of the same FeatureType</b> 
      * @param typeArg the Feature type of of the features.
      */
-    public CollectionFeatureReader(FeatureCollection featuresArg,
+    public CollectionFeatureReader(FeatureCollection<SimpleFeatureType, SimpleFeature> featuresArg,
         SimpleFeatureType typeArg) {
         assert !featuresArg.isEmpty();
         collection = featuresArg;

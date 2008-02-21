@@ -139,6 +139,6 @@ class WFSFeatureCollection extends DataFeatureCollection {
     protected Iterator<SimpleFeature> openIterator() throws IOException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         reader = protocolHandler.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        return new FeatureReaderIterator(reader);
+        return new FeatureReaderIterator<SimpleFeature>(reader);
     }
 }

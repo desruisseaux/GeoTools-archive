@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
 
@@ -37,11 +38,11 @@ public class FilteringIteration extends FeatureCollectionIteration {
      * @param filter DOCUMENT ME!
      * @param collection DOCUMENT ME!
      */
-    public FilteringIteration(org.opengis.filter.Filter filter, FeatureCollection collection) {
+    public FilteringIteration(org.opengis.filter.Filter filter, FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
         super(new FilterHandler(filter), collection);
     }
 
-    public static void filter(FeatureCollection features, Filter filter) {
+    public static void filter(FeatureCollection<SimpleFeatureType, SimpleFeature> features, Filter filter) {
         FilteringIteration i = new FilteringIteration(filter, features);
         i.iterate();
     }
@@ -63,7 +64,7 @@ public class FilteringIteration extends FeatureCollectionIteration {
         }
 
         public void endFeatureCollection(
-            org.geotools.feature.FeatureCollection fc) {
+            org.geotools.feature.FeatureCollection<SimpleFeatureType, SimpleFeature> fc) {
         }
 
         public void handleAttribute(AttributeDescriptor type,
@@ -77,7 +78,7 @@ public class FilteringIteration extends FeatureCollectionIteration {
         }
 
         public void handleFeatureCollection(
-            org.geotools.feature.FeatureCollection fc) {
+            org.geotools.feature.FeatureCollection<SimpleFeatureType, SimpleFeature> fc) {
         }
     }
 }

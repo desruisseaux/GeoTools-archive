@@ -64,7 +64,7 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
      * @throws IOException
      */
     public PostgisFeatureWriter(
-		FeatureReader fReader, QueryData queryData, boolean WKBEnabled,boolean byteaWKB, PostgisSQLBuilder sqlBuilder
+		FeatureReader<SimpleFeatureType, SimpleFeature> fReader, QueryData queryData, boolean WKBEnabled,boolean byteaWKB, PostgisSQLBuilder sqlBuilder
 	) throws IOException {
     	
         super(fReader, queryData);

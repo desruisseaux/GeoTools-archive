@@ -436,7 +436,7 @@ public class FilterTest extends TestCase {
         long startTime = System.currentTimeMillis();
         FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(
                 allQuery, Transaction.AUTO_COMMIT);
-        FilteringFeatureReader ffr = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(
+        FilteringFeatureReader<SimpleFeatureType, SimpleFeature> ffr = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(
                 fr, filter);
         ArrayList slowResults = new ArrayList();
         collectResults(ffr, slowResults);

@@ -16,9 +16,12 @@
 package org.geotools.feature;
 
 import java.util.EventObject;
+
+import org.geotools.data.FeatureEvent;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.data.FeatureEvent;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -52,7 +55,7 @@ public class CollectionEvent extends EventObject {
     /** Holds value of property features. */
     private SimpleFeature[] features;
 
-    public CollectionEvent(FeatureCollection collection, FeatureEvent event) {
+    public CollectionEvent(FeatureCollection<? extends FeatureType, ? extends Feature> collection, FeatureEvent event) {
         super(collection);
 
         switch (event.getEventType()) {
@@ -85,7 +88,7 @@ public class CollectionEvent extends EventObject {
      * @param involvedFeatures DOCUMENT ME!
      * @param type DOCUMENT ME!
      */
-    public CollectionEvent(FeatureCollection source, SimpleFeature[] involvedFeatures, int type) {
+    public CollectionEvent(FeatureCollection<? extends FeatureType, ? extends Feature> source, SimpleFeature[] involvedFeatures, int type) {
         super(source);
         this.type = type;
         this.features = involvedFeatures;
@@ -96,8 +99,8 @@ public class CollectionEvent extends EventObject {
      *
      * @return The FeatureCollection<SimpleFeatureType, SimpleFeature> which was the event's source.
      */
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection() {
-        return (FeatureCollection) source;
+    public FeatureCollection<? extends FeatureType, ? extends Feature> getCollection() {
+        return (FeatureCollection<? extends FeatureType, ? extends Feature>) source;
     }
 
     /**

@@ -225,7 +225,7 @@ final class OneLayerContext implements MapContext {
     public void addLayer(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, Style style) {
     }
 
-    public void addLayer(FeatureCollection collection, Style style) {
+    public void addLayer(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Style style) {
     }
 
     public void addLayer(Collection collection, Style style) {

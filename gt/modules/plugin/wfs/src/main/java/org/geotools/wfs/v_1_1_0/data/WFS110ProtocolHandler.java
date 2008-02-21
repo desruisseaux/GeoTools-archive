@@ -596,7 +596,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
         {
             Filter filter = query.getFilter();
             if (Filter.EXCLUDE.equals(filter)) {
-                return new EmptyFeatureReader(contentType);
+                return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(contentType);
             }
             // TODO: split filters!!
             if (filter instanceof BBOX || filter instanceof Id) {
@@ -624,7 +624,7 @@ public class WFS110ProtocolHandler extends WFSProtocolHandler {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = new WFSFeatureReader(parser);
 
         if (!reader.hasNext()) {
-            return new EmptyFeatureReader(contentType);
+            return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(contentType);
         }
 
         SimpleFeatureType readerType = reader.getFeatureType();

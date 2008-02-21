@@ -330,11 +330,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         
         // for the others, wrap so that we don't report the wrong owning datastore
         if(source instanceof FeatureLocking)
-            return new WrappingPostgisFeatureLocking((FeatureLocking) source, this);
+            return new WrappingPostgisFeatureLocking((FeatureLocking<SimpleFeatureType, SimpleFeature>) source, this);
         else if(source instanceof FeatureStore)
-            return new WrappingPostgisFeatureStore((FeatureStore) source, this);
+            return new WrappingPostgisFeatureStore((FeatureStore<SimpleFeatureType, SimpleFeature>) source, this);
         else 
-            return new WrappingPostgisFeatureSource((FeatureSource) source, this);
+            return new WrappingPostgisFeatureSource((FeatureSource<SimpleFeatureType, SimpleFeature>) source, this);
     }
 
     public FeatureSource<SimpleFeatureType, SimpleFeature> getView(Query query) throws IOException, SchemaException {

@@ -100,7 +100,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource<SimpleFeat
          
          //max feature cap
          if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-             features = new MaxFeaturesFeatureCollection( features, query.getMaxFeatures() );
+             features = new MaxFeaturesFeatureCollection<SimpleFeatureType, SimpleFeature>( features, query.getMaxFeatures() );
          }
          
          return features;
@@ -109,7 +109,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource<SimpleFeat
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Filter filter) throws IOException {
         //filter
         if ( filter != null && !filter.equals( Filter.INCLUDE ) ) {
-            return new FilteringFeatureCollection( getFeatures() , filter );
+            return new FilteringFeatureCollection<SimpleFeatureType, SimpleFeature>( getFeatures() , filter );
         }
         
         return getFeatures();

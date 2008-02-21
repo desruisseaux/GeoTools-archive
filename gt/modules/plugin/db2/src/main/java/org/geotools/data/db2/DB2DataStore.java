@@ -538,10 +538,10 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
 		}
 
 		if ((filter == Filter.INCLUDE) || filter.equals(Filter.INCLUDE)) {
-			return new EmptyFeatureReader(requestType);
+			return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(requestType);
 		}
 
-		FeatureReader reader = getFeatureReader(query, transaction);
+		FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query, transaction);
 
 		if (compare == 1) {
 			reader = new ReTypeFeatureReader(reader, requestType);

@@ -74,7 +74,7 @@ public class Collection_MaxFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateMax(FeatureCollection collection,
+    public static CalcResult calculateMax(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         MaxVisitor maxVisitor = new MaxVisitor(expression);
         collection.accepts(maxVisitor, null);
@@ -129,7 +129,7 @@ public class Collection_MaxFunction extends FunctionExpressionImpl
 			return new Integer(0); // no features were visited in the making of this answer
 		}
                 Expression expr = (Expression) getExpression(0);
-		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

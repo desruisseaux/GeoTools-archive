@@ -919,7 +919,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
     // Feature Store Testing
     //
     public void testGetFeatureStoreModifyFeatures1() throws IOException {
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         // FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         // rd1Filter = factory.createFidFilter( roadFeatures[0].getID() );
@@ -935,7 +935,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
     }
 
     public void testGetFeatureStoreModifyFeatures2() throws IOException {
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
 
@@ -961,7 +961,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
      * @throws IOException
      */
     public void testGetFeatureStoreModifyFeatures3() throws IOException {
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         PropertyIsEqualTo filter = ff.equals(ff.property("name"), ff.literal("r1"));
@@ -971,7 +971,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
     }
 
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         road.removeFeatures(td.rd1Filter);
         assertEquals(0, road.getFeatures(td.rd1Filter).size());
@@ -980,7 +980,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     public void testGetFeatureStoreRemoveAllFeatures()
         throws IOException {
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         road.removeFeatures(Filter.INCLUDE);
         assertEquals(0, road.getFeatures().size());
@@ -988,7 +988,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { td.newRoad, });
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+         FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         road.addFeatures(DataUtilities.collection(reader));
         assertEquals(td.roadFeatures.length + 1, count("road"));
@@ -998,7 +998,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         throws NoSuchElementException, IOException, IllegalAttributeException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { td.newRoad, });
 
-        FeatureStore road = (FeatureStore) dataStore.getFeatureSource("road");
+         FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
 
         assertEquals(3, count("road"));
 
@@ -1022,7 +1022,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
      */
     public void testLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
-        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
         road.setFeatureLock(lock);
 
         assertFalse(isLocked("road", "road.1"));
@@ -1032,7 +1032,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     public void testUnLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
-        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
         road.setFeatureLock(lock);
         road.lockFeatures();
 
@@ -1061,8 +1061,8 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         FeatureLock lockB = FeatureLockFactory.generate("LockB", LOCK_DURATION);
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureLocking road1 = (FeatureLocking) dataStore.getFeatureSource("road");
-        FeatureLocking road2 = (FeatureLocking) dataStore.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road1 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road2 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
         road1.setTransaction(t1);
         road2.setTransaction(t2);
         road1.setFeatureLock(lockA);
@@ -1114,7 +1114,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
     public void testGetFeatureLockingExpire() throws Exception {
         FeatureLock lock = FeatureLockFactory.generate("Timed", 1000);
 
-        FeatureLocking road = (FeatureLocking) dataStore.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) dataStore.getFeatureSource("road");
         road.setFeatureLock(lock);
         assertFalse(isLocked("road", "road.0"));
 
@@ -1323,7 +1323,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         return null;
     }
 
-    boolean covers(FeatureIterator reader, SimpleFeature[] array)
+    boolean covers(FeatureIterator<SimpleFeature> reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;

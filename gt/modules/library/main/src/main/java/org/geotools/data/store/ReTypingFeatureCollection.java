@@ -38,7 +38,7 @@ public class ReTypingFeatureCollection extends DecoratingFeatureCollection<Simpl
 	}
 	
 	public FeatureIterator<SimpleFeature> features() {
-		return new DelegateFeatureIterator( this, iterator() );
+		return new DelegateFeatureIterator<SimpleFeature>( this, iterator() );
 	}
 
 	public void close(FeatureIterator<SimpleFeature> close) {

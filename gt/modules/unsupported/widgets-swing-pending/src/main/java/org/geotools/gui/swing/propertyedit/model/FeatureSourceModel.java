@@ -34,6 +34,7 @@ import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -117,10 +118,10 @@ public class FeatureSourceModel implements TableModel {
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
-        FeatureStore store;
+        FeatureStore<SimpleFeatureType, SimpleFeature> store;
         if (layer.getFeatureSource() instanceof FeatureStore) {
 
-            store = (FeatureStore) layer.getFeatureSource();
+            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) layer.getFeatureSource();
             DefaultTransaction transaction = new DefaultTransaction("trans_maj");
 
 

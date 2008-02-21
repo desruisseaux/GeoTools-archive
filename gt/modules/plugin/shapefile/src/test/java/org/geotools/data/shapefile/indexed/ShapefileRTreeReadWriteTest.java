@@ -103,7 +103,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
                 memorymapped, true);
 
         s.createSchema(type);
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(type
                 .getTypeName());
 
         store.addFeatures(one);
@@ -136,7 +136,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
         s.createSchema(type);
 
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) s.getFeatureSource(type
                 .getTypeName());
         store.addFeatures(one);
 

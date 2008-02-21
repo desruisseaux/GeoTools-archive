@@ -452,7 +452,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         SimpleFeature f;
 
-        for (FeatureIterator i = c1.features(); i.hasNext();) {
+        for (FeatureIterator<SimpleFeature> i = c1.features(); i.hasNext();) {
             f = (SimpleFeature) i.next();
             assertTrue(msg + " " + f.getID(), c2.contains(f));
         }
@@ -891,7 +891,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         return count == array.length;
     }
 
-    boolean covers(FeatureIterator reader, SimpleFeature[] array) throws NoSuchElementException,
+    boolean covers(FeatureIterator<SimpleFeature> reader, SimpleFeature[] array) throws NoSuchElementException,
             IOException, IllegalAttributeException {
         SimpleFeature feature;
         int count = 0;
@@ -1518,7 +1518,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     // Feature Store Testing
     //
     public void testGetFeatureStoreModifyFeatures1() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         // FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         // rd1Filter = factory.createFidFilter( roadFeatures[0].getID() );
@@ -1533,7 +1533,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureStoreModifyFeatures2() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         rd1Filter = factory.createFidFilter(roadFeatures[0].getID());
@@ -1554,7 +1554,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * @throws IOException
      */
     public void testGetFeatureStoreModifyFeatures3() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         CompareFilter filter = factory.createCompareFilter(Filter.COMPARE_EQUALS);
@@ -1566,7 +1566,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         road.removeFeatures(rd1Filter);
         assertEquals(0, road.getFeatures(rd1Filter).size());
@@ -1574,7 +1574,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureStoreRemoveAllFeatures() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         road.removeFeatures(Filter.INCLUDE);
         assertEquals(0, road.getFeatures().size());
@@ -1582,7 +1582,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         road.addFeatures(DataUtilities.collection(reader));
         assertEquals(roadFeatures.length + 1, count("road"));
@@ -1592,7 +1592,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             IllegalAttributeException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
 
-        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
 
         assertEquals(3, count("road"));
 
@@ -1606,9 +1606,9 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     // Transaction t1 = new DefaultTransaction();
     // Transaction t2 = new DefaultTransaction();
     //
-    // FeatureStore road = (FeatureStore) data.getFeatureSource("road");
-    // FeatureStore road1 = (FeatureStore) data.getFeatureSource("road");
-    // FeatureStore road2 = (FeatureStore) data.getFeatureSource("road");
+    // FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
+    // FeatureStore road1 = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
+    // FeatureStore road2 = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
     //
     // road1.setTransaction(t1);
     // road2.setTransaction(t2);
@@ -1704,7 +1704,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      */
     public void testLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
         road.setFeatureLock(lock);
 
         assertFalse(isLocked("road", "road.rd1"));
@@ -1714,7 +1714,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testUnLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", LOCK_DURATION);
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
         road.setFeatureLock(lock);
         road.lockFeatures();
 
@@ -1743,8 +1743,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureLock lockB = FeatureLockFactory.generate("LockB", LOCK_DURATION);
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureLocking road1 = (FeatureLocking) data.getFeatureSource("road");
-        FeatureLocking road2 = (FeatureLocking) data.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road1 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road2 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
         road1.setTransaction(t1);
         road2.setTransaction(t2);
         road1.setFeatureLock(lockA);
@@ -1796,7 +1796,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureLockingExpire() throws Exception {
         FeatureLock lock = FeatureLockFactory.generate("Timed", 1000);
 
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("road");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("road");
         road.setFeatureLock(lock);
         assertFalse(isLocked("road", "road.rd1"));
 

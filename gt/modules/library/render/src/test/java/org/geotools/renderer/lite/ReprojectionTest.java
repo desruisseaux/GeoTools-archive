@@ -52,7 +52,7 @@ public class ReprojectionTest extends TestCase {
 	}
 
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> createLineCollection() throws Exception {
-		FeatureCollection fc = FeatureCollections.newCollection();
+	    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = FeatureCollections.newCollection();
 		fc.add(createLine(-177, 0, -177, 10));
 		fc.add(createLine(-177, 0, -200, 0));
 		fc.add(createLine(-177, 0, -177, 100));

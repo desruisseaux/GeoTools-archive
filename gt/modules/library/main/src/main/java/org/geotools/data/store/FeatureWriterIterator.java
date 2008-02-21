@@ -40,7 +40,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @since 2.1.RC0
  * @source $URL$
  */
-final class FeatureWriterIterator implements Iterator {
+final class FeatureWriterIterator implements Iterator<SimpleFeature> {
     FeatureWriter<SimpleFeatureType, SimpleFeature> writer;    
     public FeatureWriterIterator( FeatureWriter<SimpleFeatureType, SimpleFeature> writer ){
         this.writer = writer;
@@ -66,7 +66,7 @@ final class FeatureWriterIterator implements Iterator {
         }        
     }
 
-    public Object next() {
+    public SimpleFeature next() {
         if( writer == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }

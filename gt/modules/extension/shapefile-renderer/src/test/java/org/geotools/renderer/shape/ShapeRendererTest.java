@@ -260,7 +260,7 @@ public class ShapeRendererTest extends TestCase {
     public void testAddTransaction() throws Exception {
         final ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
         Style st = TestUtilites.createTestStyle(null, typename);
-        FeatureStore store = (FeatureStore) ds.getFeatureSource();
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection = store.getFeatures();
@@ -289,7 +289,7 @@ public class ShapeRendererTest extends TestCase {
     public void testModifyTransaction() throws Exception {
         ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
         Style st = TestUtilites.createTestStyle(null, typename);
-        FeatureStore store = (FeatureStore) ds.getFeatureSource();
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
         store.modifyFeatures(ds.getSchema().getAttribute("NAME"), "bleep",

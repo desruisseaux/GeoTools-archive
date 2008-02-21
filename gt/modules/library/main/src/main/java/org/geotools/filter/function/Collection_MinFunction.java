@@ -73,7 +73,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException
      */
-    public static CalcResult calculateMin(FeatureCollection collection,
+    public static CalcResult calculateMin(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         MinVisitor minVisitor = new MinVisitor(expression);
         collection.accepts(minVisitor, null);
@@ -127,7 +127,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
 			return new Integer(0); // no features were visited in the making of this answer
 		}
                 Expression expr = (Expression) getExpression(0);
-		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection) feature;
+		FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;

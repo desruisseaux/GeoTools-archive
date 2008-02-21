@@ -30,10 +30,10 @@ import org.opengis.feature.type.FeatureType;
  * @author Ian Schneider
  * @source $URL$
  */
-public class FeatureIteratorImpl<T extends FeatureType, F extends Feature> implements FeatureIterator<F> {
+public class FeatureIteratorImpl<F extends Feature> implements FeatureIterator<F> {
     /** The iterator from the FeatureCollection<SimpleFeatureType, SimpleFeature> to return features from. */
      java.util.Iterator<F> iterator;
-     FeatureCollection<T, F> collection;
+     FeatureCollection<? extends FeatureType, F> collection;
      
     /**
      * Create a new FeatureIterator<SimpleFeature> using the Iterator from the given
@@ -41,7 +41,7 @@ public class FeatureIteratorImpl<T extends FeatureType, F extends Feature> imple
      *
      * @param collection The FeatureCollection<SimpleFeatureType, SimpleFeature> to perform the iteration on.
      */
-    public FeatureIteratorImpl(FeatureCollection<T, F> collection) {
+    public FeatureIteratorImpl(FeatureCollection<? extends FeatureType, F> collection) {
         this.collection = collection;
         this.iterator = collection.iterator();
     }

@@ -45,8 +45,8 @@ import java.util.Set;
  * Transaction t = new DefaultTransaction("handle");
  * t.putProperty( "hint", new Integer(7) );
  * try {
- *     FeatureStore road = (FeatureStore) store.getFeatureSource("road");
- *     FeatureStore river = (FeatureStore) store.getFeatureSource("river");
+ *     FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) store.getFeatureSource("road");
+ *     FeatureStore river = (FeatureStore<SimpleFeatureType, SimpleFeature>) store.getFeatureSource("river");
  *
  *     road.setTransaction( t );
  *     river.setTransaction( t );

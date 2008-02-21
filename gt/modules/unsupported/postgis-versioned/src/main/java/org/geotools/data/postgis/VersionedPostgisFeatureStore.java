@@ -402,7 +402,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // time simply allow not include fid attributes in the insert queries (or provide a
         // "default"
         // value for them).
-        FeatureSource<SimpleFeatureType, SimpleFeature> changesets = (FeatureSource) store
+        FeatureSource<SimpleFeatureType, SimpleFeature> changesets = (FeatureSource<SimpleFeatureType, SimpleFeature>) store
                 .getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS);
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);

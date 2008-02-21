@@ -35,7 +35,7 @@ import org.opengis.filter.Filter;
  * <pre><code>
  * FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource("roads");
  * if( source instanceof FeatureLocking ) {
- *     FeatureLocking locking = (FeatureLocking) source;
+ *     FeatureLocking locking = (FeatureLocking<SimpleFeatureType, SimpleFeature>) source;
  *     ...
  * }
  *

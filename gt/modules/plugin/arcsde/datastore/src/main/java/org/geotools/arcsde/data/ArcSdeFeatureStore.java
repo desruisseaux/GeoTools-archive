@@ -115,7 +115,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     // }
 
     /**
-     * @see FeatureStore#addFeatures(FeatureCollection)
+     * @see FeatureStore#addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature>)
      */
     public Set<String> addFeatures(
             final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)

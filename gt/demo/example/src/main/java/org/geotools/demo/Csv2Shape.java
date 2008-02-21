@@ -86,7 +86,8 @@ public class Csv2Shape {
 		
 		Transaction transaction = new DefaultTransaction("create");
 		String typeName = newDataStore.getTypeNames()[0];
-		FeatureStore<SimpleFeatureType, SimpleFeature> featureStore = (FeatureStore) newDataStore.getFeatureSource( typeName );
+		FeatureStore<SimpleFeatureType, SimpleFeature> featureStore;
+        featureStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) newDataStore.getFeatureSource( typeName );
 		featureStore.setTransaction(transaction);
 		try {			
 			featureStore.addFeatures(collection);

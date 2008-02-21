@@ -4747,7 +4747,7 @@ public class GMLComplexTypes {
                     ? (ComplexType) t.getParent() : null;
 
             return ((t != null) && (value instanceof FeatureCollection)
-            		&& ((FeatureCollection)value).getBounds()!=null);
+            		&& ((FeatureCollection<SimpleFeatureType, SimpleFeature>)value).getBounds()!=null);
         }
 
         /**
@@ -4769,7 +4769,7 @@ public class GMLComplexTypes {
                     null);
             }
 
-            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) value;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) value;
 
             if (fc.getBounds() != null) {
                 BoundingShapeType.getInstance().encode(null, fc.getBounds(),

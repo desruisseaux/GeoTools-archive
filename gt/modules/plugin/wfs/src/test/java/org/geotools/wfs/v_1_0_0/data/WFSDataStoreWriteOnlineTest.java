@@ -68,12 +68,12 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
     
-    public static Id doInsert(DataStore ds,SimpleFeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public static Id doInsert(DataStore ds,SimpleFeatureType ft,FeatureCollection<SimpleFeatureType, SimpleFeature> insert) throws NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	WFSFeatureStore fs = (WFSFeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	System.out.println("Insert Read 1");
-    	FeatureIterator fr = fs.getFeatures().features();
+    	FeatureIterator<SimpleFeature> fr = fs.getFeatures().features();
     	int count1 = 0;
     	while(fr.hasNext()){
     		count1 ++; fr.next();
@@ -152,11 +152,11 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     public static void doDelete(DataStore ds,SimpleFeatureType ft, Id ff) throws NoSuchElementException, IllegalAttributeException, IOException{
     	assertNotNull("doInsertFailed?",ff);
     	Transaction t = new DefaultTransaction();
-    	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
+    	FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore<SimpleFeatureType, SimpleFeature>)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
     	System.out.println("Delete Read 1");
-    	FeatureIterator fr = fs.getFeatures().features();
+    	FeatureIterator<SimpleFeature> fr = fs.getFeatures().features();
     	int count1 = 0;
     	while(fr.hasNext()){
     		count1 ++; fr.next();
@@ -194,7 +194,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     
     public static void doUpdate(DataStore ds,SimpleFeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryRegistryException, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
-    	FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
+    	FeatureStore<SimpleFeatureType, SimpleFeature> fs = (FeatureStore<SimpleFeatureType, SimpleFeature>)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
     	AttributeDescriptor at = ft.getAttribute(attributeToChange);

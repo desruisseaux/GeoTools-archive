@@ -72,13 +72,13 @@ public class LineNotTouchingPolygonInteriorValidation
         ValidationResults results) throws Exception {
     	boolean r = true;
     	
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource) layers.get(getLineTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsLine = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getLineTypeRef());
         if(fsLine == null)
         	return true;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcLine = fsLine.getFeatures();
         FeatureIterator<SimpleFeature> fLine = fcLine.features();
         
-        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
+        FeatureSource<SimpleFeatureType, SimpleFeature> fsPoly = (FeatureSource<SimpleFeatureType, SimpleFeature>) layers.get(getRestrictedPolygonTypeRef());
         if(fsPoly == null)
         	return true;
         FeatureCollection<SimpleFeatureType, SimpleFeature> fcPoly = fsPoly.getFeatures();

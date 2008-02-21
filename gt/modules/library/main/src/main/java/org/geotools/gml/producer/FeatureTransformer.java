@@ -412,12 +412,12 @@ public class FeatureTransformer extends TransformerBase {
         public void encode(Object o) throws IllegalArgumentException {
             try {
                 if (o instanceof FeatureCollection) {
-                    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection) o;
+                    FeatureCollection<SimpleFeatureType, SimpleFeature> fc = (FeatureCollection<SimpleFeatureType, SimpleFeature>) o;
                     FeatureCollectionIteration.iteration(this, fc);
                 } else if (o instanceof FeatureCollection[]) {
                     //Did FeatureResult[] so that we are sure they're all the same type.
                     //Could also consider collections here...  
-                    FeatureCollection[] results = (FeatureCollection[]) o;
+                    FeatureCollection<SimpleFeatureType, SimpleFeature>[] results = (FeatureCollection[]) o;
                     ReferencedEnvelope bounds = null;
 
                     for (int i = 0; i < results.length; i++) {
@@ -437,7 +437,7 @@ public class FeatureTransformer extends TransformerBase {
                     endFeatureCollection();
                 } else if (o instanceof FeatureReader) {
                     // THIS IS A HACK FOR QUICK USE
-                     FeatureReader<SimpleFeatureType, SimpleFeature> r = (FeatureReader) o;
+                     FeatureReader<SimpleFeatureType, SimpleFeature> r = (FeatureReader<SimpleFeatureType, SimpleFeature>) o;
 
                     startFeatureCollection();
 
@@ -477,7 +477,7 @@ public class FeatureTransformer extends TransformerBase {
             }
         }
 
-        public void handleFeatureIterator(FeatureIterator iterator)
+        public void handleFeatureIterator(FeatureIterator<SimpleFeature> iterator)
             throws IOException {
             try {
                 while (iterator.hasNext() && running) {
@@ -558,7 +558,7 @@ public class FeatureTransformer extends TransformerBase {
          *
          * @param collection DOCUMENT ME!
          */
-        public void handleFeatureCollection(FeatureCollection collection) {
+        public void handleFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
             startFeatureCollection();
             writeBounds(collection.getBounds());
         }
@@ -596,7 +596,7 @@ public class FeatureTransformer extends TransformerBase {
          *
          * @param collection DOCUMENT ME!
          */
-        public void endFeatureCollection(FeatureCollection collection) {
+        public void endFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) {
             endFeatureCollection();
         }
 

@@ -65,7 +65,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection <
      */
     GeometryCoordinateSequenceTransformer transformer;
     
-    public ReprojectingFeatureCollection(FeatureCollection delegate,
+    public ReprojectingFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> delegate,
             CoordinateReferenceSystem target) {
         this( delegate, delegate.getSchema().getDefaultGeometry().getCRS(), target );
     }
@@ -117,18 +117,18 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection <
     }
 
     public  FeatureReader<SimpleFeatureType, SimpleFeature> reader() throws IOException {
-        return new DelegateFeatureReader(getSchema(), features());
+        return new DelegateFeatureReader<SimpleFeatureType, SimpleFeature>(getSchema(), features());
     }
 
     public FeatureIterator<SimpleFeature> features() {
-        return new DelegateFeatureIterator(this, iterator());
+        return new DelegateFeatureIterator<SimpleFeature>(this, iterator());
     }
 
-    public void close(FeatureIterator close) {
+    public void close(FeatureIterator<SimpleFeature> close) {
         close.close();
     }
 
-    public Iterator iterator() {
+    public Iterator<SimpleFeature> iterator() {
         try {
             return new ReprojectingIterator(delegate.iterator(), transform, schema, transformer);
         } catch (Exception e) {

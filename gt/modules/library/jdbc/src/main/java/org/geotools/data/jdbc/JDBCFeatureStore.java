@@ -337,7 +337,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
         return addedFids;
     }
 
-    public Set<String> addFeatures(FeatureCollection collection) throws IOException {
+    public Set<String> addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature> collection) throws IOException {
         Set<String> addedFids = new HashSet<String>();
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;

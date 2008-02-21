@@ -26,6 +26,7 @@ import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.test.TestData;
 import org.geotools.validation.xml.XMLReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -85,7 +86,7 @@ public class TestFixture {
         	ShapefileDataStore dataStore = new ShapefileDataStore( shapefile.toURL() );
         	String dataStoreId = dataStore.getTypeNames()[0].toUpperCase();
         	String typeName = dataStore.getTypeNames()[0];
-        	FeatureIterator features = dataStore.getFeatureSource( typeName ).getFeatures().features();
+        	FeatureIterator<SimpleFeature> features = dataStore.getFeatureSource( typeName ).getFeatures().features();
         	MemoryDataStore cache = new MemoryDataStore( features );
         	
         	repository.register( dataStoreId, cache );

@@ -623,7 +623,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(type, reader.getFeatureType());
         assertEquals(1, count(reader));
 
-        FeatureStore store = (FeatureStore) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         store.setTransaction(t);
         store.removeFeatures(rd1Filter);
 
@@ -1174,7 +1174,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
     // Feature Store Testing
     //
     public void testGetFeatureStoreModifyFeatures1() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         AttributeDescriptor name = roadType.getAttribute("NAME");
         road.modifyFeatures(name, "changed", rd1Filter);
 
@@ -1183,7 +1183,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
     }
 
     public void testGetFeatureStoreModifyFeatures2() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         AttributeDescriptor name = roadType.getAttribute("NAME");
         road.modifyFeatures(new AttributeDescriptor[] { name, },
             new Object[] { "changed", }, rd1Filter);
@@ -1193,7 +1193,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
     }
 
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
 
         road.removeFeatures(rd1Filter);
         assertEquals(0, road.getFeatures(rd1Filter).size());
@@ -1202,7 +1202,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
+         FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         
         road.addFeatures( DataUtilities.collection(reader));
         assertEquals(roadFeatures.length + 1, road.getFeatures().size());
@@ -1210,7 +1210,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testGetFeatureStoreSetFeatures() throws IOException {
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = DataUtilities.reader(new SimpleFeature[] { newRoad, });
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
+         FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
 
         road.setFeatures(reader);
         assertEquals(1, road.getFeatures().size());
@@ -1221,9 +1221,9 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
 
-        FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
-        FeatureStore road1 = (FeatureStore) data.getFeatureSource("ROAD");
-        FeatureStore road2 = (FeatureStore) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road1 = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
+        FeatureStore<SimpleFeatureType, SimpleFeature> road2 = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
 
         road1.setTransaction(t1);
         road2.setTransaction(t2);
@@ -1319,7 +1319,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
      */
     public void testLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", 3600);
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("ROAD");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         road.setFeatureLock(lock);
 
         assertFalse(isLocked("ROAD", roadFeatures[0].getID()));
@@ -1329,7 +1329,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testUnLockFeatures() throws IOException {
         FeatureLock lock = FeatureLockFactory.generate("test", 360000);
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("ROAD");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         road.setFeatureLock(lock);
         road.lockFeatures();
 
@@ -1357,8 +1357,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureLock lockB = FeatureLockFactory.generate("LockB", 3600);
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureLocking road1 = (FeatureLocking) data.getFeatureSource("ROAD");
-        FeatureLocking road2 = (FeatureLocking) data.getFeatureSource("ROAD");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road1 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road2 = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         road1.setTransaction(t1);
         road2.setTransaction(t2);
         road1.setFeatureLock(lockA);
@@ -1406,7 +1406,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testGetFeatureLockingExpire() throws Exception {
         FeatureLock lock = FeatureLockFactory.generate("Timed", 1);
-        FeatureLocking road = (FeatureLocking) data.getFeatureSource("ROAD");
+        FeatureLocking<SimpleFeatureType, SimpleFeature> road = (FeatureLocking<SimpleFeatureType, SimpleFeature>) data.getFeatureSource("ROAD");
         road.setFeatureLock(lock);
         assertFalse(isLocked("ROAD", roadFeatures[0].getID()));
         road.lockFeatures(rd1Filter);

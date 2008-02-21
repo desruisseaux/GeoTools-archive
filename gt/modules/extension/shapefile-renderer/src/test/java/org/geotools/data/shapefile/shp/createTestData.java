@@ -64,7 +64,7 @@ public class createTestData {
         final SimpleFeatureType featureType = builder.buildFeatureType();
         datastore.createSchema(featureType);
 
-        FeatureStore store = (FeatureStore) datastore.getFeatureSource(
+        FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) datastore.getFeatureSource(
                 "test_lines");
         FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
         collection = DataUtilities
