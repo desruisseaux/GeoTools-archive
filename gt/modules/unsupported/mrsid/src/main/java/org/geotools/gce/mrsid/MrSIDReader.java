@@ -682,8 +682,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		} else {
 			final ImageReader reader = readerSPI.createReaderInstance();
 			reader.setInput(input, true, true);
-			reader.read(imageChoice, readP);
-			coverage = PlanarImage.wrapRenderedImage(reader.read(imageChoice));
+			coverage = PlanarImage.wrapRenderedImage(reader.read(imageChoice, readP));
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -697,15 +696,28 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				// adjustedRequestEnvelope
 				final int ssWidth = coverage.getWidth();
 				final int ssHeight = coverage.getHeight();
-				return super.createImageCoverage(coverage,
-						ConcatenatedTransform.create(ProjectiveTransform
-								.create(new AffineTransform(originalGridRange
-										.getLength(0)
-										/ (1.0 * ssWidth), 0, 0,
-										originalGridRange.getLength(1)
-												/ (1.0 * ssHeight),
-										sourceRegion.x + 0.5,
-										sourceRegion.y + 0.5)), raster2Model));
+				
+				// //
+	            //
+	            // setting new coefficients to define a new affineTransformation 
+	            // to be applied to the grid to world transformation 
+	            // ----------------------------------------------------------------------------------- 
+	            //
+	            // With respect to the original envelope, the obtained planarImage needs to be
+	            // rescaled and translated. The scaling factors are computed as the ratio between the
+	            // cropped source region sizes and the read image sizes. 
+	            // The translate settings are represented by the offsets of the source region.
+	            //
+	            // //
+	            final double scaleX = sourceRegion.width / (1.0 * ssWidth);
+	            final double scaleY = sourceRegion.height / (1.0 * ssHeight);
+	            final double translateX = sourceRegion.x;
+	            final double translateY = sourceRegion.y;
+
+	            return super.createImageCoverage(coverage,
+	                ConcatenatedTransform.create(ProjectiveTransform.create(
+	                        new AffineTransform(scaleX, 0, 0, scaleY, translateX + 0.5, translateY
+	                            + 0.5)), raster2Model));
 			} else {
 				// In case of no adjustedRequestEnvelope (As an instance, when
 				// reading the whole image), I can use the transformation. So,
@@ -910,7 +922,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 						.toRectangle())
 						|| sourceRegion.isEmpty())
 					throw new DataSourceException(
-							"The crop region is empty invalid.");
+							"The crop region is empty.");
 				sourceRegion.setRect(sourceRegion
 						.intersection(this.originalGridRange.toRectangle()));
 
@@ -1061,7 +1073,11 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					try {
 						crs = CRS.parseWKT(wkt);
 					} catch (FactoryException fe) {
-						// unable to get CRS from WKT
+						 if (LOGGER.isLoggable(Level.FINE)) {
+	                      	    LOGGER.log(Level.FINE, "Unable to get CRS from"
+									+ " WKT contained in metadata."
+									+ " Looking for a PRJ.");
+	                        }
 						crs = null;
 					}
 			}
