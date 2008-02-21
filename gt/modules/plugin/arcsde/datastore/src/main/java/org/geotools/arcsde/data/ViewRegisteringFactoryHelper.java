@@ -60,8 +60,10 @@ import org.geotools.data.DataSourceException;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id$
- * @source $URL$
+ * @version $Id: ViewRegisteringFactoryHelper.java 28170 2007-11-30 01:31:09Z
+ *          groldan $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ViewRegisteringFactoryHelper.java $
  */
 public class ViewRegisteringFactoryHelper {
     private static final Logger LOGGER = org.geotools.util.logging.Logging

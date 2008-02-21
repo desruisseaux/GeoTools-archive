@@ -398,7 +398,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
             int idx = loadFeatures(sds).size();
 
             while (idx > 0) {
-                FeatureWriter writer = null;
+                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
                 try {
                     writer = sds.getFeatureWriter(sds.getTypeNames()[0],
@@ -438,7 +438,7 @@ public class IndexedShapefileDataStoreTest extends TestCaseSupport {
             int idx = loadFeatures(sds).size();
 
             while (idx > 0) {
-                FeatureWriter writer = null;
+                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
                 try {
                     writer = sds.getFeatureWriter(sds.getTypeNames()[0],

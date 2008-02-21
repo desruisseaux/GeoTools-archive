@@ -51,13 +51,13 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
      * passed to this method:<br/>
      * 
      * <ul>
-     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing the
-     * pyramid that this reader will be reading</li>
+     * <li>ArcSDERasterReaderSpi.PYRAMID - a {@link ArcSDEPyramid} describing
+     * the pyramid that this reader will be reading</li>
      * <li>ArcSDERasterReaderSpi.RASTER_COLUMN - a String containing the Raster
      * column for this readers RASTER_TABLE</li>
-     * <li>ArcSDERasterReaderSpi.RASTER_TABLE -
-     * a String containing the name of the ArcSDE raster table to read. Probably
-     * needs to be qualified with the schema name.</li>
+     * <li>ArcSDERasterReaderSpi.RASTER_TABLE - a String containing the name of
+     * the ArcSDE raster table to read. Probably needs to be qualified with the
+     * schema name.</li>
      * </ul>
      */
     public ImageReader createReaderInstance(Object extension) throws IOException {
@@ -66,14 +66,18 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
             final String t = (String) ((Map) extension).get(RASTER_TABLE);
             final String c = (String) ((Map) extension).get(RASTER_COLUMN);
             if (p == null)
-                throw new IllegalArgumentException("missing value for 'ArcSDERasterReaderSpi.PYRAMID' in supplied paramater map.");
+                throw new IllegalArgumentException(
+                        "missing value for 'ArcSDERasterReaderSpi.PYRAMID' in supplied paramater map.");
             if (c == null)
-                throw new IllegalArgumentException("missing value for 'ArcSDERasterReaderSpi.RASTER_COLUMN' in supplied paramater map.");
+                throw new IllegalArgumentException(
+                        "missing value for 'ArcSDERasterReaderSpi.RASTER_COLUMN' in supplied paramater map.");
             if (t == null)
-                throw new IllegalArgumentException("missing value for 'ArcSDERasterReaderSpi.RASTER_TABLE' in supplied paramater map.");
+                throw new IllegalArgumentException(
+                        "missing value for 'ArcSDERasterReaderSpi.RASTER_TABLE' in supplied paramater map.");
             return new ArcSDERasterReader(this, p, t, c);
         } else {
-            throw new IllegalArgumentException("ArcSDERasterReader needs a java.util.Map of parameters to be instantiated");
+            throw new IllegalArgumentException(
+                    "ArcSDERasterReader needs a java.util.Map of parameters to be instantiated");
         }
     }
 
@@ -82,7 +86,8 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
     }
 
     /**
-     * We completely ignore the setInput() call in this reader, so we'll happily accept anything.
+     * We completely ignore the setInput() call in this reader, so we'll happily
+     * accept anything.
      */
     public Class[] getInputTypes() {
         return new Class[] { Object.class };

@@ -13,19 +13,25 @@ import com.esri.sde.sdk.client.SeQueryInfo;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/FeatureTypeInfo.java $
  */
 final class FeatureTypeInfo {
 
     private final SimpleFeatureType featureType;
+
     private final FIDReader fidStrategy;
+
     private final boolean isWritable;
+
     // we don't support transaction on multiversioned tables
     private final boolean isMultiVersion;
+
     /** is it a SDE registered view? */
     private final boolean isView;
 
     private final PlainSelect definitionQuery;
+
     private final SeQueryInfo sdeDefinitionQuery;
 
     public FeatureTypeInfo(final SimpleFeatureType featureType, final FIDReader fidStrategy,

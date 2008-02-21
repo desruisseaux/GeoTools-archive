@@ -11,11 +11,12 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.factory.Hints;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Id;
 
 public class JDBCUpdateFeatureWriter extends JDBCFeatureReader implements
-        FeatureWriter {
+        FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     ResultSetFeature last;
     

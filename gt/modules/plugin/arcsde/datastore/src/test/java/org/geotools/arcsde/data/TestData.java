@@ -77,7 +77,9 @@ public class TestData {
             "FLOAT64_COL", "STRING_COL", "DATE_COL", "SHAPE" };
 
     private SeColumnDefinition[] tempTableColumns;
+
     private SeLayer tempTableLayer;
+
     private SeTable tempTable;
 
     /** DOCUMENT ME! */
@@ -246,7 +248,8 @@ public class TestData {
         }
     }
 
-    public void deleteTable(final String typeName) throws DataSourceException, UnavailableArcSDEConnectionException {
+    public void deleteTable(final String typeName) throws DataSourceException,
+            UnavailableArcSDEConnectionException {
         ArcSDEConnectionPool connectionPool = getConnectionPool();
         deleteTable(connectionPool, typeName);
     }
@@ -267,9 +270,10 @@ public class TestData {
         }
     }
 
-    private void deleteTable(final ArcSDEConnectionPool pool, final String tableName) throws DataSourceException, UnavailableArcSDEConnectionException {
+    private void deleteTable(final ArcSDEConnectionPool pool, final String tableName)
+            throws DataSourceException, UnavailableArcSDEConnectionException {
         ArcSDEPooledConnection conn = pool.getConnection();
-        try{
+        try {
             SeTable table = new SeTable(conn, tableName);
             table.delete();
         } catch (Exception e) {
@@ -548,8 +552,9 @@ public class TestData {
     } // End method insertData
 
     /**
-     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with features whose schema adheres to the one
-     * created in <code>createTestData()</code> and returns it.
+     * Creates a FeatureCollection<SimpleFeatureType, SimpleFeature> with
+     * features whose schema adheres to the one created in
+     * <code>createTestData()</code> and returns it.
      * 
      * <p>
      * This schema is something like:
@@ -580,9 +585,11 @@ public class TestData {
      *             a feature with the given attribute values.
      * @throws SeException
      */
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(Class jtsGeomType, int numFeatures)
-            throws IOException, IllegalAttributeException, SeException {
-        FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections.newCollection();
+    public FeatureCollection<SimpleFeatureType, SimpleFeature> createTestFeatures(
+            Class jtsGeomType, int numFeatures) throws IOException, IllegalAttributeException,
+            SeException {
+        FeatureCollection<SimpleFeatureType, SimpleFeature> col = FeatureCollections
+                .newCollection();
         SimpleFeatureType type = getDataStore().getSchema(getTemp_table());
         Object[] values = new Object[type.getAttributeCount()];
 

@@ -385,7 +385,7 @@ public abstract class ContentDataStore implements DataStore {
      * in a {@link FeatureWriter}.
      * </p>
      */
-    public final FeatureWriter getFeatureWriter(String typeName, Filter filter,
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter,
         Transaction tx) throws IOException {
         
         ContentFeatureStore featureStore = ensureFeatureStore(typeName,tx);
@@ -420,7 +420,7 @@ public abstract class ContentDataStore implements DataStore {
      * This method is convenience for <code>getFeatureWriter(typeName,Filter.INCLUDE,tx)</code>.
      * </p>
      */
-    public final FeatureWriter getFeatureWriter(String typeName, Transaction tx)
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Transaction tx)
         throws IOException {
         
         return getFeatureWriter( typeName, Filter.INCLUDE, tx );
@@ -435,7 +435,7 @@ public abstract class ContentDataStore implements DataStore {
      * in a {@link FeatureWriter}.
      * </p>
      */
-    public final FeatureWriter getFeatureWriterAppend(String typeName, Transaction tx)
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName, Transaction tx)
         throws IOException {
         
         ContentFeatureStore featureStore = ensureFeatureStore(typeName,tx);

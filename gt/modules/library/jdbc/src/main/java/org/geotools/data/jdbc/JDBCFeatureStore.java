@@ -185,7 +185,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, filter, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, filter, transaction );
      * Feature feature;
      * while( writer.hasNext() ){
      *    feature = writer.next();
@@ -218,7 +218,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
             // implement as atomic
             Transaction atomic = new DefaultTransaction();
             try {
-                FeatureWriter writer = getDataStore().getFeatureWriter(typeName, filter, atomic);
+                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(typeName, filter, atomic);
                 modifyFeatures( type, value, writer );                
                 atomic.commit();                
             }
@@ -230,7 +230,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
             }                        
         }
         else {
-            FeatureWriter writer = getDataStore().getFeatureWriter(typeName, filter, getTransaction() );
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(typeName, filter, getTransaction() );
             modifyFeatures( type, value, writer );            
         }
     }
@@ -266,7 +266,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
      * </p>
      * <pre><code>
      * Set set = new HashSet();
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, true, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, true, transaction );
      * Featrue feature, newFeature;
      * while( reader.hasNext() ){
      *    feature = reader.next();
@@ -305,7 +305,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
         SimpleFeature newFeature;
-        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
 
         try {
@@ -342,7 +342,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
         String typeName = getSchema().getTypeName();
         SimpleFeature feature = null;
         SimpleFeature newFeature;
-        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
 
         Iterator iterator = collection.iterator();
@@ -393,7 +393,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, filter, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, filter, transaction );
      * Feature feature;
      * while( writer.hasNext() ){
      *    feature = writer.next();
@@ -436,7 +436,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore<
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, false, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, false, transaction );
      * Feature feature, newFeature;
      * while( writer.hasNext() ){
      *    feature = writer.next();

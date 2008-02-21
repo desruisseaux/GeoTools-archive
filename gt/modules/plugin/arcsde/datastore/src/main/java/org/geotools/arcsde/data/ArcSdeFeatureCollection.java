@@ -20,23 +20,28 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * FeatureCollection<SimpleFeatureType, SimpleFeature> implementation that works over an
- * {@link ArcSDEFeatureReader} or one of the decorators over it returned by
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> implementation that
+ * works over an {@link ArcSDEFeatureReader} or one of the decorators over it
+ * returned by
  * {@link ArcSDEDataStore#getFeatureReader(Query, ArcSDEPooledConnection, boolean)}.
  * 
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
  * @source $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSdeFeatureCollection.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSdeFeatureCollection.java $
  * @see FeatureCollection
  */
 public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     private final ArcSdeFeatureSource featureSource;
+
     private final Query query;
+
     private final Set<FeatureReaderIterator> openIterators;
+
     private ArcSDEPooledConnection connection;
+
     private SimpleFeatureType childrenSchema;
 
     public ArcSdeFeatureCollection(final ArcSdeFeatureSource featureSource, final Query namedQuery) {
@@ -59,7 +64,8 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
                 final ArcSDEDataStore dataStore = featureSource.getDataStore();
                 DefaultQuery query = new DefaultQuery(this.query);
                 query.setFilter(Filter.EXCLUDE);
-                final  FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, conn, false);
+                final FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore
+                        .getFeatureReader(query, conn, false);
                 this.childrenSchema = reader.getFeatureType();
                 reader.close();
             } catch (IOException e) {
@@ -109,8 +115,9 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     protected final Iterator openIterator() throws IOException {
         final ArcSDEDataStore dataStore = featureSource.getDataStore();
         final ArcSDEPooledConnection connection = getConnection();
-        
-        final  FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(query, connection, false);
+
+        final FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(
+                query, connection, false);
         // slight optimization here: store the child features schema if not yet
         // done
         if (this.childrenSchema == null) {

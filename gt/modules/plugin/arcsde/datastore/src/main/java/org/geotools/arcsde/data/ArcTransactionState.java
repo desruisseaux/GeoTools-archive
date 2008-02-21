@@ -127,7 +127,7 @@ final class ArcTransactionState implements Transaction.State {
             close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new ArcSdeException(se);
-        }finally{
+        } finally {
             connection.getLock().unlock();
         }
     }
@@ -150,7 +150,7 @@ final class ArcTransactionState implements Transaction.State {
             close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new ArcSdeException(se);
-        }finally{
+        } finally {
             connection.getLock().unlock();
         }
     }

@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Jesse Eichar
  */
-public class ShapefileFeatureWriter implements FeatureWriter {
+public class ShapefileFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     // the  FeatureReader<SimpleFeatureType, SimpleFeature> to obtain the current Feature from
     protected  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;

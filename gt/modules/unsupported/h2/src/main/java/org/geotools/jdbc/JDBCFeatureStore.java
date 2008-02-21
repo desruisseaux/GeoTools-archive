@@ -423,7 +423,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         return reader;
     }
     
-    protected FeatureWriter getWriterInternal(Query query, int flags)
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> getWriterInternal(Query query, int flags)
             throws IOException {
         
         if ( flags == 0 ) {
@@ -435,7 +435,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         
         Filter postFilter;
         //check for update only case
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
         try {
             //check for insert only
             if ( (flags | WRITER_ADD) == WRITER_ADD ) {

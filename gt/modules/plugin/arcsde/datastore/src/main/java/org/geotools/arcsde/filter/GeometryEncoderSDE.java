@@ -93,7 +93,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
     static {
         capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         capabilities.addType(Id.class);
-        
+
         capabilities.addType(BBOX.class);
         capabilities.addType(Contains.class);
         capabilities.addType(Crosses.class);

@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureWriter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * An iterator wrapper for a FeatureWriter - for use with
@@ -39,8 +41,8 @@ import org.geotools.data.FeatureWriter;
  * @source $URL$
  */
 final class FeatureWriterIterator implements Iterator {
-    FeatureWriter writer;    
-    public FeatureWriterIterator( FeatureWriter writer ){
+    FeatureWriter<SimpleFeatureType, SimpleFeature> writer;    
+    public FeatureWriterIterator( FeatureWriter<SimpleFeatureType, SimpleFeature> writer ){
         this.writer = writer;
     }
     public boolean hasNext() {

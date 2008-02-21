@@ -16,7 +16,6 @@
  */
 package org.geotools.arcsde.gce;
 
-
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.InputStream;
@@ -41,18 +40,21 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Tests the functionality of the ArcSDE raster-display package to read rasters from an
- * ArcSDE database
+ * Tests the functionality of the ArcSDE raster-display package to read rasters
+ * from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEGCReaderWorkingTest.java $
+ * @version $Id: ArcSDEGCReaderWorkingTest.java 28599 2008-01-04 10:35:26Z
+ *          simboss $
  */
 public class ArcSDEGCReaderWorkingTest extends TestCase {
 
     private CoordinateReferenceSystem crs;
+
     private GridGeometry2D statewideRealWorldExampleRes, southShoreExampleRes;
-    
+
     private Properties conProps;
 
     /**
@@ -61,48 +63,56 @@ public class ArcSDEGCReaderWorkingTest extends TestCase {
      */
     public ArcSDEGCReaderWorkingTest(String name) throws Exception {
         super(name);
-        
+
         conProps = new Properties();
         String propsFile = "liverasterdatasets.properties";
         URL conParamsSource = org.geotools.test.TestData.url(new ArcSDEPyramidTest(""), propsFile);
 
         InputStream in = conParamsSource.openStream();
         if (in == null) {
-            throw new IllegalStateException("cannot find test params: " + conParamsSource.toExternalForm());
+            throw new IllegalStateException("cannot find test params: "
+                    + conParamsSource.toExternalForm());
         }
         conProps.load(in);
         in.close();
     }
-    
+
     public void setUp() throws Exception {
         super.setUp();
-        
+
         crs = CRS.decode("EPSG:26986");
-        // 33,000.25 m 782,500.143 m , 332,999.75 m 953,499.857 m], java.awt.Rectangle[x=0,y=0,width=500,height=285]
-        statewideRealWorldExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,285)), new ReferencedEnvelope(33000.25,332999.75,782500.143,953499.857,crs));
-        
-        // x=0,y=0,width=500,height=285]  envelope -- [222,175.135 m 800,289.513 m , 294,775.014 m 841,671.444 m]
-        southShoreExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,285)), new ReferencedEnvelope(222175.135,294775.014,800289.513,841671.444,crs));
-            
-        
+        // 33,000.25 m 782,500.143 m , 332,999.75 m 953,499.857 m],
+        // java.awt.Rectangle[x=0,y=0,width=500,height=285]
+        statewideRealWorldExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,
+                285)), new ReferencedEnvelope(33000.25, 332999.75, 782500.143, 953499.857, crs));
+
+        // x=0,y=0,width=500,height=285] envelope -- [222,175.135 m
+        // 800,289.513 m , 294,775.014 m 841,671.444 m]
+        southShoreExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500, 285)),
+                new ReferencedEnvelope(222175.135, 294775.014, 800289.513, 841671.444, crs));
+
     }
 
     public void testWorkingExample() throws Exception {
 
         String fourbandurl = conProps.getProperty("fourbandurl");
-        
+
         GridCoverage2D gc;
         Format f = new ArcSDERasterFormatFactory().createFormat();
-        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader)((AbstractGridFormat)f).getReader(fourbandurl);
-        
+        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
+                .getReader(fourbandurl);
+
         GeneralParameterValue[] requestParams = new Parameter[1];
-        
-        //requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,statewideRealWorldExampleRes);
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,southShoreExampleRes);
-        gc = (GridCoverage2D)r.read(requestParams);
+
+        // requestParams[0] = new
+        // Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,statewideRealWorldExampleRes);
+        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,
+                southShoreExampleRes);
+        gc = (GridCoverage2D) r.read(requestParams);
         assertNotNull(gc);
         try {
-            ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File("workingTestOutput1.png"));
+            ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File(
+                    "workingTestOutput1.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }

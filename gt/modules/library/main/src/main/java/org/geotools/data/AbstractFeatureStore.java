@@ -72,7 +72,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, filter, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, filter, transaction );
      * while( writer.hasNext() ){
      *    feature = writer.next();
      *    feature.setAttribute( type.getName(), value );
@@ -106,7 +106,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, filter, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, filter, transaction );
      * Feature feature;
      * while( writer.hasNext() ){
      *    feature = writer.next();
@@ -168,7 +168,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * </p>
      * <pre><code>
      * Set set = new HashSet();
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, true, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, true, transaction );
      * Featrue feature, newFeature;
      * while( reader.hasNext() ){
      *    feature = reader.next();
@@ -281,7 +281,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, filter, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, filter, transaction );
      * Feature feature;
      * while( writer.hasNext() ){
      *    feature = writer.next();
@@ -302,7 +302,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      */
     public void removeFeatures(Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
-        FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getDataStore().getFeatureWriter(typeName,
                 filter, getTransaction());
 
         try {
@@ -322,7 +322,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * Equivelent to:
      * </p>
      * <pre><code>
-     * FeatureWriter writer = dataStore.getFeatureWriter( typeName, false, transaction );
+     * FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter( typeName, false, transaction );
      * Feature feature, newFeature;
      * while( writer.hasNext() ){
      *    feature = writer.next();

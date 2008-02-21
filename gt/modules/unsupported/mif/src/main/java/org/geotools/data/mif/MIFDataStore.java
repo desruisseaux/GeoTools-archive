@@ -231,7 +231,7 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @throws IOException
      */
-    protected FeatureWriter getFeatureWriter(String typeName)
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName)
         throws IOException {
         return getMIFFile(typeName).getFeatureWriter();
     }

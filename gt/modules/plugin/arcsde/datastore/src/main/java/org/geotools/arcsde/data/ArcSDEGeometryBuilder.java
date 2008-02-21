@@ -667,6 +667,7 @@ public abstract class ArcSDEGeometryBuilder {
 
         /** DOCUMENT ME! */
         private static int numParts = 1; // it's allways 1 for geoms other
+
         // than multipolygons
 
         /** DOCUMENT ME! */

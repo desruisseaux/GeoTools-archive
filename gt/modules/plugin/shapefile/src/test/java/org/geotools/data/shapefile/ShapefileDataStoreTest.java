@@ -376,7 +376,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             int idx = loadFeatures(sds).size();
 
             while (idx > 0) {
-                FeatureWriter writer = null;
+                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
 
                 try {
                     writer = sds.getFeatureWriter(sds.getTypeNames()[0],
@@ -414,7 +414,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             int idx = loadFeatures(sds).size();
 
             while (idx > 0) {
-                FeatureWriter writer = null;
+                FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
                 try {
                     writer = sds.getFeatureWriter(sds.getTypeNames()[0],
                             Filter.INCLUDE, Transaction.AUTO_COMMIT);
@@ -450,7 +450,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 .toURL());
         shapefileDataStore.createSchema(featureType);
 
-        FeatureWriter featureWriter = shapefileDataStore.getFeatureWriter(
+        FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter = shapefileDataStore.getFeatureWriter(
                 shapefileDataStore.getTypeNames()[0], Transaction.AUTO_COMMIT);
 
         // don't add any features to the data store....

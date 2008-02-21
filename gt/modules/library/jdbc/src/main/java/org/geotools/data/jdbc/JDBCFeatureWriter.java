@@ -44,7 +44,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author aaime
  * @source $URL$
  */
-public class JDBCFeatureWriter implements FeatureWriter {
+public class JDBCFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     /** The logger for the jdbc module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");

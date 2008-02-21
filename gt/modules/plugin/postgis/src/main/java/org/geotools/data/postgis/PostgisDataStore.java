@@ -1728,7 +1728,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
         Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
@@ -1768,9 +1768,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
         Transaction transaction) throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, Filter.EXCLUDE,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getFeatureWriter(typeName, Filter.EXCLUDE,
                 transaction);
 
         while (writer.hasNext()) {

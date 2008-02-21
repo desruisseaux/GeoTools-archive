@@ -909,7 +909,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testGetFeatureWriterTypeNameTransaction()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("ROAD", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
@@ -918,7 +918,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
     public void testGetFeatureWriterAppendTypeNameTransaction()
         throws Exception {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriterAppend("ROAD", Transaction.AUTO_COMMIT);
         assertEquals(0, count(writer));
@@ -930,7 +930,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
      */
     public void testGetFeatureWriterFilter()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("ROAD", Filter.EXCLUDE,
                 Transaction.AUTO_COMMIT);
@@ -963,8 +963,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
     public void testGetFeatureWriterTransaction() throws Exception {
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureWriter writer1 = data.getFeatureWriter("ROAD", rd1Filter, t1);
-        FeatureWriter writer2 = data.getFeatureWriterAppend("ROAD", t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = data.getFeatureWriter("ROAD", rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = data.getFeatureWriterAppend("ROAD", t2);
 
         SimpleFeatureType road = data.getSchema("ROAD");
          FeatureReader<SimpleFeatureType, SimpleFeature> reader;

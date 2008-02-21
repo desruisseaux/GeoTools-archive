@@ -228,7 +228,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
             Filter, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 
@@ -243,7 +243,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
         Transaction transaction) throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 
@@ -258,7 +258,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
      * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String,
      *      org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
         Transaction transaction) throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 

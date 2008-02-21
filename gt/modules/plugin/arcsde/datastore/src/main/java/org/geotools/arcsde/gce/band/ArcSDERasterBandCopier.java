@@ -25,40 +25,51 @@ import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public abstract class ArcSDERasterBandCopier {
-    
+
     protected int tileWidth, tileHeight;
-    
+
     public static ArcSDERasterBandCopier getInstance(int sePixelType, int tileWidth, int tileHeight) {
         ArcSDERasterBandCopier ret;
         if (sePixelType == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
             ret = new UnsignedByteBandCopier();
         } else {
-            throw new IllegalArgumentException("Don't know how to create ArcSDE band reader for pixel type " + sePixelType);
+            throw new IllegalArgumentException(
+                    "Don't know how to create ArcSDE band reader for pixel type " + sePixelType);
         }
         ret.tileWidth = tileWidth;
         ret.tileHeight = tileHeight;
         return ret;
     }
-    
+
     /**
-     * @param tile The actual tile you wish to copy from
-     * @param raster The raster into which data should be copied
-     * @param copyOffX The x-coordinate of the TILE at which the raster should start copying 
-     * @param copyOffY The y-coordinate of the TILE at which the raster should start copying
-     * @param targetBand The band in the supplied raster into which the data from this tile should be copied
+     * @param tile
+     *            The actual tile you wish to copy from
+     * @param raster
+     *            The raster into which data should be copied
+     * @param copyOffX
+     *            The x-coordinate of the TILE at which the raster should start
+     *            copying
+     * @param copyOffY
+     *            The y-coordinate of the TILE at which the raster should start
+     *            copying
+     * @param targetBand
+     *            The band in the supplied raster into which the data from this
+     *            tile should be copied
      * @throws DataSourceException
      */
-    public abstract void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX, int copyOffY, int targetBand) throws DataSourceException;
-    
-    
+    public abstract void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX,
+            int copyOffY, int targetBand) throws DataSourceException;
+
     protected Object createTransferObject(int transferType, int numPixels) {
         if (transferType == DataBuffer.TYPE_BYTE) {
             return new byte[numPixels];
         } else if (transferType == DataBuffer.TYPE_INT) {
             return new int[numPixels];
         } else {
-            throw new IllegalArgumentException("Can't transfer ArcSDE Raster data to a java.awt.Raster with a transferType of " + transferType);
+            throw new IllegalArgumentException(
+                    "Can't transfer ArcSDE Raster data to a java.awt.Raster with a transferType of "
+                            + transferType);
         }
-        
+
     }
 }

@@ -33,79 +33,81 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
- * An implementation of the ArcSDE Raster Format.  Based on the ArcGrid module.
+ * An implementation of the ArcSDE Raster Format. Based on the ArcGrid module.
  * 
  * @author Saul Farber (saul.farber)
  * @author jeichar
  * @author Simone Giannecchini (simboss)
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/gce/ArcSDERasterFormat.java $
  */
 public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
-	protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDERasterFormat.class.getPackage().getName());
-	
-	/**
-	 * Creates an instance and sets the metadata.
-	 */
-	public ArcSDERasterFormat() {
-		setInfo();
-	}
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger(ArcSDERasterFormat.class.getPackage().getName());
 
-	/**
-	 * Sets the metadata information.
-	 */
-	private void setInfo() {
-		HashMap info = new HashMap();
+    /**
+     * Creates an instance and sets the metadata.
+     */
+    public ArcSDERasterFormat() {
+        setInfo();
+    }
 
-		info.put("name", "ArcSDE Raster");
-		info.put("description", "ArcSDE Raster Format");
-		info.put("vendor", "Geotools");
-		info.put("docURL", "");
-		info.put("version", "0.1-alpha");
-		mInfo = info;
-        
-        readParameters = new ParameterGroup(
-                new DefaultParameterDescriptorGroup(
-                        mInfo,
-                        new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
-	}
+    /**
+     * Sets the metadata information.
+     */
+    private void setInfo() {
+        HashMap info = new HashMap();
 
-	/**
-	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
-	 *      source)
-	 */
-	public GridCoverageReader getReader(Object source) {
-		return getReader(source, null);
-	}
-    
+        info.put("name", "ArcSDE Raster");
+        info.put("description", "ArcSDE Raster Format");
+        info.put("vendor", "Geotools");
+        info.put("docURL", "");
+        info.put("version", "0.1-alpha");
+        mInfo = info;
+
+        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(mInfo,
+                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
+    }
+
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
+     *      source)
+     */
+    public GridCoverageReader getReader(Object source) {
+        return getReader(source, null);
+    }
+
     public GridCoverageReader getReader(Object source, Hints hints) {
         try {
             return new ArcSDERasterGridCoverage2DReader(source, hints);
         } catch (DataSourceException dse) {
-            LOGGER.log(Level.SEVERE,"Unable to creata ArcSDERasterReader for " + source + ".", dse);
+            LOGGER
+                    .log(Level.SEVERE, "Unable to creata ArcSDERasterReader for " + source + ".",
+                            dse);
             return null;
         }
     }
 
-	/**
-	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
-	 *      destination)
-	 */
-	public GridCoverageWriter getWriter(Object destination) {
-		//return new ArcGridWriter(destination);
-		return null;
-	}
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
+     *      destination)
+     */
+    public GridCoverageWriter getWriter(Object destination) {
+        // return new ArcGridWriter(destination);
+        return null;
+    }
 
-	/**
-	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
-	 *      input)
-	 */
-	public boolean accepts(Object input) {
+    /**
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
+     *      input)
+     */
+    public boolean accepts(Object input) {
         StringBuffer url;
         if (input instanceof File) {
-            url = new StringBuffer(((File)input).getPath());
+            url = new StringBuffer(((File) input).getPath());
         } else if (input instanceof String) {
-            url = new StringBuffer((String)input);
+            url = new StringBuffer((String) input);
         } else {
             return false;
         }
@@ -115,43 +117,43 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
         } catch (Exception e) {
             return false;
         }
-	}
+    }
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getName()
-	 */
-	public String getName() {
-		return (String) this.mInfo.get("name");
-	}
+    /**
+     * @see org.opengis.coverage.grid.Format#getName()
+     */
+    public String getName() {
+        return (String) this.mInfo.get("name");
+    }
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getDescription()
-	 */
-	public String getDescription() {
-		return (String) this.mInfo.get("description");
-	}
+    /**
+     * @see org.opengis.coverage.grid.Format#getDescription()
+     */
+    public String getDescription() {
+        return (String) this.mInfo.get("description");
+    }
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getVendor()
-	 */
-	public String getVendor() {
-		return (String) this.mInfo.get("vendor");
-	}
+    /**
+     * @see org.opengis.coverage.grid.Format#getVendor()
+     */
+    public String getVendor() {
+        return (String) this.mInfo.get("vendor");
+    }
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getDocURL()
-	 */
-	public String getDocURL() {
-		return (String) this.mInfo.get("docURL");
-	}
+    /**
+     * @see org.opengis.coverage.grid.Format#getDocURL()
+     */
+    public String getDocURL() {
+        return (String) this.mInfo.get("docURL");
+    }
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getVersion()
-	 */
-	public String getVersion() {
-		return (String) this.mInfo.get("version");
-	}
-    
+    /**
+     * @see org.opengis.coverage.grid.Format#getVersion()
+     */
+    public String getVersion() {
+        return (String) this.mInfo.get("version");
+    }
+
     /**
      * Retrieves the default instance for the {@link ArcSDERasterFormat} of the
      * {@link GeoToolsWriteParams} to control the writing process.

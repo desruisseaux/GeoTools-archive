@@ -36,13 +36,13 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
     protected FeatureTypeInfo typeInfo;
+
     protected ArcSDEDataStore dataStore;
 
     public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo, final ArcSDEDataStore dataStore) {
         this.typeInfo = typeInfo;
         this.dataStore = dataStore;
     }
-    
 
     /**
      * Returns the same name than the feature type (ie,
@@ -57,13 +57,14 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     public ResourceInfo getInfo() {
-        return new ResourceInfo(){
+        return new ResourceInfo() {
             final Set<String> words = new HashSet<String>();
             {
                 words.add("features");
                 words.add("view");
-                words.add( ArcSdeFeatureSource.this.getSchema().getTypeName() );
+                words.add(ArcSdeFeatureSource.this.getSchema().getTypeName());
             }
+
             public ReferencedEnvelope getBounds() {
                 try {
                     return ArcSdeFeatureSource.this.getBounds();
@@ -71,6 +72,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
                     return null;
                 }
             }
+
             public CoordinateReferenceSystem getCRS() {
                 return ArcSdeFeatureSource.this.getSchema().getCRS();
             }
@@ -95,21 +97,20 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
                 Name name = ArcSdeFeatureSource.this.getSchema().getName();
                 URI namespace;
                 try {
-                    namespace = new URI( name.getNamespaceURI() );
-                    return namespace;                    
+                    namespace = new URI(name.getNamespaceURI());
+                    return namespace;
                 } catch (URISyntaxException e) {
                     return null;
-                }                
+                }
             }
 
             public String getTitle() {
                 Name name = ArcSdeFeatureSource.this.getSchema().getName();
                 return name.getLocalPart();
             }
-            
+
         };
     }
-    
 
     /**
      * @see FeatureSource#addFeatureListener(FeatureListener)
@@ -263,16 +264,19 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     /**
      * @see FeatureSource#getFeatures(Query)
      */
-    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Query query) throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Query query)
+            throws IOException {
         final Query namedQuery = namedQuery(query);
-        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new ArcSdeFeatureCollection(this, namedQuery);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new ArcSdeFeatureCollection(
+                this, namedQuery);
         return collection;
     }
 
     /**
      * @see FeatureSource#getFeatures(Filter)
      */
-    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Filter filter) throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(final Filter filter)
+            throws IOException {
         DefaultQuery query = new DefaultQuery(typeInfo.getFeatureTypeName(), filter);
         return getFeatures(query);
     }
@@ -280,7 +284,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     /**
      * @see FeatureSource#getFeatures()
      */
-    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures() throws IOException {
+    public final FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures()
+            throws IOException {
         return getFeatures(Filter.INCLUDE);
     }
 

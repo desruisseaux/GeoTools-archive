@@ -187,7 +187,7 @@ public class TransactionStateDiff implements State {
         if (diff.isEmpty()) {
             return;
         }
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 		try{
         	writer = store.createFeatureWriter(typeName, transaction);
         }catch (UnsupportedOperationException e) {
@@ -321,7 +321,7 @@ public class TransactionStateDiff implements State {
      * @throws IOException If a FeatureRader could not be constucted to record
      *         differences against
      */
-    public synchronized FeatureWriter writer(final String typeName, Filter filter)
+    public synchronized FeatureWriter<SimpleFeatureType, SimpleFeature> writer(final String typeName, Filter filter)
         throws IOException {
         Diff diff = diff(typeName);
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);

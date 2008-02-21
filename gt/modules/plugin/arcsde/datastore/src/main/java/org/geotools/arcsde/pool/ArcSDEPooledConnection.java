@@ -77,7 +77,7 @@ public class ArcSDEPooledConnection extends SeConnection {
         }
     }
 
-    public final Lock getLock(){
+    public final Lock getLock() {
         return lock;
     }
 

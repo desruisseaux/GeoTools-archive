@@ -49,7 +49,8 @@ import com.esri.sde.sdk.client.SeTable;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/FIDReader.java $
  */
 public abstract class FIDReader {
 
@@ -181,6 +182,7 @@ public abstract class FIDReader {
          */
 
         private final String shapeColName;
+
         /**
          * Index of the Shape, populated as a side effect of
          * getPropertiesToFetch()

@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @see TransactionStateDiff
  * @source $URL$
  */
-public abstract class DiffFeatureWriter implements FeatureWriter {
+public abstract class DiffFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     protected  FeatureReader<SimpleFeatureType, SimpleFeature> reader;
     protected Diff diff;
     SimpleFeature next; // next value aquired by hasNext()

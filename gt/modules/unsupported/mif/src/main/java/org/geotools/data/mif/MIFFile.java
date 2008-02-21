@@ -517,7 +517,7 @@ public class MIFFile {
      *
      * @throws IOException
      */
-    public FeatureWriter getFeatureWriter() throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter() throws IOException {
         return getFeatureWriter(false);
     }
 
@@ -532,7 +532,7 @@ public class MIFFile {
      *
      * @throws IOException
      */
-    private FeatureWriter getFeatureWriter(boolean append)
+    private FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(boolean append)
         throws IOException {
         if (append) {
             // copy inMif to OutMIf
@@ -1635,7 +1635,7 @@ public class MIFFile {
      * MIF FeatureWriter
      * </p>
      */
-    private class Writer implements FeatureWriter {
+    private class Writer implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
         private PrintStream outMif = null;
         private PrintStream outMid = null;
         private  FeatureReader<SimpleFeatureType, SimpleFeature> innerReader = null;

@@ -25,12 +25,12 @@ import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeExtent;
 
 /**
- * Represents one level in an ArcSDE pyramid.  Holds information about a given pyramid level, like
- * resolution, x/y offsets, number of tiles high/wide, total pixel size and total envelope covered by
- * this level.
+ * Represents one level in an ArcSDE pyramid. Holds information about a given
+ * pyramid level, like resolution, x/y offsets, number of tiles high/wide, total
+ * pixel size and total envelope covered by this level.
  * 
  * @author sfarber
- *
+ * 
  */
 public class ArcSDEPyramidLevel {
     private int pyramidLevel, xOffset, yOffset, xTiles, yTiles;
@@ -38,16 +38,16 @@ public class ArcSDEPyramidLevel {
     private double xRes, yRes;
 
     private ReferencedEnvelope envelope;
-    
+
     public Dimension size;
 
     public ArcSDEPyramidLevel(int level, SeExtent extent, CoordinateReferenceSystem crs,
             SDEPoint offset, int xTiles, int yTiles, Dimension size) {
         this.pyramidLevel = level;
-        this.xRes = (extent.getMaxX() - extent.getMinX())/size.width;
-        this.yRes = (extent.getMaxY() - extent.getMinY())/size.height;
-        this.envelope = new ReferencedEnvelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(),
-                extent.getMaxY(), crs);
+        this.xRes = (extent.getMaxX() - extent.getMinX()) / size.width;
+        this.yRes = (extent.getMaxY() - extent.getMinY()) / size.height;
+        this.envelope = new ReferencedEnvelope(extent.getMinX(), extent.getMaxX(),
+                extent.getMinY(), extent.getMaxY(), crs);
         if (offset != null) {
             this.xOffset = (int) offset.getX();
             this.yOffset = (int) offset.getY();
@@ -79,14 +79,14 @@ public class ArcSDEPyramidLevel {
     }
 
     /**
-     * @return  DOCUMENT ME!!!
+     * @return DOCUMENT ME!!!
      */
     public int getXOffset() {
         return xOffset;
     }
 
     /**
-     * @return  DOCUMENT ME!!!
+     * @return DOCUMENT ME!!!
      */
     public int getYOffset() {
         return yOffset;

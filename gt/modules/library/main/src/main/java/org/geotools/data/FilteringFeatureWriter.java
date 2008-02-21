@@ -38,13 +38,13 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class FilteringFeatureWriter implements FeatureWriter {
+public class FilteringFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
     Filter filter;
     SimpleFeature next = null; // next feature as peeked by hasNext()
     SimpleFeature current = null; // holds current Feature returned to user
 
-    public FilteringFeatureWriter(FeatureWriter writer, Filter filter) {
+    public FilteringFeatureWriter(FeatureWriter<SimpleFeatureType, SimpleFeature> writer, Filter filter) {
         this.writer = writer;
         this.filter = filter;
     }

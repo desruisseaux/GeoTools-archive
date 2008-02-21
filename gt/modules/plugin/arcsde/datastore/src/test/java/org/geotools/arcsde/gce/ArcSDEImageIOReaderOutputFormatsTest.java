@@ -49,12 +49,15 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEImageIOReaderOutputFormatsTest.java $
+ * @version $Id: ArcSDEImageIOReaderOutputFormatsTest.java 28048 2007-11-26
+ *          12:53:18Z groldan $
  */
 public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.gce");
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.arcsde.gce");
 
     private ArcSDEConnectionPool pool = null;
 
@@ -67,7 +70,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
      * 
      */
     public ArcSDEImageIOReaderOutputFormatsTest(String name) throws Exception {
-        super(name);   
+        super(name);
     }
 
     /**
@@ -81,9 +84,10 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        
-        //do setup one time only
-        if (pool != null) return;
+
+        // do setup one time only
+        if (pool != null)
+            return;
 
         Properties conProps = new Properties();
         String propsFile = "raster-testparams.properties";
@@ -175,7 +179,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
     public void testRead4BandIntoTYPE_INT_RGBImage() throws Exception {
 
         String imgPrefix = "type_int_rgb-fourband-image";
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -201,29 +206,26 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             rParam.setDestination(image);
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"2.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             rParam.setDestination(image);
             rParam.setSourceRegion(new Rectangle(43, 30, 1000, 1000));
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"3.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "3.png"));
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
@@ -245,7 +247,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
     public void testRead4BandIntoTYPE_INT_ARGBImage() throws Exception {
 
         String imgPrefix = "type_int_argb-fourband-image";
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -271,44 +274,44 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"2.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setSourceRegion(new Rectangle(43, 30, 1000, 1000));
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"3.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "3.png"));
         } finally {
             if (scon != null)
                 scon.close();
@@ -331,7 +334,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
         String imgPrefix = "type_int_rgb-threeband-image";
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(threeBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -357,29 +361,26 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             rParam.setDestination(image);
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"2.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             rParam.setDestination(image);
             rParam.setSourceRegion(new Rectangle(43, 30, 1000, 1000));
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"3.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "3.png"));
         } finally {
             if (scon != null)
                 scon.close();
@@ -403,7 +404,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
         String imgPrefix = "type_int_argb-threeband-image";
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(threeBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -428,50 +430,50 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"2.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setSourceRegion(new Rectangle(43, 30, 1000, 1000));
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"3.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "3.png"));
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
         }
     }
-    
+
     /**
      * Tests reading the first three bands of a 4-band image (1 = RED, 2 =
      * GREEN, 3 = BLUE, 4 = NEAR_INFRARED) into a TYPE_INT_ARGB image.
@@ -488,7 +490,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
         String imgPrefix = "type_3byte_bgr-3band-image";
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(threeBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -510,10 +513,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
         } catch (Exception e) {
             throw e;
         } finally {
@@ -521,7 +523,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
                 scon.close();
         }
     }
-    
+
     /**
      * Tests reading the first three bands of a 4-band image (1 = RED, 2 =
      * GREEN, 3 = BLUE, 4 = NEAR_INFRARED) into a TYPE_INT_ARGB image.
@@ -538,7 +540,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
         String imgPrefix = "type_3byte_bgr-4band-image";
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -560,15 +563,15 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            //ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            imgPrefix+"1.png"));
+            // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    imgPrefix + "1.png"));
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();

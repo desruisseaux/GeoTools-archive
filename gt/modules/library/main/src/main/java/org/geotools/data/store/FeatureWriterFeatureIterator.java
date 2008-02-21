@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 final class FeatureWriterFeatureIterator implements FeatureIterator<SimpleFeature> {
     FeatureWriter<SimpleFeatureType, SimpleFeature> writer;    
-    public FeatureWriterFeatureIterator( FeatureWriter writer ){
+    public FeatureWriterFeatureIterator( FeatureWriter<SimpleFeatureType, SimpleFeature> writer ){
         this.writer = writer;
     }
     public boolean hasNext() {

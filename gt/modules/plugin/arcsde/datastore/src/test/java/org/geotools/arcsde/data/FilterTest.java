@@ -148,8 +148,8 @@ public class FilterTest extends TestCase {
      * @throws IllegalAttributeException
      *             DOCUMENT ME!
      */
-    private static void collectResults(FeatureReader <SimpleFeatureType, SimpleFeature> fr, Collection c)
-            throws NoSuchElementException, IOException, IllegalAttributeException {
+    private static void collectResults(FeatureReader<SimpleFeatureType, SimpleFeature> fr,
+            Collection c) throws NoSuchElementException, IOException, IllegalAttributeException {
         while (fr.hasNext()) {
             c.add(fr.next());
         }
@@ -398,8 +398,8 @@ public class FilterTest extends TestCase {
         HashSet fidSet = new HashSet();
         fidSet.add(ff.featureId("SDE.SDE.JAKARTA.101"));
         Filter fidFilter = ff.id(fidSet);
-         FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(new DefaultQuery("SDE.SDE.JAKARTA",
-                fidFilter), Transaction.AUTO_COMMIT);
+        FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(
+                new DefaultQuery("SDE.SDE.JAKARTA", fidFilter), Transaction.AUTO_COMMIT);
         SimpleFeature feature = fr.next();
         fr.close();
 
@@ -434,8 +434,10 @@ public class FilterTest extends TestCase {
         System.err.println("Performing slow read...");
 
         long startTime = System.currentTimeMillis();
-         FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(allQuery, Transaction.AUTO_COMMIT);
-        FilteringFeatureReader ffr = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(fr, filter);
+        FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(
+                allQuery, Transaction.AUTO_COMMIT);
+        FilteringFeatureReader ffr = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(
+                fr, filter);
         ArrayList slowResults = new ArrayList();
         collectResults(ffr, slowResults);
         ffr.close();

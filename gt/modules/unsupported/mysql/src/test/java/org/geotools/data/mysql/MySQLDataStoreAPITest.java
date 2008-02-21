@@ -622,7 +622,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         return data.getFeatureReader(type, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
-    public FeatureWriter writer(String typeName) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> writer(String typeName) throws IOException {
         return data.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
     }
 
@@ -762,7 +762,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     //        assertEquals(type, reader.getFeatureType());
     //        assertEquals(1, count(reader));
     //
-    //        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
+    //        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
     //        Feature feature;
     //
     //        while (writer.hasNext()) {
@@ -982,12 +982,12 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      * Test for FeatureWriter getFeatureWriter(String, Filter, Transaction)
      */
     public void testGetFeatureWriter() throws Exception {
-        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
     }
 
     public void testGetFeatureWriterClose() throws Exception {
-        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
         writer.close();
 
@@ -1047,7 +1047,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeaturesWriterAdd() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         SimpleFeature feature;
 
         LOGGER.info("about to call has next on writer " + writer);
@@ -1156,7 +1156,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeatureWriterTypeNameTransaction()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
@@ -1166,7 +1166,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     public void testGetFeatureWriterAppendTypeNameTransaction()
         throws Exception {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
         assertEquals(0, count(writer));
@@ -1190,7 +1190,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      */
     public void testGetFeatureWriterFilter()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("road", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
 
@@ -1218,8 +1218,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     //    public void testGetFeatureWriterTransaction() throws Exception {
     //        Transaction t1 = new DefaultTransaction();
     //        Transaction t2 = new DefaultTransaction();
-    //        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
-    //        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
+    //        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+    //        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = data.getFeatureWriterAppend("road", t2);
     //
     //        FeatureType road = data.getSchema("road");
     //         FeatureReader<SimpleFeatureType, SimpleFeature> reader;

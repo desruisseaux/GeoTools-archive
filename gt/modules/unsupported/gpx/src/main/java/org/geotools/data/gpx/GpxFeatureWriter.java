@@ -14,7 +14,7 @@ import org.geotools.xml.Encoder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-public class GpxFeatureWriter implements FeatureWriter {
+public class GpxFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     private final String typeName;
     private final GpxDataStore dataStore;

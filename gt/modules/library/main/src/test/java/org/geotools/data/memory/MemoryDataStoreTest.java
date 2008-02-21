@@ -594,7 +594,7 @@ public class MemoryDataStoreTest extends DataTestCase {
      */
     public void testGetFeatureWriter() throws NoSuchElementException, IOException,
             IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
 
         try {
@@ -626,7 +626,7 @@ public class MemoryDataStoreTest extends DataTestCase {
     }
 
     public void testGetFeaturesWriterAdd() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         SimpleFeature feature;
 
         while( writer.hasNext() ) {
@@ -660,7 +660,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 
     public void testGetFeatureWriterTypeNameTransaction() throws NoSuchElementException,
             IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
@@ -668,7 +668,7 @@ public class MemoryDataStoreTest extends DataTestCase {
     }
 
     public void testGetFeatureWriterAppendTypeNameTransaction() throws Exception {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
         assertEquals(0, count(writer));
@@ -680,7 +680,7 @@ public class MemoryDataStoreTest extends DataTestCase {
      */
     public void testGetFeatureWriterFilter() throws NoSuchElementException, IOException,
             IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("road", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
         assertTrue(writer instanceof EmptyFeatureWriter);
@@ -703,8 +703,8 @@ public class MemoryDataStoreTest extends DataTestCase {
     public void testGetFeatureWriterTransaction() throws Exception {
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
-        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = data.getFeatureWriterAppend("road", t2);
 
         SimpleFeatureType road = data.getSchema("road");
          FeatureReader<SimpleFeatureType, SimpleFeature> reader;

@@ -398,7 +398,7 @@ public class GpxDataStore extends AbstractDataStore {
     }
 
     @Override
-    protected FeatureWriter createFeatureWriter(String typeName, Transaction transaction) throws IOException {
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createFeatureWriter(String typeName, Transaction transaction) throws IOException {
         return new GpxFeatureWriter(this, typeName, transaction);
     }
 

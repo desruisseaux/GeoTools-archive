@@ -390,7 +390,7 @@ public class DataTestCase extends TestCase {
      * Counts the number of Features in the specified writer.
      * This method will close the writer.
      */
-    protected int count(FeatureWriter writer)
+    protected int count(FeatureWriter<SimpleFeatureType, SimpleFeature> writer)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 

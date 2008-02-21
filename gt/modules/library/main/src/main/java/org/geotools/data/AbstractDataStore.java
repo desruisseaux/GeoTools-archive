@@ -201,7 +201,7 @@ public abstract class AbstractDataStore implements DataStore {
      * @throws UnsupportedOperationException Subclass may implement
      * @deprecated
      */
-    protected FeatureWriter getFeatureWriter(String typeName) throws IOException{
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName) throws IOException{
         throw new UnsupportedOperationException("Schema creation not supported");    	
     }
 
@@ -219,7 +219,7 @@ public abstract class AbstractDataStore implements DataStore {
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    protected FeatureWriter createFeatureWriter(String typeName, Transaction transaction)
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createFeatureWriter(String typeName, Transaction transaction)
     throws IOException {
         throw new UnsupportedOperationException("Schema creation not supported");    	
     }
@@ -458,7 +458,7 @@ public abstract class AbstractDataStore implements DataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
@@ -477,7 +477,7 @@ public abstract class AbstractDataStore implements DataStore {
                 + "did you mean to use Transaction.AUTO_COMMIT?");
         }
 
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         if (transaction == Transaction.AUTO_COMMIT) {
         	try{
@@ -512,7 +512,7 @@ public abstract class AbstractDataStore implements DataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
         Transaction transaction) throws IOException {
 
     	return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
@@ -522,9 +522,9 @@ public abstract class AbstractDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String, org.geotools.data.Transaction)
      *
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
         Transaction transaction) throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, transaction);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getFeatureWriter(typeName, transaction);
 
         while (writer.hasNext()) {
             writer.next(); // Hmmm this would be a use for skip() then?

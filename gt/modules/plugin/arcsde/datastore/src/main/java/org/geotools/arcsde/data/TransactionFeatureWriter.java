@@ -41,9 +41,9 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @throws IOException
      */
     public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcTransactionState state,
-            final FeatureListenerManager listenerManager) throws NoSuchElementException,
-            IOException {
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ArcTransactionState state, final FeatureListenerManager listenerManager)
+            throws NoSuchElementException, IOException {
 
         super(fidReader, featureType, filteredContent, state.getConnection(), listenerManager);
         this.state = state;

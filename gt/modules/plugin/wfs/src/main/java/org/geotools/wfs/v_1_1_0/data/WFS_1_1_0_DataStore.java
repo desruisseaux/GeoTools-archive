@@ -133,7 +133,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @throws UnsupportedOperationException
      *             always since this operation does not apply to a WFS backend
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter, Transaction transaction)
             throws IOException {
         throw new UnsupportedOperationException("This is a read only DataStore");
     }
@@ -146,7 +146,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @throws UnsupportedOperationException
      *             always since this operation does not apply to a WFS backend
      */
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Transaction transaction)
             throws IOException {
         throw new UnsupportedOperationException("This is a read only DataStore");
     }
@@ -159,7 +159,7 @@ public final class WFS_1_1_0_DataStore implements WFSDataStore {
      * @throws UnsupportedOperationException
      *             always since this operation does not apply to a WFS backend
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName, Transaction transaction)
             throws IOException {
         throw new UnsupportedOperationException("This is a read only DataStore");
     }

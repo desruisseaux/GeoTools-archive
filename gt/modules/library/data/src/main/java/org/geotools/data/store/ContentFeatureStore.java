@@ -104,7 +104,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * 
      * @param filter The filter
      */
-    public final FeatureWriter getWriter( Filter filter ) throws IOException {
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getWriter( Filter filter ) throws IOException {
         return getWriter( filter, WRITER_ADD | WRITER_UPDATE );
     }
     
@@ -114,7 +114,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * @param filter The filter
      * @param flags flags specifying writing mode
      */
-    public final FeatureWriter getWriter( Filter filter, int flags  ) throws IOException {
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getWriter( Filter filter, int flags  ) throws IOException {
         return getWriter( new DefaultQuery( getSchema().getTypeName(), filter ), flags );
     }
     
@@ -123,7 +123,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * 
      * @param query The query
      */
-    public final FeatureWriter getWriter( Query query ) throws IOException {
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getWriter( Query query ) throws IOException {
         return getWriter( query, WRITER_ADD | WRITER_UPDATE );
     }
     
@@ -133,10 +133,10 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * @param query The query
      * @param flags flags specifying writing mode
      */
-    public final FeatureWriter getWriter( Query query, int flags ) throws IOException {
+    public final FeatureWriter<SimpleFeatureType, SimpleFeature> getWriter( Query query, int flags ) throws IOException {
         query = joinQuery( query );
         
-        FeatureWriter writer = getWriterInternal( query, flags );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriterInternal( query, flags );
         
         //TODO: apply wrappers
         
@@ -168,7 +168,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
      * </p>
      * 
      */
-    protected abstract FeatureWriter getWriterInternal( Query query, int flags ) 
+    protected abstract FeatureWriter<SimpleFeatureType, SimpleFeature> getWriterInternal( Query query, int flags ) 
         throws IOException;
     
     /**
@@ -327,7 +327,7 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
         }
         
         //grab a feature writer
-        FeatureWriter writer = getWriter( filter, WRITER_UPDATE );
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getWriter( filter, WRITER_UPDATE );
         try {
             //remove everything
             while( writer.hasNext() ) {

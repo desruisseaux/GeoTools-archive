@@ -1459,7 +1459,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
 	 *      boolean, org.geotools.data.Transaction)
 	 */
-	public FeatureWriter getFeatureWriter(String typeName,
+	public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName,
 			Transaction transaction) throws IOException {
 		return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
 	}
@@ -1492,9 +1492,9 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
 	 *      boolean, org.geotools.data.Transaction)
 	 */
-	public FeatureWriter getFeatureWriterAppend(String typeName,
+	public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
 			Transaction transaction) throws IOException {
-		FeatureWriter writer = getFeatureWriter(typeName, Filter.EXCLUDE,
+		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getFeatureWriter(typeName, Filter.EXCLUDE,
 				transaction);
 
 		while (writer.hasNext()) {
@@ -1528,7 +1528,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             If the provided filter is null
 	 * @throws DataSourceException
 	 */
-	public FeatureWriter getFeatureWriter(String typeName, org.opengis.filter.Filter filter,
+	public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, org.opengis.filter.Filter filter,
 			Transaction transaction) throws IOException {
 		if (filter == null) {
 			throw new NullPointerException("getFeatureReader requires Filter: "
@@ -1568,7 +1568,7 @@ public abstract class JDBC1DataStore implements DataStore {
 				true, null);
 		FeatureReader reader = createFeatureReader(info.getSchema(),
 				postFilter, queryData);
-		FeatureWriter writer = createFeatureWriter(reader, queryData);
+		FeatureWriter<SimpleFeatureType, SimpleFeature> writer = createFeatureWriter(reader, queryData);
 
 		if ((getLockingManager() != null)
 				&& getLockingManager() instanceof InProcessLockingManager) {

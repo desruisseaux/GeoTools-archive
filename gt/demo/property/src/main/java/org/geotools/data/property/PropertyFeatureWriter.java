@@ -31,7 +31,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-public class PropertyFeatureWriter implements FeatureWriter {
+public class PropertyFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
     PropertyDataStore store;
         
     File read;

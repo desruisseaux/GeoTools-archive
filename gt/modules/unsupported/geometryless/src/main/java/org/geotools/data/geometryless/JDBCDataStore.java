@@ -198,7 +198,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @throws IOException
      *             if the database cannot be properly accessed
      */
-    public FeatureWriter getFeatureWriter(String typeName) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName) throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
@@ -212,7 +212,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @throws IOException
      *             if the database cannot be properly accessed
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName) throws IOException {
         return getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT);
     }
 

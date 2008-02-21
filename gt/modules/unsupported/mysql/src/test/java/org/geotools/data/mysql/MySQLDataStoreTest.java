@@ -279,7 +279,7 @@ public class MySQLDataStoreTest extends TestCase {
         return count;
     }
 
-    int count(FeatureWriter writer)
+    int count(FeatureWriter<SimpleFeatureType, SimpleFeature> writer)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -300,7 +300,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
 
         //count(writer);
         assertEquals(6, count(writer));
@@ -321,7 +321,7 @@ public class MySQLDataStoreTest extends TestCase {
     public void testBadTypeName() throws Exception {
         try {
             String badType = "badType43";
-            FeatureWriter writer = dstore.getFeatureWriter(badType, Filter.INCLUDE,
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(badType, Filter.INCLUDE,
                     Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {

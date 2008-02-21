@@ -137,7 +137,7 @@ public class TypeDiffState implements State {
             return;
         }
 
-        FeatureWriter writer = entry.createWriter();
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = entry.createWriter();
         SimpleFeature feature;
         SimpleFeature update;
         String fid;
@@ -243,7 +243,7 @@ public class TypeDiffState implements State {
      * @throws IOException If a FeatureRader could not be constucted to record
      *         differences against
      */
-    public synchronized FeatureWriter writer()
+    public synchronized FeatureWriter<SimpleFeatureType, SimpleFeature> writer()
         throws IOException {
         Diff diff = new Diff();
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = entry.createReader();

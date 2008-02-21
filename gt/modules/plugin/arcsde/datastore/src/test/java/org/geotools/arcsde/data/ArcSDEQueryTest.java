@@ -237,7 +237,8 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCalculateResultCount() throws Exception {
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(typeName).getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
+                typeName).getFeatures();
         FeatureIterator<SimpleFeature> reader = features.features();
         int read = 0;
         while (reader.hasNext()) {
@@ -257,7 +258,8 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCalculateQueryExtent() throws Exception {
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(typeName).getFeatures();
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
+                typeName).getFeatures();
         FeatureIterator<SimpleFeature> reader = features.features();
         ReferencedEnvelope real = new ReferencedEnvelope();
         while (reader.hasNext()) {
@@ -273,8 +275,8 @@ public class ArcSDEQueryTest extends TestCase {
 
         reader.close();
 
-         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = dstore.getFeatureReader(filteringQuery,
-                Transaction.AUTO_COMMIT);
+        FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = dstore.getFeatureReader(
+                filteringQuery, Transaction.AUTO_COMMIT);
         real = new ReferencedEnvelope();
         while (featureReader.hasNext()) {
             real.include(featureReader.next().getBounds());

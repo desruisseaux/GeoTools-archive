@@ -28,7 +28,8 @@ import org.opengis.filter.Filter;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeTable;
 
-public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureStore<SimpleFeatureType, SimpleFeature> {
+public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
+        FeatureStore<SimpleFeatureType, SimpleFeature> {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
@@ -98,12 +99,15 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     // * @see ArcSDEDataStore#getFeatureReader(Query, Transaction)
     // */
     // @Override
-    // public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatures(Query query) throws IOException {
-    // FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new DefaultFeatureResults(this, query);
+    // public FeatureCollection<SimpleFeatureType, SimpleFeature>
+    // getFeatures(Query query) throws IOException {
+    // FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new
+    // DefaultFeatureResults(this, query);
     // return collection;
     // // final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
     // // final Transaction transaction = getTransaction();
-    // // final  FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = ds.getFeatureReader(query,
+    // // final FeatureReader<SimpleFeatureType, SimpleFeature> featureReader =
+    // ds.getFeatureReader(query,
     // transaction);
     // // final FeatureCollection<SimpleFeatureType, SimpleFeature> collection =
     // DataUtilities.collection(featureReader);
@@ -113,14 +117,17 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     /**
      * @see FeatureStore#addFeatures(FeatureCollection)
      */
-    public Set<String> addFeatures(final FeatureCollection<SimpleFeatureType, SimpleFeature> collection) throws IOException {
+    public Set<String> addFeatures(
+            final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+            throws IOException {
         // System.err.println(">>addFeatures called at " +
         // Thread.currentThread().getName());
         final String typeName = typeInfo.getFeatureTypeName();
         final ArcSDEPooledConnection connection = getConnection();
         connection.getLock().lock();
         try {
-            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriterAppend(typeName, transaction);
+            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
+                    .getFeatureWriterAppend(typeName, transaction);
             final FeatureIterator<SimpleFeature> iterator = collection.features();
             Set<String> featureIds = new HashSet<String>();
             try {
@@ -147,13 +154,14 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             }
             return featureIds;
         } finally {
-        	try {
+            try {
                 if (!connection.isTransactionActive()) {
                     connection.close();
                 }
             } finally {
                 connection.getLock().unlock();
-            }        }
+            }
+        }
     }
 
     @Override
@@ -189,7 +197,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         try {
             final String typeName = typeInfo.getFeatureTypeName();
             final Transaction transaction = getTransaction();
-            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter(typeName, filter, transaction);
+            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
+                    .getFeatureWriter(typeName, filter, transaction);
 
             try {
                 SimpleFeature feature;
@@ -204,13 +213,14 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                 writer.close();
             }
         } finally {
-        	try {
+            try {
                 if (!connection.isTransactionActive()) {
                     connection.close();
                 }
             } finally {
                 connection.getLock().unlock();
-            }        }
+            }
+        }
     }
 
     /**
@@ -236,11 +246,12 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         try {
             final String typeName = typeInfo.getFeatureTypeName();
             // short circuit cut if needed to remove all features
-//            if (Filter.INCLUDE == filter) {
-//                truncate(typeName, connection);
-//                return;
-//            }
-            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter(typeName, filter, transaction);
+            // if (Filter.INCLUDE == filter) {
+            // truncate(typeName, connection);
+            // return;
+            // }
+            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
+                    .getFeatureWriter(typeName, filter, transaction);
             try {
                 while (writer.hasNext()) {
                     writer.next();
@@ -251,13 +262,14 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             }
         } finally {
             if (connection != null) {
-            	try {
+                try {
                     if (!connection.isTransactionActive()) {
                         connection.close();
                     }
                 } finally {
                     connection.getLock().unlock();
-                }            }
+                }
+            }
         }
     }
 
@@ -265,7 +277,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * 
      * @see FeatureStore#setFeatures(FeatureReader)
      */
-    public void setFeatures(final FeatureReader<SimpleFeatureType, SimpleFeature> reader) throws IOException {
+    public void setFeatures(final FeatureReader<SimpleFeatureType, SimpleFeature> reader)
+            throws IOException {
         final SimpleFeatureType readerType = reader.getFeatureType();
         if (!getSchema().equals(readerType)) {
             throw new IllegalArgumentException("Type mismatch: " + readerType);
@@ -317,7 +330,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             // need to do actual deletes, as SeTable.truncate does not respects
             // transactions and would delete all content
             LOGGER.fine("deleting all table records for " + typeName);
-            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore.getFeatureWriter(typeName, transaction);
+            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
+                    .getFeatureWriter(typeName, transaction);
             while (writer.hasNext()) {
                 writer.next();
                 writer.remove();

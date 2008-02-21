@@ -68,7 +68,7 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
      * Adds a feature so we have something to read.
      */
     protected boolean addFeature(String table) throws Exception {
-        FeatureWriter writer = ds.getFeatureWriter(table, Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = ds.getFeatureWriter(table, Transaction.AUTO_COMMIT);
         SimpleFeature feature;
 
         while (writer.hasNext()) {

@@ -111,8 +111,8 @@ class ArcSDEAttributeReader implements AttributeReader {
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
      * @param query
-     *            the {@link SeQuery} wrapper where to fetch rows from. Must NOT be
-     *            already {@link ArcSDEQuery#execute() executed}.
+     *            the {@link SeQuery} wrapper where to fetch rows from. Must NOT
+     *            be already {@link ArcSDEQuery#execute() executed}.
      * 
      * @param connection
      *            the connection the <code>query</code> is being ran over.
@@ -146,11 +146,11 @@ class ArcSDEAttributeReader implements AttributeReader {
             Class geometryClass = geomType.getType().getBinding();
             this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
         }
-        //get the lock before executing the query so streams don't get confused
+        // get the lock before executing the query so streams don't get confused
         connection.getLock().lock();
-        try{
+        try {
             query.execute();
-        }catch(IOException e){
+        } catch (IOException e) {
             connection.getLock().unlock();
             throw e;
         }
@@ -183,7 +183,7 @@ class ArcSDEAttributeReader implements AttributeReader {
                     connection.close();
                 }
             }
-            if(connection != null){
+            if (connection != null) {
                 connection.getLock().unlock();
             }
             query = null;

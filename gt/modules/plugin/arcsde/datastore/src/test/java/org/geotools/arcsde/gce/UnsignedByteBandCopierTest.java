@@ -47,72 +47,83 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * raster tile and copies it to a java.awt.Raster for display.
  * 
  * @author Saul Farber
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/UnsignedByteBandCopierTest.java $
+ * @version $Id: UnsignedByteBandCopierTest.java 27856 2007-11-12 17:23:35Z
+ *          desruisseaux $
  */
 public class UnsignedByteBandCopierTest extends TestCase {
 
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.gce");
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.arcsde.gce");
+
     private ArcSDEConnectionPool pool;
+
     private Properties conProps;
 
     public UnsignedByteBandCopierTest(String name) {
         super(name);
     }
-    
+
     protected void setUp() throws Exception {
         super.setUp();
-        
+
         conProps = new Properties();
-        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties").openStream();
+        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties")
+                .openStream();
         conProps.load(in);
         in.close();
-        pool = ArcSDEConnectionPoolFactory.getInstance().createPool(new ArcSDEConnectionConfig(conProps));
+        pool = ArcSDEConnectionPoolFactory.getInstance().createPool(
+                new ArcSDEConnectionConfig(conProps));
     }
 
     public void testLiveRasterTile() throws Exception {
         ArcSDEPooledConnection scon = null;
         try {
-            
+
             scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER"}, new SeSqlConstruct(conProps.getProperty("fourbandtable")));
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(conProps
+                    .getProperty("fourbandtable")));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
             SeRasterAttr rAttr = r.getRaster(0);
-            
-            int[] bands = new int[] { 1, 2, 3 };            
+
+            int[] bands = new int[] { 1, 2, 3 };
             SeRasterConstraint rConstraint = new SeRasterConstraint();
             rConstraint.setBands(bands);
             rConstraint.setLevel(10);
-            //pick #bands random tiles in the middle of the state
-            rConstraint.setEnvelope(1,1,1,1);
+            // pick #bands random tiles in the middle of the state
+            rConstraint.setEnvelope(1, 1, 1, 1);
             rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
-            
+
             q.queryRasterTile(rConstraint);
-            
-            BufferedImage outputImage = new BufferedImage(128,128,BufferedImage.TYPE_3BYTE_BGR);
-            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr.getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
-            
+
+            BufferedImage outputImage = new BufferedImage(128, 128, BufferedImage.TYPE_3BYTE_BGR);
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
+                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+
             SeRasterTile rTile = r.getRasterTile();
             for (int i = 0; i < bands.length; i++) {
                 LOGGER.info("copying band " + rTile.getBandId().longValue());
-                bandCopier.copyPixelData(rTile, outputImage.getRaster(), 0,0, bands.length - i - 1);
+                bandCopier
+                        .copyPixelData(rTile, outputImage.getRaster(), 0, 0, bands.length - i - 1);
                 rTile = r.getRasterTile();
             }
-            
-            //ImageIO.write(outputImage, "PNG", new File("ubbCopierTest1.png"));
-            
-            //Well, now we have an image tile.  Does it have what we expect on it?
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(outputImage,
-                            conProps.getProperty("unsignedbytebandcopiertest.image")));
-            
-            
+
+            // ImageIO.write(outputImage, "PNG", new
+            // File("ubbCopierTest1.png"));
+
+            // Well, now we have an image tile. Does it have what we expect on
+            // it?
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(
+                    outputImage, conProps.getProperty("unsignedbytebandcopiertest.image")));
+
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
         } finally {
-            if (scon != null) scon.close();
+            if (scon != null)
+                scon.close();
         }
     }
 }

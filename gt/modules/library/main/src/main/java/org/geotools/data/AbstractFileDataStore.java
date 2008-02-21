@@ -72,7 +72,7 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
     /**
      * Singular version, calls parent with getSchema().getTypeName()
      */
-    public FeatureWriter getFeatureWriter(Filter filter, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(Filter filter, Transaction transaction)
         throws IOException {
         return getFeatureWriter(getSchema().getTypeName(), filter, transaction);
     }
@@ -81,7 +81,7 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(Transaction transaction)
         throws IOException {
         return getFeatureWriter(getSchema().getTypeName(), transaction);
     }
@@ -90,7 +90,7 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
      * @see org.geotools.data.DataStore#getFeatureWriterAppend(java.lang.String,
      *      org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(Transaction transaction)
         throws IOException {
         return getFeatureWriterAppend(getSchema().getTypeName(), transaction);
     }

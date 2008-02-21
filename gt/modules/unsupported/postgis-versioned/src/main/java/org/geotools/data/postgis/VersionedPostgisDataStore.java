@@ -250,12 +250,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         return wrapped.getLockingManager();
     }
 
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Transaction transaction)
             throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter, Transaction transaction)
             throws IOException {
         if(TBL_CHANGESETS.equals(typeName))
             throw new DataSourceException("Changesets feature type is read only");
@@ -269,7 +269,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     /**
      * Returns either a standard feature writer, or a pure append feature writer
      */
-    protected FeatureWriter getFeatureWriterInternal(String typeName, Filter filter,
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterInternal(String typeName, Filter filter,
             Transaction transaction, boolean append) throws IOException, DataSourceException {
         // check transaction definition is ok
         // checkTransactionProperties(transaction);
@@ -290,12 +290,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         // Gather the update writer, used to expire old revisions, and the
         // append writer, used to create new revisions
-        FeatureWriter updateWriter;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> updateWriter;
         if (append)
             updateWriter = null;
         else
             updateWriter = wrapped.getFeatureWriter(typeName, revisionedFilter, transaction);
-        FeatureWriter appendWriter = wrapped.getFeatureWriterAppend(typeName, transaction);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> appendWriter = wrapped.getFeatureWriterAppend(typeName, transaction);
 
         // mark this feature type as dirty
         VersionedJdbcTransactionState state = wrapped.getVersionedJdbcTransactionState(transaction);
@@ -310,7 +310,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         return writer;
     }
 
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName, Transaction transaction)
             throws IOException {
         if (!isVersioned(typeName))
             return wrapped.getFeatureWriterAppend(typeName, transaction);

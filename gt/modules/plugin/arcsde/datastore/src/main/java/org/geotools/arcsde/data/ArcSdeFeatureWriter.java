@@ -46,49 +46,59 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.operation.valid.IsValidOp;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
-abstract class ArcSdeFeatureWriter implements FeatureWriter {
+abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     protected static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+
     /**
      * Fid prefix used for just created and not yet committed features
      */
     private static final String NEW_FID_PREFIX = "@NEW_";
+
     /**
      * Complete feature type this writer acts upon
      */
     protected final SimpleFeatureType featureType;
+
     /**
      * Connection to hold while this feature writer is alive.
      */
     protected ArcSDEPooledConnection connection;
+
     /**
      * Reader for streamed access to filtered content this writer acts upon.
      */
-    protected  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent;
+    protected FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent;
+
     /**
      * Builder for new Features this writer creates when next() is called and
      * hasNext() == false
      */
     protected final SimpleFeatureBuilder featureBuilder;
+
     /**
      * Map of {row index/mutable column names} in the SeTable structure. Not to
      * be accessed directly, but through
      * {@link #getMutableColumnNames(ArcSDEPooledConnection)}
      */
     private LinkedHashMap<Integer, String> mutableColumnNames;
+
     /**
      * Not to be accessed directly, but through {@link #getLayer()}
      */
     private SeLayer cachedLayer;
+
     /**
      * Not to be accessed directly, but through {@link #getTable()}
      */
     private SeTable cachedTable;
+
     /**
      * The feature at the current index. No need to maintain any sort of
      * collection of features as this writer works a feature at a time.
      */
     protected SimpleFeature feature;
+
     /**
      * Provides row_id column index
      */
@@ -97,8 +107,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
     protected final FeatureListenerManager listenerManager;
 
     public ArcSdeFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcSDEPooledConnection connection,
-            final FeatureListenerManager listenerManager) {
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ArcSDEPooledConnection connection, final FeatureListenerManager listenerManager) {
         assert fidReader != null;
         assert featureType != null;
         assert filteredContent != null;

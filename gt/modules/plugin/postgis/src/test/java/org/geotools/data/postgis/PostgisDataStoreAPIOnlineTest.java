@@ -463,7 +463,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
                 Transaction.AUTO_COMMIT);
     }
 
-    public FeatureWriter writer(String typeName) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> writer(String typeName) throws IOException {
         return data.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
     }
 
@@ -734,7 +734,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(1, count(reader));
         reader.close();
 
-        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -968,13 +968,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * Test for FeatureWriter getFeatureWriter(String, Filter, Transaction)
      */
     public void xtestGetFeatureWriter() throws Exception {
-        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
     }
 
     public void testGetFeatureWriterClose() throws Exception {
-        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE,
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
 
         writer.close();
@@ -998,7 +998,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureWriterRemove() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -1014,7 +1014,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureWriterRemoveAll() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         try {
@@ -1036,7 +1036,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeaturesWriterAdd() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         SimpleFeature feature;
 
         LOGGER.info("about to call has next on writer " + writer);
@@ -1129,7 +1129,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeaturesWriterModify() throws IOException, IllegalAttributeException {
-        FeatureWriter writer = writer("road");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer("road");
         SimpleFeature feature;
 
         while (writer.hasNext()) {
@@ -1149,7 +1149,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testGetFeatureWriterTypeNameTransaction() throws NoSuchElementException,
             IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(roadFeatures.length, count(writer));
@@ -1158,7 +1158,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureWriterAppendTypeNameTransaction() throws Exception {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = data.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
         assertEquals(0, count(writer));
@@ -1179,7 +1179,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      */
     public void testGetFeatureWriterFilter() throws NoSuchElementException, IOException,
             IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
         writer = data.getFeatureWriter("road", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
 
         // see task above
@@ -1207,8 +1207,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureWriterTransaction() throws Exception {
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
-        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
-        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = data.getFeatureWriterAppend("road", t2);
 
         SimpleFeatureType road = data.getSchema("road");
          FeatureReader<SimpleFeatureType, SimpleFeature> reader;
@@ -1385,13 +1385,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
                 conn.close();
         }
         Transaction t1 = new DefaultTransaction();
-        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = data.getFeatureWriter("road", rd1Filter, t1);
         SimpleFeature f1 = (SimpleFeature) writer1.next();
         f1.setAttribute("name", new String("r1_"));
         writer1.write();
 
         Transaction t2 = new DefaultTransaction();
-        FeatureWriter writer2 = data.getFeatureWriter("road", rd1Filter, t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = data.getFeatureWriter("road", rd1Filter, t2);
         SimpleFeature f2 = (SimpleFeature) writer2.next();
         f2.setAttribute("name", new String("r1__"));
         try {
@@ -1830,7 +1830,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
         reader.close();
 
-        FeatureWriter writer = data.getFeatureWriterAppend("lake", Transaction.AUTO_COMMIT);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = data.getFeatureWriterAppend("lake", Transaction.AUTO_COMMIT);
         SimpleFeature f = (SimpleFeature) writer.next();
         f.setAttributes(lakeFeatures[0].getAttributes());
         writer.write();

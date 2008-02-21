@@ -423,9 +423,9 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureWriter createFeatureWriter(final String typeName, final Transaction transaction)
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> createFeatureWriter(final String typeName, final Transaction transaction)
         throws IOException {
-        return new FeatureWriter() {
+        return new FeatureWriter<SimpleFeatureType, SimpleFeature>() {
                 SimpleFeatureType featureType = getSchema(typeName);
                 Map contents = features(typeName);
                 Iterator iterator = contents.values().iterator();

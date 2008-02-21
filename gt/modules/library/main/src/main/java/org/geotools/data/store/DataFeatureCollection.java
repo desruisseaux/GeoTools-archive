@@ -152,7 +152,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
      * </p>
      * @throws UnsupportedOperationException To indicate that write support is not avaiable
      */
-    protected FeatureWriter writer() throws IOException {
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> writer() throws IOException {
         throw new UnsupportedOperationException( "Modification of this collection is not supported" );
     }
     //
@@ -544,7 +544,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
             }
         }
         /*
-        FeatureWriter writer = null;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = null;
         try {
             writer = writer();  // will error out if readOnly
             for( int index=0; writer.hasNext(); index++ ){

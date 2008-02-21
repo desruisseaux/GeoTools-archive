@@ -7,8 +7,9 @@ import java.sql.SQLException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.factory.Hints;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
-public class JDBCInsertFeatureWriter extends JDBCFeatureReader implements FeatureWriter {
+public class JDBCInsertFeatureWriter extends JDBCFeatureReader implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
     
     ResultSetFeature last;

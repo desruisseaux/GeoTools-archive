@@ -558,14 +558,14 @@ public abstract class ActiveTypeEntry implements TypeEntry {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.data.Transaction)
      */
-    public FeatureWriter writer( Transaction transaction) throws IOException {        
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> writer( Transaction transaction) throws IOException {        
         if (transaction == null) {
             throw new NullPointerException(
                 "getFeatureWriter requires Transaction: "
                 + "did you mean to use Transaction.AUTO_COMMIT?");
         }
 
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         if (transaction == Transaction.AUTO_COMMIT) {
             writer = createWriter();
@@ -590,7 +590,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * </p>
      * @return Subclass must supply a FeatureWriter
      */
-    protected FeatureWriter createWriter() {
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createWriter() {
         return new EmptyFeatureWriter( schema );
     }
     
@@ -601,8 +601,8 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * (aka copy file, open the file in append mode, replace origional on close).
      * </p>
      */
-    protected FeatureWriter createAppend( Transaction transaction) throws IOException {
-        FeatureWriter writer = writer( transaction );
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createAppend( Transaction transaction) throws IOException {
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = writer( transaction );
         while (writer.hasNext()) {
             writer.next(); // Hmmm this would be a use for skip() then?
         }

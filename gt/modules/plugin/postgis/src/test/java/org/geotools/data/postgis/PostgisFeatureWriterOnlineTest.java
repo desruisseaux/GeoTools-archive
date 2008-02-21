@@ -5,6 +5,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class PostgisFeatureWriterOnlineTest extends AbstractPostgisOnlineTestCase {
 
@@ -43,7 +44,7 @@ public class PostgisFeatureWriterOnlineTest extends AbstractPostgisOnlineTestCas
     
     public String attemptWrite(String table) throws Exception {
         Transaction transaction = new DefaultTransaction("attemptWriteFW");
-        FeatureWriter writer = ds.getFeatureWriter(table, transaction);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = ds.getFeatureWriter(table, transaction);
         SimpleFeature feature;
 
         while (writer.hasNext()) {

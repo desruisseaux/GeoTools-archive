@@ -569,7 +569,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     public void testGetFeatureWriterTypeNameTransaction()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = dataStore.getFeatureWriter("road", Transaction.AUTO_COMMIT);
         assertEquals(td.roadFeatures.length, count(writer));
@@ -579,7 +579,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     public void testGetFeatureWriterAppendTypeNameTransaction()
         throws Exception {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         writer = dataStore.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
         assertEquals(0, count(writer));
@@ -600,7 +600,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
      */
     public void testGetFeatureWriterFilter()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
         writer = dataStore.getFeatureWriter("road", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
 
         // see task above
@@ -629,8 +629,8 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         Transaction t1 = new DefaultTransaction();
         Transaction t2 = new DefaultTransaction();
 
-        FeatureWriter writer1 = dataStore.getFeatureWriter("road", td.rd1Filter, t1);
-        FeatureWriter writer2 = dataStore.getFeatureWriterAppend("road", t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = dataStore.getFeatureWriter("road", td.rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = dataStore.getFeatureWriterAppend("road", t2);
 
         SimpleFeatureType road = dataStore.getSchema("road");
          FeatureReader<SimpleFeatureType, SimpleFeature> reader;
@@ -812,13 +812,13 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         }
 
         Transaction t1 = new DefaultTransaction();
-        FeatureWriter writer1 = dataStore.getFeatureWriter("road", td.rd1Filter, t1);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer1 = dataStore.getFeatureWriter("road", td.rd1Filter, t1);
         SimpleFeature f1 = (SimpleFeature) writer1.next();
         f1.setAttribute("name", new String("r1_"));
         writer1.write();
 
         Transaction t2 = new DefaultTransaction();
-        FeatureWriter writer2 = dataStore.getFeatureWriter("road", td.rd1Filter, t2);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer2 = dataStore.getFeatureWriter("road", td.rd1Filter, t2);
         SimpleFeature f2 = (SimpleFeature) writer2.next();
         f2.setAttribute("name", new String("r1__"));
 
@@ -1279,7 +1279,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
             Transaction.AUTO_COMMIT);
     }
 
-    FeatureWriter writer(String typeName) throws IOException {
+    FeatureWriter<SimpleFeatureType, SimpleFeature> writer(String typeName) throws IOException {
         return dataStore.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
     }
 
@@ -1287,7 +1287,7 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
      * Counts the number of Features in the specified writer.
      * This method will close the writer.
      */
-    protected int count(FeatureWriter writer)
+    protected int count(FeatureWriter<SimpleFeatureType, SimpleFeature> writer)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 

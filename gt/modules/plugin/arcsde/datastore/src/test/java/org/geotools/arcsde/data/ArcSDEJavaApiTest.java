@@ -73,6 +73,7 @@ public class ArcSDEJavaApiTest extends TestCase {
     private static TestData testData;
 
     private ArcSDEPooledConnection conn;
+
     private ArcSDEConnectionPool pool;
 
     /**

@@ -49,27 +49,29 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEImageIOReaderFunctionalTest.java $
+ * @version $Id: ArcSDEImageIOReaderFunctionalTest.java 28048 2007-11-26
+ *          12:53:18Z groldan $
  */
 public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.gce");
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.arcsde.gce");
 
     private Properties conProps;
-    
+
     private ArcSDEConnectionPool pool = null;
 
     private HashMap fourBandReaderProps, threeBandReaderProps;
 
     private SeRasterAttr rasterAttrThreeBand, rasterAttrFourBand;
 
-    
     /**
      * Creates a new ArcSDEConnectionPoolTest object.
      * 
-     * Lots of one-time setup operations in here.  Rather than re-do
-     * everything for each test, it's just done once in the class constructor.
+     * Lots of one-time setup operations in here. Rather than re-do everything
+     * for each test, it's just done once in the class constructor.
      * 
      * Not sure how this jives with JUnits testing framework though...
      * 
@@ -77,15 +79,16 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
     public ArcSDEImageIOReaderFunctionalTest(String name) throws Exception {
         super(name);
     }
-    
+
     protected void setUp() throws Exception {
         super.setUp();
-        
-        //do the setup one-time only.
-        if (conProps != null) return;
-        
-        
-        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties").openStream();
+
+        // do the setup one-time only.
+        if (conProps != null)
+            return;
+
+        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties")
+                .openStream();
         conProps = new Properties();
         conProps.load(in);
         in.close();
@@ -93,7 +96,6 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
         ArcSDEConnectionConfig connectionConfig = new ArcSDEConnectionConfig(conProps);
         pool = ArcSDEConnectionPoolFactory.getInstance().createPool(connectionConfig);
 
-        
         ArcSDEPooledConnection scon = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
@@ -128,7 +130,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
         }
 
         try {
-            
+
             scon = pool.getConnection();
             tableName = conProps.getProperty("threebandtable");
             q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
@@ -154,7 +156,6 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
         }
     }
 
-
     /**
      * Tests reading the first three bands of a 4-band image (1 = RED, 2 =
      * GREEN, 3 = BLUE, 4 = NEAR_INFRARED) into a TYPE_INT_RGB image.
@@ -165,7 +166,8 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
      */
     public void testReadOutsideImageBounds() throws Exception {
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -185,7 +187,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
             rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0,0, 100,100));
+            rParam.setSourceRegion(new Rectangle(0, 0, 100, 100));
             image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
@@ -195,12 +197,11 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             rParam.setBandMapper(bandMapper);
 
             reader.read(9, rParam);
-            
-            //ImageIO.write(image, "PNG", new File("testReadOutsideImageBounds.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            conProps.getProperty("testReadOutsideImageBounds.image")));
-            
+
+            // ImageIO.write(image, "PNG", new
+            // File("testReadOutsideImageBounds.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    conProps.getProperty("testReadOutsideImageBounds.image")));
 
         } catch (Exception e) {
             throw e;
@@ -209,10 +210,11 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
                 scon.close();
         }
     }
-    
+
     public void testReadOffsetImage() throws Exception {
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -231,35 +233,36 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             int[] opaque;
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
-            
+
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = 0xff000000;
             }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque, image.getRaster().getDataBuffer());
+            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
+                    image.getRaster().getDataBuffer());
             rParam.setDestination(image);
             rParam.setDestinationOffset(new Point(100, 100));
             rParam.setSourceBands(new int[] { 1, 2, 3 });
             rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0,0, 100,100));
+            rParam.setSourceRegion(new Rectangle(0, 0, 100, 100));
             rParam.setBandMapper(bandMapper);
             reader.read(8, rParam);
-            
-            //ImageIO.write(image, "PNG", new File("testReadOffsetImage.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            conProps.getProperty("testReadOffsetImage.image")));
+
+            // ImageIO.write(image, "PNG", new File("testReadOffsetImage.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    conProps.getProperty("testReadOffsetImage.image")));
 
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
         }
     }
-    
+
     public void testReadOffLeftImage() throws Exception {
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -278,26 +281,26 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             int[] opaque;
 
             ArcSDERasterImageReadParam rParam;
-            
+
             rParam = new ArcSDERasterImageReadParam();
-            rParam.setSourceBands(new int[] {1, 2, 3} );
+            rParam.setSourceBands(new int[] { 1, 2, 3 });
             rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0,0,67,86));
-            image = new BufferedImage(294,207, BufferedImage.TYPE_INT_ARGB);
+            rParam.setSourceRegion(new Rectangle(0, 0, 67, 86));
+            image = new BufferedImage(294, 207, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = opaque[i] = 0xff000000;
             }
             rParam.setDestination(image);
             rParam.setBandMapper(bandMapper);
-            
+
             reader.read(11, rParam);
-            
-            //ImageIO.write(image, "PNG", new File("testReadOffLeftImage.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            conProps.getProperty("testReadOffLeftImage.image")));
-            
+
+            // ImageIO.write(image, "PNG", new
+            // File("testReadOffLeftImage.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    conProps.getProperty("testReadOffLeftImage.image")));
+
         } catch (Exception e) {
             throw e;
         } finally {
@@ -305,10 +308,11 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
                 scon.close();
         }
     }
-    
+
     public void testReadStateWide() throws Exception {
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(fourBandReaderProps);
+        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
+                .createReaderInstance(fourBandReaderProps);
 
         ArcSDEPooledConnection scon = null;
         try {
@@ -327,26 +331,25 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             int[] opaque;
 
             ArcSDERasterImageReadParam rParam;
-            
+
             rParam = new ArcSDERasterImageReadParam();
-            rParam.setSourceBands(new int[] {1, 2, 3} );
+            rParam.setSourceBands(new int[] { 1, 2, 3 });
             rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0,16,586,335));
-            image = new BufferedImage(587,335, BufferedImage.TYPE_INT_ARGB);
+            rParam.setSourceRegion(new Rectangle(0, 16, 586, 335));
+            image = new BufferedImage(587, 335, BufferedImage.TYPE_INT_ARGB);
             opaque = new int[image.getWidth() * image.getHeight()];
             for (int i = 0; i < opaque.length; i++) {
                 opaque[i] = opaque[i] = 0xff000000;
             }
             rParam.setDestination(image);
             rParam.setBandMapper(bandMapper);
-            
+
             reader.read(10, rParam);
-            
-            //ImageIO.write(image, "PNG", new File("testReadStateWide.png"));
-            assertTrue("Image from SDE isn't what we expected.",
-                    RasterTestUtils.imageEquals(image,
-                            conProps.getProperty("testReadStateWide.image")));
-            
+
+            // ImageIO.write(image, "PNG", new File("testReadStateWide.png"));
+            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+                    conProps.getProperty("testReadStateWide.image")));
+
         } catch (Exception e) {
             throw e;
         } finally {

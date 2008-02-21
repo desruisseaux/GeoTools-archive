@@ -23,8 +23,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
 
     public AutoCommitFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final  FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent, final ArcSDEPooledConnection connection,
-            FeatureListenerManager listenerManager) throws NoSuchElementException, IOException {
+            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+            final ArcSDEPooledConnection connection, FeatureListenerManager listenerManager)
+            throws NoSuchElementException, IOException {
 
         super(fidReader, featureType, filteredContent, connection, listenerManager);
     }

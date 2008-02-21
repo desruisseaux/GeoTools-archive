@@ -238,7 +238,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
         return filter;
     }
 
-    public FeatureWriter getFeatureWriterAppend(String typeName,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(String typeName,
             Transaction transaction) throws IOException {
         if (transaction == null) {
             throw new NullPointerException(
@@ -246,7 +246,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
                             + "did you mean to use Transaction.AUTO_COMMIT?");
         }
 
-        FeatureWriter writer;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
         if (transaction == Transaction.AUTO_COMMIT) {
             return super.getFeatureWriterAppend(typeName, transaction);
@@ -732,7 +732,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
      *                 If the typeName is not available or some other error
      *                 occurs.
      */
-    protected FeatureWriter createFeatureWriter(String typeName,
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createFeatureWriter(String typeName,
             Transaction transaction) throws IOException {
         typeCheck(typeName);
 

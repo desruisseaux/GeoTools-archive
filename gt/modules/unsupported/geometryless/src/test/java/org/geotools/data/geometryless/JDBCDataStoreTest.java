@@ -310,7 +310,7 @@ public class JDBCDataStoreTest extends TestCase {
         return count;
     }
 
-    int count(FeatureWriter writer)
+    int count(FeatureWriter<SimpleFeatureType, SimpleFeature> writer)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -332,7 +332,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
 
         //count(writer);
         assertEquals(6, count(writer));
@@ -353,7 +353,7 @@ public class JDBCDataStoreTest extends TestCase {
     public void testBadTypeName() throws Exception {
         try {
             String badType = "badType43";
-            FeatureWriter writer =
+            FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
                 dstore.getFeatureWriter(badType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {
@@ -394,7 +394,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int attKeyPos = 0;
         Integer attKey = new Integer(10);
         String attName = "name";
@@ -436,7 +436,7 @@ public class JDBCDataStoreTest extends TestCase {
 
     public void testGetFeaturesWriterModifyGeometry()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer =
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
             dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
@@ -466,7 +466,7 @@ public class JDBCDataStoreTest extends TestCase {
 
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer =
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
             dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
@@ -500,7 +500,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int count = 0;
 
         while (writer.hasNext()) {
@@ -556,7 +556,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);

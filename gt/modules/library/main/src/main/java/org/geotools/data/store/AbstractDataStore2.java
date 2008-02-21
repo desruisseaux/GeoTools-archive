@@ -270,7 +270,7 @@ public class AbstractDataStore2 implements DataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
@@ -283,7 +283,7 @@ public class AbstractDataStore2 implements DataStore {
             return new EmptyFeatureWriter(featureType);
         }
 
-        FeatureWriter writer = getFeatureWriter(typeName, transaction);
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer = getFeatureWriter(typeName, transaction);
 
         if (filter != Filter.INCLUDE) {
             writer = new FilteringFeatureWriter(writer, filter);
@@ -300,7 +300,7 @@ public class AbstractDataStore2 implements DataStore {
      * @return FeatureWriter
      * @throws IOException
      */
-    public FeatureWriter getFeatureWriter( String typeName, Transaction transaction ) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter( String typeName, Transaction transaction ) throws IOException {
         return entry( typeName ).writer( transaction );
     }
     /**
@@ -312,7 +312,7 @@ public class AbstractDataStore2 implements DataStore {
      * @return FeatureWriter already skipped to the end
      * @throws IOException
      */
-    public FeatureWriter getFeatureWriterAppend( String typeName, Transaction transaction ) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend( String typeName, Transaction transaction ) throws IOException {
         return entry( typeName ).createAppend( transaction );
     }
     

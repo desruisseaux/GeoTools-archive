@@ -43,7 +43,8 @@ import com.esri.sde.sdk.pe.PeFactory;
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/ArcSDEDataStoreFactory.java $
- * @version $Id$
+ * @version $Id: ArcSDEDataStoreFactory.java 29405 2008-02-20 17:38:46Z
+ *          saul.farber $
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /** package's logger */
@@ -57,8 +58,11 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     private static List<Param> paramMetadata = new ArrayList<Param>(10);
 
     public static final int JSDE_VERSION_DUMMY = -1;
+
     public static final int JSDE_VERSION_90 = 0;
+
     public static final int JSDE_VERSION_91 = 1;
+
     public static final int JSDE_VERSION_92 = 2;
 
     private static int JSDE_CLIENT_VERSION;
@@ -102,7 +106,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
 
     private static void determineJsdeVersion() {
         try {
-        	//this class only exists in the dummy api...
+            // this class only exists in the dummy api...
             Class.forName("com.esri.sde.sdk.GeoToolsDummyAPI");
             JSDE_CLIENT_VERSION = JSDE_VERSION_DUMMY;
         } catch (Throwable t) {

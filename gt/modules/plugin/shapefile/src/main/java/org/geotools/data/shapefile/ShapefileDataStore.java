@@ -557,7 +557,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *                 If the typeName is not available or some other error
      *                 occurs.
      */
-    protected FeatureWriter createFeatureWriter(String typeName,
+    protected FeatureWriter<SimpleFeatureType, SimpleFeature> createFeatureWriter(String typeName,
             Transaction transaction) throws IOException {
         typeCheck(typeName);
 

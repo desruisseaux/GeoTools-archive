@@ -343,8 +343,8 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @see DataStore#getFeatureWriter(String, Transaction)
      */
-    public FeatureWriter getFeatureWriter(final String typeName, final Transaction transaction)
-            throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(final String typeName,
+            final Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
@@ -352,8 +352,8 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @see DataStore#getFeatureWriter(String, Filter, Transaction)
      */
-    public FeatureWriter getFeatureWriter(final String typeName, final Filter filter,
-            final Transaction transaction) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(final String typeName,
+            final Filter filter, final Transaction transaction) throws IOException {
         // get the connection the streamed writer content has to work over
         // so the reader and writer share it
         final ArcSDEPooledConnection connection;
@@ -421,8 +421,8 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @see DataStore#getFeatureWriterAppend(String, Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(final String typeName, final Transaction transaction)
-            throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(
+            final String typeName, final Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.EXCLUDE, transaction);
     }
 
