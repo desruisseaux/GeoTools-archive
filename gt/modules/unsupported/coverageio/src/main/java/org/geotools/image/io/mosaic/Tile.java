@@ -180,7 +180,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * {@link RegionCalculator}'s work is in progress, and set to a new value on completion.
      * <p>
      * <b>Note:</b> {@link RegionCalculator} really needs a new instance for each tile.
-     * No caching allowed.
+     * No caching allowed before {@code RegionCalculator} processing. Caching allowed
+     * <em>after</em> {@code RegionCalculator} processing.
      */
     private AffineTransform gridToCRS;
 
@@ -716,6 +717,23 @@ public class Tile implements Comparable<Tile>, Serializable {
     }
 
     /**
+     * Sets the new "<cite>grid to real world</cite>" transform to use after the translation
+     * performed by {@link #translate}, if any. Should be an immutable instance because it will
+     * not be cloned.
+     *
+     * @throws IllegalStateException if an other transform was already assigned to this tile.
+     */
+    final synchronized void setGridToCRS(final AffineTransform at) throws IllegalStateException {
+        if (gridToCRS != null) {
+            if (!gridToCRS.equals(at)) {
+                throw new IllegalStateException();
+            }
+        } else {
+            gridToCRS = at;
+        }
+    }
+
+    /**
      * Returns the subsampling relative to the tile having the finest resolution. This method never
      * returns {@code null}, and the width & height shall never be smaller than 1. The return type
      * is of {@linkplain Dimension dimension} kind because the value can also be interpreted as
@@ -871,16 +889,16 @@ public class Tile implements Comparable<Tile>, Serializable {
     /**
      * Translates this tile. For internal usage by {@link RegionCalculator} only.
      * This method is invoked slightly after {@link #setRegion} for final adjustment.
+     * <p>
+     * Reminder: {@link #setGridToCRS(AffineTransform)} should be invoked after this method.
      *
      * @param xSubsampling The translation to apply on <var>x</var> values (often 0).
      * @param ySubsampling The translation to apply on <var>y</var> values (often 0).
-     * @param gridToCRS The new "<cite>grid to real world</cite>" transform to use after this
-     *        translation. Should be an immutable instance because it will not be cloned.
      */
-    final synchronized void translate(final int dx, final int dy, final AffineTransform gridToCRS) {
+    final synchronized void translate(final int dx, final int dy) {
         x += dx;
         y += dy;
-        this.gridToCRS = gridToCRS;
+        gridToCRS = null;
     }
 
     /**

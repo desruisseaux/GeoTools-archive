@@ -21,7 +21,9 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import org.geotools.resources.XMath;
+import org.geotools.math.XMath;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -41,7 +43,7 @@ import org.geotools.resources.XMath;
  * @author Martin Desruisseaux
  * @author Simone Giannecchini
  */
-public abstract class XAffineTransform extends AffineTransform {
+public class XAffineTransform extends AffineTransform {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -51,7 +53,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * Constructs a new {@code XAffineTransform} that is a
      * copy of the specified {@code AffineTransform} object.
      */
-    protected XAffineTransform(final AffineTransform tr) {
+    public XAffineTransform(final AffineTransform tr) {
         super(tr);
     }
 
@@ -71,8 +73,16 @@ public abstract class XAffineTransform extends AffineTransform {
      * Checks if the caller is allowed to change this {@code XAffineTransform} state.
      * If this method is defined to thrown an exception in all case, then this
      * {@code XAffineTransform} is immutable.
+     * <p>
+     * The default implementation throws the exception in all case, thus making this
+     * instance immutable.
+     *
+     * @throws UnsupportedOperationException if this affine transform is immutable.
      */
-    protected abstract void checkPermission();
+    protected void checkPermission() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(
+                  Errors.format(ErrorKeys.UNMODIFIABLE_AFFINE_TRANSFORM));
+    }
 
     /**
      * Checks for {@linkplain #checkPermission permission} before translating this transform.

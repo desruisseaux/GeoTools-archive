@@ -234,7 +234,8 @@ final class RegionCalculator {
                 final ImageGeometry geometry = new ImageGeometry(groupBounds, reference);
                 reference = geometry.getGridToCRS(); // Fetchs the immutable instance.
                 for (final Tile tile : tilesArray) {
-                    tile.translate(dx, dy, reference);
+                    tile.translate(dx, dy);
+                    tile.setGridToCRS(reference);
                 }
                 results.put(geometry, tilesArray);
             }

@@ -18,6 +18,7 @@ package org.geotools.image.io.mosaic;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +31,13 @@ import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.datum.PixelInCell;
+
 import org.geotools.math.XMath;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.GridRange2D;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -86,6 +93,12 @@ public class MosaicBuilder {
      * This value must be set before {@link Tile} objects are created.
      */
     private ImageReaderSpi tileReaderSpi;
+
+    /**
+     * The envelope for the mosaic as a whole, or {@code null} if none. This is optional, but
+     * if specified this builder uses it for assigning values to {@link Tile#getGridToCRS}.
+     */
+    private GeneralEnvelope mosaicEnvelope;
 
     /**
      * The raster bounding box in pixel coordinates. The initial value is {@code null}.
@@ -226,6 +239,32 @@ public class MosaicBuilder {
             } while (!XArray.contains(spi.getFormatNames(), provider));
         }
         setTileReaderSpi(spi);
+    }
+
+    /**
+     * Returns the envelope for the mosaic as a whole, or {@code null} if none. This is optional,
+     * but if specified this builder uses it for assigning values to {@link Tile#getGridToCRS}.
+     */
+    public Envelope getMosaicEnvelope() {
+        return (mosaicEnvelope != null) ? mosaicEnvelope.clone() : null;
+    }
+
+    /**
+     * Sets the envelope for the mosaic as a whole, or {@code null} if none. This is optional,
+     * but if specified this builder uses it for assigning values to {@link Tile#getGridToCRS}.
+     * <p>
+     * This is merely a convenient way to invoke {@link TileManager#setGridToCRS} with a transform
+     * computed from the envelope and the {@linkplain #getUntiledImageBounds untiled image bounds},
+     * where the later may be known only at reading time. As always, creating "grid to CRS" from an
+     * envelope is ambiguous, since we don't know if axis need to be interchanged, <var>y</var> axis
+     * flipped, <cite>etc.</cite> Subclasses can gain more control by overriding the
+     * {@link #createGridToEnvelopeMapper createGridToEnvelopeMapper} method. The default behavior
+     * fits most typical cases however.
+     *
+     * @see #createGridToEnvelopeMapper
+     */
+    public void setMosaicEnvelope(final Envelope envelope) {
+        mosaicEnvelope = (envelope != null) ? new GeneralEnvelope(envelope) : null;
     }
 
     /**
@@ -569,11 +608,19 @@ public class MosaicBuilder {
         overviewFieldSize = 0;
         rowFieldSize      = 0;
         columnFieldSize   = 0;
+        final TileManager tiles;
         switch (layout) {
-            case CONSTANT_GEOGRAPHIC_AREA: return createTileManager(true);
-            case CONSTANT_TILE_SIZE:       return createTileManager(false);
+            case CONSTANT_GEOGRAPHIC_AREA: tiles = createTileManager(true);  break;
+            case CONSTANT_TILE_SIZE:       tiles = createTileManager(false); break;
             default: throw new IllegalStateException(layout.toString());
         }
+        if (mosaicEnvelope != null) {
+            final GridToEnvelopeMapper mapper = createGridToEnvelopeMapper(tiles);
+            mapper.setGridRange(new GridRange2D(untiledBounds));
+            mapper.setEnvelope(mosaicEnvelope);
+            tiles.setGridToCRS((AffineTransform) mapper.createTransform());
+        }
+        return tiles;
     }
 
     /**
@@ -832,5 +879,25 @@ public class MosaicBuilder {
         format26(buffer, column,   columnFieldSize);
         format10(buffer, row,      rowFieldSize);
         return buffer.append('.').append(extension).toString();
+    }
+
+    /**
+     * Invoked automatically when a "<cite>grid to CRS</cite>" transform needs to be computed. The
+     * default implementation returns a new {@link GridToEnvelopeMapper} instance in its default
+     * configuration, except for the {@linkplain GridToEnvelopeMapper#setGridType grid type} which
+     * is set to {@link PixelInCell#CELL_CORNER CELL_CORNER} (OGC specification maps pixel center,
+     * while Java I/O maps pixel upper-left corner).
+     * <p>
+     * Subclasses may override this method in order to configure the mapper in an other way.
+     *
+     * @param tiles The tiles for which a "<cite>grid to CRS</cite>" transform needs to be computed.
+     * @return An "grid to envelope" mapper having the desired configuration.
+     *
+     * @see #setMosaicEnvelope
+     */
+    protected GridToEnvelopeMapper createGridToEnvelopeMapper(final TileManager tiles) {
+        final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
+        mapper.setGridType(PixelInCell.CELL_CORNER);
+        return mapper;
     }
 }

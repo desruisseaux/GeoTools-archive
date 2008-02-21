@@ -19,14 +19,16 @@ package org.geotools.image.io.mosaic;
 import java.util.*; // We use really a lot of those imports.
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform; // For javadoc
+import java.awt.geom.AffineTransform;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
+
 import org.geotools.coverage.grid.ImageGeometry;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -194,6 +196,37 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                 if (expand.width  > tileSize.width)  tileSize.width  = expand.width;
                 if (expand.height > tileSize.height) tileSize.height = expand.height;
             }
+        }
+    }
+
+    /**
+     * Sets the {@linkplain Tile#getGridTocRS grid to CRS} transform for every tiles. A copy of
+     * the supplied affine transform is {@linkplain AffineTransform#scale scaled} according the
+     * {@linkplain Tile#getSubsampling subsampling} of each tile. Tiles having the same
+     * subsampling will share the same immutable instance of affine transform.
+     * <p>
+     * The <cite>grid to CRS</cite> transform is not necessary for proper working of {@linkplain
+     * MosaicImageReader mosaic image reader}, but is provided as a convenience for users.
+     * <p>
+     * This method can be invoked only once.
+     *
+     * @param gridToCRS The "grid to CRS" transform.
+     * @throws IllegalStateException if a transform was already assigned to at least one tile.
+     */
+    public synchronized void setGridToCRS(final AffineTransform gridToCRS)
+            throws IllegalStateException
+    {
+        final Map<Dimension,AffineTransform> shared = new HashMap<Dimension,AffineTransform>();
+        for (final Tile tile : tiles) {
+            final Dimension subsampling = tile.getSubsampling();
+            AffineTransform at = shared.get(subsampling);
+            if (at == null) {
+                at = new AffineTransform(gridToCRS);
+                at.scale(subsampling.width, subsampling.height);
+                at = new XAffineTransform(at);
+                shared.put(subsampling, at);
+            }
+            tile.setGridToCRS(at);
         }
     }
 

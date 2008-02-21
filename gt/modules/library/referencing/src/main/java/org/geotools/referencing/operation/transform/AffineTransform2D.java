@@ -87,9 +87,9 @@ public class AffineTransform2D extends XAffineTransform
      * Throws an {@link UnsupportedOperationException} when a mutable method
      * is invoked, since {@code AffineTransform2D} must be immutable.
      */
-    protected final void checkPermission() {
-        throw new UnsupportedOperationException(
-                  Errors.format(ErrorKeys.UNMODIFIABLE_AFFINE_TRANSFORM));
+    @Override
+    protected final void checkPermission() throws UnsupportedOperationException {
+        super.checkPermission();
     }
 
     /**
