@@ -303,11 +303,18 @@ public class GeographicMetadata extends IIOMetadata {
      * Alters the internal state of this metadata from a tree defined by the specified metadata.
      * The default implementation expects the {@value GeographicMetadataFormat#FORMAT_NAME} format.
      *
-     * @param metadata The metadata to merge to this object.
+     * @param  metadata The metadata to merge to this object.
+     * @throws IIOInvalidTreeException If the metadata can not be merged.
      */
     public void mergeTree(final IIOMetadata metadata) throws IIOInvalidTreeException {
-        mergeTree(GeographicMetadataFormat.FORMAT_NAME,
-                metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME));
+        final Node tree;
+        try {
+            tree = metadata.getAsTree(GeographicMetadataFormat.FORMAT_NAME);
+        } catch (IllegalArgumentException exception) {
+            throw new IIOInvalidTreeException(Errors.format(
+                    ErrorKeys.GEOTOOLS_EXTENSION_REQUIRED_$1, "mergeTree"), exception, null);
+        }
+        mergeTree(GeographicMetadataFormat.FORMAT_NAME, tree);
     }
 
     /**

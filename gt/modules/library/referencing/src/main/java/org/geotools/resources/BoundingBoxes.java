@@ -21,6 +21,7 @@ import java.text.FieldPosition;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -68,8 +69,8 @@ public final class BoundingBoxes {
 
     /**
      * Initializes a geographic bounding box from the specified envelope. If the envelope contains
-     * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
-     * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
+     * a CRS, then the bounding box will be projected to a geographic CRS. Otherwise, the envelope
+     * is assumed already in appropriate CRS.
      *
      * @param envelope The source envelope.
      * @param box The target bounding box.
@@ -79,14 +80,16 @@ public final class BoundingBoxes {
     {
         final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
         if (crs != null) {
-            if (!startsWith(crs, DefaultGeographicCRS.WGS84) &&
+            final GeographicCRS standardCRS = CRSUtilities.getStandardGeographicCRS2D(crs);
+            if (!startsWith(crs, standardCRS) &&
+                !startsWith(crs, DefaultGeographicCRS.WGS84) &&
                 !startsWith(crs, DefaultGeographicCRS.WGS84_3D))
             {
                 final CoordinateOperation operation;
                 final CoordinateOperationFactory factory;
                 factory = ReferencingFactoryFinder.getCoordinateOperationFactory(LENIENT);
                 try {
-                    operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
+                    operation = factory.createOperation(crs, standardCRS);
                 } catch (FactoryException exception) {
                     throw new TransformPathNotFoundException(Errors.format(
                               ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
@@ -108,7 +111,7 @@ public final class BoundingBoxes {
     {
         final int dimension = head.getCoordinateSystem().getDimension();
         return crs.getCoordinateSystem().getDimension() >= dimension &&
-               CRS.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,dimension), head);
+               CRS.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs, 0, dimension), head);
     }
 
     /**

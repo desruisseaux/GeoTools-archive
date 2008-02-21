@@ -252,7 +252,7 @@ public final class FeatureUtilities {
 	 *             in case the provided {@link MathTransform} chokes.
 	 */
 	public static java.awt.Polygon convertPolygonToPointArray(final Polygon roiInput,
-			MathTransform worldToGridTransform, List/*<Double>*/ points)
+			MathTransform worldToGridTransform, List<Point2D> points)
 			throws TransformException {
 		final boolean isIdentity = worldToGridTransform.isIdentity();
 		final double coords[] = new double[2];
@@ -272,8 +272,8 @@ public final class FeatureUtilities {
 
 			// send it back to the returned polygon
 			final int x = (int) (coords[0] + 0.5d);
-			final int y = (int) (int) (coords[1] + 0.5d);
-			if(points!=null)
+			final int y = (int) (coords[1] + 0.5d);
+			if (points != null)
 				points.add(new Point2D.Double(x, y));
 
 			// send it back to the returned polygon

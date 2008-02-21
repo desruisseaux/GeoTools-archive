@@ -29,6 +29,10 @@ import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.RangeMeaning;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -87,9 +91,8 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     private CoordinateReferenceSystem crs;
 
     /**
-     * Constructs an empty envelope of the specified dimension.
-     * All ordinates are initialized to 0 and the coordinate reference
-     * system is undefined.
+     * Constructs an empty envelope of the specified dimension. All ordinates
+     * are initialized to 0 and the coordinate reference system is undefined.
      */
     public GeneralEnvelope(final int dimension) {
         ordinates = new double[dimension*2];
@@ -288,7 +291,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     }
 
     /**
-     * Make sure the specified dimensions are identical.
+     * Makes sure the specified dimensions are identical.
      */
     private static void ensureSameDimension(final int dim1, final int dim2)
             throws MismatchedDimensionException
@@ -327,8 +330,10 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     }
 
     /**
-     * Set the coordinate reference system in which the coordinate are given.
-     * Note: this method <strong>do not</strong> reproject the envelope.
+     * Sets the coordinate reference system in which the coordinate are given.
+     * This method <strong>do not</strong> reproject the envelope, and do not
+     * check if the envelope is contained in the new domain of validity. The
+     * later can be enforced by a call to {@link #validate}.
      *
      * @param  crs The new coordinate reference system, or {@code null}.
      * @throws MismatchedDimensionException if the specified CRS doesn't have the expected
@@ -339,6 +344,117 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     {
         AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
+    }
+
+    /**
+     * Restricts this envelope to the CS or CRS
+     * {@linkplain CoordinateReferenceSystem#getDomainOfValidity domain of validity}.
+     * This method performs two steps:
+     *
+     * <ol>
+     *   <li><p>First, it ensures that the envelope is contained in the {@linkplain CoordinateSystem
+     *   coordinate system} domain. Out of range ordinates are validated in a way that depends on
+     *   the {@linkplain CoordinateSystemAxis#getRangeMeaning range meaning}:
+     *   <ul>
+     *     <li>If {@linkplain RangeMeaning#EXACT EXACT} (typically <em>latitudes</em> ordinates),
+     *     values greater than the {@linkplain CoordinateSystemAxis#getMaximumValue maximum value}
+     *     are replaced by the maximum, and values smaller than the
+     *     {@linkplain CoordinateSystemAxis#getMinimumValue minimum value}
+     *     are replaced by the minimum.</li>
+     *
+     *     <li>If {@linkplain RangeMeaning#WRAPAROUND WRAPAROUND} (typically <em>longitudes</em>
+     *     ordinates), a multiple of the range (e.g. 360° for longitudes) is added or subtracted.
+     *     If a value stay out of range after this correction, then the ordinates are set to the
+     *     full [{@linkplain CoordinateSystemAxis#getMinimumValue minimum} ...
+     *     {@linkplain CoordinateSystemAxis#getMaximumValue maximum}] range.
+     *
+     *     <blockquote>
+     *     <b>Example:</b> [185° ... 190°] of longitude is equivalent to [-175° ... -170°]. But
+     *     [175° ... 185°] would be equivalent to [175° ... -175°], which is likely to mislead
+     *     most users of {@link Envelope} since the lower bounds is numerically greater than the
+     *     upper bounds. Reordering as [-175° ... 175°] would interchange the meaning of what is
+     *     "inside" and "outside" the envelope. So this implementation conservatively expands the
+     *     range to [-180° ... 180°] in order to ensure that the validated envelope fully contains
+     *     the original envelope.
+     *     </blockquote></li>
+     *   </ul>
+     *   </p></li>
+     *   <li><p>Second and only if {@code crsDomain} is {@code true}, the envelope validated in
+     *   the previous step is intersected with the CRS
+     *   {@linkplain CoordinateReferenceSystem#getDomainOfValidity domain of validity}, if any.
+     *   </p></li>
+     * </ol>
+     *
+     * @param  crsDomain {@code true} if the envelope should be restricted to the CRS domain in
+     *         addition of the CS domain.
+     * @return {@code true} if this envelope has been modified, or {@code false} if no change
+     *         was done.
+     *
+     * @since 2.5
+     */
+    public boolean validate(final boolean crsDomain) {
+        boolean changed = false;
+        if (crs != null) {
+            final int dimension = ordinates.length / 2;
+            final CoordinateSystem cs = crs.getCoordinateSystem();
+            for (int i=0; i<dimension; i++) {
+                final int j = i + dimension;
+                final CoordinateSystemAxis axis = cs.getAxis(i);
+                final double  minimum = axis.getMinimumValue();
+                final double  maximum = axis.getMaximumValue();
+                final RangeMeaning rm = axis.getRangeMeaning();
+                if (RangeMeaning.EXACT.equals(rm)) {
+                    if (ordinates[i] < minimum) {ordinates[i] = minimum; changed = true;}
+                    if (ordinates[j] > maximum) {ordinates[j] = maximum; changed = true;}
+                } else if (RangeMeaning.WRAPAROUND.equals(rm)) {
+                    final double length = maximum - minimum;
+                    if (length > 0 && length < Double.POSITIVE_INFINITY) {
+                        final double offset = Math.floor((ordinates[i] - minimum) / length) * length;
+                        if (offset != 0) {
+                            ordinates[i] -= offset;
+                            ordinates[j] -= offset;
+                            changed = true;
+                        }
+                        if (ordinates[j] > maximum) {
+                            ordinates[i] = minimum; // See method Javadoc
+                            ordinates[j] = maximum;
+                            changed = true;
+                        }
+                    }
+                }
+            }
+            if (crsDomain) {
+                final Envelope domain = CRS.getEnvelope(crs);
+                if (domain != null) {
+                    final CoordinateReferenceSystem domainCRS = domain.getCoordinateReferenceSystem();
+                    if (domainCRS == null) {
+                        intersect(domain);
+                    } else {
+                        /*
+                         * The domain may have fewer dimensions than this envelope (typically only
+                         * the ones relative to horizontal dimensions).  We can rely on directions
+                         * for matching axis since CRS.getEnvelope(crs) should have transformed the
+                         * domain to this envelope CRS.
+                         */
+                        final CoordinateSystem domainCS = domainCRS.getCoordinateSystem();
+                        final int domainDimension = domainCS.getDimension();
+                        for (int i=0; i<domainDimension; i++) {
+                            final double minimum = domain.getMinimum(i);
+                            final double maximum = domain.getMaximum(i);
+                            final AxisDirection direction = domainCS.getAxis(i).getDirection();
+                            for (int j=0; j<dimension; j++) {
+                                if (direction.equals(cs.getAxis(j).getDirection())) {
+                                    final int k = j + dimension;
+                                    if (ordinates[j] < minimum) ordinates[j] = minimum;
+                                    if (ordinates[k] > maximum) ordinates[k] = maximum;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return changed;
     }
 
     /**
@@ -356,7 +472,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      */
     @Override
     public DirectPosition getLowerCorner() {
-        final int dim = ordinates.length/2;
+        final int dim = ordinates.length / 2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, 0, position.ordinates, 0, dim);
         position.setCoordinateReferenceSystem(crs);
@@ -371,7 +487,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      */
     @Override
     public DirectPosition getUpperCorner() {
-        final int dim = ordinates.length/2;
+        final int dim = ordinates.length / 2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, dim, position.ordinates, 0, dim);
         position.setCoordinateReferenceSystem(crs);
@@ -419,7 +535,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * Returns the center ordinate along the specified dimension.
      */
     public final double getCenter(final int dimension) {
-        return 0.5*(ordinates[dimension] + ordinates[dimension+ordinates.length/2]);
+        return 0.5*(ordinates[dimension] + ordinates[dimension + ordinates.length/2]);
     }
 
     /**
@@ -428,7 +544,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * minimal ordinate.
      */
     public final double getLength(final int dimension) {
-        return ordinates[dimension+ordinates.length/2] - ordinates[dimension];
+        return ordinates[dimension + ordinates.length/2] - ordinates[dimension];
     }
 
     /**
@@ -594,7 +710,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * non-{@linkplain #isNull null}, but the converse is not always true.
      */
     public boolean isEmpty() {
-        final int dimension = ordinates.length/2;
+        final int dimension = ordinates.length / 2;
         if (dimension == 0) {
             return true;
         }
@@ -634,7 +750,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      */
     public void add(final DirectPosition position) throws MismatchedDimensionException {
         ensureNonNull("position", position);
-        final int dim = ordinates.length/2;
+        final int dim = ordinates.length / 2;
         AbstractDirectPosition.ensureDimensionMatch("position", position.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, position.getCoordinateReferenceSystem()) : position;
         for (int i=0; i<dim; i++) {
@@ -720,7 +836,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
             throws MismatchedDimensionException
     {
         ensureNonNull("envelope", envelope);
-        final int dim = ordinates.length/2;
+        final int dim = ordinates.length / 2;
         AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
@@ -763,7 +879,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
             throws MismatchedDimensionException
     {
         ensureNonNull("envelope", envelope);
-        final int dim = ordinates.length/2;
+        final int dim = ordinates.length / 2;
         AbstractDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
@@ -823,7 +939,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     public GeneralEnvelope getSubEnvelope(final int lower, final int upper)
             throws IndexOutOfBoundsException
     {
-        final int curDim = ordinates.length/2;
+        final int curDim = ordinates.length / 2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
@@ -851,7 +967,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     public GeneralEnvelope getReducedEnvelope(final int lower, final int upper)
             throws IndexOutOfBoundsException
     {
-        final int curDim = ordinates.length/2;
+        final int curDim = ordinates.length / 2;
         final int rmvDim = upper-lower;
         if (lower<0 || lower>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
@@ -933,7 +1049,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @param envelope The envelope to compare with.
      * @param eps The tolerance value to use for numerical comparaisons.
-     * @param relativeToLength {@code true} if the tolerance value should be relative to
+     * @param epsIsRelative {@code true} if the tolerance value should be relative to
      *        axis length, or {@code false} if it is an absolute value.
      *
      * @see #contains(Envelope, boolean)
@@ -941,9 +1057,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @since 2.4
      */
-    public boolean equals(final Envelope envelope, final double eps,
-                          final boolean relativeToLength)
-    {
+    public boolean equals(final Envelope envelope, final double eps, final boolean epsIsRelative) {
         ensureNonNull("envelope", envelope);
         final int dimension = getDimension();
         if (envelope.getDimension() != dimension) {
@@ -952,7 +1066,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dimension; i++) {
             double epsilon;
-            if (relativeToLength) {
+            if (epsIsRelative) {
                 epsilon = Math.max(getLength(i), envelope.getLength(i));
                 epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
             } else {

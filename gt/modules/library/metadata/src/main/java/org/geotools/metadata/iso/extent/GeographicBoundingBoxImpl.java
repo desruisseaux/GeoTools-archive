@@ -36,8 +36,9 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Geographic position of the dataset. This is only an approximate
- * so specifying the co-ordinate reference system is unnecessary.
+ * Geographic position of the dataset. This is only an approximate so specifying the coordinate
+ * reference system is unnecessary. The CRS shall be geographic with Greenwich prime meridian,
+ * but the datum doesn't need to be WGS84.
  *
  * @since 2.1
  * @source $URL$
@@ -126,10 +127,17 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
 
     /**
      * Constructs a geographic bounding box from the specified envelope. If the envelope contains
-     * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
-     * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
+     * a CRS, then the bounding box may be projected to a geographic one. Otherwise, the envelope
+     * is assumed already in appropriate CRS.
      * <p>
-     * <strong>Note:</strong> This method is available only if the referencing module is
+     * When coordinate transformation is required, the target geographic CRS is not necessarly
+     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS#WGS84 WGS84}. This method
+     * preserves the same {@linkplain org.opengis.referencing.datum.Ellipsoid ellipsoid} than
+     * in the envelope CRS when possible. This is because geographic bounding box are only
+     * approximative and the ISO specification do not mandates a particular CRS, so we avoid
+     * transformations that are not strictly necessary.
+     * <p>
+     * <strong>Note:</strong> This constructor is available only if the referencing module is
      * on the classpath.
      *
      * @param  envelope The envelope to use for initializing this geographic bounding box.

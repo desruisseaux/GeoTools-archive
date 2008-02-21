@@ -39,6 +39,7 @@ import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -54,7 +55,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.operation.transform.IdentityTransform;
@@ -429,130 +429,148 @@ public final class CRS {
     }
 
     /**
-     * Returns the valid area bounding box for the specified coordinate reference system, or
-     * {@code null} if unknown. This method search in the metadata informations associated with
-     * the given CRS. The returned envelope is expressed in terms of the specified CRS.
+     * Returns the domain of validity for the specified coordinate reference system,
+     * or {@code null} if unknown.
+     *
+     * This method fetchs the {@linkplain CoordinateReferenceSystem#getDomainOfValidity domain
+     * of validity} associated with the given CRS. Only {@linkplain GeographicExtent geographic
+     * extents} of kind {@linkplain BoundingPolygon bounding polygon} are taken in account. If
+     * none are found, then the {@linkplain #getGeographicBoundingBox geographic bounding boxes}
+     * are used as a fallback.
+     * <p>
+     * The returned envelope is expressed in terms of the specified CRS.
      *
      * @param  crs The coordinate reference system, or {@code null}.
      * @return The envelope in terms of the specified CRS, or {@code null} if none.
      *
+     * @see #getGeographicBoundingBox
+     * @see org.geotools.geometry.GeneralEnvelope#validate
+     *
      * @since 2.2
      */
-    public static Envelope getEnvelope(CoordinateReferenceSystem crs) {
-        Envelope envelope = getGeographicEnvelope(crs);
-        if (envelope != null) {
-            final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
-            if (sourceCRS != null) try {
-                crs = CRS.getHorizontalCRS(crs);
-                if (crs == null) {
-                    throw new TransformException(Errors.format(ErrorKeys.CANT_SEPARATE_CRS_$1,
-                            crs.getName()));
-                }
-                if (!equalsIgnoreMetadata(sourceCRS, crs)) {
-                    final GeneralEnvelope e;
-                    e = transform(findMathTransform(sourceCRS, crs, true), envelope);
-                    e.setCoordinateReferenceSystem(crs);
-                    envelope = e;
-                }
-            } catch (FactoryException exception) {
-                /*
-                 * No transformation path was found for the specified CRS. Logs a warning and
-                 * returns null, since it is a legal return value according this method contract.
-                 */
-                envelope = null;
-                unexpectedException("getEnvelope", exception);
-            } catch (TransformException exception) {
-                /*
-                 * The envelope is probably outside the range of validity for this CRS.
-                 * It should not occurs, since the envelope is supposed to describe the
-                 * CRS area of validity. Logs a warning and returns null, since it is a
-                 * legal return value according this method contract.
-                 */
-                envelope = null;
-                unexpectedException("getEnvelope", exception);
-            }
-        }
-        return envelope;
-    }
-
-    /**
-     * Returns the valid area bounding box for the specified coordinate reference system, or
-     * {@code null} if unknown. This method search in the metadata informations associated with
-     * the given CRS. The returned envelope is always expressed in terms of the
-     * {@linkplain DefaultGeographicCRS#WGS_84 WGS 84} CRS.
-     *
-     * @param  crs The coordinate reference system, or {@code null}.
-     * @return The envelope, or {@code null} if none.
-     */
-    private static Envelope getGeographicEnvelope(final CoordinateReferenceSystem crs) {
-        GeneralEnvelope envelope = null;
+    public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
+        Envelope envelope = null;
+        GeneralEnvelope merged = null;
         if (crs != null) {
             final Extent domainOfValidity = crs.getDomainOfValidity();
             if (domainOfValidity != null) {
-                for (final GeographicExtent geo : domainOfValidity.getGeographicElements()) {
-                    final GeneralEnvelope candidate;
-                    if (geo instanceof GeographicBoundingBox) {
-                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        final Boolean inclusion = bounds.getInclusion();
-                        if (inclusion == null) {
-                            // Status unknow; ignore this bounding box.
-                            continue;
-                        }
-                        if (!inclusion.booleanValue()) {
-                            // TODO: we could uses Envelope.substract if such
-                            //       a method is defined in a future version.
-                            continue;
-                        }
-                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
-                                                                      bounds.getSouthBoundLatitude()},
-                                                        new double[] {bounds.getEastBoundLongitude(),
-                                                                      bounds.getNorthBoundLatitude()});
-                        candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-                    } else if (geo instanceof BoundingPolygon) {
-                        // TODO: iterates through all polygons and invoke Polygon.getEnvelope();
-                        continue;
-                    } else {
+                for (final GeographicExtent extent : domainOfValidity.getGeographicElements()) {
+                    if (Boolean.FALSE.equals(extent.getInclusion())) {
                         continue;
                     }
-                    if (envelope == null) {
-                        envelope = candidate;
-                    } else {
-                        envelope.add(candidate);
+                    if (extent instanceof BoundingPolygon) {
+                        for (final Geometry geometry : ((BoundingPolygon) extent).getPolygons()) {
+                            final Envelope candidate = geometry.getEnvelope();
+                            if (candidate != null) {
+                                final CoordinateReferenceSystem sourceCRS =
+                                        candidate.getCoordinateReferenceSystem();
+                                if (sourceCRS == null || equalsIgnoreMetadata(sourceCRS, crs)) {
+                                    if (envelope == null) {
+                                        envelope = candidate;
+                                    } else {
+                                        if (merged == null) {
+                                            envelope = merged = new GeneralEnvelope(envelope);
+                                        }
+                                        merged.add(envelope);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        }
+        /*
+         * If no envelope was found, uses the geographic bounding box as a fallback. We will
+         * need to transform it from WGS84 to the supplied CRS. This step was not required in
+         * the previous block because the later selected only envelopes in the right CRS.
+         */
+        if (envelope == null) {
+            final GeographicBoundingBox bounds = getGeographicBoundingBox(crs);
+            if (bounds != null && !Boolean.FALSE.equals(bounds.getInclusion())) {
+                envelope = merged = new GeneralEnvelope(
+                        new double[] {bounds.getWestBoundLongitude(), bounds.getSouthBoundLatitude()},
+                        new double[] {bounds.getEastBoundLongitude(), bounds.getNorthBoundLatitude()});
+                /*
+                 * We do not assign WGS84 inconditionnaly to the geographic bounding box, because
+                 * it is not defined to be on a particular datum; it is only approximative bounds.
+                 * We try to get the GeographicCRS from the user-supplied CRS and fallback on WGS
+                 * 84 only if we found none.
+                 */
+                final SingleCRS     targetCRS = getHorizontalCRS(crs);
+                final GeographicCRS sourceCRS = CRSUtilities.getStandardGeographicCRS2D(targetCRS);
+                merged.setCoordinateReferenceSystem(sourceCRS);
+                try {
+                    envelope = transform(envelope, targetCRS);
+                } catch (TransformException exception) {
+                    /*
+                     * The envelope is probably outside the range of validity for this CRS.
+                     * It should not occurs, since the envelope is supposed to describe the
+                     * CRS area of validity. Logs a warning and returns null, since it is a
+                     * legal return value according this method contract.
+                     */
+                    envelope = null;
+                    unexpectedException("getEnvelope", exception);
+                }
+                /*
+                 * If transform(...) created a new envelope, its CRS is already targetCRS so it
+                 * doesn't matter if 'merged' is not anymore the right instance. If 'transform'
+                 * returned the envelope unchanged, the 'merged' reference still valid and we
+                 * want to ensure that it have the user-supplied CRS.
+                 */
+                merged.setCoordinateReferenceSystem(targetCRS);
             }
         }
         return envelope;
     }
 
     /**
-     * Returns the valid geographic area for the specified coordinate reference system, or
-     * {@code null} if unknown. This method search in the metadata informations associated
-     * with the given CRS.
+     * Returns the valid geographic area for the specified coordinate reference system,
+     * or {@code null} if unknown.
+     *
+     * This method fetchs the {@linkplain CoordinateReferenceSystem#getDomainOfValidity domain
+     * of validity} associated with the given CRS. Only {@linkplain GeographicExtent geographic
+     * extents} of kind {@linkplain GeographicBoundingBox geographic bounding box} are taken in
+     * account.
      *
      * @param  crs The coordinate reference system, or {@code null}.
      * @return The geographic area, or {@code null} if none.
      *
+     * @see #getEnvelope
+     *
      * @since 2.3
      */
     public static GeographicBoundingBox getGeographicBoundingBox(final CoordinateReferenceSystem crs) {
-        final Envelope envelope = getGeographicEnvelope(crs);
-        if (envelope != null) try {
-            return new GeographicBoundingBoxImpl(envelope);
-        } catch (TransformException exception) {
-            /*
-             * Should not occurs, since envelopes are usually already in geographic coordinates.
-             * If it occurs anyway, returns null since it is allowed by this method contract.
-             */
-            unexpectedException("getGeographicBoundingBox", exception);
+        GeographicBoundingBox     bounds = null;
+        GeographicBoundingBoxImpl merged = null;
+        if (crs != null) {
+            final Extent domainOfValidity = crs.getDomainOfValidity();
+            if (domainOfValidity != null) {
+                for (final GeographicExtent extent : domainOfValidity.getGeographicElements()) {
+                    if (extent instanceof GeographicBoundingBox) {
+                        final GeographicBoundingBox candidate = (GeographicBoundingBox) extent;
+                        if (bounds == null) {
+                            bounds = candidate;
+                        } else {
+                            if (merged == null) {
+                                bounds = merged = new GeographicBoundingBoxImpl(bounds);
+                            }
+                            merged.add(candidate);
+                        }
+                    }
+                }
+            }
         }
-        return null;
+        return bounds;
     }
 
     /**
      * Returns the first horizontal coordinate reference system found in the given CRS,
      * or {@code null} if there is none. A horizontal CRS is usually a two-dimensional
      * {@linkplain GeographicCRS geographic} or {@linkplain ProjectedCRS projected} CRS.
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The horizontal CRS, or {@code null} if none.
      *
      * @since 2.4
      */
@@ -583,6 +601,9 @@ public final class CRS {
      * Returns the first projected coordinate reference system found in a the given CRS,
      * or {@code null} if there is none.
      *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The projected CRS, or {@code null} if none.
+     *
      * @since 2.4
      */
     public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
@@ -604,6 +625,9 @@ public final class CRS {
     /**
      * Returns the first vertical coordinate reference system found in a the given CRS,
      * or {@code null} if there is none.
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The vertical CRS, or {@code null} if none.
      *
      * @since 2.4
      */
@@ -627,6 +651,9 @@ public final class CRS {
      * Returns the first temporal coordinate reference system found in the given CRS,
      * or {@code null} if there is none.
      *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The temporal CRS, or {@code null} if none.
+     *
      * @since 2.4
      */
     public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
@@ -648,6 +675,9 @@ public final class CRS {
     /**
      * Returns the first ellipsoid found in a coordinate reference system,
      * or {@code null} if there is none.
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The ellipsoid, or {@code null} if none.
      *
      * @since 2.4
      */
@@ -941,17 +971,21 @@ public final class CRS {
     {
         if (envelope != null && targetCRS != null) {
             final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
-            if (sourceCRS != null && !equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-                final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
-                final CoordinateOperation operation;
-                try {
-                    operation = factory.createOperation(sourceCRS, targetCRS);
-                } catch (FactoryException exception) {
-                    throw new TransformException(Errors.format(ErrorKeys.CANT_TRANSFORM_ENVELOPE), exception);
+            if (sourceCRS != null) {
+                if (!equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+                    final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
+                    final CoordinateOperation operation;
+                    try {
+                        operation = factory.createOperation(sourceCRS, targetCRS);
+                    } catch (FactoryException exception) {
+                        throw new TransformException(Errors.format(
+                                ErrorKeys.CANT_TRANSFORM_ENVELOPE), exception);
+                    }
+                    if (!operation.getMathTransform().isIdentity()) {
+                        envelope = transform(operation, envelope);
+                    }
                 }
-                if (!operation.getMathTransform().isIdentity()) {
-                    envelope = transform(operation, envelope);
-                }
+                assert equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), targetCRS);
             }
         }
         return envelope;
@@ -1445,9 +1479,7 @@ public final class CRS {
      *   <p><b>{@code -encoding}=<var>charset</var></b><br>
      *       Sets the console encoding for this application output. This value has no impact
      *       on data, but may improve the output quality. This is not needed on Linux terminal
-     *       using UTF-8 encoding (tip: the <cite>terminus font</cite> gives good results).
-     *       Windows users may need to set this encoding to the value returned by the
-     *       {@code chcp} command line. This parameter need to be specified only once.</p>
+     *       using UTF-8 encoding (tip: the <cite>terminus font</cite> gives good results).</p>
      *
      *   <p><b>{@code -dependencies}</b><br>
      *       Lists authority factory dependencies as a tree.</p>

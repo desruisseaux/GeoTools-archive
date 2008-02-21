@@ -15,11 +15,9 @@
  */
 package org.geotools.gui.swing.table;
 
-// J2SE dependencies
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 
-// Geotools dependencies
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -108,6 +106,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
      * @todo Just gets first feature type - should use typed feature
      *       collection.  Revisit when we have FeatureDocument.
      */
+    @Override
     public String getColumnName(int col) {
         if (featureTable==null || featureTable.isEmpty()) {
             return null;
@@ -127,7 +126,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
      */
     public Object getValueAt(final int row, final int col) {
         if (featureArray == null) {
-            featureArray = (SimpleFeature[]) featureTable.toArray(new SimpleFeature[featureTable.size()]);
+            featureArray = featureTable.toArray(new SimpleFeature[featureTable.size()]);
         }
         return featureArray[row].getAttribute(col);
     }

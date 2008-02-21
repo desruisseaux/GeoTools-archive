@@ -15,28 +15,21 @@
  */
 package org.geotools.gui.swing;
 
-// J2SE dependencies
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-// JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.TopologyException;
 
-// Geotools dependencies
 import org.geotools.util.logging.Logging;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -60,7 +53,7 @@ public class FeatureTableModelTest extends TestBase {
      * Standard logging instance.
      */
     protected static final Logger LOGGER = Logging.getLogger("org.geotools.filter");
-    
+
     /**
      * Feature on which to perform tests.
      */
@@ -100,10 +93,10 @@ public class FeatureTableModelTest extends TestBase {
         MemoryDataStore datastore = new MemoryDataStore();
         datastore.addFeature(testFeatures[0]);
         datastore.addFeature(testFeatures[1]);
-        
+
         String typeName = datastore.getTypeNames()[0];
         FeatureCollection<SimpleFeatureType, SimpleFeature> table = datastore.getFeatureSource(typeName).getFeatures();
-        
+
         FeatureTableModel ftm = new FeatureTableModel();
         ftm.setFeatureCollection(table);
         JTable jtable = new JTable();
@@ -118,6 +111,7 @@ public class FeatureTableModelTest extends TestBase {
      * @throws SchemaException If there is a problem setting up the schema.
      * @throws IllegalAttributeException If problem setting up the feature.
      */
+    @Override
     protected void setUp() throws SchemaException, IllegalAttributeException, TopologyException {
 
         SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
@@ -136,8 +130,8 @@ public class FeatureTableModelTest extends TestBase {
 
         // Builds the schema
         testSchema = b.buildFeatureType();
-       
-        
+
+
 
         // Creates coordinates for a linestring
         Coordinate[] lineCoords = new Coordinate[3];
@@ -181,7 +175,7 @@ public class FeatureTableModelTest extends TestBase {
         attributesB[8] = new Double(200000.5);
         attributesB[9] = "feature B";
 
-        
+
         // Creates the feature itself
         testFeatures = new SimpleFeature[2];
         testFeatures[0] = SimpleFeatureBuilder.build(testSchema, attributesA, "fid.1");

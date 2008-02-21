@@ -88,6 +88,7 @@ public class GeneralGridRange implements GridRange, Serializable {
 
     /**
      * Constructs an initially empty grid range of the specified dimension.
+     * This is used by {@link #getSubGridRange} before a grid range goes public.
      */
     private GeneralGridRange(final int dimension) {
         index = new int[dimension*2];
@@ -120,8 +121,8 @@ public class GeneralGridRange implements GridRange, Serializable {
      */
     public GeneralGridRange(final int[] lower, final int[] upper) {
         if (lower.length != upper.length) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        lower.length, upper.length));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, lower.length, upper.length));
         }
         index = new int[lower.length + upper.length];
         System.arraycopy(lower, 0, index, 0,            lower.length);
@@ -133,24 +134,46 @@ public class GeneralGridRange implements GridRange, Serializable {
      * Constructs two-dimensional range defined by a {@link Rectangle}.
      */
     public GeneralGridRange(final Rectangle rect) {
-        index = new int[] {
-            rect.x,            rect.y,
-            rect.x+rect.width, rect.y+rect.height
-        };
-        checkCoherence();
+        this(rect, 2);
+    }
+
+    /**
+     * Constructs multi-dimensional range defined by a {@link Rectangle}.
+     * The two first dimensions are set to the
+     * [{@linkplain Rectangle#x x} .. x+{@linkplain Rectangle#width width}] and
+     * [{@linkplain Rectangle#y y} .. x+{@linkplain Rectangle#height height}]
+     * ranges respectively. Extra dimensions (if any) are set to the [0..1] range.
+     *
+     * @param rect The rectangle.
+     * @param dimension Number of dimensions for this grid range. Must be equals or greater than 2.
+     *
+     * @since 2.5
+     */
+    public GeneralGridRange(final Rectangle rect, final int dimension) {
+        this(rect.x, rect.y, rect.width, rect.height, dimension);
     }
 
     /**
      * Constructs two-dimensional range defined by a {@link Raster}.
      */
     public GeneralGridRange(final Raster raster) {
-        final int x = raster.getMinX();
-        final int y = raster.getMinY();
-        index = new int[] {
-            x,                   y,
-            x+raster.getWidth(), y+raster.getHeight()
-        };
-        checkCoherence();
+        this(raster, 2);
+    }
+
+    /**
+     * Constructs multi-dimensional range defined by a {@link Raster}.
+     * The two first dimensions are set to the
+     * [{@linkplain Raster#getMinX x} .. x+{@linkplain Raster#getWidth width}] and
+     * [{@linkplain Raster#getMinY y} .. x+{@linkplain Raster#getHeight height}]
+     * ranges respectively. Extra dimensions (if any) are set to the [0..1] range.
+     *
+     * @param raster The raster.
+     * @param dimension Number of dimensions for this grid range. Must be equals or greater than 2.
+     *
+     * @since 2.5
+     */
+    public GeneralGridRange(final Raster raster, final int dimension) {
+        this(raster.getMinX(), raster.getMinY(), raster.getWidth(), raster.getHeight(), dimension);
     }
 
     /**
@@ -162,19 +185,34 @@ public class GeneralGridRange implements GridRange, Serializable {
 
     /**
      * Constructs multi-dimensional range defined by a {@link RenderedImage}.
+     * The two first dimensions are set to the
+     * [{@linkplain RenderedImage#getMinX x} .. x+{@linkplain RenderedImage#getWidth width}] and
+     * [{@linkplain RenderedImage#getMinY y} .. x+{@linkplain RenderedImage#getHeight height}]
+     * ranges respectively. Extra dimensions (if any) are set to the [0..1] range.
      *
      * @param image The image.
-     * @param dimension Number of dimensions for this grid range.
-     *        Dimensions over 2 will be set to the [0..1] range.
+     * @param dimension Number of dimensions for this grid range. Must be equals or greater than 2.
+     *
+     * @since 2.5
      */
-    GeneralGridRange(final RenderedImage image, final int dimension) {
+    public GeneralGridRange(final RenderedImage image, final int dimension) {
+        this(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight(), dimension);
+    }
+
+    /**
+     * Constructs a multi-dimensional range. We keep this constructor private because the arguments
+     * can be confusing. Forcing usage of {@link Rectangle} in public API is probably safer.
+     */
+    private GeneralGridRange(int x, int y, int width, int height, int dimension) {
+        if (dimension < 2) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "dimension", dimension));
+        }
         index = new int[dimension*2];
-        final int x = image.getMinX();
-        final int y = image.getMinY();
         index[0] = x;
         index[1] = y;
-        index[dimension+0] = x+image.getWidth();
-        index[dimension+1] = y+image.getHeight();
+        index[dimension + 0] = x + width;
+        index[dimension + 1] = y + height;
         Arrays.fill(index, dimension+2, index.length, 1);
         checkCoherence();
     }

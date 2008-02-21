@@ -635,8 +635,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * </code></blockquote>
      *
      * <P>The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line using the "{@code chcp}" command with no arguments.
-     * This {@code -encoding} argument need to be supplied only once.</P>
+     * commande line using the "{@code chcp}" command with no arguments.</P>
      *
      * @param args Command line arguments.
      */

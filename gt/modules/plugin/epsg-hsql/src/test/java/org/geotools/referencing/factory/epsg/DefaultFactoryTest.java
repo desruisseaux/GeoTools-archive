@@ -476,8 +476,8 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals(-5.20, bbox.getWestBoundLongitude(), EPS);
         assertEquals( 8.23, bbox.getEastBoundLongitude(), EPS);
         final Envelope envelope = CRS.getEnvelope(crs);
-        assertEquals(46.948, envelope.getMinimum(0), 1E-3);
-        assertEquals(56.781, envelope.getMaximum(0), 1E-3);
+        assertEquals(46.944, envelope.getMinimum(0), 1E-3);
+        assertEquals(56.777, envelope.getMaximum(0), 1E-3);
         assertEquals(-8.375, envelope.getMinimum(1), 1E-3);
         assertEquals( 6.548, envelope.getMaximum(1), 1E-3);
         assertNull(CRS.getEnvelope(null));

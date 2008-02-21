@@ -24,15 +24,17 @@ import java.awt.geom.Rectangle2D;
 import javax.units.Unit;
 
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.SingleCRS;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -45,7 +47,11 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -266,6 +272,37 @@ public final class CRSUtilities {
     }
 
     /**
+     * Derives a geographic CRS with (<var>longitude</var>, <var>latitude</var>) axis order in
+     * decimal degrees, relative to Greenwich. If no such CRS can be obtained of created, returns
+     * {@link DefaultGeographicCRS#WGS84}.
+     *
+     * @param  crs A source CRS.
+     * @return A two-dimensional geographic CRS with standard axis. Never {@code null}.
+     */
+    public static GeographicCRS getStandardGeographicCRS2D(CoordinateReferenceSystem crs) {
+        while (crs instanceof GeneralDerivedCRS) {
+            crs = ((GeneralDerivedCRS) crs).getBaseCRS();
+        }
+        if (!(crs instanceof SingleCRS)) {
+            return DefaultGeographicCRS.WGS84;
+        }
+        final Datum datum = ((SingleCRS) crs).getDatum();
+        if (!(datum instanceof GeodeticDatum)) {
+            return DefaultGeographicCRS.WGS84;
+        }
+        GeodeticDatum geoDatum = (GeodeticDatum) datum;
+        if (geoDatum.getPrimeMeridian().getGreenwichLongitude() != 0) {
+            geoDatum = new DefaultGeodeticDatum(geoDatum.getName().getCode(),
+                    geoDatum.getEllipsoid(), DefaultPrimeMeridian.GREENWICH);
+        } else if (crs instanceof GeographicCRS) {
+            if (CRS.equalsIgnoreMetadata(DefaultEllipsoidalCS.GEODETIC_2D, crs.getCoordinateSystem())) {
+                return (GeographicCRS) crs;
+            }
+        }
+        return new DefaultGeographicCRS(crs.getName().getCode(), geoDatum, DefaultEllipsoidalCS.GEODETIC_2D);
+    }
+
+    /**
      * Transforms the relative distance vector specified by {@code source} and stores
      * the result in {@code dest}.  A relative distance vector is transformed without
      * applying the translation components.
@@ -349,6 +386,8 @@ public final class CRSUtilities {
      *       Or yet better: move formatting code in {@code GeographicBoundingBox.toString()}
      *       method, and move the transformation code into {@code GeographicBoundingBox}
      *       constructor.
+     *
+     * @todo Do not requires specifically WGS 84, using {@link #getStandardGeographicCRS}.
      */
     public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
         Exception exception;
