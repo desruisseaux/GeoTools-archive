@@ -217,6 +217,7 @@ public class WFSParsingTest extends TestCase {
         assertEquals(targetNs, type.getTargetNamespace());
     }
 
+    @SuppressWarnings("unchecked")
     public void testParseGetFeature() throws Exception {
         File tmp = File.createTempFile("geoserver-DescribeFeatureType", "xml");
         tmp.deleteOnExit();
@@ -256,7 +257,8 @@ public class WFSParsingTest extends TestCase {
         List featureCollections = fc.getFeature();
         assertEquals(1, featureCollections.size());
 
-        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) featureCollections.get(0);
+        FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection;
+        featureCollection = (FeatureCollection<SimpleFeatureType, SimpleFeature>) featureCollections.get(0);
         assertEquals(5, featureCollection.size());
 
         FeatureIterator<SimpleFeature> features = featureCollection.features();
@@ -274,7 +276,10 @@ public class WFSParsingTest extends TestCase {
             assertEquals(39.73245, p.getX(), 0.1);
             assertEquals(2.00342, p.getY(), 0.1);
 
-            assertEquals(BigInteger.valueOf(155), f.getAttribute("intProperty"));
+            Object intProperty = f.getAttribute("intProperty");
+            assertTrue(intProperty instanceof BigInteger);
+            
+            assertEquals(BigInteger.valueOf(155), intProperty);
             assertEquals(new URI("http://www.opengeospatial.org/"), f.getAttribute("uriProperty"));
             assertEquals(new Float(12765.0), f.getAttribute("measurand"));
             assertTrue(f.getAttribute("dateProperty") instanceof Date);
