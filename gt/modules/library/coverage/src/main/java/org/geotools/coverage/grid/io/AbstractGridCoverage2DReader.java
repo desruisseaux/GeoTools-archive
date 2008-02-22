@@ -364,7 +364,7 @@ public abstract class AbstractGridCoverage2DReader implements
         	 // -highest resolution image is at level 0.
         	 // -all the overviews share the same envelope
         	 // -the aspect ratio for the overviews is constant
-        	 // -the provided resolutions are takne directly from the grid
+        	 // -the provided resolutions are taken directly from the grid
         	 resolutionsLevels.add(new Resolution(1,highestRes[0],highestRes[1], 0));
              for (int i = 0; i < overViewResolutions.length; i++) {
             	 resolutionsLevels.add(new Resolution(overViewResolutions[i][0]/highestRes[0],overViewResolutions[i][0],overViewResolutions[i][1] , i+1));
