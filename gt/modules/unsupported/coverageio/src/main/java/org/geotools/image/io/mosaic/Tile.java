@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.InvalidClassException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Collection;
 import javax.imageio.ImageIO;
@@ -581,19 +582,26 @@ public class Tile implements Comparable<Tile>, Serializable {
         ImageReaderSpi provider = null;
         final String path = getInputName(input);
         if (path != null) {
-            final int split = path.lastIndexOf('.', path.lastIndexOf('/') + 1);
+            final int split = path.indexOf('.', path.lastIndexOf('/') + 1);
             if (split >= 0) {
                 final String suffix = path.substring(split + 1).trim();
+                String[] suffixes = null;
                 final Iterator<ImageReaderSpi> it = IIORegistry.getDefaultInstance()
                         .getServiceProviders(ImageReaderSpi.class, true);
                 while (it.hasNext()) {
                     final ImageReaderSpi candidate = it.next();
-                    if (XArray.contains(candidate.getFileSuffixes(), suffix)) {
+                    final String[] candidateSuffixes = candidate.getFileSuffixes();
+                    if (XArray.contains(candidateSuffixes, suffix)) {
                         if (provider != null) {
+                            if (Arrays.equals(candidateSuffixes, suffixes)) {
+                                // E.g. we may have both CLIB and JSE version of PNG reader.
+                                continue;
+                            }
                             // We have an ambiguity - Returns null so we don't make a choice.
                             return null;
                         }
                         provider = candidate;
+                        suffixes = candidateSuffixes;
                         // Continue the search for making sure that we don't have an ambiguity.
                     }
                 }

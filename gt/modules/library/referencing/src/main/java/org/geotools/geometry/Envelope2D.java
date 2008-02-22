@@ -64,6 +64,14 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     private CoordinateReferenceSystem crs;
 
     /**
+     * Constructs an initially empty envelope with no CRS.
+     *
+     * @since 2.5
+     */
+    public Envelope2D() {
+    }
+
+    /**
      * Constructs two-dimensional envelope defined by an other {@link Envelope}.
      */
     public Envelope2D(final Envelope envelope) {
