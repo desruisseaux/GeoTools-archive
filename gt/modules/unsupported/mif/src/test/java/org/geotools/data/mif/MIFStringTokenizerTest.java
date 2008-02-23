@@ -102,6 +102,35 @@ public class MIFStringTokenizerTest extends TestCase {
         }
     }
 
+
+    /*
+     * Class under test for String getToken(char, boolean, boolean)
+     */
+    public void testGetTokencharbooleanbooleanInQuote() {
+    	tok.readLine("\"foo \"quote inside quoted string\" bar\",next");
+
+        try {
+    	    assertEquals("foo \"quote inside quoted string\" bar", tok.getToken(',', false, true));
+        } catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    
+    /*
+     * Class under test for String getToken(char, boolean, boolean)
+     */
+    public void testGetTokencharbooleanbooleanInQuoteEnd() {
+    	tok.readLine("\"foo \"quote inside quoted string\"\"");
+
+        try {
+    	    assertEquals("foo \"quote inside quoted string\"", tok.getToken(',', false, true));
+        } catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    
     /*
      * Class under test for String getToken(char)
      */

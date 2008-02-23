@@ -112,15 +112,20 @@ public class MIFStringTokenizer {
 
                 while (loop) {
                     while ((index < len) && (line.charAt(index) != '"'))
-                        index++;
-
-                    if ((index < (len - 1)) && (line.charAt(index + 1) == '"')) {
-                        index += 2;
+                    		index ++;
+                    
+                    if (	(index < (len - 2)) && 
+                    		(line.charAt(index) == '"') && 
+                    		(line.charAt(index + 1) == separator)) {
+                    	loop = false;
+                    } else if (	(index == (len - 1)) && 
+                    			(line.charAt(index) == '"') ) {
+                    	loop = false;
                     } else {
-                        loop = false;
+                    	index ++;
                     }
                 }
-
+                
                 token = line.substring(1, index).replaceAll("\"\"", "\"");
                 line = ltrim(line.substring(index + 1));
 
