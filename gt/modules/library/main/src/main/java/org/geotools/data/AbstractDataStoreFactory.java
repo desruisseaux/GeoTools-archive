@@ -20,13 +20,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
-import org.geotools.parameter.Parameter;
+import org.geotools.data.DataAccessFactory.Param;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.FloatParameter;
-import org.opengis.parameter.ParameterValue;
+import org.geotools.parameter.Parameter;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
 
 
 /**
@@ -169,7 +169,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     /**
      * Returns the implementation hints. The default implementation returns en empty map.
      */
-    public Map getImplementationHints() {
+    public Map<java.awt.RenderingHints.Key, ?> getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
 }

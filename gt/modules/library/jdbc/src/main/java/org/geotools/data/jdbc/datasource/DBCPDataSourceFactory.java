@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 
 /**
  * A datasource factory using DBCP connection pool

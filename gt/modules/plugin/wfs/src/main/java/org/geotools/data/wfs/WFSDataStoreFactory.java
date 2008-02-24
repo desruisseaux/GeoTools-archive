@@ -281,16 +281,16 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         if (perParameterSetDataStoreCache.containsKey(params)) {
             return perParameterSetDataStoreCache.get(params);
         }
-        final URL getCapabilitiesRequest = URL.lookUp(params);
-        final Boolean protocol = PROTOCOL.lookUp(params);
-        final String user = USERNAME.lookUp(params);
-        final String pass = PASSWORD.lookUp(params);
-        final int timeout = TIMEOUT.lookUp(params);
-        final int buffer = BUFFER_SIZE.lookUp(params);
-        final boolean tryGZIP = TRY_GZIP.lookUp(params);
-        final boolean lenient = LENIENT.lookUp(params);
-        final String encoding = ENCODING.lookUp(params);
-        final Integer maxFeatures = MAXFEATURES.lookUp(params);
+        final URL getCapabilitiesRequest = (URL)URL.lookUp(params);
+        final Boolean protocol = (Boolean)PROTOCOL.lookUp(params);
+        final String user = (String)USERNAME.lookUp(params);
+        final String pass = (String)PASSWORD.lookUp(params);
+        final int timeout = (Integer)TIMEOUT.lookUp(params);
+        final int buffer = (Integer)BUFFER_SIZE.lookUp(params);
+        final boolean tryGZIP = (Boolean)TRY_GZIP.lookUp(params);
+        final boolean lenient = (Boolean)LENIENT.lookUp(params);
+        final String encoding = (String)ENCODING.lookUp(params);
+        final Integer maxFeatures = (Integer)MAXFEATURES.lookUp(params);
         final Charset defaultEncoding = Charset.forName(encoding);
 
         if (((user == null) && (pass != null)) || ((pass == null) && (user != null))) {

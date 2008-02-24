@@ -19,7 +19,7 @@ package org.geotools.data.db2;
 import java.io.IOException;
 import java.util.Map;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 
 
 /**

@@ -22,7 +22,7 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 
 /**
  * @author johann sorel

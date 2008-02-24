@@ -22,7 +22,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 import org.geotools.factory.Factory;
 
 

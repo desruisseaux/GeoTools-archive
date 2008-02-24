@@ -23,7 +23,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 

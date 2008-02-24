@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 
 public abstract class AbstractDataSourceFactorySpi implements DataSourceFactorySpi {
 

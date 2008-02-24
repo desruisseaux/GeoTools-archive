@@ -17,16 +17,15 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
-import org.opengis.referencing.FactoryException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -82,48 +81,10 @@ public final class DataStoreFinder {
      *         attached to the specified resource without errors.
      */
     public static synchronized DataStore getDataStore(Map params) throws IOException {
-        Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
-        DataStoreFactorySpi fac;
-
-        IOException canProcessButNotAvailable = null;
-        while (ps.hasNext()) {
-        	fac = (DataStoreFactorySpi) ps.next();
-        	boolean canProcess = false;
-            try {
-                canProcess = fac.canProcess(params);
-            } catch (Throwable t) {
-                LOGGER.log( Level.WARNING, "Problem asking "+fac.getDisplayName()+" if it can process request:"+t, t );
-                // Protect against DataStores that don't carefully code canProcess
-                continue;
-            }
-            if (canProcess) {
-                boolean isAvailable = false;
-                try {
-                    isAvailable = fac.isAvailable();
-                } catch (Throwable t) {
-                    LOGGER.log( Level.WARNING, "Difficulity checking if "+fac.getDisplayName()+" is available:"+t, t );
-                    // Protect against DataStores that don't carefully code isAvailable
-                    continue;
-                }
-                if( isAvailable ){
-                    try {
-                        return fac.createDataStore(params);
-                    }
-                    catch (IOException couldNotConnect ){
-                        canProcessButNotAvailable = couldNotConnect;
-                        LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but could not connect", couldNotConnect );
-                    }
-                }
-                else {
-                    canProcessButNotAvailable = new IOException( fac.getDisplayName()+" should be used, but is not availble. Have you installed the required drivers or jar files?");
-                    LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but is not availble", canProcessButNotAvailable );
-                }
-            }
-        }
-        if( canProcessButNotAvailable != null ){
-            throw canProcessButNotAvailable;
-        }
-        return null;
+        Iterator<DataStoreFactorySpi> ps = getAvailableDataStores();
+        DataAccess<? extends FeatureType, ? extends Feature> dataStore;
+        dataStore = DataAccessFinder.getDataStore(params, ps);
+        return (DataStore) dataStore;
     }
 
     /**
@@ -134,9 +95,8 @@ public final class DataStoreFinder {
      * @return An iterator over all discovered datastores which have registered
      *         factories
      */
-    public static synchronized Iterator getAllDataStores() {
-        Set availableDS = new HashSet(5);
-        return getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
+    public static synchronized Iterator<DataStoreFactorySpi> getAllDataStores() {
+        return DataAccessFinder.getAllDataStores(getServiceRegistry(), DataStoreFactorySpi.class);
     }
 
     /**
@@ -147,18 +107,10 @@ public final class DataStoreFinder {
      * @return An iterator over all discovered datastores which have registered
      *         factories, and whose available method returns true.
      */
-    public static synchronized Iterator getAvailableDataStores() {
-        Set availableDS = new HashSet(5);
-        Iterator it = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
-        DataStoreFactorySpi dsFactory;
-        while (it.hasNext()) {
-        	dsFactory = (DataStoreFactorySpi) it.next();
-
-            if (dsFactory.isAvailable()) {
-                availableDS.add(dsFactory);
-            }
-        }
-
+    public static synchronized Iterator<DataStoreFactorySpi> getAvailableDataStores() {
+        Set<DataStoreFactorySpi> availableDS;
+        FactoryRegistry serviceRegistry = getServiceRegistry();
+        availableDS = DataAccessFinder.getAvailableDataStores(serviceRegistry, DataStoreFactorySpi.class);
         return availableDS.iterator();
     }
 

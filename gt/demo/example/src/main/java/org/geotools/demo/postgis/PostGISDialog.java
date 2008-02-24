@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 
 /**

@@ -24,7 +24,6 @@ import javax.sql.DataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 

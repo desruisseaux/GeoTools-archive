@@ -27,7 +27,7 @@ import java.util.PropertyResourceBundle;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.data.DataAccessFactory.Param;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
