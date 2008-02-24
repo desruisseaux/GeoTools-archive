@@ -237,8 +237,9 @@ public class WFSParsingTest extends TestCase {
         // http://localhost:8080/geoserver/wfs?service=WFS&amp;version=1.1.0&amp;request=DescribeFeatureType&amp;typeName=sf:PrimitiveGeoFeature
         String schemaLocation = doc.getDocumentElement().getAttributeNS(
                 "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
-        schemaLocation = schemaLocation.replaceAll("http://cite.opengeospatial.org/gmlsf .*",
-                "http://cite.opengeospatial.org/gmlsf " + tmp.getAbsolutePath());
+        String absolutePath = tmp.toURL().toExternalForm();
+		schemaLocation = schemaLocation.replaceAll("http://cite.opengeospatial.org/gmlsf .*",
+                "http://cite.opengeospatial.org/gmlsf " + absolutePath);
         doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                 "schemaLocation", schemaLocation);
 
@@ -277,7 +278,8 @@ public class WFSParsingTest extends TestCase {
             assertEquals(2.00342, p.getY(), 0.1);
 
             Object intProperty = f.getAttribute("intProperty");
-            assertTrue(intProperty instanceof BigInteger);
+            assertNotNull(intProperty);
+            assertTrue(intProperty.getClass().getName(), intProperty instanceof BigInteger);
             
             assertEquals(BigInteger.valueOf(155), intProperty);
             assertEquals(new URI("http://www.opengeospatial.org/"), f.getAttribute("uriProperty"));
