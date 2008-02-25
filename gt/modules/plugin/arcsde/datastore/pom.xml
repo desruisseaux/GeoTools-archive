@@ -186,11 +186,6 @@
           <version>${sde.version}</version>
         </dependency>
         <dependency>
-          <groupId>edu.oswego</groupId>
-          <artifactId>concurrent</artifactId>
-          <!-- version provided by main pom -->
-        </dependency>
-        <dependency>
           <groupId>com.esri</groupId>
           <artifactId>jsde_jpe_sdk</artifactId>
           <version>${sde.version}</version>
