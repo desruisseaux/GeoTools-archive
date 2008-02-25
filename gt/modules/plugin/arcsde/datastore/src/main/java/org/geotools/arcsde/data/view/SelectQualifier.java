@@ -120,6 +120,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
         Map /* <String,Table> */aliases = extractTableAliases(fromItems);
 
+        //@todo: REVISIT, looks like a bug here, fromItems is not being read after assigned
         fromItems = removeTableAliases(fromItems);
 
         List selectItems = qualifySelectItems(aliases, plainSelect.getSelectItems());

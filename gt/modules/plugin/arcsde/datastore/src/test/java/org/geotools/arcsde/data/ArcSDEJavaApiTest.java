@@ -873,7 +873,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         final ArcSDEPooledConnection transConn;
 
         final SeTable tempTable = testData.getTempTable();
-        final SeLayer tempLayer = testData.getTempLayer();
+        //final SeLayer tempLayer = testData.getTempLayer();
 
         testData.truncateTempTable();
 

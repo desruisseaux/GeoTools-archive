@@ -524,7 +524,6 @@ public class TestData {
         // Year, month, date, hour, minute, second.
         cal.set(2004, 06, 1, 0, 0, 0);
 
-        SeExtent envelope = coordref.getXYEnvelope();
         try {
             for (int i = 1; i <= shapes.length; i++) {
                 SeRow row = insert.getRowToSet();

@@ -44,6 +44,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.text.cql2.CQL;
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -246,46 +247,47 @@ public class ArcSDEDataStoreTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void _testStress() throws Exception {
-        try {
-            ArcSDEDataStore ds = testData.getDataStore();
 
-            ArcSDEConnectionPool pool = ds.getConnectionPool();
-            final int initialAvailableCount = pool.getAvailableCount();
-            final int initialPoolSize = pool.getPoolSize();
+        ArcSDEDataStore ds = testData.getDataStore();
 
-            String typeName = testData.getTemp_table();
+        ArcSDEConnectionPool pool = ds.getConnectionPool();
+        final int initialAvailableCount = pool.getAvailableCount();
+        final int initialPoolSize = pool.getPoolSize();
 
-            FeatureSource<SimpleFeatureType, SimpleFeature> source = ds.getFeatureSource(typeName);
+        String typeName = testData.getTemp_table();
 
-            assertEquals(initialAvailableCount, pool.getAvailableCount());
-            assertEquals(initialPoolSize, pool.getPoolSize());
+        FeatureSource<SimpleFeatureType, SimpleFeature> source;
+        source = ds.getFeatureSource(typeName);
 
-            SimpleFeatureType schema = source.getSchema();
+        assertEquals(initialAvailableCount, pool.getAvailableCount());
+        assertEquals(initialPoolSize, pool.getPoolSize());
 
-            assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
-            assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
+        SimpleFeatureType schema = source.getSchema();
 
-            final Envelope layerBounds = source.getBounds();
+        assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
 
-            assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
-            assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
+        final Envelope layerBounds = source.getBounds();
 
-            source.getCount(Query.ALL);
+        assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
 
-            assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
-            assertEquals("After size()", initialPoolSize, pool.getPoolSize());
+        source.getCount(Query.ALL);
 
-            BBOX bbox = ff.bbox(schema.getDefaultGeometry().getLocalName(),
-                    layerBounds.getMinX() + 10, layerBounds.getMinY() + 10,
-                    layerBounds.getMaxX() - 10, layerBounds.getMaxY() - 10, schema.getCRS()
-                            .getName().getCode());
+        assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
+        assertEquals("After size()", initialPoolSize, pool.getPoolSize());
 
-            for (int i = 0; i < 20; i++) {
-                LOGGER.fine("Running iteration #" + i);
+        BBOX bbox = ff.bbox(schema.getDefaultGeometry().getLocalName(), layerBounds.getMinX() + 10,
+                layerBounds.getMinY() + 10, layerBounds.getMaxX() - 10, layerBounds.getMaxY() - 10,
+                schema.getCRS().getName().getCode());
 
-                FeatureCollection<SimpleFeatureType, SimpleFeature> res = source.getFeatures(bbox);
-                FeatureIterator<SimpleFeature> reader = res.features();
+        for (int i = 0; i < 20; i++) {
+            LOGGER.fine("Running iteration #" + i);
 
+            FeatureCollection<SimpleFeatureType, SimpleFeature> res;
+            res = source.getFeatures(bbox);
+            FeatureIterator<SimpleFeature> reader = res.features();
+            try {
                 assertNotNull(reader.next());
 
                 assertTrue(0 < res.size());
@@ -297,13 +299,9 @@ public class ArcSDEDataStoreTest extends TestCase {
                 assertNotNull(res.getBounds());
 
                 assertNotNull(reader.next());
-
+            } finally {
                 reader.close();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
         }
     }
 
@@ -522,8 +520,11 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
 
-            Object geom = f.getDefaultGeometry();
+            // Object geom = f.getDefaultGeometry();
             // assertNotNull(geom);
+
+            GeometryAttribute defaultGeom = f.getDefaultGeometryProperty();
+            assertNotNull(defaultGeom);
 
             return true;
         }
@@ -850,7 +851,8 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private void testGetFeatureSource(FeatureSource<SimpleFeatureType, SimpleFeature> fsource) throws IOException {
+    private void testGetFeatureSource(FeatureSource<SimpleFeatureType, SimpleFeature> fsource)
+            throws IOException {
         assertNotNull(fsource);
         assertNotNull(fsource.getDataStore());
         assertEquals(fsource.getDataStore(), store);

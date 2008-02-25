@@ -59,7 +59,7 @@ class TableQualifier {
         qualifiedTable.setName(table.getName());
         qualifiedTable.setAlias(table.getAlias());
 
-        String schema = table.getSchemaName(); // user name in sde land
+        //String schema = table.getSchemaName(); // user name in sde land
 
         // if (schema != null) {
         try {

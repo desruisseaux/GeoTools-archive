@@ -801,36 +801,46 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         DataStore ds = testData.getDataStore();
 
+        SimpleFeature feature;
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
+        writer = ds.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
         try {
-            FeatureWriter<SimpleFeatureType, SimpleFeature> writer = ds.getFeatureWriter(typeName,
-                    Transaction.AUTO_COMMIT);
-            SimpleFeature f = writer.next();
-            f.setAttribute("INT32_COL", Integer.valueOf(1000));
+            feature = writer.next();
+            feature.setAttribute("INT32_COL", Integer.valueOf(1000));
 
             writer.write();
+        } finally {
             writer.close();
-            LOGGER.info("Wrote null-geom feature to sde");
+        }
+        LOGGER.info("Wrote null-geom feature to sde");
 
-            FeatureReader<SimpleFeatureType, SimpleFeature> r = ds.getFeatureReader(
-                    new DefaultQuery(typeName, Filter.INCLUDE), Transaction.AUTO_COMMIT);
-            assertTrue(r.hasNext());
-            f = r.next();
-            LOGGER.info("recovered geometry " + f.getDefaultGeometry()
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        reader = ds.getFeatureReader(new DefaultQuery(typeName, Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
+
+        // save the ID to update the feature later
+        String newId;
+        try {
+            assertTrue(reader.hasNext());
+            feature = reader.next();
+            LOGGER.info("recovered geometry " + feature.getDefaultGeometry()
                     + " from single inserted feature.");
-            assertNull(f.getDefaultGeometry());
-            // save the ID to update the feature later
-            String newId = f.getID();
-            assertFalse(r.hasNext());
-            r.close();
-            LOGGER.info("Confirmed exactly one feature in new sde layer");
+            assertNull(feature.getDefaultGeometry());
+            newId = feature.getID();
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+        LOGGER.info("Confirmed exactly one feature in new sde layer");
 
-            FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-            HashSet<FeatureId> ids = new HashSet<FeatureId>();
-            ids.add(ff.featureId(newId));
-            Filter idFilter = ff.id(ids);
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        HashSet<FeatureId> ids = new HashSet<FeatureId>();
+        ids.add(ff.featureId(newId));
+        Filter idFilter = ff.id(ids);
 
-            writer = ds.getFeatureWriter(typeName, idFilter, Transaction.AUTO_COMMIT);
+        writer = ds.getFeatureWriter(typeName, idFilter, Transaction.AUTO_COMMIT);
 
+        try {
             assertTrue(writer.hasNext());
 
             LOGGER.info("Confirmed feature is fetchable via it's api-determined FID");
@@ -845,25 +855,25 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             SimpleFeature toBeUpdated = writer.next();
             toBeUpdated.setAttribute("SHAPE", sampleMultiLine);
             writer.write();
+        } finally {
             writer.close();
+        }
+        LOGGER.info("Null-geom feature updated with a sample geometry.");
 
-            LOGGER.info("Null-geom feature updated with a sample geometry.");
-
-            DefaultQuery query = new DefaultQuery(testData.getTemp_table(), idFilter);
-            r = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
-            assertTrue(r.hasNext());
-            f = r.next();
-            MultiLineString recoveredMLS = (MultiLineString) f.getDefaultGeometry();
+        DefaultQuery query = new DefaultQuery(testData.getTemp_table(), idFilter);
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        try {
+            assertTrue(reader.hasNext());
+            feature = reader.next();
+            MultiLineString recoveredMLS = (MultiLineString) feature.getDefaultGeometry();
             assertTrue(!recoveredMLS.isEmpty());
             // I tried to compare the recovered MLS to the
             // sampleMultiLineString, but they're
             // slightly different. SDE does some rounding, and winds up giving
             // me 0.0000002 for zero,
             // and 11.9992 for 12. Meh.
-            r.close();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } finally {
+            reader.close();
         }
     }
 
@@ -1110,7 +1120,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTemp_table();
 
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds
+                .getFeatureSource(typeName);
 
         final int initialCount = store.getCount(Query.ALL);
         assertTrue(initialCount > 0);
@@ -1130,7 +1141,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final String typeName = testData.getTemp_table();
 
         final Transaction transaction = new DefaultTransaction("testSetFeaturesTransaction handle");
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds
+                .getFeatureSource(typeName);
         store.setTransaction(transaction);
 
         final int initialCount = store.getCount(Query.ALL);
@@ -1177,7 +1189,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 .createTestFeatures(LineString.class, featureCount);
 
         final DataStore ds = testData.getDataStore();
-        final FeatureStore<SimpleFeatureType, SimpleFeature> fStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds.getFeatureSource(typeName);
+        final FeatureStore<SimpleFeatureType, SimpleFeature> fStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) ds
+                .getFeatureSource(typeName);
         final Transaction transaction = new DefaultTransaction("testTransactionMultithreadAccess");
         fStore.setTransaction(transaction);
 

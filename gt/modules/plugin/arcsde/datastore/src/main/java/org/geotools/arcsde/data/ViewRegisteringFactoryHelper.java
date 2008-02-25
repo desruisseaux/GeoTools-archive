@@ -105,8 +105,9 @@ public class ViewRegisteringFactoryHelper {
      */
     public static Map cleanUpViewDefinitions(Map params) {
         Map cleanedUpViews = new HashMap();
-        for (Iterator it = params.keySet().iterator(); it.hasNext();) {
-            String key = (String) it.next();
+        for (Iterator it = params.entrySet().iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            String key = (String) entry.getKey();
             if (!key.startsWith("sqlView.")) {
                 continue;
             }
@@ -114,7 +115,7 @@ public class ViewRegisteringFactoryHelper {
                 continue;
             }
 
-            String typeName = (String) params.get(key);
+            String typeName = (String) entry.getValue();
 
             String viewId = key.substring("sqlView.".length(), key.indexOf(".typeName"));
 

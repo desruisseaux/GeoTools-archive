@@ -113,7 +113,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
         DataStore dataStore;
 
         try {
-            dataStore = DataStoreFinder.getDataStore(nonWorkingParams);
+            DataStoreFinder.getDataStore(nonWorkingParams);
             fail("should have failed with non working parameters");
         } catch (DataSourceException e) {
             assertTrue(true);

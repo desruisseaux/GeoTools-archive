@@ -687,8 +687,9 @@ public class ArcSDEAdapter {
      *             {@link SeShape#getType() types} defined in the esri arcsde
      *             java api 9.0)
      */
-    public static Class getGeometryTypeFromSeShape(SeShape shape) throws SeException {
-        Class clazz = com.vividsolutions.jts.geom.Geometry.class;
+    public static Class<? extends Geometry> getGeometryTypeFromSeShape(SeShape shape)
+            throws SeException {
+        final Class<? extends Geometry> clazz;
 
         final int seShapeType = shape == null ? SeShape.TYPE_NIL : shape.getType();
 

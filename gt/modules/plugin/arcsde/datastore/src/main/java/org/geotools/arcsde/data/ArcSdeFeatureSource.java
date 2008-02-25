@@ -165,7 +165,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     protected ReferencedEnvelope getBounds(final Query namedQuery,
             final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
         Envelope ev;
-        final String typeName = namedQuery.getTypeName();
+        //final String typeName = namedQuery.getTypeName();
         // if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
         // LOGGER.finer("getting bounds of entire layer. Using optimized SDE
         // call.");
