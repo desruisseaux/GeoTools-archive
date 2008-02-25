@@ -28,6 +28,11 @@ package org.geotools.arcsde.filter;
  */
 public class GeometryEncoderException extends Exception {
     /**
+     * Serial version uid
+     */
+    private static final long serialVersionUID = -8926292317791976269L;
+
+    /**
      * Creates a new GeometryEncoderException object.
      * 
      * @param msg

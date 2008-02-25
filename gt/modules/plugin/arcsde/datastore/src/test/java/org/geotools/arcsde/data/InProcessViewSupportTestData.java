@@ -238,8 +238,6 @@ public class InProcessViewSupportTestData {
      */
     private static void insertChildData(ArcSDEPooledConnection conn, SeTable table)
             throws SeException {
-        SeInsert insert = null;
-
         final String[] columns = { "ID", "MASTER_ID", "NAME", "DESCRIPTION" };
 
         int childId = 0;
@@ -248,7 +246,7 @@ public class InProcessViewSupportTestData {
             for (int child = 0; child < master; child++) {
                 childId++;
 
-                insert = new SeInsert(conn);
+                SeInsert insert = new SeInsert(conn);
                 insert.intoTable(table.getName(), columns);
                 insert.setWriteMode(true);
 
@@ -259,9 +257,13 @@ public class InProcessViewSupportTestData {
                 row.setString(2, "child" + (childId));
                 row.setString(3, "description" + (childId));
                 insert.execute();
+                //insert.close();
             }
         }
         // add the 7th row to test group by
+        SeInsert insert = new SeInsert(conn);
+        insert.intoTable(table.getName(), columns);
+        insert.setWriteMode(true);
         SeRow row = insert.getRowToSet();
 
         row.setInteger(0, new Integer(7));
@@ -269,7 +271,7 @@ public class InProcessViewSupportTestData {
         row.setString(2, "child6");
         row.setString(3, "description7");
         insert.execute();
-
+        //insert.close();
         conn.commitTransaction();
     }
 }

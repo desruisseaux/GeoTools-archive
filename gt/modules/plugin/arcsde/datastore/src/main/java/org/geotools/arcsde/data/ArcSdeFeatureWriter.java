@@ -500,7 +500,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * 
      * @param row
      * @param index
-     * @param value
+     * @param convertedValue
      * @param coordRef
      * 
      * @throws SeException
@@ -508,46 +508,48 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @throws IOException
      *             DOCUMENT ME!
      */
-    private void setRowValue(final SeRow row, final int index, Object value,
+    private void setRowValue(final SeRow row, final int index, final Object value,
             final SeCoordinateReference coordRef, final String attName, final String typeName,
             final String fid) throws SeException, IOException {
 
         final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
-
+        
         final int colType = seColumnDefinition.getType();
+        //the actual value to be set, converted to the appropriate type where needed
+        Object convertedValue = value;
         if (colType == SeColumnDefinition.TYPE_INT16) {
-            value = Converters.convert(value, Short.class);
-            row.setShort(index, (Short) value);
+            convertedValue = Converters.convert(convertedValue, Short.class);
+            row.setShort(index, (Short) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_INT32) {
-            value = Converters.convert(value, Integer.class);
-            row.setInteger(index, (Integer) value);
+            convertedValue = Converters.convert(convertedValue, Integer.class);
+            row.setInteger(index, (Integer) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_INT64) {
-            value = Converters.convert(value, Long.class);
-            row.setLong(index, (Long) value);
+            convertedValue = Converters.convert(convertedValue, Long.class);
+            row.setLong(index, (Long) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_FLOAT32) {
-            value = Converters.convert(value, Float.class);
-            row.setFloat(index, (Float) value);
+            convertedValue = Converters.convert(convertedValue, Float.class);
+            row.setFloat(index, (Float) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_FLOAT64) {
-            value = Converters.convert(value, Double.class);
-            row.setDouble(index, (Double) value);
+            convertedValue = Converters.convert(convertedValue, Double.class);
+            row.setDouble(index, (Double) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_STRING
                 || colType == SeColumnDefinition.TYPE_NSTRING
                 || colType == SeColumnDefinition.TYPE_CLOB
                 || colType == SeColumnDefinition.TYPE_NCLOB) {
-            value = Converters.convert(value, String.class);
-            row.setString(index, (String) value);
+            convertedValue = Converters.convert(convertedValue, String.class);
+            row.setString(index, (String) convertedValue);
         } else if (colType == SeColumnDefinition.TYPE_DATE) {
             // REVISIT: is converters already ready for date->calendar?
-            if (value != null) {
+            if (convertedValue != null) {
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTime((Date) value);
+                calendar.setTime((Date) convertedValue);
                 row.setTime(index, calendar);
             } else {
                 row.setTime(index, null);
             }
         } else if (colType == SeColumnDefinition.TYPE_SHAPE) {
-            if (value != null) {
-                final Geometry geom = (Geometry) value;
+            if (convertedValue != null) {
+                final Geometry geom = (Geometry) convertedValue;
                 IsValidOp validator = new IsValidOp(geom);
                 if (!validator.isValid()) {
                     TopologyValidationError validationError = validator.getValidationError();

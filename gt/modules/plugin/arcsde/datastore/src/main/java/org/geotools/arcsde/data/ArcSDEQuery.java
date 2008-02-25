@@ -922,12 +922,14 @@ class ArcSDEQuery {
          * to specify which properties to fetch.
          * 
          * @param unqualifiedPropertyNames
+         *            non null, possibly empty, list of property names to fetch
          * @return
          * @throws SeException
          * @throws DataSourceException
          */
-        public SeQueryInfo getQueryInfo(String[] unqualifiedPropertyNames) throws SeException,
-                DataSourceException {
+        public SeQueryInfo getQueryInfo(final String[] unqualifiedPropertyNames)
+                throws SeException, DataSourceException {
+            assert unqualifiedPropertyNames != null;
             String[] tables;
             String byClause = null;
 
@@ -959,8 +961,7 @@ class ArcSDEQuery {
                 sqlConstruct.setWhere(where);
             }
 
-            final int queriedAttCount = unqualifiedPropertyNames == null ? 0
-                    : unqualifiedPropertyNames.length;
+            final int queriedAttCount = unqualifiedPropertyNames.length;
 
             if (queriedAttCount > 0) {
                 String[] sdeAttNames = new String[queriedAttCount];

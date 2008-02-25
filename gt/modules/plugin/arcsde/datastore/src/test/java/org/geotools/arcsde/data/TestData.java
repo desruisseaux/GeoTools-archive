@@ -141,6 +141,9 @@ public class TestData {
 
         this.temp_table = this.conProps.getProperty("temp_table");
         this.configKeyword = this.conProps.getProperty("configKeyword");
+        if (this.configKeyword == null) {
+            this.configKeyword = "DEFAULTS";
+        }
 
         if (this.temp_table == null) {
             throw new IllegalArgumentException("temp_table not defined in " + propsFile);
@@ -357,12 +360,10 @@ public class TestData {
      * 
      * 
      */
-    private static SeColumnDefinition[] createBaseTable(SeConnection conn, SeTable table,
-            SeLayer layer, String configKeyword) throws SeException {
+    private static SeColumnDefinition[] createBaseTable(final SeConnection conn,
+            final SeTable table, final SeLayer layer, final String configKeyword)
+            throws SeException {
         SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
-
-        if (configKeyword == null)
-            configKeyword = "DEFAULTS";
 
         /*
          * Define the columns and their attributes for the table to be created.
@@ -717,8 +718,8 @@ public class TestData {
      * 
      * @return DOCUMENT ME!
      */
-    private static LineString createTestLineString(GeometryFactory gf, int index) {
-        Coordinate[] coords = { new Coordinate(0, 0), new Coordinate(++index, -index) };
+    private static LineString createTestLineString(final GeometryFactory gf, final int index) {
+        Coordinate[] coords = { new Coordinate(0, 0), new Coordinate(1 + index, -index) };
 
         return gf.createLineString(coords);
     }
@@ -733,8 +734,9 @@ public class TestData {
      * 
      * @return DOCUMENT ME!
      */
-    private static MultiLineString createTestMultiLineString(GeometryFactory gf, int index) {
-        Coordinate[] coords1 = { new Coordinate(0, 0), new Coordinate(++index, ++index) };
+    private static MultiLineString createTestMultiLineString(final GeometryFactory gf,
+            final int index) {
+        Coordinate[] coords1 = { new Coordinate(0, 0), new Coordinate(1 + index, 1 + index) };
         Coordinate[] coords2 = { new Coordinate(0, index), new Coordinate(index, 0) };
         LineString[] lines = { gf.createLineString(coords1), gf.createLineString(coords2) };
 

@@ -4,7 +4,7 @@ import com.esri.sde.sdk.client.SeTable.SeTableStats;
 
 public class SeQuery {
 	
-	public SeQuery(SeConnection c) {}
+	public SeQuery(SeConnection c)throws SeException {}
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
 	
 	public static /* GEOT-947 final*/ short SE_OPTIMIZE = 0;

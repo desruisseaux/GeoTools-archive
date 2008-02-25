@@ -436,10 +436,10 @@ public class ArcSDEDataStoreTest extends TestCase {
         // build the query asking for a subset of attributes
         final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
-        FeatureReader<SimpleFeatureType, SimpleFeature> reader = null;
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         SimpleFeatureType resultSchema;
         try {
-            reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
             resultSchema = reader.getFeatureType();
         } finally {
             reader.close();

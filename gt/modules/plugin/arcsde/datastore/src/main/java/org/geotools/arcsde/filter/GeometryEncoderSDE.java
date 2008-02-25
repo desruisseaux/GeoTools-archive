@@ -206,11 +206,12 @@ public class GeometryEncoderSDE implements FilterVisitor {
      *            {@link #visit(Not, Object)} to revert the logical evaluation
      *            criteria.
      */
-    private void addSpatialFilter(final BinarySpatialOperator filter, int sdeMethod, boolean truth,
-            final Object extraData) {
+    private void addSpatialFilter(final BinarySpatialOperator filter, final int sdeMethod,
+            final boolean truth, final Object extraData) {
+        boolean appliedTruth = truth;
         if (extraData instanceof Boolean) {
             boolean andValue = ((Boolean) extraData).booleanValue();
-            truth = truth && andValue;
+            appliedTruth = truth && andValue;
         }
         org.opengis.filter.expression.Expression left, right;
         PropertyName propertyExpr;
@@ -297,7 +298,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
             }
             // Add the filter to our list
             SeShapeFilter shapeFilter = new SeShapeFilter(getLayerName(), this.sdeLayer
-                    .getSpatialColumn(), filterShape, sdeMethod, truth);
+                    .getSpatialColumn(), filterShape, sdeMethod, appliedTruth);
             this.sdeSpatialFilters.add(shapeFilter);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);

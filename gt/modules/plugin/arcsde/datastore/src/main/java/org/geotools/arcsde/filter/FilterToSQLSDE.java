@@ -142,7 +142,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @param alias
      * @return
      */
-    public String getColumnDefinition(String alias) {
+    public String getColumnDefinition(final String alias) {
         final String encodedColumnDefinition;
         if (this.definitionQuery != null) {
             // its an inprocess view
@@ -153,11 +153,12 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
             // encodedColumnDefinition = sqlExpression + " AS " + alias;
             encodedColumnDefinition = sqlExpression;
         } else {
+            String nonNsPrefixedAlias = alias;
             if (alias.indexOf(":") != -1) {
                 // we've got to 'de-namespaceify' this attribute, if neccesary
-                alias = alias.substring(alias.indexOf(":") + 1);
+                nonNsPrefixedAlias = alias.substring(alias.indexOf(":") + 1);
             }
-            encodedColumnDefinition = layerQualifiedName + "." + alias;
+            encodedColumnDefinition = layerQualifiedName + "." + nonNsPrefixedAlias;
         }
         return encodedColumnDefinition;
     }

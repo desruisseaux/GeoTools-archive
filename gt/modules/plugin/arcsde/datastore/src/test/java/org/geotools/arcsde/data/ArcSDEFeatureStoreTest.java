@@ -1328,6 +1328,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                 final boolean multiVersion = reg.isMultiVersion();
                 System.out.println(tname + " is versioned: " + multiVersion);
                 if (multiVersion) {
+                    //@todo: handle versioned sde table
                 }
             }
         } finally {

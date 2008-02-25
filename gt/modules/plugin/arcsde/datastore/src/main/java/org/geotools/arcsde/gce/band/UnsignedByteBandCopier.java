@@ -25,10 +25,7 @@ import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeRasterTile;
 
-public class UnsignedByteBandCopier extends ArcSDERasterBandCopier {
-
-    UnsignedByteBandCopier() {
-    }
+class UnsignedByteBandCopier extends ArcSDERasterBandCopier {
 
     Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
 

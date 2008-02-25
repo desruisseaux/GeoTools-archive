@@ -308,19 +308,30 @@ public class ArcSDEAdapter {
 
         List<AttributeDescriptor> attributeDescriptors;
 
-        SeQuery testQuery = null;
+        // is the first table is a layer, we'll get it to obtain CRS info
+        // from
+        String mainTable;
         try {
-            // is the first table is a layer, we'll get it to obtain CRS info
-            // from
-            String mainTable = queryInfo.getConstruct().getTables()[0];
-            SeLayer layer = null;
-            try {
-                layer = conn.getLayer(mainTable);
-            } catch (NoSuchElementException e) {
-                LOGGER.info(mainTable + " is not an SeLayer, so no CRS info will be parsed");
-            }
-            LOGGER.fine("testing query");
+            mainTable = queryInfo.getConstruct().getTables()[0];
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+
+        SeLayer layer = null;
+        try {
+            layer = conn.getLayer(mainTable);
+        } catch (NoSuchElementException e) {
+            LOGGER.info(mainTable + " is not an SeLayer, so no CRS info will be parsed");
+        }
+        LOGGER.fine("testing query");
+
+        final SeQuery testQuery;
+        try {
             testQuery = new SeQuery(conn);
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+        try {
             testQuery.prepareQueryInfo(queryInfo);
             testQuery.execute();
             LOGGER.fine("definition query executed successfully");
@@ -335,11 +346,10 @@ public class ArcSDEAdapter {
         } catch (SeException e) {
             throw new ArcSdeException(e);
         } finally {
-            if (testQuery != null) {
-                try {
-                    testQuery.close();
-                } catch (SeException e) {
-                }
+            try {
+                testQuery.close();
+            } catch (SeException e) {
+                throw new ArcSdeException(e);
             }
         }
         final SimpleFeatureType type = createSchema(typeName, namespace, attributeDescriptors);

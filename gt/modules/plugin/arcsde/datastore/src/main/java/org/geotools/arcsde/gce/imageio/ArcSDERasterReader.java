@@ -184,6 +184,8 @@ public class ArcSDERasterReader extends ImageReader {
                 destHeight = destination.getHeight() - destOffset.y;
             destination = destination
                     .getSubimage(destOffset.x, destOffset.y, destWidth, destHeight);
+        } else if (destination == null) {
+            throw new IllegalStateException("Got a null destination, this shouldn't happen!");
         } else {
             // we've got a non-null destination image and there's no offset.
             // Nothing to do!

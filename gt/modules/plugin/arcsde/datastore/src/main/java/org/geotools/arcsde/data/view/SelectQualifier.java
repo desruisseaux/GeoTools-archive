@@ -148,10 +148,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
         return aliases;
     }
 
-    private List removeTableAliases(List fromItems) {
-        fromItems = new ArrayList(fromItems);
+    private List removeTableAliases(final List fromItems) {
+        List items = new ArrayList(fromItems);
 
-        for (Iterator it = fromItems.iterator(); it.hasNext();) {
+        for (Iterator it = items.iterator(); it.hasNext();) {
 
             FromItem fromItem = (FromItem) it.next();
 
@@ -160,7 +160,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
                 table.setAlias(null);
             }
         }
-        return fromItems;
+        return items;
     }
 
     /**

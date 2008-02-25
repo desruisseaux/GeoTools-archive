@@ -166,6 +166,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
      *             DOCUMENT ME!
      */
     protected void tearDown() throws Exception {
+        //do-nothing
     }
 
     /**

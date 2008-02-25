@@ -138,7 +138,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         if (testData == null) {
             oneTimeSetUp();
         }
-        this.pool = this.testData.getDataStore().getConnectionPool();
+        this.pool = testData.getDataStore().getConnectionPool();
         this.conn = this.pool.getConnection();
     }
 
@@ -709,16 +709,14 @@ public class ArcSDEJavaApiTest extends TestCase {
      */
     public void testCreateNonStandardSchema() throws SeException, IOException,
             UnavailableArcSDEConnectionException {
-        SeLayer layer = new SeLayer(conn);
-        SeTable table = null;
-
+        final SeLayer layer = new SeLayer(conn);
+        /*
+         * Create a qualified table name with current user's name and the
+         * name of the table to be created, "EXAMPLE".
+         */
+        final String tableName = (conn.getUser() + ".NOTENDSWITHGEOM");
+        final SeTable table = new SeTable(conn, tableName);
         try {
-            /*
-             * Create a qualified table name with current user's name and the
-             * name of the table to be created, "EXAMPLE".
-             */
-            String tableName = (conn.getUser() + ".NOTENDSWITHGEOM");
-            table = new SeTable(conn, tableName);
             layer.setTableName("NOTENDSWITHGEOM");
 
             try {
@@ -813,9 +811,9 @@ public class ArcSDEJavaApiTest extends TestCase {
             table.addColumn(colDefs[4]);
             table.addColumn(colDefs[5]);
             table.addColumn(colDefs[6]);
-        } catch (SeException e) {
-            LOGGER.throwing(this.getClass().getName(), "testCreateNonStandardSchema", e);
-            throw e;
+        //} catch (SeException e) {
+        //    LOGGER.throwing(this.getClass().getName(), "testCreateNonStandardSchema", e);
+        //    throw e;
         } finally {
             try {
                 table.delete();
