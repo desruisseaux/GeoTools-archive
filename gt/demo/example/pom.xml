@@ -137,6 +137,11 @@
       <artifactId>gt2-widgets-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-xml-filter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
         <!-- GeoTools unsupported -->
     <dependency>
       <groupId>org.geotools</groupId>
