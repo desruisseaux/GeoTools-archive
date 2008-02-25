@@ -68,40 +68,45 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     private static int JSDE_CLIENT_VERSION;
 
     static {
-        paramMetadata.add(new Param("namespace", String.class,
-                "namespace associated to this data store", false));
-        paramMetadata.add(new Param("dbtype", String.class, "fixed value. Must be \"arcsde\"",
-                true, "arcsde"));
-        paramMetadata.add(new Param("server", String.class,
-                "sever name where the ArcSDE gateway is running", true));
-        paramMetadata
-                .add(new Param(
-                        "port",
-                        Integer.class,
-                        "port number in wich the ArcSDE server is listening for connections.Generally it's 5151",
-                        true, Integer.valueOf(5151)));
-        paramMetadata.add(new Param("instance", String.class,
-                "the specific database to connect to. Only applicable to "
-                        + "certain databases. Value ignored if not applicable.", false));
-        paramMetadata.add(new Param("user", String.class, "name of a valid database user account.",
-                true));
-        paramMetadata
-                .add(new Param("password", String.class, "the database user's password.", true));
+        String description = "namespace associated to this data store";
+        paramMetadata.add(new Param("namespace", String.class, description, false));
+
+        description = "fixed value. Must be \"arcsde\"";
+        paramMetadata.add(new Param("dbtype", String.class, description, true, "arcsde"));
+
+        description = "sever name where the ArcSDE gateway is running";
+        paramMetadata.add(new Param("server", String.class, description, true));
+
+        description = "port number in wich the ArcSDE server is listening for connections.Generally it's 5151";
+        Integer DEFAULT_PORT = Integer.valueOf(5151);
+        paramMetadata.add(new Param("port", Integer.class, description, true, DEFAULT_PORT));
+
+        description = "the specific database to connect to. Only applicable to "
+                + "certain databases. Value ignored if not applicable.";
+        paramMetadata.add(new Param("instance", String.class, description, false));
+
+        description = "name of a valid database user account.";
+        paramMetadata.add(new Param("user", String.class, description, true));
+
+        description = "the database user's password.";
+        paramMetadata.add(new Param("password", String.class, description, true));
 
         // optional parameters:
-        paramMetadata.add(new Param("pool.minConnections", Integer.class,
-                "Minimun number of open connections", false, Integer
-                        .valueOf(ArcSDEConnectionPool.DEFAULT_CONNECTIONS)));
-        paramMetadata.add(new Param("pool.maxConnections", Integer.class,
-                "Maximun number of open connections (will not work if < 2)", false, Integer
-                        .valueOf(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS)));
-        paramMetadata.add(new Param("pool.timeOut", Integer.class,
-                "Milliseconds to wait for an available connection before failing to connect",
-                false, Integer.valueOf(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME)));
+        description = "Minimun number of open connections";
+        paramMetadata.add(new Param("pool.minConnections", Integer.class, description, false,
+                Integer.valueOf(ArcSDEConnectionPool.DEFAULT_CONNECTIONS)));
+
+        description = "Maximun number of open connections (will not work if < 2)";
+        Integer MAX_CONNECTIONS = Integer.valueOf(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS);
+        paramMetadata.add(new Param("pool.maxConnections", Integer.class, description, false,
+                MAX_CONNECTIONS));
+
+        description = "Milliseconds to wait for an available connection before failing to connect";
+        Integer TIMEOUT = Integer.valueOf(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME);
+        paramMetadata.add(new Param("pool.timeOut", Integer.class, description, false, TIMEOUT));
 
         // determine which JSDE api we're running against
         determineJsdeVersion();
-
     }
 
     private static void determineJsdeVersion() {
