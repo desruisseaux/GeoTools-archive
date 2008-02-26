@@ -302,7 +302,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 // we're being reprojected. We'll need to reproject reqEnv into
                 // our native coordsys
                 try {
-                    ReferencedEnvelope origReqEnv = reqEnv;
+                    //ReferencedEnvelope origReqEnv = reqEnv;
                     reqEnv = reqEnv.transform(nativeCRS, true);
                 } catch (FactoryException fe) {
                     // unable to reproject?
@@ -506,30 +506,28 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             throw new IllegalArgumentException(
                     "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName -- Got "
                             + sdeUrl);
+        }
+        if (sdeUrl.indexOf("sde://") == -1) {
+            sdeUrl.delete(0, 5);
         } else {
-            if (sdeUrl.indexOf("sde://") == -1)
-                sdeUrl.delete(0, 5);
-            else
-                sdeUrl.delete(0, 6);
+            sdeUrl.delete(0, 6);
         }
 
         int idx = sdeUrl.indexOf(":");
         if (idx == -1) {
             throw new IllegalArgumentException(
                     "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        } else {
-            sdeUser = sdeUrl.substring(0, idx);
-            sdeUrl.delete(0, idx);
         }
+        sdeUser = sdeUrl.substring(0, idx);
+        sdeUrl.delete(0, idx);
 
         idx = sdeUrl.indexOf("@");
         if (idx == -1) {
             throw new IllegalArgumentException(
                     "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        } else {
-            sdePass = sdeUrl.substring(1, idx);
-            sdeUrl.delete(0, idx);
         }
+        sdePass = sdeUrl.substring(1, idx);
+        sdeUrl.delete(0, idx);
 
         idx = sdeUrl.indexOf(":");
         if (idx == -1) {
@@ -540,11 +538,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             if (idx == -1) {
                 throw new IllegalArgumentException(
                         "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-            } else {
-                sdeHost = sdeUrl.substring(1, idx).toString();
-                sdeUrl.delete(0, idx);
             }
-
+            sdeHost = sdeUrl.substring(1, idx).toString();
+            sdeUrl.delete(0, idx);
         } else {
             sdeHost = sdeUrl.substring(1, idx).toString();
             sdeUrl.delete(0, idx);
@@ -553,20 +549,18 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             if (idx == -1) {
                 throw new IllegalArgumentException(
                         "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-            } else {
-                sdePort = Integer.parseInt(sdeUrl.substring(1, idx).toString());
-                sdeUrl.delete(0, idx);
             }
+            sdePort = Integer.parseInt(sdeUrl.substring(1, idx).toString());
+            sdeUrl.delete(0, idx);
         }
 
         idx = sdeUrl.indexOf("#");
         if (idx == -1) {
             throw new IllegalArgumentException(
                     "ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
-        } else {
-            sdeDBName = sdeUrl.substring(1, idx).toString();
-            sdeUrl.delete(0, idx);
         }
+        sdeDBName = sdeUrl.substring(1, idx).toString();
+        sdeUrl.delete(0, idx);
 
         return new ArcSDEConnectionConfig("arcsde", sdeHost, sdePort + "", sdeDBName, sdeUser,
                 sdePass);
@@ -722,7 +716,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 throw new DataSourceException("Error fetching raster connection data from "
                         + rasterTable + ": " + se.getSeError().getErrDesc(), se);
             } finally {
-                if (scon != null && !scon.isClosed())
+                if (!scon.isClosed())
                     scon.close();
             }
 

@@ -107,7 +107,7 @@ public class ViewRegisteringFactoryHelper {
             LOGGER.finest("sql query is '" + sqlQuery + "'");
 
             PlainSelect selectBody = parseSqlQuery(sqlQuery);
-            dataStore.registerView(typeName, (PlainSelect) selectBody);
+            dataStore.registerView(typeName, selectBody);
         }
     }
 

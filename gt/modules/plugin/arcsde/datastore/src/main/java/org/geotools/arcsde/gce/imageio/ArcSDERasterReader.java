@@ -181,7 +181,7 @@ public class ArcSDERasterReader extends ImageReader {
             final int imageWidth = destOffset.x + sourceRegion.width;
             final int imageHeight = destOffset.y + sourceRegion.height;
             destination = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-        } else if (destination != null && !(destOffset.x == 0 && destOffset.y == 0)) {
+        } else if (!(destOffset.x == 0 && destOffset.y == 0)) {
             int destWidth = sourceRegion.width, destHeight = sourceRegion.height;
             if (destOffset.x + sourceRegion.width > destination.getWidth())
                 destWidth = destination.getWidth() - destOffset.x;
@@ -189,8 +189,6 @@ public class ArcSDERasterReader extends ImageReader {
                 destHeight = destination.getHeight() - destOffset.y;
             destination = destination
                     .getSubimage(destOffset.x, destOffset.y, destWidth, destHeight);
-        } else if (destination == null) {
-            throw new IllegalStateException("Got a null destination, this shouldn't happen!");
         } else {
             // we've got a non-null destination image and there's no offset.
             // Nothing to do!
@@ -401,7 +399,8 @@ public class ArcSDERasterReader extends ImageReader {
                 // fetch the next tile
                 curTile = r.getRasterTile();
             }
-            curTile = null;
+            //always null at this point
+            //curTile = null;
             destinationSubTile = null;
 
             // don't need to close connections, cause that's done in the

@@ -53,7 +53,7 @@ public class ArcSDEGCReaderWorkingTest extends TestCase {
 
     private CoordinateReferenceSystem crs;
 
-    private GridGeometry2D statewideRealWorldExampleRes, southShoreExampleRes;
+    private GridGeometry2D southShoreExampleRes;
 
     private Properties conProps;
 
@@ -82,9 +82,7 @@ public class ArcSDEGCReaderWorkingTest extends TestCase {
         super.setUp();
 
         crs = CRS.decode("EPSG:26986");
-        // 33,000.25 m 782,500.143 m , 332,999.75 m 953,499.857 m],
-        // java.awt.Rectangle[x=0,y=0,width=500,height=285]
-        statewideRealWorldExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,
+        new GridGeometry2D(new GeneralGridRange(new Rectangle(500,
                 285)), new ReferencedEnvelope(33000.25, 332999.75, 782500.143, 953499.857, crs));
 
         // x=0,y=0,width=500,height=285] envelope -- [222,175.135 m

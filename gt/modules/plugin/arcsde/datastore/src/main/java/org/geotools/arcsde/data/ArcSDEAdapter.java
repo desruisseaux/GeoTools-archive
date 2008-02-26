@@ -272,7 +272,7 @@ public class ArcSDEAdapter {
         }
         final boolean isMultiVersioned = registration.isMultiVersion();
         final boolean isView = registration.isView();
-        final boolean canWrite = isWritable(typeName, table);
+        final boolean canWrite = isWritable(table);
         final FIDReader fidStrategy;
         fidStrategy = FIDReader.getFidReader(connection, table, layer, registration);
 
@@ -281,19 +281,35 @@ public class ArcSDEAdapter {
         return typeInfo;
     }
 
-    private static boolean isWritable(final String typeName, final SeTable table)
-            throws ArcSdeException {
+    /**
+     * Checks wether the user can write to the given {@code table}.
+     * <p>
+     * Depends on the proviledges of the user the connection the table was
+     * created with.
+     * </p>
+     * 
+     * @param table
+     *            the sde table to check for write permissions
+     * @return {@code true} if the table's connection user has both insert,
+     *         update and delete priviledges.
+     * @throws ArcSdeException
+     *             if an SeException is thrown asking the table for the
+     *             permissions
+     */
+    private static boolean isWritable(final SeTable table) throws ArcSdeException {
         final int permissions;
         try {
             permissions = table.getPermissions();
         } catch (SeException e) {
-            throw new ArcSdeException("Can't get the permissions for " + typeName, e);
+            throw new ArcSdeException("Can't get the permissions for " + table.getName(), e);
         }
         final int insertMask = SeDefs.SE_INSERT_PRIVILEGE;
         final int updateMask = SeDefs.SE_UPDATE_PRIVILEGE;
+        final int deleteMask = SeDefs.SE_DELETE_PRIVILEGE;
         boolean canWrite = false;
         if (((insertMask & permissions) == insertMask)
-                && ((updateMask & permissions) == updateMask)) {
+                && ((updateMask & permissions) == updateMask)
+                && ((deleteMask & permissions) == deleteMask)) {
             canWrite = true;
         }
         return canWrite;
@@ -628,8 +644,6 @@ public class ArcSDEAdapter {
 
         final int isPolygon = ((seShapeType & AREA_MASK) == AREA_MASK) ? 1 : 0;
 
-        boolean isError = false;
-
         // first check if the shape type supports more than one geometry
         // type.
         // In that case, it is *highly* recomended that it support all the
@@ -663,7 +677,7 @@ public class ArcSDEAdapter {
             } else if (isPolygon == 1) {
                 clazz = MultiPolygon.class;
             } else {
-                isError = true;
+                throw new IllegalStateException("this shouldn't happen!");
             }
         } else {
             if (isPoint == 1) {
@@ -673,7 +687,7 @@ public class ArcSDEAdapter {
             } else if (isPolygon == 1) {
                 clazz = Polygon.class;
             } else {
-                isError = true;
+                throw new IllegalStateException("this shouldn't happen!");
             }
         }
 
@@ -1062,6 +1076,7 @@ public class ArcSDEAdapter {
 
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
+            error = e;
             throw new ArcSdeException(e);
         } finally {
             if ((error != null) && tableCreated) {

@@ -47,7 +47,7 @@ public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
             .getLogger(ArcSDERasterFormatFactory.class.getPackage().getName());
 
     /** friendly factory description */
-    private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 9.x Raster Support via GridCoverageExchange Interface";
+    //private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 9.x Raster Support via GridCoverageExchange Interface";
 
     /**
      * DOCUMENT ME!

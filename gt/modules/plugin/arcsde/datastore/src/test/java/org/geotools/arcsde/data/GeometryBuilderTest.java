@@ -475,39 +475,21 @@ public class GeometryBuilderTest extends TestCase {
         return sdeCoords;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param coords
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     */
-    private double[] toSdeCoords(Coordinate[] coords) {
-        int nCoords = coords.length;
-        double[] sdeCoords = new double[2 * nCoords];
-        Coordinate c;
+    // private double[] toSdeCoords(Coordinate[] coords) {
+    // int nCoords = coords.length;
+    // double[] sdeCoords = new double[2 * nCoords];
+    // Coordinate c;
+    //
+    // for (int i = 0, j = 1; i < nCoords; i++, j += 2) {
+    // c = coords[i];
+    // sdeCoords[j - 1] = c.x;
+    // sdeCoords[j] = c.y;
+    // }
+    //
+    // return sdeCoords;
+    // }
 
-        for (int i = 0, j = 1; i < nCoords; i++, j += 2) {
-            c = coords[i];
-            sdeCoords[j - 1] = c.x;
-            sdeCoords[j] = c.y;
-        }
 
-        return sdeCoords;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param resource
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
-     */
     private Geometry[] loadTestData(final String resource) throws Exception {
         List testGeoms = new LinkedList();
         Geometry g;

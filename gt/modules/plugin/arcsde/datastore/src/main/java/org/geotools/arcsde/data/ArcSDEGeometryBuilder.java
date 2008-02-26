@@ -155,9 +155,8 @@ public abstract class ArcSDEGeometryBuilder {
     public Geometry construct(SeShape shape) throws SeException, DataSourceException {
         if (shape == null || shape.isNil()) {
             return getEmpty();
-        } else {
-            return newGeometry(shape.getAllCoords());
         }
+        return newGeometry(shape.getAllCoords());
     }
 
     /**
@@ -256,58 +255,59 @@ public abstract class ArcSDEGeometryBuilder {
      * @return the array of <code>double</code> primitives that represents
      *         <code>jtsGeom</code> in <code>SeShape</code> format
      */
-    private double[][][] geometryToSdeCoords(Geometry jtsGeom) {
-        int numParts;
-        int numSubParts = 1;
-        double[][][] sdeCoords;
-
-        GeometryCollection gcol = null;
-
-        // to simplify the algorithm, allways use GeometryCollections
-        // as input geometries
-        if (jtsGeom instanceof MultiPolygon) {
-            gcol = (GeometryCollection) jtsGeom;
-        } else {
-            Geometry[] geoms = { jtsGeom };
-
-            gcol = new GeometryFactory().createGeometryCollection(geoms);
-        }
-
-        numParts = gcol.getNumGeometries();
-
-        sdeCoords = new double[numParts][0][0];
-
-        for (int i = 0; i < numParts; i++) {
-            Geometry geom = gcol.getGeometryN(i);
-
-            numSubParts = (geom instanceof Polygon) ? (((Polygon) geom).getNumInteriorRing() + 1)
-                    : ((geom instanceof GeometryCollection) ? ((GeometryCollection) geom)
-                            .getNumGeometries() : 1);
-
-            sdeCoords[i] = new double[numSubParts][0];
-
-            Coordinate[] partCoords = null;
-
-            for (int j = 0; j < numSubParts; j++) {
-                if (geom instanceof Polygon) {
-                    if (j == 0) {
-                        partCoords = ((Polygon) geom).getExteriorRing().getCoordinates();
-                    } else {
-                        partCoords = ((Polygon) geom).getInteriorRingN(j - 1).getCoordinates();
-                    }
-                } else if (geom instanceof GeometryCollection) {
-                    partCoords = ((GeometryCollection) geom).getGeometryN(j).getCoordinates();
-                } else {
-                    partCoords = geom.getCoordinates();
-                }
-
-                sdeCoords[i][j] = toSdeCoords(partCoords);
-            }
-        }
-
-        return sdeCoords;
-    }
-
+    // private double[][][] geometryToSdeCoords(Geometry jtsGeom) {
+    // int numParts;
+    // int numSubParts = 1;
+    // double[][][] sdeCoords;
+    //
+    // GeometryCollection gcol = null;
+    //
+    // // to simplify the algorithm, allways use GeometryCollections
+    // // as input geometries
+    // if (jtsGeom instanceof MultiPolygon) {
+    // gcol = (GeometryCollection) jtsGeom;
+    // } else {
+    // Geometry[] geoms = { jtsGeom };
+    //
+    // gcol = new GeometryFactory().createGeometryCollection(geoms);
+    // }
+    //
+    // numParts = gcol.getNumGeometries();
+    //
+    // sdeCoords = new double[numParts][0][0];
+    //
+    // for (int i = 0; i < numParts; i++) {
+    // Geometry geom = gcol.getGeometryN(i);
+    //
+    // numSubParts = (geom instanceof Polygon) ? (((Polygon)
+    // geom).getNumInteriorRing() + 1)
+    // : ((geom instanceof GeometryCollection) ? ((GeometryCollection) geom)
+    // .getNumGeometries() : 1);
+    //
+    // sdeCoords[i] = new double[numSubParts][0];
+    //
+    // Coordinate[] partCoords = null;
+    //
+    // for (int j = 0; j < numSubParts; j++) {
+    // if (geom instanceof Polygon) {
+    // if (j == 0) {
+    // partCoords = ((Polygon) geom).getExteriorRing().getCoordinates();
+    // } else {
+    // partCoords = ((Polygon) geom).getInteriorRingN(j - 1).getCoordinates();
+    // }
+    // } else if (geom instanceof GeometryCollection) {
+    // partCoords = ((GeometryCollection)
+    // geom).getGeometryN(j).getCoordinates();
+    // } else {
+    // partCoords = geom.getCoordinates();
+    // }
+    //
+    // sdeCoords[i][j] = toSdeCoords(partCoords);
+    // }
+    // }
+    //
+    // return sdeCoords;
+    // }
     /**
      * Creates an array of linear coordinates as <code>SeShape</code> use from
      * an array of JTS <code>Coordinate</code> objects
@@ -318,19 +318,19 @@ public abstract class ArcSDEGeometryBuilder {
      * @return the <code>SeShape</code> style coordinate array of a single
      *         geometry given by its <code>Coordinate</code> array
      */
-    private double[] toSdeCoords(Coordinate[] coords) {
-        int nCoords = coords.length;
-        double[] sdeCoords = new double[2 * nCoords];
-        Coordinate c;
-
-        for (int i = 0, j = 1; i < nCoords; i++, j += 2) {
-            c = coords[i];
-            sdeCoords[j - 1] = c.x;
-            sdeCoords[j] = c.y;
-        }
-
-        return sdeCoords;
-    }
+    // private double[] toSdeCoords(Coordinate[] coords) {
+    // int nCoords = coords.length;
+    // double[] sdeCoords = new double[2 * nCoords];
+    // Coordinate c;
+    //
+    // for (int i = 0, j = 1; i < nCoords; i++, j += 2) {
+    // c = coords[i];
+    // sdeCoords[j - 1] = c.x;
+    // sdeCoords[j] = c.y;
+    // }
+    //
+    //        return sdeCoords;
+    //    }
 
     /**
      * Builds a JTS Geometry who't type is given by the
@@ -670,14 +670,6 @@ public abstract class ArcSDEGeometryBuilder {
     private static class LineStringBuilder extends ArcSDEGeometryBuilder {
         /** the empty linestring singleton */
         private static Geometry EMPTY;
-
-        /** DOCUMENT ME! */
-        private static int numParts = 1; // it's allways 1 for geoms other
-
-        // than multipolygons
-
-        /** DOCUMENT ME! */
-        private static int[] partOffsets = { 0 };
 
         /** singleton for linestring building */
         private static final ArcSDEGeometryBuilder instance = new LineStringBuilder();

@@ -116,7 +116,7 @@ public abstract class FIDReader {
         }
         setColumnIndex(fidIndex);
 
-        return (String[]) attNames.toArray(new String[attNames.size()]);
+        return attNames.toArray(new String[attNames.size()]);
     }
 
     /**
@@ -198,6 +198,7 @@ public abstract class FIDReader {
 
         @Override
         public long readFid(SdeRow row) throws IOException {
+            long longFid;
             if (shapeIndex != -1) {
                 // we have the shape, so SHAPE.fid couldn't be retrieved
                 // at the same time, need to get the shape and ask it for the id
@@ -207,15 +208,16 @@ public abstract class FIDReader {
                         throw new NullPointerException("Can't get FID from " + layerName
                                 + " as it has SHAPE fid reading strategy and got a null shape");
                     }
-                    return shape.getFeatureId().longValue();
+                    longFid = shape.getFeatureId().longValue();
                 } catch (SeException e) {
                     throw new ArcSdeException("Getting fid from shape", e);
                 }
             } else {
                 int shapeIdIndex = getColumnIndex();
                 Integer id = (Integer) row.getObject(shapeIdIndex);
-                return id.longValue();
+                longFid = id.longValue();
             }
+            return longFid;
         }
 
         @Override
@@ -238,7 +240,7 @@ public abstract class FIDReader {
                 }
                 setColumnIndex(fidIndex);
             }
-            return (String[]) attNames.toArray(new String[attNames.size()]);
+            return attNames.toArray(new String[attNames.size()]);
         }
 
     }

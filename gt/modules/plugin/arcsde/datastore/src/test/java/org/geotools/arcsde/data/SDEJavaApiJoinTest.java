@@ -376,7 +376,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
-        Filter filter = (Filter) CQL.toFilter(cqlQuery);
+        Filter filter = CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(InProcessViewSupportTestData.typeName, filter);
 
         Envelope bounds = fs.getBounds(query);
@@ -411,7 +411,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         assertNotNull(fs);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description4'";
-        Filter filter = (Filter) CQL.toFilter(cqlQuery);
+        Filter filter = CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(InProcessViewSupportTestData.typeName, filter);
 
         int count = fs.getCount(query);
@@ -450,7 +450,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
         String cqlQuery = "NAME='name2' OR DESCRIPTION='description6'";
-        Filter filter = (Filter) CQL.toFilter(cqlQuery);
+        Filter filter = CQL.toFilter(cqlQuery);
         DefaultQuery query = new DefaultQuery(InProcessViewSupportTestData.typeName, filter);
 
         FeatureSource<SimpleFeatureType, SimpleFeature> fs = store
@@ -621,7 +621,7 @@ public class SDEJavaApiJoinTest extends TestCase {
                                                                  */
         };
 
-        final int shapeIndex = 5;
+        // final int shapeIndex = 5;
         final int expectedCount = 6;
 
         SeQuery query = new SeQuery(conn);
@@ -637,15 +637,16 @@ public class SDEJavaApiJoinTest extends TestCase {
         queryInfo.setByClause(" GROUP BY " + groupBy + " ORDER BY "
                 + InProcessViewSupportTestData.CHILD + ".NAME DESC");
 
-        final int[] expectedShapeIndicators = { SeRow.SE_IS_NOT_NULL_VALUE, // child6
-                // (&&
-                // child7)
-                SeRow.SE_IS_REPEATED_FEATURE, // child5
-                SeRow.SE_IS_REPEATED_FEATURE, // child4
-                SeRow.SE_IS_NOT_NULL_VALUE, // child3
-                SeRow.SE_IS_REPEATED_FEATURE, // child2
-                SeRow.SE_IS_NOT_NULL_VALUE // child1
-        };
+        // final int[] expectedShapeIndicators = { SeRow.SE_IS_NOT_NULL_VALUE,
+        // // child6
+        // // (&&
+        // // child7)
+        // SeRow.SE_IS_REPEATED_FEATURE, // child5
+        // SeRow.SE_IS_REPEATED_FEATURE, // child4
+        // SeRow.SE_IS_NOT_NULL_VALUE, // child3
+        // SeRow.SE_IS_REPEATED_FEATURE, // child2
+        // SeRow.SE_IS_NOT_NULL_VALUE // child1
+        // };
         try {
             query.prepareQueryInfo(queryInfo);
             query.execute();

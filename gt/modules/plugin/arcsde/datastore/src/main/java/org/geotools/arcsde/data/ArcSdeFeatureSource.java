@@ -16,15 +16,10 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.Icon;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -42,7 +37,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -53,6 +47,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     protected FeatureTypeInfo typeInfo;
 
     protected ArcSDEDataStore dataStore;
+
+    private ArcSdeResourceInfo resourceInfo;
 
     public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo, final ArcSDEDataStore dataStore) {
         this.typeInfo = typeInfo;
@@ -71,60 +67,14 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
         return getSchema().getName();
     }
 
-    public ResourceInfo getInfo() {
-        return new ResourceInfo() {
-            final Set<String> words = new HashSet<String>();
-            {
-                words.add("features");
-                words.add("view");
-                words.add(ArcSdeFeatureSource.this.getSchema().getTypeName());
-            }
-
-            public ReferencedEnvelope getBounds() {
-                try {
-                    return ArcSdeFeatureSource.this.getBounds();
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-
-            public CoordinateReferenceSystem getCRS() {
-                return ArcSdeFeatureSource.this.getSchema().getCRS();
-            }
-
-            public String getDescription() {
-                return null;
-            }
-
-            public Icon getIcon() {
-                return null;
-            }
-
-            public Set<String> getKeywords() {
-                return words;
-            }
-
-            public String getName() {
-                return ArcSdeFeatureSource.this.getSchema().getTypeName();
-            }
-
-            public URI getSchema() {
-                Name name = ArcSdeFeatureSource.this.getSchema().getName();
-                URI namespace;
-                try {
-                    namespace = new URI(name.getNamespaceURI());
-                    return namespace;
-                } catch (URISyntaxException e) {
-                    return null;
-                }
-            }
-
-            public String getTitle() {
-                Name name = ArcSdeFeatureSource.this.getSchema().getName();
-                return name.getLocalPart();
-            }
-
-        };
+    /**
+     * @see FeatureSource#getInfo()
+     */
+    public synchronized ResourceInfo getInfo() {
+        if (this.resourceInfo == null) {
+            this.resourceInfo = new ArcSdeResourceInfo(this.typeInfo, this);
+        }
+        return this.resourceInfo;
     }
 
     /**
@@ -180,7 +130,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     protected ReferencedEnvelope getBounds(final Query namedQuery,
             final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
         Envelope ev;
-        //final String typeName = namedQuery.getTypeName();
+        // final String typeName = namedQuery.getTypeName();
         // if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
         // LOGGER.finer("getting bounds of entire layer. Using optimized SDE
         // call.");

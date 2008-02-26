@@ -77,10 +77,9 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
                 throw new IllegalArgumentException(
                         "missing value for 'ArcSDERasterReaderSpi.RASTER_TABLE' in supplied paramater map.");
             return new ArcSDERasterReader(this, p, t, c);
-        } else {
-            throw new IllegalArgumentException(
-                    "ArcSDERasterReader needs a java.util.Map of parameters to be instantiated");
         }
+        throw new IllegalArgumentException(
+                "ArcSDERasterReader needs a java.util.Map of parameters to be instantiated");
     }
 
     @Override

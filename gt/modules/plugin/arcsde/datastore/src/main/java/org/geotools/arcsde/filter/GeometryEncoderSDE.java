@@ -310,7 +310,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
 
     // The Spatial Operator methods (these call to the above visit() method
     public Object visit(BBOX filter, Object extraData) {
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_ENVP, true, extraData);
+        addSpatialFilter(filter, SeFilter.METHOD_ENVP, true, extraData);
         return extraData;
     }
 
@@ -356,9 +356,9 @@ public class GeometryEncoderSDE implements FilterVisitor {
     }
 
     public Object visit(Overlaps filter, Object extraData) {
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II, true, extraData);
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, false, extraData);
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, false, extraData);
+        addSpatialFilter(filter, SeFilter.METHOD_II, true, extraData);
+        addSpatialFilter(filter, SeFilter.METHOD_PC, false, extraData);
+        addSpatialFilter(filter, SeFilter.METHOD_SC, false, extraData);
         return extraData;
     }
 

@@ -55,7 +55,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     private final Set<FeatureReaderIterator<SimpleFeature>> openIterators;
 
-    private ArcSDEPooledConnection connection;
+    private ArcSDEPooledConnection _connection;
 
     private SimpleFeatureType childrenSchema;
 
@@ -155,22 +155,22 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     }
 
     private synchronized ArcSDEPooledConnection getConnection() throws IOException {
-        if (connection == null || connection.isPassivated()) {
-            connection = featureSource.getConnection();
-            connection.getLock().lock();
+        if (_connection == null || _connection.isPassivated()) {
+            _connection = featureSource.getConnection();
+            _connection.getLock().lock();
         }
-        return connection;
+        return _connection;
     }
 
     private synchronized void closeConnection() {
         if (openIterators.size() == 0) {
-            if (!connection.isPassivated()) {
-                connection.getLock().unlock();
-                if (!connection.isTransactionActive()) {
-                    connection.close();
+            if (!_connection.isPassivated()) {
+                _connection.getLock().unlock();
+                if (!_connection.isTransactionActive()) {
+                    _connection.close();
                 }
             }
-            connection = null;
+            _connection = null;
         }
     }
 }

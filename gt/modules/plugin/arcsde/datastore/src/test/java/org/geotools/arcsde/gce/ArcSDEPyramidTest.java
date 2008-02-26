@@ -20,7 +20,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -50,9 +49,6 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
  * @version $Id$
  */
 public class ArcSDEPyramidTest extends TestCase {
-
-    private static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.arcsde.gce");
 
     private ArcSDEConnectionPool pool;
 

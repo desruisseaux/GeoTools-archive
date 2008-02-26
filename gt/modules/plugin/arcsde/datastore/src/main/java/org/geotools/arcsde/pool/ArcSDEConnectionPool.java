@@ -33,9 +33,7 @@ import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeInstance;
 import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeRelease;
 
 /**
  * Maintains <code>SeConnection</code>'s for a single set of connection
@@ -309,87 +307,6 @@ public class ArcSDEConnectionPool {
      */
     public ArcSDEConnectionConfig getConfig() {
         return this.config;
-    }
-
-    /**
-     * Inner utility class to report the configuration of the ArcSDE service and
-     * the underlying RDBMS pointed by a <code>ArcSDEConnectionConfig</code>
-     * object.
-     * 
-     * @author Gabriel Roldan, Axios Engineering
-     * @version $Id: ArcSDEConnectionPool.java 25767 2007-06-07 10:33:44Z
-     *          groldan $
-     */
-    private static class SeConfigReport {
-        /**
-         * Reports the configuration of the ArcSDE version and DBMS information
-         * to the logging system, at connection pool's startup, with INFO
-         * logging level.
-         * 
-         * @param config
-         *            DOCUMENT ME!
-         * 
-         * @throws DataSourceException
-         *             if a SeException is thrown by the ArcSDE Java API while
-         *             trying to fetch the server information.
-         */
-        static void reportConfiguration(ArcSDEConnectionConfig config) throws DataSourceException {
-            try {
-                SeInstance instanceInfo = new SeInstance(config.getServerName(), config
-                        .getPortNumber().intValue());
-
-                if (!LOGGER.isLoggable(INFO_LOG_LEVEL)) {
-                    return;
-                }
-
-                StringBuffer sb = new StringBuffer("***\nArcSDE configuration info:\n");
-
-                sb.append("*** ArcSDE Server info: ****");
-                sb.append("Server name: " + instanceInfo.getServerName());
-
-                SeInstance.SeInstanceStatus status = instanceInfo.getStatus();
-                SeRelease sdeRelease = status.getSeRelease();
-
-                sb.append("\n ArcSDE version: ");
-                sb.append(sdeRelease.getMajor());
-                sb.append('.');
-                sb.append(sdeRelease.getMinor());
-                sb.append('.');
-                sb.append(sdeRelease.getBugFix());
-                sb.append(" - ");
-                sb.append(sdeRelease.getDesc());
-
-                sb.append("\nAccepting connections: ");
-                sb.append(status.isAccepting());
-                sb.append("\nBlocking connections: ");
-                sb.append(status.isBlocking());
-
-                SeInstance.SeInstanceConfiguration iconf = instanceInfo.getConfiguration();
-                sb.append("\n---- Instance configuration: ----");
-                sb.append("\nInstance is read-only: ");
-                sb.append(iconf.getReadOnlyInstance());
-                sb.append("\nHome path: ");
-                sb.append(iconf.getHomePath());
-                sb.append("\nLog path: ");
-                sb.append(iconf.getLogPath());
-                sb.append("\nMax. connections: ");
-                sb.append(iconf.getMaxConnections());
-                sb.append("\nMax. layers: ");
-                sb.append(iconf.getMaxLayers());
-                sb.append("\nMax. streams: ");
-                sb.append(iconf.getMaxStreams()
-                        + " (maximum number of streams allowed by the ArcSde instance)");
-                sb.append("\nStream pool size: ");
-                sb.append(iconf.getStreamPoolSize()
-                        + " (maximum number of streams allowed in a native pool.)");
-
-                sb.append("\n**************************");
-                LOGGER.log(INFO_LOG_LEVEL, sb.toString());
-            } catch (SeException e) {
-                throw new DataSourceException("Error fetching information from " + " the server "
-                        + config.getServerName() + ":" + config.getPortNumber());
-            }
-        }
     }
 
     /**

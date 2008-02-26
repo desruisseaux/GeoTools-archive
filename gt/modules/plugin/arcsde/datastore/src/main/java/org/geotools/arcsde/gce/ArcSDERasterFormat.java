@@ -128,7 +128,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public String getName() {
-        return (String) this.mInfo.get("name");
+        return this.mInfo.get("name");
     }
 
     /**
@@ -136,7 +136,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public String getDescription() {
-        return (String) this.mInfo.get("description");
+        return this.mInfo.get("description");
     }
 
     /**
@@ -144,7 +144,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public String getVendor() {
-        return (String) this.mInfo.get("vendor");
+        return this.mInfo.get("vendor");
     }
 
     /**
@@ -152,7 +152,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public String getDocURL() {
-        return (String) this.mInfo.get("docURL");
+        return this.mInfo.get("docURL");
     }
 
     /**
@@ -160,7 +160,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      */
     @Override
     public String getVersion() {
-        return (String) this.mInfo.get("version");
+        return this.mInfo.get("version");
     }
 
     /**
