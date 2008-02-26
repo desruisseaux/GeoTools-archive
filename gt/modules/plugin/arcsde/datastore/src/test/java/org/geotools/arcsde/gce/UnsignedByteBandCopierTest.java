@@ -65,6 +65,7 @@ public class UnsignedByteBandCopierTest extends TestCase {
         super(name);
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

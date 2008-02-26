@@ -82,6 +82,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
      * @throws IllegalStateException
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -165,6 +166,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void tearDown() throws Exception {
         //do-nothing
     }

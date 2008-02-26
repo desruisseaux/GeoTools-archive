@@ -248,9 +248,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         }
     }
 
-    private void fireAdded(final SimpleFeature feature) {
+    private void fireAdded(final SimpleFeature addedFeature) {
         final String typeName = featureType.getTypeName();
-        final BoundingBox bounds = feature.getBounds();
+        final BoundingBox bounds = addedFeature.getBounds();
         final ReferencedEnvelope referencedEnvelope;
         if (bounds instanceof ReferencedEnvelope) {
             referencedEnvelope = (ReferencedEnvelope) bounds;
@@ -260,9 +260,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         doFireFeaturesAdded(typeName, referencedEnvelope);
     }
 
-    private void fireChanged(final SimpleFeature feature) {
+    private void fireChanged(final SimpleFeature changedFeature) {
         final String typeName = featureType.getTypeName();
-        final BoundingBox bounds = feature.getBounds();
+        final BoundingBox bounds = changedFeature.getBounds();
         final ReferencedEnvelope referencedEnvelope;
         if (bounds instanceof ReferencedEnvelope) {
             referencedEnvelope = (ReferencedEnvelope) bounds;
@@ -272,9 +272,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         doFireFeaturesChanged(typeName, referencedEnvelope);
     }
 
-    private void fireRemoved(final SimpleFeature feature) {
+    private void fireRemoved(final SimpleFeature removedFeature) {
         final String typeName = featureType.getTypeName();
-        final BoundingBox bounds = feature.getBounds();
+        final BoundingBox bounds = removedFeature.getBounds();
         final ReferencedEnvelope referencedEnvelope;
         if (bounds instanceof ReferencedEnvelope) {
             referencedEnvelope = (ReferencedEnvelope) bounds;
@@ -297,7 +297,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         // final ArcSDEPooledConnection connection = getConnection();
         if (isNewlyCreated(feature)) {
             try {
-                Number newId = insertSeRow(feature, getLayer(), connection);
+                Number newId = insertSeRow(feature, getLayer());
                 MutableFIDFeature mutableFidFeature = (MutableFIDFeature) feature;
                 String id = featureType.getTypeName() + "." + newId.longValue();
                 mutableFidFeature.setID(id);
@@ -310,7 +310,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             }
         } else {
             try {
-                updateRow(feature, getLayer(), connection);
+                updateRow(feature, getLayer());
                 fireChanged(feature);
             } catch (SeException e) {
                 ArcSdeException sdeEx = new ArcSdeException(e);
@@ -322,9 +322,12 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     /**
-     * Inserts a feature into an SeLayer.
+     * Updates the contents of a Feature in the database.
+     * <p>
+     * The db row to modify is obtained from the feature id.
+     * </p>
      * 
-     * @param feature
+     * @param modifiedFeature
      *            the newly create Feature to insert.
      * @param layer
      *            the layer where to insert the feature.
@@ -336,29 +339,27 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      *             if thrown by any sde stream method
      * @throws IOException
      */
-    private void updateRow(final SimpleFeature feature, final SeLayer layer,
-            final ArcSDEPooledConnection connection) throws SeException, NoSuchElementException,
-            IOException {
+    private void updateRow(final SimpleFeature modifiedFeature, final SeLayer layer)
+            throws SeException, NoSuchElementException, IOException {
         final SeUpdate updateStream = new SeUpdate(connection);
         // updateStream.setWriteMode(true);
 
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
         final SeRow row;
-        final LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames(connection);
+        final LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
         {
             String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
                     .toArray(new String[0]);
-            SimpleFeatureType featureType = feature.getFeatureType();
             String typeName = featureType.getTypeName();
 
-            final String fid = feature.getID();
+            final String fid = modifiedFeature.getID();
             final long numericFid = ArcSDEAdapter.getNumericFid(fid);
             final SeObjectId seObjectId = new SeObjectId(numericFid);
             row = updateStream.singleRow(seObjectId, typeName, rowColumnNames);
         }
 
-        setRowProperties(feature, seCoordRef, mutableColumns, row);
+        setRowProperties(modifiedFeature, seCoordRef, mutableColumns, row);
         updateStream.execute();
         // updateStream.flushBufferedWrites();
         updateStream.close();
@@ -367,7 +368,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     /**
      * Inserts a feature into an SeLayer.
      * 
-     * @param feature
+     * @param newFeature
      *            the newly create Feature to insert.
      * @param layer
      *            the layer where to insert the feature.
@@ -379,20 +380,20 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      *             if thrown by any sde stream method
      * @throws IOException
      */
-    private Number insertSeRow(final SimpleFeature feature, final SeLayer layer,
-            final ArcSDEPooledConnection connection) throws SeException, IOException {
+    private Number insertSeRow(final SimpleFeature newFeature, final SeLayer layer)
+            throws SeException, IOException {
 
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
         Number newId = null;
 
         // this returns only the mutable attributes
-        LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames(connection);
+        LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
         if (fidReader instanceof FIDReader.UserManagedFidReader) {
             newId = getNextAvailableUserManagedId();
             // set the userId value on the feature so its grabbed from it at
             // setRowProperties
-            feature.setAttribute(fidReader.getFidColumn(), newId);
+            newFeature.setAttribute(fidReader.getFidColumn(), newId);
         }
         SeInsert insertStream = new SeInsert(connection);
         {
@@ -406,7 +407,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
 
         final SeRow row = insertStream.getRowToSet();
 
-        setRowProperties(feature, seCoordRef, mutableColumns, row);
+        setRowProperties(newFeature, seCoordRef, mutableColumns, row);
 
         insertStream.execute();
 
@@ -513,9 +514,10 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             final String fid) throws SeException, IOException {
 
         final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
-        
+
         final int colType = seColumnDefinition.getType();
-        //the actual value to be set, converted to the appropriate type where needed
+        // the actual value to be set, converted to the appropriate type where
+        // needed
         Object convertedValue = value;
         if (colType == SeColumnDefinition.TYPE_INT16) {
             convertedValue = Converters.convert(convertedValue, Short.class);
@@ -576,15 +578,14 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * {@link SeRegistration#SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE}, which are
      * used as row id columns managed by arcsde.
      * 
-     * @param connection
      * @return a map keyed by mutable column name and valued by the index of the
      *         mutable column name in the SeTable structure
      * @throws IOException
      * @throws NoSuchElementException
      * @throws SeException
      */
-    private LinkedHashMap<Integer, String> getMutableColumnNames(ArcSDEPooledConnection connection)
-            throws NoSuchElementException, IOException, SeException {
+    private LinkedHashMap<Integer, String> getMutableColumnNames() throws NoSuchElementException,
+            IOException, SeException {
         if (mutableColumnNames == null) {
             // We are going to inspect the column defintions in order to
             // determine which attributes are actually mutable...
@@ -657,12 +658,16 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
 
     /**
      * Checks if <code>feature</code> has been created by this writer
+     * <p>
+     * A Feature is created but not yet inserted if its id starts with
+     * {@link #NEW_FID_PREFIX}
+     * </p>
      * 
-     * @param feature
+     * @param aFeature
      * @return
      */
-    private final boolean isNewlyCreated(SimpleFeature feature) {
-        final String id = feature.getID();
+    private final boolean isNewlyCreated(SimpleFeature aFeature) {
+        final String id = aFeature.getID();
         return id.startsWith(NEW_FID_PREFIX);
     }
 }

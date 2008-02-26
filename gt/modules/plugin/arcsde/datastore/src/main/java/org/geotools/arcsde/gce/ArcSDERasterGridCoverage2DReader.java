@@ -128,6 +128,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
      * 
      * @deprecated -- use pyramidInfo.getLevel(x).getTileWidth(),getTileHeight()
      **************************************************************************/
+    @Deprecated
     private int tileWidth, tileHeight;
 
     /**

@@ -113,6 +113,7 @@ public class ArcSDEPyramidLevel {
         return new ReferencedEnvelope(this.envelope);
     }
 
+    @Override
     public String toString() {
         return "[level: " + pyramidLevel + "  xRes: " + xRes + "  yRes: " + yRes + "  xOffset: "
                 + xOffset + "  yOffset: " + yOffset + "  extent: " + envelope + "  tilesWide: "

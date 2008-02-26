@@ -77,10 +77,12 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
             try {
                 final ArcSDEPooledConnection conn = getConnection();
                 final ArcSDEDataStore dataStore = featureSource.getDataStore();
-                DefaultQuery query = new DefaultQuery(this.query);
-                query.setFilter(Filter.EXCLUDE);
-                final FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore
-                        .getFeatureReader(query, conn, false);
+                DefaultQuery excludeFilterQuery = new DefaultQuery(this.query);
+                excludeFilterQuery.setFilter(Filter.EXCLUDE);
+                
+                final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+                reader = dataStore.getFeatureReader(excludeFilterQuery, conn, false);
+                
                 this.childrenSchema = reader.getFeatureType();
                 reader.close();
             } catch (IOException e) {
@@ -139,7 +141,8 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
             this.childrenSchema = reader.getFeatureType();
         }
 
-        final FeatureReaderIterator<SimpleFeature> iterator = new FeatureReaderIterator<SimpleFeature>(reader) {
+        final FeatureReaderIterator<SimpleFeature> iterator = new FeatureReaderIterator<SimpleFeature>(
+                reader) {
             @Override
             public void close() {
                 super.close();

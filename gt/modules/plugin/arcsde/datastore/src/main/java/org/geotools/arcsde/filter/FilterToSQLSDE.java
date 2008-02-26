@@ -169,6 +169,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * 
      * @return DOCUMENT ME!
      */
+    @Override
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
@@ -195,6 +196,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @throws GeoAPIFilterToSQLEncoderException
      *             DOCUMENT ME!
      */
+    @Override
     public void encode(Filter filter) throws FilterToSQLException {
         if (getCapabilities().fullySupports(filter)) {
             filter.accept(this, null);
@@ -213,6 +215,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @throws RuntimeException
      *             DOCUMENT ME!
      */
+    @Override
     public Object visit(final Id filter, final Object unused) {
         final Set<Identifier> identifiers = filter.getIdentifiers();
         if (identifiers.size() == 0) {
@@ -274,6 +277,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @throws RuntimeException
      *             for io exception with writer
      */
+    @Override
     public Object visit(PropertyName expression, Object extraData) throws RuntimeException {
         LOGGER.finer("exporting PropertyName");
         final String attName = expression.getPropertyName();
@@ -310,6 +314,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @param the
      *            filter to be visited
      */
+    @Override
     public Object visit(ExcludeFilter filter, Object extraData) {
         try {
             out.write("1 = 2");
@@ -328,6 +333,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      *            filter to be visited
      * 
      */
+    @Override
     public Object visit(IncludeFilter filter, Object extraData) {
         try {
             out.write("1 = 1");

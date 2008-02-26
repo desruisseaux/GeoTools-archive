@@ -39,6 +39,7 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
 
     final public static String RASTER_TABLE = "org.geotools.arcsde.gce.imageio.RASTER_TABLE";
 
+    @Override
     public boolean canDecodeInput(Object source) throws IOException {
         // trust me, if you have to ask whether this plugin can decode a given
         // source, it can't.
@@ -60,7 +61,8 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
      * schema name.</li>
      * </ul>
      */
-    public ImageReader createReaderInstance(Object extension) throws IOException {
+    @Override
+    public ImageReader createReaderInstance(final Object extension) throws IOException {
         if (extension instanceof Map) {
             final ArcSDEPyramid p = (ArcSDEPyramid) ((Map) extension).get(PYRAMID);
             final String t = (String) ((Map) extension).get(RASTER_TABLE);
@@ -81,6 +83,7 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
         }
     }
 
+    @Override
     public String getDescription(Locale locale) {
         return "ESRI ArcSDE database-stored raster image reader.";
     }
@@ -89,6 +92,7 @@ public class ArcSDERasterReaderSpi extends ImageReaderSpi {
      * We completely ignore the setInput() call in this reader, so we'll happily
      * accept anything.
      */
+    @Override
     public Class[] getInputTypes() {
         return new Class[] { Object.class };
     }

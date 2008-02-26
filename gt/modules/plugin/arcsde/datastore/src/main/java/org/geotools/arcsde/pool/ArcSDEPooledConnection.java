@@ -81,6 +81,7 @@ public class ArcSDEPooledConnection extends SeConnection {
         return lock;
     }
 
+    @Override
     public final boolean isClosed() {
         return super.isClosed();
     }
@@ -242,6 +243,7 @@ public class ArcSDEPooledConnection extends SeConnection {
         }
     }
 
+    @Override
     public String toString() {
         return "ArcSDEPooledConnection[" + connectionId + "]";
     }
@@ -260,10 +262,12 @@ public class ArcSDEPooledConnection extends SeConnection {
     /**
      * Compares for reference equality
      */
+    @Override
     public boolean equals(Object other) {
         return other == this;
     }
 
+    @Override
     public int hashCode() {
         return 17 ^ this.config.hashCode();
     }

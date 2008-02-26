@@ -181,6 +181,7 @@ public class ArcSDEConnectionPool {
      * Ensures proper closure of connection pool at this object's finalization
      * stage.
      */
+    @Override
     protected void finalize() {
         close();
     }
@@ -428,6 +429,7 @@ public class ArcSDEConnectionPool {
          * @throws SeException
          *             if the connection can't be created
          */
+        @Override
         public Object makeObject() throws IOException {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
@@ -480,6 +482,7 @@ public class ArcSDEConnectionPool {
          *         operative (checked by asking its user name),
          *         <code>false</code> otherwise.
          */
+        @Override
         public boolean validateObject(Object obj) {
             ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
             boolean valid = !conn.isClosed();
@@ -509,12 +512,14 @@ public class ArcSDEConnectionPool {
          *            an instance of {@link ArcSDEPooledConnection} maintained
          *            by this pool.
          */
+        @Override
         public void destroyObject(Object obj) {
             ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
             conn.destroy();
         }
     }
 
+    @Override
     public String toString() {
         StringBuffer ret = new StringBuffer();
         ret.append("[ACTIVE: ");

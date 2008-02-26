@@ -74,10 +74,12 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
      *      source)
      */
+    @Override
     public GridCoverageReader getReader(Object source) {
         return getReader(source, null);
     }
 
+    @Override
     public GridCoverageReader getReader(Object source, Hints hints) {
         try {
             return new ArcSDERasterGridCoverage2DReader(source, hints);
@@ -93,6 +95,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
      *      destination)
      */
+    @Override
     public GridCoverageWriter getWriter(Object destination) {
         // return new ArcGridWriter(destination);
         return null;
@@ -102,6 +105,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
      *      input)
      */
+    @Override
     public boolean accepts(Object input) {
         StringBuffer url;
         if (input instanceof File) {
@@ -122,6 +126,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getName()
      */
+    @Override
     public String getName() {
         return (String) this.mInfo.get("name");
     }
@@ -129,6 +134,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getDescription()
      */
+    @Override
     public String getDescription() {
         return (String) this.mInfo.get("description");
     }
@@ -136,6 +142,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getVendor()
      */
+    @Override
     public String getVendor() {
         return (String) this.mInfo.get("vendor");
     }
@@ -143,6 +150,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getDocURL()
      */
+    @Override
     public String getDocURL() {
         return (String) this.mInfo.get("docURL");
     }
@@ -150,6 +158,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
     /**
      * @see org.opengis.coverage.grid.Format#getVersion()
      */
+    @Override
     public String getVersion() {
         return (String) this.mInfo.get("version");
     }
@@ -161,6 +170,7 @@ public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
      * @return a default instance for the {@link ArcSDERasterFormat} of the
      *         {@link GeoToolsWriteParams} to control the writing process.
      */
+    @Override
     public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
         throw new UnsupportedOperationException("ArcSDE Rasters are read only for now.");
     }

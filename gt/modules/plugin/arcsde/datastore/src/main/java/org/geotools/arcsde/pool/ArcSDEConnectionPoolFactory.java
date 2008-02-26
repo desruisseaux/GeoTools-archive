@@ -114,6 +114,7 @@ public class ArcSDEConnectionPoolFactory {
      * Ensures proper closure of connection pools at this object's finalization
      * stage.
      */
+    @Override
     protected void finalize() {
         closeAll();
     }

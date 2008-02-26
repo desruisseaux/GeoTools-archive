@@ -493,6 +493,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             return new PointBuilder().getEmpty();
         }
@@ -524,6 +525,7 @@ public abstract class ArcSDEGeometryBuilder {
          * @throws UnsupportedOperationException
          *             DOCUMENT ME!
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             throw new UnsupportedOperationException("This method should not "
                     + "be called for this builder. It should be mapped to the "
@@ -562,6 +564,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createPoint((Coordinate) null);
@@ -581,6 +584,7 @@ public abstract class ArcSDEGeometryBuilder {
          * @throws DataSourceException
          *             DOCUMENT ME!
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             return super.factory.createPoint(new Coordinate(coords[0][0][0], coords[0][0][1]));
         }
@@ -618,6 +622,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createMultiPoint((Point[]) null);
@@ -637,6 +642,7 @@ public abstract class ArcSDEGeometryBuilder {
          * @throws DataSourceException
          *             DOCUMENT ME!
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             int nPoints = coords.length;
 
@@ -692,6 +698,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createLineString((Coordinate[]) null);
@@ -711,6 +718,7 @@ public abstract class ArcSDEGeometryBuilder {
          * @throws DataSourceException
          *             DOCUMENT ME!
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             return constructLineString(coords[0][0]);
         }
@@ -759,6 +767,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createMultiLineString(null);
@@ -778,6 +787,7 @@ public abstract class ArcSDEGeometryBuilder {
          * @throws DataSourceException
          *             DOCUMENT ME!
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             MultiLineString mls = null;
 
@@ -828,6 +838,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return DOCUMENT ME!
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createPolygon(null, null);
@@ -844,6 +855,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @throws DataSourceException
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             return buildPolygon(coords);
         }
@@ -913,6 +925,7 @@ public abstract class ArcSDEGeometryBuilder {
          * 
          * @return an empty multipolygon
          */
+        @Override
         protected Geometry getEmpty() {
             if (EMPTY == null) {
                 EMPTY = new GeometryFactory().createMultiPolygon(null);
@@ -935,6 +948,7 @@ public abstract class ArcSDEGeometryBuilder {
          *             if it is not possible to obtain the shape's coordinate
          *             arrays or an exception occurs while building the Geometry
          */
+        @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             Polygon[] polys = null;
 

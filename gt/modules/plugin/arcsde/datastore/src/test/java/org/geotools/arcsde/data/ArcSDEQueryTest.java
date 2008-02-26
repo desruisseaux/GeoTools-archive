@@ -60,7 +60,7 @@ public class ArcSDEQueryTest extends TestCase {
     /**
      * do not access it directly, use {@link #getQueryAll()}
      */
-    private ArcSDEQuery queryAll;
+    private ArcSDEQuery _queryAll;
 
     /**
      * do not access it directly, use {@link #getQueryFiltered()}
@@ -100,10 +100,12 @@ public class ArcSDEQueryTest extends TestCase {
         suite.addTestSuite(ArcSDEQueryTest.class);
 
         TestSetup wrapper = new TestSetup(suite) {
+            @Override
             protected void setUp() throws Exception {
                 oneTimeSetUp();
             }
 
+            @Override
             protected void tearDown() {
                 oneTimeTearDown();
             }
@@ -136,6 +138,7 @@ public class ArcSDEQueryTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (testData == null) {
@@ -158,10 +161,11 @@ public class ArcSDEQueryTest extends TestCase {
         filteringQuery = new DefaultQuery(typeName, filter);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         try {
-            this.queryAll.close();
+            this._queryAll.close();
         } catch (Exception e) {
             // no-op
         }
@@ -170,15 +174,15 @@ public class ArcSDEQueryTest extends TestCase {
         } catch (Exception e) {
             // no-op
         }
-        this.queryAll = null;
+        this._queryAll = null;
         this.queryFiltered = null;
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
-        this.queryAll = ArcSDEQuery
+        this._queryAll = ArcSDEQuery
                 .createQuery(connection, ftype, Query.ALL, FIDReader.NULL_READER);
-        return this.queryAll;
+        return this._queryAll;
     }
 
     private ArcSDEQuery getQueryFiltered() throws IOException {

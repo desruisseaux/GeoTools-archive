@@ -211,9 +211,9 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
         connection.getLock().lock();
         try {
             final String typeName = typeInfo.getFeatureTypeName();
-            final Transaction transaction = getTransaction();
+            final Transaction currTransaction = getTransaction();
             final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
-                    .getFeatureWriter(typeName, filter, transaction);
+                    .getFeatureWriter(typeName, filter, currTransaction);
 
             try {
                 SimpleFeature feature;
@@ -251,8 +251,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
      */
     public void removeFeatures(final Filter filter) throws IOException {
         final ArcSDEPooledConnection connection;
-        final Transaction transaction = getTransaction();
-        if (Transaction.AUTO_COMMIT == transaction) {
+        final Transaction currTransaction = getTransaction();
+        if (Transaction.AUTO_COMMIT == currTransaction) {
             connection = null;
         } else {
             connection = getConnection();
@@ -266,7 +266,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
             // return;
             // }
             final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
-                    .getFeatureWriter(typeName, filter, transaction);
+                    .getFeatureWriter(typeName, filter, currTransaction);
             try {
                 while (writer.hasNext()) {
                     writer.next();
@@ -371,14 +371,14 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     @Override
     protected ArcSDEPooledConnection getConnection() throws IOException,
             UnavailableArcSDEConnectionException {
-        final Transaction transaction = getTransaction();
+        final Transaction currTransaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
         ArcSDEPooledConnection connection;
-        if (Transaction.AUTO_COMMIT.equals(transaction)) {
+        if (Transaction.AUTO_COMMIT.equals(currTransaction)) {
             connection = connectionPool.getConnection();
         } else {
             final ArcTransactionState state;
-            state = (ArcTransactionState) transaction.getState(connectionPool);
+            state = (ArcTransactionState) currTransaction.getState(connectionPool);
             connection = state.getConnection();
         }
         return connection;

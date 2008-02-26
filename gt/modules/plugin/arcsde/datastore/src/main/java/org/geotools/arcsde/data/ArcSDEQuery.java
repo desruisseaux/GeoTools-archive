@@ -78,7 +78,7 @@ class ArcSDEQuery {
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
      */
-    ArcSDEPooledConnection connection = null;
+    final ArcSDEPooledConnection connection;
 
     /**
      * The exact feature type this query is about to request from the arcsde
@@ -319,7 +319,7 @@ class ArcSDEQuery {
         if (this.query == null) {
             try {
                 String[] propsToQuery = fidReader.getPropertiesToFetch(this.schema);
-                this.query = createSeQueryForFetch(connection, propsToQuery);
+                this.query = createSeQueryForFetch(propsToQuery);
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
@@ -340,8 +340,6 @@ class ArcSDEQuery {
      * query extent and result count, but not for fetching SeRows.
      * </p>
      * 
-     * @param connection
-     *            DOCUMENT ME!
      * @param propertyNames
      *            names of attributes to build the query for, respecting order
      * 
@@ -353,7 +351,7 @@ class ArcSDEQuery {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    private SeQuery createSeQueryForFetch(ArcSDEPooledConnection connection, String[] propertyNames)
+    private SeQuery createSeQueryForFetch(String[] propertyNames)
             throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("constructing new sql query with connection: " + connection
@@ -362,7 +360,7 @@ class ArcSDEQuery {
                     + "'");
         }
 
-        SeQuery query = new SeQuery(connection);
+        SeQuery seQuery = new SeQuery(connection);
 
         SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
         if (LOGGER.isLoggable(Level.FINER)) {
@@ -370,16 +368,16 @@ class ArcSDEQuery {
             LOGGER.finer(msg);
         }
         try {
-            query.prepareQueryInfo(qInfo);
+            seQuery.prepareQueryInfo(qInfo);
         } catch (SeException e) {
             // HACK: a DATABASE LEVEL ERROR (code -51) occurs when using
             // prepareQueryInfo but the geometry att is not required in the list
             // of properties to retrieve, and thus propertyNames contains
             // SHAPE.fid as a last resort to get a fid
             if (-51 == e.getSeError().getSdeError()) {
-                query.close();
-                query = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
-                query.prepareQuery();
+                seQuery.close();
+                seQuery = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
+                seQuery.prepareQuery();
             } else {
                 throw new ArcSdeException(e);
             }
@@ -388,11 +386,11 @@ class ArcSDEQuery {
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
         if (spatialConstraints.length > 0) {
             final boolean setReturnGeometryMasks = false;
-            query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, setReturnGeometryMasks,
+            seQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, setReturnGeometryMasks,
                     spatialConstraints);
         }
 
-        return query;
+        return seQuery;
     }
 
     private String toString(SeQueryInfo qInfo) {
@@ -444,8 +442,6 @@ class ArcSDEQuery {
      * </p>
      * 
      * 
-     * @param connection
-     *            DOCUMENT ME!
      * @param propertyNames
      *            names of attributes to build the query for, respecting order
      * 
@@ -457,20 +453,20 @@ class ArcSDEQuery {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo(ArcSDEPooledConnection connection)
+    private SeQuery createSeQueryForQueryInfo()
             throws SeException, DataSourceException {
 
-        SeQuery query = new SeQuery(connection);
+        SeQuery seQuery = new SeQuery(connection);
 
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
 
         if (spatialConstraints.length > 0) {
             final boolean setReturnGeometryMasks = true;
-            query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, setReturnGeometryMasks,
+            seQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, setReturnGeometryMasks,
                     spatialConstraints);
         }
 
-        return query;
+        return seQuery;
     }
 
     /**
@@ -592,7 +588,7 @@ class ArcSDEQuery {
                 // result.
 
                 try {
-                    countQuery = createSeQueryForQueryInfo(connection);
+                    countQuery = createSeQueryForQueryInfo();
                     SeQueryInfo qInfo = filters.getQueryInfo(columns);
 
                     SeTable.SeTableStats tableStats = countQuery.calculateTableStatistics(
@@ -646,7 +642,7 @@ class ArcSDEQuery {
 
             String[] spatialCol = { schema.getDefaultGeometry().getLocalName() };
 
-            extentQuery = createSeQueryForQueryInfo(connection);
+            extentQuery = createSeQueryForQueryInfo();
 
             SeQueryInfo sdeQueryInfo = filters.getQueryInfo(spatialCol);
 
@@ -679,7 +675,7 @@ class ArcSDEQuery {
      * 
      * @param query
      */
-    private void close(SeQuery query) {
+    private static void close(SeQuery query) {
         if (query == null) {
             return;
         }
@@ -806,6 +802,7 @@ class ArcSDEQuery {
      * 
      * @return DOCUMENT ME!
      */
+    @Override
     public String toString() {
         return "Schema: " + this.schema.getTypeName() + ", query: " + this.query;
     }
@@ -831,7 +828,7 @@ class ArcSDEQuery {
         private final Filter sourceFilter;
 
         /** DOCUMENT ME! */
-        private Filter sqlFilter;
+        private Filter _sqlFilter;
 
         /** DOCUMENT ME! */
         private Filter geometryFilter;
@@ -839,7 +836,7 @@ class ArcSDEQuery {
         /** DOCUMENT ME! */
         private Filter unsupportedFilter;
 
-        private FilterToSQLSDE sqlEncoder;
+        private FilterToSQLSDE _sqlEncoder;
 
         /**
          * Holds the ArcSDE Java API definition of the geometry related filters
@@ -893,10 +890,10 @@ class ArcSDEQuery {
                     sqlEncoder.getCapabilities(), featureType, null);
             sourceFilter.accept(unpacker, null);
 
-            this.sqlFilter = unpacker.getFilterPre();
+            this._sqlFilter = unpacker.getFilterPre();
 
-            if (LOGGER.isLoggable(Level.FINE) && sqlFilter != null)
-                LOGGER.fine("SQL portion of SDE Query: '" + sqlFilter + "'");
+            if (LOGGER.isLoggable(Level.FINE) && _sqlFilter != null)
+                LOGGER.fine("SQL portion of SDE Query: '" + _sqlFilter + "'");
 
             Filter remainingFilter = unpacker.getFilterPost();
 
@@ -1065,7 +1062,7 @@ class ArcSDEQuery {
          *         ArcSDE Java API side.
          */
         public Filter getSqlFilter() {
-            return (this.sqlFilter == null) ? Filter.INCLUDE : this.sqlFilter;
+            return (this._sqlFilter == null) ? Filter.INCLUDE : this._sqlFilter;
         }
 
         /**
@@ -1093,7 +1090,7 @@ class ArcSDEQuery {
         }
 
         private FilterToSQLSDE getSqlEncoder() {
-            if (sqlEncoder == null) {
+            if (_sqlEncoder == null) {
                 final String layerName;
                 try {
                     layerName = sdeLayer.getQualifiedName();
@@ -1102,10 +1099,10 @@ class ArcSDEQuery {
                             "error getting layer's qualified name").initCause(e);
                 }
                 String fidColumn = fidReader.getFidColumn();
-                sqlEncoder = new FilterToSQLSDE(layerName, fidColumn, featureType,
+                _sqlEncoder = new FilterToSQLSDE(layerName, fidColumn, featureType,
                         layerSelectStatement);
             }
-            return sqlEncoder;
+            return _sqlEncoder;
         }
     }
 }

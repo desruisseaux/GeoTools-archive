@@ -62,6 +62,7 @@ public class ArcSDEPyramidTest extends TestCase {
         super(name);
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         conProps = new Properties();

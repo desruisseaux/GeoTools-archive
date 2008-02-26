@@ -133,6 +133,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
      * 
      * @deprecated remove when the old data api dissapear
      */
+    @Deprecated
     public void setLayer(SeLayer layer) {
         this.sdeLayer = layer;
     }

@@ -280,7 +280,7 @@ public class ArcSDEConnectionConfig {
      * @throws NullPointerException
      *             DOCUMENT ME!
      */
-    private Integer checkParams(String dbType, String serverName, String portNumber,
+    private static Integer checkParams(String dbType, String serverName, String portNumber,
             String databaseName, String userName, String userPassword)
             throws IllegalArgumentException, NullPointerException {
         // check if dbtype is 'arcsde'
@@ -332,7 +332,7 @@ public class ArcSDEConnectionConfig {
      * @throws IllegalArgumentException
      *             DOCUMENT ME!
      */
-    private void throwIllegal(String paramName, String paramValue) throws IllegalArgumentException {
+    private static void throwIllegal(String paramName, String paramValue) throws IllegalArgumentException {
         throw new IllegalArgumentException("'" + paramValue + "'" + ILLEGAL_ARGUMENT_MSG
                 + paramName);
     }
@@ -392,6 +392,7 @@ public class ArcSDEConnectionConfig {
      * 
      * @return DOCUMENT ME!
      */
+    @Override
     public int hashCode() {
         int hash = 37;
         hash *= getServerName().hashCode();
@@ -409,6 +410,7 @@ public class ArcSDEConnectionConfig {
      * 
      * @return DOCUMENT ME!
      */
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -453,10 +455,10 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
+     * @return a human friendly description of this parameter holder contents
+     *         (password is masked), mostly usefull for stack traces
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(getClass().getName() + "[");
         sb.append("dbtype=");

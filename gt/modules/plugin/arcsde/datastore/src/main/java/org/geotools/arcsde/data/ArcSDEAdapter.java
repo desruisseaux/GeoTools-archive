@@ -838,6 +838,7 @@ public class ArcSDEAdapter {
          * 
          * @return Text represenation for debugging
          */
+        @Override
         public String toString() {
             return "SdeTypeDef[colDefType=" + this.colDefType + ", size=" + this.size + ", scale="
                     + this.scale + "]";

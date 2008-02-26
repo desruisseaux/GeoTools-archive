@@ -83,6 +83,7 @@ public class ArcSDEGCReaderSymbolizedTest extends TestCase {
         in.close();
     }
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 

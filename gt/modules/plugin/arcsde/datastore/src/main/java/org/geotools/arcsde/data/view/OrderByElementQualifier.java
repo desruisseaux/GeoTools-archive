@@ -36,7 +36,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 public class OrderByElementQualifier implements OrderByVisitor {
     /** DOCUMENT ME! */
-    private OrderByElement qualifiedOrderBy;
+    private OrderByElement _qualifiedOrderBy;
 
     /** DOCUMENT ME! */
     private SeConnection conn;
@@ -72,7 +72,7 @@ public class OrderByElementQualifier implements OrderByVisitor {
         OrderByElementQualifier qualifier = new OrderByElementQualifier(conn, tableAliases);
         orderBy.accept(qualifier);
 
-        return qualifier.qualifiedOrderBy;
+        return qualifier._qualifiedOrderBy;
     }
 
     /**
@@ -92,6 +92,6 @@ public class OrderByElementQualifier implements OrderByVisitor {
 
         qualifiedOrderBy.setColumnReference(qualifiedColRef);
 
-        this.qualifiedOrderBy = qualifiedOrderBy;
+        this._qualifiedOrderBy = qualifiedOrderBy;
     }
 }

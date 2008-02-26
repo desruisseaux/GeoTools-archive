@@ -105,10 +105,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         suite.addTestSuite(ArcSDEFeatureStoreTest.class);
 
         TestSetup wrapper = new TestSetup(suite) {
+            @Override
             protected void setUp() throws Exception {
                 oneTimeSetUp();
             }
 
+            @Override
             protected void tearDown() {
                 oneTimeTearDown();
             }
@@ -142,6 +144,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         // facilitates running a single test at a time (eclipse lets you do this
@@ -151,6 +154,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

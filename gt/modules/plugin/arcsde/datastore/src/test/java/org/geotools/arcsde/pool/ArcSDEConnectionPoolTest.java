@@ -72,6 +72,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
      * @throws IllegalStateException
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -107,6 +108,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void tearDown() throws Exception {
         connectionConfig = null;
 
@@ -171,8 +173,8 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         congfig = new ArcSDEConnectionConfig(connectionParameters);
 
         try {
-            ArcSDEConnectionPool pool = pf.createPool(congfig);
-            LOGGER.fine("connection succeed " + pool.getPoolSize() + " connections ready");
+            ArcSDEConnectionPool connPool = pf.createPool(congfig);
+            LOGGER.fine("connection succeed " + connPool.getPoolSize() + " connections ready");
         } catch (DataSourceException ex) {
             throw ex;
         } finally {

@@ -78,18 +78,22 @@ public class ArcSDERasterReader extends ImageReader {
         _rasterColumn = rasterColumn;
     }
 
+    @Override
     public int getHeight(int imageIndex) throws IOException {
         return _rasterPyramid.getPyramidLevel(imageIndex).size.height;
     }
 
+    @Override
     public int getWidth(int imageIndex) throws IOException {
         return _rasterPyramid.getPyramidLevel(imageIndex).size.width;
     }
 
+    @Override
     public Iterator getImageTypes(int imageIndex) throws IOException {
         return supportedImageTypes.iterator();
     }
 
+    @Override
     public int getNumImages(boolean allowSearch) throws IOException {
         return _rasterPyramid.getNumLevels();
     }
@@ -112,6 +116,7 @@ public class ArcSDERasterReader extends ImageReader {
      * 
      * @throws IOException
      */
+    @Override
     public BufferedImage read(int imageIndex, ImageReadParam param) throws IOException {
 
         // we only read from ArcSDERasterImageReadParams.
@@ -425,6 +430,7 @@ public class ArcSDERasterReader extends ImageReader {
     /**
      * Not implemented
      */
+    @Override
     public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
         return null;
     }
@@ -432,6 +438,7 @@ public class ArcSDERasterReader extends ImageReader {
     /**
      * Not implemented
      */
+    @Override
     public IIOMetadata getStreamMetadata() throws IOException {
         return null;
     }

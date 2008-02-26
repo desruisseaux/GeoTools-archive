@@ -82,6 +82,7 @@ public class GeometryBuilderTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         this.wktReader = new WKTReader();
@@ -93,6 +94,7 @@ public class GeometryBuilderTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void tearDown() throws Exception {
         this.geometryBuilder = null;
         this.wktReader = null;

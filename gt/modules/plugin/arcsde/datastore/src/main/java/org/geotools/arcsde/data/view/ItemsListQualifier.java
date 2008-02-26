@@ -40,7 +40,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 class ItemsListQualifier implements ItemsListVisitor {
     /** DOCUMENT ME! */
-    ItemsList qualifiedList;
+    ItemsList _qualifiedList;
 
     /** DOCUMENT ME! */
     private SeConnection conn;
@@ -76,7 +76,7 @@ class ItemsListQualifier implements ItemsListVisitor {
         ItemsListQualifier q = new ItemsListQualifier(conn, tableAliases);
         items.accept(q);
 
-        return q.qualifiedList;
+        return q._qualifiedList;
     }
 
     /**
@@ -87,7 +87,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      */
     public void visit(SubSelect subSelect) {
         SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
-        this.qualifiedList = qualified;
+        this._qualifiedList = qualified;
     }
 
     /**
@@ -109,6 +109,6 @@ class ItemsListQualifier implements ItemsListVisitor {
 
         ExpressionList qExpList = new ExpressionList();
         qExpList.setExpressions(qualifiedList);
-        this.qualifiedList = qExpList;
+        this._qualifiedList = qExpList;
     }
 }

@@ -105,7 +105,7 @@ public class TestData {
     /** the configuration keyword to use when creating layers and tables */
     private String configKeyword;
 
-    private ArcSDEConnectionPool pool;
+    private ArcSDEConnectionPool _pool;
 
     /**
      * Creates a new TestData object.
@@ -194,12 +194,12 @@ public class TestData {
     }
 
     public ArcSDEConnectionPool getConnectionPool() throws DataSourceException {
-        if (this.pool == null) {
+        if (this._pool == null) {
             ArcSDEConnectionPoolFactory pfac = ArcSDEConnectionPoolFactory.getInstance();
             ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(this.conProps);
-            this.pool = pfac.createPool(config);
+            this._pool = pfac.createPool(config);
         }
-        return this.pool;
+        return this._pool;
     }
 
     /**
@@ -241,10 +241,10 @@ public class TestData {
      */
     public void deleteTempTable() {
         // only if the datastore was used
-        if (this.pool != null) {
+        if (this._pool != null) {
             try {
-                pool = getDataStore().getConnectionPool();
-                deleteTempTable(pool);
+                _pool = getDataStore().getConnectionPool();
+                deleteTempTable(_pool);
             } catch (Exception e) {
                 LOGGER.fine(e.getMessage());
             }
@@ -261,21 +261,21 @@ public class TestData {
      * Gracefully deletes the temp table hiding any exception (no problem if it
      * does not exist)
      * 
-     * @param pool
+     * @param connPool
      *            to get the connection to use in deleting
      *            {@link #getTemp_table()}
      */
-    public void deleteTempTable(ArcSDEConnectionPool pool) {
+    public void deleteTempTable(ArcSDEConnectionPool connPool) {
         try {
-            deleteTable(pool, getTemp_table());
+            deleteTable(connPool, getTemp_table());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void deleteTable(final ArcSDEConnectionPool pool, final String tableName)
+    private static void deleteTable(final ArcSDEConnectionPool connPool, final String tableName)
             throws DataSourceException, UnavailableArcSDEConnectionException {
-        ArcSDEPooledConnection conn = pool.getConnection();
+        ArcSDEPooledConnection conn = connPool.getConnection();
         try {
             SeTable table = new SeTable(conn, tableName);
             table.delete();
@@ -892,8 +892,6 @@ public class TestData {
         final SeLayer layer = new SeLayer(conn);
         final SeTable table = new SeTable(conn, tableName);
         layer.setTableName(tableName);
-
-        final String configKeyword = "DEFAULTS";
 
         final boolean isNullable = true;
 

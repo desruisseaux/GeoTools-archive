@@ -385,7 +385,6 @@ public class ArcSDEDataStore implements DataStore {
 
             final FIDReader fidReader = typeInfo.getFidStrategy();
 
-            final FeatureListenerManager listenerManager = this.listenerManager;
             if (Transaction.AUTO_COMMIT == transaction) {
                 writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection,
                         listenerManager);

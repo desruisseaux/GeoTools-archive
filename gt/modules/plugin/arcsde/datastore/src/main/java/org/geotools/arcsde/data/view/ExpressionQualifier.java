@@ -74,7 +74,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 class ExpressionQualifier implements ExpressionVisitor {
     /** DOCUMENT ME! */
-    private Expression qualifiedExpression;
+    private Expression _qualifiedExpression;
 
     /** DOCUMENT ME! */
     private SeConnection conn;
@@ -111,7 +111,7 @@ class ExpressionQualifier implements ExpressionVisitor {
 
         exp.accept(qualifier);
 
-        return qualifier.qualifiedExpression;
+        return qualifier._qualifiedExpression;
     }
 
     /**
@@ -121,7 +121,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(NullValue nullValue) {
-        qualifiedExpression = nullValue;
+        _qualifiedExpression = nullValue;
     }
 
     /**
@@ -144,7 +144,7 @@ class ExpressionQualifier implements ExpressionVisitor {
 
         qfunction.setParameters(qualifiedParams);
 
-        this.qualifiedExpression = qfunction;
+        this._qualifiedExpression = qfunction;
     }
 
     /**
@@ -160,7 +160,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         Expression qExp = ExpressionQualifier.qualify(conn, tableAliases, exp);
 
         qInv.setExpression(qExp);
-        this.qualifiedExpression = qInv;
+        this._qualifiedExpression = qInv;
     }
 
     /**
@@ -170,7 +170,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(JdbcParameter jdbcParameter) {
-        this.qualifiedExpression = jdbcParameter;
+        this._qualifiedExpression = jdbcParameter;
     }
 
     /**
@@ -180,7 +180,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(DoubleValue doubleValue) {
-        this.qualifiedExpression = doubleValue;
+        this._qualifiedExpression = doubleValue;
     }
 
     /**
@@ -190,7 +190,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(LongValue longValue) {
-        this.qualifiedExpression = longValue;
+        this._qualifiedExpression = longValue;
     }
 
     /**
@@ -200,7 +200,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(DateValue dateValue) {
-        this.qualifiedExpression = dateValue;
+        this._qualifiedExpression = dateValue;
     }
 
     /**
@@ -210,7 +210,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(TimeValue timeValue) {
-        this.qualifiedExpression = timeValue;
+        this._qualifiedExpression = timeValue;
     }
 
     /**
@@ -220,7 +220,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(TimestampValue timestampValue) {
-        this.qualifiedExpression = timestampValue;
+        this._qualifiedExpression = timestampValue;
     }
 
     /**
@@ -236,7 +236,7 @@ class ExpressionQualifier implements ExpressionVisitor {
 
         Parenthesis qualified = new Parenthesis();
         qualified.setExpression(qualifiedExpression);
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -246,7 +246,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(StringValue stringValue) {
-        this.qualifiedExpression = stringValue;
+        this._qualifiedExpression = stringValue;
     }
 
     private void visitBinaryExpression(BinaryExpression exp) {
@@ -285,7 +285,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         qualified.setLeftExpression(left);
         qualified.setRightExpression(right);
 
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -339,7 +339,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         Expression rigth = qualify(conn, tableAliases, andExpression.getRightExpression());
 
         AndExpression and = new AndExpression(left, rigth);
-        this.qualifiedExpression = and;
+        this._qualifiedExpression = and;
     }
 
     /**
@@ -353,7 +353,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         Expression rigth = qualify(conn, tableAliases, orExpression.getRightExpression());
 
         OrExpression or = new OrExpression(left, rigth);
-        this.qualifiedExpression = or;
+        this._qualifiedExpression = or;
     }
 
     /**
@@ -372,7 +372,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         qualified.setBetweenExpressionStart(start);
         qualified.setBetweenExpressionEnd(end);
         qualified.setLeftExpression(left);
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -419,7 +419,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         InExpression qualified = new InExpression();
         qualified.setLeftExpression(left);
         qualified.setItemsList(itemsList);
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -434,7 +434,7 @@ class ExpressionQualifier implements ExpressionVisitor {
 
         qualified.setLeftExpression(left);
         qualified.setNot(isNullExpression.isNot());
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -486,7 +486,7 @@ class ExpressionQualifier implements ExpressionVisitor {
     public void visit(Column tableColumn) {
 
         Column qualified = ColumnQualifier.qualify(conn, tableAliases, tableColumn);
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
 
     }
 
@@ -498,7 +498,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      */
     public void visit(SubSelect subSelect) {
         SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
-        this.qualifiedExpression = qualified;
+        this._qualifiedExpression = qualified;
     }
 
     /**
@@ -525,7 +525,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         qualifiedWhen.setElseExpression(elseExpr);
         qualifiedWhen.setSwitchExpression(switchExpr);
         qualifiedWhen.setWhenClauses(whenClauses);
-        this.qualifiedExpression = qualifiedWhen;
+        this._qualifiedExpression = qualifiedWhen;
     }
 
     /**
@@ -541,6 +541,6 @@ class ExpressionQualifier implements ExpressionVisitor {
         WhenClause q = new WhenClause();
         q.setWhenExpression(whenExpr);
         q.setThenExpression(thenExpr);
-        this.qualifiedExpression = q;
+        this._qualifiedExpression = q;
     }
 }

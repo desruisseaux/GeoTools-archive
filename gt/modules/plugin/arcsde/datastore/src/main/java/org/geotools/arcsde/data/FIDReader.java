@@ -196,6 +196,7 @@ public abstract class FIDReader {
             this.shapeIndex = -1;
         }
 
+        @Override
         public long readFid(SdeRow row) throws IOException {
             if (shapeIndex != -1) {
                 // we have the shape, so SHAPE.fid couldn't be retrieved
@@ -217,6 +218,7 @@ public abstract class FIDReader {
             }
         }
 
+        @Override
         public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {
             List<String> attNames = new ArrayList<String>(schema.getAttributeCount() + 1);
 
@@ -256,6 +258,7 @@ public abstract class FIDReader {
     }
 
     public static final FIDReader NULL_READER = new FIDReader(null, null) {
+        @Override
         public long readFid(SdeRow row) throws IOException {
             return (long) (10000 * Math.random());
         }

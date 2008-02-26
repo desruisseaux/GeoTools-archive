@@ -91,10 +91,12 @@ public class FilterTest extends TestCase {
         suite.addTestSuite(FilterTest.class);
 
         TestSetup wrapper = new TestSetup(suite) {
+            @Override
             protected void setUp() throws Exception {
                 oneTimeSetUp();
             }
 
+            @Override
             protected void tearDown() {
                 oneTimeTearDown();
             }
@@ -119,6 +121,7 @@ public class FilterTest extends TestCase {
         testData.tearDown(cleanTestTable, cleanPool);
     }
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         // facilitates running a single test at a time (eclipse lets you do this
@@ -129,6 +132,7 @@ public class FilterTest extends TestCase {
         this.dataStore = testData.getDataStore();
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -237,7 +241,6 @@ public class FilterTest extends TestCase {
         Coordinate[] coordArray = new Coordinate[] { new Coordinate(minx, miny),
                 new Coordinate(minx, maxy), new Coordinate(maxx, maxy), new Coordinate(maxx, miny),
                 new Coordinate(minx, miny) };
-        GeometryFactory gf = new GeometryFactory();
         Polygon p = gf.createPolygon(gf.createLinearRing(coordArray), new LinearRing[0]);
 
         return p;

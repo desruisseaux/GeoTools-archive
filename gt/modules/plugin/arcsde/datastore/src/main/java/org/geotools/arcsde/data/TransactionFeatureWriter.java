@@ -95,6 +95,7 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
         }
     }
 
+    @Override
     public void write() throws IOException {
         connection.getLock().lock();
         try {
@@ -109,6 +110,7 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
         }
     }
 
+    @Override
     public void remove() throws IOException {
         connection.getLock().lock();
         try {

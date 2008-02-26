@@ -155,11 +155,13 @@ public class SDEJavaApiJoinTest extends TestCase {
         suite.addTestSuite(SDEJavaApiJoinTest.class);
 
         TestSetup wrapper = new TestSetup(suite) {
+            @Override
             protected void setUp() throws IOException, SeException, NoSuchAuthorityCodeException,
                     FactoryException {
                 oneTimeSetUp();
             }
 
+            @Override
             protected void tearDown() {
                 oneTimeTearDown();
             }
@@ -204,8 +206,8 @@ public class SDEJavaApiJoinTest extends TestCase {
      * the DataStore
      * 
      * @throws Exception
-     *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         if (testData == null) {
@@ -214,12 +216,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         this.store = testData.getDataStore();
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
-     */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

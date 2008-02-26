@@ -95,10 +95,12 @@ public class ArcSDEJavaApiTest extends TestCase {
         suite.addTestSuite(ArcSDEJavaApiTest.class);
 
         TestSetup wrapper = new TestSetup(suite) {
+            @Override
             protected void setUp() throws Exception {
                 oneTimeSetUp();
             }
 
+            @Override
             protected void tearDown() {
                 oneTimeTearDown();
             }
@@ -131,6 +133,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         // facilitates running a single test at a time (eclipse lets you do this
@@ -148,6 +151,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      *             DOCUMENT ME!
      */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         if (conn != null) {
@@ -876,8 +880,8 @@ public class ArcSDEJavaApiTest extends TestCase {
         testData.truncateTempTable();
 
         {
-            final ArcSDEConnectionPool pool = testData.getConnectionPool();
-            transConn = pool.getConnection();
+            final ArcSDEConnectionPool connPool = testData.getConnectionPool();
+            transConn = connPool.getConnection();
             // start a transaction on transConn
             transConn.setTransactionAutoCommit(0);
             transConn.startTransaction();
