@@ -188,7 +188,7 @@ public class MosaicImageWriter extends ImageWriter {
              */
             runtime.gc();
             if (maximumPixelCount == 0) {
-                maximumPixelCount = (int) Math.min(1024*1024*1024, runtime.freeMemory()) / 4;
+                maximumPixelCount = (int) Math.min(1024*1024*1024, runtime.freeMemory()) / 2;
             }
             /*
              * Loads the image for some initial tile from the list. We will write as many tiles as
@@ -218,6 +218,7 @@ public class MosaicImageWriter extends ImageWriter {
                 logger.log(getLogRecord(VocabularyKeys.ERROR_$1, error));
                 continue;
             }
+            maximumPixelCount = 0; // Will try to use again free memory later.
             /*
              * Searchs tiles inside the same region with a resolution which is equals or lower by
              * an integer ratio. If such tiles are found we can write them using the image loaded
@@ -324,10 +325,13 @@ public class MosaicImageWriter extends ImageWriter {
                                          final int maximumPixelCount)
             throws IOException
     {
-        final RTree tree = new RTree(tiles.toArray(new Tile[tiles.size()]));
+        final ThreadGroup treeThreads = new ThreadGroup("TreeNode");
+        final TreeNode tree = new TreeNode(tiles.toArray(new Tile[tiles.size()]), treeThreads);
         final Set<Dimension> subsamplingDone = tiles.size() > 24 ? new HashSet<Dimension>() : null;
         Tile selectedTile = null;
         int subtileCount = 0;
+        tree.join(treeThreads);
+        assert tree.containsAll(tiles);
         for (final Tile tile : tiles) {
             /*
              * Gets the collection of tiles in the same area than the tile we are examinating.

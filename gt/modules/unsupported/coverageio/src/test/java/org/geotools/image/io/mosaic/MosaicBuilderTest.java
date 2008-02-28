@@ -36,19 +36,16 @@ import junit.framework.TestCase;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TileBuilderTest extends TestCase {
+public class MosaicBuilderTest extends TestCase {
     /**
-     * Tests with a set of files corresponding to a Blue Marble mosaic.
+     * Returns the tiles to be used for {@link #testBlueMarble}.
      */
-    public void testBlueMarble() throws IOException, ClassNotFoundException {
-        final MosaicBuilder builder = new MosaicBuilder();
-
+    static Tile[] getBlueMarbleTiles(final MosaicBuilder builder, final int S) {
         assertNull(builder.getTileReaderSpi());
         builder.setTileReaderSpi("png");
         final ImageReaderSpi spi = builder.getTileReaderSpi();
         assertNotNull(spi);
 
-        final int S = 21600;
         final File directory = new File("geodata"); // Dummy directory - will not be read.
         final Tile[] tiles = new Tile[] {
             new Tile(spi, new File(directory, "A1.png"), 0, new Rectangle(0*S, 0, S, S)),
@@ -60,6 +57,17 @@ public class TileBuilderTest extends TestCase {
             new Tile(spi, new File(directory, "C2.png"), 0, new Rectangle(2*S, S, S, S)),
             new Tile(spi, new File(directory, "D2.png"), 0, new Rectangle(3*S, S, S, S))
         };
+        return tiles;
+    }
+
+    /**
+     * Tests with a set of files corresponding to a Blue Marble mosaic.
+     */
+    public void testBlueMarble() throws IOException, ClassNotFoundException {
+        assertTrue(MosaicBuilder.class.desiredAssertionStatus());
+        final MosaicBuilder builder = new MosaicBuilder();
+        final int S = 21600;
+        final Tile[] tiles = getBlueMarbleTiles(builder, S);
 
         Rectangle bounds = new Rectangle(S*4, S*2);
         builder.setUntiledImageBounds(bounds);

@@ -83,7 +83,7 @@ public class TileManager implements Serializable {
      * The {@linkplain #tiles} in a tree for faster access.
      * Will be created only when first needed.
      */
-    private transient RTree tree;
+    private transient TreeNode tree;
 
     /**
      * The subsampling used at the time {@link #tilesOfInterest} has been computed.
@@ -319,7 +319,10 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     private long searchTiles(final boolean subsamplingChangeAllowed) throws IOException {
         long lowestCost = Long.MAX_VALUE;
         if (tree == null) {
-            tree = new RTree(tiles);
+            final ThreadGroup threads = new ThreadGroup("TreeNode");
+            tree = new TreeNode(tiles, threads);
+            tree.join(threads);
+            assert tree.containsAll(allTiles);
         }
         // The list of tiles to consider must be a copy, because it will be emptied.
         final Collection<Tile> tiles = tree.intersect(region);
