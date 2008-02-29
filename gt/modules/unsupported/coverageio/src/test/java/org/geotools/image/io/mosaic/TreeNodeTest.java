@@ -55,7 +55,7 @@ public class TreeNodeTest extends TestCase {
          */
         final TreeNode tree = new TreeNode(tiles, null);
         tree.join(null);
-        assertNotNull(tree.tile);
+        assertNotNull(tree.getTile());
         assertEquals(tree, tree);
         assertTrue (tree.containsAll(manager.getTiles()));
         assertFalse(tree.containsAll(Arrays.asList(originalTiles)));
@@ -67,19 +67,21 @@ public class TreeNodeTest extends TestCase {
             roi.y      = random.nextInt(bounds.height);
             roi.width  = random.nextInt(bounds.width  / 4);
             roi.height = random.nextInt(bounds.height / 4);
-            final Set<Tile> intersect = toSet(tree.intersect(roi));
-            assertEquals(intersect(tiles, roi), intersect);
-            final Set<Tile> contained = toSet(tree.containedIn(roi));
-            assertEquals(containedIn(tiles, roi), contained);
-            assertFalse(intersect.isEmpty()); // Only for our test suite (since empty set are not forbidden)
-            assertTrue (intersect.containsAll(contained));
-            assertFalse(contained.containsAll(intersect));
+            final Set<Tile> intersect1 = toSet(tree.intersecting(roi));
+            final Set<Tile> intersect2 = intersecting(tiles, roi);
+            final Set<Tile> contained1 = toSet(tree.containedIn(roi));
+            final Set<Tile> contained2 = containedIn(tiles, roi);
+            assertEquals(intersect2, intersect1);
+            assertEquals(contained2, contained1);
+            assertFalse (intersect1.isEmpty()); // Only for our test suite (since empty set are not forbidden)
+            assertTrue  (intersect1.containsAll(contained1));
+            assertFalse (contained1.containsAll(intersect1));
             if (false) {
                 System.out.print(roi);
                 System.out.print(" intersect=");
-                System.out.print(intersect.size());
+                System.out.print(intersect1.size());
                 System.out.print(" contained=");
-                System.out.println(contained.size());
+                System.out.println(contained1.size());
             }
         }
         /*
@@ -91,6 +93,42 @@ public class TreeNodeTest extends TestCase {
         tree2.join(threads);
         assertTrue(threads.isDestroyed());
         assertEquals(tree, tree2);
+        /*
+         * Tests removal of nodes.
+         */
+        tree.setReadOnly();
+        assertEquals(tree, tree2);
+        for (int i=0; i<tiles.length; i += 10) {
+            assertTrue(tree2.remove(tiles[i]));
+        }
+        assertFalse(tree.equals(tree2));
+        for (int i=0; i<20; i++) {
+            roi.x      = random.nextInt(bounds.width);
+            roi.y      = random.nextInt(bounds.height);
+            roi.width  = random.nextInt(bounds.width  / 4);
+            roi.height = random.nextInt(bounds.height / 4);
+            final Set<Tile> intersect1 = toSet(tree2.intersecting(roi));
+            final Set<Tile> intersect2 = intersecting(tiles, roi);
+            final Set<Tile> contained1 = toSet(tree2.containedIn(roi));
+            final Set<Tile> contained2 = containedIn(tiles, roi);
+            boolean removedSome = false;
+            for (int j=0; j<tiles.length; j += 10) {
+                final Tile tile = tiles[j];
+                removedSome |= intersect2.remove(tile);
+                removedSome |= contained2.remove(tile);
+            }
+            assertTrue  (removedSome);
+            assertEquals(intersect2, intersect1);
+            assertEquals(contained2, contained1);
+            assertTrue  (intersect1.containsAll(contained1));
+            assertFalse (contained1.containsAll(intersect1));
+        }
+        try {
+            tree.remove(tiles[100]);
+            fail("Removal should not be allowed on a read-only tree.");
+        } catch (UnsupportedOperationException e) {
+            // This is the expected exception.
+        }
     }
 
     /**
@@ -105,7 +143,7 @@ public class TreeNodeTest extends TestCase {
     /**
      * Returns the tiles intersecting the given region.
      */
-    private static Set<Tile> intersect(final Tile[] tiles, final Rectangle region) throws IOException {
+    private static Set<Tile> intersecting(final Tile[] tiles, final Rectangle region) throws IOException {
         final Set<Tile> interest = new LinkedHashSet<Tile>();
         for (final Tile tile : tiles) {
             if (region.intersects(tile.getAbsoluteRegion())) {

@@ -320,12 +320,14 @@ fill:   for (final List<Tile> sameInputs : asArray) {
         long lowestCost = Long.MAX_VALUE;
         if (tree == null) {
             final ThreadGroup threads = new ThreadGroup("TreeNode");
-            tree = new TreeNode(tiles, threads);
+            final TreeNode tree = new TreeNode(tiles, threads);
             tree.join(threads);
+            tree.setReadOnly();
             assert tree.containsAll(allTiles);
+            this.tree = tree; // Save only on success.
         }
         // The list of tiles to consider must be a copy, because it will be emptied.
-        final Collection<Tile> tiles = tree.intersect(region);
+        final Collection<Tile> tiles = tree.intersecting(region);
         Map<Rectangle,Tile> candidates=null, bestCandidates=null;
         /*
          * If 'subsamplingChangeAllowed' is false, the do loop below will be executed exactly once.
@@ -373,8 +375,8 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                     continue;
                 }
                 /*
-                 * The tile is capable to read its image at the given subsampling. Computes the
-                 * cost that reading this tile would have.
+                 * The tile is capable to read its image at the given subsampling.
+                 * Computes the cost that reading this tile would have.
                  */
                 final Rectangle region = tile.getAbsoluteRegion();
                 final Rectangle toRead = region.intersection(regionOfInterest);

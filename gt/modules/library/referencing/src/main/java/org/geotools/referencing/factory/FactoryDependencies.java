@@ -21,7 +21,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 // The following are just data structure, not dependencies to the whole Swing framework.

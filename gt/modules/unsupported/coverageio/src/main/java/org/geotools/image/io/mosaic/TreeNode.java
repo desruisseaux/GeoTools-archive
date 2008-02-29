@@ -36,6 +36,14 @@ import org.geotools.resources.UnmodifiableArrayList;
  * to fit children in existing tile bounds on the assumption that most tile layouts are already
  * organized in some form pyramid.
  * <p>
+ * The value of the inherited rectangle is the {@linkplain Tile#getAbsoluteRegion absolute region}
+ * of the tile, computed and stored once for ever for efficienty during searchs. This class extends
+ * {@link Rectangle} for pure opportunist reasons, in order to reduce the amount of object created
+ * (because we will have thousands of TreeNodes) and for direct (no indirection, no virtual calls)
+ * invocation of {@link Rectangle} services. We authorize ourself this unrecommendable practice only
+ * because this class is not public. The inherited {@link Rectangle} should <string>never</strong>
+ * be modified by anyone outside this class.
+ * <p>
  * Note that the {@link #compareTo} method is inconsistent with {@link #equals}. It should
  * be considered as an implementation details exposed because this class is not public.
  *
@@ -43,18 +51,14 @@ import org.geotools.resources.UnmodifiableArrayList;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class TreeNode implements Comparable<TreeNode>, Runnable {
+@SuppressWarnings("serial") // Will not be serialized anyway.
+final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable {
     /**
      * The parent tile which may contains other tiles. May be {@code null} for the root
-     * (but not always), but is garanteed non-null for every childs.
+     * (but not always), but initially non-null for every childs. However may be set to
+     * {@code null} at some later stage if the node has been removed from the tree.
      */
-    protected final Tile tile;
-
-    /**
-     * The {@linkplain Tile#getAbsoluteRegion absolute region} of the tile.
-     * Computed and stored once for ever for efficienty during searchs.
-     */
-    private Rectangle region;
+    private Tile tile;
 
     /**
      * On construction, the {@linkplain Tile#getSubsampling subsampling}.
@@ -75,8 +79,8 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * @throws IOException if an I/O operation was required and failed.
      */
     private TreeNode(final Tile tile) throws IOException {
+        super(tile.getAbsoluteRegion());
         this.tile = tile;
-        region = tile.getAbsoluteRegion();
         final Dimension subsampling = tile.getSubsampling();
         xSubsampling = subsampling.width;
         ySubsampling = subsampling.height;
@@ -118,7 +122,7 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
         if (nodes.length != 0) {
             root = nodes[0];
             for (int i=1; i<nodes.length; i++) {
-                if (!root.region.contains(nodes[i].region)) {
+                if (!root.contains(nodes[i])) {
                     root = null;
                     break;
                 }
@@ -126,13 +130,12 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
         }
         int i;
         if (root != null) {
+            setBounds(root);
             tile         = root.tile;
-            region       = root.region;
             xSubsampling = root.xSubsampling;
             ySubsampling = root.ySubsampling;
             i = 1;
         } else {
-            tile = null;
             i = 0;
         }
         children = new LinkedList<TreeNode>();
@@ -149,7 +152,9 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
     }
 
     /**
-     * Organizes the {@linkplain #children} in subtrees.
+     * Organizes the {@linkplain #children} in subtrees. Note that this method is invoked
+     * recursively by {@link #addChildren}, which may have created a different thread for
+     * that.
      *
      * @param threads Must be a newly allocated an initially empty thread group, or {@code null}.
      */
@@ -162,17 +167,20 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
                 iterator = children.listIterator(index);
             }
         }
-        children = UnmodifiableArrayList.wrap(children.toArray(new TreeNode[children.size()]));
     }
 
     /**
      * Adds children to this nodes. Every children found are removed from the collection.
      * Returns {@code true} if at least one candidate child moved to this node.
+     * <p>
+     * This method garantees that the {@linkplain #children} list is definitive on returns, but does
+     * not garantee that the construction of children elements is completed (i.e. the references are
+     * definitives, but not the referees). Their construction may be underway in a separated thread.
      */
     private boolean addChildren(final Iterator<TreeNode> candidates, final ThreadGroup threads) {
         while (candidates.hasNext()) {
             final TreeNode candidate = candidates.next();
-            if (region.contains(candidate.region)) {
+            if (contains(candidate)) {
                 candidates.remove();
                 if (children == null) {
                     children = new LinkedList<TreeNode>();
@@ -181,7 +189,7 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
             } else {
                 // Assertion expected because nodes should be sorted by decreasing area.
                 // A rectangle with smaller area can not contains a rectangle with greater area.
-                assert !candidate.region.contains(region) : region;
+                assert !candidate.contains(this) : this;
             }
         }
         /*
@@ -231,15 +239,15 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
          * Completes the calculation of subsamplings. We take the opportunity for synchronizing
          * memory content if the calculation was performed in a separated thread.
          */
-        final boolean computeRegion = (region == null);
+        final boolean computeRegion = isEmpty();
         for (final TreeNode node : children) {
             synchronized (node) {
                 node.finestSubsampling(this);
                 if (computeRegion) {
-                    if (region == null) {
-                        region = new Rectangle(node.region);
+                    if (isEmpty()) {
+                        setBounds(node);
                     } else {
-                        region.add(node.region);
+                        add(node);
                     }
                 }
             }
@@ -282,18 +290,41 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * basis that initial order, when sorted by {@link TileManager}, should be efficient for
      * reading tiles sequentially.
      */
-    public int compareTo(final TreeNode other) {
-        final Rectangle r1 = this. region;
-        final Rectangle r2 = other.region;
-        long a1 = (long) r1.width * (long) r1.height;
-        long a2 = (long) r2.width * (long) r2.height;
+    public int compareTo(final TreeNode that) {
+        long a1 = (long) this.width * (long) this.height;
+        long a2 = (long) that.width * (long) that.height;
         if (a1 > a2) return -1; // Greatest values first
         if (a1 < a2) return +1;
-        a1 = (long) this .xSubsampling * (long) this .ySubsampling;
-        a2 = (long) other.xSubsampling * (long) other.ySubsampling;
+        a1 = (long) this.xSubsampling * (long) this.ySubsampling;
+        a2 = (long) that.xSubsampling * (long) that.ySubsampling;
         if (a1 < a2) return -1; // Smallest values first
         if (a1 > a2) return +1;
         return 0;
+    }
+
+    /**
+     * Set this tree as read-only. As a side effect,
+     * it will also reduce the amount of memory used.
+     */
+    public void setReadOnly() {
+        if (children != null) {
+            children = UnmodifiableArrayList.wrap(children.toArray(new TreeNode[children.size()]));
+            for (final TreeNode node : children) {
+                node.setReadOnly();
+            }
+        }
+    }
+
+    /**
+     * Removes the given tile.
+     *
+     * @param  tile The tile to remove.
+     * @return {@code true} if the given tile was found and removed.
+     * @throws IOException if an I/O operation was required and failed.
+     * @throws UnsupportedOperationException if {@link #setReadOnly} has been invoked.
+     */
+    public boolean remove(final Tile tile) throws IOException, UnsupportedOperationException {
+        return contains(tile.getAbsoluteRegion(), tile, true);
     }
 
     /**
@@ -306,7 +337,7 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      */
     public boolean containsAll(final Collection<Tile> tiles) throws IOException {
         for (final Tile tile : tiles) {
-            if (!contains(tile, tile.getAbsoluteRegion())) {
+            if (!contains(tile.getAbsoluteRegion(), tile, false)) {
                 return false;
             }
         }
@@ -317,18 +348,30 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * Returns {@code true} if this tree contains the given tile. This method
      * invokes itself recursively for scanning through the subtrees.
      *
+     * @param  region The result of {@link Tile#getAbsoluteRegion}.
      * @param  candidate The tile to test for presence in this tree.
-     * @param  bounds The result of {@link Tile#getAbsoluteRegion}.
+     * @param  {@code true} if the node containing the tile should be removed.
      * @return {@code true} if the given tile is presents in this tree.
      */
-    private boolean contains(final Tile candidate, final Rectangle bounds) {
+    private boolean contains(final Rectangle region, final Tile candidate, final boolean remove) {
         if (Utilities.equals(candidate, tile)) {
-            assert bounds.equals(region);
+            assert region.equals(this);
+            if (remove) {
+                tile = null;
+            }
             return true;
         }
-        if (children != null && region.contains(bounds)) {
-            for (final TreeNode node : children) {
-                if (node.contains(candidate, bounds)) {
+        if (children != null && contains(region)) {
+            final Iterator<TreeNode> it = children.iterator();
+            while (it.hasNext()) {
+                final TreeNode node = it.next();
+                if (node.contains(region, candidate, remove)) {
+                    if (remove && node.tile == null && node.children == null) {
+                        it.remove();
+                        if (children.isEmpty()) {
+                            children = null;
+                        }
+                    }
                     return true;
                 }
             }
@@ -340,9 +383,9 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * Returns the tiles intersecting the given region of interest (ROI).
      * The returned collection is a copy that can be modified without altering the tree.
      */
-    public Collection<Tile> intersect(final Rectangle roi) {
+    public Collection<Tile> intersecting(final Rectangle roi) {
         final List<Tile> tiles = new LinkedList<Tile>();
-        intersect(roi, tiles);
+        intersecting(roi, tiles);
         return tiles;
     }
 
@@ -350,14 +393,14 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * Adds the tiles intersecting the given region of interest (ROI) to the given array.
      * This method invokes itself recursively down the tree.
      */
-    private void intersect(final Rectangle roi, final Collection<Tile> tiles) {
-        if (region.intersects(roi)) {
+    private void intersecting(final Rectangle roi, final Collection<Tile> tiles) {
+        if (intersects(roi)) {
             if (tile != null) {
                 tiles.add(tile);
             }
             if (children != null) {
                 for (final TreeNode child : children) {
-                    child.intersect(roi, tiles);
+                    child.intersecting(roi, tiles);
                 }
             }
         }
@@ -378,9 +421,9 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      * This method invokes itself recursively down the tree.
      */
     private void containedIn(final Rectangle roi, final Collection<Tile> tiles) {
-        if (roi.contains(region)) {
+        if (roi.contains(this)) {
             copy(tiles);
-        } else if (children != null && roi.intersects(region)) {
+        } else if (children != null && roi.intersects(this)) {
             for (final TreeNode child : children) {
                 child.containedIn(roi, tiles);
             }
@@ -397,10 +440,17 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
         }
         if (children != null) {
             for (final TreeNode child : children) {
-                assert region.contains(child.region) : child;
+                assert contains(child) : child;
                 child.copy(tiles);
             }
         }
+    }
+
+    /**
+     * Returns the tile in this node, or {@code null} if none.
+     */
+    public Tile getTile() {
+        return tile;
     }
 
     /**
@@ -410,11 +460,7 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
      */
     @Override
     public int hashCode() {
-        int code = xSubsampling + 37*ySubsampling;
-        if (region != null) {
-            code += 31 * region.hashCode();
-        }
-        return code;
+        return super.hashCode() + 31*xSubsampling + 37*ySubsampling;
     }
 
     /**
@@ -430,9 +476,9 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
             final TreeNode that = (TreeNode) other;
             return this.xSubsampling == that.xSubsampling &&
                    this.ySubsampling == that.ySubsampling &&
-                   Utilities.equals(this.region,   that.region) &&
                    Utilities.equals(this.tile,     that.tile) &&
-                   Utilities.equals(this.children, that.children);
+                   Utilities.equals(this.children, that.children) &&
+                   super.equals(that);
         }
         return false;
     }
@@ -444,9 +490,9 @@ final class TreeNode implements Comparable<TreeNode>, Runnable {
     public String toString() {
         final StringBuilder buffer = new StringBuilder(getClass().getSimpleName());
         buffer.append('[');
-        if (region != null) {
-            buffer.append("location=").append(region.x).append(',').append(region.y).
-                   append(", size=").append(region.width).append(',').append(region.height);
+        if (!isEmpty()) {
+            buffer.append("location=").append(x).append(',').append(y).
+                   append(", size=").append(width).append(',').append(height);
         }
         return buffer.append(']').toString();
     }

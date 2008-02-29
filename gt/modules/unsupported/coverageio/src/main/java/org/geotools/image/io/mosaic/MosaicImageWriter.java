@@ -65,6 +65,11 @@ import org.geotools.util.logging.Logging;
  */
 public class MosaicImageWriter extends ImageWriter {
     /**
+     * The logging level for tiling information during reads and writes.
+     */
+    private Level level = Level.FINE;
+
+    /**
      * Constructs an image writer with the default provider.
      */
     public MosaicImageWriter() {
@@ -76,6 +81,24 @@ public class MosaicImageWriter extends ImageWriter {
      */
     public MosaicImageWriter(final ImageWriterSpi spi) {
         super(spi != null ? spi : Spi.DEFAULT);
+    }
+
+    /**
+     * Returns the logging level for tile information during read and write operations.
+     */
+    public Level getLogLevel() {
+        return level;
+    }
+
+    /**
+     * Sets the logging level for tile information during read and write operations.
+     * The default value is {@link Level#FINE}. A {@code null} value restore the default.
+     */
+    public void setLogLevel(Level level) {
+        if (level == null) {
+            level = Level.FINE;
+        }
+        this.level = level;
     }
 
     /**
@@ -159,14 +182,11 @@ public class MosaicImageWriter extends ImageWriter {
     public void writeFromInput(final Object input, final int inputIndex, final int outputIndex)
             throws IOException
     {
-        final Logger logger = Logging.getLogger(MosaicImageWriter.class);
-        final boolean loggable = logger.isLoggable(Level.FINE);
         /*
          * Gets the reader first - especially before getOutput() - because the user may have
          * overriden filter(ImageReader) and set the output accordingly. TileBuilder do that.
          */
-        final ImageReader     reader = getImageReader(input);
-        final ImageReadParam  params = reader.getDefaultReadParam();
+        final ImageReader reader = getImageReader(input);
         final TileManager[] managers = getOutput();
         if (managers == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
@@ -177,8 +197,23 @@ public class MosaicImageWriter extends ImageWriter {
         } else {
             tiles = Collections.emptyList();
         }
+        final ThreadGroup treeThreads = new ThreadGroup("TreeNode");
+        final TreeNode tree = new TreeNode(tiles.toArray(new Tile[tiles.size()]), treeThreads);
+        /*
+         * Do here a little bit of work that we could have done at the begining of this method.
+         * We do it there, between "new TreeNode" and "tree.join" because TreeNode may be doing
+         * some work in background threads.
+         */
         int maximumPixelCount = 0; // To be computed after a runtime.gc() when first needed.
-        final Runtime runtime = Runtime.getRuntime();
+        final Runtime        runtime   = Runtime.getRuntime();
+        final ImageReadParam params    = reader.getDefaultReadParam();
+        final Logger         logger    = Logging.getLogger(MosaicImageWriter.class);
+        final boolean        logWrites = logger.isLoggable(level);
+        final boolean        logReads  = !(reader instanceof MosaicImageReader);
+        if (!logReads) {
+            ((MosaicImageReader) reader).setLogLevel(level);
+        }
+        tree.join(treeThreads);
         while (!tiles.isEmpty()) {
             /*
              * Before to attempt image loading, ask explicitly for a garbage collection cycle.
@@ -188,7 +223,9 @@ public class MosaicImageWriter extends ImageWriter {
              */
             runtime.gc();
             if (maximumPixelCount == 0) {
-                maximumPixelCount = (int) Math.min(1024*1024*1024, runtime.freeMemory()) / 2;
+                long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+                usedMemory = runtime.maxMemory() - 2*usedMemory;
+                maximumPixelCount = (int) Math.min(1024*1024*1024, usedMemory);
             }
             /*
              * Loads the image for some initial tile from the list. We will write as many tiles as
@@ -196,8 +233,8 @@ public class MosaicImageWriter extends ImageWriter {
              * the list, so next iterations will process only the remaining tiles.
              */
             final Dimension imageSubsampling = new Dimension(); // Computed by next line.
-            final Tile imageTile = getEnclosingTile(tiles, imageSubsampling, maximumPixelCount);
-            if (loggable) {
+            final Tile imageTile = getEnclosingTile(tiles, tree, imageSubsampling, maximumPixelCount);
+            if (logReads) {
                 logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
             }
             params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
@@ -215,10 +252,8 @@ public class MosaicImageWriter extends ImageWriter {
                     throw error;
                 }
                 // We reduced the amount of memory allowed to ourself. Try again.
-                logger.log(getLogRecord(VocabularyKeys.ERROR_$1, error));
                 continue;
             }
-            maximumPixelCount = 0; // Will try to use again free memory later.
             /*
              * Searchs tiles inside the same region with a resolution which is equals or lower by
              * an integer ratio. If such tiles are found we can write them using the image loaded
@@ -236,7 +271,7 @@ public class MosaicImageWriter extends ImageWriter {
                 if (!imageRegion.contains(sourceRegion)) {
                     continue;
                 }
-                if (loggable) {
+                if (logWrites) {
                     logger.log(getLogRecord(VocabularyKeys.SAVING_$1, tile));
                 }
                 final int xSubsampling = subsampling.width  / imageSubsampling.width;
@@ -254,6 +289,9 @@ public class MosaicImageWriter extends ImageWriter {
                 close(writer.getOutput(), tile.getInput());
                 writer.dispose();
                 it.remove();
+                if (!tree.remove(tile)) {
+                    throw new AssertionError(tile); // Should never happen.
+                }
             }
             assert !tiles.contains(imageTile) : imageTile;
         }
@@ -280,8 +318,8 @@ public class MosaicImageWriter extends ImageWriter {
     /**
      * Returns a log message for the given tile.
      */
-    private static LogRecord getLogRecord(final int key, final Object arg) {
-        final LogRecord record = Vocabulary.getResources(null).getLogRecord(Level.FINE, key, arg);
+    private LogRecord getLogRecord(final int key, final Object arg) {
+        final LogRecord record = Vocabulary.getResources(locale).getLogRecord(level, key, arg);
         record.setSourceClassName(MosaicImageWriter.class.getName());
         record.setSourceMethodName("writeFromInput");
         return record;
@@ -314,23 +352,18 @@ public class MosaicImageWriter extends ImageWriter {
      * data to load without too much CPU cost.
      *
      * @param tiles The tiles to examine. This collection is not modified.
+     * @param tree Same as {@code tiles}, but as a tree for faster searchs.
      * @param imageSubsampling Where to store the subsampling to use for reading the tile.
      *        This is an output parameter only.
-     *
-     * @todo {@code tiles} argument should be a {@link RTree} in argument in order to
-     *       avoid creating it again and again at every method invocation.
      */
-    private static Tile getEnclosingTile(final Collection<Tile> tiles,
+    private static Tile getEnclosingTile(final Collection<Tile> tiles, final TreeNode tree,
                                          final Dimension imageSubsampling,
                                          final int maximumPixelCount)
             throws IOException
     {
-        final ThreadGroup treeThreads = new ThreadGroup("TreeNode");
-        final TreeNode tree = new TreeNode(tiles.toArray(new Tile[tiles.size()]), treeThreads);
         final Set<Dimension> subsamplingDone = tiles.size() > 24 ? new HashSet<Dimension>() : null;
         Tile selectedTile = null;
         int subtileCount = 0;
-        tree.join(treeThreads);
         assert tree.containsAll(tiles);
         for (final Tile tile : tiles) {
             /*

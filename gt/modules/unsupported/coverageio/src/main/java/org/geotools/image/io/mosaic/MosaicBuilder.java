@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
@@ -138,6 +139,11 @@ public class MosaicBuilder {
     private transient String extension;
 
     /**
+     * The logging level for tiling information during reads and writes.
+     */
+    private Level level = Level.FINE;
+
+    /**
      * Generates tiles using the default factory.
      */
     public MosaicBuilder() {
@@ -153,6 +159,24 @@ public class MosaicBuilder {
     public MosaicBuilder(final TileManagerFactory factory) {
         this.factory = (factory != null) ? factory : TileManagerFactory.DEFAULT;
         layout = TileLayout.CONSTANT_TILE_SIZE;
+    }
+
+    /**
+     * Returns the logging level for tile information during read and write operations.
+     */
+    public Level getLogLevel() {
+        return level;
+    }
+
+    /**
+     * Sets the logging level for tile information during read and write operations.
+     * The default value is {@link Level#FINE}. A {@code null} value restore the default.
+     */
+    public void setLogLevel(Level level) {
+        if (level == null) {
+            level = Level.FINE;
+        }
+        this.level = level;
     }
 
     /**
@@ -857,6 +881,7 @@ public class MosaicBuilder {
             prefix = filename.substring(0, i);
         }
         final Writer writer = new Writer(inputIndex, writeTiles);
+        writer.setLogLevel(getLogLevel());
         writer.writeFromInput(input, inputIndex, 0);
         return writer.tiles;
     }
