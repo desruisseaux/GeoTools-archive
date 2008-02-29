@@ -46,6 +46,7 @@ import org.geotools.gui.swing.map.map2d.control.RefreshAction;
 import org.geotools.gui.swing.map.map2d.control.ZoomAllAction;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
+import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
@@ -91,6 +92,9 @@ public class JMiniMap extends JComponent {
             oldStrategy.removeStrategyListener(strategyListen);
             newStrategy.addStrategyListener(strategyListen);
         }
+
+        public void mapActionStateChanged(Map2DActionStateEvent event) {
+        }
     };
 
     public JMiniMap() {
@@ -98,7 +102,7 @@ public class JMiniMap extends JComponent {
         add(BorderLayout.CENTER, map.getComponent());
 
         
-        map.setBackDecoration(new ColorDecoration());
+        map.setBackgroundDecoration(new ColorDecoration());
         map.addDecoration(deco);
     }
 
@@ -259,6 +263,9 @@ public class JMiniMap extends JComponent {
             public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
                 oldStrategy.removeStrategyListener(strategyListen);
                 newStrategy.addStrategyListener(strategyListen);
+            }
+
+            public void mapActionStateChanged(Map2DActionStateEvent event) {
             }
         };
 

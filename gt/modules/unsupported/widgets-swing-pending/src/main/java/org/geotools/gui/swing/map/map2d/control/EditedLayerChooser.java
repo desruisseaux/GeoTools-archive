@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
@@ -109,6 +110,9 @@ public class EditedLayerChooser extends JComboBox {
         public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
             oldStrategy.removeStrategyListener(strategyListener);
             newStrategy.addStrategyListener(strategyListener);
+        }
+
+        public void mapActionStateChanged(Map2DActionStateEvent event) {
         }
     };
     private MapLayerListListener contextListener = new MapLayerListListener() {

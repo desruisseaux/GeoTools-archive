@@ -16,34 +16,25 @@
 
 package org.geotools.gui.swing.toolbox.process;
 
+import org.opengis.util.ProgressListener;
+
 /**
  *
  * @author johann sorel
  */
-public interface Process extends Runnable {
+public interface Process {
 
-    public static final ProcessListener[] EMPTY_LISTENER_ARRAY = {};
     
-    public void stopProcess();
+    void setMonitor(ProgressListener monitor);
     
-    public boolean isRunning();
+    ProgressListener getMonitor();
+        
+    void process();
     
-    /**
-     * add ProcessToolListener
-     * @param listener
-     */
-    public void addProcessListener(ProcessListener listener);
+    boolean isProcessing();    
+    
+    Object[] getOutputObjects();
 
-    /**
-     * remove ProcessToolListener
-     * @param listener to remove
-     */
-    public void removeProcessListener(ProcessListener listener);
-
-    /**
-     * get ProcessToolListener list
-     * @return the listener's table
-     */
-    public ProcessListener[] getProcessListeners();
+    ProcessDescriptor getDescriptor();
     
 }

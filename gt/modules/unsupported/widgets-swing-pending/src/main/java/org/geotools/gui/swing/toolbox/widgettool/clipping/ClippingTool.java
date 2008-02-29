@@ -44,7 +44,6 @@ import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.gui.swing.toolbox.process.ClipProcess;
-import org.geotools.gui.swing.toolbox.process.ProcessListener;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.simple.SimpleFeature;
@@ -58,6 +57,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.toolbox.process.ProcessMonitor;
+import org.opengis.util.ProgressListener;
 
 /**
  *
@@ -475,36 +476,59 @@ public class ClippingTool extends AbstractWidgetTool {
             FeatureStore<SimpleFeatureType, SimpleFeature> out = (FeatureStore<SimpleFeatureType, SimpleFeature>) outStore.getFeatureSource(outStore.getTypeNames()[0]);
 
 
-            ClipProcess process = new ClipProcess(source, clip, out,attlink);
+            final ClipProcess process = new ClipProcess(source, clip, out,attlink);
 
 
             gui_ok.setEnabled(false);
             gui_progress.setValue(0);
 
-            process.addProcessListener(new ProcessListener() {
+//            process.setMonitor(new ProcessListener() {
+//
+//                public void processChanged(int val, int max, String desc) {
+//                    gui_progress.setMaximum(max);
+//                    gui_progress.setValue(val);
+//                    gui_progress.setString(desc);
+//                }
+//
+//                public void objectCreated(Object obj) {
+//                }
+//
+//                public void processEnded(String desc) {
+//                    gui_progress.setString(desc);
+//                    gui_ok.setEnabled(true);
+//                }
+//
+//                public void processInterrupted(Exception e) {
+//                    gui_progress.setString(error);
+//                    e.printStackTrace();
+//                    gui_ok.setEnabled(true);
+//                }
+//            });
+            
+            
+//            Process process = new ... ;
+//            ProgressListener monitor = new ... ;
+//            process.setMonitor(monitor);
+//                 
+//            new Thread(){
+//                @Override
+//                public void run(){
+//                    process.process();
+//                }
+//            }.start();
+            
+//            ProcessMonitor monitor = new ProcessMonitor(null, true);            
+//            process.setMonitor(monitor);
+//            
+//            new Thread(){
+//                @Override
+//                public void run(){
+//                    process.process();
+//                }
+//            }.start();
+            
 
-                public void processChanged(int val, int max, String desc) {
-                    gui_progress.setMaximum(max);
-                    gui_progress.setValue(val);
-                    gui_progress.setString(desc);
-                }
-
-                public void objectCreated(Object obj) {
-                }
-
-                public void processEnded(String desc) {
-                    gui_progress.setString(desc);
-                    gui_ok.setEnabled(true);
-                }
-
-                public void processInterrupted(Exception e) {
-                    gui_progress.setString(error);
-                    e.printStackTrace();
-                    gui_ok.setEnabled(true);
-                }
-            });
-
-            new Thread(process).start();
+            
 
         } catch (IOException e) {
             System.out.println(e);

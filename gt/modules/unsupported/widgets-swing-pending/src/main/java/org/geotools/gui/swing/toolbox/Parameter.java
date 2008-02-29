@@ -24,14 +24,10 @@ package org.geotools.gui.swing.toolbox;
 public class Parameter {
 
     
-    public final String description;
-    
-    public final String key;
-    
-    public final boolean required;
-        
-    public final Object sample;
-    
+    public final String description;    
+    public final String key;    
+    public final boolean required;        
+    public final Object sample;    
     public final Class type ;
         
     public Parameter(String description, String key, boolean required, Object sample, Class type){

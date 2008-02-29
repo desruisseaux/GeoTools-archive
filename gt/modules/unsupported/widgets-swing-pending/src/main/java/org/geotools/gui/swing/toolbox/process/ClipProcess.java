@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,13 +54,18 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.util.InternationalString;
+import org.opengis.util.ProgressListener;
 
 /**
  *
  * @author johann sorel
  */
-public class ClipProcess extends AbstractProcess {
+public class ClipProcess implements Process {
 
+    private ProgressListener monitor = null;
+    
     private final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private int x = 0;
     private int max = 1;
@@ -316,17 +322,18 @@ public class ClipProcess extends AbstractProcess {
 
     }
 
-    public void stopProcess() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isRunning() {
+    public boolean isProcessing() {
         return running;
     }
 
-    public void run() {
+    public void process() {
         running = true;
-        fireProcessChanged(x, max, "");
+        
+        monitor.setTask(new SimpleInternationalString("Clip"));
+        
+        if(monitor != null){
+            monitor.progress(0);
+        }
 
 
         SimpleFeatureType inType = inSource.getSchema();
@@ -349,7 +356,10 @@ public class ClipProcess extends AbstractProcess {
 
             FeatureCollection<SimpleFeatureType, SimpleFeature> outCol = FeatureCollections.newCollection();
             max = inCol.size();
-            fireProcessChanged(x, max, "");
+            
+            if(monitor != null){
+                monitor.progress(x/max);
+            }
 
             x = 0;
             while (ite.hasNext()) {
@@ -357,14 +367,39 @@ public class ClipProcess extends AbstractProcess {
                 SimpleFeature sf = ite.next();
                 clip(inCRS, clipCRS, outCol, sf, outType);
 
-                fireProcessChanged(x, max, x + "/" + max);
+                if(monitor != null){
+                    monitor.progress(x/max);
+                    monitor.setTask(new SimpleInternationalString("Clip : "+x+"/"+max) );
+                }
             }
 
             fillLayer(outCol, outStore);
 
-            fireProcessEnded("");
+            if(monitor != null){
+                monitor.complete();
+                monitor.dispose();
+            }
+            
         } catch (Exception i) {
-            fireProcessInterrupted(i);
+            if(monitor != null){
+                monitor.exceptionOccurred(i);
+            }
         }
+    }
+
+    public void setMonitor(ProgressListener monitor) {
+        this.monitor = monitor;
+    }
+
+    public ProgressListener getMonitor() {
+        return monitor;
+    }
+
+    public Object[] getOutputObjects() {
+        return new Object[0];
+    }
+
+    public ProcessDescriptor getDescriptor() {
+        return new ClipProcessDescriptor();
     }
 }

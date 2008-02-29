@@ -16,80 +16,36 @@
 
 package org.geotools.gui.swing.map.map2d.decoration;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-
-import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.map2d.Map2D;
-
 /**
  *
- * @author Johann Sorel
+ * @author johann sorel
  */
-public class InformationDecoration extends JComponent implements MapDecoration{
+public interface InformationDecoration extends MapDecoration{
 
-    
-    private final BufferedImage buffer;
-    private boolean drawing = false;
-    
-    public InformationDecoration(){
-        ImageIcon anim = IconBundle.getResource().getIcon("JS_GT");
-        String msg = BUNDLE.getString("drawing_wait");
-        
-        
-        Font currentFont = new Font("Arial",Font.BOLD|Font.ITALIC,13);
-        FontMetrics currentMetrics = getFontMetrics(currentFont);
-        int high = (currentMetrics.getHeight() > anim.getIconHeight()) ? currentMetrics.getHeight() : anim.getIconHeight();
-        int width = currentMetrics.stringWidth(msg)+anim.getIconWidth()+2;
-        
-        buffer = new BufferedImage(width+9, high+7, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = (Graphics2D) buffer.getGraphics();
-        g2d.setColor(Color.WHITE);
-        g2d.fillRoundRect(2, 2, (width+6), (high+4), 9,9);
-        g2d.drawImage(anim.getImage(), 5, 4, this);
-        g2d.setColor(Color.BLACK);
-        g2d.drawRoundRect(2, 2, (width+6), (high+4), 9,9);                
-        g2d.setFont(new Font("Arial",Font.BOLD|Font.ITALIC,13));
-        g2d.drawString(msg, (anim.getIconWidth()+2+3+2) , (buffer.getHeight()/2 + currentMetrics.getHeight()/2)  );
-        
+    public static enum LEVEL{
+        NORMAL,
+        INFO,
+        WARNING,
+        ERROR
     }
     
-    public void setDrawing(boolean b){        
-        drawing = b;
-        revalidate();
-        repaint();
-    }
+    public static int DEFAULT_TIME = 10000;
     
-    @Override
-    public void paintComponent(Graphics g) {
-        if(drawing){
-            g.drawImage(buffer, 0, 0, this);           
-            }
-    }
-
-    public void refresh() {
-        repaint();
-    }
-
-    public JComponent geComponent() {
-        return this;
-    }
+    public void setPaintingIconVisible(boolean b);
     
-    public void setMap2D(Map2D map) {
-        
-    }
-
-    public Map2D getMap2D() {
-        return null;
-    }
-
+    public boolean isPaintingIconVisible();
+    
+    public void displayLowLevelMessages(boolean display);
+    
+    public boolean isDisplayingLowLevelMessages();
+    
+    /**
+     * 
+     * @param text
+     * @param time : time cant be inferior to 3000 (3seconds)
+     * @param level
+     */
+    public void displayMessage(String text, int time, LEVEL level);
     
     
 }

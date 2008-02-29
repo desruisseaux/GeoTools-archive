@@ -1,8 +1,8 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -14,24 +14,39 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.listener;
+package org.geotools.gui.swing.map.map2d.handler;
 
-import java.util.EventListener;
+import javax.swing.ImageIcon;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DNavigationEvent;
+import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 
 /**
- * NavigableMap2DListener used to listen to Map2D Navigation events 
- * @author Johann Sorel
+ *
+ * @author johann sorel
  */
-public interface NavigableMap2DListener extends EventListener{
+public interface NavigationHandler {
+
+        
+    /**
+     * 
+     * @param map2d
+     * @param mapComponent
+     */
+    void install(NavigableMap2D map2d);
     
     /**
-     * called when the navigation handler change
-     * @param mce : Map2DNavigationEvent
+     * 
      */
-    public void navigationHandlerChanged(Map2DNavigationEvent mce);
+    void uninstall();
     
+    /**
+     * 
+     * @return
+     */
+    boolean isInstalled();
+    
+    String getTitle();
+    
+    ImageIcon getIcon();
     
 }

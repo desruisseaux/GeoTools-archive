@@ -14,22 +14,36 @@
  *    Lesser General Public License for more details.
  */
 
+package org.geotools.gui.swing.misc.filtre;
 
-package org.geotools.gui.swing.toolbox.process;
-
-import java.util.EventListener;
+import java.io.FileFilter;
 
 /**
+ *
  * @author johann sorel
  */
-public interface ProcessListener extends EventListener{
+public class FileFilterFactory {
 
-    public void processChanged(int val, int max, String desc);
+    public static enum FILE_FORMAT{
+        SHAPEFILE("",""),
+        GEOTIFF("",""),
+        GML("",""),
+        WORLD_IMAGE("","");
+            
+        String desc;
+        String[] ends;
+        
+        FILE_FORMAT(String i18n, String ... ends){
+            desc = i18n;
+        }
+               
+        
+    };
     
-    public void objectCreated(Object obj);
     
-    public void processEnded(String desc);
+    public static FileFilter createFileFilter(FILE_FORMAT format){
+        return null;
+    }
     
-    public void processInterrupted(Exception e);
     
 }

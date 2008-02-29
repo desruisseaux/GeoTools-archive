@@ -19,12 +19,13 @@ package org.geotools.gui.swing.map.map2d;
 import java.awt.Component;
 import java.awt.Point;
 
-import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 
 /**
  * Map2D interface, used for mapcontext viewing
@@ -32,14 +33,12 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author Johann Sorel
  */
 public interface Map2D {
-   
-    
+       
     /**
      * set the rendering strategy
      * @param strategy : throw nullpointexception if strategy is null
      */
-    public void setRenderingStrategy(RenderingStrategy strategy);
-    
+    public void setRenderingStrategy(RenderingStrategy strategy);    
     /**
      * get the map2d rendering strategy
      * @return RenderingStrategy : should never return null;
@@ -56,67 +55,77 @@ public interface Map2D {
      * add a Map2DListener
      * @param listener : Map2Dlistener to add
      */
-    public void addMap2DListener(Map2DListener listener);
-        
+    public void addMap2DListener(Map2DListener listener);        
     /**
      * remove a Map2DListener
      * @param listener : Map2DListener to remove
      */
-    public void removeMap2DListener(Map2DListener listener);
-    
+    public void removeMap2DListener(Map2DListener listener);    
     /**
      * 
      * @return array of Map2DListener
      */
     public Map2DListener[] getMap2DListeners();
     
-    
-    //---------------------Basic functions--------------------------------------
-    
+    //------------------Action State--------------------------------------------    
+    /**
+     * set the action state. Pan, ZoomIn, ZoomOut ...
+     * @param state : MapConstants.ACTION_STATE
+     */
+    public void setActionState(MapConstants.ACTION_STATE state);    
+    /**
+     * get the actual action state
+     * @return MapConstants.ACTION_STATE
+     */
+    public MapConstants.ACTION_STATE getActionState();
+        
+    //---------------------Basic functions--------------------------------------    
     /**
      * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
      * @param mx : x coordinate of the mouse on the map (in pixel)
      * @param my : y coordinate of the mouse on the map (in pixel)
      * @return JTS Coordinate
      */
-    public Coordinate toMapCoord(int mx, int my);
-    
+    public Coordinate toMapCoord(int mx, int my);    
+    /**
+     * transform a JTS Coordinate in an pixel x/y coordinate
+     * @param coord
+     * @return Java2D Point
+     */
     public Point toComponentCoord(Coordinate coord);
-    
-        
-    //----------------------Over/Sub/information layers-------------------------
-    
+            
+    //----------------------Over/Sub/information layers-------------------------    
+    /**
+     * set the top InformationDecoration of the map2d widget
+     * @param info , can't be null
+     */
+    public void setInformationDecoration(InformationDecoration info);    
     /**
      * get the top InformationDecoration of the map2d widget
      * @return InformationDecoration
      */
-    public InformationDecoration getInformationLayer();
-
+    public InformationDecoration getInformationDecoration();
     /**
      * set the decoration behind the map
-     * @param back : MapDecoration, use null to remove the decoration
+     * @param back : MapDecoration, can't be null
      */
-    public void setBackDecoration(MapDecoration back);
-
+    public void setBackgroundDecoration(MapDecoration back);
     /**
      * get the decoration behind the map
      * @return MapDecoration : or null if no back decoration
      */
-    public MapDecoration getBackDecoration();
-
+    public MapDecoration getBackgroundDecoration();
     /**
      * add a Decoration between the map and the information top decoration
      * @param deco : MapDecoration to add
      */
     public void addDecoration(MapDecoration deco);
-
     /**
      * insert a MapDecoration at a specific index
      * @param index : index where to isert the decoration
      * @param deco : MapDecoration to add
      */
     public void addDecoration(int index, MapDecoration deco);
-
     /**
      * get the index of a MapDecoration
      * @param deco : MapDecoration to find
@@ -124,19 +133,15 @@ public interface Map2D {
      * @throw ClassCastException or NullPointerException
      */
     public int getDecorationIndex(MapDecoration deco);
-
     /**
      * remove a MapDecoration
      * @param deco : MapDecoration to remove
      */
     public void removeDecoration(MapDecoration deco);
-
     /**
      * get an array of all MapDecoration
      * @return array of MapDecoration
      */
     public MapDecoration[] getDecorations();
-
-    
-    
+        
 }

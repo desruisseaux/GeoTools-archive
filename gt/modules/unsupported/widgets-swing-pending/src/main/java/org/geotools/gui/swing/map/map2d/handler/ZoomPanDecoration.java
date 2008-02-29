@@ -14,8 +14,9 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.decoration;
+package org.geotools.gui.swing.map.map2d.handler;
 
+import org.geotools.gui.swing.map.map2d.decoration.*;
 import java.awt.Color;
 import java.awt.Graphics;
 

@@ -16,7 +16,7 @@
 
 package org.geotools.gui.swing.map.map2d;
 
-import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.map2d.handler.NavigationHandler;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 
 /**
@@ -24,31 +24,7 @@ import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
  * @author Johann Sorel
  */
 public interface NavigableMap2D extends Map2D{
-    
-    /**
-     * set the action state. Pan, ZoomIn, ZoomOut ...
-     * @param state : MapConstants.ACTION_STATE
-     */
-    public void setActionState(MapConstants.ACTION_STATE state);
-    
-    /**
-     * get the actual action state
-     * @return MapConstants.ACTION_STATE
-     */
-    public MapConstants.ACTION_STATE getActionState();
-    
-    /**
-     * set the zoom factor. It is used when zooming in or out.
-     * @param zoomFactor
-     */
-    public void setZoomFactor(double zoomFactor);
-    
-    /**
-     * get the zoom factor
-     * @return double value of the zoom factor
-     */
-    public double getZoomFactor();
-    
+        
     /**
      * get to the previous maparea is there was one
      */
@@ -59,6 +35,17 @@ public interface NavigableMap2D extends Map2D{
      */
     public void nextMapArea();
     
+    /**
+     * the NavigationHandler is managing the selection decoration and the related listeners.
+     * @param handler
+     */
+    public void setNavigationHandler(NavigationHandler handler);
+    
+    /**
+     * 
+     * @return NavigationHandler
+     */
+    public NavigationHandler getNavigationHandler();
     
       
     /**

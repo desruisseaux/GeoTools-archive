@@ -22,6 +22,7 @@ import javax.swing.AbstractAction;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
+import org.geotools.gui.swing.map.map2d.handler.DefaultZoomOutHandler;
 
 /**
  *
@@ -33,7 +34,8 @@ public class ZoomOutAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent arg0) {
         if (map != null && map instanceof NavigableMap2D) {
-            ((NavigableMap2D) map).setActionState(MapConstants.ACTION_STATE.ZOOM_OUT);
+            ((NavigableMap2D) map).setNavigationHandler(new DefaultZoomOutHandler());
+            map.setActionState(MapConstants.ACTION_STATE.NAVIGATE);
         }
     }
 

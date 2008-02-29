@@ -19,6 +19,7 @@ package org.geotools.gui.swing.toolbox.process;
 import java.util.Map;
 
 import org.geotools.gui.swing.toolbox.Parameter;
+import org.opengis.util.ProgressListener;
 
 /**
  * @author johann sorel
@@ -36,12 +37,29 @@ public interface ProcessDescriptor {
     public String getTitle();
         
     /**
+     * 
+     * @param parameters
+     * @return true if Map is valid
+     */
+    public boolean isValid(Map parameters);
+    
+    /**
      * @param parameters 
-     * @return ProcessTool
+     * @return Process
      * @throws java.lang.IllegalArgumentException 
      */
     public Process createProcess(Map parameters) throws IllegalArgumentException;
                 
+    
+    /**
+     * 
+     * @param parameters
+     * @param monitor
+     * @return Process
+     * @throws java.lang.IllegalArgumentException
+     */
+    public Process create(Map parameters, ProgressListener monitor) throws IllegalArgumentException;
+    
     /**
      * get an array of parameter to config the process tool
      * @return array of Parameter

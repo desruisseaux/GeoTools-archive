@@ -27,9 +27,7 @@ public class MapConstants {
      * Possible actions states available for a map
      */
     public static enum ACTION_STATE{
-        ZOOM_IN,
-        ZOOM_OUT,
-        PAN,
+        NAVIGATE,
         SELECT,
         EDIT,
         NONE

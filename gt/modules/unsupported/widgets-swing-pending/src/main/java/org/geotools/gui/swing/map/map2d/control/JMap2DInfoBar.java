@@ -40,6 +40,7 @@ public class JMap2DInfoBar extends JToolBar {
     private Map2D map = null;
     private JMap2DMouseCoordPanel m_coord = new JMap2DMouseCoordPanel();
     private JCheckBox gui_chk_refresh = new JCheckBox();
+    private JCheckBox gui_chk_message = new JCheckBox();
     private JButton gui_config = new JButton(ICON_CONFIG);
 
     public JMap2DInfoBar() {
@@ -65,7 +66,9 @@ public class JMap2DInfoBar extends JToolBar {
         });
 
         gui_chk_refresh.setText(bundle.getString("autorefresh"));
+        gui_chk_message.setText(bundle.getString("messages"));
         gui_chk_refresh.setOpaque(false);
+        gui_chk_message.setOpaque(false);
         gui_chk_refresh.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent arg0) {
@@ -74,11 +77,19 @@ public class JMap2DInfoBar extends JToolBar {
                 }
             }
         });
+        gui_chk_message.addActionListener(new ActionListener() {
 
+            public void actionPerformed(ActionEvent arg0) {
+                if (map != null) {
+                    map.getInformationDecoration().displayLowLevelMessages(gui_chk_message.isSelected());
+                }
+            }
+        });
 
 
         add(gui_config);
         add(m_coord);
+        add(gui_chk_message);
         add(gui_chk_refresh);
     }
 
@@ -92,6 +103,7 @@ public class JMap2DInfoBar extends JToolBar {
             this.map = (Map2D) map;
             m_coord.setMap(map);
             gui_chk_refresh.setSelected(map.getRenderingStrategy().isAutoRefresh());
+            gui_chk_message.setSelected(map.getInformationDecoration().isDisplayingLowLevelMessages());
         }
 
         if (map instanceof JDefaultMap2D) {

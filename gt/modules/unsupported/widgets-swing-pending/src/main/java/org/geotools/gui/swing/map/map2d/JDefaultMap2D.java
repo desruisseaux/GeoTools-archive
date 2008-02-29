@@ -27,7 +27,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
 
-import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
+import org.geotools.gui.swing.map.map2d.decoration.DefaultInformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
@@ -40,6 +40,11 @@ import org.geotools.renderer.GTRenderer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
+import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
+import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
+import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 
 /**
  * Default implementation of Map2D
@@ -47,6 +52,12 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class JDefaultMap2D extends JPanel implements Map2D {
 
+    
+    /**
+     * Action state of the map widget
+     */
+    protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.NONE;
+    
     /**
      * EventListenerList to manage all possible Listeners
      */
@@ -61,15 +72,15 @@ public class JDefaultMap2D extends JPanel implements Map2D {
      */
     protected RenderingStrategy renderingStrategy = new SingleBufferedImageStrategy();
     private static final MapDecoration[] EMPTY_OVERLAYER_ARRAY = {};
-    private final InformationDecoration informationDecoration = new InformationDecoration();
     private final List<MapDecoration> userDecorations = new ArrayList<MapDecoration>();
     private final StrategyListener strategylisten = new StrategyListen();
     private final PropertyChangeListener crslisten = new CRSLsiten();
     private final JLayeredPane mapDecorationPane = new JLayeredPane();
     private final JLayeredPane userDecorationPane = new JLayeredPane();
     private final JLayeredPane mainDecorationPane = new JLayeredPane();
-    private int nextMapDecorationIndex = 1;
-    private MapDecoration backDecoration;
+    private int nextMapDecorationIndex = 1;    
+    private InformationDecoration informationDecoration = new DefaultInformationDecoration();
+    private MapDecoration backDecoration = new ColorDecoration();
 
     /**
      * create a default JDefaultMap2D
@@ -82,7 +93,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         userDecorationPane.setLayout(new BufferLayout());
         mainDecorationPane.setLayout(new BufferLayout());
 
-        mainDecorationPane.add(informationDecoration, new Integer(3));
+        mainDecorationPane.add(informationDecoration.geComponent(), new Integer(3));
         mainDecorationPane.add(userDecorationPane, new Integer(2));
         mainDecorationPane.add(mapDecorationPane, new Integer(1));
 
@@ -93,7 +104,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
         mapDecorationPane.revalidate();
 
-
         setOpaque(false);
     }
 
@@ -103,6 +113,17 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
         for (Map2DListener l : lst) {
             l.mapStrategyChanged(oldOne, newOne);
+        }
+
+    }
+    
+    private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {
+        Map2DActionStateEvent mce = new Map2DActionStateEvent(this, oldone, newone);
+
+        Map2DListener[] lst = getMap2DListeners();
+
+        for (Map2DListener l : lst) {
+            l.mapActionStateChanged(mce);
         }
 
     }
@@ -130,30 +151,43 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     protected void setRendering(boolean render) {
-        informationDecoration.setDrawing(render);
+        informationDecoration.setPaintingIconVisible(render);
     }
 
     //----------------------Over/Sub/information layers-------------------------
-    public InformationDecoration getInformationLayer() {
+    
+    public void setInformationDecoration(InformationDecoration info) {
+        if(info == null){
+            throw new NullPointerException("info decoration can't be null");
+        }
+        
+        mainDecorationPane.remove(informationDecoration.geComponent());        
+        informationDecoration = info;
+        mainDecorationPane.add(informationDecoration.geComponent(), new Integer(3));
+        
+        mainDecorationPane.revalidate();
+        mainDecorationPane.repaint();
+    }
+    
+    public InformationDecoration getInformationDecoration() {
         return informationDecoration;
     }
 
-    public void setBackDecoration(MapDecoration back) {
+    public void setBackgroundDecoration(MapDecoration back) {
 
-        if (backDecoration != null) {
-            mainDecorationPane.remove(backDecoration.geComponent());
+        if(back == null){
+            throw new NullPointerException("background decoration can't be null");
         }
+        
+        mainDecorationPane.remove(backDecoration.geComponent());        
         backDecoration = back;
-
-        if (back != null) {
-            mainDecorationPane.add(backDecoration.geComponent(), new Integer(0));
-        }
-
+        mainDecorationPane.add(backDecoration.geComponent(), new Integer(0));
+        
         mainDecorationPane.revalidate();
         mainDecorationPane.repaint();
     }
 
-    public MapDecoration getBackDecoration() {
+    public MapDecoration getBackgroundDecoration() {
         return backDecoration;
     }
 
@@ -209,6 +243,19 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //-----------------------------MAP2D----------------------------------------
+    public void setActionState(ACTION_STATE state) {
+
+        if (actionState != state) {
+            fireActionStateChanged(actionState, state);
+            actionState = state;
+        }
+            
+    }
+
+    public ACTION_STATE getActionState() {
+        return actionState;
+    }
+    
     public Coordinate toMapCoord(int mx, int my) {
         Envelope mapArea = renderingStrategy.getMapArea();
 
@@ -315,5 +362,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
             THIS_MAP.mapContextChanged(event);
         }
     }
+
 }
 
