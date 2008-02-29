@@ -17,7 +17,6 @@ package org.geotools.demo.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +67,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.ImageDecoration;
+import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration.LEVEL;
 import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.minimap.JMiniMap;
@@ -142,7 +142,7 @@ public class DemoAll extends javax.swing.JFrame {
         overBackImage.setOpaque(true);
         overBackImage.setBackground(new Color(0.7f, 0.7f, 1f, 0.8f));
         overBackImage.setStyle(org.jdesktop.swingx.JXImagePanel.Style.CENTERED);
-        map.setBackDecoration(overBackColor);
+        map.setBackgroundDecoration(overBackColor);
         map.addDecoration(overNavigation);
 
         tree.addTreeContextListener(new TreeContextListener() {
@@ -231,7 +231,31 @@ public class DemoAll extends javax.swing.JFrame {
         map.getRenderingStrategy().setContext(context);
         minimap.setRelatedMap2D(map);
 
+        
+        Thread t = new Thread(){
+            
+            public void run(){
+                map.getInformationDecoration().displayMessage("This in an information message", 25000, LEVEL.INFO);
+                try {
+                    sleep(5000);
+                } catch (Exception e) {
+                }
+                map.getInformationDecoration().displayMessage("This in a warning message", 25000, LEVEL.WARNING);
+                try {
+                    sleep(5000);
+                } catch (Exception e) {
+                }
+                map.getInformationDecoration().displayMessage("This in an error message", 25000, LEVEL.ERROR);
+                try {
+                    sleep(5000);
+                } catch (Exception e) {
+                }
+                map.getInformationDecoration().displayMessage("This in a normal message", 25000, LEVEL.NORMAL);
 
+            }
+        };
+        t.start();
+        
     }
 
     private MapContext buildContext() {
@@ -858,15 +882,15 @@ public class DemoAll extends javax.swing.JFrame {
     }//GEN-LAST:event_guiChkSelectionActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        map.setBackDecoration(overBackImage);
+        map.setBackgroundDecoration(overBackImage);
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        map.setBackDecoration(overBackColor);
+        map.setBackgroundDecoration(overBackColor);
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
-        map.setBackDecoration(null);
+        map.setBackgroundDecoration(null);
     }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
 
     private void gui_ChknavigationlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_ChknavigationlayerActionPerformed
