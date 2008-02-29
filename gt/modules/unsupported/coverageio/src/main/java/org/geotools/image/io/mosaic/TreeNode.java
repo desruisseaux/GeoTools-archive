@@ -289,6 +289,9 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
      * If two tiles have the same area and subsampling, then their order is unchanged on the
      * basis that initial order, when sorted by {@link TileManager}, should be efficient for
      * reading tiles sequentially.
+     * <p>
+     * This method is inconsistent with {@link #equals}. It is okay for our usage of it,
+     * which should be restricted to this {@link TreeNode} package-privated class only.
      */
     public int compareTo(final TreeNode that) {
         long a1 = (long) this.width * (long) this.height;
@@ -300,6 +303,37 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
         if (a1 < a2) return -1; // Smallest values first
         if (a1 > a2) return +1;
         return 0;
+    }
+
+    /**
+     * Compares this tree with the specified one for equality. Note that we inherit the
+     * {@link #hashCode} method from {@link Rectangle}, which is suffisient for meeting
+     * the consistency requirement.  The quality of the hash code value does not really
+     * matter since this tree is not aimed to be inserted in a hash map.
+     */
+    @Override
+    public boolean equals(final Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!super.equals(other)) {
+            return false;
+        }
+        if (!(other instanceof TreeNode)) {
+            return true; // For consistency with Rectangle.equals which accepts arbitrary Rectangle.
+        }
+        final TreeNode that = (TreeNode) other;
+        return this.xSubsampling == that.xSubsampling &&
+               this.ySubsampling == that.ySubsampling &&
+               Utilities.equals(this.tile,     that.tile) &&
+               Utilities.equals(this.children, that.children);
+    }
+
+    /**
+     * Returns the tile in this node, or {@code null} if none.
+     */
+    public Tile getTile() {
+        return tile;
     }
 
     /**
@@ -354,7 +388,9 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
      * @return {@code true} if the given tile is presents in this tree.
      */
     private boolean contains(final Rectangle region, final Tile candidate, final boolean remove) {
-        if (Utilities.equals(candidate, tile)) {
+        // Tests with == rather than Object.equals(Object) in order to protect ourself from user
+        // overriding of 'equals'. This is correct for the usage that we make in this package.
+        if (candidate == tile) {
             assert region.equals(this);
             if (remove) {
                 tile = null;
@@ -377,33 +413,6 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
             }
         }
         return false;
-    }
-
-    /**
-     * Returns the tiles intersecting the given region of interest (ROI).
-     * The returned collection is a copy that can be modified without altering the tree.
-     */
-    public Collection<Tile> intersecting(final Rectangle roi) {
-        final List<Tile> tiles = new LinkedList<Tile>();
-        intersecting(roi, tiles);
-        return tiles;
-    }
-
-    /**
-     * Adds the tiles intersecting the given region of interest (ROI) to the given array.
-     * This method invokes itself recursively down the tree.
-     */
-    private void intersecting(final Rectangle roi, final Collection<Tile> tiles) {
-        if (intersects(roi)) {
-            if (tile != null) {
-                tiles.add(tile);
-            }
-            if (children != null) {
-                for (final TreeNode child : children) {
-                    child.intersecting(roi, tiles);
-                }
-            }
-        }
     }
 
     /**
@@ -447,53 +456,29 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
     }
 
     /**
-     * Returns the tile in this node, or {@code null} if none.
+     * Returns the tiles intersecting the given region of interest (ROI).
+     * The returned collection is a copy that can be modified without altering the tree.
      */
-    public Tile getTile() {
-        return tile;
+    public Collection<Tile> intersecting(final Rectangle roi) {
+        final List<Tile> tiles = new LinkedList<Tile>();
+        intersecting(roi, tiles);
+        return tiles;
     }
 
     /**
-     * Returns a hash code value for this tree. This is used only for consistency with
-     * {@link #equals}, but the quality of the hash code value does not really matter
-     * since this tree is not aimed to be inserted in a hash map.
+     * Adds the tiles intersecting the given region of interest (ROI) to the given array.
+     * This method invokes itself recursively down the tree.
      */
-    @Override
-    public int hashCode() {
-        return super.hashCode() + 31*xSubsampling + 37*ySubsampling;
-    }
-
-    /**
-     * Compares this tree with the specified one for equality.
-     * this is used mostly for debugging purpose.
-     */
-    @Override
-    public boolean equals(final Object other) {
-        if (other == this) {
-            return true;
+    private void intersecting(final Rectangle roi, final Collection<Tile> tiles) {
+        if (intersects(roi)) {
+            if (tile != null) {
+                tiles.add(tile);
+            }
+            if (children != null) {
+                for (final TreeNode child : children) {
+                    child.intersecting(roi, tiles);
+                }
+            }
         }
-        if (other instanceof TreeNode) {
-            final TreeNode that = (TreeNode) other;
-            return this.xSubsampling == that.xSubsampling &&
-                   this.ySubsampling == that.ySubsampling &&
-                   Utilities.equals(this.tile,     that.tile) &&
-                   Utilities.equals(this.children, that.children) &&
-                   super.equals(that);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a string representation for debugging purpose.
-     */
-    @Override
-    public String toString() {
-        final StringBuilder buffer = new StringBuilder(getClass().getSimpleName());
-        buffer.append('[');
-        if (!isEmpty()) {
-            buffer.append("location=").append(x).append(',').append(y).
-                   append(", size=").append(width).append(',').append(height);
-        }
-        return buffer.append(']').toString();
     }
 }
