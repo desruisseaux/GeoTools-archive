@@ -337,6 +337,13 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
     }
 
     /**
+     * Returns the children, or {@code null} if none.
+     */
+    public List<TreeNode> getChildren() {
+        return children;
+    }
+
+    /**
      * Set this tree as read-only. As a side effect,
      * it will also reduce the amount of memory used.
      */
