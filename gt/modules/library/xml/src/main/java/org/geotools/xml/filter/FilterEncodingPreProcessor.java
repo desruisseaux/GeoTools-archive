@@ -25,6 +25,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FilterVisitor2;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -35,6 +36,8 @@ import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
 import org.geotools.xml.XMLHandlerHints;
 import org.opengis.filter.BinaryLogicOperator;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,7 +91,7 @@ import java.util.Stack;
  *
  * @author Jesse
  */
-public class FilterEncodingPreProcessor implements FilterVisitor {
+public class FilterEncodingPreProcessor implements FilterVisitor, FilterVisitor2 {
     private static final int LOW = 0;
     private static final int MEDIUM = 1;
     private static final int HIGH = 2;
@@ -560,6 +563,14 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         // nothing todo
     }
 
+    public void visit(IncludeFilter filter) {
+        current.push(new Data(filter));
+    }
+
+    public void visit(ExcludeFilter filter) {
+        current.push(new Data(filter));
+    }
+
     private static class Data {
         final public static Data NONE = new Data(Filter.EXCLUDE);
         final public static Data ALL = new Data(Filter.INCLUDE);
@@ -591,4 +602,5 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
     public boolean requiresPostProcessing() {
         return requiresPostProcessing;
     }
+
 }
