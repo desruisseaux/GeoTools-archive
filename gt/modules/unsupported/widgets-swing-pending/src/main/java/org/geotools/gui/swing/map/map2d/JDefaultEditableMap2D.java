@@ -20,15 +20,12 @@ import java.awt.Color;
 
 import javax.swing.JComponent;
 
-import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultEditionHandler;
 import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
+import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapContext;
@@ -54,6 +51,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 
 /**
  * Default implementation of EditableMap2D
@@ -66,8 +64,11 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     protected final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final BufferComponent memoryPane = new BufferComponent();
     private MapLayer editionLayer = null;
-    protected Color editionStyleColor = Color.RED;
     private EditionHandler editionHandler = new DefaultEditionHandler();
+    
+    private PointSymbolizer pointSymbol = null;
+    private LineSymbolizer lineSymbol = null;
+    private PolygonSymbolizer polygonSymbol = null;
 
     /**
      * create a default JDefaultEditableMap2D
@@ -75,6 +76,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     public JDefaultEditableMap2D() {
         super();
 
+        initSymbols();
+        
         mapLayerListlistener = new MapLayerListListen();
         addMapDecoration(memoryPane);
 
@@ -84,8 +87,10 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         editionHandler.install(this);
     }
-
-    public Style createPointStyle() {
+    
+    private void initSymbols(){
+        Color editionStyleColor = Color.RED;
+        
         Fill fill = STYLE_BUILDER.createFill(editionStyleColor, 1f);
         Stroke stroke = STYLE_BUILDER.createStroke(editionStyleColor, 1);
         stroke.setOpacity(STYLE_BUILDER.literalExpression(1f));
@@ -95,33 +100,18 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         gra.setOpacity(STYLE_BUILDER.literalExpression(1f));
         gra.setMarks(new Mark[]{mark});
         gra.setSize(STYLE_BUILDER.literalExpression(14));
-
-        PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
-
-        Style pointSelectionStyle = STYLE_BUILDER.createStyle();
-        pointSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(ps));
-
-        return pointSelectionStyle;
-    }
-
-    public Style createStyle() {
-        Fill fill = STYLE_BUILDER.createFill(editionStyleColor, 0.4f);
-        Stroke stroke = STYLE_BUILDER.createStroke(editionStyleColor, 2);
+       
+        pointSymbol = STYLE_BUILDER.createPointSymbolizer(gra);
+                
+        fill = STYLE_BUILDER.createFill(editionStyleColor, 0.4f);
+        stroke = STYLE_BUILDER.createStroke(editionStyleColor, 2);
         stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
 
-        PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
-        LineSymbolizer ls = STYLE_BUILDER.createLineSymbolizer(stroke);
-
-        Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ls});
-        r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
-        Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{pls});
-        r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
-
-        Style editionStyle = STYLE_BUILDER.createStyle();
-        editionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r2, r3}));
-
-        return editionStyle;
+        polygonSymbol = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
+        lineSymbol = STYLE_BUILDER.createLineSymbolizer(stroke);
+        
     }
+
 
     private void adjusteContexts() {
         MapContext context = renderingStrategy.getContext();
@@ -141,22 +131,23 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     private void fireEditLayerChanged(MapLayer oldone, MapLayer newone) {
-        Map2DEditLayerEvent mce = new Map2DEditLayerEvent(this, oldone, newone);
+        Map2DEditionEvent mce = new Map2DEditionEvent(this, oldone, newone,editionHandler);
 
-        EditableMap2DListener[] lst = getEditableMap2DListeners();
+        Map2DEditionListener[] lst = getEditableMap2DListeners();
 
-        for (EditableMap2DListener l : lst) {
-            l.mapEditLayerChanged(mce);
+        for (Map2DEditionListener l : lst) {
+            l.editedLayerChanged(mce);
         }
 
     }
 
-    private void fireHandlerChanged(EditionHandler handler) {
+    private void fireHandlerChanged(EditionHandler oldhandler, EditionHandler newhandler) {
+        Map2DEditionEvent mce = new Map2DEditionEvent(this, editionLayer,oldhandler,newhandler);
+        
+        Map2DEditionListener[] lst = getEditableMap2DListeners();
 
-        EditableMap2DListener[] lst = getEditableMap2DListeners();
-
-        for (EditableMap2DListener l : lst) {
-            l.editionHandlerChanged(handler);
+        for (Map2DEditionListener l : lst) {
+            l.editionHandlerChanged(mce);
         }
     }
 
@@ -196,16 +187,51 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
 
     //--------------------EDITABLE MAP2D----------------------------------------
-    public void setEditionHandler(EditionHandler handler) {
-        if (handler == null) {
+    
+    public void setPointSymbolizer(PointSymbolizer symbol) {
+        if(symbol == null){
+            throw new NullPointerException("symbol can't be null");
+        }        
+        pointSymbol = symbol;
+    }
+
+    public void setLineSymbolizer(LineSymbolizer symbol) {
+        if(symbol == null){
+            throw new NullPointerException("symbol can't be null");
+        }        
+        lineSymbol = symbol;
+    }
+
+    public void setPolygonSymbolizer(PolygonSymbolizer symbol) {
+        if(symbol == null){
+            throw new NullPointerException("symbol can't be null");
+        }        
+        polygonSymbol = symbol;
+    }
+
+    public LineSymbolizer getLineSymbolizer() {
+        return lineSymbol;
+    }
+
+    public PointSymbolizer getPointSymbolizer() {
+        return pointSymbol;
+    }
+    
+    public PolygonSymbolizer getPolygonSymbolizer() {
+        return polygonSymbol;
+    }
+        
+    public void setEditionHandler(EditionHandler newHandler) {
+        if (newHandler == null) {
             throw new NullPointerException();
-        } else if (handler != editionHandler) {
+        } else if (newHandler != editionHandler) {
 
             editionHandler.cancelEdition();
             editionHandler.uninstallListeners();
             editionHandler.uninstall();
 
-            editionHandler = handler;
+            EditionHandler oldHandler = editionHandler;
+            editionHandler = newHandler;
 
             editionHandler.install(this);
 
@@ -213,7 +239,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                 editionHandler.installListeners(this);
             }
 
-            fireHandlerChanged(editionHandler);
+            fireHandlerChanged(oldHandler,newHandler);
         }
     }
 
@@ -246,16 +272,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         adjusteContexts();
     }
 
-    public void addEditableMap2DListener(EditableMap2DListener listener) {
-        MAP2DLISTENERS.add(EditableMap2DListener.class, listener);
+    public void addEditableMap2DListener(Map2DEditionListener listener) {
+        MAP2DLISTENERS.add(Map2DEditionListener.class, listener);
     }
 
-    public void removeEditableMap2DListener(EditableMap2DListener listener) {
-        MAP2DLISTENERS.remove(EditableMap2DListener.class, listener);
+    public void removeEditableMap2DListener(Map2DEditionListener listener) {
+        MAP2DLISTENERS.remove(Map2DEditionListener.class, listener);
     }
 
-    public EditableMap2DListener[] getEditableMap2DListeners() {
-        return MAP2DLISTENERS.getListeners(EditableMap2DListener.class);
+    public Map2DEditionListener[] getEditableMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(Map2DEditionListener.class);
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------
@@ -300,5 +326,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             return null;
         }
     }
+
+    
 }
 

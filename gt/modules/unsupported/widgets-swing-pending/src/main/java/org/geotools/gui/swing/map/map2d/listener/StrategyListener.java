@@ -31,15 +31,12 @@ public interface StrategyListener extends EventListener{
      * set the actual state of the strategy
      * @param rendering : true if the strategy strat working, false when it stops
      */
-    public void setRendering(boolean rendering);
-    
-    
+    public void setRendering(boolean rendering);    
     /**
      * called when Map2d MapArea changed
      * @param event : Map2DMapAreaEvent
      */
-    public void mapAreaChanged(Map2DMapAreaEvent event);
-    
+    public void mapAreaChanged(Map2DMapAreaEvent event);    
     /**
      * called when MapContext changed
      * @param event : Map2DContextEvent

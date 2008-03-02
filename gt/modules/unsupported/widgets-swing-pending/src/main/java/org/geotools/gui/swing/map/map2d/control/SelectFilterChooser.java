@@ -30,7 +30,7 @@ import javax.swing.border.Border;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
-import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DSelectionListener;
 
 /**
  *
@@ -49,7 +49,7 @@ public class SelectFilterChooser extends JComboBox {
             }
         }
     };
-    private SelectableMap2DListener selectionListener = new SelectableMap2DListener() {
+    private Map2DSelectionListener selectionListener = new Map2DSelectionListener() {
 
         public void selectionChanged(Map2DSelectionEvent event) {
         }
@@ -57,8 +57,8 @@ public class SelectFilterChooser extends JComboBox {
         public void selectionFilterChanged(Map2DSelectionEvent event) {
             
             removeItemListener(listListener);
-            if(event.getFilter() != getSelectedItem()){
-                setSelectedItem(event.getFilter());
+            if(event.getNewFilter() != getSelectedItem()){
+                setSelectedItem(event.getNewFilter());
                 }
             addItemListener(listListener);
         }

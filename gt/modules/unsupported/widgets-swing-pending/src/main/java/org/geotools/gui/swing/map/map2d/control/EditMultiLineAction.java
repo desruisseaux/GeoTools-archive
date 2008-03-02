@@ -22,10 +22,9 @@ import javax.swing.AbstractAction;
 import org.geotools.data.FeatureStore;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
-import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 import org.geotools.gui.swing.map.map2d.handler.MultiLineCreationHandler;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.map.MapLayer;
 
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -37,13 +36,13 @@ import com.vividsolutions.jts.geom.MultiLineString;
 public class EditMultiLineAction extends AbstractAction {
 
     private Map2D map = null;
-    private EditableMap2DListener listener = new EditableMap2DListener() {
+    private Map2DEditionListener listener = new Map2DEditionListener() {
 
-        public void mapEditLayerChanged(Map2DEditLayerEvent event) {
-            checkLayer(event.getNewEditLayer());
+        public void editedLayerChanged(Map2DEditionEvent event) {
+            checkLayer(event.getNewEditedLayer());
         }
 
-        public void editionHandlerChanged(EditionHandler handler) {
+        public void editionHandlerChanged(Map2DEditionEvent event) {
         }
     };
 

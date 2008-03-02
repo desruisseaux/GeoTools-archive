@@ -139,7 +139,7 @@ public class MultiPolygonCreationHandler extends AbstractEditionHandler {
 
         private void grabGeometry(int mx, int my) {
             Geometry geo = mousePositionToGeometry(mx, my);
-            Filter flt = map2D.createFilter(geo, map2D.getEditedMapLayer());
+            Filter flt = map2D.createFilter(geo, map2D.getSelectionFilter(),map2D.getEditedMapLayer());
 
             FeatureCollection<SimpleFeatureType, SimpleFeature> editgeoms = null;
             try {
@@ -157,7 +157,7 @@ public class MultiPolygonCreationHandler extends AbstractEditionHandler {
                     if (obj instanceof Geometry) {
                         hasEditionGeometry = true;
                         Geometry geom = (Geometry) obj;
-                        geom = map2D.projectGeometry(geom, map2D.getEditedMapLayer().getFeatureSource().getSchema().getCRS(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem());
+                        geom = FACILITIES_FACTORY.projectGeometry(geom, map2D.getEditedMapLayer().getFeatureSource().getSchema().getCRS(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem());
                         geoms.add((Geometry) geom.clone());
                         editedFeatureID = sf.getID();
                         System.out.println(editedFeatureID);
@@ -199,7 +199,7 @@ public class MultiPolygonCreationHandler extends AbstractEditionHandler {
         }
 
         private void dragGeometryNode(int mx, int my) {
-            Coordinate mouseCoord = map2D.toMapCoord(mx, my);
+            Coordinate mouseCoord = map2D.getRenderingStrategy().toMapCoord(mx, my);
 
             Geometry geo = geoms.get(0);
 
@@ -243,7 +243,7 @@ public class MultiPolygonCreationHandler extends AbstractEditionHandler {
 
                 if (button == MouseEvent.BUTTON1) {
                     nbRightClick = 0;
-                    coords.add(map2D.toMapCoord(e.getX(), e.getY()));
+                    coords.add(map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY()));
                     updateCreationGeoms();
                 } else if (button == MouseEvent.BUTTON3) {
                     nbRightClick++;

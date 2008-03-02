@@ -33,9 +33,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
-import org.geotools.gui.swing.map.map2d.handler.ZoomPanDecoration;
 
 /**
  *
@@ -260,7 +258,7 @@ public class DefaultPanHandler implements NavigationHandler {
         public void mouseWheelMoved(MouseWheelEvent e) {
             int val = e.getWheelRotation();
 
-            Coordinate coord = map2D.toMapCoord(e.getX(), e.getY());
+            Coordinate coord = map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY());
 
             if (val > 0) {
                 Envelope env = map2D.getRenderingStrategy().getMapArea();

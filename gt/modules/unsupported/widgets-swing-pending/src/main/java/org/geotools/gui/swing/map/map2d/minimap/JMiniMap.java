@@ -28,8 +28,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.ImageIcon;
@@ -46,8 +44,8 @@ import org.geotools.gui.swing.map.map2d.control.RefreshAction;
 import org.geotools.gui.swing.map.map2d.control.ZoomAllAction;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
-import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
@@ -87,13 +85,13 @@ public class JMiniMap extends JComponent {
         }
     };
     private final Map2DListener mapListen = new Map2DListener() {
-
-        public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
-            oldStrategy.removeStrategyListener(strategyListen);
-            newStrategy.addStrategyListener(strategyListen);
+        
+        public void mapStrategyChanged(Map2DEvent mapEvent) {
+            mapEvent.getPreviousStrategy().removeStrategyListener(strategyListen);
+            mapEvent.getNewStrategy().addStrategyListener(strategyListen);
         }
 
-        public void mapActionStateChanged(Map2DActionStateEvent event) {
+        public void mapActionStateChanged(Map2DEvent mapEvent) {
         }
     };
 
@@ -260,12 +258,12 @@ public class JMiniMap extends JComponent {
         };
         private final Map2DListener mapListen = new Map2DListener() {
 
-            public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
-                oldStrategy.removeStrategyListener(strategyListen);
-                newStrategy.addStrategyListener(strategyListen);
+            public void mapStrategyChanged(Map2DEvent mapEvent) {
+                mapEvent.getPreviousStrategy().removeStrategyListener(strategyListen);
+                mapEvent.getNewStrategy().addStrategyListener(strategyListen);
             }
 
-            public void mapActionStateChanged(Map2DActionStateEvent event) {
+            public void mapActionStateChanged(Map2DEvent mapEvent) {
             }
         };
 
@@ -369,8 +367,8 @@ public class JMiniMap extends JComponent {
                 Coordinate minCoord = new Coordinate(env.getMinX(), env.getMinY());
                 Coordinate maxCoord = new Coordinate(env.getMaxX(), env.getMaxY());
 
-                Point minPoint = map.toComponentCoord(minCoord);
-                Point maxPoint = map.toComponentCoord(maxCoord);
+                Point minPoint = map.getRenderingStrategy().toComponentCoord(minCoord);
+                Point maxPoint = map.getRenderingStrategy().toComponentCoord(maxCoord);
 
                 g.setColor(Color.RED);
                 g.drawRect(minPoint.x, getHeight() - (maxPoint.y - minPoint.y) - minPoint.y, maxPoint.x - minPoint.x, maxPoint.y - minPoint.y);
@@ -395,7 +393,7 @@ public class JMiniMap extends JComponent {
 
         public void mousePressed(MouseEvent e) {
             if(relatedMap != null){
-                Coordinate coord = map.toMapCoord(e.getX(), e.getY());
+                Coordinate coord = map.getRenderingStrategy().toMapCoord(e.getX(), e.getY());
                 
                 Envelope env = relatedMap.getRenderingStrategy().getMapArea();
                 

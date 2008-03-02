@@ -22,15 +22,13 @@ import javax.swing.JComboBox;
 
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
-import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -64,10 +62,10 @@ public class EditedLayerChooser extends JComboBox {
             }
         }
     };
-    private EditableMap2DListener editmapListener = new EditableMap2DListener() {
+    private Map2DEditionListener editmapListener = new Map2DEditionListener() {
 
-        public void mapEditLayerChanged(Map2DEditLayerEvent event) {
-            MapLayer layer = event.getNewEditLayer();
+        public void editedLayerChanged(Map2DEditionEvent event) {
+            MapLayer layer = event.getNewEditedLayer();
 
             removeItemListener(listListener);
             if (layer != null && !editionLayer.equals(layer)) {
@@ -79,7 +77,7 @@ public class EditedLayerChooser extends JComboBox {
             addItemListener(listListener);
         }
 
-        public void editionHandlerChanged(EditionHandler handler) {
+        public void editionHandlerChanged(Map2DEditionEvent event) {
         }
     };
     
@@ -107,12 +105,12 @@ public class EditedLayerChooser extends JComboBox {
     };
     private Map2DListener mapListener = new Map2DListener() {
 
-        public void mapStrategyChanged(RenderingStrategy oldStrategy, RenderingStrategy newStrategy) {
-            oldStrategy.removeStrategyListener(strategyListener);
-            newStrategy.addStrategyListener(strategyListener);
+        public void mapStrategyChanged(Map2DEvent mapEvent) {
+            mapEvent.getPreviousStrategy().removeStrategyListener(strategyListener);
+            mapEvent.getNewStrategy().addStrategyListener(strategyListener);
         }
 
-        public void mapActionStateChanged(Map2DActionStateEvent event) {
+        public void mapActionStateChanged(Map2DEvent mapEvent) {
         }
     };
     private MapLayerListListener contextListener = new MapLayerListListener() {

@@ -18,21 +18,30 @@ package org.geotools.gui.swing.map.map2d.listener;
 
 import java.util.EventListener;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
-import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
+import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 
 /**
- * EditableMap2DListener used to listen to Map2D edition events
+ * SelectableMap2DListener used to listen to Map2D Selection events 
  * @author Johann Sorel
  */
-public interface EditableMap2DListener extends EventListener{
+public interface Map2DSelectionListener extends EventListener{
+
+    /**
+     * called when the map2D selection changed
+     * @param event : Map2DSelectionEvent
+     */
+    public void selectionChanged(Map2DSelectionEvent event);
     
     /**
-     * called when the edited layer change
-     * @param event : Map2DEditLayerEvent
+     * called when filter changed
+     * @param event : Map2DSelectionEvent
      */
-    public void mapEditLayerChanged(Map2DEditLayerEvent event);
+    public void selectionFilterChanged(Map2DSelectionEvent event);
     
-    public void editionHandlerChanged(EditionHandler handler);
+    /**
+     * called when selection handler changed
+     * @param event : Map2DSelectionEvent
+     */
+    public void selectionHandlerChanged(Map2DSelectionEvent event);
     
 }

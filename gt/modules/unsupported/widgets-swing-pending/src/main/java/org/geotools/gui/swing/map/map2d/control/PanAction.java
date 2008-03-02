@@ -19,8 +19,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.Map2D.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.gui.swing.map.map2d.handler.DefaultPanHandler;
 
@@ -35,7 +35,7 @@ public class PanAction extends AbstractAction {
     public void actionPerformed(ActionEvent arg0) {
         if (map != null && map instanceof NavigableMap2D) {
             ((NavigableMap2D) map).setNavigationHandler(new DefaultPanHandler());
-            map.setActionState(MapConstants.ACTION_STATE.NAVIGATE);
+            map.setActionState(ACTION_STATE.NAVIGATE);
         }
     }
 

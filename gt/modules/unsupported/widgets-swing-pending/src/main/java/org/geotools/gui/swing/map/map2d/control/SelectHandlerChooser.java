@@ -33,7 +33,7 @@ import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionHandler;
 import org.geotools.gui.swing.map.map2d.handler.LasoSelectionHandler;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
-import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DSelectionListener;
 
 /**
  *
@@ -52,7 +52,7 @@ public class SelectHandlerChooser extends JComboBox {
             }
         }
     };
-    private SelectableMap2DListener selectionListener = new SelectableMap2DListener() {
+    private Map2DSelectionListener selectionListener = new Map2DSelectionListener() {
 
         public void selectionChanged(Map2DSelectionEvent event) {
         }
@@ -62,10 +62,10 @@ public class SelectHandlerChooser extends JComboBox {
 
         public void selectionHandlerChanged(Map2DSelectionEvent event) {
             removeItemListener(listListener);
-            if (event.getHandler() != getSelectedItem()) {
-                if (event.getHandler() instanceof DefaultSelectionHandler) {
+            if (event.getNewHandler() != getSelectedItem()) {
+                if (event.getNewHandler() instanceof DefaultSelectionHandler) {
                     setSelectedItem(defaultHandler);
-                } else if (event.getHandler() instanceof LasoSelectionHandler) {
+                } else if (event.getNewHandler() instanceof LasoSelectionHandler) {
                     setSelectedItem(lasoHandler);
                 } else {
 

@@ -19,8 +19,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.Map2D.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.gui.swing.map.map2d.handler.DefaultZoomInHandler;
 
@@ -36,7 +36,7 @@ public class ZoomInAction extends AbstractAction {
         if (map != null && map instanceof NavigableMap2D) {
             
             ((NavigableMap2D) map).setNavigationHandler(new DefaultZoomInHandler());
-            map.setActionState(MapConstants.ACTION_STATE.NAVIGATE);
+            map.setActionState(ACTION_STATE.NAVIGATE);
         }
     }
 

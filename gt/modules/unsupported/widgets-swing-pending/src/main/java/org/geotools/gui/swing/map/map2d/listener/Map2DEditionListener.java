@@ -18,20 +18,24 @@ package org.geotools.gui.swing.map.map2d.listener;
 
 import java.util.EventListener;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DNavigationEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 
 /**
- * NavigableMap2DListener used to listen to Map2D Navigation events 
+ * EditableMap2DListener used to listen to Map2D edition events
  * @author Johann Sorel
  */
-public interface NavigableMap2DListener extends EventListener{
+public interface Map2DEditionListener extends EventListener{
     
     /**
-     * called when the navigation handler change
-     * @param mce : Map2DNavigationEvent
+     * called when the edited layer change
+     * @param event : Map2DEditionEvent
      */
-    public void navigationHandlerChanged(Map2DNavigationEvent mce);
+    public void editedLayerChanged(Map2DEditionEvent event);
     
+    /**
+     * called when edition handler change
+     * @param event : Map2DEditionEvent
+     */
+    public void editionHandlerChanged(Map2DEditionEvent event);
     
 }

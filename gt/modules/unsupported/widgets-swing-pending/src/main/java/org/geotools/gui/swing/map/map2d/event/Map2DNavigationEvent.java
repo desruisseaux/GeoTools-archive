@@ -32,9 +32,7 @@ import org.geotools.gui.swing.map.map2d.handler.NavigationHandler;
  */
 public class Map2DNavigationEvent extends EventObject{
 
-    private Geometry env = null;
     private NavigationHandler handler = null;
-    
     
     /**
      * create a Map2DSelectionEvent
@@ -47,7 +45,6 @@ public class Map2DNavigationEvent extends EventObject{
         super(map);
         this.handler = handler;
     }
-
     
     public NavigationHandler getHandler() {
         return handler;

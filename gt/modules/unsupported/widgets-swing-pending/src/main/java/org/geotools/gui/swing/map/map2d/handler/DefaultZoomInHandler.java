@@ -326,7 +326,7 @@ public class DefaultZoomInHandler implements NavigationHandler {
         public void mouseWheelMoved(MouseWheelEvent e) {
             int val = e.getWheelRotation();
 
-            Coordinate coord = map2D.toMapCoord(e.getX(), e.getY());
+            Coordinate coord = map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY());
 
             if (val > 0) {
                 Envelope env = map2D.getRenderingStrategy().getMapArea();

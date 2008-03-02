@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 /**
  *
@@ -81,10 +82,11 @@ public class DefaultSelectionHandler implements SelectionHandler {
         Coordinate[] coord = new Coordinate[5];
         int taille = 4;
 
-        coord[0] = map2D.toMapCoord(mx - taille, my - taille);
-        coord[1] = map2D.toMapCoord(mx - taille, my + taille);
-        coord[2] = map2D.toMapCoord(mx + taille, my + taille);
-        coord[3] = map2D.toMapCoord(mx + taille, my - taille);
+        RenderingStrategy strategy = map2D.getRenderingStrategy();
+        coord[0] = strategy.toMapCoord(mx - taille, my - taille);
+        coord[1] = strategy.toMapCoord(mx - taille, my + taille);
+        coord[2] = strategy.toMapCoord(mx + taille, my + taille);
+        coord[3] = strategy.toMapCoord(mx + taille, my - taille);
         coord[4] = coord[0];
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
@@ -94,10 +96,11 @@ public class DefaultSelectionHandler implements SelectionHandler {
     private void doMouseSelection(int mx, int my, int ex, int ey) {
         Coordinate[] coord = new Coordinate[5];
 
-        coord[0] = map2D.toMapCoord(mx, my);
-        coord[1] = map2D.toMapCoord(mx, ey);
-        coord[2] = map2D.toMapCoord(ex, ey);
-        coord[3] = map2D.toMapCoord(ex, my);
+        RenderingStrategy strategy = map2D.getRenderingStrategy();
+        coord[0] = strategy.toMapCoord(mx, my);
+        coord[1] = strategy.toMapCoord(mx, ey);
+        coord[2] = strategy.toMapCoord(ex, ey);
+        coord[3] = strategy.toMapCoord(ex, my);
         coord[4] = coord[0];
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);

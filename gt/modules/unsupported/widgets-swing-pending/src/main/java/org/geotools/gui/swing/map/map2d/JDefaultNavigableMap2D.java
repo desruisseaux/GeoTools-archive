@@ -18,12 +18,10 @@ package org.geotools.gui.swing.map.map2d;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.handler.NavigationHandler;
-import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DNavigationListener;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.gui.swing.map.map2d.event.Map2DNavigationEvent;
@@ -50,9 +48,9 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     private void fireHandlerChanged(NavigationHandler handler) {
         Map2DNavigationEvent mce = new Map2DNavigationEvent(this, handler);
 
-        NavigableMap2DListener[] lst = getNavigableMap2DListeners();
+        Map2DNavigationListener[] lst = getNavigableMap2DListeners();
 
-        for (NavigableMap2DListener l : lst) {
+        for (Map2DNavigationListener l : lst) {
             l.navigationHandlerChanged(mce);
         }
 
@@ -190,15 +188,15 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
     }
 
-    public void addNavigableMap2DListener(NavigableMap2DListener listener) {
-        MAP2DLISTENERS.add(NavigableMap2DListener.class, listener);
+    public void addNavigableMap2DListener(Map2DNavigationListener listener) {
+        MAP2DLISTENERS.add(Map2DNavigationListener.class, listener);
     }
 
-    public void removeNavigableMap2DListener(NavigableMap2DListener listener) {
-        MAP2DLISTENERS.remove(NavigableMap2DListener.class, listener);
+    public void removeNavigableMap2DListener(Map2DNavigationListener listener) {
+        MAP2DLISTENERS.remove(Map2DNavigationListener.class, listener);
     }
 
-    public NavigableMap2DListener[] getNavigableMap2DListeners() {
-        return MAP2DLISTENERS.getListeners(NavigableMap2DListener.class);
+    public Map2DNavigationListener[] getNavigableMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(Map2DNavigationListener.class);
     }
 }

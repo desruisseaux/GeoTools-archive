@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
@@ -25,6 +26,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.renderer.GTRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Point;
 
 /**
  * Rendering Strategy is used to specify a memory management
@@ -33,20 +35,34 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public interface RenderingStrategy {
     
+    
+    //---------------------Basic functions--------------------------------------    
+    /**
+     * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
+     * @param mx : x coordinate of the mouse on the map (in pixel)
+     * @param my : y coordinate of the mouse on the map (in pixel)
+     * @return JTS Coordinate
+     */
+    public Coordinate toMapCoord(int mx, int my);    
+    /**
+     * transform a JTS Coordinate in an pixel x/y coordinate
+     * @param coord
+     * @return Java2D Point
+     */
+    public Point toComponentCoord(Coordinate coord);
+    
     /**
      * create a BufferedImage of the layer, using the mapcontext CRS and MapArea
      * @param layer : Maplayer to make the BufferedImage
      * @return BufferedImage
      */
-    public BufferedImage createBufferImage(MapLayer layer);
-    
+    public BufferedImage createBufferImage(MapLayer layer);    
     /**
      * create a BufferedImage of a MapContext, using the mapcontext CRS and MapArea
      * @param context : MapContext to make the BufferedImage
      * @return BufferedImage
      */
-    public BufferedImage createBufferImage(MapContext context);
-    
+    public BufferedImage createBufferImage(MapContext context);    
     /**
      * create a bufferedImage of what is actually visible on the map widget
      * @return BufferedImage
@@ -57,8 +73,7 @@ public interface RenderingStrategy {
      * set the MapContext
      * @param context : can not be null 
      */
-    public void setContext(MapContext context);
-    
+    public void setContext(MapContext context);    
     /**
      * get the MapContext
      * @return MapContext or null if no mapContext
@@ -69,8 +84,7 @@ public interface RenderingStrategy {
      * set the maparea to look at
      * @param area : can not be null 
      */
-    public void setMapArea(Envelope area);
-    
+    public void setMapArea(Envelope area);    
     /**
      * get the maparea to look at
      * @return Envelope or null if no MapArea
@@ -92,14 +106,12 @@ public interface RenderingStrategy {
      * add a StrategyListener
      * @param listener : StrategyListener to add
      */
-    public void addStrategyListener(StrategyListener listener);
-    
+    public void addStrategyListener(StrategyListener listener);    
     /**
      * remove a StrategyListener
      * @param listener : StrategyListener to remove
      */
-    public void removeStrategyListener(StrategyListener listener);
-    
+    public void removeStrategyListener(StrategyListener listener);    
     /**
      * get an array of StrategyListener
      * @return array of StrategyListener

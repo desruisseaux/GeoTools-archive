@@ -14,26 +14,23 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map;
+package org.geotools.gui.swing.map.map2d.listener;
+
+import java.util.EventListener;
+
+import org.geotools.gui.swing.map.map2d.event.Map2DNavigationEvent;
 
 /**
- * Class for all map constants and enums
- * 
- * @author johann sorel
+ * NavigableMap2DListener used to listen to Map2D Navigation events 
+ * @author Johann Sorel
  */
-public class MapConstants {
-
+public interface Map2DNavigationListener extends EventListener{
+    
     /**
-     * Possible actions states available for a map
+     * called when the navigation handler change
+     * @param mce : Map2DNavigationEvent
      */
-    public static enum ACTION_STATE{
-        NAVIGATE,
-        SELECT,
-        EDIT,
-        NONE
-    };
+    public void navigationHandlerChanged(Map2DNavigationEvent mce);
     
     
-    
-     
 }

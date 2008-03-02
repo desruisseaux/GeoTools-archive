@@ -30,23 +30,66 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class Map2DSelectionEvent extends EventObject{
 
-    private Geometry env = null;
-    private SELECTION_FILTER filter = null;
-    private SelectionHandler handler = null;
+    private final Geometry oldgeo;
+    private final Geometry newgeo;
+    private final SELECTION_FILTER oldfilter;
+    private final SELECTION_FILTER newfilter;
+    private final SelectionHandler oldhandler;
+    private final SelectionHandler newhandler;
     
+    
+    /**
+     * create a Map2DSelectionEvent
+     * @param map : Map2D source componant
+     * @param oldgeo : old JTS Geometry  of the selection or null
+     * @param newgeo : new JTS Geometry  of the selection or null
+     * @param filter : SELECTION_FILTER
+     * @param handler : SelectionHandler
+     */
+    public Map2DSelectionEvent(SelectableMap2D map, Geometry oldgeo,Geometry newgeo, SELECTION_FILTER filter, SelectionHandler handler){
+        super(map);
+        this.oldgeo = oldgeo;
+        this.newgeo = newgeo;
+        this.oldfilter = filter;
+        this.newfilter = filter;
+        this.oldhandler = handler;
+        this.newhandler = handler;
+    }
+    
+    /**
+     * create a Map2DSelectionEvent
+     * @param map : Map2D source componant
+     * @param geo : JTS Geometry  of the selection or null
+     * @param oldfilter : old SELECTION_FILTER
+     * @param newfilter : new SELECTION_FILTER
+     * @param handler : SelectionHandler
+     */
+    public Map2DSelectionEvent(SelectableMap2D map, Geometry geo, SELECTION_FILTER oldfilter, SELECTION_FILTER newfilter, SelectionHandler handler){
+        super(map);
+        this.oldgeo = geo;
+        this.newgeo = geo;
+        this.oldfilter = oldfilter;
+        this.newfilter = newfilter;
+        this.oldhandler = handler;
+        this.newhandler = handler;
+    }
     
     /**
      * create a Map2DSelectionEvent
      * @param map : Map2D source componant
      * @param geo : JTS Geometry  of the selection or null
      * @param filter : SELECTION_FILTER
-     * @param handler : SelectionHandler
+     * @param oldhandler : old SelectionHandler
+     * @param newhandler : new SelectionHandler
      */
-    public Map2DSelectionEvent(SelectableMap2D map, Geometry geo, SELECTION_FILTER filter, SelectionHandler handler){
+    public Map2DSelectionEvent(SelectableMap2D map, Geometry geo, SELECTION_FILTER filter, SelectionHandler oldhandler,SelectionHandler newhandler){
         super(map);
-        env = geo;
-        this.filter = filter;
-        this.handler = handler;
+        this.oldgeo = geo;
+        this.newgeo = geo;
+        this.oldfilter = filter;
+        this.newfilter = filter;
+        this.oldhandler = oldhandler;
+        this.newhandler = newhandler;
     }
 
     /**
@@ -54,16 +97,49 @@ public class Map2DSelectionEvent extends EventObject{
      * Geometry is in the mapcontext CRS.
      * @return JTS Geometry, or null if no selection.
      */
-    public Geometry getGeometry() {
-        return env;
+    public Geometry getNewGeometry() {
+        return newgeo;
     }
     
-    public SELECTION_FILTER getFilter() {
-        return filter;
+    /**
+     * Geometry corresponding to the old selection zone.
+     * Geometry is in the mapcontext CRS.
+     * @return JTS Geometry, or null if no selection.
+     */
+    public Geometry getPreviousGeometry() {
+        return oldgeo;
     }
     
-    public SelectionHandler getHandler() {
-        return handler;
+    /**
+     * New Filter
+     * @return SELECTION_FILTER
+     */
+    public SELECTION_FILTER getNewFilter() {
+        return newfilter;
+    }
+    
+    /**
+     * Old Filter
+     * @return SELECTION_FILTER
+     */
+    public SELECTION_FILTER getPreviousFilter() {
+        return oldfilter;
+    }
+    
+    /**
+     * New SelectionHandler
+     * @return SelectionHandler
+     */
+    public SelectionHandler getNewHandler() {
+        return newhandler;
+    }
+    
+    /**
+     * Old SelectionHandler
+     * @return SelectionHandler
+     */
+    public SelectionHandler getOldHandler() {
+        return oldhandler;
     }
     
     

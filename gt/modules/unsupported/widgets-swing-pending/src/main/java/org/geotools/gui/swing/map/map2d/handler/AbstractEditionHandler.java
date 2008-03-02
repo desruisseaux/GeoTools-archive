@@ -59,6 +59,13 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
+import org.geotools.gui.swing.misc.FacilitiesFactory;
+import org.geotools.gui.swing.misc.GeometryClassFilter;
+import org.geotools.styling.Rule;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.Symbolizer;
 
 /**
  *
@@ -66,6 +73,9 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 abstract class AbstractEditionHandler implements EditionHandler {
 
+    protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
+    protected final FacilitiesFactory FACILITIES_FACTORY = new FacilitiesFactory();
+    
     protected final ImageIcon ICON;
     protected final String title;
     protected static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
@@ -98,6 +108,27 @@ abstract class AbstractEditionHandler implements EditionHandler {
         img.getGraphics().drawImage(eci_edit.getImage(), 0, 0, null);
         CUR_EDIT = tk.createCustomCursor(img, new java.awt.Point(7, 1), "edit");
     }
+    
+    
+    private Style createPointStyle(){
+        Style pointSelectionStyle = STYLE_BUILDER.createStyle();
+        pointSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle( map2D.getPointSymbolizer()));
+        return pointSelectionStyle;
+    }
+    
+    private Style createStyle(){
+        Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ map2D.getLineSymbolizer()});
+        r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
+        Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{ map2D.getPolygonSymbolizer()});
+        r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
+
+        Style editionStyle = STYLE_BUILDER.createStyle();
+        editionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r2, r3}));
+
+        return editionStyle;
+    }
+    
+    
 
     public void install(EditableMap2D map) {
         installed = true;
@@ -118,7 +149,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
             try {
                 mds.createSchema(featureType);
                 FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                layer = new DefaultMapLayer(fs, map2D.createStyle());
+                layer = new DefaultMapLayer(fs, createStyle());
             } catch (IOException se) {
                 se.printStackTrace();
             }
@@ -139,7 +170,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
             try {
                 mds.createSchema(featureType);
                 FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                layer = new DefaultMapLayer(fs, map2D.createPointStyle());
+                layer = new DefaultMapLayer(fs,createPointStyle());
             } catch (IOException se) {
                 se.printStackTrace();
             }
@@ -195,10 +226,11 @@ abstract class AbstractEditionHandler implements EditionHandler {
         Coordinate[] coord = new Coordinate[5];
         int taille = 4;
 
-        coord[0] = map2D.toMapCoord(mx - taille, my - taille);
-        coord[1] = map2D.toMapCoord(mx - taille, my + taille);
-        coord[2] = map2D.toMapCoord(mx + taille, my + taille);
-        coord[3] = map2D.toMapCoord(mx + taille, my - taille);
+        RenderingStrategy strategy = map2D.getRenderingStrategy();
+        coord[0] = strategy.toMapCoord(mx - taille, my - taille);
+        coord[1] = strategy.toMapCoord(mx - taille, my + taille);
+        coord[2] = strategy.toMapCoord(mx + taille, my + taille);
+        coord[3] = strategy.toMapCoord(mx + taille, my - taille);
         coord[4] = coord[0];
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
@@ -271,7 +303,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
                 AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
 
-                geom = map2D.projectGeometry(geom, editionLayer);
+                geom = FACILITIES_FACTORY.projectGeometry(geom,map2D.getRenderingStrategy().getContext(), editionLayer);
 
                 List<AttributeDescriptor> lst = featureType.getAttributes();
                 for (int i = 0,  n = lst.size(); i < n; i++) {
@@ -371,7 +403,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
                     SimpleFeatureType featureType = (SimpleFeatureType) editionLayer.getFeatureSource().getSchema();
                     AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
 
-                    Geometry geom = map2D.projectGeometry(geo, editionLayer);
+                    Geometry geom = FACILITIES_FACTORY.projectGeometry(geo, map2D.getRenderingStrategy().getContext(), editionLayer);
                     
                     try {
                         store.modifyFeatures(geomAttribut, geom, filter);
@@ -508,7 +540,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
         }
 
         for (Geometry geo : geoms) {
-            geomsOut.add(map2D.projectGeometry(geo, map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
+            geomsOut.add(FACILITIES_FACTORY.projectGeometry(geo, map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
         //geomsOut.add(map2D.projectGeometry(geo, memoryMapContext.getCoordinateReferenceSystem(), map2D.getRenderingStrategy().getContext().getCoordinateReferenceSystem()));
         }
 

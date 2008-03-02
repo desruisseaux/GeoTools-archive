@@ -17,6 +17,7 @@ package org.geotools.gui.swing.map.map2d.strategy;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Point;
 import java.awt.event.ComponentEvent;
 import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Rectangle;
@@ -191,6 +192,43 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
     }
 
     //-----------------------RenderingStrategy----------------------------------
+    
+    public Coordinate toMapCoord(int mx, int my) {
+
+        Rectangle bounds = comp.getBounds();
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        return toMapCoord(mx, my, width, height, bounds);
+    }
+    
+    public Point toComponentCoord(Coordinate coord){
+        
+        Rectangle bounds = comp.getBounds();
+        
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        
+        double xval = bounds.width/width;
+        double yval = bounds.height/height;
+        
+        double minX = coord.x - mapArea.getMinX();
+        double minY = coord.y - mapArea.getMinY();
+        
+        int x = (int)(minX*xval);
+        int y = (int)(minY*yval);
+        
+        return new Point(x,y);
+        
+    }
+
+    private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
+        
+        double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
+        double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
+        return new Coordinate(mapX, mapY);
+    }
+    
+    
     public abstract BufferedImage createBufferImage(MapLayer layer);
 
     public abstract BufferedImage createBufferImage(MapContext context);

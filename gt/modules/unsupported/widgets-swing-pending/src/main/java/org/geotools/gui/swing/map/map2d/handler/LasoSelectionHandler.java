@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 /**
  *
@@ -82,11 +83,11 @@ public class LasoSelectionHandler implements SelectionHandler {
     private Geometry mousePositionToGeometry(int mx, int my) {
         Coordinate[] coord = new Coordinate[5];
         int taille = 4;
-
-        coord[0] = map2D.toMapCoord(mx - taille, my - taille);
-        coord[1] = map2D.toMapCoord(mx - taille, my + taille);
-        coord[2] = map2D.toMapCoord(mx + taille, my + taille);
-        coord[3] = map2D.toMapCoord(mx + taille, my - taille);
+        RenderingStrategy strategy = map2D.getRenderingStrategy();
+        coord[0] = strategy.toMapCoord(mx - taille, my - taille);
+        coord[1] = strategy.toMapCoord(mx - taille, my + taille);
+        coord[2] = strategy.toMapCoord(mx + taille, my + taille);
+        coord[3] = strategy.toMapCoord(mx + taille, my - taille);
         coord[4] = coord[0];
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
@@ -147,12 +148,12 @@ public class LasoSelectionHandler implements SelectionHandler {
             points.clear();
             coords.clear();
             points.add(new Point(e.getX(), e.getY()));
-            coords.add(map2D.toMapCoord(e.getX(), e.getY()));
+            coords.add(map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY()));
         }
 
         public void mouseReleased(MouseEvent e) {
             points.add(new Point(e.getX(), e.getY()));
-            coords.add(map2D.toMapCoord(e.getX(), e.getY()));
+            coords.add(map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY()));
 
             doSelection(coords);
 
@@ -171,7 +172,7 @@ public class LasoSelectionHandler implements SelectionHandler {
 
         public void mouseDragged(MouseEvent e) {
             points.add(new Point(e.getX(), e.getY()));
-            coords.add(map2D.toMapCoord(e.getX(), e.getY()));
+            coords.add(map2D.getRenderingStrategy().toMapCoord(e.getX(), e.getY()));
             selectionPane.setPoints(new ArrayList<Point>(points));
         }
 

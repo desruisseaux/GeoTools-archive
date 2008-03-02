@@ -16,26 +16,69 @@
 package org.geotools.gui.swing.map.map2d;
 
 import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.map.MapLayer;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
 
 /**
- * interface for map2d widget how handle Edition
+ * interface for map2d widget who handle Edition
  * @author Johann Sorel
  */
 public interface EditableMap2D extends SelectableMap2D {
 
-    public void setMemoryLayers(MapLayer[] layers);
-            
+    /**
+     * set the MapLayers to paint in the memory decoration
+     * @param layers
+     */
+    public void setMemoryLayers(MapLayer[] layers);            
+    /**
+     * refresh the decoration with the memoryLayers
+     */
     public void repaintMemoryDecoration();
-
-    public Style createPointStyle();
-
-    public Style createStyle();
-
-    public void setEditionHandler(EditionHandler handler);
     
+    /**
+     * set the PointSymbolizer
+     * @param symbol , can't be null
+     */
+    public void setPointSymbolizer(PointSymbolizer symbol);    
+    /**
+     * set the LineSymbolizer
+     * @param symbol , can't be null
+     */
+    public void setLineSymbolizer(LineSymbolizer symbol);    
+    /**
+     * set the PolygonSymbolizer 
+     * @param symbol , can't be null
+     */
+    public void setPolygonSymbolizer(PolygonSymbolizer symbol);    
+    /**
+     * get the PointSymbolizer
+     * @return PointSymbolizer
+     */
+    public PointSymbolizer getPointSymbolizer();    
+    /**
+     * get the LineSymbolizer
+     * @return LineSymbolizer
+     */
+    public LineSymbolizer getLineSymbolizer();
+    /**
+     * get the PolygonSymbolizer
+     * @return PolygonSymbolizer
+     */
+    public PolygonSymbolizer getPolygonSymbolizer();
+
+    /**
+     * set EditionHandler
+     * @param handler
+     */
+    public void setEditionHandler(EditionHandler handler);    
+    /**
+     * get EditionHandler
+     * @return EditionHandler
+     */
     public EditionHandler getEditionHandler();
     
     /**
@@ -43,7 +86,6 @@ public interface EditableMap2D extends SelectableMap2D {
      * @param layer : MapLayer to edit
      */
     public void setEditedMapLayer(MapLayer layer);
-
     /**
      * get the edited MapLayer
      * @return edited MapLayer
@@ -54,17 +96,15 @@ public interface EditableMap2D extends SelectableMap2D {
      * add an EditableMap2DListener
      * @param listener : EditableMap2DListener to add
      */
-    public void addEditableMap2DListener(EditableMap2DListener listener);
-
+    public void addEditableMap2DListener(Map2DEditionListener listener);
     /**
      * remove an EditableMap2DListener
      * @param listener : EditableMap2DListener to remove
      */
-    public void removeEditableMap2DListener(EditableMap2DListener listener);
-
+    public void removeEditableMap2DListener(Map2DEditionListener listener);
     /**
      * get an array of EditableMap2DListener
      * @return array of EditableMap2DListener
      */
-    public EditableMap2DListener[] getEditableMap2DListeners();
+    public Map2DEditionListener[] getEditableMap2DListeners();
 }

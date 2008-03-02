@@ -17,8 +17,6 @@ package org.geotools.gui.swing.map.map2d;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +24,13 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionHandler;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
-import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DSelectionListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
@@ -44,7 +40,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -62,8 +57,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -134,10 +127,10 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         int taille = 4;
 
-        coord[0] = toMapCoord(mx - taille, my - taille);
-        coord[1] = toMapCoord(mx - taille, my + taille);
-        coord[2] = toMapCoord(mx + taille, my + taille);
-        coord[3] = toMapCoord(mx + taille, my - taille);
+        coord[0] = renderingStrategy.toMapCoord(mx - taille, my - taille);
+        coord[1] = renderingStrategy.toMapCoord(mx - taille, my + taille);
+        coord[2] = renderingStrategy.toMapCoord(mx + taille, my + taille);
+        coord[3] = renderingStrategy.toMapCoord(mx + taille, my - taille);
         coord[4] = coord[0];
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
@@ -151,10 +144,10 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * @param layer : MapLayer for which the filter is made
      * @return Filter
      */
-    public Filter createFilter(Geometry geom, MapLayer layer) {
+    public Filter createFilter(Geometry geom, SELECTION_FILTER filter, MapLayer layer) {
         Filter f = null;
 
-        geom = projectGeometry(geom, layer);
+        geom = FACILITIES_FACTORY.projectGeometry(geom, renderingStrategy.getContext(), layer);
 
         try {
             String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
@@ -163,7 +156,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
             Expression exp1 = FILTER_FACTORY_2.property(name);
             Expression exp2 = FILTER_FACTORY_2.literal(geom);
-            switch (selectionFilter) {
+            switch (filter) {
                 case CONTAINS:
                     f = FILTER_FACTORY_2.contains(exp1, exp2);
                     break;
@@ -192,115 +185,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return f;
     }
 
-    /**
-     * reproject a geometry from the current Mapcontext to layer CRS
-     * @param geom
-     * @param layer
-     * @return
-     */
-    public Geometry projectGeometry(Geometry geom, MapLayer layer) {
-        MathTransform transform = null;
-
-        MapContext context = renderingStrategy.getContext();
-        CoordinateReferenceSystem contextCRS = context.getCoordinateReferenceSystem();
-        CoordinateReferenceSystem layerCRS = layer.getFeatureSource().getSchema().getCRS();
-
-        if (layerCRS == null) {
-            layerCRS = contextCRS;
-        }
-
-
-        if (!contextCRS.equals(layerCRS)) {
-            try {
-                transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                geom = JTS.transform(geom, transform);
-            } catch (Exception ex) {
-                System.out.println("Error using default layer CRS, searching for a close CRS");
-
-                try {
-                    Integer epsgId = CRS.lookupEpsgCode(layerCRS, true);
-                    if (epsgId != null) {
-                        System.out.println("Close CRS found, will replace original CRS for convertion");
-                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
-                        layerCRS = newCRS;
-                        transform = CRS.findMathTransform(contextCRS, layerCRS);
-                    } else {
-                        System.out.println("No close CRS found, will force convert");
-                        try {
-                            transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Search Error, no close CRS found, will force convertion");
-
-                    try {
-                        transform = CRS.findMathTransform(contextCRS, layerCRS, true);
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
-                }
-                ex.printStackTrace();
-            }
-        }
-
-        return geom;
-    }
-
-    /**
-     * reproject a geometry from a CRS to another
-     * @param geom
-     * @param inCRS
-     * @param outCRS
-     * @return
-     */
-    public Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS) {
-        MathTransform transform = null;
-
-        if (outCRS == null) {
-            outCRS = inCRS;
-        }
-
-
-
-        if (!inCRS.equals(outCRS)) {
-            try {
-                transform = CRS.findMathTransform(inCRS, outCRS, true);
-                geom = JTS.transform(geom, transform);
-            } catch (Exception ex) {
-                System.out.println("Error using default layer CRS, searching for a close CRS");
-
-                try {
-                    Integer epsgId = CRS.lookupEpsgCode(outCRS, true);
-                    if (epsgId != null) {
-                        System.out.println("Close CRS found, will replace original CRS for convertion");
-                        CoordinateReferenceSystem newCRS = CRS.decode("EPSG:" + epsgId);
-                        outCRS = newCRS;
-                        transform = CRS.findMathTransform(inCRS, outCRS);
-                    } else {
-                        System.out.println("No close CRS found, will force convert");
-                        try {
-                            transform = CRS.findMathTransform(inCRS, outCRS, true);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Search Error, no close CRS found, will force convertion");
-
-                    try {
-                        transform = CRS.findMathTransform(inCRS, outCRS, true);
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
-                }
-                ex.printStackTrace();
-            }
-        }
-
-        return geom;
-    }
+    
 
     private Style createStyle(MapLayer layer) {
 
@@ -412,34 +297,34 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     }
 
-    private void fireSelectionChanged(Geometry geo) {
-        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo, selectionFilter, selectionHandler);
+    private void fireSelectionChanged(Geometry oldgeo, Geometry newgeo) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, oldgeo,newgeo, selectionFilter, selectionHandler);
 
-        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+        Map2DSelectionListener[] lst = getSelectableMap2DListeners();
 
-        for (SelectableMap2DListener l : lst) {
+        for (Map2DSelectionListener l : lst) {
             l.selectionChanged(mce);
         }
 
     }
 
-    private void fireFilterChanged(SELECTION_FILTER filter) {
-        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, filter, selectionHandler);
+    private void fireFilterChanged(SELECTION_FILTER oldfilter,SELECTION_FILTER newfilter) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, oldfilter, newfilter, selectionHandler);
 
-        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+        Map2DSelectionListener[] lst = getSelectableMap2DListeners();
 
-        for (SelectableMap2DListener l : lst) {
+        for (Map2DSelectionListener l : lst) {
             l.selectionFilterChanged(mce);
         }
 
     }
 
-    private void fireHandlerChanged(SelectionHandler handler) {
-        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, selectionFilter, handler);
+    private void fireHandlerChanged(SelectionHandler oldhandler, SelectionHandler newhandler) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, selectionGeometrie, selectionFilter, oldhandler, newhandler);
 
-        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+        Map2DSelectionListener[] lst = getSelectableMap2DListeners();
 
-        for (SelectableMap2DListener l : lst) {
+        for (Map2DSelectionListener l : lst) {
             l.selectionHandlerChanged(mce);
         }
 
@@ -569,7 +454,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
             if (selectionGeometrie != null) {
                 try {
-                    Filter f = createFilter(selectionGeometrie, copy);
+                    Filter f = createFilter(selectionGeometrie, selectionFilter, copy);
                     applyStyleFilter(copy.getStyle(), f);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -618,12 +503,13 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return copies.containsKey(layer);
     }
 
-    public void setSelectionFilter(SELECTION_FILTER filter) {
-        if (filter == null) {
+    public void setSelectionFilter(SELECTION_FILTER newFilter) {
+        if (newFilter == null) {
             throw new NullPointerException();
-        } else if (filter != selectionFilter) {
-            selectionFilter = filter;
-            fireFilterChanged(selectionFilter);
+        } else if (newFilter != selectionFilter) {
+            SELECTION_FILTER oldFilter = selectionFilter;
+            selectionFilter = newFilter;
+            fireFilterChanged(oldFilter,newFilter);
         }
     }
 
@@ -631,22 +517,23 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return selectionFilter;
     }
 
-    public void setSelectionHandler(SelectionHandler handler) {
-        if (handler == null) {
+    public void setSelectionHandler(SelectionHandler newHandler) {
+        if (newHandler == null) {
             throw new NullPointerException();
-        } else if (handler != selectionHandler) {
+        } else if (newHandler != selectionHandler) {
 
             if (selectionHandler.isInstalled()) {
                 selectionHandler.uninstall();
             }
 
-            selectionHandler = handler;
+            SelectionHandler oldHandler = selectionHandler;
+            selectionHandler = newHandler;
 
             if (actionState == ACTION_STATE.SELECT) {
                 selectionHandler.install(this);
             }
 
-            fireHandlerChanged(selectionHandler);
+            fireHandlerChanged(oldHandler,newHandler);
         }
     }
 
@@ -661,8 +548,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         doSelection(geometry);
     }
 
-    public void doSelection(Geometry geometry) {
-        selectionGeometrie = geometry;
+    public void doSelection(Geometry newGeo) {
+        Geometry oldGeo = selectionGeometrie;
+        selectionGeometrie = newGeo;
 
         Filter f = null;
 
@@ -673,7 +561,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         for (MapLayer layer : selectionMapContext.getLayers()) {
 
             try {
-                f = createFilter(geometry, layer);
+                f = createFilter(newGeo, selectionFilter, layer);
                 applyStyleFilter(layer.getStyle(), f);
 
             } catch (Exception e) {
@@ -683,20 +571,20 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         selectionStrategy.refresh();
 
-        fireSelectionChanged(geometry);
+        fireSelectionChanged(oldGeo,newGeo);
 
     }
 
-    public void addSelectableMap2DListener(SelectableMap2DListener listener) {
-        MAP2DLISTENERS.add(SelectableMap2DListener.class, listener);
+    public void addSelectableMap2DListener(Map2DSelectionListener listener) {
+        MAP2DLISTENERS.add(Map2DSelectionListener.class, listener);
     }
 
-    public void removeSelectableMap2DListener(SelectableMap2DListener listener) {
-        MAP2DLISTENERS.remove(SelectableMap2DListener.class, listener);
+    public void removeSelectableMap2DListener(Map2DSelectionListener listener) {
+        MAP2DLISTENERS.remove(Map2DSelectionListener.class, listener);
     }
 
-    public SelectableMap2DListener[] getSelectableMap2DListeners() {
-        return MAP2DLISTENERS.getListeners(SelectableMap2DListener.class);
+    public Map2DSelectionListener[] getSelectableMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(Map2DSelectionListener.class);
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------        

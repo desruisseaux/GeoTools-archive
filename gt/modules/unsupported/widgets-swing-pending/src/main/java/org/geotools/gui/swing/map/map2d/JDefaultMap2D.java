@@ -16,8 +16,6 @@
 package org.geotools.gui.swing.map.map2d;
 
 import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -36,15 +34,9 @@ import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.map.MapContext;
-import org.geotools.renderer.GTRenderer;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.gui.swing.map.MapConstants;
-import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
-import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
 
 /**
  * Default implementation of Map2D
@@ -56,7 +48,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     /**
      * Action state of the map widget
      */
-    protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.NONE;
+    protected ACTION_STATE actionState = ACTION_STATE.NONE;
     
     /**
      * EventListenerList to manage all possible Listeners
@@ -108,17 +100,18 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     private void fireStrategyChanged(RenderingStrategy oldOne, RenderingStrategy newOne) {
+        Map2DEvent mce = new Map2DEvent(this, actionState, oldOne, newOne);
 
         Map2DListener[] lst = getMap2DListeners();
 
         for (Map2DListener l : lst) {
-            l.mapStrategyChanged(oldOne, newOne);
+            l.mapStrategyChanged(mce);
         }
 
     }
     
-    private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {
-        Map2DActionStateEvent mce = new Map2DActionStateEvent(this, oldone, newone);
+    private void fireActionStateChanged(ACTION_STATE oldone, ACTION_STATE newone) {
+        Map2DEvent mce = new Map2DEvent(this, oldone, newone,renderingStrategy);
 
         Map2DListener[] lst = getMap2DListeners();
 
@@ -256,44 +249,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         return actionState;
     }
     
-    public Coordinate toMapCoord(int mx, int my) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        Rectangle bounds = getBounds();
-        double width = mapArea.getWidth();
-        double height = mapArea.getHeight();
-        return toMapCoord(mx, my, width, height, bounds);
-    }
-    
-    public Point toComponentCoord(Coordinate coord){
-        
-        Envelope mapArea = renderingStrategy.getMapArea();
-        Rectangle bounds = getBounds();
-        
-        double width = mapArea.getWidth();
-        double height = mapArea.getHeight();
-        
-        double xval = bounds.width/width;
-        double yval = bounds.height/height;
-        
-        double minX = coord.x - mapArea.getMinX();
-        double minY = coord.y - mapArea.getMinY();
-        
-        int x = (int)(minX*xval);
-        int y = (int)(minY*yval);
-        
-        return new Point(x,y);
-        
-    }
-
-    private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
-        Envelope mapArea = renderingStrategy.getMapArea();
-
-        double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
-        double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
-        return new Coordinate(mapX, mapY);
-    }
-
     public void setRenderingStrategy(RenderingStrategy strategy) {
 
         if (strategy == null) {

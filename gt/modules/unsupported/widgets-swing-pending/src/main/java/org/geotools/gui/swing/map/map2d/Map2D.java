@@ -17,14 +17,11 @@
 package org.geotools.gui.swing.map.map2d;
 
 import java.awt.Component;
-import java.awt.Point;
 
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 
 /**
@@ -34,6 +31,17 @@ import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
  */
 public interface Map2D {
        
+    /**
+     * Possible actions states available for a map
+     */
+    public static enum ACTION_STATE{
+        NAVIGATE,
+        SELECT,
+        EDIT,
+        NONE
+    };
+    
+    
     /**
      * set the rendering strategy
      * @param strategy : throw nullpointexception if strategy is null
@@ -72,29 +80,14 @@ public interface Map2D {
      * set the action state. Pan, ZoomIn, ZoomOut ...
      * @param state : MapConstants.ACTION_STATE
      */
-    public void setActionState(MapConstants.ACTION_STATE state);    
+    public void setActionState(ACTION_STATE state);    
     /**
      * get the actual action state
      * @return MapConstants.ACTION_STATE
      */
-    public MapConstants.ACTION_STATE getActionState();
-        
-    //---------------------Basic functions--------------------------------------    
-    /**
-     * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
-     * @param mx : x coordinate of the mouse on the map (in pixel)
-     * @param my : y coordinate of the mouse on the map (in pixel)
-     * @return JTS Coordinate
-     */
-    public Coordinate toMapCoord(int mx, int my);    
-    /**
-     * transform a JTS Coordinate in an pixel x/y coordinate
-     * @param coord
-     * @return Java2D Point
-     */
-    public Point toComponentCoord(Coordinate coord);
+    public ACTION_STATE getActionState();
             
-    //----------------------Over/Sub/information layers-------------------------    
+    //----------------------map decorations-------------------------------------
     /**
      * set the top InformationDecoration of the map2d widget
      * @param info , can't be null

@@ -22,10 +22,9 @@ import javax.swing.ImageIcon;
 
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
-import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DSelectionListener;
 import org.geotools.map.MapLayer;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -68,26 +67,22 @@ public interface SelectableMap2D extends NavigableMap2D{
      * add a MapLayer in the selection list
      * @param layer : Maplayer to add
      */
-    public void addSelectableLayer(MapLayer layer);
-    
+    public void addSelectableLayer(MapLayer layer);    
     /**
      * add MapLayers in the selection list
      * @param layer : array of MapLayer to add
      */
-    public void addSelectableLayer(MapLayer[] layer);
-    
+    public void addSelectableLayer(MapLayer[] layer);    
     /**
      * remove a MapLayer from selection list
      * @param layer : MapLayer to remove
      */
-    public void removeSelectableLayer(MapLayer layer);
-    
+    public void removeSelectableLayer(MapLayer layer);    
     /**
      * get an array of the selectable layers
      * @return array of MapLayer
      */
-    public MapLayer[] getSelectableLayer();
-    
+    public MapLayer[] getSelectableLayer();    
     /**
      * know if a MapLayer is selectable
      * @param layer : MapLayer to test
@@ -100,8 +95,7 @@ public interface SelectableMap2D extends NavigableMap2D{
      * most used filters are are SELECTION_FILTER.WITHIN and SELECTION_FILTER.INTERSECTS
      * @param filter
      */
-    public void setSelectionFilter(SELECTION_FILTER filter);
-    
+    public void setSelectionFilter(SELECTION_FILTER filter);    
     /**
      * 
      * @return SELECTION_FILTER
@@ -112,70 +106,49 @@ public interface SelectableMap2D extends NavigableMap2D{
      * the SelectionHandler is managing the selection decoration and the related listeners.
      * @param handler
      */
-    public void setSelectionHandler(SelectionHandler handler);
-    
+    public void setSelectionHandler(SelectionHandler handler);    
     /**
      * 
      * @return SelectionHandler
      */
     public SelectionHandler getSelectionHandler();
-    
+        
     /**
-     * reproject a geometry from the current Mapcontext to layer CRS
-     * @param geom
-     * @param layer
-     * @return
-     */
-    public Geometry projectGeometry(Geometry geom, MapLayer layer);
-
-    /**
-     * reproject a geometry from a CRS to another
-     * @param geom
-     * @param inCRS
-     * @param outCRS
-     * @return
-     */
-    public Geometry projectGeometry(Geometry geom, CoordinateReferenceSystem inCRS, CoordinateReferenceSystem outCRS);    
-    
-    /**
-     * 
+     * create a filter for a MapLayer
      * @param geo
-     * @param layer
+     * @param filter SELECTION_FILTER
+     * @param layer MapLayer
      * @return
      */
-    public Filter createFilter(Geometry geo, MapLayer layer);
+    public Filter createFilter(Geometry geo, SELECTION_FILTER filter , MapLayer layer);
     
     /**
      * make a selection with x,y coordinate
      * @param x : X coordinate of the point selection
      * @param y : Y coordinate of the point selection
      */
-    public void doSelection(double x, double y);
-    
+    public void doSelection(double x, double y);    
     /**
      * make a selection with a JTS geometry
      * @param geo : JTS Geometry
      */
     public void doSelection(Geometry geo);
         
-    
     /**
      * add a SelectableMap2DListener
      * @param listener : SelectableMap2DListener to add
      */
-    public void addSelectableMap2DListener(SelectableMap2DListener listener);
-    
+    public void addSelectableMap2DListener(Map2DSelectionListener listener);    
     /**
      * remove a SelectableMap2DListener 
      * @param listener : SelectableMap2DListener to remove
      */
-    public void removeSelectableMap2DListener(SelectableMap2DListener listener);
-    
+    public void removeSelectableMap2DListener(Map2DSelectionListener listener);    
     /**
      * get an array of SelectableMap2DListener
      * @return array of SelectableMap2DListener
      */
-    public SelectableMap2DListener[] getSelectableMap2DListeners();
+    public Map2DSelectionListener[] getSelectableMap2DListeners();
     
       
 }

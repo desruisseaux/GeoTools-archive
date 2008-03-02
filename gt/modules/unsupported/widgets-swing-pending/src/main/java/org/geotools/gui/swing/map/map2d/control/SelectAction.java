@@ -19,8 +19,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.Map2D.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 
 /**
@@ -33,7 +33,7 @@ public class SelectAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent arg0) {
         if (map != null && map instanceof SelectableMap2D) {
-            ((SelectableMap2D) map).setActionState(MapConstants.ACTION_STATE.SELECT);
+            ((SelectableMap2D) map).setActionState(ACTION_STATE.SELECT);
         }
     }
 

@@ -29,7 +29,7 @@ import javax.swing.border.Border;
 
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultEditionHandler;
 import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
 import org.geotools.gui.swing.map.map2d.handler.LineCreationHandler;
@@ -38,7 +38,7 @@ import org.geotools.gui.swing.map.map2d.handler.MultiPointCreationHandler;
 import org.geotools.gui.swing.map.map2d.handler.MultiPolygonCreationHandler;
 import org.geotools.gui.swing.map.map2d.handler.PointCreationHandler;
 import org.geotools.gui.swing.map.map2d.handler.PolygonCreationHandler;
-import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 
 /**
  *
@@ -57,13 +57,13 @@ public class EditHandlerChooser extends JComboBox {
             }
         }
     };
-    private EditableMap2DListener selectionListener = new EditableMap2DListener() {
+    private Map2DEditionListener selectionListener = new Map2DEditionListener() {
 
-        public void mapEditLayerChanged(Map2DEditLayerEvent event) {
-        }
 
-        public void editionHandlerChanged(EditionHandler handler) {
+        public void editionHandlerChanged(Map2DEditionEvent event) {
             removeItemListener(listListener);
+            EditionHandler handler = event.getNewEditionHandler();
+            
             if (handler != getSelectedItem()) {
                 if (handler instanceof DefaultEditionHandler) {
                     setSelectedItem(defaultHandler);
@@ -85,6 +85,10 @@ public class EditHandlerChooser extends JComboBox {
             }
             addItemListener(listListener);
         }
+
+        public void editedLayerChanged(Map2DEditionEvent event) {
+        }
+
     };
     private final EditionHandler defaultHandler = new DefaultEditionHandler();
     private final EditionHandler pointHandler = new PointCreationHandler();

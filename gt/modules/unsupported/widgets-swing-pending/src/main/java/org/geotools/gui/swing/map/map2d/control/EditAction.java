@@ -19,9 +19,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.Map2D.ACTION_STATE;
 
 /**
  *
@@ -33,7 +33,7 @@ public class EditAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent arg0) {
         if (map != null && map instanceof EditableMap2D) {
-            ((EditableMap2D) map).setActionState(MapConstants.ACTION_STATE.EDIT);
+            ((EditableMap2D) map).setActionState(ACTION_STATE.EDIT);
         }
     }
 
