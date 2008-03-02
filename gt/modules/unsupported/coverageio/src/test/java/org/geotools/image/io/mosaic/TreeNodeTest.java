@@ -17,6 +17,7 @@
 package org.geotools.image.io.mosaic;
 
 import java.util.Set;
+import java.util.List;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,41 +26,44 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 
 /**
- * Tests {@link TreeNode}.
+ * Tests {@link TreeNode} and {@link RTree}. The later is merely a wrapper around
+ * {@link TreeNode} except for the {@link RTree#searchTiles} method, which is not
+ * tested here (see {@link TileManagerTest} for that).
  *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TreeNodeTest extends TestCase {
+public class TreeNodeTest extends TestBase {
+    /**
+     * The root of an RTree for {@link #targetTiles}.
+     */
+    private TreeNode root;
+
+    /**
+     * Initializes every fields in this class.
+     */
+    @Override
+    protected void setUp() throws IOException {
+        super.setUp();
+        assertEquals(4733, targetTiles.length);
+        root = new TreeNode(targetTiles, null);
+        root.join(null);
+    }
+
     /**
      * Tests with a set of files corresponding to a Blue Marble mosaic.
      */
     public void testTreeNode() throws IOException {
-        final MosaicBuilder builder = new MosaicBuilder();
-        builder.setTileSize(new Dimension(960,960));
-        final int S = 21600;
-        final Tile[] originalTiles = MosaicBuilderTest.getBlueMarbleTiles(builder, S);
-        final TileManager manager = builder.createTileManager(originalTiles, 0, false);
-        final Tile[] tiles = manager.getTiles().toArray(new Tile[manager.getTiles().size()]);
-        assertEquals(4733, tiles.length);
-
         // TreeNode has many assert statements, so we want them enabled.
         assertTrue(TreeNode.class.desiredAssertionStatus());
-        /*
-         * At first, tests the creation of the tree without multi-threading.
-         */
-        final TreeNode tree = new TreeNode(tiles, null);
-        tree.join(null);
-        assertNotNull(tree.getTile());
-        assertEquals(tree, tree);
-        assertTrue (tree.containsAll(manager.getTiles()));
-        assertFalse(tree.containsAll(Arrays.asList(originalTiles)));
-        final Rectangle bounds = new Rectangle(S*4, S*2);
+        assertNotNull(root.getTile());
+        assertEquals(root, root);
+        assertTrue (root.containsAll(manager.getTiles()));
+        assertFalse(root.containsAll(Arrays.asList(sourceTiles)));
+        final Rectangle bounds = new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2);
         final Rectangle roi = new Rectangle();
         final Random random = new Random(4353223575290515986L);
         for (int i=0; i<100; i++) {
@@ -67,10 +71,10 @@ public class TreeNodeTest extends TestCase {
             roi.y      = random.nextInt(bounds.height);
             roi.width  = random.nextInt(bounds.width  / 4);
             roi.height = random.nextInt(bounds.height / 4);
-            final Set<Tile> intersect1 = toSet(tree.intersecting(roi));
-            final Set<Tile> intersect2 = intersecting(tiles, roi);
-            final Set<Tile> contained1 = toSet(tree.containedIn(roi));
-            final Set<Tile> contained2 = containedIn(tiles, roi);
+            final Set<Tile> intersect1 = toSet(root.intersecting(roi));
+            final Set<Tile> intersect2 = intersecting(targetTiles, roi);
+            final Set<Tile> contained1 = toSet(root.containedIn(roi));
+            final Set<Tile> contained2 = containedIn(targetTiles, roi);
             assertEquals(intersect2, intersect1);
             assertEquals(contained2, contained1);
             assertFalse (intersect1.isEmpty()); // Only for our test suite (since empty set are not forbidden)
@@ -89,31 +93,31 @@ public class TreeNodeTest extends TestCase {
          * to the non-multithread one.
          */
         final ThreadGroup threads = new ThreadGroup("TreeNode");
-        final TreeNode tree2 = new TreeNode(tiles, threads);
+        final TreeNode tree2 = new TreeNode(targetTiles, threads);
         tree2.join(threads);
         assertTrue(threads.isDestroyed());
-        assertEquals(tree, tree2);
+        assertEquals(root, tree2);
         /*
          * Tests removal of nodes.
          */
-        tree.setReadOnly();
-        assertEquals(tree, tree2);
-        for (int i=0; i<tiles.length; i += 10) {
-            assertTrue(tree2.remove(tiles[i]));
+        root.setReadOnly();
+        assertEquals(root, tree2);
+        for (int i=0; i<targetTiles.length; i += 10) {
+            assertTrue(tree2.remove(targetTiles[i]));
         }
-        assertFalse(tree.equals(tree2));
+        assertFalse(root.equals(tree2));
         for (int i=0; i<20; i++) {
             roi.x      = random.nextInt(bounds.width);
             roi.y      = random.nextInt(bounds.height);
             roi.width  = random.nextInt(bounds.width  / 4);
             roi.height = random.nextInt(bounds.height / 4);
             final Set<Tile> intersect1 = toSet(tree2.intersecting(roi));
-            final Set<Tile> intersect2 = intersecting(tiles, roi);
+            final Set<Tile> intersect2 = intersecting(targetTiles, roi);
             final Set<Tile> contained1 = toSet(tree2.containedIn(roi));
-            final Set<Tile> contained2 = containedIn(tiles, roi);
+            final Set<Tile> contained2 = containedIn(targetTiles, roi);
             boolean removedSome = false;
-            for (int j=0; j<tiles.length; j += 10) {
-                final Tile tile = tiles[j];
+            for (int j=0; j<targetTiles.length; j += 10) {
+                final Tile tile = targetTiles[j];
                 removedSome |= intersect2.remove(tile);
                 removedSome |= contained2.remove(tile);
             }
@@ -124,11 +128,33 @@ public class TreeNodeTest extends TestCase {
             assertFalse (contained1.containsAll(intersect1));
         }
         try {
-            tree.remove(tiles[100]);
+            root.remove(targetTiles[100]);
             fail("Removal should not be allowed on a read-only tree.");
         } catch (UnsupportedOperationException e) {
             // This is the expected exception.
         }
+    }
+
+    /**
+     * Tests the {@link RTree} class.
+     */
+    public void testRTree() throws IOException {
+        final RTree tree = new RTree(root);
+        assertEquals(new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2), tree.getBounds());
+        assertEquals(new Dimension(TARGET_SIZE,   TARGET_SIZE),   tree.getTileSize());
+
+        TreeNode node = root;
+        List<TreeNode> children = null;
+        final int[] subsampling = new int[] {1,3,5,9,15,45,90};
+        for (int i=subsampling.length; --i>=0;) {
+            assertEquals(subsampling[i], node.xSubsampling);
+            assertEquals(subsampling[i], node.ySubsampling);
+            children = node.getChildren();
+            if (children != null) {
+                node = children.get(0);
+            }
+        }
+        assertNull("Expected leaf node.", children);
     }
 
     /**

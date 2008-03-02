@@ -33,6 +33,7 @@ import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.Comparators;
+import org.geotools.util.LRULinkedHashMap;
 
 
 /**
@@ -44,6 +45,10 @@ import org.geotools.util.Comparators;
  * serializable {@linkplain Tile#getInput input}. The {@link ImageReaderSpi} doesn't need to
  * be serializable, but its class must be known to {@link javax.imageio.spi.IIORegistry} at
  * deserialization time.
+ * <p>
+ * This class is thread-safe but default implementation is not scalable to a high number of
+ * concurrent threads. Up to 4 concurrent calls to {@link #getTile getTile} should be okay,
+ * more may slow down the execution.
  *
  * @since 2.5
  * @source $URL$
@@ -55,6 +60,16 @@ public class TileManager implements Serializable {
      * For cross-version compatibility during serialization.
      */
     private static final long serialVersionUID = -6070623930537957163L;
+
+    /**
+     * The expected maximal number of concurrent threads using the same {@link TileManager}
+     * instance. There is no risk of heratic behavior if the number of concurrent threads
+     * exceed this constant - {@link TileManager} would just become slower.
+     * <p>
+     * This number should be small because the code is rather simple and not designed for
+     * scalability in highly concurrent context.
+     */
+    private static final int CONCURRENT_THREADS = 4;
 
     /**
      * The tiles sorted by {@linkplain Tile#getInput input}) first, then by
@@ -74,36 +89,27 @@ public class TileManager implements Serializable {
     private transient Collection<Tile> allTiles;
 
     /**
-     * The tiles in the region of interest, or {@code null} if not yet computed.
-     */
-    private transient Collection<Tile> tilesOfInterest;
-
-    /**
-     * The {@linkplain #tiles} in a tree for faster access.
-     * Will be created only when first needed.
-     *
-     * @todo If profiling show contention in calls to the synchronized {@link #searchTiles}
-     *       method, we could consider putting this tree in a {@link ThreadLocal} variable.
-     *       The {@link ThreadLocal#initialValue} should be overriden in order to returns
-     *       the {@link RTree#clone} of a single tree instance. Then the {@link #searchTiles}
-     *       method should synchronize only when checking for the cached values, and for caching
-     *       the result. The call to {@link RTree#searchTiles} itself would be unsynchronized.
-     */
-    private transient RTree tree;
-
-    /**
-     * The subsampling used at the time {@link #tilesOfInterest} has been computed.
-     */
-    private transient int xSubsampling, ySubsampling;
-
-    /**
-     * The region of interest. The reference is final, but the rectangle values will change.
+     * The {@linkplain #tiles} as a trees for faster access. The array and its elements
+     * will be created only when first needed. Every elements after the first one are
+     * {@linkplain RTree#clone clones}.
      * <p>
-     * Consider this field as final. It is not because it needs to be set by {@link #readObject}.
-     * If this field become public or protected in a future version, then we should make it final
-     * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
+     * The work performed by {@link RTree} may be relatively expensive, so we use different
+     * instance per thread if there is concurrent usage of {@link TileManager}.
      */
-    private transient Rectangle regionOfInterest;
+    private transient RTree[] trees;
+
+    /**
+     * The tiles in the region of interest. We need to retains the last collection because
+     * {@link MosaicImageReader} implementation may ask the same one a few consecutive times.
+     * Only the last collection would have been enough if we didn't allowed concurrent access
+     * to {@link TileManager}. But because of concurrency, we need a little bit more than only
+     * the last request.
+     * <p>
+     * Note that we make no attempt to block a thread if an other thread is already computing tiles
+     * for the same ROI. The intend here is to preserve (if possible) the last calculation performed
+     * by any thread, not to implement a real cache. The later is assumed caller's responsability.
+     */
+    private transient Map<SubsampledRectangle,Collection<Tile>> tilesOfInterest;
 
     /**
      * The region enclosing all tiles. Will be computed only when first needed.
@@ -130,27 +136,6 @@ public class TileManager implements Serializable {
      * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
     private transient Set<ImageReaderSpi> providers;
-
-    /**
-     * Creates a new tile manager initialized to the same values than the given one. This is
-     * useful when wanting concurrent access to the same tile informations from different threads.
-     *
-     * @throws IOException if an I/O operation was required but failed.
-     */
-    protected TileManager(final TileManager copy) throws IOException {
-        synchronized (copy) {
-            tiles            = copy.tiles;
-            allTiles         = copy.allTiles;
-            tilesOfInterest  = copy.tilesOfInterest;
-            tree             = copy.getTree().clone(); // Because RTree is not thread-safe.
-            xSubsampling     = copy.xSubsampling;
-            ySubsampling     = copy.ySubsampling;
-            regionOfInterest = new Rectangle(copy.regionOfInterest); // Must be own instance.
-            region           = copy.region;
-            tileSize         = copy.tileSize;
-            geometry         = copy.geometry;
-        }
-    }
 
     /**
      * Creates a manager for the given tiles. This constructor is protected for subclassing,
@@ -200,7 +185,6 @@ fill:   for (final List<Tile> sameInputs : asArray) {
         }
         this.tiles = tiles;
         allTiles = UnmodifiableArrayList.wrap(tiles);
-        regionOfInterest = new Rectangle();
     }
 
     /**
@@ -252,28 +236,62 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
-    public synchronized Rectangle getRegion() throws IOException {
+    final synchronized Rectangle getRegion() throws IOException {
         if (region == null) {
-            region = getTree().getBounds();
+            final RTree tree = getTree();
+            try {
+                region = tree.getBounds();
+            } finally {
+                release(tree);
+            }
         }
-        return new Rectangle(region);
+        return region;
     }
 
     /**
-     * Returns the RTree, creating it if necessary.
+     * Returns the RTree, creating it if necessary. Calls to this method must be followed by a
+     * {@code try ... finally} block with call to {@link #release} in the {@code finally} block.
      */
     private RTree getTree() throws IOException {
         assert Thread.holdsLock(this);
-        if (tree == null) {
-            final ThreadGroup threads = new ThreadGroup("TreeNode");
-            final TreeNode root = new TreeNode(tiles, threads);
-            final RTree tree = new RTree(root);
-            root.join(threads);
+        if (trees == null) {
+            final ThreadGroup threads = new ThreadGroup("RTree");
+            final TreeNode    root    = new TreeNode(tiles, threads);
+            final RTree       tree    = new RTree(root);
+            final RTree[]     trees   = new RTree[CONCURRENT_THREADS];
+            trees[0] = tree;
+            root.join(threads); // Wait for the background construction to finish.
             root.setReadOnly();
             assert root.containsAll(allTiles);
-            this.tree = tree; // Save only on success.
+            this.trees = trees; // Save last so it is saved only on success.
         }
-        return tree;
+        /*
+         * Returns the first instance available for use,
+         * creating a new one if we hit an empty slot.
+         */
+        for (int i=0; i<trees.length; i++) {
+            RTree tree = trees[i];
+            if (tree == null) {
+                trees[i] = tree = trees[0].clone();
+            } else if (tree.inUse) {
+                continue;
+            }
+            tree.inUse = true;
+            return tree;
+        }
+        // Every instances are in use. Returns a clone to be discarted after usage.
+        return trees[0].clone();
+    }
+
+    /**
+     * Releases a tree acquired by {@link #getTree}. We do not synchronize
+     * because {@link RTree#inUse} is declared as a volatile field.
+     */
+    private void release(final RTree tree) {
+        // Safety for avoiding NullPointerException to be thrown in 'finally' block.
+        if (tree != null) {
+            tree.inUse = false;
+        }
     }
 
     /**
@@ -300,28 +318,44 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
-    public synchronized Collection<Tile> getTiles(final Rectangle region,
-            final Dimension subsampling, final boolean subsamplingChangeAllowed) throws IOException
+    public Collection<Tile> getTiles(final Rectangle region, final Dimension subsampling,
+                                     final boolean subsamplingChangeAllowed) throws IOException
     {
-        if (tilesOfInterest == null || !regionOfInterest.equals(region) ||
-            xSubsampling != subsampling.width || ySubsampling != subsampling.height)
-        {
-            // Initializes the tree with the search criterions.
-            final RTree tree = getTree();
-            tree.regionOfInterest.setBounds(region);
-            tree.xSubsampling = subsampling.width;
-            tree.ySubsampling = subsampling.height;
-            tree.subsamplingChangeAllowed = subsamplingChangeAllowed;
-
-            // Performs the search and saves the results.
-            final Tile[] result = tree.searchTiles();
-            tilesOfInterest = UnmodifiableArrayList.wrap(result);
-            regionOfInterest.setBounds(tree.regionOfInterest);
-            xSubsampling = tree.xSubsampling;
-            ySubsampling = tree.ySubsampling;
-            subsampling.setSize(xSubsampling, ySubsampling);
+        final SubsampledRectangle regionOfInterest = new SubsampledRectangle(region, subsampling);
+        Collection<Tile> values;
+        final RTree tree;
+        synchronized (this) {
+            if (tilesOfInterest == null) {
+                tilesOfInterest = LRULinkedHashMap.createForRecentAccess(CONCURRENT_THREADS * 2);
+                /*
+                 * We create a map with greater capacity than the expected maximum number of
+                 * concurrent threads because if a thread is fast enough for executing two queries
+                 * while an other thread executed only one, the result of the slow thread would be
+                 * lost. Using a capacity twice bigger is an arbitrary choice (a thread could be 3
+                 * time faster), but we assume that it is enough for typical usages. Insuffisient
+                 * value can slow down the execution, but the result still valids.
+                 */
+            }
+            values = tilesOfInterest.get(regionOfInterest);
+            if (values != null) {
+                return values;
+            }
+            tree = getTree();
         }
-        return tilesOfInterest;
+        try {
+            // Initializes the tree with the search criterions.
+            tree.regionOfInterest = regionOfInterest;
+            tree.subsamplingChangeAllowed = subsamplingChangeAllowed;
+            values = UnmodifiableArrayList.wrap(tree.searchTiles());
+            synchronized (this) {
+                // After the search, saves the results.
+                tilesOfInterest.put(regionOfInterest, values);
+                subsampling.setSize(regionOfInterest.xSubsampling, regionOfInterest.ySubsampling);
+            }
+        } finally {
+            release(tree);
+        }
+        return values;
     }
 
     /**
@@ -340,19 +374,16 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
-    public synchronized Dimension getTileSize() throws IOException {
+    final synchronized Dimension getTileSize() throws IOException {
         if (tileSize == null) {
-            for (final Tile tile : getTiles()) {
-                final Rectangle expand = tile.getAbsoluteRegion();
-                if (tileSize == null) {
-                    tileSize = expand.getSize();
-                } else {
-                    if (expand.width  > tileSize.width)  tileSize.width  = expand.width;
-                    if (expand.height > tileSize.height) tileSize.height = expand.height;
-                }
+            final RTree tree = getTree();
+            try {
+                tileSize = tree.getTileSize();
+            } finally {
+                release(tree);
             }
         }
-        return new Dimension(tileSize);
+        return tileSize;
     }
 
     /**
@@ -448,6 +479,5 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             providers.add(tile.getImageReaderSpi());
         }
         providers = Collections.unmodifiableSet(providers);
-        regionOfInterest = new Rectangle();
     }
 }

@@ -41,14 +41,11 @@ final class RTree {
 
     /**
      * The requested region. This field must be set before {@link #searchTiles} is invoked.
+     * Before the search, its {@link SubsampledRectangle#xSubsampling xSubsampling} and
+     * {@link SubsampledRectangle#ySubsampling ySubsampling} fields are the requested subsamplings.
+     * After the search, they are set to the subsamplings of the best set of tiles found.
      */
-    protected final Rectangle regionOfInterest;
-
-    /**
-     * Before the search, the requested subsamplings. After the search, the subsamplings of the
-     * best set of tiles found. This field must be set before {@link #searchTiles} is invoked.
-     */
-    protected int xSubsampling, ySubsampling;
+    protected SubsampledRectangle regionOfInterest;
 
     /**
      * {@code true} if the search is allowed to look for tiles with finer subsampling than the
@@ -99,11 +96,16 @@ final class RTree {
     protected long cost;
 
     /**
+     * {@code true} if this {@code RTree} instance is currently in use by any thread, or
+     * {@code false} if it is available for use.
+     */
+    volatile boolean inUse;
+
+    /**
      * Creates a RTree using the given root node.
      */
     public RTree(final TreeNode root) {
         this.root = root;
-        regionOfInterest    = new Rectangle();
         relativeSubsampling = new Dimension();
         relativeReadBounds  = new Rectangle();
         subsamplingDone     = new HashSet<Dimension>();
@@ -119,19 +121,25 @@ final class RTree {
     }
 
     /**
-     * Computes the bounding box of all tiles.
+     * Returns the bounding box of all tiles.
      */
     public Rectangle getBounds() {
-        Rectangle bounds = null;
-        // No need to scan down the tree - the first level encompass every childs.
+        return new Rectangle(root);
+    }
+
+    /**
+     * Returns the largest tile width and largest tile height in the children,
+     * not scanning into subtrees.
+     */
+    public Dimension getTileSize() {
+        final Dimension tileSize = new Dimension();
         for (final TreeNode node : root.getChildren()) {
-            if (bounds == null) {
-                bounds = new Rectangle(node);
-            } else {
-                bounds.add(node);
-            }
+            final int width  = node.width  / node.xSubsampling;
+            final int height = node.height / node.ySubsampling;
+            if (width  > tileSize.width)  tileSize.width  = width;
+            if (height > tileSize.height) tileSize.height = height;
         }
-        return bounds;
+        return tileSize;
     }
 
     /**
@@ -157,7 +165,7 @@ final class RTree {
      */
     public Tile[] searchTiles() throws IOException {
         assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty() && candidates == null;
-        subsampling = new Dimension(xSubsampling, ySubsampling);
+        subsampling = regionOfInterest.getSubsampling();
         Map<Rectangle,Tile> bestCandidates = null;
         long lowestCost = Long.MAX_VALUE;
         try {
@@ -177,8 +185,7 @@ final class RTree {
                 if (cost < lowestCost) {
                     lowestCost = cost;
                     bestCandidates = candidates;
-                    xSubsampling = subsampling.width;
-                    ySubsampling = subsampling.height;
+                    regionOfInterest.setSubsampling(subsampling);
                 } else {
                     candidates.clear(); // Reuses the existing HashMap.
                 }

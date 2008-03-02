@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
 
@@ -52,19 +51,13 @@ import org.geotools.resources.UnmodifiableArrayList;
  * @author Martin Desruisseaux
  */
 @SuppressWarnings("serial") // Will not be serialized anyway.
-final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable {
+final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>, Runnable {
     /**
      * The parent tile which may contains other tiles. May be {@code null} for the root
      * (but not always), but initially non-null for every childs. However may be set to
      * {@code null} at some later stage if the node has been removed from the tree.
      */
     private Tile tile;
-
-    /**
-     * On construction, the {@linkplain Tile#getSubsampling subsampling}.
-     * After tree completion, the finest subsampling in this tile and chlidren.
-     */
-    private int xSubsampling, ySubsampling;
 
     /**
      * The children that are fully enclosed in the {@linkplain #tile}, or {@code null} if none
@@ -79,11 +72,8 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
      * @throws IOException if an I/O operation was required and failed.
      */
     private TreeNode(final Tile tile) throws IOException {
-        super(tile.getAbsoluteRegion());
+        super(tile.getAbsoluteRegion(), tile.getSubsampling());
         this.tile = tile;
-        final Dimension subsampling = tile.getSubsampling();
-        xSubsampling = subsampling.width;
-        ySubsampling = subsampling.height;
     }
 
     /**
@@ -147,66 +137,74 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
          * separated thread in order to take advantage of multi-processor machines.
          */
         assert threads == null || threads.activeCount() == 0 : threads;
-        createTree(threads);
+        organizeChildren(threads);
         // join(threads) must be invoked at some later stage after this point.
     }
 
     /**
-     * Organizes the {@linkplain #children} in subtrees. Note that this method is invoked
-     * recursively by {@link #addChildren}, which may have created a different thread for
-     * that.
-     *
-     * @param threads Must be a newly allocated an initially empty thread group, or {@code null}.
-     */
-    private void createTree(final ThreadGroup threads) {
-        ListIterator<TreeNode> iterator = children.listIterator();
-        while (iterator.hasNext()) {
-            final TreeNode node = iterator.next();
-            final int index = iterator.nextIndex();
-            if (node.addChildren(iterator, threads)) {
-                iterator = children.listIterator(index);
-            }
-        }
-    }
-
-    /**
-     * Adds children to this nodes. Every children found are removed from the collection.
-     * Returns {@code true} if at least one candidate child moved to this node.
+     * Organizes the {@linkplain #children} in subtrees. Every children found are removed from the
+     * collection. Note that this method invokes itself recursively, but some recursive invocation
+     * may be done in a different thread.
      * <p>
      * This method garantees that the {@linkplain #children} list is definitive on returns, but does
      * not garantee that the construction of children elements is completed (i.e. the references are
      * definitives, but not the referees). Their construction may be underway in a separated thread.
+     *
+     * @param threads Must be a newly allocated an initially empty thread group, or {@code null}.
      */
-    private boolean addChildren(final Iterator<TreeNode> candidates, final ThreadGroup threads) {
+    private void organizeChildren(final ThreadGroup threads) {
+        ListIterator<TreeNode> candidates = children.listIterator();
         while (candidates.hasNext()) {
-            final TreeNode candidate = candidates.next();
-            if (contains(candidate)) {
-                candidates.remove();
-                if (children == null) {
-                    children = new LinkedList<TreeNode>();
+            final TreeNode child = candidates.next();
+            final int index = candidates.nextIndex();
+            while (candidates.hasNext()) {
+                final TreeNode candidate = candidates.next();
+                if (child.contains(candidate)) {
+                    candidates.remove();
+                    if (child.children == null) {
+                        child.children = new LinkedList<TreeNode>();
+                    }
+                    child.children.add(candidate);
+                } else {
+                    // Assertion expected because nodes should be sorted by decreasing area.
+                    // A rectangle with smaller area can not contains a rectangle with greater area.
+                    assert !candidate.contains(this) : this;
                 }
-                children.add(candidate);
-            } else {
-                // Assertion expected because nodes should be sorted by decreasing area.
-                // A rectangle with smaller area can not contains a rectangle with greater area.
-                assert !candidate.contains(this) : this;
             }
+            if (child.children != null) {
+                /*
+                 * If we started from the root level, process children in a separated thread
+                 * in order to take advantage of multi-processor machines. Otherwise process
+                 * children in current thread in order to avoid creating too many threads.
+                 */
+                if (threads == null) {
+                    child.organizeChildren(null);
+                } else {
+                    /*
+                     * This block is identical to previous one (see run() implementation), except
+                     * that it is executed in an other thread. This is safe because the child now
+                     * have its own list of children which is disjoint from the list processed by
+                     * current execution of this method.
+                     */
+                    final Thread thread = new Thread(threads, child, "TreeNode");
+                    thread.start();
+                }
+            }
+            /*
+             * Advances to the next 'child' tile, and test again all subsequent tiles for inclusion.
+             * Note that in most tile layout, the list of tiles is much shorter because of the tiles
+             * removed from the list during the previous run.
+             */
+            candidates = children.listIterator(index);
         }
         /*
-         * If we started from the root level, process children in a separated thread in order
-         * to take advantage of multi-processor machines. Otherwise process children in current
-         * thread in order to avoid creating too many threads.
+         * Computes subsampling only if the children are not processed by different threads,
+         * otherwise we have no garantee that the children values are ready. In the later case,
+         * subsampling will be computed by 'join' instead.
          */
-        if (children == null) {
-            return false;
+        if (threads == null) {
+            computeSubsampling();
         }
-        if (threads != null) {
-            final Thread thread = new Thread(threads, this, "TreeNode");
-            thread.start();
-        } else {
-            createTree(threads);
-        }
-        return true;
     }
 
     /**
@@ -236,39 +234,34 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
             threads.destroy();
         }
         /*
-         * Completes the calculation of subsamplings. We take the opportunity for synchronizing
-         * memory content if the calculation was performed in a separated thread.
+         * Note: According Java Language Specification, all written variables are flushed to main
+         * memory when a thread terminates. Thread.join() guarantee that the effect made by that
+         * thread are visibles. However as a paranoiac safety we will synchronize on every nodes
+         * for making sure that wratten variables are read before to compute subsampling.
          */
-        final boolean computeRegion = isEmpty();
         for (final TreeNode node : children) {
             synchronized (node) {
-                node.finestSubsampling(this);
-                if (computeRegion) {
-                    if (isEmpty()) {
-                        setBounds(node);
-                    } else {
-                        add(node);
-                    }
+                if (isEmpty()) {
+                    setBounds(node);
+                } else {
+                    add(node);
                 }
             }
         }
+        computeSubsampling();
     }
 
     /**
-     * If this node uses a finer subsampling than the specified parent node, sets
-     * the parent subsampling accordingly. This method invokes itself recursively.
+     * Sets the subsampling to the greatest subsampling used by children.
+     * This method do <strong>not</strong> scan recursively down the tree.
      */
-    private void finestSubsampling(final TreeNode parent) {
+    private void computeSubsampling() {
         if (children != null) {
-            for (final TreeNode node : children) {
-                if (xSubsampling == 1 && ySubsampling == 1) {
-                    break; // No need to continue, since there is no lower value.
-                }
-                node.finestSubsampling(this);
+            for (final TreeNode child : children) {
+                if (child.xSubsampling > xSubsampling) xSubsampling = child.xSubsampling;
+                if (child.ySubsampling > ySubsampling) ySubsampling = child.ySubsampling;
             }
         }
-        if (xSubsampling < parent.xSubsampling) parent.xSubsampling = xSubsampling;
-        if (ySubsampling < parent.ySubsampling) parent.ySubsampling = ySubsampling;
     }
 
     /**
@@ -276,15 +269,16 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
      * side-effect, but should never be invoked directly from outside this class.
      */
     public synchronized void run() {
-        createTree(null);
+        organizeChildren(null);
     }
 
     /**
-     * Comparator for sorting tiles by descreasing area and increasing subsamplings. The
+     * Comparator for sorting tiles by descreasing area and subsamplings. The
      * {@linkplain TreeNode#TreeNode(Tile[]) constructor} expects this order for inserting
      * a tile into the smallest tile that can contains it. If two tiles cover the same area,
-     * then they are sorted by increasing subsamplings. The intend is that tiles sorted last
-     * should be more economical to read than tiles sorted first.
+     * then they are sorted by descreasing subsamplings. The intend is that tiles sorted last
+     * are usually the ones with finest resolution no matter if the layout is "constant area"
+     * or "constant tile size".
      * <p>
      * If two tiles have the same area and subsampling, then their order is unchanged on the
      * basis that initial order, when sorted by {@link TileManager}, should be efficient for
@@ -300,8 +294,8 @@ final class TreeNode extends Rectangle implements Comparable<TreeNode>, Runnable
         if (a1 < a2) return +1;
         a1 = (long) this.xSubsampling * (long) this.ySubsampling;
         a2 = (long) that.xSubsampling * (long) that.ySubsampling;
-        if (a1 < a2) return -1; // Smallest values first
-        if (a1 > a2) return +1;
+        if (a1 > a2) return -1;
+        if (a1 < a2) return +1;
         return 0;
     }
 

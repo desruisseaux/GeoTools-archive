@@ -24,9 +24,6 @@ import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import javax.imageio.spi.ImageReaderSpi;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -36,40 +33,16 @@ import junit.framework.TestCase;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MosaicBuilderTest extends TestCase {
-    /**
-     * Returns the tiles to be used for {@link #testBlueMarble}.
-     */
-    static Tile[] getBlueMarbleTiles(final MosaicBuilder builder, final int S) {
-        assertNull(builder.getTileReaderSpi());
-        builder.setTileReaderSpi("png");
-        final ImageReaderSpi spi = builder.getTileReaderSpi();
-        assertNotNull(spi);
-
-        final File directory = new File("geodata"); // Dummy directory - will not be read.
-        final Tile[] tiles = new Tile[] {
-            new Tile(spi, new File(directory, "A1.png"), 0, new Rectangle(0*S, 0, S, S)),
-            new Tile(spi, new File(directory, "B1.png"), 0, new Rectangle(1*S, 0, S, S)),
-            new Tile(spi, new File(directory, "C1.png"), 0, new Rectangle(2*S, 0, S, S)),
-            new Tile(spi, new File(directory, "D1.png"), 0, new Rectangle(3*S, 0, S, S)),
-            new Tile(spi, new File(directory, "A2.png"), 0, new Rectangle(0*S, S, S, S)),
-            new Tile(spi, new File(directory, "B2.png"), 0, new Rectangle(1*S, S, S, S)),
-            new Tile(spi, new File(directory, "C2.png"), 0, new Rectangle(2*S, S, S, S)),
-            new Tile(spi, new File(directory, "D2.png"), 0, new Rectangle(3*S, S, S, S))
-        };
-        return tiles;
-    }
-
+public class MosaicBuilderTest extends TestBase {
     /**
      * Tests with a set of files corresponding to a Blue Marble mosaic.
      */
     public void testBlueMarble() throws IOException, ClassNotFoundException {
         assertTrue(MosaicBuilder.class.desiredAssertionStatus());
-        final MosaicBuilder builder = new MosaicBuilder();
-        final int S = 21600;
-        final Tile[] tiles = getBlueMarbleTiles(builder, S);
+        builder.setSubsamplings((Dimension[]) null);
+        builder.setTileSize(null);
 
-        Rectangle bounds = new Rectangle(S*4, S*2);
+        Rectangle bounds = new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2);
         builder.setUntiledImageBounds(bounds);
         assertEquals(bounds, builder.getUntiledImageBounds());
 
@@ -95,11 +68,12 @@ public class MosaicBuilderTest extends TestCase {
             assertEquals("height[" + i + ']', height[i], subsamplings[i].height);
         }
 
-        builder.setTileDirectory(new File("S960")); // Dummy directory - will not be written.
-        TileManager tileManager = builder.createTileManager(tiles, 0, false);
+        TileManager tileManager = builder.createTileManager(sourceTiles, 0, false);
         assertEquals(4733, tileManager.getTiles().size());
         final String asText = tileManager.toString();
         assertFalse(asText.trim().length() == 0);
+        assertTrue("Expected tiles created as in setUp()", manager.equals(tileManager));
+        // we don't use assertEquals because the message is too long to format in case of failure.
 
         // Tests serialization
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
