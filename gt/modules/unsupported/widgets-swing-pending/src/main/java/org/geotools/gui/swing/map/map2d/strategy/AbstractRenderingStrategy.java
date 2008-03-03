@@ -25,8 +25,7 @@ import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.event.EventListenerList;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -53,7 +52,6 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
 
     /**
      * create a default AbstractStrategy 
-     * @param renderer
      */
     public AbstractRenderingStrategy() {
         comp = init();
@@ -170,7 +168,7 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
 
     protected void fireMapAreaChanged(Envelope oldone, Envelope newone) {
 
-        Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
+        RenderingStrategyEvent mce = new RenderingStrategyEvent(this,context, oldone, newone);
 
         StrategyListener[] lst = getStrategyListeners();
 
@@ -181,7 +179,7 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
     }
 
     protected void fireMapContextChanged(MapContext oldcontext, MapContext newContext) {
-        Map2DContextEvent mce = new Map2DContextEvent(this, oldcontext, newContext);
+        RenderingStrategyEvent mce = new RenderingStrategyEvent(this, oldcontext, newContext,mapArea);
 
         StrategyListener[] lst = getStrategyListeners();
 

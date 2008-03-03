@@ -97,7 +97,7 @@ public class Map2DSelectionEvent extends EventObject{
      * Geometry is in the mapcontext CRS.
      * @return JTS Geometry, or null if no selection.
      */
-    public Geometry getNewGeometry() {
+    public Geometry getGeometry() {
         return newgeo;
     }
     
@@ -114,7 +114,7 @@ public class Map2DSelectionEvent extends EventObject{
      * New Filter
      * @return SELECTION_FILTER
      */
-    public SELECTION_FILTER getNewFilter() {
+    public SELECTION_FILTER getFilter() {
         return newfilter;
     }
     
@@ -130,7 +130,7 @@ public class Map2DSelectionEvent extends EventObject{
      * New SelectionHandler
      * @return SelectionHandler
      */
-    public SelectionHandler getNewHandler() {
+    public SelectionHandler getHandler() {
         return newhandler;
     }
     
@@ -138,7 +138,7 @@ public class Map2DSelectionEvent extends EventObject{
      * Old SelectionHandler
      * @return SelectionHandler
      */
-    public SelectionHandler getOldHandler() {
+    public SelectionHandler getPreviousHandler() {
         return oldhandler;
     }
     

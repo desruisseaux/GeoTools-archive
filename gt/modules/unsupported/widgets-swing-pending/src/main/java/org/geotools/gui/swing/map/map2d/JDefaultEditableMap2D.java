@@ -21,13 +21,11 @@ import java.awt.Color;
 import javax.swing.JComponent;
 
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultEditionHandler;
 import org.geotools.gui.swing.map.map2d.handler.EditionHandler;
 import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
-import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -40,17 +38,10 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.Symbolizer;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 
 /**
@@ -61,7 +52,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private final MapLayerListListener mapLayerListlistener;
     private final SingleBufferedImageStrategy memoryStrategy = new SingleBufferedImageStrategy();
-    protected final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+    private final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final BufferComponent memoryPane = new BufferComponent();
     private MapLayer editionLayer = null;
     private EditionHandler editionHandler = new DefaultEditionHandler();
@@ -112,7 +103,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         
     }
 
-
     private void adjusteContexts() {
         MapContext context = renderingStrategy.getContext();
 
@@ -158,7 +148,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         if (state == ACTION_STATE.EDIT) {
             editionHandler.installListeners(this);
         } else {
-            editionHandler.cancelEdition();
             editionHandler.uninstallListeners();
         }
 
@@ -172,17 +161,17 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     @Override
-    protected void mapAreaChanged(Map2DMapAreaEvent event) {
+    protected void mapAreaChanged(RenderingStrategyEvent event) {
         super.mapAreaChanged(event);
         adjusteContexts();
     }
 
     @Override
-    protected void mapContextChanged(Map2DContextEvent event) {
+    protected void mapContextChanged(RenderingStrategyEvent event) {
         super.mapContextChanged(event);
         
         event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-        event.getNewContext().addMapLayerListListener(mapLayerListlistener);
+        event.getContext().addMapLayerListListener(mapLayerListlistener);
     }
 
 
@@ -247,13 +236,15 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         return editionHandler;
     }
 
-    public void setEditedMapLayer(MapLayer layer) {
+    public void setEditedMapLayer(MapLayer newLayer) {
 
-        if (editionLayer != layer) {
+        if (editionLayer != newLayer) {
             editionHandler.cancelEdition();
 
-            fireEditLayerChanged(editionLayer, layer);
-            editionLayer = layer;
+            MapLayer oldLayer = editionLayer;
+            editionLayer = newLayer;
+            
+            fireEditLayerChanged(oldLayer, newLayer);            
         }
 
     }

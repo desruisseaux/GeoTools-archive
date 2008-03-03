@@ -62,10 +62,10 @@ public class SelectHandlerChooser extends JComboBox {
 
         public void selectionHandlerChanged(Map2DSelectionEvent event) {
             removeItemListener(listListener);
-            if (event.getNewHandler() != getSelectedItem()) {
-                if (event.getNewHandler() instanceof DefaultSelectionHandler) {
+            if (event.getHandler() != getSelectedItem()) {
+                if (event.getHandler() instanceof DefaultSelectionHandler) {
                     setSelectedItem(defaultHandler);
-                } else if (event.getNewHandler() instanceof LasoSelectionHandler) {
+                } else if (event.getHandler() instanceof LasoSelectionHandler) {
                     setSelectedItem(lasoHandler);
                 } else {
 

@@ -39,7 +39,7 @@ public class EditLineAction extends AbstractAction {
     private Map2DEditionListener listener = new Map2DEditionListener() {
 
         public void editedLayerChanged(Map2DEditionEvent event) {
-            checkLayer(event.getNewEditedLayer());
+            checkLayer(event.getEditedLayer());
         }
 
         public void editionHandlerChanged(Map2DEditionEvent event) {

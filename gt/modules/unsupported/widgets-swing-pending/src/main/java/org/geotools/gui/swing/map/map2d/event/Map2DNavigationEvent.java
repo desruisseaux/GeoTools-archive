@@ -32,22 +32,35 @@ import org.geotools.gui.swing.map.map2d.handler.NavigationHandler;
  */
 public class Map2DNavigationEvent extends EventObject{
 
-    private NavigationHandler handler = null;
+    private final NavigationHandler oldhandler;
+    private final NavigationHandler newhandler;
     
     /**
-     * create a Map2DSelectionEvent
+     * create a Map2DNavigationEvent
      * @param map : Map2D source componant
-     * @param geo : JTS Geometry  of the selection or null
-     * @param filter : SELECTION_FILTER
-     * @param handler : SelectionHandler
+     * @param oldhandler : old NavigationHandler, can't be null
+     * @param newhandler : new NavigationHandler, can't be null
      */
-    public Map2DNavigationEvent(NavigableMap2D map, NavigationHandler handler){
+    public Map2DNavigationEvent(NavigableMap2D map, NavigationHandler oldhandler, NavigationHandler newhandler){
         super(map);
-        this.handler = handler;
+        this.oldhandler = oldhandler;
+        this.newhandler = newhandler;
     }
     
+    /**
+     * get the new navigationHandler
+     * @return NavigationHandler, can't be null
+     */
     public NavigationHandler getHandler() {
-        return handler;
+        return newhandler;
+    }
+    
+    /**
+     * get the previous navigationHandler
+     * @return NavigationHandler, can't be null
+     */
+    public NavigationHandler getPreviousHandler() {
+        return oldhandler;
     }
     
     

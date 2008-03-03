@@ -74,7 +74,7 @@ public class Map2DEvent extends EventObject{
      * get new action state
      * @return ACTION_STATE
      */
-    public ACTION_STATE getNewState() {
+    public ACTION_STATE getState() {
         return newstate;
     }
     
@@ -82,7 +82,7 @@ public class Map2DEvent extends EventObject{
      * get the new Strategy
      * @return RenderingStrategy
      */
-    public RenderingStrategy getNewStrategy() {
+    public RenderingStrategy getStrategy() {
         return newstrategy;
     }
     

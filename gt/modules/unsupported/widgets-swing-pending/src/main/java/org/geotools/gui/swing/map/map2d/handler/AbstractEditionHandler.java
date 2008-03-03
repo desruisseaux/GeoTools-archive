@@ -59,6 +59,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.data.Transaction;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
@@ -75,7 +76,6 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
     protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
     protected final FacilitiesFactory FACILITIES_FACTORY = new FacilitiesFactory();
-    
     protected final ImageIcon ICON;
     protected final String title;
     protected static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
@@ -108,18 +108,17 @@ abstract class AbstractEditionHandler implements EditionHandler {
         img.getGraphics().drawImage(eci_edit.getImage(), 0, 0, null);
         CUR_EDIT = tk.createCustomCursor(img, new java.awt.Point(7, 1), "edit");
     }
-    
-    
-    private Style createPointStyle(){
+
+    private Style createPointStyle() {
         Style pointSelectionStyle = STYLE_BUILDER.createStyle();
-        pointSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle( map2D.getPointSymbolizer()));
+        pointSelectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(map2D.getPointSymbolizer()));
         return pointSelectionStyle;
     }
-    
-    private Style createStyle(){
-        Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ map2D.getLineSymbolizer()});
+
+    private Style createStyle() {
+        Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{map2D.getLineSymbolizer()});
         r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
-        Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{ map2D.getPolygonSymbolizer()});
+        Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{map2D.getPolygonSymbolizer()});
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
         Style editionStyle = STYLE_BUILDER.createStyle();
@@ -127,8 +126,6 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
         return editionStyle;
     }
-    
-    
 
     public void install(EditableMap2D map) {
         installed = true;
@@ -170,7 +167,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
             try {
                 mds.createSchema(featureType);
                 FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                layer = new DefaultMapLayer(fs,createPointStyle());
+                layer = new DefaultMapLayer(fs, createPointStyle());
             } catch (IOException se) {
                 se.printStackTrace();
             }
@@ -216,6 +213,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
     }
 
     //--------------------Geometry Edition--------------------------------------
+
     /**
      *  transform a mouse coordinate in JTS Geometry using the CRS of the mapcontext
      * @param mx : x coordinate of the mouse on the map (in pixel)
@@ -303,7 +301,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
                 AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
 
-                geom = FACILITIES_FACTORY.projectGeometry(geom,map2D.getRenderingStrategy().getContext(), editionLayer);
+                geom = FACILITIES_FACTORY.projectGeometry(geom, map2D.getRenderingStrategy().getContext(), editionLayer);
 
                 List<AttributeDescriptor> lst = featureType.getAttributes();
                 for (int i = 0,  n = lst.size(); i < n; i++) {
@@ -333,7 +331,7 @@ abstract class AbstractEditionHandler implements EditionHandler {
                     String name = editionLayer.getFeatureSource().getName().getLocalPart();
                     try {
                         //GR: question: why not just editionLayer.getFeatureSource()?
-                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore)editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
+                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
                         store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
                     } catch (IOException e) {
                         // Tell it the name of the shapefile it should look for in our DataStore
@@ -367,69 +365,63 @@ abstract class AbstractEditionHandler implements EditionHandler {
 
     protected synchronized void validateModifiedGeometry(final Geometry geo, final String ID) {
 
-        if(geo == null || ID == null){
+        if (geo == null || ID == null) {
             throw new NullPointerException();
         }
-        
-        
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-
-                MapLayer editionLayer = map2D.getEditedMapLayer();
-
-                FeatureStore<SimpleFeatureType, SimpleFeature> store;
-                if (editionLayer.getFeatureSource() instanceof FeatureStore) {
-
-                    String name = editionLayer.getFeatureSource().getName().getLocalPart();
-                    try {
-                        //GR question: why not just editionLayer.getFeatureSource()?
-                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore)editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
-                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
-                    } catch (IOException e) {
-                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
-                    }
-
-                    store.getDataStore().dispose();
-//                    store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
-                    
-                    DefaultTransaction transaction = new DefaultTransaction("trans_maj");
-
-                    store.setTransaction(transaction);
-                    FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
-                    Filter filter = ff.id(Collections.singleton(ff.featureId(ID)));
 
 
-                    SimpleFeatureType featureType = (SimpleFeatureType) editionLayer.getFeatureSource().getSchema();
-                    AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
+        MapLayer editionLayer = map2D.getEditedMapLayer();
 
-                    Geometry geom = FACILITIES_FACTORY.projectGeometry(geo, map2D.getRenderingStrategy().getContext(), editionLayer);
-                    
-                    try {
-                        store.modifyFeatures(geomAttribut, geom, filter);
-                        transaction.commit();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        try {
-                            transaction.rollback();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } finally {
-                        transaction.close();
-                    }
+        FeatureStore<SimpleFeatureType, SimpleFeature> store;
+        if (editionLayer.getFeatureSource() instanceof FeatureStore) {
 
-
-
-                }
-
+            String name = editionLayer.getFeatureSource().getName().getLocalPart();
+            try {
+                //GR question: why not just editionLayer.getFeatureSource()?
+                FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
+                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
+            } catch (IOException e) {
+                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
             }
-        });
+
+//            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
+//                    store.getDataStore().dispose();
+
+            DefaultTransaction transaction = new DefaultTransaction("trans_maj");
+//                    Transaction previoustransaction = store.getTransaction();
+
+            store.setTransaction(transaction);
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+            Filter filter = ff.id(Collections.singleton(ff.featureId(ID)));
+
+
+            SimpleFeatureType featureType = (SimpleFeatureType) editionLayer.getFeatureSource().getSchema();
+            AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
+
+            Geometry geom = FACILITIES_FACTORY.projectGeometry(geo, map2D.getRenderingStrategy().getContext(), editionLayer);
+
+            try {
+                store.modifyFeatures(geomAttribut, geom, filter);
+                transaction.commit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                try {
+                    transaction.rollback();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                transaction.close();
+//                store.setTransaction(Transaction.AUTO_COMMIT);
+            }
+
+        }
 
     }
 
 
     //---------------------Memory Layer-----------------------------------------
+
     protected synchronized void setMemoryLayerGeometry(List<Geometry> geoms) {
 
         if (memoryLayer != null) {

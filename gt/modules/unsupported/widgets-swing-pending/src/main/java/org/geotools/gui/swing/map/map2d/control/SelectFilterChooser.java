@@ -57,8 +57,8 @@ public class SelectFilterChooser extends JComboBox {
         public void selectionFilterChanged(Map2DSelectionEvent event) {
             
             removeItemListener(listListener);
-            if(event.getNewFilter() != getSelectedItem()){
-                setSelectedItem(event.getNewFilter());
+            if(event.getFilter() != getSelectedItem()){
+                setSelectedItem(event.getFilter());
                 }
             addItemListener(listListener);
         }

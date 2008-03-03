@@ -18,8 +18,7 @@ package org.geotools.gui.swing.map.map2d;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.handler.NavigationHandler;
 import org.geotools.gui.swing.map.map2d.listener.Map2DNavigationListener;
 
@@ -45,8 +44,8 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         super();
     }
     
-    private void fireHandlerChanged(NavigationHandler handler) {
-        Map2DNavigationEvent mce = new Map2DNavigationEvent(this, handler);
+    private void fireHandlerChanged(NavigationHandler oldhandler, NavigationHandler newhandler) {
+        Map2DNavigationEvent mce = new Map2DNavigationEvent(this, oldhandler, newhandler);
 
         Map2DNavigationListener[] lst = getNavigableMap2DListeners();
 
@@ -58,71 +57,37 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     
     //----------------------Map2d override--------------------------------------
     @Override
-    protected void mapContextChanged(Map2DContextEvent event) {
-        super.mapContextChanged(event);
-        
+    protected void mapContextChanged(RenderingStrategyEvent event) {
+        super.mapContextChanged(event);        
         mapAreas.clear();
-
         lastMapArea = getRenderingStrategy().getMapArea();
     }
 
     @Override
-    protected void mapAreaChanged(Map2DMapAreaEvent event) {
+    protected void mapAreaChanged(RenderingStrategyEvent event) {
         super.mapAreaChanged(event);
 
         while (mapAreas.size() > 10) {
             mapAreas.remove(0);
         }
 
-        Envelope newMapArea = event.getNewMapArea();
+        Envelope newMapArea = event.getMapArea();
         lastMapArea = newMapArea;
 
-        if (mapAreas.contains(newMapArea)) {
-
-//            if (mapAreas.size() > 1) {
-//
-//                int position = mapAreas.indexOf(newMapArea);
-//
-//                if (position == 0) {
-//                    gui_previousArea.setEnabled(false);
-//                    gui_nextArea.setEnabled(true);
-//                } else if (position == mapAreas.size() - 1) {
-//                    gui_previousArea.setEnabled(true);
-//                    gui_nextArea.setEnabled(false);
-//                } else {
-//                    gui_previousArea.setEnabled(true);
-//                    gui_nextArea.setEnabled(true);
-//                }
-//
-//            } else {
-//                gui_previousArea.setEnabled(false);
-//                gui_nextArea.setEnabled(false);
-//            }
-
-
-        } else {
+        if (!mapAreas.contains(newMapArea)) {
             mapAreas.add(newMapArea);
-
-//            if (mapAreas.size() > 1) {
-//                gui_previousArea.setEnabled(true);
-//                gui_nextArea.setEnabled(false);
-//            } else {
-//                gui_previousArea.setEnabled(false);
-//                gui_nextArea.setEnabled(false);
-//            }
-        }
+        } 
 
     }
 
     @Override
     public void setRenderingStrategy(RenderingStrategy stratege) {
-        ACTION_STATE oldAction = actionState;
-        super.setRenderingStrategy(stratege);
-        
-        if (oldAction == ACTION_STATE.NAVIGATE && navigationHandler.isInstalled()) {
+        if (actionState == ACTION_STATE.NAVIGATE && navigationHandler.isInstalled()) {
             navigationHandler.uninstall();
         }
-
+        
+        super.setRenderingStrategy(stratege);
+        
         if (actionState == ACTION_STATE.NAVIGATE) {
             navigationHandler.install(this);
         }
@@ -143,22 +108,24 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     
     //-----------------------NAVIGABLEMAP2D-------------------------------------
         
-    public void setNavigationHandler(NavigationHandler handler) {
-        if (handler == null) {
+    public void setNavigationHandler(NavigationHandler newHandler) {
+        if (newHandler == null) {
             throw new NullPointerException();
-        } else if (handler != navigationHandler) {
+        } else if (newHandler != navigationHandler) {
 
+            NavigationHandler oldHandler = navigationHandler;
+            
             if (navigationHandler.isInstalled()) {
                 navigationHandler.uninstall();
             }
 
-            navigationHandler = handler;
+            navigationHandler = newHandler;
 
-            if (actionState == ACTION_STATE.SELECT) {
+            if (actionState == ACTION_STATE.NAVIGATE) {
                 navigationHandler.install(this);
             }
 
-            fireHandlerChanged(navigationHandler);
+            fireHandlerChanged(oldHandler,newHandler);
         }
     }
 

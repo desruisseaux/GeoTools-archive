@@ -62,7 +62,7 @@ public class EditHandlerChooser extends JComboBox {
 
         public void editionHandlerChanged(Map2DEditionEvent event) {
             removeItemListener(listListener);
-            EditionHandler handler = event.getNewEditionHandler();
+            EditionHandler handler = event.getEditionHandler();
             
             if (handler != getSelectedItem()) {
                 if (handler instanceof DefaultEditionHandler) {

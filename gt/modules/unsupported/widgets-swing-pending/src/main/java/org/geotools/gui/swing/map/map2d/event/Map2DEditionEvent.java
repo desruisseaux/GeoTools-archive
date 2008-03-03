@@ -72,7 +72,7 @@ public class Map2DEditionEvent extends EventObject{
      * 
      * @return MapLayer , can be null
      */
-    public MapLayer getNewEditedLayer(){
+    public MapLayer getEditedLayer(){
         return newLayer;
     }
     
@@ -88,7 +88,7 @@ public class Map2DEditionEvent extends EventObject{
      * 
      * @return EditionHandler, can't be null
      */
-    public EditionHandler getNewEditionHandler(){
+    public EditionHandler getEditionHandler(){
         return newHandler;
     }
     

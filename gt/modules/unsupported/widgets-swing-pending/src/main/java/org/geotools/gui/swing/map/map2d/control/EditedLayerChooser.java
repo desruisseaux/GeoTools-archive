@@ -22,10 +22,9 @@ import javax.swing.JComboBox;
 
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DEditionListener;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
@@ -65,7 +64,7 @@ public class EditedLayerChooser extends JComboBox {
     private Map2DEditionListener editmapListener = new Map2DEditionListener() {
 
         public void editedLayerChanged(Map2DEditionEvent event) {
-            MapLayer layer = event.getNewEditedLayer();
+            MapLayer layer = event.getEditedLayer();
 
             removeItemListener(listListener);
             if (layer != null && !editionLayer.equals(layer)) {
@@ -86,15 +85,15 @@ public class EditedLayerChooser extends JComboBox {
         public void setRendering(boolean rendering) {
         }
 
-        public void mapAreaChanged(Map2DMapAreaEvent event) {
+        public void mapAreaChanged(RenderingStrategyEvent event) {
         }
 
-        public void mapContextChanged(Map2DContextEvent event) {
+        public void mapContextChanged(RenderingStrategyEvent event) {
             if (editionContext != null) {
                 editionContext.removeMapLayerListListener(contextListener);
             }
 
-            editionContext = event.getNewContext();
+            editionContext = event.getContext();
 
             if (editionContext != null) {
                 editionContext.addMapLayerListListener(contextListener);
@@ -107,7 +106,7 @@ public class EditedLayerChooser extends JComboBox {
 
         public void mapStrategyChanged(Map2DEvent mapEvent) {
             mapEvent.getPreviousStrategy().removeStrategyListener(strategyListener);
-            mapEvent.getNewStrategy().addStrategyListener(strategyListener);
+            mapEvent.getStrategy().addStrategyListener(strategyListener);
         }
 
         public void mapActionStateChanged(Map2DEvent mapEvent) {

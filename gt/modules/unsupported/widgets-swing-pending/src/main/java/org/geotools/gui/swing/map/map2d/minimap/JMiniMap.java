@@ -44,12 +44,10 @@ import org.geotools.gui.swing.map.map2d.control.RefreshAction;
 import org.geotools.gui.swing.map.map2d.control.ZoomAllAction;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -77,18 +75,19 @@ public class JMiniMap extends JComponent {
         public void setRendering(boolean rendering) {
         }
 
-        public void mapAreaChanged(Map2DMapAreaEvent event) {
+        public void mapContextChanged(RenderingStrategyEvent event) {
+            setContext(event.getContext());
         }
 
-        public void mapContextChanged(Map2DContextEvent event) {
-            setContext(event.getNewContext());
+        public void mapAreaChanged(RenderingStrategyEvent event) {
         }
+
     };
     private final Map2DListener mapListen = new Map2DListener() {
         
         public void mapStrategyChanged(Map2DEvent mapEvent) {
             mapEvent.getPreviousStrategy().removeStrategyListener(strategyListen);
-            mapEvent.getNewStrategy().addStrategyListener(strategyListen);
+            mapEvent.getStrategy().addStrategyListener(strategyListen);
         }
 
         public void mapActionStateChanged(Map2DEvent mapEvent) {
@@ -248,19 +247,20 @@ public class JMiniMap extends JComponent {
             public void setRendering(boolean rendering) {
             }
 
-            public void mapAreaChanged(Map2DMapAreaEvent event) {
+            public void mapContextChanged(RenderingStrategyEvent event) {
+            }
+
+            public void mapAreaChanged(RenderingStrategyEvent event) {
                 revalidate();
                 repaint();
             }
 
-            public void mapContextChanged(Map2DContextEvent event) {
-            }
         };
         private final Map2DListener mapListen = new Map2DListener() {
 
             public void mapStrategyChanged(Map2DEvent mapEvent) {
                 mapEvent.getPreviousStrategy().removeStrategyListener(strategyListen);
-                mapEvent.getNewStrategy().addStrategyListener(strategyListen);
+                mapEvent.getStrategy().addStrategyListener(strategyListen);
             }
 
             public void mapActionStateChanged(Map2DEvent mapEvent) {

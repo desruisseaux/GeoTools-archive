@@ -25,8 +25,7 @@ import javax.swing.JComponent;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.handler.DefaultSelectionHandler;
 import org.geotools.gui.swing.map.map2d.handler.SelectionHandler;
@@ -71,7 +70,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Default implementation of navigableMap2D
+ * Default implementation of selectableMap2D
  * @author Johann Sorel
  */
 public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements SelectableMap2D {
@@ -92,6 +91,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      * Filter factory 2
      */
     protected final FilterFactory2 FILTER_FACTORY_2 = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+    
     private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MapLayerListListener mapLayerListlistener;
@@ -109,11 +109,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     public JDefaultSelectableMap2D() {
         super();
         mapLayerListlistener = new MapLayerListListen();
-
         selectionStrategy.setContext(selectionMapContext);
-
         addMapDecoration(selectedDecoration);
-
     }
 
     /**
@@ -135,7 +132,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
         return GEOMETRY_FACTORY.createPolygon(lr1, null);
-
     }
 
     /**
@@ -188,7 +184,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     
 
     private Style createStyle(MapLayer layer) {
-
 
         Class jtsClass = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
@@ -340,16 +335,14 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         } else if (selectionHandler.isInstalled()) {
             selectionHandler.uninstall();
         }
-
         
     }
 
     @Override
-    protected void mapAreaChanged(Map2DMapAreaEvent event) {
+    protected void mapAreaChanged(RenderingStrategyEvent event) {
         super.mapAreaChanged(event);
 
         MapContext context = renderingStrategy.getContext();
-
 
         try {
             selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
@@ -359,9 +352,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             ex.printStackTrace();
         }
 
-
-
-        selectionStrategy.setMapArea(event.getNewMapArea());
+        selectionStrategy.setMapArea(event.getMapArea());
     }
 
     @Override
@@ -383,16 +374,16 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     @Override
-    protected void mapContextChanged(Map2DContextEvent event) {
+    protected void mapContextChanged(RenderingStrategyEvent event) {
         super.mapContextChanged(event);
                 
-        if (event.getNewContext() != oldMapcontext) {
-            oldMapcontext = event.getNewContext();
+        if (event.getContext() != oldMapcontext) {
+            oldMapcontext = event.getContext();
 
             selectionMapContext.clearLayerList();
             copies.clear();
 
-            MapContext context = event.getNewContext();
+            MapContext context = event.getContext();
 
             try {
                 selectionMapContext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
@@ -405,20 +396,20 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
 
             event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-            event.getNewContext().addMapLayerListListener(mapLayerListlistener);
+            event.getContext().addMapLayerListListener(mapLayerListlistener);
         }
 
     }
 
     @Override
     public void setRenderingStrategy(RenderingStrategy stratege) {
-        ACTION_STATE oldAction = actionState;
-        super.setRenderingStrategy(stratege);
         
-        if (oldAction == ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
+        if (actionState == ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
             selectionHandler.uninstall();
         }
-
+        
+        super.setRenderingStrategy(stratege);
+        
         if (actionState == ACTION_STATE.SELECT) {
             selectionHandler.install(this);
         }
@@ -494,9 +485,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     public MapLayer[] getSelectableLayer() {
         return copies.keySet().toArray(new MapLayer[0]);
-
-//        return selectionMapContext.getLayers();
-    //return selectableLayers.toArray(new MapLayer[selectableLayers.size()]);
     }
 
     public boolean isLayerSelectable(MapLayer layer) {
@@ -542,9 +530,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     public void doSelection(double x, double y) {
-
         Geometry geometry = GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
-        // org.opengis.geometry.Geometry geometry = new Point();
         doSelection(geometry);
     }
 
