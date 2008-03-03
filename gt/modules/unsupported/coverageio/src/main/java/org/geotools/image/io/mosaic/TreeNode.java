@@ -182,7 +182,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                  * in order to take advantage of multi-processor machines. Otherwise process
                  * children in current thread in order to avoid creating too many threads.
                  */
-                if (true || threads == null) {
+                if (threads == null) {
                     child.organizeChildren(null);
                 } else {
                     /*
