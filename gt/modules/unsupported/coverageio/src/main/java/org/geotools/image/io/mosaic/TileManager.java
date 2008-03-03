@@ -33,7 +33,6 @@ import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.Comparators;
-import org.geotools.util.LRULinkedHashMap;
 
 
 /**
@@ -97,19 +96,6 @@ public class TileManager implements Serializable {
      * instance per thread if there is concurrent usage of {@link TileManager}.
      */
     private transient RTree[] trees;
-
-    /**
-     * The tiles in the region of interest. We need to retains the last collection because
-     * {@link MosaicImageReader} implementation may ask the same one a few consecutive times.
-     * Only the last collection would have been enough if we didn't allowed concurrent access
-     * to {@link TileManager}. But because of concurrency, we need a little bit more than only
-     * the last request.
-     * <p>
-     * Note that we make no attempt to block a thread if an other thread is already computing tiles
-     * for the same ROI. The intend here is to preserve (if possible) the last calculation performed
-     * by any thread, not to implement a real cache. The later is assumed caller's responsability.
-     */
-    private transient Map<SubsampledRectangle,Collection<Tile>> tilesOfInterest;
 
     /**
      * The region enclosing all tiles. Will be computed only when first needed.
@@ -252,8 +238,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * Returns the RTree, creating it if necessary. Calls to this method must be followed by a
      * {@code try ... finally} block with call to {@link #release} in the {@code finally} block.
      */
-    private RTree getTree() throws IOException {
-        assert Thread.holdsLock(this);
+    private synchronized RTree getTree() throws IOException {
         if (trees == null) {
             final ThreadGroup threads = new ThreadGroup("RTree");
             final TreeNode    root    = new TreeNode(tiles, threads);
@@ -314,7 +299,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      *          If {@code true}, this method is allowed to replace {@code subsampling} by the
      *          highest subsampling that overviews can handle, not greater than the given
      *          subsampling.
-     * @return The tiles that intercept the given region.
+     * @return The tiles that intercept the given region. May be empty but never {@code null}.
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getImageReader reader} and this operation failed.
      */
@@ -322,36 +307,15 @@ fill:   for (final List<Tile> sameInputs : asArray) {
                                      final boolean subsamplingChangeAllowed) throws IOException
     {
         final SubsampledRectangle regionOfInterest = new SubsampledRectangle(region, subsampling);
-        Collection<Tile> values;
-        final RTree tree;
-        synchronized (this) {
-            if (tilesOfInterest == null) {
-                tilesOfInterest = LRULinkedHashMap.createForRecentAccess(CONCURRENT_THREADS * 2);
-                /*
-                 * We create a map with greater capacity than the expected maximum number of
-                 * concurrent threads because if a thread is fast enough for executing two queries
-                 * while an other thread executed only one, the result of the slow thread would be
-                 * lost. Using a capacity twice bigger is an arbitrary choice (a thread could be 3
-                 * time faster), but we assume that it is enough for typical usages. Insuffisient
-                 * value can slow down the execution, but the result still valids.
-                 */
-            }
-            values = tilesOfInterest.get(regionOfInterest);
-            if (values != null) {
-                return values;
-            }
-            tree = getTree();
-        }
+        final RTree tree = getTree();
+        final Collection<Tile> values;
         try {
             // Initializes the tree with the search criterions.
             tree.regionOfInterest = regionOfInterest;
             tree.subsamplingChangeAllowed = subsamplingChangeAllowed;
             values = UnmodifiableArrayList.wrap(tree.searchTiles());
-            synchronized (this) {
-                // After the search, saves the results.
-                tilesOfInterest.put(regionOfInterest, values);
-                subsampling.setSize(regionOfInterest.xSubsampling, regionOfInterest.ySubsampling);
-            }
+            subsampling.setSize(regionOfInterest.xSubsampling, regionOfInterest.ySubsampling);
+            tree.regionOfInterest = null; // Just as a safety (not really required).
         } finally {
             release(tree);
         }

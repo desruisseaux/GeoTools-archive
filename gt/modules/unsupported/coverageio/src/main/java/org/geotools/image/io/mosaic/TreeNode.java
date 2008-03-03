@@ -66,6 +66,11 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     private List<TreeNode> children;
 
     /**
+     * {@code true} if there is no empty space between direct {@linkplain #children}.
+     */
+    private boolean dense;
+
+    /**
      * Creates a node for a single tile.
      *
      * @param  tile The tile.
@@ -177,7 +182,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                  * in order to take advantage of multi-processor machines. Otherwise process
                  * children in current thread in order to avoid creating too many threads.
                  */
-                if (threads == null) {
+                if (true || threads == null) {
                     child.organizeChildren(null);
                 } else {
                     /*
@@ -203,7 +208,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
          * subsampling will be computed by 'join' instead.
          */
         if (threads == null) {
-            computeSubsampling();
+            onChildrenCompletion();
         }
     }
 
@@ -248,19 +253,22 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                 }
             }
         }
-        computeSubsampling();
+        if (threads != null) {
+            onChildrenCompletion();
+        }
     }
 
     /**
      * Sets the subsampling to the greatest subsampling used by children.
      * This method do <strong>not</strong> scan recursively down the tree.
      */
-    private void computeSubsampling() {
+    private void onChildrenCompletion() {
         if (children != null) {
             for (final TreeNode child : children) {
                 if (child.xSubsampling > xSubsampling) xSubsampling = child.xSubsampling;
                 if (child.ySubsampling > ySubsampling) ySubsampling = child.ySubsampling;
             }
+            dense = calculateDense(children, this);
         }
     }
 
@@ -481,5 +489,25 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                 }
             }
         }
+    }
+
+    /**
+     * Returns {@code true} if there is no empty space between the specified regions. Those
+     * rectangles must be direct {@linkplain #getChildren children}, or children of children.
+     */
+    final boolean isDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
+        return dense || calculateDense(regions, roi);
+    }
+
+    /**
+     * Returns {@code true} if there is no empty space between rectangles in the specified
+     * region of interest (ROI).
+     *
+     * @todo This method is not yet implemented. For now we return {@code true} inconditionnaly
+     *       since it match common {@link TileLayout}. We define this method so we can remember
+     *       where to implement this check if we implement it in a future version.
+     */
+    private static boolean calculateDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
+        return true;
     }
 }
