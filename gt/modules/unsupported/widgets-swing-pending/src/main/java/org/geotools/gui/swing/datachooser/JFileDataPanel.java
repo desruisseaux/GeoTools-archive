@@ -36,9 +36,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.GridCoverageFinder;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
-import org.geotools.gui.swing.misc.filtre.raster.FiltreTIF;
-import org.geotools.gui.swing.misc.filtre.raster.FiltreWorldImage;
-import org.geotools.gui.swing.misc.filtre.vecteur.FiltreShape;
+import org.geotools.gui.swing.misc.filter.FileFilterFactory;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
@@ -61,9 +59,9 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     public JFileDataPanel() {
         initComponents();
 
-        gui_choose.addChoosableFileFilter(new FiltreWorldImage());
-        gui_choose.addChoosableFileFilter(new FiltreTIF());
-        gui_choose.addChoosableFileFilter(new FiltreShape());
+        gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.WORLD_IMAGE));
+        gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.GEOTIFF));
+        gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.ESRI_SHAPEFILE));
         gui_choose.setMultiSelectionEnabled(true);
 
         if (LASTPATH != null) {

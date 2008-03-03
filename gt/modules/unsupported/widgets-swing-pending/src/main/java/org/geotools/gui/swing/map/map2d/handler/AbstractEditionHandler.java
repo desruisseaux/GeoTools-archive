@@ -323,22 +323,22 @@ abstract class AbstractEditionHandler implements EditionHandler {
                 DefaultTransaction transaction = null;
                 FeatureStore<SimpleFeatureType, SimpleFeature> store = null;
                 try {
-                    String featureName = data.getTypeNames()[0]; // there is only one in a shapefile
+//                    String featureName = data.getTypeNames()[0]; // there is only one in a shapefile
 
                     // Create the DefaultTransaction Object
                     transaction = new DefaultTransaction();
 
-                    String name = editionLayer.getFeatureSource().getName().getLocalPart();
-                    try {
-                        //GR: question: why not just editionLayer.getFeatureSource()?
-                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
-                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
-                    } catch (IOException e) {
-                        // Tell it the name of the shapefile it should look for in our DataStore
-                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource(featureName);
-                    }
+//                    String name = editionLayer.getFeatureSource().getName().getLocalPart();
+//                    try {
+//                        //GR: question: why not just editionLayer.getFeatureSource()?
+//                        FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
+//                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
+//                    } catch (IOException e) {
+//                        // Tell it the name of the shapefile it should look for in our DataStore
+//                        store = (FeatureStore<SimpleFeatureType, SimpleFeature>) data.getFeatureSource(featureName);
+//                    }
 
-
+                    store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
 
                     // Then set the transaction for that FeatureStore
                     store.setTransaction(transaction);
@@ -375,16 +375,16 @@ abstract class AbstractEditionHandler implements EditionHandler {
         FeatureStore<SimpleFeatureType, SimpleFeature> store;
         if (editionLayer.getFeatureSource() instanceof FeatureStore) {
 
-            String name = editionLayer.getFeatureSource().getName().getLocalPart();
-            try {
-                //GR question: why not just editionLayer.getFeatureSource()?
-                FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
-                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
-            } catch (IOException e) {
-                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
-            }
+//            String name = editionLayer.getFeatureSource().getName().getLocalPart();
+//            try {
+//                //GR question: why not just editionLayer.getFeatureSource()?
+//                FeatureSource<SimpleFeatureType, SimpleFeature> source = ((DataStore) editionLayer.getFeatureSource().getDataStore()).getFeatureSource(name);
+//                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) source;
+//            } catch (IOException e) {
+//                store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
+//            }
 
-//            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
+            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) editionLayer.getFeatureSource();
 //                    store.getDataStore().dispose();
 
             DefaultTransaction transaction = new DefaultTransaction("trans_maj");

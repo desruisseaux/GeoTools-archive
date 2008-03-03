@@ -14,8 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 
-import org.geotools.gui.swing.misc.filtre.vecteur.FiltreMifMid;
-import org.geotools.gui.swing.misc.filtre.vecteur.FiltreSVG;
+import org.geotools.gui.swing.misc.filter.FileFilterFactory;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.DCircle;
 import org.geotools.gui.swing.toolbox.widgettool.svg2mif.element.DLine;
@@ -267,7 +266,7 @@ public class SVG2MIFTool extends AbstractWidgetTool {
 
     private void jBn_fichier_en_sortieclic_fichier_destination(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBn_fichier_en_sortieclic_fichier_destination
         JFileChooser explorateurDestination = new JFileChooser();
-        explorateurDestination.addChoosableFileFilter(new FiltreMifMid());
+        explorateurDestination.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.MAPINFO_EXCHANGE));
 
         explorateurDestination.setFileFilter(explorateurDestination.getChoosableFileFilters()[1]);
 
@@ -293,7 +292,7 @@ public class SVG2MIFTool extends AbstractWidgetTool {
 
     private void jBn_fichier_a_convclic_fichier_source(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBn_fichier_a_convclic_fichier_source
         JFileChooser explorateur = new JFileChooser();
-        explorateur.addChoosableFileFilter(new FiltreSVG());
+        explorateur.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.SCALABLE_VECTOR_GRAPHICS));
 
         explorateur.setFileFilter(explorateur.getChoosableFileFilters()[1]);
         int valeur = explorateur.showOpenDialog(this);

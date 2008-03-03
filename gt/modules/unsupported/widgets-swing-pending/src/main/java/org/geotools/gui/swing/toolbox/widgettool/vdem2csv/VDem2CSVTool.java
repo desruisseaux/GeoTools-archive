@@ -25,8 +25,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.geotools.gui.swing.misc.filtre.mnt.FiltreVDem;
-import org.geotools.gui.swing.misc.filtre.txt.FiltreCSV;
+import org.geotools.gui.swing.misc.filter.FileFilterFactory;
 import org.geotools.gui.swing.toolbox.widgettool.AbstractWidgetTool;
 
 /**
@@ -319,7 +318,7 @@ public class VDem2CSVTool extends AbstractWidgetTool {
 
     private void but_chercher_sortiechercherSortie(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_chercher_sortiechercherSortie
         JFileChooser jfc = new JFileChooser();
-        jfc.addChoosableFileFilter(new FiltreCSV());
+        jfc.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.COMMA_SEPARATED_VALUES));
         
         jfc.setFileFilter(jfc.getChoosableFileFilters()[1]);
         
@@ -343,7 +342,7 @@ public class VDem2CSVTool extends AbstractWidgetTool {
 
     private void but_chercher_entreechercherEntree(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_chercher_entreechercherEntree
         JFileChooser jfc = new JFileChooser();
-        jfc.addChoosableFileFilter(new FiltreVDem());
+        jfc.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.VISUALDEM));
         
         jfc.setFileFilter(jfc.getChoosableFileFilters()[1]);
                 

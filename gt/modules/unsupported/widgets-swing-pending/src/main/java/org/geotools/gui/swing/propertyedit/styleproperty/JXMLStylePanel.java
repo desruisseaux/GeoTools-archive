@@ -36,10 +36,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.misc.filtre.FiltreSLD;
+import org.geotools.gui.swing.misc.filter.FileFilterFactory;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.SLDConfiguration;
@@ -151,7 +152,8 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
     private void actionImport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionImport
 
         JFileChooser jfc = new JFileChooser();
-        FiltreSLD fsld = new FiltreSLD();
+        
+        FileFilter fsld = FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.STYLE_LAYER_DESCRIPTOR);
         jfc.addChoosableFileFilter(fsld);
         jfc.setFileFilter(fsld);
 
@@ -173,7 +175,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
 
     private void actionExport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionExport
         JFileChooser jfc = new JFileChooser();
-        FiltreSLD fsld = new FiltreSLD();
+        FileFilter fsld = FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.STYLE_LAYER_DESCRIPTOR);
         jfc.addChoosableFileFilter(fsld);
         jfc.setFileFilter(fsld);
 
