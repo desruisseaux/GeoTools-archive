@@ -53,8 +53,7 @@ import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.DeleteItem;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
-import org.geotools.gui.swing.datachooser.DataListener;
-import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
+import org.geotools.gui.swing.datachooser.JPostGISDataPanel;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
@@ -95,7 +94,7 @@ public class DemoExplorer extends JFrame {
                         for (int i = 0; i < tabbed.getTabCount(); i++) {
                             DataSave save = new DataSave();
                             save.nom = tabbed.getTitleAt(i);
-                            save.map = ((JDatabaseDataPanel) tabbed.getComponentAt(i)).getProperties();
+                            save.map = ((JPostGISDataPanel) tabbed.getComponentAt(i)).getProperties();
                             saves[i] = save;
                         }
 
@@ -143,31 +142,31 @@ public class DemoExplorer extends JFrame {
         if (saves != null) {
             for (DataSave save : saves) {
 
-                JDatabaseDataPanel data = new JDatabaseDataPanel();
-                data.parseProperties(save.map);
+                JPostGISDataPanel data = new JPostGISDataPanel();
+                data.setProperties(save.map);
                 tabbed.add(save.nom, data);
 
-                data.addListener(new DataListener() {
-
-                            public void addLayers(MapLayer[] layers) {
-                                if (context != null) {
-                                    context.addLayers(layers);
-                                }
-                            }
-                        });
+//                data.addListener(new DataListener() {
+//
+//                            public void addLayers(MapLayer[] layers) {
+//                                if (context != null) {
+//                                    context.addLayers(layers);
+//                                }
+//                            }
+//                        });
             }
         } else {
-            JDatabaseDataPanel data = new JDatabaseDataPanel();
+            JPostGISDataPanel data = new JPostGISDataPanel();
             tabbed.add("Server 1", data);
 
-            data.addListener(new DataListener() {
-
-                        public void addLayers(MapLayer[] layers) {
-                            if (context != null) {
-                                context.addLayers(layers);
-                            }
-                        }
-                    });
+//            data.addListener(new DataListener() {
+//
+//                        public void addLayers(MapLayer[] layers) {
+//                            if (context != null) {
+//                                context.addLayers(layers);
+//                            }
+//                        }
+//                    });
         }
 
     }
@@ -225,17 +224,17 @@ public class DemoExplorer extends JFrame {
                             nom = "Server";
                         }
 
-                        JDatabaseDataPanel data = new JDatabaseDataPanel();
+                        JPostGISDataPanel data = new JPostGISDataPanel();
                         tabbed.add(nom, data);
 
-                        data.addListener(new DataListener() {
-
-                                    public void addLayers(MapLayer[] layers) {
-                                        if (context != null) {
-                                            context.addLayers(layers);
-                                        }
-                                    }
-                                });
+//                        data.addListener(new DataListener() {
+//
+//                                    public void addLayers(MapLayer[] layers) {
+//                                        if (context != null) {
+//                                            context.addLayers(layers);
+//                                        }
+//                                    }
+//                                });
                     }
                 });
         removeserver.addActionListener(new ActionListener() {

@@ -226,11 +226,12 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //-----------------------------MAP2D----------------------------------------
-    public void setActionState(ACTION_STATE state) {
+    public void setActionState(ACTION_STATE newstate) {
 
-        if (actionState != state) {
-            fireActionStateChanged(actionState, state);
-            actionState = state;
+        if (actionState != newstate) {
+            ACTION_STATE oldstate = actionState;
+            actionState = newstate;
+            fireActionStateChanged(oldstate, newstate);
         }
 
     }

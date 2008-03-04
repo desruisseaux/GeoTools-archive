@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
-import javax.swing.event.EventListenerList;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -52,24 +51,40 @@ import org.opengis.referencing.operation.TransformException;
 public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
-    private static File LASTPATH = null;
-    private EventListenerList listeners = new EventListenerList();
-
-    /** Creates new form DefaultShapeTypeChooser */
+    
     public JFileDataPanel() {
+       this(null);
+    }
+      
+    
+    /** 
+     * Creates new form 
+     * @param openPath
+     * @param communPaths 
+     */
+    public JFileDataPanel(File openPath) {
         initComponents();
-
+                
+        if(openPath != null){
+            gui_choose.setCurrentDirectory(openPath);
+        }
+                
         gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.WORLD_IMAGE));
         gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.GEOTIFF));
+        gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.GEOGRAPHY_MARKUP_LANGUAGE));
         gui_choose.addChoosableFileFilter(FileFilterFactory.createFileFilter(FileFilterFactory.FORMAT.ESRI_SHAPEFILE));
         gui_choose.setMultiSelectionEnabled(true);
 
-        if (LASTPATH != null) {
-            gui_choose.setCurrentDirectory(LASTPATH);
-        }
-
     }
 
+    public void setDirectory(File directory){
+        gui_choose.setCurrentDirectory(directory);
+    }
+    
+    public File getDirectory(){
+        return gui_choose.getCurrentDirectory();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -78,21 +93,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        but_nouveau = new javax.swing.JButton();
-        jtf_error = new javax.swing.JTextField();
         gui_choose = new javax.swing.JFileChooser();
-
-        but_nouveau.setIcon(IconBundle.getResource().getIcon("16_data_add"));
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle"); // NOI18N
-        but_nouveau.setText(bundle.getString("add")); // NOI18N
-        but_nouveau.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        but_nouveau.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionNouveau(evt);
-            }
-        });
-
-        jtf_error.setEditable(false);
 
         gui_choose.setControlButtonsAreShown(false);
 
@@ -100,86 +101,16 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(but_nouveau)
-                .addContainerGap())
-            .add(gui_choose, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 367, Short.MAX_VALUE)
+            .add(gui_choose, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 470, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(gui_choose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(but_nouveau)
-                    .add(jtf_error, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+            .add(gui_choose, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-    private void actionNouveau(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNouveau
-        ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
-        RandomStyleFactory rsf = new RandomStyleFactory();
 
-        String errorStr = BUNDLE.getString("DefaultFileTypeChooser_error");
-
-        File[] files = gui_choose.getSelectedFiles();
-        for (File f : files) {
-            LASTPATH = f;
-            Object source = getDataStore(f);
-            if (source != null) {
-                try {
-                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
-                    Style style = rsf.createRandomVectorStyle(fs);
-                    MapLayer layer = new DefaultMapLayer(fs, style);
-                    layer.setTitle(f.getName());
-                    layers.add(layer);
-                } catch (IOException ex) {
-                    jtf_error.setText(errorStr);
-                }
-            } else {
-
-                source = getGridCoverage(f);
-                if (source != null) {
-                    try {
-                        Style style = rsf.createRasterStyle();
-                        MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
-                        layer.setTitle(f.getName());
-                        layers.add(layer);
-                    } catch (TransformException ex) {
-                        jtf_error.setText(errorStr);
-                    } catch (FactoryRegistryException ex) {
-                        jtf_error.setText(errorStr);
-                    } catch (SchemaException ex) {
-                        jtf_error.setText(errorStr);
-                    } catch (IllegalAttributeException ex) {
-                        jtf_error.setText(errorStr);
-                    }
-                } else {
-                    jtf_error.setText(errorStr);
-                }
-            }
-            LASTPATH = f;
-        }
-
-        if (layers.size() > 0) {
-            MapLayer[] lys = new MapLayer[layers.size()];
-            for (int i = 0; i < layers.size(); i++) {
-                lys[i] = layers.get(i);
-            }
-            fireEvent(lys);
-        }
-        
-    }//GEN-LAST:event_actionNouveau
-
-    public ImageIcon getIcon16() {
+    public ImageIcon getIcon() {
         return IconBundle.getResource().getIcon("16_geofile");
-    }
-
-    public ImageIcon getIcon48() {
-        return IconBundle.getResource().getIcon("48_geofile");
     }
 
     public String getTitle() {
@@ -225,22 +156,54 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         return cover;
     }
 
-    private void fireEvent(MapLayer[] layers) {
-        for (DataListener lst : listeners.getListeners(DataListener.class)) {
-            lst.addLayers(layers);
-        }
-
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton but_nouveau;
     private javax.swing.JFileChooser gui_choose;
-    private javax.swing.JTextField jtf_error;
     // End of variables declaration//GEN-END:variables
-    public void addListener(DataListener listener) {
-        listeners.add(DataListener.class, listener);
-    }
 
-    public void removeListener(DataListener listener) {
-        listeners.remove(DataListener.class, listener);
+    
+    public MapLayer[] getLayers() {
+        ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+        RandomStyleFactory rsf = new RandomStyleFactory();
+
+        String errorStr = BUNDLE.getString("DefaultFileTypeChooser_error");
+
+        File[] files = gui_choose.getSelectedFiles();
+        for (File f : files) {
+            Object source = getDataStore(f);
+            if (source != null) {
+                try {
+                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
+                    Style style = rsf.createRandomVectorStyle(fs);
+                    MapLayer layer = new DefaultMapLayer(fs, style);
+                    layer.setTitle(f.getName());
+                    layers.add(layer);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+
+                source = getGridCoverage(f);
+                if (source != null) {
+                    try {
+                        Style style = rsf.createRasterStyle();
+                        MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
+                        layer.setTitle(f.getName());
+                        layers.add(layer);
+                    } catch (TransformException ex) {
+                        ex.printStackTrace();
+                    } catch (FactoryRegistryException ex) {
+                        ex.printStackTrace();
+                    } catch (SchemaException ex) {
+                        ex.printStackTrace();
+                    } catch (IllegalAttributeException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                }
+            }
+        }
+        
+        return layers.toArray(new MapLayer[layers.size()]);
+        
     }
 }

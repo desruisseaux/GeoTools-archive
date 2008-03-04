@@ -332,7 +332,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         
         if (state == ACTION_STATE.SELECT && !selectionHandler.isInstalled()) {
             selectionHandler.install(this);
-        } else if (selectionHandler.isInstalled()) {
+        } else if (state != ACTION_STATE.SELECT && selectionHandler.isInstalled()) {
             selectionHandler.uninstall();
         }
         

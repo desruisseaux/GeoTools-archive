@@ -52,7 +52,7 @@ public class FileFilterFactory {
         GEOGRAPHY_MARKUP_LANGUAGE("gml", "gml"),
         KEYHOLE_MARKUP_LANGUAGE("kml", "kml"),
         KEYHOLE_MARKUP_LANGUAGE_ZIPPED("kmz", "kmz"),
-        JOINT_PHOTOGRAPHIC_EXPERTS_GROUP("jpg", "jpg", "jpeg"),
+        JOINT_PHOTOGRAPHIC_EXPERTS_GROUP("jpg", "jpg", "jpeg","gif"),
         JPEG_2000("jpg2", "jp2", "j2k"),
         MAPINFO_EXCHANGE("mif", "mif"),
         MAPINFO_TAB("tab", "tab"),
@@ -96,10 +96,10 @@ public class FileFilterFactory {
             private String desc;
 
             {
-                StringBuffer buff = new StringBuffer("(");
+                StringBuffer buff = new StringBuffer();
                 
                 buff.append(format.getDescription().toString());
-                buff.append(' ');
+                buff.append(" (");
                 
                 String[] ends = format.getFileEnds();
                 

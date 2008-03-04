@@ -34,6 +34,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 
 /**
  *
@@ -45,7 +46,7 @@ public class DefaultZoomInHandler implements NavigationHandler {
     private Cursor CUR_ZOOM_IN;
     private static final String title = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/handler/Bundle").getString("default");
     protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-    private final MouseInputListener mouseInputListener = new MouseListen();
+    private final MouseListen mouseInputListener = new MouseListen();
     private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
     private NavigableMap2D map2D = null;
@@ -70,12 +71,14 @@ public class DefaultZoomInHandler implements NavigationHandler {
         map2D.addDecoration(zoompanPanel);
         map2D.getComponent().addMouseListener(mouseInputListener);
         map2D.getComponent().addMouseMotionListener(mouseInputListener);
+        map2D.getComponent().addMouseWheelListener(mouseInputListener);
     }
 
     public void uninstall() {
         map2D.removeDecoration(zoompanPanel);
         map2D.getComponent().removeMouseListener(mouseInputListener);
         map2D.getComponent().removeMouseMotionListener(mouseInputListener);
+        map2D.getComponent().removeMouseWheelListener(mouseInputListener);
         map2D = null;
         installed = false;
     }
@@ -90,6 +93,18 @@ public class DefaultZoomInHandler implements NavigationHandler {
 
     public ImageIcon getIcon() {
         return ICON;
+    }
+    
+    private void zoom(int startx,int starty, int endx, int endy){
+        RenderingStrategy strategy = map2D.getRenderingStrategy();
+        
+        Coordinate coord1 = strategy.toMapCoord(startx, starty);
+        Coordinate coord2 = strategy.toMapCoord(endx, endy);
+        
+        Envelope env = new Envelope(coord1, coord2);
+        
+        strategy.setMapArea(env);
+       
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------
@@ -246,6 +261,10 @@ public class DefaultZoomInHandler implements NavigationHandler {
 
             if (mousebutton == MouseEvent.BUTTON1) {
 
+                if(startX != endX && startY != endY){
+                    zoom(startX,startY,endX,endY);
+                }
+                
                 int width = map2D.getComponent().getWidth() / 2;
                 int height = map2D.getComponent().getHeight() / 2;
                 int left = e.getX() - (width / 2);

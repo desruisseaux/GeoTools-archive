@@ -100,7 +100,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
                         
         if (state == ACTION_STATE.NAVIGATE && !navigationHandler.isInstalled()) {
             navigationHandler.install(this);
-        } else if (navigationHandler.isInstalled()) {
+        } else if (state != ACTION_STATE.NAVIGATE && navigationHandler.isInstalled()) {
             navigationHandler.uninstall();
         }
 

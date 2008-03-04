@@ -34,7 +34,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
-import org.geotools.gui.swing.map.map2d.handler.ZoomPanDecoration;
 
 /**
  *
@@ -49,7 +48,7 @@ public class DefaultZoomOutHandler implements NavigationHandler {
     private static final String title = ResourceBundle.getBundle("org/geotools/gui/swing/map/map2d/handler/Bundle").getString("default");
     
     protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-    private final MouseInputListener mouseInputListener = new MouseListen();
+    private final MouseListen mouseInputListener = new MouseListen();
     private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
     private NavigableMap2D map2D = null;
@@ -76,12 +75,14 @@ public class DefaultZoomOutHandler implements NavigationHandler {
         map2D.addDecoration(zoompanPanel);
         map2D.getComponent().addMouseListener(mouseInputListener);
         map2D.getComponent().addMouseMotionListener(mouseInputListener);
+        map2D.getComponent().addMouseWheelListener(mouseInputListener);
     }
 
     public void uninstall() {
         map2D.removeDecoration(zoompanPanel);
         map2D.getComponent().removeMouseListener(mouseInputListener);
         map2D.getComponent().removeMouseMotionListener(mouseInputListener);
+        map2D.getComponent().removeMouseWheelListener(mouseInputListener);
         map2D = null;
         installed = false;
     }

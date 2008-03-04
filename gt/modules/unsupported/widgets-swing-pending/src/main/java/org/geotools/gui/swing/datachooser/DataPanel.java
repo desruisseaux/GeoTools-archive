@@ -19,17 +19,16 @@ package org.geotools.gui.swing.datachooser;
 import java.awt.Component;
 
 import javax.swing.ImageIcon;
+import org.geotools.map.MapLayer;
 
 /**
  * @author johann sorel
  */
 public interface DataPanel {
         
-    public ImageIcon getIcon16(); 
-    public ImageIcon getIcon48();    
+    public ImageIcon getIcon();   
     public String getTitle();    
     public Component getChooserComponent();    
-    public void addListener( DataListener listener);
-    public void removeListener( DataListener listener);
+    public MapLayer[] getLayers();
     
 }

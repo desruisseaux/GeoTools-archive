@@ -40,7 +40,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
-import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.misc.Render.LayerListRenderer;
 import org.geotools.gui.swing.toolbox.process.ClipProcess;
@@ -57,6 +56,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.datachooser.JOracleDataPanel;
+import org.geotools.gui.swing.datachooser.JPostGISDataPanel;
 import org.geotools.gui.swing.toolbox.process.ProcessMonitor;
 import org.opengis.util.ProgressListener;
 
@@ -413,16 +414,17 @@ public class ClippingTool extends AbstractWidgetTool {
         //liste des panneaux visibles
         List<DataPanel> lst = new ArrayList<DataPanel>();
         lst.add(new JFileDataPanel());
-        lst.add(new JDatabaseDataPanel());
+        lst.add(new JPostGISDataPanel());
+        lst.add(new JOracleDataPanel());
 
         JDataChooser jdc = new JDataChooser(null, lst);
         JDataChooser.ACTION ret = jdc.showDialog();
 
         if (ret == JDataChooser.ACTION.APPROVE) {
             //tous les MapLayers correspondants aux fichiers/tables sélectionnées.
-            List<MapLayer> layers = jdc.getLayers();
-            if (!layers.isEmpty()) {
-                inExternLayer = layers.get(0);
+            MapLayer[] layers = jdc.getLayers();
+            if (!(layers.length == 0)) {
+                inExternLayer = layers[0];
                 inLayer = inExternLayer;
                 gui_jtf_inexternal.setText(inLayer.getTitle());
             }
@@ -435,16 +437,17 @@ public class ClippingTool extends AbstractWidgetTool {
         //liste des panneaux visibles
         List<DataPanel> lst = new ArrayList<DataPanel>();
         lst.add(new JFileDataPanel());
-        lst.add(new JDatabaseDataPanel());
+        lst.add(new JPostGISDataPanel());
+        lst.add(new JOracleDataPanel());
 
         JDataChooser jdc = new JDataChooser(null, lst);
         JDataChooser.ACTION ret = jdc.showDialog();
 
         if (ret == JDataChooser.ACTION.APPROVE) {
             //tous les MapLayers correspondants aux fichiers/tables sélectionnées.
-            List<MapLayer> layers = jdc.getLayers();
-            if (!layers.isEmpty()) {
-                clipExternLayer = layers.get(0);
+            MapLayer[] layers = jdc.getLayers();
+            if (!(layers.length ==0)) {
+                clipExternLayer = layers[0];
                 clipLayer = clipExternLayer;
                 gui_jtf_clipexternal.setText(clipLayer.getTitle());
             }
