@@ -18,10 +18,12 @@ package org.geotools.image.io.mosaic;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.Enumeration;
 import java.awt.Rectangle;
 import java.io.IOException;
 
@@ -51,13 +53,26 @@ import org.geotools.resources.UnmodifiableArrayList;
  * @author Martin Desruisseaux
  */
 @SuppressWarnings("serial") // Will not be serialized anyway.
-final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>, Runnable {
+final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>,
+        javax.swing.tree.TreeNode // TODO: should be org.geotools.gui.swing.tree.TreeNode
+{
+    /**
+     * The parent, or {@code null} if none. This is not used by {@link TreeNode} itself,
+     * but is provided for implementing the {@link javax.swing.tree.TreeNode} interface.
+     */
+    private TreeNode parent;
+
     /**
      * The parent tile which may contains other tiles. May be {@code null} for the root
      * (but not always), but initially non-null for every childs. However may be set to
      * {@code null} at some later stage if the node has been removed from the tree.
      */
     private Tile tile;
+
+    /**
+     * The index, used for preserving order compared to the user-specified one.
+     */
+    private final int index;
 
     /**
      * The children that are fully enclosed in the {@linkplain #tile}, or {@code null} if none
@@ -73,24 +88,23 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     /**
      * Creates a node for a single tile.
      *
-     * @param  tile The tile.
+     * @param  tile  The tile.
+     * @param  index The original index in the user-specified array.
      * @throws IOException if an I/O operation was required and failed.
      */
-    private TreeNode(final Tile tile) throws IOException {
+    private TreeNode(final Tile tile, final int index) throws IOException {
         super(tile.getAbsoluteRegion(), tile.getSubsampling());
-        this.tile = tile;
+        this.tile  = tile;
+        this.index = index;
     }
 
     /**
-     * Builds the root of a tree for the given tiles. Caller should invokes {@link #join}
-     * exactly once as late as possible after creation but before the first use.
+     * Builds the root of a tree for the given tiles.
      *
-     * @param  threads Must be a newly allocated an initially empty thread group. May be
-     *         {@code null} if multithreading is not wanted (e.g. during debugging).
      * @param  tiles The tiles to be inserted in the tree.
      * @throws IOException if an I/O operation was required and failed.
      */
-    TreeNode(final Tile[] tiles, final ThreadGroup threads) throws IOException {
+    public TreeNode(final Tile[] tiles) throws IOException {
         /*
          * Sorts the TreeNode with biggest tree first (this is required for the algorithm building
          * the tree). Note that the TreeNode array should be created before any sorting is applied,
@@ -99,7 +113,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
          */
         final TreeNode[] nodes = new TreeNode[tiles.length];
         for (int i=0; i<tiles.length; i++) {
-            nodes[i] = new TreeNode(tiles[i]);
+            nodes[i] = new TreeNode(tiles[i], i);
         }
         Arrays.sort(nodes);
         /*
@@ -123,161 +137,95 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                 }
             }
         }
-        int i;
         if (root != null) {
             setBounds(root);
             tile         = root.tile;
+            index        = root.index;
             xSubsampling = root.xSubsampling;
             ySubsampling = root.ySubsampling;
-            i = 1;
         } else {
-            i = 0;
-        }
-        children = new LinkedList<TreeNode>();
-        while (i < nodes.length) {
-            children.add(nodes[i++]);
+            index = -1;
         }
         /*
-         * Creates the tree. For each "root" tiles, we will creates the subtree in a
-         * separated thread in order to take advantage of multi-processor machines.
+         * Now inserts every nodes in the tree. At first we try to add each node into the smallest
+         * parent that can contain it and align it on a grid. If the node can not be aligned, then
+         * we add it into the smallest parent regardless of alignment. The grid condition produces
+         * good results for TileLayout.CONSTANT_TILE_SIZE. However it may not work so well with
+         * random tiles (open issue).
          */
-        assert threads == null || threads.activeCount() == 0 : threads;
-        organizeChildren(threads);
-        // join(threads) must be invoked at some later stage after this point.
+        for (int i=(index >= 0 ? 1 : 0); i<nodes.length; i++) {
+            final TreeNode child = nodes[i];
+            TreeNode parent = smallest(child, true);
+            if (parent == this && !isGridded(child)) {
+                parent = smallest(child, false);
+            }
+            if (parent.children == null) {
+                parent.children = new LinkedList<TreeNode>();
+            }
+            parent.children.add(child);
+        }
+        calculate();
     }
 
     /**
-     * Organizes the {@linkplain #children} in subtrees. Every children found are removed from the
-     * collection. Note that this method invokes itself recursively, but some recursive invocation
-     * may be done in a different thread.
-     * <p>
-     * This method garantees that the {@linkplain #children} list is definitive on returns, but does
-     * not garantee that the construction of children elements is completed (i.e. the references are
-     * definitives, but not the referees). Their construction may be underway in a separated thread.
+     * Returns the smallest tree node containing the given region. This method do not very if
+     * {@code this} node {@linkplain #contains contains} the given bounds - we assume that the
+     * caller verified that. This is required by the constructor which may invoke this method
+     * from the root with an empty bounding box.
      *
-     * @param threads Must be a newly allocated an initially empty thread group, or {@code null}.
+     * @param  The bounds to check for inclusion.
+     * @param  {@code true} if we require that the node can align the given bounds on a grid.
+     * @return The smallest node, or {@code this} if none (never {@code null}).
      */
-    private void organizeChildren(final ThreadGroup threads) {
-        ListIterator<TreeNode> candidates = children.listIterator();
-        while (candidates.hasNext()) {
-            final TreeNode child = candidates.next();
-            final int index = candidates.nextIndex();
-            while (candidates.hasNext()) {
-                final TreeNode candidate = candidates.next();
-                if (child.contains(candidate)) {
-                    candidates.remove();
-                    if (child.children == null) {
-                        child.children = new LinkedList<TreeNode>();
-                    }
-                    child.children.add(candidate);
-                } else {
-                    // Assertion expected because nodes should be sorted by decreasing area.
-                    // A rectangle with smaller area can not contains a rectangle with greater area.
-                    assert !candidate.contains(this) : this;
-                }
-            }
-            if (child.children != null) {
-                /*
-                 * If we started from the root level, process children in a separated thread
-                 * in order to take advantage of multi-processor machines. Otherwise process
-                 * children in current thread in order to avoid creating too many threads.
-                 */
-                if (threads == null) {
-                    child.organizeChildren(null);
-                } else {
-                    /*
-                     * This block is identical to previous one (see run() implementation), except
-                     * that it is executed in an other thread. This is safe because the child now
-                     * have its own list of children which is disjoint from the list processed by
-                     * current execution of this method.
-                     */
-                    final Thread thread = new Thread(threads, child, "TreeNode");
-                    thread.start();
-                }
-            }
-            /*
-             * Advances to the next 'child' tile, and test again all subsequent tiles for inclusion.
-             * Note that in most tile layout, the list of tiles is much shorter because of the tiles
-             * removed from the list during the previous run.
-             */
-            candidates = children.listIterator(index);
-        }
-        /*
-         * Computes subsampling only if the children are not processed by different threads,
-         * otherwise we have no garantee that the children values are ready. In the later case,
-         * subsampling will be computed by 'join' instead.
-         */
-        if (threads == null) {
-            onChildrenCompletion();
-        }
-    }
-
-    /**
-     * Blocks until every threads completed their work. This method <strong>must</strong> be
-     * invoked exactly once after {@link #TreeNode(Tile[])} constructor, as late as possible
-     * but before first use. If this method is not invoked, {@link NullPointerException} may
-     * occur randomly or the method results may be just plain false.
-     *
-     * @param threads The thread group given to the constructor.
-     */
-    final void join(final ThreadGroup threads) {
-        if (threads != null) {
-            final Thread[] actives = new Thread[children.size()];
-            int count;
-            while ((count = threads.enumerate(actives, false)) != 0) {
-                for (int i=0; i<count; i++) {
-                    final Thread active = actives[i];
-                    assert active != Thread.currentThread() : active;
-                    try {
-                        active.join();
-                    } catch (InterruptedException e) {
-                        // Someone doesn't want to let us wait. Process other
-                        // threads; we will try this one again later.
+    private TreeNode smallest(final Rectangle bounds, final boolean gridded) {
+        TreeNode smallest = this;
+        if (children != null) {
+            long smallestArea = (long) width * (long) height;
+            for (final TreeNode child : children) {
+                if (child.contains(bounds)) {
+                    final TreeNode candidate = child.smallest(bounds, gridded);
+                    if (!gridded || candidate.isGridded(bounds)) {
+                        final long area = (long) candidate.width * (long) candidate.height;
+                        if (area < smallestArea) {
+                            smallestArea = area;
+                            smallest = candidate;
+                        }
                     }
                 }
             }
-            threads.destroy();
         }
-        /*
-         * Note: According Java Language Specification, all written variables are flushed to main
-         * memory when a thread terminates. Thread.join() guarantee that the effect made by that
-         * thread are visibles. However as a paranoiac safety we will synchronize on every nodes
-         * for making sure that wratten variables are read before to compute subsampling.
-         */
-        for (final TreeNode node : children) {
-            synchronized (node) {
-                if (isEmpty()) {
-                    setBounds(node);
-                } else {
-                    add(node);
-                }
-            }
-        }
-        if (threads != null) {
-            onChildrenCompletion();
-        }
+        return smallest;
     }
 
     /**
-     * Sets the subsampling to the greatest subsampling used by children.
-     * This method do <strong>not</strong> scan recursively down the tree.
+     * Returns {@code true} if the given child is layered on a grid in this node.
      */
-    private void onChildrenCompletion() {
+    private boolean isGridded(final Rectangle child) {
+        return width  % child.width  == 0 && (child.x - x) % child.width  == 0 &&
+               height % child.height == 0 && (child.y - y) % child.height == 0;
+    }
+
+    /**
+     * Calculates the fields. This method is invoked when the tree construction is completed,
+     * i.e. every node must be assigned to its final parent.
+     */
+    private void calculate() {
         if (children != null) {
             for (final TreeNode child : children) {
+                child.parent = this;
+                child.calculate();
                 if (child.xSubsampling > xSubsampling) xSubsampling = child.xSubsampling;
                 if (child.ySubsampling > ySubsampling) ySubsampling = child.ySubsampling;
+                if (tile == null) {
+                    if (isEmpty()) {
+                        setBounds(child);
+                    } else {
+                        add(child);
+                    }
+                }
             }
             dense = calculateDense(children, this);
         }
-    }
-
-    /**
-     * Creates the tree for the given node. This method is public as an implementation
-     * side-effect, but should never be invoked directly from outside this class.
-     */
-    public synchronized void run() {
-        organizeChildren(null);
     }
 
     /**
@@ -332,10 +280,70 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     }
 
     /**
-     * Returns the tile in this node, or {@code null} if none.
+     * Returns the string representation of this node. This string should holds in a single line
+     * since it may be displayed in a {@link javax.swing.JTree}. The content may change in any
+     * future version. It is provided mostly for debugging purpose.
      */
-    public Tile getTile() {
+    @Override
+    public String toString() {
+        return (tile != null) ? tile.toString() : super.toString();
+    }
+
+    /**
+     * Returns the tile in this node, or {@code null} if none. This is also the <cite>Swing</cite>
+     * user object which is formatted (when available) by the {@link #toString} method, as required
+     * by {@link javax.swing.JTree}.
+     */
+    public Tile getUserObject() {
         return tile;
+    }
+
+    /**
+     * Returns the parent node that contains this child node.
+     */
+    public TreeNode getParent() {
+        return parent;
+    }
+
+    /**
+     * Returns {@code true} if there is no empty space between the specified regions. Those
+     * rectangles must be direct {@linkplain #getChildren children}, or children of children.
+     */
+    final boolean isDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
+        return dense || calculateDense(regions, roi);
+    }
+
+    /**
+     * Returns {@code true} if this node has no children. Note that this is slightly different from
+     * {@link #getAllowsChildren} which returns {@code false} if this node <strong>can not</strong>
+     * have children.
+     */
+    public boolean isLeaf() {
+        return children == null;
+    }
+
+    /**
+     * Return {@code true} in almost every case since there is no reason to prevent a tile from
+     * containing smaller tiles, unless the tile bounds {@linkplain #isEmpty is empty}.
+     */
+    public boolean getAllowsChildren() {
+        return !isEmpty();
+    }
+
+    /**
+     * Returns the number of children. This method is provided for <cite>Swing</cite> usage.
+     * When using {@link TreeNode} directly, consider using {@link #getChildren} instead.
+     */
+    public int getChildCount() {
+        return (children != null) ? children.size() : 0;
+    }
+
+    /**
+     * Returns the children at the given index. This method is provided for <cite>Swing</cite>
+     * usage. When using {@link TreeNode} directly, consider using {@link #getChildren} instead.
+     */
+    public TreeNode getChildAt(final int index) {
+        return children.get(index);
     }
 
     /**
@@ -343,6 +351,26 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
      */
     public List<TreeNode> getChildren() {
         return children;
+    }
+
+    /**
+     * Returns an enumeration over the children. This method is provided for <cite>Swing</cite>
+     * usage. When using {@link TreeNode} directly, consider using {@link #getChildren} instead.
+     */
+    public Enumeration<TreeNode> children() {
+        Collection<TreeNode> children = this.children;
+        if (children == null) {
+            children = Collections.emptyList();
+        }
+        return Collections.enumeration(children);
+    }
+
+    /**
+     * Returns the index of given node. If this node does not contain the given one,
+     * -1 will be returned. This method is provided for <cite>Swing</cite> usage.
+     */
+    public int getIndex(final javax.swing.tree.TreeNode node) {
+        return (children != null) ? children.indexOf(node) : -1;
     }
 
     /**
@@ -489,14 +517,6 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                 }
             }
         }
-    }
-
-    /**
-     * Returns {@code true} if there is no empty space between the specified regions. Those
-     * rectangles must be direct {@linkplain #getChildren children}, or children of children.
-     */
-    final boolean isDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
-        return dense || calculateDense(regions, roi);
     }
 
     /**

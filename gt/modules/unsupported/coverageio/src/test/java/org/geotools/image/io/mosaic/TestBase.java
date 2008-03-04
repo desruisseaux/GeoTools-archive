@@ -20,14 +20,11 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import javax.imageio.spi.ImageReaderSpi;
 
 import javax.swing.JTree;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import junit.framework.TestCase;
 
@@ -106,8 +103,8 @@ public abstract class TestBase extends TestCase {
      */
     final void show(final TreeNode root) {
         final JFrame frame = new JFrame("TreeNode");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.add(new JScrollPane(new JTree(toSwing(root))));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new JScrollPane(new JTree(root)));
         frame.pack();
         frame.setVisible(true);
         try {
@@ -115,21 +112,5 @@ public abstract class TestBase extends TestCase {
         } catch (InterruptedException e) {
             // Go back to work.
         }
-    }
-
-    /**
-     * Wraps the given RTree node (including children) into a Swing tree node.
-     *
-     * @todo {@link TreeNode} should implements directly the Swing interface instead.
-     */
-    private static MutableTreeNode toSwing(final TreeNode node) {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode(node.getTile().toString());
-        final List<TreeNode> children = node.getChildren();
-        if (children != null) {
-            for (final TreeNode child : children) {
-                root.add(toSwing(child));
-            }
-        }
-        return root;
     }
 }

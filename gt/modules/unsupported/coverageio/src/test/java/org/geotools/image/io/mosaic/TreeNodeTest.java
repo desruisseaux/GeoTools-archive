@@ -49,8 +49,7 @@ public class TreeNodeTest extends TestBase {
     protected void setUp() throws IOException {
         super.setUp();
         assertEquals(4733, targetTiles.length);
-        root = new TreeNode(targetTiles, null);
-        root.join(null);
+        root = new TreeNode(targetTiles);
     }
 
     /**
@@ -59,7 +58,7 @@ public class TreeNodeTest extends TestBase {
     public void testTreeNode() throws IOException {
         // TreeNode has many assert statements, so we want them enabled.
         assertTrue(TreeNode.class.desiredAssertionStatus());
-        assertNotNull(root.getTile());
+        assertNotNull(root.getUserObject());
         assertEquals(root, root);
         assertTrue (root.containsAll(manager.getTiles()));
         assertFalse(root.containsAll(Arrays.asList(sourceTiles)));
@@ -90,13 +89,9 @@ public class TreeNodeTest extends TestBase {
             }
         }
         /*
-         * Tests multi-threading computation and ensure that it is identical
-         * to the non-multithread one.
+         * Creates a copy and ensure it is identical to the original one.
          */
-        final ThreadGroup threads = new ThreadGroup("TreeNode");
-        final TreeNode tree2 = new TreeNode(targetTiles, threads);
-        tree2.join(threads);
-        assertTrue(threads.isDestroyed());
+        final TreeNode tree2 = new TreeNode(targetTiles);
         assertEquals(root, tree2);
         /*
          * Tests removal of nodes.
@@ -157,7 +152,7 @@ if (true) return; // Test disabled for now.
     private static void checkSubsampling(final TreeNode node, final int[] subsamplings, int i)
             throws IOException
     {
-        final Tile tile = node.getTile();
+        final Tile tile = node.getUserObject();
         final String message = tile.toString();
         assertTrue(message, --i >= 0);
         final int subsampling = subsamplings[i];
@@ -171,7 +166,7 @@ if (true) return; // Test disabled for now.
         if (children != null) {
             final Rectangle bounds = tile.getAbsoluteRegion();
             for (final TreeNode child : children) {
-                assertTrue(message, bounds.contains(child.getTile().getAbsoluteRegion()));
+                assertTrue(message, bounds.contains(child.getUserObject().getAbsoluteRegion()));
                 checkSubsampling(child, subsamplings, i);
             }
         }

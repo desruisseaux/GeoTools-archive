@@ -18,7 +18,10 @@ package org.geotools.image.io.mosaic;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -191,20 +194,27 @@ public class MosaicImageWriter extends ImageWriter {
         if (managers == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
         }
+        final int bytesPerPixel;
         final Collection<Tile> tiles;
         if (isWriteEnabled()) {
             tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
+            /*
+             * Computes an estimation of the amount of memory to be required for each pixel.
+             * This estimation may not be accurate especially for image packing many pixels
+             * per byte, but a value too high is probably better than a value too low.
+             */
+            final SampleModel model = reader.getRawImageType(inputIndex).getSampleModel();
+            bytesPerPixel = Math.max(1, model.getNumBands() *
+                    DataBuffer.getDataTypeSize(model.getDataType()) / Byte.SIZE);
         } else {
             tiles = Collections.emptyList();
+            bytesPerPixel = 1;
         }
-        final ThreadGroup treeThreads = new ThreadGroup("TreeNode");
-        final TreeNode tree = new TreeNode(tiles.toArray(new Tile[tiles.size()]), treeThreads);
-        /*
-         * Do here a little bit of work that we could have done at the begining of this method.
-         * We do it there, between "new TreeNode" and "tree.join" because TreeNode may be doing
-         * some work in background threads.
-         */
         int maximumPixelCount = 0; // To be computed after a runtime.gc() when first needed.
+        /*
+         * Various other objects to be required in the loop...
+         */
+        final TreeNode       tree      = new TreeNode(tiles.toArray(new Tile[tiles.size()]));
         final Runtime        runtime   = Runtime.getRuntime();
         final ImageReadParam params    = reader.getDefaultReadParam();
         final Logger         logger    = Logging.getLogger(MosaicImageWriter.class);
@@ -213,7 +223,7 @@ public class MosaicImageWriter extends ImageWriter {
         if (!logReads) {
             ((MosaicImageReader) reader).setLogLevel(level);
         }
-        tree.join(treeThreads);
+        BufferedImage image = null;
         while (!tiles.isEmpty()) {
             /*
              * Before to attempt image loading, ask explicitly for a garbage collection cycle.
@@ -225,7 +235,7 @@ public class MosaicImageWriter extends ImageWriter {
             if (maximumPixelCount == 0) {
                 long usedMemory = runtime.totalMemory() - runtime.freeMemory();
                 usedMemory = runtime.maxMemory() - 2*usedMemory;
-                maximumPixelCount = (int) Math.min(1024*1024*1024, usedMemory);
+                maximumPixelCount = (int) Math.min(1024*1024*1024, usedMemory) / bytesPerPixel;
             }
             /*
              * Loads the image for some initial tile from the list. We will write as many tiles as
@@ -234,24 +244,34 @@ public class MosaicImageWriter extends ImageWriter {
              */
             final Dimension imageSubsampling = new Dimension(); // Computed by next line.
             final Tile imageTile = getEnclosingTile(tiles, tree, imageSubsampling, maximumPixelCount);
+            final Rectangle imageRegion = imageTile.getAbsoluteRegion();
+            if (image != null) {
+                final int width  = imageRegion.width  / imageSubsampling.width;
+                final int height = imageRegion.height / imageSubsampling.height;
+                if (width != image.getWidth() || height != image.getHeight()) {
+                    maximumPixelCount = 0; // Forces a new computation.
+                    image = null;
+                    continue;
+                }
+            }
             if (logReads) {
                 logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
             }
-            params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
-            final Rectangle imageRegion = imageTile.getAbsoluteRegion();
             params.setSourceRegion(imageRegion);
+            params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
+            params.setDestination(image);
             /*
-             * Now process to the image loading...
+             * Now process to the image loading. If we fails with an OutOfMemoryError (which
+             * typically happen while creating the large BufferedImage), reduces the amount
+             * of memory that we are allowed to use and try again.
              */
-            final RenderedImage image;
             try {
-                image = reader.readAsRenderedImage(inputIndex, params);
+                image = reader.read(inputIndex, params);
             } catch (OutOfMemoryError error) {
                 maximumPixelCount >>>= 1;
                 if (maximumPixelCount == 0) {
                     throw error;
                 }
-                // We reduced the amount of memory allowed to ourself. Try again.
                 continue;
             }
             /*
@@ -395,8 +415,8 @@ public class MosaicImageWriter extends ImageWriter {
              * could not be used for reading the tile considered by the outer loop.
              */
             final long area = (long) region.width * (long) region.height;
-            Dimension finerSubsampling = null;
-            int bestSize = Integer.MAX_VALUE;
+            Dimension finerSubsampling = subsampling;
+            int bestSize = subsampling.width * subsampling.height;
             for (final Iterator<Tile> it=enclosed.iterator(); it.hasNext();) {
                 final Tile subtile = it.next();
                 final Dimension s = subtile.getSubsampling();

@@ -26,6 +26,8 @@ import java.io.Serializable;
 import java.io.ObjectInputStream;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -46,7 +48,7 @@ import org.geotools.util.Comparators;
  * deserialization time.
  * <p>
  * This class is thread-safe but default implementation is not scalable to a high number of
- * concurrent threads. Up to 4 concurrent calls to {@link #getTile getTile} should be okay,
+ * concurrent threads. Up to 4 concurrent calls to {@link #getTiles getTiles} should be okay,
  * more may slow down the execution.
  *
  * @since 2.5
@@ -122,6 +124,11 @@ public class TileManager implements Serializable {
      * and use reflection like {@link org.geotools.coverage.grid.GridCoverage2D#readObject}.
      */
     private transient Set<ImageReaderSpi> providers;
+
+    /**
+     * A view of the tile as a Swing tree. Created only when first requested.
+     */
+    private transient TreeModel swing;
 
     /**
      * Creates a manager for the given tiles. This constructor is protected for subclassing,
@@ -240,12 +247,10 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      */
     private synchronized RTree getTree() throws IOException {
         if (trees == null) {
-            final ThreadGroup threads = new ThreadGroup("RTree");
-            final TreeNode    root    = new TreeNode(tiles, threads);
-            final RTree       tree    = new RTree(root);
-            final RTree[]     trees   = new RTree[CONCURRENT_THREADS];
+            final TreeNode root  = new TreeNode(tiles);
+            final RTree    tree  = new RTree(root);
+            final RTree[]  trees = new RTree[CONCURRENT_THREADS];
             trees[0] = tree;
-            root.join(threads); // Wait for the background construction to finish.
             root.setReadOnly();
             assert root.containsAll(allTiles);
             this.trees = trees; // Save last so it is saved only on success.
@@ -390,6 +395,22 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     @Override
     public String toString() {
         return Tile.toString(allTiles);
+    }
+
+    /**
+     * Returns this tree as a <cite>Swing</cite> tree model. The labels displayed in this tree
+     * may change in any future version. This method is provided only as a debugging tools.
+     */
+    public synchronized TreeModel toSwingTree() throws IOException {
+        if (swing == null) {
+            final RTree tree = getTree();
+            try {
+                swing = new DefaultTreeModel(tree.root);
+            } finally {
+                release(tree);
+            }
+        }
+        return swing;
     }
 
     /**

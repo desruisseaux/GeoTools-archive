@@ -39,7 +39,7 @@ final class RTree {
     /**
      * The root of the tree.
      */
-    private final TreeNode root;
+    protected final TreeNode root;
 
     /**
      * The requested region. This field must be set before {@link #searchTiles} is invoked.
@@ -239,7 +239,7 @@ final class RTree {
         int       tileCost   = 0;      // Cost of the tile under the 'readRegion' key.
         boolean   tileAdded  = false;  // true if we add the tile (not if it replaces an old one).
         Rectangle readRegion = null;   // The region to be read (may be smaller than node region).
-        Tile tile = node.getTile();
+        Tile tile = node.getUserObject();
         if (tile != null) {
             assert node.equals(tile.getAbsoluteRegion()) : tile;
             final Dimension floor = tile.getSubsamplingFloor(subsampling);
