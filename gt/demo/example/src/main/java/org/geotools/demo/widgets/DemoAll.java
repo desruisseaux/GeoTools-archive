@@ -56,11 +56,10 @@ import org.geotools.gui.swing.contexttree.popup.RuleMinScaleItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
-import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
-import org.geotools.gui.swing.datachooser.JServerDataPanel;
+import org.geotools.gui.swing.datachooser.JOracleDataPanel;
+import org.geotools.gui.swing.datachooser.JPostGISDataPanel;
 import org.geotools.gui.swing.datachooser.JWFSDataPanel;
-import org.geotools.gui.swing.datachooser.JWMSDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.JDefaultEditableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
@@ -128,15 +127,15 @@ public class DemoAll extends javax.swing.JFrame {
         final MapContext context = buildContext();
         initTree(tree, map);
 
-        pan_mappane.add(BorderLayout.CENTER,map);
-        pan_minimap.add(BorderLayout.CENTER,minimap);
+        pan_mappane.add(BorderLayout.CENTER, map);
+        pan_minimap.add(BorderLayout.CENTER, minimap);
 
         tree.addContext(context);
 
         gui_map2dnavigation.setMap(map);
         gui_map2dselection.setMap(map);
         gui_map2dinfo.setMap(map);
-        gui_map2dedit.setMap(map);
+//        gui_map2dedit.setMap(map);
 
         overBackImage.setImage(IconBundle.getResource().getIcon("about").getImage());
         overBackImage.setOpaque(true);
@@ -231,10 +230,10 @@ public class DemoAll extends javax.swing.JFrame {
         map.getRenderingStrategy().setContext(context);
         minimap.setRelatedMap2D(map);
 
-        
-        Thread t = new Thread(){
-            
-            public void run(){
+
+        Thread t = new Thread() {
+
+            public void run() {
                 map.getInformationDecoration().displayMessage("This in an information message", 25000, LEVEL.INFO);
                 try {
                     sleep(5000);
@@ -255,7 +254,7 @@ public class DemoAll extends javax.swing.JFrame {
             }
         };
         t.start();
-        
+
     }
 
     private MapContext buildContext() {
@@ -341,7 +340,6 @@ public class DemoAll extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        group_jdatachooser = new javax.swing.ButtonGroup();
         dia_about = new javax.swing.JDialog();
         jXImagePanel1 = new org.jdesktop.swingx.JXImagePanel();
         jLabel1 = new javax.swing.JLabel();
@@ -364,18 +362,10 @@ public class DemoAll extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         gui_map2dnavigation = new org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar();
         gui_map2dselection = new org.geotools.gui.swing.map.map2d.control.JMap2DSelectionBar();
-        gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
-        jToolBar2 = new javax.swing.JToolBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JSeparator();
-        chk_file = new javax.swing.JCheckBoxMenuItem();
-        chk_database = new javax.swing.JCheckBoxMenuItem();
-        chk_server = new javax.swing.JCheckBoxMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
@@ -389,12 +379,6 @@ public class DemoAll extends javax.swing.JFrame {
         guiChkSubStyle = new javax.swing.JCheckBoxMenuItem();
         jSeparator4 = new javax.swing.JSeparator();
         jMenuItem8 = new javax.swing.JMenuItem();
-        jMenu7 = new javax.swing.JMenu();
-        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
-        jSeparator5 = new javax.swing.JSeparator();
-        guiChkShapeCreateTool = new javax.swing.JCheckBoxMenuItem();
-        guiChkVdem2CSV = new javax.swing.JCheckBoxMenuItem();
-        guiChkSVG2MIF = new javax.swing.JCheckBoxMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItem5 = new javax.swing.JMenuItem();
         jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
@@ -548,18 +532,6 @@ public class DemoAll extends javax.swing.JFrame {
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(gui_map2dselection, gridBagConstraints);
 
-        gui_map2dedit.setFloatable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel2.add(gui_map2dedit, gridBagConstraints);
-
-        jToolBar2.setFloatable(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel2.add(jToolBar2, gridBagConstraints);
-
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         jMenu1.setText("File");
@@ -581,31 +553,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu1.add(jMenuItem1);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Data");
-
-        jMenuItem3.setText("Add Data");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataChooserAction(evt);
-            }
-        });
-        jMenu2.add(jMenuItem3);
-        jMenu2.add(jSeparator3);
-
-        chk_file.setSelected(true);
-        chk_file.setText("FileDataPanel");
-        jMenu2.add(chk_file);
-
-        chk_database.setSelected(true);
-        chk_database.setText("DatabaseDataPanel");
-        jMenu2.add(chk_database);
-
-        chk_server.setSelected(true);
-        chk_server.setText("ServerDataPanel");
-        jMenu2.add(chk_server);
-
-        jMenuBar1.add(jMenu2);
 
         jMenu4.setText("GUI");
 
@@ -680,47 +627,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu5.add(jMenuItem8);
 
         jMenu4.add(jMenu5);
-
-        jMenu7.setText("Tool Tree");
-
-        jCheckBoxMenuItem1.setSelected(true);
-        jCheckBoxMenuItem1.setText("Clip");
-        jCheckBoxMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jCheckBoxMenuItem1);
-        jMenu7.add(jSeparator5);
-
-        guiChkShapeCreateTool.setSelected(true);
-        guiChkShapeCreateTool.setText("Shapefile creation");
-        guiChkShapeCreateTool.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkShapeCreateToolActionPerformed(evt);
-            }
-        });
-        jMenu7.add(guiChkShapeCreateTool);
-
-        guiChkVdem2CSV.setSelected(true);
-        guiChkVdem2CSV.setText("VDem > CSV");
-        guiChkVdem2CSV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkVdem2CSVActionPerformed(evt);
-            }
-        });
-        jMenu7.add(guiChkVdem2CSV);
-
-        guiChkSVG2MIF.setSelected(true);
-        guiChkSVG2MIF.setText("SVG > MIF");
-        guiChkSVG2MIF.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkSVG2MIFActionPerformed(evt);
-            }
-        });
-        jMenu7.add(guiChkSVG2MIF);
-
-        jMenu4.add(jMenu7);
 
         jMenu6.setText("Map2D");
 
@@ -798,36 +704,6 @@ public class DemoAll extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
-
-
-        if (tree.getActiveContext() != null) {
-            List<DataPanel> lst = new ArrayList<DataPanel>();
-
-            if (chk_file.isSelected()) {
-                lst.add(new JFileDataPanel());
-            }
-            if (chk_database.isSelected()) {
-                lst.add(new JDatabaseDataPanel());
-            }
-            if (chk_server.isSelected()) {
-                lst.add(new JServerDataPanel());
-            }
-
-            JDataChooser jdc = new JDataChooser(null, lst);
-
-            JDataChooser.ACTION ret = jdc.showDialog();
-
-            if (ret == JDataChooser.ACTION.APPROVE) {
-                List<MapLayer> layers = jdc.getLayers();
-                for (MapLayer layer : layers) {
-                    tree.getActiveContext().addLayer(layer);
-                }
-            }
-
-        }
-    }//GEN-LAST:event_dataChooserAction
-
     private void exitAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitAction
         System.exit(0);
     }//GEN-LAST:event_exitAction
@@ -915,25 +791,17 @@ public class DemoAll extends javax.swing.JFrame {
         if (tree.getActiveContext() != null) {
             List<DataPanel> lst = new ArrayList<DataPanel>();
 
-            if (chk_file.isSelected()) {
-                lst.add(new JFileDataPanel());
-            }
-            if (chk_database.isSelected()) {
-                lst.add(new JDatabaseDataPanel());
-            }
-            if (chk_server.isSelected()) {
-                lst.add(new JServerDataPanel());
-            }
-
+            lst.add(new JFileDataPanel());
+            lst.add(new JPostGISDataPanel());
+            lst.add(new JOracleDataPanel());
             lst.add(new JWFSDataPanel());
-            lst.add(new JWMSDataPanel());
 
             JDataChooser jdc = new JDataChooser(null, lst);
 
             JDataChooser.ACTION ret = jdc.showDialog();
 
             if (ret == JDataChooser.ACTION.APPROVE) {
-                List<MapLayer> layers = jdc.getLayers();
+                MapLayer[] layers = jdc.getLayers();
                 for (MapLayer layer : layers) {
                     tree.getActiveContext().addLayer(layer);
                 }
@@ -966,38 +834,6 @@ public class DemoAll extends javax.swing.JFrame {
         }
 }//GEN-LAST:event_guiChkSubSourceActionPerformed
 
-    private void guiChkSVG2MIFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkSVG2MIFActionPerformed
-        if (guiChkSVG2MIF.isSelected()) {
-            tooltree.addTool(svg2mifTool);
-        } else {
-            tooltree.removeTool(svg2mifTool);
-        }        
-    }//GEN-LAST:event_guiChkSVG2MIFActionPerformed
-
-    private void guiChkVdem2CSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkVdem2CSVActionPerformed
-        if (guiChkVdem2CSV.isSelected()) {
-            tooltree.addTool(vdem2csvTool);
-        } else {
-            tooltree.removeTool(vdem2csvTool);
-        }  
-    }//GEN-LAST:event_guiChkVdem2CSVActionPerformed
-
-    private void guiChkShapeCreateToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkShapeCreateToolActionPerformed
-        if (guiChkShapeCreateTool.isSelected()) {
-            tooltree.addTool(shapeTool);
-        } else {
-            tooltree.removeTool(shapeTool);
-        }  
-    }//GEN-LAST:event_guiChkShapeCreateToolActionPerformed
-
-    private void jCheckBoxMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem1ActionPerformed
-        if (jCheckBoxMenuItem1.isSelected()) {
-            tooltree.addTool(clipTool);
-        } else {
-            tooltree.removeTool(clipTool);
-        }  
-    }//GEN-LAST:event_jCheckBoxMenuItem1ActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -1020,42 +856,30 @@ public class DemoAll extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bg_backlayer;
-    private javax.swing.JCheckBoxMenuItem chk_database;
-    private javax.swing.JCheckBoxMenuItem chk_file;
-    private javax.swing.JCheckBoxMenuItem chk_server;
     private javax.swing.JDialog dia_about;
-    private javax.swing.ButtonGroup group_jdatachooser;
     private javax.swing.JCheckBoxMenuItem guiChkOpacity;
-    private javax.swing.JCheckBoxMenuItem guiChkSVG2MIF;
     private javax.swing.JCheckBoxMenuItem guiChkSelection;
-    private javax.swing.JCheckBoxMenuItem guiChkShapeCreateTool;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
     private javax.swing.JCheckBoxMenuItem guiChkSubSource;
     private javax.swing.JCheckBoxMenuItem guiChkSubStyle;
-    private javax.swing.JCheckBoxMenuItem guiChkVdem2CSV;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
     private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
-    private org.geotools.gui.swing.map.map2d.control.JMap2DEditBar gui_map2dedit;
     private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
     private org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar gui_map2dnavigation;
     private org.geotools.gui.swing.map.map2d.control.JMap2DSelectionBar gui_map2dselection;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
-    private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
@@ -1070,14 +894,11 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JToolBar jToolBar2;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
