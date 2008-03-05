@@ -38,7 +38,6 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
-import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -94,7 +93,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     
     private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-    private final MapLayerListListener mapLayerListlistener;
     private final BufferComponent selectedDecoration = new BufferComponent();
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private MapContext oldMapcontext = null;
@@ -108,7 +106,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      */
     public JDefaultSelectableMap2D() {
         super();
-        mapLayerListlistener = new MapLayerListListen();
         selectionStrategy.setContext(selectionMapContext);
         addMapDecoration(selectedDecoration);
     }
@@ -356,8 +353,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     @Override
-    protected void crsChanged(PropertyChangeEvent arg0) {
-        super.crsChanged(arg0);
+    public void propertyChange(PropertyChangeEvent arg0) {
+        super.propertyChange(arg0);
         
         MapContext context = renderingStrategy.getContext();
 
@@ -395,8 +392,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
                 ex.printStackTrace();
             }
 
-            event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-            event.getContext().addMapLayerListListener(mapLayerListlistener);
         }
 
     }
@@ -435,6 +430,19 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        selectionStrategy.dispose();
+    }
+
+    @Override
+    public void layerRemoved(MapLayerListEvent event) {
+        super.layerRemoved(event);
+        removeSelectableLayer(event.getLayer());
+    }
+
+    
 
     //----------------------SELECTABLE MAP2D------------------------------------
     private void addSelectableLayerNU(MapLayer layer) {
@@ -574,22 +582,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------        
-    private class MapLayerListListen implements MapLayerListListener {
-
-        public void layerAdded(MapLayerListEvent event) {
-        }
-
-        public void layerRemoved(MapLayerListEvent event) {
-            removeSelectableLayer(event.getLayer());
-        }
-
-        public void layerChanged(MapLayerListEvent event) {
-        }
-
-        public void layerMoved(MapLayerListEvent event) {
-        }
-    }
-
+   
     private class BufferComponent extends JComponent implements MapDecoration {
 
         public BufferComponent() {
@@ -610,6 +603,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         public Map2D getMap2D() {
             return null;
+        }
+
+        public void dispose() {
         }
         }
 }

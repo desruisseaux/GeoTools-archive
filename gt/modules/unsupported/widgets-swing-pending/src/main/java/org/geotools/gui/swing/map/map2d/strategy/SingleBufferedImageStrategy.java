@@ -37,7 +37,6 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -153,9 +152,15 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         thread.wake();
     }
 
-    //-------------layer events-------------------------------------------------
     @Override
-    protected void layerAdd(MapLayerListEvent event) {
+     public void dispose(){
+        super.dispose();
+        thread.dispose();
+    }
+    
+    //-------------layer events-------------------------------------------------
+    
+    public void layerAdded(MapLayerListEvent event) {
 
         if (getContext().getLayerCount() == 1) {
             try {
@@ -171,29 +176,37 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
             testRefresh();
         }
     }
-
-    @Override
-    protected void layerRemove(MapLayerListEvent event) {
+    
+    public void layerRemoved(MapLayerListEvent event) {
         testRefresh();
     }
 
-    @Override
-    protected void layerChange(MapLayerListEvent event) {
+    public void layerChanged(MapLayerListEvent event) {
         testRefresh();
     }
 
-    @Override
-    protected void layerMove(MapLayerListEvent event) {
+    public void layerMoved(MapLayerListEvent event) {
         testRefresh();
     }
 
     //----------private classes-------------------------------------------------
     private class DrawingThread extends Thread {
 
+        private boolean dispose = false;
+        
+        public void dispose(){
+            dispose = true;
+            wake();
+        }
+        
         @Override
         public void run() {
 
-            while (true) {
+            while (true && !dispose) {
+                
+                if(dispose){
+                    break;
+                }
 
                 if (mustupdate) {
                     setPainting(true);

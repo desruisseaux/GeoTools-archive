@@ -192,9 +192,16 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         paintingThread.wake();
     }
 
-    //-------------layer events-------------------------------------------------
     @Override
-    protected void layerAdd(MapLayerListEvent event) {
+    public void dispose(){
+        super.dispose();
+        thread.dispose();
+        paintingThread.dispose();
+    }
+    
+    //-------------layer events-------------------------------------------------
+    
+    public void layerAdded(MapLayerListEvent event) {
 
         if (getContext().getLayerCount() == 1) {
             try {
@@ -211,28 +218,37 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
-    @Override
-    protected void layerRemove(MapLayerListEvent event) {
+    public void layerRemoved(MapLayerListEvent event) {
+        testRefresh();
+    }
+    
+    public void layerChanged(MapLayerListEvent event) {
         testRefresh();
     }
 
-    @Override
-    protected void layerChange(MapLayerListEvent event) {
-        testRefresh();
-    }
-
-    @Override
-    protected void layerMove(MapLayerListEvent event) {
+    public void layerMoved(MapLayerListEvent event) {
         testRefresh();
     }
 
     //----------private classes-------------------------------------------------
     private class DrawingThread extends Thread {
 
+        private boolean dispose = false;
+        
+        public void dispose(){
+            dispose = true;
+            wake();
+        }
+        
         @Override
         public void run() {
 
-            while (true) {
+            while (true && !dispose) {
+                
+                if(dispose){
+                    break;
+                }
+                
                 if (mustupdate) {
                     mustupdate = false;
                     setPainting(true);
@@ -262,11 +278,22 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
     private class RepaintingThread extends Thread {
 
+        private boolean dispose = false;
+        
+        public void dispose(){
+            dispose = true;
+            wake();
+        }
+        
         @Override
         public void run() {
 
-            while (true) {
+            while (true && !dispose) {
 
+                if(dispose){
+                    break;
+                }
+                
                 comp.repaint();
 
                 while (isPainting()) {

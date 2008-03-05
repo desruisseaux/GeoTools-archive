@@ -76,4 +76,7 @@ public class LasoSelectionDecoration extends JComponent implements MapDecoration
     public Map2D getMap2D() {
         return null;
     }
+
+    public void dispose() {
+    }
 }

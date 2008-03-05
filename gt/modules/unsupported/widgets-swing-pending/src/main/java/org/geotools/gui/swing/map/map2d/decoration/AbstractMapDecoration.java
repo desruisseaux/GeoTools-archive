@@ -35,6 +35,8 @@ public abstract class AbstractMapDecoration implements MapDecoration{
         return map;
     }
 
+    public void dispose() {
+    }
     
 
 }

@@ -85,4 +85,7 @@ public class DefaultSelectionDecoration extends JComponent implements MapDecorat
     public Map2D getMap2D() {
         return null;
     }
+
+    public void dispose() {
+    }
 }

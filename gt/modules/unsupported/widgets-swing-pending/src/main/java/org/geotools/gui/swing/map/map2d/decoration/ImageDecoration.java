@@ -46,4 +46,7 @@ public class ImageDecoration extends JXImagePanel implements MapDecoration{
     public Map2D getMap2D() {
         return null;
     }
+
+    public void dispose() {
+    }
 }

@@ -39,6 +39,7 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.lang.ref.WeakReference;
 
 /**
  * Optimize Strategy for edition. high memory needed
@@ -51,14 +52,14 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
     private BufferComponent comp ;
     private MapContext buffercontext ;
     private GraphicsConfiguration GC ;
-    private boolean mustupdate ;
     
-    private Map<MapLayer, BufferedImage> stock ;
+    boolean mustupdate ;    
+    Map<MapLayer, BufferedImage> stock ;
 
     @Override
     protected JComponent init() {
         renderer = new ShapefileRenderer();
-        thread = new DrawingThread();
+        thread = new DrawingThread(this);
         comp = new BufferComponent();
         buffercontext = new OneLayerContext();
         GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
@@ -103,7 +104,7 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
-    private void mergeBuffers() {
+    void mergeBuffers() {
         VolatileImage vi = createBackBuffer();
         Graphics2D g2d = (Graphics2D) vi.getGraphics();
 
@@ -189,10 +190,17 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         mustupdate = true;
         thread.wake();
     }
+    
+    
+    @Override
+    public void dispose(){
+        super.dispose();
+        thread.dispose();
+    }
 
     //-------------layer events-------------------------------------------------
-    @Override
-    protected void layerAdd(MapLayerListEvent event) {
+
+    public void layerAdded(MapLayerListEvent event) {
 
         MapLayer layer = event.getLayer();
         stock.put(layer, createBufferImage(layer));
@@ -213,63 +221,23 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
-    @Override
-    protected void layerRemove(MapLayerListEvent event) {
+    public void layerRemoved(MapLayerListEvent event) {
         stock.remove(event.getLayer());
         mergeBuffers();
     }
 
-    @Override
-    protected void layerChange(MapLayerListEvent event) {
+    public void layerChanged(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
         stock.put(layer, createBufferImage(layer));
         mergeBuffers();
     }
 
-    @Override
-    protected void layerMove(MapLayerListEvent event) {
+    public void layerMoved(MapLayerListEvent event) {
         mergeBuffers();
     }
 
     //----------private classes-------------------------------------------------
-    private class DrawingThread extends Thread {
-
-        @Override
-        public void run() {
-
-            while (true) {
-                if (mustupdate) {
-                    setPainting(true);
-
-                    stock.clear();
-                    MapLayer[] layers = getContext().getLayers();
-
-                    for (MapLayer layer : layers) {
-                        stock.put(layer, createBufferImage(layer));
-                        mergeBuffers();
-                    }
-
-                    mustupdate = false;
-                    setPainting(false);
-                }
-
-                block();
-            }
-        }
-
-        public synchronized void wake() {
-            notifyAll();
-        }
-
-        private synchronized void block() {
-            try {
-                wait();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
+        
     private class BufferComponent extends JComponent {
 
         private VolatileImage img = null;
@@ -301,6 +269,66 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         }
         }
 }
-    
+
+
+class DrawingThread extends Thread {
+
+        private boolean dispose = false;
+
+        private final WeakReference<MergeBufferedImageStrategy> ref;
+        
+        DrawingThread(MergeBufferedImageStrategy strategy){
+            this.ref = new WeakReference<MergeBufferedImageStrategy>(strategy);
+        }
+        
+        
+        public void dispose(){
+            dispose = true;
+            wake();
+        }
+        
+        @Override
+        public void run() {
+
+            while (true && !dispose) {
+                
+                MergeBufferedImageStrategy st = ref.get();
+                
+                if(dispose || st == null){
+                    break;
+                }
+                
+                
+                if (st.mustupdate) {
+                    st.setPainting(true);
+
+                    st.stock.clear();
+                    MapLayer[] layers = st.getContext().getLayers();
+
+                    for (MapLayer layer : layers) {
+                        st.stock.put(layer, st.createBufferImage(layer));
+                        st.mergeBuffers();
+                    }
+
+                    st.mustupdate = false;
+                    st.setPainting(false);
+                }
+
+                block();
+            }
+        }
+
+        public synchronized void wake() {
+            notifyAll();
+        }
+
+        private synchronized void block() {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
     

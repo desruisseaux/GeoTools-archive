@@ -137,5 +137,9 @@ public interface RenderingStrategy {
      */
     public boolean isPainting();
     
-        
+    /**
+     * must be call to remove all reference on the renderingstrategy.
+     * to avoid memory leack.
+     */
+    public void dispose();
 }

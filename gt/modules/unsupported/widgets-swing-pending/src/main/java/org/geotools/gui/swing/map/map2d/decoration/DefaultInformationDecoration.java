@@ -195,4 +195,7 @@ public class DefaultInformationDecoration extends JComponent implements Informat
     public boolean isDisplayingLowLevelMessages() {
         return lowlevel;
     }
+
+    public void dispose() {
+    }
 }

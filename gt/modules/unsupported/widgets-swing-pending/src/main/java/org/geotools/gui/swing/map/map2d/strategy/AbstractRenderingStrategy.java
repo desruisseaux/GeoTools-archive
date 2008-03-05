@@ -38,9 +38,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * Abstract rendering strategy
  * @author Johann Sorel
  */
-public abstract class AbstractRenderingStrategy implements RenderingStrategy {
+public abstract class AbstractRenderingStrategy implements RenderingStrategy, MapLayerListListener {
 
-    private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
     private final EventListenerList STRATEGY_LISTENERS = new EventListenerList();
     private MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private Envelope oldMapArea = null;
@@ -239,22 +238,22 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
         return comp;
     }
 
-    public final void setContext(MapContext context) {
+    public final void setContext(MapContext newContext) {
 
-        if (context == null) {
+        if (newContext == null) {
             throw new NullPointerException("Context can't be null");
         }
 
-        if (this.context != context) {
-            this.context.removeMapLayerListListener(mapLayerListlistener);
+        if (this.context != newContext) {
+            this.context.removeMapLayerListListener(this);
 
             MapContext oldContext = this.context;
-            this.context = context;
-            this.context.addMapLayerListListener(mapLayerListlistener);
+            this.context = newContext;
+            this.context.addMapLayerListListener(this);
 
             refresh();
 
-            fireMapContextChanged(oldContext, this.context);
+            fireMapContextChanged(oldContext, newContext);
         }
     }
 
@@ -303,37 +302,18 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy {
     public final boolean isPainting() {
         return isPainting;
     }
-
+    
+    public void dispose(){
+        this.context.removeMapLayerListListener(this);
+    }
 
     //----------------------Layer events----------------------------------------
-    protected abstract void layerAdd(MapLayerListEvent event);
+    public abstract void layerAdded(MapLayerListEvent event);
 
-    protected abstract void layerRemove(MapLayerListEvent event);
+    public abstract void layerRemoved(MapLayerListEvent event);
 
-    protected abstract void layerChange(MapLayerListEvent event);
+    public abstract void layerChanged(MapLayerListEvent event);
 
-    protected abstract void layerMove(MapLayerListEvent event);
+    public abstract void layerMoved(MapLayerListEvent event);
 
-    //------------------------PRIVATES CLASSES----------------------------------
-    private final class MapLayerListListen implements MapLayerListListener {
-
-        public void layerAdded(MapLayerListEvent event) {
-            layerAdd(event);
-        }
-
-        public void layerRemoved(MapLayerListEvent event) {
-            layerRemove(event);
-        }
-
-        public void layerChanged(MapLayerListEvent event) {
-            layerChange(event);
-        }
-
-        public void layerMoved(MapLayerListEvent event) {
-            layerMove(event);
-        }
-    }
-}
-    
-
-    
+}        

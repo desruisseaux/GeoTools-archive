@@ -192,4 +192,7 @@ public class NavigationDecoration extends JPanel implements MapDecoration{
     public Map2D getMap2D() {
         return map;
     }
+
+    public void dispose() {
+    }
 }

@@ -414,5 +414,8 @@ public class JMiniMap extends JComponent {
 
         public void mouseExited(MouseEvent e) {
         }
+
+        public void dispose() {
+        }
     }
 }

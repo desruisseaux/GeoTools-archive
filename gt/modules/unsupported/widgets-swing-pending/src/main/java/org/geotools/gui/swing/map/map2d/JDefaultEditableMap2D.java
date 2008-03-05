@@ -30,7 +30,6 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
-import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
@@ -50,7 +49,6 @@ import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
  */
 public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
 
-    private final MapLayerListListener mapLayerListlistener;
     private final SingleBufferedImageStrategy memoryStrategy = new SingleBufferedImageStrategy();
     private final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final BufferComponent memoryPane = new BufferComponent();
@@ -69,7 +67,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         initSymbols();
         
-        mapLayerListlistener = new MapLayerListListen();
         addMapDecoration(memoryPane);
 
         // memory strategy------------------------------------------------------
@@ -170,10 +167,25 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     protected void mapContextChanged(RenderingStrategyEvent event) {
         super.mapContextChanged(event);
         
-        event.getPreviousContext().removeMapLayerListListener(mapLayerListlistener);
-        event.getContext().addMapLayerListListener(mapLayerListlistener);
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        
+        memoryStrategy.dispose();
+    }
+
+    @Override
+    public void layerRemoved(MapLayerListEvent event) {
+        super.layerRemoved(event);
+        
+        if (editionLayer == event.getLayer()) {
+                setEditedMapLayer(null);
+            }
+    }
+
+    
 
     //--------------------EDITABLE MAP2D----------------------------------------
     
@@ -276,24 +288,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     }
 
     //---------------------PRIVATE CLASSES--------------------------------------
-    private class MapLayerListListen implements MapLayerListListener {
-
-        public void layerRemoved(MapLayerListEvent event) {
-
-            if (editionLayer == event.getLayer()) {
-                setEditedMapLayer(null);
-            }
-        }
-
-        public void layerChanged(MapLayerListEvent event) {
-        }
-
-        public void layerMoved(MapLayerListEvent event) {
-        }
-
-        public void layerAdded(MapLayerListEvent event) {
-        }
-    }
+    
 
     private class BufferComponent extends JComponent implements MapDecoration {
 
@@ -315,6 +310,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         public Map2D getMap2D() {
             return null;
+        }
+
+        public void dispose() {
         }
     }
 

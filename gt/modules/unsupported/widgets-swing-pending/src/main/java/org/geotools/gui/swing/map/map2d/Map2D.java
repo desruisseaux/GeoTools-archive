@@ -52,6 +52,12 @@ public interface Map2D {
      * @return RenderingStrategy : should never return null;
      */
     public RenderingStrategy getRenderingStrategy();
+    
+    /**
+     * must be called when the map2d is not used anymore.
+     * to avoid memoryleack if it uses thread or other resources
+     */
+    public void dispose();
                         
     /**
      * get the visual component 

@@ -85,4 +85,7 @@ public class ZoomPanDecoration extends JComponent implements MapDecoration{
     public Map2D getMap2D() {
         return null;
     }
+
+    public void dispose() {
+    }
 }

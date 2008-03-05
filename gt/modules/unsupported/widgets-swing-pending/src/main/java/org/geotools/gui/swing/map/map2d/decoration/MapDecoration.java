@@ -36,6 +36,12 @@ public interface MapDecoration {
     public void refresh();
     
     /**
+     * must be called when the decoration is not used anymore.
+     * to avoid memoryleack if it uses thread or other resources
+     */
+    public void dispose();
+    
+    /**
      * set the related map2d
      * @param map the map2D
      */

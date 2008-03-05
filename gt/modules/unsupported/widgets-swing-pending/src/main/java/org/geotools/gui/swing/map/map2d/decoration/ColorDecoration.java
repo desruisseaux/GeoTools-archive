@@ -52,4 +52,7 @@ public class ColorDecoration extends JPanel implements MapDecoration{
         return null;
     }
 
+    public void dispose() {
+    }
+
 }
