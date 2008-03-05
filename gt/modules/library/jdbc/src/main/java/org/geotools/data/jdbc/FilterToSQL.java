@@ -366,12 +366,20 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     	char esc = filter.getEscape().charAt(0);
     	char multi = filter.getWildCard().charAt(0);
     	char single = filter.getSingleChar().charAt(0);
-    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,filter.getLiteral());
         
-    	
-    	Expression att = filter.getExpression();
-    	 
-    	try {
+        String literal = filter.getLiteral();
+        Expression att = filter.getExpression();
+        
+        //JD: hack for date values, we append some additional padding to handle
+        // the matching of time/timezone/etc...
+        AttributeDescriptor ad = (AttributeDescriptor) att.evaluate( featureType );
+        if ( ad != null && Date.class.isAssignableFrom( ad.getType().getBinding() ) ) {
+            literal += multi;
+        }
+        
+    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,literal);
+        
+        try {
 	    	att.accept(this, extraData);
 	    	out.write(" LIKE '");
 	    	out.write(pattern);
