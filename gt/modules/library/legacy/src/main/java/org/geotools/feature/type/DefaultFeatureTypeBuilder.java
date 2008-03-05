@@ -18,7 +18,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @deprecated 
  */
+@Deprecated
 public class DefaultFeatureTypeBuilder extends SimpleFeatureTypeBuilder {
     
 	public DefaultFeatureTypeBuilder() {
