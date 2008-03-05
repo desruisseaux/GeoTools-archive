@@ -332,6 +332,7 @@ public interface FeatureCollection<T extends FeatureType, F extends Feature> ext
      * collection.subCollection( myFilter ).sort( {"foo","bar"} );
      * collection.subCollection( myFilter ).sort( "bar" ).sort("foo")
      * @param order
+     * @return FeatureCollection sorted in the indicated order
      */
     public FeatureCollection<T, F> sort(SortBy order);
 

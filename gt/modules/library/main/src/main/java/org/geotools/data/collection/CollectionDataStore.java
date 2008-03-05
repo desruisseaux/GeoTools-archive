@@ -136,13 +136,12 @@ public class CollectionDataStore extends AbstractDataStore {
      */
     protected ReferencedEnvelope getBoundsInternal(Query query) {
         FeatureIterator<SimpleFeature> iterator = collection.features();
-        Envelope envelope = null;
+        ReferencedEnvelope envelope = new ReferencedEnvelope( featureType.getCRS() );
 
         if (iterator.hasNext()) {
             int count = 1;
             Filter filter = query.getFilter();
-            envelope = ((Geometry)iterator.next().getDefaultGeometry()).getEnvelopeInternal();
-
+            
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 SimpleFeature feature = iterator.next();
 
@@ -152,8 +151,7 @@ public class CollectionDataStore extends AbstractDataStore {
                 }
             }
         }
-
-        return ReferencedEnvelope.reference(envelope);
+        return envelope;
         
     }
 
