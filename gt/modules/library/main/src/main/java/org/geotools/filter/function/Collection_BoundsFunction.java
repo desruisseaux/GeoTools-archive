@@ -71,7 +71,7 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl{
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateBounds(
+    static CalcResult calculateBounds(
             FeatureCollection<? extends FeatureType, ? extends Feature> collection)
             throws IllegalFilterException, IOException {
         BoundsVisitor boundsVisitor = new BoundsVisitor();

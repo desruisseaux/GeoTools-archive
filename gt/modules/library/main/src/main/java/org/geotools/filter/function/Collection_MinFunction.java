@@ -73,7 +73,7 @@ public class Collection_MinFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException
      */
-    public static CalcResult calculateMin(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
+    static CalcResult calculateMin(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         MinVisitor minVisitor = new MinVisitor(expression);
         collection.accepts(minVisitor, null);

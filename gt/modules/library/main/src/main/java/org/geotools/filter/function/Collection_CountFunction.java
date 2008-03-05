@@ -71,7 +71,7 @@ public class Collection_CountFunction extends FunctionExpressionImpl{
 	 * @throws IllegalFilterException
 	 * @throws IOException
 	 */
-	public static CalcResult calculateCount(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+	static CalcResult calculateCount(FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
 			throws IllegalFilterException, IOException {
 		CountVisitor countVisitor = new CountVisitor();
 		collection.accepts(countVisitor, null);

@@ -74,7 +74,7 @@ public class Collection_SumFunction extends FunctionExpressionImpl
      * @throws IllegalFilterException
      * @throws IOException 
      */
-    public static CalcResult calculateSum(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
+    static CalcResult calculateSum(FeatureCollection<SimpleFeatureType, SimpleFeature> collection,
         Expression expression) throws IllegalFilterException, IOException {
         SumVisitor sumVisitor = new SumVisitor(expression);
         collection.accepts(sumVisitor, null);
