@@ -65,10 +65,10 @@ public class FileDataStoreFinder {
      *         attached to the specified resource without errors.
      */
     public static DataStore getDataStore(URL url) throws IOException {
-        Iterator ps = getAvailableDataStores();
+        Iterator<FileDataStoreFactorySpi> ps = getAvailableDataStores();
 
         while (ps.hasNext()) {
-            FileDataStoreFactorySpi fac = (FileDataStoreFactorySpi) ps.next();
+            FileDataStoreFactorySpi fac = ps.next();
 
             try {
                 if (fac.canProcess(url)) {
@@ -98,7 +98,7 @@ public class FileDataStoreFinder {
      * @see FileDataStoreFactorySpi
      * @see FileDataStore
      */
-    public static Iterator getAvailableDataStores() {
+    public static Iterator<FileDataStoreFactorySpi> getAvailableDataStores() {
         Set availableDS = new HashSet();
         
         Set all = CommonFactoryFinder.getFileDataStoreFactories( null );
@@ -113,5 +113,35 @@ public class FileDataStoreFinder {
         }
 
         return availableDS.iterator();
+    }
+    
+    /**
+     * Go through each file DataStore and check what file extentions 
+     * are supported.
+     * @return Set of supported file extensions
+     */
+    public static Set<String> getAvailableFileExtentions(){
+        Set<String> extentions = new HashSet<String>();
+        
+        Iterator<FileDataStoreFactorySpi> ps = getAvailableDataStores();
+        while (ps.hasNext()) {
+            FileDataStoreFactorySpi fac = ps.next();
+            try {
+                for( String fileExtention : fac.getFileExtensions() ){
+                    extentions.add( fileExtention );
+                }
+            } catch (Throwable t) {
+                /**
+                 * The logger for the filter module.
+                 */
+                LOGGER.log(Level.WARNING,
+                    "Could not aquire " + fac.getDescription() + ":" + t, t);
+
+                // Protect against DataStores that don't carefully
+                // code canProcess
+                continue;
+            }
+        }
+        return extentions;
     }
 }

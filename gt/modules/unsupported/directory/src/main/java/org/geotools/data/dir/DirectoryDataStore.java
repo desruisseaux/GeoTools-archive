@@ -86,6 +86,12 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
     }
     
+    public DirectoryDataStore(File f) throws MalformedURLException, IOException {
+        dir = f;
+        createOrder = FileDataStoreFinder.getAvailableFileExtentions().toArray( new String[0]);
+        dataStores = new HashMap();
+        load(f);
+    }
     /**
      * Creates a new DirectoryDataStore object.
      *
@@ -101,7 +107,10 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         dir = f;
         createOrder = co;
         dataStores = new HashMap();
+        load(f);
+    }
 
+    private void load( File f ) throws IOException, MalformedURLException {
         // load list of dataStores by typeName
         File[] children = f.listFiles();
 
