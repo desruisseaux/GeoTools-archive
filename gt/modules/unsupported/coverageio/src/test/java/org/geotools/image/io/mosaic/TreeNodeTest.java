@@ -62,7 +62,7 @@ public class TreeNodeTest extends TestBase {
         assertEquals(root, root);
         assertTrue (root.containsAll(manager.getTiles()));
         assertFalse(root.containsAll(Arrays.asList(sourceTiles)));
-        assertTrue (root.isDense(root.getChildren(), root));
+        assertTrue (SubsampledRectangle.dense(root, root.getChildren()));
         final Rectangle bounds = new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2);
         final Rectangle roi = new Rectangle();
         final Random random = new Random(4353223575290515986L);
@@ -96,7 +96,7 @@ public class TreeNodeTest extends TestBase {
         /*
          * Tests removal of nodes.
          */
-        root.setReadOnly();
+        root.setReadOnly(null);
         assertEquals(root, tree2);
         for (int i=0; i<targetTiles.length; i += 10) {
             assertTrue(tree2.remove(targetTiles[i]));
@@ -135,40 +135,95 @@ public class TreeNodeTest extends TestBase {
      * Tests the {@link RTree} class.
      */
     public void testRTree() throws IOException {
-if (true) return; // Test disabled for now.
-        show(root);
         final RTree tree = new RTree(root);
+        root.setReadOnly(tree);
+        if (false) {
+            show(root);
+        }
         assertEquals(new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2), tree.getBounds());
         assertEquals(new Dimension(TARGET_SIZE,   TARGET_SIZE),   tree.getTileSize());
-        final int[] subsamplings = new int[] {1,3,5,9,15,45,90};
-        checkSubsampling(root, subsamplings, subsamplings.length);
+        int[] subsamplings;
+        /*
+         * Subsampling 15 in the first series and subsampling 9 in the second series are repeated
+         * twice because the last occurence is a "virtual tile" generated in order to separate
+         * tiles that would otherwise overlap. In the schema below, the tree on the left side is
+         * what we get before overlapping tiles are separated. Tiles with subsamplings 15 and 9
+         * are mixed in the same level because both of them are divisors of 45 while none of them
+         * are the divisor of the other (9 is not a divisor of 15). So TreeNode automatically
+         * generate an extra level with same subsampling in order to separate them.
+         *
+         *   90                          90
+         *   +---45                      +---45
+         *   |   +---15                  |   +---15
+         *   |   +---15                  |   |   +---15
+         *   |   |  ...                  |   |   +---15
+         *   |   +---09                  |   |      ...
+         *   |   +---09                  |   +---09
+         *   |      ...                  |       +---09
+         *   +---45                      |       +---09
+         *       +---15                  |          ...
+         *       +---15                  +---45
+         *       |  ...                      +---15
+         *       +---09                      |   +---15
+         *       +---09                      |   +---15
+         *          ...                      |      ...
+         */
+        subsamplings = new int[] {5,15,15,45,90};
+        checkSubsampling(root, subsamplings, subsamplings.length, 3, 0);
+        subsamplings = new int[] {1,3,9,9,45,90};
+        checkSubsampling(root, subsamplings, subsamplings.length, 4, 1);
     }
 
     /**
      * Ensures that every children have the expected subsampling. This method invokes itself
      * recursively down the tree. It is an helper method for {@link #testRTree} only. Checking
      * subsampling is a convenient way to ensure that every tiles are where they should be.
+     *
+     * @param node         The node to test.
+     * @param subsamplings The expected subsamplings for every levels in the tree.
+     * @param level        The level as an index in the {@code subsamplings} array.
+     * @param branching    For the first node without tile, the branch to select.
      */
-    private static void checkSubsampling(final TreeNode node, final int[] subsamplings, int i)
+    private static void checkSubsampling(final TreeNode node, final int[] subsamplings, int level,
+                                         final int branchPoint, final int branchToSelect)
             throws IOException
     {
-        final Tile tile = node.getUserObject();
-        final String message = tile.toString();
-        assertTrue(message, --i >= 0);
-        final int subsampling = subsamplings[i];
+        final String message = node.toString();
+        assertTrue(message, --level >= 0);
+        final int subsampling = subsamplings[level];
         assertEquals(message, subsampling, node.xSubsampling);
         assertEquals(message, subsampling, node.ySubsampling);
-        final Dimension d = tile.getSubsampling();
-        assertEquals(message, subsampling, d.width);
-        assertEquals(message, subsampling, d.height);
 
-        final List<TreeNode> children = node.getChildren();
-        if (children != null) {
-            final Rectangle bounds = tile.getAbsoluteRegion();
-            for (final TreeNode child : children) {
-                assertTrue(message, bounds.contains(child.getUserObject().getAbsoluteRegion()));
-                checkSubsampling(child, subsamplings, i);
+        final TreeNode parent = node.getParent();
+        if (parent != null) {
+            assertTrue(message, parent.contains(node));
+            assertTrue(message, parent.getIndex(node) >= 0);
+        }
+        final Tile tile = node.getUserObject();
+        if (tile != null) {
+            final Dimension d = tile.getSubsampling();
+            assertEquals(message, subsampling, d.width);
+            assertEquals(message, subsampling, d.height);
+            assertEquals(message, tile.getAbsoluteRegion(), node);
+            assertEquals(message, node, tile.getAbsoluteRegion()); // Tests reflexibility.
+        } else if (parent != null) {
+            assertTrue(message, node.boundsEquals(parent));
+        }
+
+        if (level != branchPoint) {
+            final List<TreeNode> children = node.getChildren();
+            if (children != null) {
+                for (final TreeNode child : children) {
+                    assertTrue(message, node.contains(child));
+                    checkSubsampling(child, subsamplings, level, branchPoint, branchToSelect);
+                }
             }
+        } else {
+            assertEquals(message, 2, node.getChildCount());
+            final TreeNode child = node.getChildAt(branchToSelect);
+            assertNull(message, child.getUserObject());
+            assertTrue(message, node.contains(child));
+            checkSubsampling(child, subsamplings, level, branchPoint, branchToSelect);
         }
     }
 

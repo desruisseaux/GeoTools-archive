@@ -251,7 +251,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             final RTree    tree  = new RTree(root);
             final RTree[]  trees = new RTree[CONCURRENT_THREADS];
             trees[0] = tree;
-            root.setReadOnly();
+            root.setReadOnly(tree);
             assert root.containsAll(allTiles);
             this.trees = trees; // Save last so it is saved only on success.
         }

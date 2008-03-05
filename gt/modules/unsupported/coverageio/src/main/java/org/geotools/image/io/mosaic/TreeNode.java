@@ -18,11 +18,12 @@ package org.geotools.image.io.mosaic;
 
 import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Enumeration;
 import java.awt.Rectangle;
 import java.io.IOException;
@@ -72,7 +73,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     /**
      * The index, used for preserving order compared to the user-specified one.
      */
-    private final int index;
+    protected final int index;
 
     /**
      * The children that are fully enclosed in the {@linkplain #tile}, or {@code null} if none
@@ -81,9 +82,33 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     private List<TreeNode> children;
 
     /**
-     * {@code true} if there is no empty space between direct {@linkplain #children}.
+     * {@code true} if at least one tile overlaps an other tile in direct {@linkplain #children}.
+     * As a special case, if a tile has exactly the same bounding box than an other tile, then we
+     * do not consider it as an overlap. This is because those exact matchs are easy to handle by
+     * {@link RTree}.
      */
-    private boolean dense;
+    private boolean overlaps;
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                C O N S T R U C T I O N                 ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+
+
+
+    /**
+     * Creates a node for the specified bounds with no subsampling and no tile.
+     */
+    private TreeNode(final Rectangle bounds) {
+        super(bounds);
+        tile = null;
+        index = -1;
+    }
 
     /**
      * Creates a node for a single tile.
@@ -161,10 +186,30 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
             }
             if (parent.children == null) {
                 parent.children = new LinkedList<TreeNode>();
+            } else if (!parent.overlaps) {
+                for (final TreeNode existing : parent.children) {
+                    if (child.intersects(existing) && !child.boundsEquals(existing)) {
+                        parent.overlaps = true;
+                        break;
+                    }
+                }
             }
             parent.children.add(child);
         }
-        calculate();
+        /*
+         * Calculates the bounds only for root node, if not already computed. We do not iterate
+         * down the tree since every children should have their bounds set to the tile bounds.
+         */
+        if (children != null && tile == null) {
+            assert (width | height) < 0 : this;
+            for (final TreeNode child : children) {
+                // No need to invoke setBounds for the first child since Rectangle.add(Rectangle)
+                // takes care of that if the width or height is negative (specified in javadoc).
+                add(child);
+            }
+        }
+        splitOverlappingChildren(); // Must be after bounds calculation.
+        postTreeCreation();
     }
 
     /**
@@ -206,25 +251,129 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     }
 
     /**
-     * Calculates the fields. This method is invoked when the tree construction is completed,
-     * i.e. every node must be assigned to its final parent.
+     * Makes sure that this node and all its children do not contains overlapping tiles. If at
+     * least one overlapping is found, then the nodes are reorganized in non-overlapping sub-nodes.
+     * Algorithm overview:
+     * <p>
+     * <ol>
+     *   <li>For the current {@linkplain #children}, keeps the first node and remove every nodes
+     *       that overlap with a previous one (except special cases described above). The removed
+     *       nodes are stored in a temporary list.</li>
+     *   <li>The nodes selected in the previous step are groupped in a new {@link TreeNode},
+     *       which will be the first {@linkplain #children} of this tile.</li>
+     *   <li>Repeat the process with the nodes that were removed in the first step. Each new
+     *       group is added as a new {@linkplain #children} in this node.</li>
+     * </ol>
+     * <p>
+     * <b>special case:</b> if an overlapping is found but the two nodes have identical bounds,
+     * then they are considered as if they did not overlap. This exception exists because this
+     * trivial overlap is easy to detect and to process by {@link RTree}.
      */
-    private void calculate() {
+    private void splitOverlappingChildren() {
+        if (children != null) {
+            assert !isEmpty() : this; // Requires that bounds has been computed.
+            for (final TreeNode child : children) {
+                child.splitOverlappingChildren();
+            }
+        }
+        if (!overlaps) {
+            return;
+        }
+        List<TreeNode> toProcess = children;
+        children = new LinkedList<TreeNode>();
+        int bestIndex=0, bestDistance=0;
+        /*
+         * The loop below is for processing a group of nodes. A "group of nodes" is either
+         * the initial children list (on the first iteration), or the nodes that have not be
+         * retained in a previous run of this loop. In the later case, those remaining nodes
+         * need to be examined again and again until they are classified in some group.
+         */
+        while (!toProcess.isEmpty()) {
+            final List<TreeNode> retained = new LinkedList<TreeNode>();
+            final List<TreeNode> removed  = new LinkedList<TreeNode>();
+            TreeNode added = toProcess.remove(0);
+            retained.add(added);
+            /*
+             * The loop below is for moving every non-overlapping nodes to the "retained" list,
+             * begining with the first node that we retained unconditionnaly in the above line
+             * (we need to start with one node in order to select non-overlapping nodes...)
+             */
+            ListIterator<TreeNode> it;
+            while ((it = toProcess.listIterator()).hasNext()) {
+                TreeNode best = null;
+                /*
+                 * The loop below is for removing every nodes that overlap with the "added" node,
+                 * and select only one node (the "best" one) in the non-overlapping nodes. We
+                 * select the closest tile (relative to the "added" one) rather than the first
+                 * one because the retention order is significant.
+                 */
+                do {
+                    final TreeNode candidate = it.next();
+                    final int distance = added.distance(candidate);
+                    if (distance < 0) {
+                        /*
+                         * Found an overlapping tile.  Accept inconditionnaly the tile if its bounds
+                         * is exactly equals to the "added" tile (this is the special case described
+                         * in the method javadoc above). Otherwise remove it from the toProcess list
+                         * and search for an other tile.
+                         */
+                        if (added.boundsEquals(candidate)) {
+                            retained.add(candidate);
+                        } else {
+                            removed.add(candidate);
+                        }
+                        it.remove();
+                    } else if (best == null || distance < bestDistance) {
+                        /*
+                         * The tile do not overlaps. Retain it only if it is the closest one
+                         * to the "added" tile.  Otherwise left it in the toProcess list for
+                         * consideration in a future iteration.
+                         */
+                        bestDistance = distance;
+                        bestIndex = it.previousIndex();
+                        best = candidate;
+                        // Note: if the distance is 0 we could break the loop as an optimization
+                        // (since we can't get anything better), but we don't because we still
+                        // need to remove the overlapping tiles that may be present in toProcess.
+                    }
+                } while (it.hasNext());
+                /*
+                 * If we found no non-overlapping tile, we are done. The toProcess list should be
+                 * empty now (it will be tested in an assert statement after the loop). Otherwise
+                 * move the best tile from the "toProcess" to the "retained" list.
+                 */
+                if (best == null) {
+                    break;
+                }
+                if (toProcess.remove(bestIndex) != best) {
+                    throw new AssertionError(bestIndex);
+                }
+                retained.add(best);
+                added = best;
+            }
+            assert toProcess.isEmpty() : toProcess;
+            assert Collections.disjoint(retained, removed);
+            final TreeNode child = new TreeNode(this);
+            child.children = retained;
+            children.add(child);
+            toProcess = removed;
+        }
+        overlaps = false;
+    }
+
+    /**
+     * Invoked when the tree construction is completed with every nodes assigned to its final
+     * parent. This method calculate the values that depend on the child hierarchy, including
+     * subsampling.
+     */
+    private void postTreeCreation() {
         if (children != null) {
             for (final TreeNode child : children) {
                 child.parent = this;
-                child.calculate();
+                child.postTreeCreation();
                 if (child.xSubsampling > xSubsampling) xSubsampling = child.xSubsampling;
                 if (child.ySubsampling > ySubsampling) ySubsampling = child.ySubsampling;
-                if (tile == null) {
-                    if (isEmpty()) {
-                        setBounds(child);
-                    } else {
-                        add(child);
-                    }
-                }
             }
-            dense = calculateDense(children, this);
         }
     }
 
@@ -273,9 +422,7 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
             return true; // For consistency with Rectangle.equals which accepts arbitrary Rectangle.
         }
         final TreeNode that = (TreeNode) other;
-        return this.xSubsampling == that.xSubsampling &&
-               this.ySubsampling == that.ySubsampling &&
-               Utilities.equals(this.tile,     that.tile) &&
+        return Utilities.equals(this.tile,     that.tile) &&
                Utilities.equals(this.children, that.children);
     }
 
@@ -286,8 +433,24 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
      */
     @Override
     public String toString() {
-        return (tile != null) ? tile.toString() : super.toString();
+        if (tile != null) {
+            return tile.toString();
+        }
+        final String string = super.toString();
+        return string.substring(string.lastIndexOf('.') + 1);
     }
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////           Q U E R I Y N G   T H E   T R E E            ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
+
+
 
     /**
      * Returns the tile in this node, or {@code null} if none. This is also the <cite>Swing</cite>
@@ -303,14 +466,6 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
      */
     public TreeNode getParent() {
         return parent;
-    }
-
-    /**
-     * Returns {@code true} if there is no empty space between the specified regions. Those
-     * rectangles must be direct {@linkplain #getChildren children}, or children of children.
-     */
-    final boolean isDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
-        return dense || calculateDense(regions, roi);
     }
 
     /**
@@ -374,14 +529,18 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
     }
 
     /**
-     * Set this tree as read-only. As a side effect,
-     * it will also reduce the amount of memory used.
+     * Set this tree as read-only. An optional comparator can be specified for sorting
+     * tiles. As a side effect, this method will also reduce the amount of memory used.
      */
-    public void setReadOnly() {
+    public void setReadOnly(final Comparator<TreeNode> comparator) {
         if (children != null) {
-            children = UnmodifiableArrayList.wrap(children.toArray(new TreeNode[children.size()]));
+            final TreeNode[] array = children.toArray(new TreeNode[children.size()]);
+            if (comparator != null) {
+                Arrays.sort(array, comparator);
+            }
+            children = UnmodifiableArrayList.wrap(array);
             for (final TreeNode node : children) {
-                node.setReadOnly();
+                node.setReadOnly(comparator);
             }
         }
     }
@@ -517,17 +676,5 @@ final class TreeNode extends SubsampledRectangle implements Comparable<TreeNode>
                 }
             }
         }
-    }
-
-    /**
-     * Returns {@code true} if there is no empty space between rectangles in the specified
-     * region of interest (ROI).
-     *
-     * @todo This method is not yet implemented. For now we return {@code true} inconditionnaly
-     *       since it match common {@link TileLayout}. We define this method so we can remember
-     *       where to implement this check if we implement it in a future version.
-     */
-    private static boolean calculateDense(final Collection<? extends Rectangle> regions, final Rectangle roi) {
-        return true;
     }
 }

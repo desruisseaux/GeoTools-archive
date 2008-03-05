@@ -35,7 +35,7 @@ import java.io.IOException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class RTree {
+final class RTree implements Comparator<TreeNode> {
     /**
      * The root of the tree.
      */
@@ -125,6 +125,14 @@ final class RTree {
     }
 
     /**
+     * For sorting the tree nodes in the same order than in the array given to
+     * the {@link TreeNode} constructor.
+     */
+    public int compare(final TreeNode o1, final TreeNode o2) {
+        return o1.index - o2.index;
+    }
+
+    /**
      * Returns the bounding box of all tiles.
      */
     public Rectangle getBounds() {
@@ -161,14 +169,12 @@ final class RTree {
      * <ul>
      *   <li>{@link SubsampledRectangle#xSubsampling} and {@link SubsampledRectangle#ySubsampling}
      *       if {@link #allowSubsamplingChange} is {@code true}</li>
-     *   <li>{@link #count} as the estimated
-     *       {@linkplain Tile#countUnwantedPixels amount of unwanted pixels}.</li>
      * </ul>
      */
     public Tile[] searchTiles() throws IOException {
-        assert subsamplingDone .isEmpty() &&
-               subsamplingToTry.isEmpty() &&
-               candidateStack.isEmpty();
+        assert candidateStack  .isEmpty() &&
+               subsamplingDone .isEmpty() &&
+               subsamplingToTry.isEmpty();
         subsampling = regionOfInterest.getSubsampling();
         Map<Rectangle,Tile> candidates     = null;
         Map<Rectangle,Tile> bestCandidates = null;
@@ -196,14 +202,13 @@ final class RTree {
                 }
             } while ((subsampling = subsamplingToTry.poll()) != null);
         } finally {
-            subsamplingDone .clear();
             subsamplingToTry.clear();
-            candidateStack.clear();
+            subsamplingDone .clear();
+            candidateStack  .clear();
         }
         /*
          * TODO: sort the result. I'm not sure that it is worth, but if we decide that it is,
-         * we could add an 'index' field into TreeNode to be initialized in the root TreeNode
-         * construction. RTree could implement Comparator for sorting the nodes.
+         * we should use the Comparator<TreeNode> implemented by this class.
          */
         final Collection<Tile> tiles = bestCandidates.values();
         return tiles.toArray(new Tile[tiles.size()]);
@@ -245,15 +250,15 @@ final class RTree {
             final Dimension floor = tile.getSubsamplingFloor(subsampling);
             if (floor == null) {
                 /*
-                 * A tile is unable to read its image at the given subsampling or any smaller
-                 * subsampling. Skip this tile. However we may try its children at the end of
-                 * this method, since they typically have a finer subsampling.
+                 * The tile in the given node is unable to read its image at the given subsampling
+                 * or any smaller subsampling. Skip this tile. However we may try its children at
+                 * the end of this method, since they typically have a finer subsampling.
                  */
             } else if (floor != subsampling) {
                 /*
-                 * A tile is unable to read its image at the given subsampling, but would
-                 * be capable if the subsampling was smaller. If we are allowed to change
-                 * the setting, add this item to the queue of subsampling to try later.
+                 * The tile in the given node is unable to read its image at the given subsampling,
+                 * but would be capable if the subsampling was smaller. If we are allowed to change
+                 * the setting, add this item to the queue of subsamplings to try later.
                  */
                 if (subsamplingChangeAllowed) {
                     if (subsamplingDone.add(floor)) {
@@ -345,7 +350,7 @@ final class RTree {
                 final List<Rectangle> added = candidateStack.subList(stackBefore, stackAfter);
                 assert !added.contains(readRegion) : added;
                 childCost = costOfStack - childCost;
-                if (childCost >= tileCost || !node.isDense(added, readRegion)) {
+                if (childCost >= tileCost || !SubsampledRectangle.dense(readRegion, added)) {
                     assert candidates.keySet().containsAll(added);
                     cost -= childCost;
                     costOfStack -= childCost;
