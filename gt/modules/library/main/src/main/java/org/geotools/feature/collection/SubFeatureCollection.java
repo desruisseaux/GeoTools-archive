@@ -53,12 +53,12 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
     protected AbstractResourceCollection rc; 
     
     public SubFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection ) {
-        this( collection, null );
+        this( collection, Filter.INCLUDE );
     }
 	public SubFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Filter subfilter ){
 		super(null,collection.getSchema());
 		
-		if (subfilter != null ) subfilter = Filter.INCLUDE;		
+		if (subfilter == null ) subfilter = Filter.INCLUDE;		
 		if (subfilter.equals(Filter.EXCLUDE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.EXCLUDE is a null operation");
 		}

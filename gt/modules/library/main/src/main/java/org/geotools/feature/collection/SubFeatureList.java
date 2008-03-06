@@ -39,8 +39,11 @@ import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
 public class SubFeatureList extends SubFeatureCollection implements RandomFeatureAccess {
-    List sort; 
-    List index;
+    /** Order by which content should be sorted */
+    List<SortBy> sort; 
+    
+    /** List of FeatureIDs in sorted order */
+    List<String> index;
     
     public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, Filter filter){
         this( list, filter, SortBy.NATURAL_ORDER );
@@ -57,17 +60,17 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
 	public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, Filter filter, SortBy subSort) {
 		super( list,  filter );
 		
-        if( subSort == null ){
-            sort = Collections.EMPTY_LIST;
+        if( subSort == null || subSort.equals( SortBy.NATURAL_ORDER ) ){
+            sort = Collections.emptyList();
         } else {
-            sort = new ArrayList();                
+            sort = new ArrayList<SortBy>();                
             if (collection instanceof SubFeatureList) {
                 SubFeatureList sorted = (SubFeatureList) collection;                    
                 sort.addAll( sorted.sort );
             }
             sort.add( subSort );
         }
-        index = null;                
+        index = null;
 	}
     
     public SubFeatureList(FeatureCollection<SimpleFeatureType, SimpleFeature> list, List order) {
@@ -103,7 +106,6 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
     			    }
     			 
 				public int size() {
-					// TODO Auto-generated method stub
 					return 0;
 				}
     			
@@ -131,22 +133,22 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
     }
 
     /** Put this SubFeatureList in touch with its inner index */
-    protected List createIndex(){
-        List fids = new ArrayList();        
-        Iterator it = collection.iterator();
+    protected List<String> createIndex(){
+        List<String> fids = new ArrayList<String>();        
+        Iterator<SimpleFeature> it = collection.iterator();
         try {            
             while( it.hasNext() ){
-                SimpleFeature feature = (SimpleFeature) it.next();
+                SimpleFeature feature = it.next();
                 if( filter.evaluate(feature ) ){
                     fids.add( feature.getID() );
                 }
             }
             if( sort != null && !sort.isEmpty()){
                 final SortBy initialOrder = (SortBy) sort.get( sort.size() -1 );                
-                Collections.sort( fids, new Comparator(){
-                    public int compare( Object key1, Object key2 ) {
-                        SimpleFeature feature1 = getFeatureMember( (String) key1 );
-                        SimpleFeature feature2 = getFeatureMember( (String) key2 );
+                Collections.sort( fids, new Comparator<String>(){
+                    public int compare( String key1, String key2 ) {
+                        SimpleFeature feature1 = getFeatureMember( key1 );
+                        SimpleFeature feature2 = getFeatureMember( key2 );
                         
                         int compare = compare( feature1, feature2, initialOrder );
                         if( compare == 0 && sort.size() > 1 ){
@@ -156,6 +158,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
                         }                        
                         return compare;
                     }
+                    @SuppressWarnings("unchecked")
                     protected int compare( SimpleFeature feature1, SimpleFeature feature2, SortBy order){
                         PropertyName name = order.getPropertyName();
                         Comparable value1 = (Comparable) name.evaluate( feature1 );
