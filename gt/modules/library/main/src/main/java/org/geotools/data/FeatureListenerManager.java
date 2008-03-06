@@ -15,9 +15,11 @@
  */
 package org.geotools.data;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.event.EventListenerList;
 
@@ -35,13 +37,42 @@ import org.opengis.feature.type.FeatureType;
  * FeatureWriters created by the DataStore will need to make use of this class
  * to provide the required FeatureEvents.
  * </p>
+ * This class has been updated to store listeners using weak references
+ * in order to cut down on memory leaks.
  *
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
 public class FeatureListenerManager {
-    /** EvenListenerLists by FeatureSource<SimpleFeatureType, SimpleFeature> */
-    Map<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList> listenerMap = new HashMap<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList>();
+    /**
+     * Hold on to provided FeatureListener using a weak reference.
+     * <p>
+     * If I was really smart I could do this with the DynamicProxy class; I am not 
+     * that smart...
+     * <p>
+     * @author Jody Garnett
+     */
+    class WeakFeatureListener implements FeatureListener {
+        WeakReference<FeatureListener> reference; 
+        public WeakFeatureListener( FeatureListener listener ){
+            reference = new WeakReference<FeatureListener>( listener );
+        }
+        
+        public void changed( FeatureEvent featureEvent ) {
+            FeatureListener listener = reference.get(); 
+            if(listener==null){ 
+                removeFeatureListener( this ); 
+            } else { 
+                listener.changed(featureEvent);
+            }
+        }        
+    }
+    
+    /**
+     * EvenListenerLists by FeatureSource, using a WeakHashMap to allow
+     * listener lists to be cleaned up after their FeatureSource is no longer referenced.
+     */
+    Map<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList> listenerMap = new WeakHashMap<FeatureSource<? extends FeatureType, ? extends Feature>, EventListenerList>();
 
     /**
      * Used by FeaureSource implementations to provide listener support.
@@ -56,6 +87,18 @@ public class FeatureListenerManager {
     }
 
     /**
+     * Used to clean up a weak reference to a feature listener after
+     * it is no longer in use.
+     * 
+     * @param listener
+     */
+    void removeFeatureListener( WeakFeatureListener listener ){
+        for( EventListenerList list : listenerMap.values() ){
+            list.remove(FeatureListener.class, listener);
+        }
+    }
+            
+    /**
      * Used by FeatureSource<SimpleFeatureType, SimpleFeature> implementations to provide listener support.
      *
      * @param featureSource
@@ -68,11 +111,18 @@ public class FeatureListenerManager {
         // don't keep references to feature sources if we have no
         // more any listener. Since there's no way to know a feature source
         // has ceased its existance, better remove references as soon as possible
-        if(list.getListenerCount() == 0)
+        if(list.getListenerCount() == 0){
             cleanListenerList(featureSource);
+        }
     }
 
-    public EventListenerList eventListenerList(FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
+    /**
+     * Retrieve the EvenListenerList for the provided FeatureSource.
+     * 
+     * @param featureSource
+     * @return
+     */
+    private EventListenerList eventListenerList(FeatureSource<? extends FeatureType, ? extends Feature> featureSource) {
         synchronized (listenerMap) {
             if (listenerMap.containsKey(featureSource)) {
                 return (EventListenerList) listenerMap.get(featureSource);
