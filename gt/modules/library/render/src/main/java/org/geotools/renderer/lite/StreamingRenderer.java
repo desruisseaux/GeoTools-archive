@@ -178,13 +178,15 @@ public final class StreamingRenderer implements GTRenderer {
 	/** Filter factory for creating bounding box filters */
 	private final static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
 	
-	private final static PropertyName gridPropertyName= filterFactory.property("grid");
+	private final static PropertyName gridPropertyName = filterFactory.property("grid");
 	
-    private final static PropertyName defaultGeometryPropertyName= filterFactory.property("");
+	private final static PropertyName paramsPropertyName = filterFactory.property("params");
+	
+  private final static PropertyName defaultGeometryPropertyName = filterFactory.property("");
 	
 
 	/**
-	 * Context which contains the layers and the bouning box which needs to be
+	 * Context which contains the layers and the bounding box which needs to be
 	 * rendered.
 	 */
 	private MapContext context;
@@ -225,7 +227,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	private double scaleDenominator;
 
-	/** Maximun displacement for generalization during rendering */
+	/** Maximum displacement for generalization during rendering */
 	private double generalizationDistance = 1.0;
 
 	/** Factory that will resolve symbolizers into rendered styles */
@@ -483,7 +485,7 @@ public final class StreamingRenderer implements GTRenderer {
 	/**
 	 * Renders features based on the map layers and their styles as specified in
 	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that paint area, enelope and worldToScreen transform
+	 * the method assumes that paint area, envelope and worldToScreen transform
 	 * are already computed. Use this method to avoid recomputation. <b>Note
 	 * however that no check is performed that they are really in sync!<b/>
 	 * 
@@ -523,7 +525,7 @@ public final class StreamingRenderer implements GTRenderer {
     /**
 	 * Renders features based on the map layers and their styles as specified in
 	 * the map context using <code>setContext</code>. <p/> This version of
-	 * the method assumes that paint area, enelope and worldToScreen transform
+	 * the method assumes that paint area, envelope and worldToScreen transform
 	 * are already computed. Use this method to avoid recomputation. <b>Note
 	 * however that no check is performed that they are really in sync!<b/>
 	 * 
@@ -678,7 +680,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param envelope to extend.
 	 * @param worldToScreen by means  of which doing the extension.
 	 * @param buffer to use for the extension.
-	 * @return an extende version of the provided {@link Envelope}.
+	 * @return an extended version of the provided {@link Envelope}.
 	 */
     private Envelope expandEnvelope(Envelope envelope, AffineTransform worldToScreen, int buffer) {
     	assert buffer>0;
@@ -737,7 +739,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * <li>Just the features whose geometric attributes lies within
 	 * <code>envelope</code> will be queried</li>
 	 * <li>The queried attributes will be limited to just those needed to
-	 * perform the rendering, based on the requiered geometric and non geometric
+	 * perform the rendering, based on the required geometric and non geometric
 	 * attributes found in the Layer's style rules</li>
 	 * <li>If a <code>Query</code> has been set to limit the resulting
 	 * layer's features, the final filter to obtain them will respect it. This
@@ -745,8 +747,8 @@ public final class StreamingRenderer implements GTRenderer {
 	 * also including maxFeatures from Query</li>
 	 * <li>At least that the layer's definition query explicitly says to
 	 * retrieve some attribute, no attributes will be requested from it, for
-	 * performance reassons. So it is desirable to not use a Query for filtering
-	 * a layer wich includes attributes. Note that including the attributes in
+	 * performance reasons. So it is desirable to not use a Query for filtering
+	 * a layer which includes attributes. Note that including the attributes in
 	 * the result is not necessary for the query's filter to get properly
 	 * processed. </li>
 	 * </ul>
@@ -762,7 +764,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param schema
 	 * @param source
 	 * @param envelope
-	 *            the spatial extent wich is the target area fo the rendering
+	 *            the spatial extent which is the target area of the rendering
 	 *            process
 	 * @param destinationCrs
 	 *            DOCUMENT ME!
@@ -770,7 +772,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param screenSize
 	 * @param geometryAttribute
 	 * @return the set of features resulting from <code>currLayer</code> after
-	 *         quering its feature source
+	 *         querying its feature source
 	 * @throws IllegalFilterException
 	 *             if something goes wrong constructing the bbox filter
 	 * @throws IOException
@@ -964,7 +966,7 @@ public final class StreamingRenderer implements GTRenderer {
 			// next we check for rules w/o filters. If we find any --> dont send
 			// anything to Datastore
 			//
-			// otherwise, we're gold and can "or" together all the fiters then
+			// otherwise, we're gold and can "or" together all the filters then
 			// AND it with the original filter.
 			// ie. SELECT * FROM ... WHERE (the_geom && BBOX) AND (filter1 OR
 			// filter2 OR filter3);
@@ -1108,7 +1110,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            from
 	 * @param schema
 	 *            the <code>layer</code>'s FeatureSource<SimpleFeatureType, SimpleFeature> schema
-	 * @return the minimun set of attribute names needed to render
+	 * @return the minimum set of attribute names needed to render
 	 *         <code>layer</code>
 	 */
 	private String[] findStyleAttributes(LiteFeatureTypeStyle[] styles,
@@ -1140,7 +1142,7 @@ public final class StreamingRenderer implements GTRenderer {
 		 * we only add the default geometry if it was used.
 		 * 
 		 * GR: if as result of sae.getAttributeNames() ftsAttributes already
-		 * contains geometry attribue names, they gets duplicated, wich produces
+		 * contains geometry attribute names, they gets duplicated, which produces
 		 * an error in AbstracDatastore when trying to create a derivate
 		 * SimpleFeatureType. So I'll add the default geometry only if it is not
 		 * already present, but: should all the geometric attributes be added by
@@ -1157,7 +1159,7 @@ public final class StreamingRenderer implements GTRenderer {
 
 			// DJB: This geometry check was commented out. I think it should
 			// actually be back in or
-			// you get ALL the attributes back, which isnt what you want.
+			// you get ALL the attributes back, which isn't what you want.
 			// ALX: For rasters I need even the "grid" attribute.
 
 			// DJB:geos-469, we do not grab all the geometry columns.
@@ -1797,7 +1799,7 @@ public final class StreamingRenderer implements GTRenderer {
 				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
 				// then I try to get read parameters associated with this
 				// coverage if there are any.
-				final Object params =gridPropertyName.evaluate("params");
+				final Object params = paramsPropertyName.evaluate(drawMe);
 				final GridCoverage2D coverage;
 				if (params != null) {
 					// //
