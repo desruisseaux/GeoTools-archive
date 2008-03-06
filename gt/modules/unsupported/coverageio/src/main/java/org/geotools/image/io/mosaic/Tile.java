@@ -819,9 +819,9 @@ public class Tile implements Comparable<Tile>, Serializable {
      * Returns {@code true} if this tile subsampling is finer than the specified value
      * for at least one dimension. For internal usage by {@link RTree#searchTiles} only.
      */
-    final boolean isFinerThan(final SubsampledRectangle subsampling) {
-        return xSubsampling < subsampling.xSubsampling ||
-               ySubsampling < subsampling.ySubsampling;
+    final boolean isFinerThan(final Dimension subsampling) {
+        return xSubsampling < subsampling.width ||
+               ySubsampling < subsampling.height;
     }
 
     /**

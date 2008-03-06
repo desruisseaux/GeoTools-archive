@@ -17,7 +17,6 @@
 package org.geotools.image.io.mosaic;
 
 import java.util.Set;
-import java.util.List;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,20 +48,20 @@ public class TreeNodeTest extends TestBase {
     protected void setUp() throws IOException {
         super.setUp();
         assertEquals(4733, targetTiles.length);
-        root = new TreeNode(targetTiles);
+        root = new GridNode(targetTiles);
     }
 
     /**
      * Tests with a set of files corresponding to a Blue Marble mosaic.
      */
     public void testTreeNode() throws IOException {
-        // TreeNode has many assert statements, so we want them enabled.
-        assertTrue(TreeNode.class.desiredAssertionStatus());
+        // GridNode has many assert statements, so we want them enabled.
+        assertTrue(GridNode.class.desiredAssertionStatus());
         assertNotNull(root.getUserObject());
         assertEquals(root, root);
         assertTrue (root.containsAll(manager.getTiles()));
         assertFalse(root.containsAll(Arrays.asList(sourceTiles)));
-        assertTrue (SubsampledRectangle.dense(root, root.getChildren()));
+        assertTrue (RTree.dense(root, root));
         final Rectangle bounds = new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2);
         final Rectangle roi = new Rectangle();
         final Random random = new Random(4353223575290515986L);
@@ -91,12 +90,11 @@ public class TreeNodeTest extends TestBase {
         /*
          * Creates a copy and ensure it is identical to the original one.
          */
-        final TreeNode tree2 = new TreeNode(targetTiles);
+        final GridNode tree2 = new GridNode(targetTiles);
         assertEquals(root, tree2);
         /*
          * Tests removal of nodes.
          */
-        root.setReadOnly(null);
         assertEquals(root, tree2);
         for (int i=0; i<targetTiles.length; i += 10) {
             assertTrue(tree2.remove(targetTiles[i]));
@@ -123,12 +121,6 @@ public class TreeNodeTest extends TestBase {
             assertTrue  (intersect1.containsAll(contained1));
             assertFalse (contained1.containsAll(intersect1));
         }
-        try {
-            root.remove(targetTiles[100]);
-            fail("Removal should not be allowed on a read-only tree.");
-        } catch (UnsupportedOperationException e) {
-            // This is the expected exception.
-        }
     }
 
     /**
@@ -136,7 +128,7 @@ public class TreeNodeTest extends TestBase {
      */
     public void testRTree() throws IOException {
         final RTree tree = new RTree(root);
-        root.setReadOnly(tree);
+// TODO root.setReadOnly(tree);
         if (false) {
             show(root);
         }
@@ -149,7 +141,7 @@ public class TreeNodeTest extends TestBase {
          * tiles that would otherwise overlap. In the schema below, the tree on the left side is
          * what we get before overlapping tiles are separated. Tiles with subsamplings 15 and 9
          * are mixed in the same level because both of them are divisors of 45 while none of them
-         * are the divisor of the other (9 is not a divisor of 15). So TreeNode automatically
+         * are the divisor of the other (9 is not a divisor of 15). So GridNode automatically
          * generate an extra level with same subsampling in order to separate them.
          *
          *   90                          90
@@ -169,9 +161,9 @@ public class TreeNodeTest extends TestBase {
          *          ...                      |      ...
          */
         subsamplings = new int[] {5,15,15,45,90};
-        checkSubsampling(root, subsamplings, subsamplings.length, 3, 0);
+        checkSubsampling((GridNode) root, subsamplings, subsamplings.length, 3, 0);
         subsamplings = new int[] {1,3,9,9,45,90};
-        checkSubsampling(root, subsamplings, subsamplings.length, 4, 1);
+        checkSubsampling((GridNode) root, subsamplings, subsamplings.length, 4, 1);
     }
 
     /**
@@ -184,9 +176,8 @@ public class TreeNodeTest extends TestBase {
      * @param level        The level as an index in the {@code subsamplings} array.
      * @param branching    For the first node without tile, the branch to select.
      */
-    private static void checkSubsampling(final TreeNode node, final int[] subsamplings, int level,
-                                         final int branchPoint, final int branchToSelect)
-            throws IOException
+    private static void checkSubsampling(final GridNode node, final int[] subsamplings,
+            int level, final int branchPoint, final int branchToSelect) throws IOException
     {
         final String message = node.toString();
         assertTrue(message, --level >= 0);
@@ -194,7 +185,7 @@ public class TreeNodeTest extends TestBase {
         assertEquals(message, subsampling, node.xSubsampling);
         assertEquals(message, subsampling, node.ySubsampling);
 
-        final TreeNode parent = node.getParent();
+        final GridNode parent = (GridNode) node.getParent();
         if (parent != null) {
             assertTrue(message, parent.contains(node));
             assertTrue(message, parent.getIndex(node) >= 0);
@@ -211,19 +202,16 @@ public class TreeNodeTest extends TestBase {
         }
 
         if (level != branchPoint) {
-            final List<TreeNode> children = node.getChildren();
-            if (children != null) {
-                for (final TreeNode child : children) {
-                    assertTrue(message, node.contains(child));
-                    checkSubsampling(child, subsamplings, level, branchPoint, branchToSelect);
-                }
+            for (final TreeNode child : node) {
+                assertTrue(message, node.contains(child));
+                checkSubsampling((GridNode) child, subsamplings, level, branchPoint, branchToSelect);
             }
         } else {
             assertEquals(message, 2, node.getChildCount());
             final TreeNode child = node.getChildAt(branchToSelect);
             assertNull(message, child.getUserObject());
             assertTrue(message, node.contains(child));
-            checkSubsampling(child, subsamplings, level, branchPoint, branchToSelect);
+            checkSubsampling((GridNode) child, subsamplings, level, branchPoint, branchToSelect);
         }
     }
 

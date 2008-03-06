@@ -20,6 +20,7 @@ import java.util.*; // We use really a lot of those imports.
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -35,7 +36,7 @@ import java.io.IOException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class RTree implements Comparator<TreeNode> {
+final class RTree implements Comparator<GridNode> {
     /**
      * The root of the tree.
      */
@@ -43,11 +44,14 @@ final class RTree implements Comparator<TreeNode> {
 
     /**
      * The requested region. This field must be set before {@link #searchTiles} is invoked.
-     * Before the search, its {@link SubsampledRectangle#xSubsampling xSubsampling} and
-     * {@link SubsampledRectangle#ySubsampling ySubsampling} fields are the requested subsamplings.
+     */
+    protected Rectangle regionOfInterest;
+
+    /**
+     * The subsamplings. Before the search, must be set at the requested subsamplings.
      * After the search, they are set to the subsamplings of the best set of tiles found.
      */
-    protected SubsampledRectangle regionOfInterest;
+    protected int xSubsampling, ySubsampling;
 
     /**
      * {@code true} if the search is allowed to look for tiles with finer subsampling than the
@@ -65,13 +69,13 @@ final class RTree implements Comparator<TreeNode> {
      * Modified value of {@link #subsampling}.
      * This is a temporary value modified during searchs.
      */
-    private final Dimension relativeSubsampling;
+    private final Dimension tmpSubsampling;
 
     /**
      * A modified value of the region to read.
      * This is a temporary value modified during searchs.
      */
-    private final Rectangle relativeReadRegion;
+    private final Rectangle tmpReadRegion;
 
     /**
      * The subsampling done so far. This is used during
@@ -86,19 +90,6 @@ final class RTree implements Comparator<TreeNode> {
     private final Queue<Dimension> subsamplingToTry;
 
     /**
-     * A stack of regions added by {@link #addTileCandidate} while iterating down the
-     * tree through children. This is a LIFO stack (<cite>last in, first out</cite>).
-     */
-    private final List<Rectangle> candidateStack;
-
-    /**
-     * Cost of elements added in {@link #candidateStack} as the estimated
-     * {@linkplain Tile#countUnwantedPixels amount of unwanted pixels}.
-     * For internal usage by {@link #addTileCandidate} only.
-     */
-    private long costOfStack;
-
-    /**
      * {@code true} if this {@code RTree} instance is currently in use by any thread, or
      * {@code false} if it is available for use.
      */
@@ -109,11 +100,10 @@ final class RTree implements Comparator<TreeNode> {
      */
     public RTree(final TreeNode root) {
         this.root = root;
-        relativeSubsampling = new Dimension();
-        relativeReadRegion  = new Rectangle();
-        subsamplingDone     = new HashSet<Dimension>();
-        subsamplingToTry    = new LinkedList<Dimension>();
-        candidateStack      = new ArrayList<Rectangle>(4);
+        tmpSubsampling   = new Dimension();
+        tmpReadRegion    = new Rectangle();
+        subsamplingDone  = new HashSet<Dimension>();
+        subsamplingToTry = new LinkedList<Dimension>();
     }
 
     /**
@@ -126,10 +116,18 @@ final class RTree implements Comparator<TreeNode> {
 
     /**
      * For sorting the tree nodes in the same order than in the array given to
-     * the {@link TreeNode} constructor.
+     * the {@link GridNode} constructor.
      */
-    public int compare(final TreeNode o1, final TreeNode o2) {
+    public int compare(final GridNode o1, final GridNode o2) {
         return o1.index - o2.index;
+    }
+
+    /**
+     * Sets the subsampling to the specified value.
+     */
+    public void setSubsampling(final Dimension subsampling) {
+        xSubsampling = subsampling.width;
+        ySubsampling = subsampling.height;
     }
 
     /**
@@ -145,9 +143,10 @@ final class RTree implements Comparator<TreeNode> {
      */
     public Dimension getTileSize() {
         final Dimension tileSize = new Dimension();
-        for (final TreeNode node : root.getChildren()) {
-            final int width  = node.width  / node.xSubsampling;
-            final int height = node.height / node.ySubsampling;
+        for (final TreeNode node : root) {
+            final GridNode child = (GridNode) node;
+            final int width  = child.width  / child.xSubsampling;
+            final int height = child.height / child.ySubsampling;
             if (width  > tileSize.width)  tileSize.width  = width;
             if (height > tileSize.height) tileSize.height = height;
         }
@@ -172,79 +171,76 @@ final class RTree implements Comparator<TreeNode> {
      * </ul>
      */
     public Tile[] searchTiles() throws IOException {
-        assert candidateStack  .isEmpty() &&
-               subsamplingDone .isEmpty() &&
-               subsamplingToTry.isEmpty();
-        subsampling = regionOfInterest.getSubsampling();
-        Map<Rectangle,Tile> candidates     = null;
-        Map<Rectangle,Tile> bestCandidates = null;
+        assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty();
+        subsampling = new Dimension(xSubsampling, ySubsampling);
+        Map<Rectangle,TreeNode> candidates     = null;
+        Map<Rectangle,TreeNode> bestCandidates = null;
         long lowestCost = Long.MAX_VALUE;
         try {
             do {
-                costOfStack = 0;
                 if (candidates == bestCandidates) {
                      // Works on a new map in order to protect 'bestCandidates' from changes.
-                    candidates = new LinkedHashMap<Rectangle,Tile>();
+                    candidates = new LinkedHashMap<Rectangle,TreeNode>();
                 }
-                final long cost = addTileCandidate(root, candidates);
+                final TreeNode selected = addTileCandidate(root, candidates);
                 /*
                  * We now have the final set of tiles for current subsampling. Checks if the cost
                  * of this set is lower than previous sets, and keep as "best candidates" if it is.
                  * If there is other subsamplings to try, we redo the process again in case we find
                  * cheaper set of tiles.
                  */
-                if (cost < lowestCost) {
-                    lowestCost = cost;
-                    bestCandidates = candidates;
-                    regionOfInterest.setSubsampling(subsampling);
-                } else {
-                    candidates.clear(); // Reuses the existing HashMap.
+                if (selected != null) {
+                    selected.filter(candidates);
+                    final long cost = selected.cost();
+                    if (cost < lowestCost) {
+                        lowestCost = cost;
+                        bestCandidates = candidates;
+                        setSubsampling(subsampling);
+                    } else {
+                        candidates.clear(); // Reuses the existing HashMap.
+                    }
                 }
             } while ((subsampling = subsamplingToTry.poll()) != null);
         } finally {
             subsamplingToTry.clear();
             subsamplingDone .clear();
-            candidateStack  .clear();
         }
         /*
          * TODO: sort the result. I'm not sure that it is worth, but if we decide that it is,
-         * we should use the Comparator<TreeNode> implemented by this class.
+         * we should use the Comparator<GridNode> implemented by this class.
          */
-        final Collection<Tile> tiles = bestCandidates.values();
-        return tiles.toArray(new Tile[tiles.size()]);
+        final Tile[] tiles = new Tile[bestCandidates.size()];
+        int count = 0;
+        for (final TreeNode node : bestCandidates.values()) {
+            final Tile tile = node.getUserObject();
+            if (tile != null) {
+                tiles[count++] = tile;
+            }
+        }
+        return XArray.resize(tiles, count);
     }
 
     /**
      * Searchs the tiles starting from the given node. This method invokes
      * itself recursively for scanning the child nodes down the tree.
      * <p>
-     * If this method <em>added</em> some tiles to the reading process, their region (identical
-     * to the keys in the {@code candidates} hash map) are added in the {@link #candidateStack}.
-     * It does not include tiles that <em>replaced</em> existing ones rather than adding a new
-     * ones.
+     * If this method <em>added</em> some tiles to the reading process, their region (identical to
+     * the keys in the {@code candidates} hash map) are {@linkplain SelectedNode#addChild added as
+     * child} of the returned object. The children does not include tiles that <em>replaced</em>
+     * existing ones rather than adding a new ones.
      *
      * @param  node The root of the subtree to examine.
      * @param  candidates The tiles that are under consideration during a search.
-     * @return The cost of the tiles added into {@code candidates}. Some child may returns a
-     *         negative value if they replaced a more costly tile, but it should be unusual.
-     *         The end result after completion of the root node should always be positive.
+     * @return The tile to be read, or {@code null} if it doesn't intersect the area of interest.
      */
-    private long addTileCandidate(final TreeNode node, final Map<Rectangle,Tile> candidates)
+    private TreeNode addTileCandidate(final TreeNode node, final Map<Rectangle,TreeNode> candidates)
             throws IOException
     {
         if (!node.intersects(regionOfInterest)) {
-            return 0;
+            return null;
         }
-        /*
-         * Checks if the tile is able to read its image at the given subsampling or any smaller
-         * subsampling. If not (which is indicated by a null floor), there is no reason to keep
-         * it for further examination, but we still need to investigate its children.
-         */
-        long      cost       = 0;      // The value to be returned by this method.
-        int       tileCost   = 0;      // Cost of the tile under the 'readRegion' key.
-        boolean   tileAdded  = false;  // true if we add the tile (not if it replaces an old one).
-        Rectangle readRegion = null;   // The region to be read (may be smaller than node region).
-        Tile tile = node.getUserObject();
+        TreeNode selectedTile = null;
+        final Tile tile = node.getUserObject();
         if (tile != null) {
             assert node.equals(tile.getAbsoluteRegion()) : tile;
             final Dimension floor = tile.getSubsamplingFloor(subsampling);
@@ -270,124 +266,62 @@ final class RTree implements Comparator<TreeNode> {
                  * The tile is capable to read its image at the given subsampling.
                  * Computes the cost that reading this tile would have.
                  */
-                readRegion = node.intersection(regionOfInterest);
-                final Tile previousTile = candidates.put(readRegion, tile);
-                relativeReadRegion.setBounds(readRegion);
-                relativeSubsampling.setSize(subsampling);
-                tileCost = tile.countUnwantedPixelsFromAbsolute(
-                        relativeReadRegion, relativeSubsampling);
-                if (previousTile == null) {
-                    cost += tileCost;
-                    tileAdded = true;
-                } else {
-                    /*
-                     * Found a tile with the same bounding box than the new tile. It is
-                     * probably a tile at a different resolution. Retains the one which
-                     * minimize the disk reading, and discard the other one. This check
-                     * is not generic since we search for an exact match, but this case
-                     * is common enough. Handling it with a HashMap will help to reduce
-                     * the amount of tiles to handle in a more costly way later. Note
-                     * that the key is an intersection, not the tile bounds, so it is
-                     * not completly redundant with the RTree.
-                     */
-                    relativeReadRegion.setBounds(readRegion);
-                    relativeSubsampling.setSize(subsampling);
-                    final int previousTileCost = previousTile.countUnwantedPixelsFromAbsolute(
-                            relativeReadRegion, relativeSubsampling);
-                    final int delta = tileCost - previousTileCost;
-                    if (delta >= 0) {
-                        // Previous tile had a cost equals or lower.
-                        // Keep the old tile, discart the new one.
-                        tile     = previousTile;
-                        tileCost = previousTileCost;
-                        candidates.put(readRegion, previousTile);
-                    } else {
-                        // We accept the new tile. Adjust the cost (which is now lower).
-                        cost += delta;
-                    }
-                }
+                final Rectangle readRegion = node.intersection(regionOfInterest);
+                tmpReadRegion.setBounds(readRegion);
+                tmpSubsampling.setSize(subsampling);
+                final int cost = tile.countUnwantedPixelsFromAbsolute(tmpReadRegion, tmpSubsampling);
+                selectedTile = new TreeNode(tile, readRegion, cost);
             }
         }
-        /*
-         * If we added a new tile (not replaced an existing one), add it to
-         * the stack so that the caller can revert the addition if it wishs.
-         */
-        if (tileAdded) {
-            candidateStack.add(readRegion);
-            costOfStack += tileCost;
-        }
-        final List<TreeNode> children = node.getChildren();
-        if (children != null) {
+        if (!node.isLeaf()) {
             /*
              * If the region to read encompass entirely this node (otherwise reading a few childs
              * may be cheaper) and if the children subsampling are not higher than the tile's one
              * (they are usually not), then there is no need to continue down the tree since the
              * childs can not do better than this node.
              */
-            if (readRegion != null) {
-                if (readRegion.equals(node) && !tile.isFinerThan(regionOfInterest)) {
-                    return cost;
+            if (selectedTile != null) {
+                if (selectedTile.boundsEquals(node) && !tile.isFinerThan(subsampling)) {
+                    return selectedTile;
                 }
+            } else {
+                selectedTile = new TreeNode(null, node.intersection(regionOfInterest), 0);
             }
             /*
-             * Process the children. They will be added to 'candidateStack', including children of
-             * children through recursive invocation of this method. After the loop we will decide
-             * if we keep all those bunch of children.
+             * Process the children, including children of children, etc. through recursive
+             * invocations of this method.
              */
-            long childCost = costOfStack;
-            final int stackBefore = candidateStack.size();
-            for (final TreeNode child : children) {
-                cost += addTileCandidate(child, candidates);
+            final long cost = selectedTile.cost();
+            for (final TreeNode child : node) {
+                selectedTile.addChild(addTileCandidate(child, candidates));
             }
-            final int stackAfter = candidateStack.size();
-            if (readRegion != null && stackAfter != stackBefore) {
-                /*
-                 * At least one child has been added and those childs overlap with the tile that
-                 * we added previously. In the easiest case, the childs are more costly than the
-                 * tile or they do not cover entirely the read region. In such case, just remove
-                 * the childs and we are done.
-                 */
-                final List<Rectangle> added = candidateStack.subList(stackBefore, stackAfter);
-                assert !added.contains(readRegion) : added;
-                childCost = costOfStack - childCost;
-                if (childCost >= tileCost || !SubsampledRectangle.dense(readRegion, added)) {
-                    assert candidates.keySet().containsAll(added);
-                    cost -= childCost;
-                    costOfStack -= childCost;
-                    candidates.keySet().removeAll(added);
-                    added.clear(); // Removes this range from candidateStack.
-                } else {
-                    /*
-                     * In this alternative, the childs are cheaper than the tile, so keep the
-                     * childs and remove the tile. First we check for the uncommon case where
-                     * a child replaced this tile.  In such case we preserve the substitution
-                     * and let the cost unchanged since the child already adjusted it.
-                     */
-                    final Tile previousTile = candidates.remove(readRegion);
-                    if (previousTile != tile) {
-                        candidates.put(readRegion, previousTile);
-                    } else {
-                        /*
-                         * The tile has been removed from the candidates. Removes it from the stack
-                         * as well. If the tile has been added by the "if (tileAdded)" block sooner
-                         * in this method, we know its index (which is faster). Otherwise we need
-                         * to scan through the array. In all cases the rectangle must be present.
-                         */
-                        cost -= tileCost;
-                        costOfStack -= tileCost;
-                        if (tileAdded) {
-                            if (candidateStack.remove(stackBefore - 1) != readRegion) {
-                                throw new AssertionError(stackBefore);
-                            }
-                        } else {
-                            if (!candidateStack.remove(readRegion)) {
-                                throw new AssertionError(readRegion);
-                            }
-                        }
-                    }
-                }
+            if (selectedTile.cost() - cost >= cost) {
+                selectedTile.setChildren(null);
+            } else {
+                selectedTile.clearTile(cost);
             }
         }
-        return cost;
+        return selectedTile;
+    }
+
+    /**
+     * Returns {@code true} if the rectangles in the given collection fill completly the given
+     * ROI with no empty space.
+     *
+     * @todo This method is not yet correctly implemented. For now we performs a naive check
+     *       which is suffisient for common {@link TileLayout}. We may need to revisit this
+     *       method in a future version.
+     */
+    static boolean dense(final Rectangle roi, final Iterable<? extends Rectangle> regions) {
+        Rectangle bounds = null;
+        for (final Rectangle rect : regions) {
+            final Rectangle inter = roi.intersection(rect);
+            if (bounds == null) {
+                bounds = inter;
+            } else {
+                bounds.add(inter); // See java.awt.Rectangle javadoc for empty rectangle handling.
+            }
+        }
+        return bounds == null || bounds.equals(roi);
     }
 }

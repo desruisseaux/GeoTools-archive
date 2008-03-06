@@ -247,11 +247,11 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      */
     private synchronized RTree getTree() throws IOException {
         if (trees == null) {
-            final TreeNode root  = new TreeNode(tiles);
+            final TreeNode root  = new GridNode(tiles);
             final RTree    tree  = new RTree(root);
             final RTree[]  trees = new RTree[CONCURRENT_THREADS];
             trees[0] = tree;
-            root.setReadOnly(tree);
+// TODO     root.setReadOnly(tree);
             assert root.containsAll(allTiles);
             this.trees = trees; // Save last so it is saved only on success.
         }
@@ -311,15 +311,15 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     public Collection<Tile> getTiles(final Rectangle region, final Dimension subsampling,
                                      final boolean subsamplingChangeAllowed) throws IOException
     {
-        final SubsampledRectangle regionOfInterest = new SubsampledRectangle(region, subsampling);
         final RTree tree = getTree();
         final Collection<Tile> values;
         try {
             // Initializes the tree with the search criterions.
-            tree.regionOfInterest = regionOfInterest;
+            tree.regionOfInterest = region;
+            tree.setSubsampling(subsampling);
             tree.subsamplingChangeAllowed = subsamplingChangeAllowed;
             values = UnmodifiableArrayList.wrap(tree.searchTiles());
-            subsampling.setSize(regionOfInterest.xSubsampling, regionOfInterest.ySubsampling);
+            subsampling.setSize(tree.xSubsampling, tree.ySubsampling);
             tree.regionOfInterest = null; // Just as a safety (not really required).
         } finally {
             release(tree);

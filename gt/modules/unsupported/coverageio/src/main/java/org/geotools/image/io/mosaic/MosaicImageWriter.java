@@ -214,7 +214,7 @@ public class MosaicImageWriter extends ImageWriter {
         /*
          * Various other objects to be required in the loop...
          */
-        final TreeNode       tree      = new TreeNode(tiles.toArray(new Tile[tiles.size()]));
+        final TreeNode       tree      = new GridNode(tiles.toArray(new Tile[tiles.size()]));
         final Runtime        runtime   = Runtime.getRuntime();
         final ImageReadParam params    = reader.getDefaultReadParam();
         final Logger         logger    = Logging.getLogger(MosaicImageWriter.class);
