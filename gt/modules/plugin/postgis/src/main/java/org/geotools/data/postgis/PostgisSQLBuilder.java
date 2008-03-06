@@ -126,7 +126,6 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
                     sql.append(", ");
                 }
             }
-            System.out.println( sql );
         }
         /** Used when WKB "ByteA" is enabled */
         private void columnGeometryByteaWKB(StringBuffer sql,
