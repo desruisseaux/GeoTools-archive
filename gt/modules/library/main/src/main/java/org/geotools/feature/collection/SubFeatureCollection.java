@@ -58,16 +58,21 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
 	public SubFeatureCollection(FeatureCollection<SimpleFeatureType, SimpleFeature> collection, Filter subfilter ){
 		super(null,collection.getSchema());
 		
-		if (subfilter != null && subfilter.equals(Filter.EXCLUDE)) {
+		if (subfilter != null ) subfilter = Filter.INCLUDE;		
+		if (subfilter.equals(Filter.EXCLUDE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.EXCLUDE is a null operation");
 		}
-		if (subfilter != null && subfilter.equals(Filter.INCLUDE)) {
-			throw new IllegalArgumentException("A subcollection with Filter.INCLUDE should be a FeatureCollectionEmpty");
-		}
-        if( subfilter != null && (collection instanceof SubFeatureCollection)){
+		
+        if( collection instanceof SubFeatureCollection){
 			SubFeatureCollection filtered = (SubFeatureCollection) collection;
-			this.collection = filtered.collection;            
-			this.filter = ff.and( filtered.filter(), subfilter );
+			if( subfilter.equals(Filter.INCLUDE)){
+                this.collection = filtered.collection;
+			    this.filter = filtered.filter();
+			}
+			else {
+			    this.collection = filtered.collection;	            			    
+			    this.filter = ff.and( filtered.filter(), subfilter );
+			}
 		} else {
 			this.collection = collection;
 			this.filter = subfilter;
