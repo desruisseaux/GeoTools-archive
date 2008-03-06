@@ -96,6 +96,24 @@ public class GeometryTransformer extends TransformerBase {
             coordWriter.setNamespaceUri( nsUri );
         }
         
+        /**
+         * Constructor for GeometryTranslator allowing the specification of the number of
+         * valid dimension represented in the Coordinates.
+         * @param handler
+         * @param prefix
+         * @param nsUri
+         * @param numDecimals
+         * @param isDummyZEnabled
+         * @param dimension If this value is 3; the coordinate.z will be used rather than dummyZ
+         * @since 2.4.1
+         */
+        public GeometryTranslator(ContentHandler handler, String prefix, String nsUri, int numDecimals, boolean isDummyZEnabled, int dimension) {
+            this(handler,prefix,nsUri);
+            coordWriter = new CoordinateWriter(numDecimals, isDummyZEnabled, dimension );
+            coordWriter.setPrefix( prefix );
+            coordWriter.setNamespaceUri( nsUri );
+        } 
+        
         public boolean isDummyZEnabled(){
             return coordWriter.isDummyZEnabled();
         }

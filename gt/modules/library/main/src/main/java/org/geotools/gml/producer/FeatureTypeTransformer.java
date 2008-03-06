@@ -19,7 +19,6 @@ package org.geotools.gml.producer;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;

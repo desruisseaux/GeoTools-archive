@@ -15,19 +15,22 @@
  */
 package org.geotools.gml.producer;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.type.DateUtil;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -41,14 +44,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -337,7 +336,25 @@ public class FeatureTransformer extends TransformerBase {
         FeatureTypeNamespaces types;
         boolean prefixGml = false;
         boolean featureBounding = false;
+        /**
+         * The string representing the Spatial Reference System of the data.
+         * <p>
+         * This value should be determined by looking at the first
+         * GeometryAttributeType encountered (but this way GeoServer can override
+         * everything and be divorced from the actual (lack of) abilities of the underlying
+         * DataStore).
+         */
         String srsName = null;
+        /**
+         * Will be 0 - if unknown; 2 if normal and 3 if working with 3D coordinates.
+         * <p>
+         * This value will be set based on looking at the *first* GeometryAttributeType encountered,
+         * a similar approach should be taken for determining the SRID name.
+         * 
+         * @since 2.4.1
+         */
+        int dimension = 0;
+        
         String lockId = null;
         ContentHandler handler;
         private boolean running = true;
@@ -376,9 +393,31 @@ public class FeatureTransformer extends TransformerBase {
         protected GeometryTranslator createGeometryTranslator( ContentHandler handler, int numDecimals ) {
         	return new GeometryTransformer.GeometryTranslator( handler, numDecimals );
         }
+        /**
+         * @param handler
+         * @param numDecimals
+         * @param useDummyZ
+         * @return
+         */
         protected GeometryTranslator createGeometryTranslator( ContentHandler handler, int numDecimals, boolean useDummyZ ) {
-        	return new GeometryTransformer.GeometryTranslator( handler, numDecimals, useDummyZ );
+            return new GeometryTransformer.GeometryTranslator( handler, numDecimals, useDummyZ );
         }
+        
+       /**
+        * Set up a GeometryTranslator for working with content of the indicate
+        * dimension.
+        * <p>
+        * This method can be used by code explicitly wishing to output 2D ordinates.
+        * 
+        * @since 2.4.1
+        * @param handler
+        * @param numDecimals
+        * @param dimension
+        * @return GeometryTranslator that will delegate  a CoordinateWriter configured with the above parameters
+        */
+       protected GeometryTranslator createGeometryTranslator( ContentHandler handler, int numDecimals, int dimension ) {
+           return new GeometryTranslator( handler, "gml",GMLUtils.GML_URL, numDecimals, false, dimension);
+       }   
         
         void setGmlPrefixing(boolean prefixGml) {
             this.prefixGml = prefixGml;
@@ -400,6 +439,12 @@ public class FeatureTransformer extends TransformerBase {
             geometryTranslator = createGeometryTranslator(handler,
                     geometryTranslator.getNumDecimals(), useDummyZ);
         }
+        
+        /** If set to 3 the real z value from the coordinates will be used */
+        void setDimension( int dimension ){
+            geometryTranslator = createGeometryTranslator(handler, geometryTranslator.getNumDecimals(), dimension );
+        }
+        
 
         public void setLockId(String lockId) {
             this.lockId = lockId;
@@ -671,6 +716,24 @@ public class FeatureTransformer extends TransformerBase {
                         contentHandler.startElement("", "", name, NULL_ATTS);
 
                         if (Geometry.class.isAssignableFrom(value.getClass())) {
+                            if( dimension == 0 ){
+                                // lets look at the CRS
+                                GeometryDescriptor geometryType = (GeometryDescriptor) descriptor;
+                                CoordinateReferenceSystem crs = geometryType.getCRS();
+                                if( crs == null ){
+                                    // I won't even bother people with a warning
+                                    // (until DataStore quality has improved
+                                    dimension = 2; // the most sensible default
+                                    
+                                }
+                                else {
+                                    dimension = crs.getCoordinateSystem().getDimension();
+                                    // note we could check the srsName here!
+                                    if( dimension == 3 ){
+                                        setDimension( dimension );
+                                    }
+                                }
+                            }
                             geometryTranslator.encode((Geometry) value, srsName);
                         } else if(value instanceof Date) {
                             String text = null;

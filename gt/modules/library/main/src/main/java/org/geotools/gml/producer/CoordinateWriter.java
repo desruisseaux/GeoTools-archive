@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 //import org.geotools.feature.*;
 
 /**
- * Handles the writing of coordinates for gml.
+ * Handles the writing of coordinates for GML.
  *
  * @author Chris Holmes
  * @author Ian Schneider
@@ -38,11 +38,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class CoordinateWriter {
     
     /**
-     * Internal representation of coordinate delimeter (',' for GML is default)
+     * Internal representation of coordinate delimiter (',' for GML is default)
      */
     private final String coordinateDelimiter;
     
-    /** Internal representation of tuple delimeter (' ' for GML is  default) */
+    /** Internal representation of tuple delimiter (' ' for GML is  default) */
     private final String tupleDelimiter;
     
     /** To be used for formatting numbers, uses US locale. */
@@ -56,9 +56,16 @@ public class CoordinateWriter {
     
     private char[] buff = new char[200];
     
+    /**
+     * True of dummyZ should be used.
+     */
     private final boolean useDummyZ;
-    
+
+    /** Dummy Z value (used to override coordinate.Z value) */
     private final double dummyZ;
+    
+    /** Dimension of expected coordinates */
+    private final int D;
     
     /**
      * Flag controlling wether namespaces should be ignored.
@@ -87,38 +94,42 @@ public class CoordinateWriter {
         this(numDecimals, tupleDelim, coordDelim, false);
     }
     
-    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean isDummyZEnabled){
-        this(numDecimals, tupleDelim, coordDelim, isDummyZEnabled, 0);
+    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useDummyZ){
+        this(numDecimals, tupleDelim, coordDelim, useDummyZ, 0);
     }
-    
-    public int getNumDecimals(){
-        return coordFormatter.getMaximumFractionDigits();
-    }
-    
-    public boolean isDummyZEnabled(){
-        return useDummyZ;
-    }
-    
-    public void setNamespaceAware(boolean namespaceAware) {
-        this.namespaceAware = namespaceAware;
-    }
-    
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-    
-    public void setNamespaceUri(String namespaceUri) {
-        this.namespaceUri = namespaceUri;
-    }
-    
     public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useDummyZ, double zValue) {
-        
-        if (tupleDelim == null || tupleDelim.length() == 0)
+        this(numDecimals, tupleDelim, coordDelim, useDummyZ, 0, 2);
+    }
+    public CoordinateWriter(int numDecimals, boolean useDummyZ,
+            int dimension) {
+        this(numDecimals, " ", ",", useDummyZ, 0, dimension );
+    }
+
+    /**
+     * Create a CoordinateWriter for outputting GML coordinates.
+     * <p>
+     * The use of dimension, z and useZ is based on your needs:
+     * <ul>
+     * <li>dimension: is from your CoordinateReferenceSystem; it is the number of axis used by the coordinate
+     * <li>useZ: is used to force the use of 3 dimensions (if needed the z value below will be used for 2D data)
+     * <li>z: the dummy z value to use if the coordinate does not have one
+     * </ul>
+     * 
+     * @param numDecimals Number of decimals to use (a speed vs accuracy trade off)
+     * @param tupleDelim delimiter to use between ordinates (usually ',')
+     * @param coordDelim delimiter to use between coordinates (usually ' ')
+     * @param useZ true if the provided zValue should be forced
+     * @param z Dummy z value to use if needed
+     * @param dimension Dimension of coordinates (usually 2 or 3)
+     */
+    public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useZ, double z, int dimension) {        
+        if (tupleDelim == null || tupleDelim.length() == 0){
             throw new IllegalArgumentException("Tuple delimeter cannot be null or zero length");
-        
+        }
         if ((coordDelim != null) && coordDelim.length() == 0) {
             throw new IllegalArgumentException("Coordinate delimeter cannot be null or zero length");
-        }
+        }        
+        D = dimension;
         
         tupleDelimiter = tupleDelim;
         coordinateDelimiter = coordDelim;
@@ -136,12 +147,47 @@ public class CoordinateWriter {
                 coordinateDelimiter);
         atts.addAttribute(uri, "ts", "ts", "ts", tupleDelimiter);
         
-        this.useDummyZ = useDummyZ;
-        this.dummyZ = zValue;
+        this.useDummyZ = useZ;
+        this.dummyZ = z;
+    }
+
+    public int getNumDecimals(){
+        return coordFormatter.getMaximumFractionDigits();
     }
     
+    public boolean isDummyZEnabled(){
+        return useDummyZ;
+    }
+    
+    
+    public void setNamespaceAware(boolean namespaceAware) {
+        this.namespaceAware = namespaceAware;
+    }
+    
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+    
+    public void setNamespaceUri(String namespaceUri) {
+        this.namespaceUri = namespaceUri;
+    }
+    /**
+     * Write the provided list of coordinates out.
+     * <p>
+     * There are a range of constants that control exactly what
+     * is written:
+     * <ul>
+     * <li>useDummyZ: if true dummyZ will be added to each coordiante
+     * <li>namespaceAware: is true the prefix and namespaceUri will be used
+     * <li>
+     * </ul>
+     * 
+     * @param c
+     * @param output
+     * @throws SAXException
+     */
     public void writeCoordinates(Coordinate[] c, ContentHandler output)
-    throws SAXException {
+        throws SAXException {
         
         String prefix = this.prefix + ":";
         String namespaceUri = this.namespaceUri;
@@ -157,31 +203,45 @@ public class CoordinateWriter {
         for (int i = 0, n = c.length; i < n; i++) {
             // clear the buffer
             coordBuff.delete(0, coordBuff.length());
+            
             // format x into buffer and append delimiter
             coordFormatter.format(c[i].x,coordBuff,zero).append(coordinateDelimiter);
+            
             // format y into buffer
-            if(useDummyZ){
+            if(D == 3 || useDummyZ){
                 coordFormatter.format(c[i].y,coordBuff,zero).append(coordinateDelimiter);
             } else{
                 coordFormatter.format(c[i].y,coordBuff,zero);
             }
+            
             // format dummy z into buffer if required
-            if(useDummyZ){
+            if( D == 3 ){
+                coordFormatter.format( c[i].z, coordBuff, zero);
+            }
+            else if(useDummyZ){
+                // 2D data being forced into 3D
                 coordFormatter.format(dummyZ, coordBuff, zero);
             }
-            // if theres another coordinate, tack on a tuple delimeter
-            if (i + 1 < c.length)
+            else {
+                // 2D data; no z required
+            }
+            
+            // if there is another coordinate, tack on a tuple delimiter
+            if (i + 1 < c.length){
                 coordBuff.append(tupleDelimiter);
+            }
+            
             // make sure our character buffer is big enough
             if (coordBuff.length() > buff.length) {
                 buff = new char[coordBuff.length()];
             }
             // copy the characters
             coordBuff.getChars(0, coordBuff.length(), buff, 0);
+            
             // finally, output
             output.characters(buff, 0, coordBuff.length());
-        }
-        
+        }        
         output.endElement(namespaceUri,"coordinates", prefix + "coordinates");
     }
+
 }
