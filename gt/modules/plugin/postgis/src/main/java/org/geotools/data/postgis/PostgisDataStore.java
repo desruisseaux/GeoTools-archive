@@ -63,6 +63,7 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
+import org.geotools.data.postgis.attributeio.EWKTAttributeIO;
 import org.geotools.data.postgis.attributeio.PgWKBAttributeIO;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.referencing.PostgisAuthorityFactory;
@@ -1789,11 +1790,26 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type,
         QueryData queryData) {
+        
+        // grab the crs if available
+        GeometryDescriptor geometryType = (GeometryDescriptor) type;
+        CoordinateReferenceSystem crs = null;
+        if(geometryType != null)
+            crs = geometryType.getCRS();
+        
+        Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();            
+        int D = (crs == null || Boolean.TRUE.equals( queryData.getHints().get( Hints.FEATURE_2D )))
+                ? 2 : crs.getCoordinateSystem().getDimension();
+        
         if (WKBEnabled) {
-            Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();
-            return new PgWKBAttributeIO(isByteaEnabled(), hints);
+            return new PgWKBAttributeIO(isByteaEnabled(), hints);            
         } else {
-            return new WKTAttributeIO();
+            if( D == 3 ){
+                return new EWKTAttributeIO();
+            }
+            else {
+                return new WKTAttributeIO();
+            }
         }
     }
 

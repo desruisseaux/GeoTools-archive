@@ -695,6 +695,8 @@ public abstract class JDBC1DataStore implements DataStore {
 			throws IOException, DataSourceException {
 		String typeName = query.getTypeName();
 		SQLBuilder sqlBuilder = getSqlBuilder(query.getTypeName());
+		sqlBuilder.setHints( query.getHints() ); // hints will control FEATURE_2D etc...
+        
 		org.opengis.filter.Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //dupe?
 		//Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 

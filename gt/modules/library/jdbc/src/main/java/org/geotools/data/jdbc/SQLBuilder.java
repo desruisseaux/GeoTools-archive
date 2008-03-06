@@ -20,6 +20,7 @@ package org.geotools.data.jdbc;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.geotools.factory.Hints;
 import org.geotools.filter.SQLEncoderException;
 import org.opengis.filter.sort.SortBy;
 
@@ -32,6 +33,20 @@ import org.opengis.filter.sort.SortBy;
  */
 public interface SQLBuilder {
 
+    /**
+     * Hints supplied by the user.
+     * <p>
+     * The following hints are of interest when working with Features:
+     * <ul>
+     * <li>Hints.FEATURE_2D - indicates that only 2 axis are needed
+     * <li>Hints.FEATURE_DETACHED - indicate feature can be updated without fear of harming the origional data
+     * <li>etc...
+     * </ul>
+     * @param hints
+     * @since 2.4.1
+     */
+    public void setHints( Hints hints );
+    
     /**
      * Makes an SQL Select statement.  Constructs an SQL statement that will select the
      * features from the table based on the filter.  The default implementation creates

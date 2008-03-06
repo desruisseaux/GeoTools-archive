@@ -25,6 +25,7 @@ import org.geotools.filter.SQLEncoderPostgis;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Builds sql for postgis.
@@ -92,39 +93,117 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     public void sqlColumns(StringBuffer sql, FIDMapper mapper,
         AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
-            sql.append("\""+mapper.getColumnName(i)+"\""); //DJB: add quotes in.  NOTE: if FID  mapper isnt oid (ie. PK - Primary Key), you could be requesting PK columns multiple times 
-
+            sql.append("\""+mapper.getColumnName(i)+"\"");
+            // DJB: add quotes in. NOTE: if FID mapper isnt oid (ie. PK - Primary Key), you could be
+            // requesting PK columns multiple times
             if ((attributes.length > 0) || (i < (mapper.getColumnCount() - 1))) {
                 sql.append(", ");
             }
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getLocalName();
+            AttributeDescriptor attribute = attributes[i];
 
-            if (attributes[i] instanceof GeometryDescriptor) {
-                
-                if (WKBEnabled) {
-                    if(byteaEnabled) {
-                        sql.append("encode(AsBinary(force_2d(\"" + colName + "\"), 'XDR'),'base64')");
+                if (attribute instanceof GeometryDescriptor) {   
+                    GeometryDescriptor geometryAttribute = (GeometryDescriptor) attribute;
+                    CoordinateReferenceSystem crs = geometryAttribute.getCRS();
+                    final int D = crs == null ? 2 : crs.getCoordinateSystem().getDimension();
+                    
+                    if (WKBEnabled) {
+                        if(byteaEnabled) {
+                            columnGeometryByteaWKB( sql, geometryAttribute, D );
+                        } else {
+                            columnGeometryWKB( sql, geometryAttribute, D );
+                        }
                     } else {
-                        sql.append("AsBinary(force_2d(\"" + colName + "\"), 'XDR')");
+                        columnGeometry( sql, geometryAttribute, D );
                     }
                 } else {
-                    sql.append("AsText(force_2d(\"" + colName + "\"))");
+                    columnAttribute(sql, attribute);
                 }
-            } else {
-                sql.append("\"" + colName + "\"");
-            }
 
-            if (i < (attributes.length - 1)) {
-                sql.append(", ");
+                if (i < (attributes.length - 1)) {
+                    sql.append(", ");
+                }
+            }
+            System.out.println( sql );
+        }
+        /** Used when WKB "ByteA" is enabled */
+        private void columnGeometryByteaWKB(StringBuffer sql,
+                GeometryDescriptor geometryAttribute, final int D) {
+            
+            sql.append("encode(");
+            if( D == 3 ){
+                sql.append("asEWKB(");
+            }
+            else {
+                sql.append("asBinary(");
+            }
+            columnGeometry(sql, geometryAttribute.getLocalName(), D );
+            sql.append(",'XDR'),'base64')");
+        }
+        /** Used when plain WKB is enabled */   
+        private void columnGeometryWKB(StringBuffer sql,
+                GeometryDescriptor geometryAttribute, final int D) {
+            
+            if( D == 3 ){
+                sql.append("asEWKB(");
+            }
+            else {
+                sql.append("asBinary(");
+            }
+            columnGeometry(sql, geometryAttribute.getLocalName(), D );
+            sql.append(",'XDR')");
+        }
+        /** Used to request a text format. */    
+        private void columnGeometry(StringBuffer sql,
+                GeometryDescriptor geometryAttribute, final int D) {
+            if( D == 3 && !isForce2D() ){
+                sql.append("asEWKT(");
+            }
+            else {
+                sql.append("asText(");
+            }
+            columnGeometry(sql, geometryAttribute.getLocalName(), D );
+            sql.append(")");
+        }
+        /**
+         * Used to wrap the correct function (force_3d or force3d) around
+         * the request for geometry data.
+         * <p>
+         * This method prevents the request of extra ordinates that will
+         * not be used.
+         * 
+         * @see isForce2D
+         * @see Hints.FEATURE_2D
+         *  
+         * @param sql
+         * @param geomName
+         * @param D
+         */
+        private void columnGeometry(StringBuffer sql,String geomName, final int D) {
+            if (D == 2 || isForce2D() ){ 
+                sql.append("force_2d(\"" + geomName + "\")");
+            }
+            else if( D == 3 ){
+                sql.append("force_3d(\"" + geomName + "\")");
+            }
+            else {
+                // D = 4?
+                // force 2D is the default behaviour until you report
+                // this as a bug and are willing to test with real data!
+                sql.append("force_2d(\"" + geomName + "\")" );
             }
         }
-    }
-
+        
+        private final void columnAttribute(StringBuffer sql, AttributeDescriptor attribute){
+            sql.append( "\"" );
+            sql.append( attribute.getLocalName() );
+            sql.append( "\"" );
+        }
+    
     /**
-     * Consutrcts FROM clause for featureType
+     * Constructs FROM clause for featureType
      * 
      * <p>
      * sql: <code>FROM typeName</code>

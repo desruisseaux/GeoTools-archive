@@ -20,6 +20,7 @@ import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.geotools.factory.Hints;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.Filters;
 import org.geotools.filter.SQLEncoder;
@@ -65,6 +66,8 @@ public class DefaultSQLBuilder implements SQLBuilder {
     private Filter lastPreFilter = null;
     private Filter lastPostFilter = null;
     
+    private Hints hints;
+    
 	/**
 	 * Constructs an instance of this class with a default SQLEncoder
 	 */
@@ -103,6 +106,22 @@ public class DefaultSQLBuilder implements SQLBuilder {
     	
     	//set the feature type on teh encoders
     	encoder.setFeatureType( featureType );
+    }
+    
+    public void setHints(Hints hints) {
+        this.hints = hints;
+    }
+    
+    /** Check the hints to see if we are forced into 2D */
+    public synchronized boolean isForce2D(){
+        if( hints == null ){
+            return false;
+        }
+        Boolean force2d = (Boolean) hints.get( Hints.FEATURE_2D );
+        if(force2d == null ){
+            return false;
+        }
+        return force2d.booleanValue();      
     }
     
     /**
