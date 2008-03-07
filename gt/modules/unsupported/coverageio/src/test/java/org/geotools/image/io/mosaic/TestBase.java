@@ -25,6 +25,8 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.swing.JTree;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 
 import junit.framework.TestCase;
 
@@ -102,8 +104,13 @@ public abstract class TestBase extends TestCase {
      * Shows the given tree in a Swing widget. This is used for debugging purpose only.
      */
     final void show(final TreeNode root) {
+        final Thread thread = Thread.currentThread();
         final JFrame frame = new JFrame("TreeNode");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override public void windowClosing(WindowEvent event) {
+                thread.interrupt();
+            }
+        });
         frame.add(new JScrollPane(new JTree(root)));
         frame.pack();
         frame.setVisible(true);
@@ -112,5 +119,6 @@ public abstract class TestBase extends TestCase {
         } catch (InterruptedException e) {
             // Go back to work.
         }
+        frame.dispose();
     }
 }

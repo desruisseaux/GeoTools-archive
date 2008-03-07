@@ -536,13 +536,13 @@ public class Hints extends RenderingHints {
 
     /**
      * Request that the features returned by the feature collections should
-     * be 2D only, can be used to prevent the request of the third ordinate
+     * be 2D only. Can be used to prevent the request of the third ordinate
      * when only two are going to be used.
      *
      * @since 2.4.1
      */
     public static final Key FEATURE_2D = new Key(Boolean.class);
-    
+
     /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.
      *

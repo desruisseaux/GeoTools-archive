@@ -232,6 +232,7 @@ final class RTree {
          */
         final List<Tile> tiles = new ArrayList<Tile>(distinctBounds.size());
         if (bestCandidate != null) {
+            assert bestCandidate.checkValidity() >= 0 : bestCandidate;
             bestCandidate.getTiles(tiles);
             if (LOGGER.isLoggable(LEVEL)) {
                 final String lineSeparator = System.getProperty("line.separator", "\n");

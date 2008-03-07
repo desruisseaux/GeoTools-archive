@@ -444,7 +444,7 @@ public final class CRS {
      * @return The envelope in terms of the specified CRS, or {@code null} if none.
      *
      * @see #getGeographicBoundingBox
-     * @see org.geotools.geometry.GeneralEnvelope#validate
+     * @see org.geotools.geometry.GeneralEnvelope#normalize
      *
      * @since 2.2
      */

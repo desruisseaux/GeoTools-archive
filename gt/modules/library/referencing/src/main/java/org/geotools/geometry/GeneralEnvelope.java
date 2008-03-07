@@ -333,7 +333,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * Sets the coordinate reference system in which the coordinate are given.
      * This method <strong>do not</strong> reproject the envelope, and do not
      * check if the envelope is contained in the new domain of validity. The
-     * later can be enforced by a call to {@link #validate}.
+     * later can be enforced by a call to {@link #normalize}.
      *
      * @param  crs The new coordinate reference system, or {@code null}.
      * @throws MismatchedDimensionException if the specified CRS doesn't have the expected
@@ -379,7 +379,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *     </blockquote></li>
      *   </ul>
      *   </p></li>
-     *   <li><p>Second and only if {@code crsDomain} is {@code true}, the envelope validated in
+     *   <li><p>Second and only if {@code crsDomain} is {@code true}, the envelope normalized in
      *   the previous step is intersected with the CRS
      *   {@linkplain CoordinateReferenceSystem#getDomainOfValidity domain of validity}, if any.
      *   </p></li>
@@ -392,7 +392,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @since 2.5
      */
-    public boolean validate(final boolean crsDomain) {
+    public boolean normalize(final boolean crsDomain) {
         boolean changed = false;
         if (crs != null) {
             final int dimension = ordinates.length / 2;

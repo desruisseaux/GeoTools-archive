@@ -134,7 +134,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * through assertions.
      */
     final void setTile(final TreeNode node) {
-        assert isLeaf() && node.isLeaf();
+        assert isRoot() && isLeaf() && node.isLeaf();
         super.setBounds(node);
         tile = node.tile;
         cost = node.cost;
@@ -159,20 +159,19 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     final void addChild(final TreeNode child) {
         if (child != null) {
-            assert tile == null || contains(child) : child;
-            assert child.parent == null : child.parent;
+            assert child.isRoot() && (tile == null || contains(child)) : child;
             child.parent = this;
             if (lastChildren == null) {
                 lastChildren = firstChildren = child;
             } else {
-                // We assume that child siblings are invalid if the parent was null, but they may be
-                // non-null if they come form nodes previously removed. It is safe to overwrite.
-                child.nextSibling = null;
                 child.previousSibling = lastChildren;
                 lastChildren.nextSibling = child;
                 lastChildren = child;
             }
-            cost += child.cost;
+            TreeNode p = this;
+            do {
+                p.cost += child.cost;
+            } while ((p = p.parent) != null);
         }
     }
 
@@ -184,8 +183,11 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
         while (child != null) {
             assert child.parent == this;
             cost -= child.cost;
-            child.parent = null;
-            child = child.nextSibling;
+            final TreeNode next = child.nextSibling;
+            child.previousSibling = null;
+            child.nextSibling     = null;
+            child.parent          = null;
+            child = next;
         }
         firstChildren = lastChildren = null;
         if (children != null) {
@@ -271,11 +273,19 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
+     * Returns {@code true} if this node has no parent. Note that having no parent
+     * implies having no sibling neither (otherwise the tree would be malformed).
+     */
+    private boolean isRoot() {
+        return parent == null && previousSibling == null && nextSibling == null;
+    }
+
+    /**
      * Returns {@code true} if this node has no children. Note that this is slightly different from
      * {@link #getAllowsChildren} which returns {@code false} if this node <strong>can not</strong>
      * have children.
      */
-    public boolean isLeaf() {
+    public final boolean isLeaf() {
         assert (firstChildren == null) == (lastChildren == null);
         return firstChildren == null;
     }
@@ -293,6 +303,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * When using {@link TreeNode} directly, consider using {@link #iterator} instead.
      */
     public final int getChildCount() {
+        // Don't invoke assertValid() directly or indirectly since it could cause never-ending loop.
         int count = 0;
         TreeNode child = firstChildren;
         while (child != null) {
@@ -395,7 +406,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
             if (children != null) {
                 last = children;
                 children = children.nextSibling;
-                assert children == null || children.previousSibling == last;
                 return last;
             }
             throw new NoSuchElementException();
@@ -515,7 +525,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
         }
         TreeNode child = firstChildren;
         while (child != null) {
-            assert contains(child) : child;
             child.copy(tiles);
             child = child.nextSibling;
         }
@@ -565,10 +574,13 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
         }
         TreeNode existing = overlaps.put(this, this);
         if (existing != null && existing != this) {
-            /*
-             * 
-             */
             if (!isCheaperThan(existing)) {
+                /*
+                 * A cheaper tiles existed for the same bounds. Reinsert the previous tile in the
+                 * map. We will delete this node from the tree later, except if the previous node
+                 * is a children of this node. In the later case, we can't remove completly this
+                 * node since it would remove its children as well, so we just nullify the tile.
+                 */
                 overlaps.put(existing, existing);
                 if (existing.parent == this) {
                     if (tile != null) {
@@ -590,7 +602,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
-     *
+     * Removes this node and all its children from the given map.
      */
     private void removeFrom(final Map<Rectangle,TreeNode> overlaps) {
         final TreeNode existing = overlaps.remove(this);
@@ -659,6 +671,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     @Override
     public final String toString() {
+        // Don't invoke assertValid() directly or indirectly since it could cause never-ending loop.
         String text;
         if (tile != null) {
             text = tile.toString();
@@ -670,5 +683,64 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
             text = text + " (" + getChildCount() + " childs)";
         }
         return text;
+    }
+
+    /**
+     * Invoked in assertion for checking the validity of the whole tree. Note that the checks are
+     * performed inconditionnaly though explicit {@code if ... throw new AssertionError(...)}
+     * statements rather than {@code assert} statements. The whole methods is expected to be
+     * invoked in an {@code assert} statement, so we do not want to repeat the assertion status
+     * check in every line of this method.
+     *
+     * @return The total number of nodes.
+     */
+    final int checkValidity() {
+        int count = 1;
+        long childrenCost = 0;
+        TreeNode child = firstChildren;
+        if (child != null) {
+            if (child.previousSibling != null) {
+                throw new AssertionError(this);
+            }
+            while (true) {
+                if (child.parent != this) {
+                    throw new AssertionError(child);
+                }
+                count += child.checkValidity();
+                childrenCost += child.cost;
+                final TreeNode next = child.nextSibling;
+                if (next == null) {
+                    break;
+                }
+                if (next.previousSibling != child) {
+                    throw new AssertionError(child);
+                }
+                if (!contains(child) && width >= 0 && height >= 0) {
+                    throw new AssertionError(child);
+                }
+                child = next;
+            }
+        }
+        if (child != lastChildren) {
+            throw new AssertionError(this);
+        }
+        if (childrenCost < 0 || cost < childrenCost) {
+            throw new AssertionError(this);
+        }
+        if (tile != null) {
+            if (isEmpty()) {
+                throw new AssertionError(this);
+            }
+            final Rectangle bounds;
+            try {
+                bounds = tile.getAbsoluteRegion();
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            if (!bounds.contains(this)) {
+                throw new AssertionError(this);
+            }
+        }
+        return count;
     }
 }

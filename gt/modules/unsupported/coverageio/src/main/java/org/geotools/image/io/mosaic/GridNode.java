@@ -77,7 +77,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      * are usually the ones with finest resolution no matter if the layout is "constant area"
      * or "constant tile size".
      * <p>
-     * If two tiles have the same area and subsampling, then their order is unchanged on the
+     * If two tiles have the same area and subsampling, then their order is restored on the
      * basis that initial order, when sorted by {@link TileManager}, should be efficient for
      * reading tiles sequentially.
      */
@@ -91,7 +91,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             a2 = (long) n2.xSubsampling * (long) n2.ySubsampling;
             if (a1 > a2) return -1;
             if (a1 < a2) return +1;
-            return 0;
+            return n1.index - n2.index;
         }
     };
 
@@ -202,6 +202,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
         }
         splitOverlappingChildren(); // Must be after bounds calculation.
         postTreeCreation();
+        assert checkValidity() >= tiles.length : this;
     }
 
     /**
@@ -372,9 +373,9 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             }
             assert toProcess.isEmpty() : toProcess;
             assert Collections.disjoint(retained, removed);
-            final TreeNode[] sorted = retained.toArray(new TreeNode[retained.size()]);
+            final GridNode[] sorted = retained.toArray(new GridNode[retained.size()]);
             retained.clear();
-            Arrays.sort(sorted);
+            Arrays.sort(sorted, LARGEST_FIRST);
             final GridNode child = new GridNode(this);
             child.setChildren(sorted);
             addChild(child);
