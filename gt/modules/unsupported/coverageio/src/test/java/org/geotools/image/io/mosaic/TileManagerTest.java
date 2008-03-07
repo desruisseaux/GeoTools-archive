@@ -78,34 +78,43 @@ public class TileManagerTest extends TestBase {
      * Tests the search of tiles on a tile layout using constant tile size.
      */
     public void testConstantSizeLayout() throws IOException {
+        int total = 0;
+
         subsampling.setSize(90, 90);
         searchTiles(false);
         assertEquals(1, tiles.size());
+        total += tiles.size();
 
-if (true) return; // The test do not pass past this point for now.
         subsampling.setSize(45, 45);
         searchTiles(false);
         assertEquals(2, tiles.size());
+        total += tiles.size();
 
-if (true) return; // The test do not pass past this point for now.
         subsampling.setSize(15, 15);
         searchTiles(false);
         assertEquals(18, tiles.size());
+        total += tiles.size();
 
         subsampling.setSize(9, 9);
         searchTiles(false);
-        assertEquals(100, tiles.size());
+        assertEquals(50, tiles.size());
+        total += tiles.size();
 
         subsampling.setSize(5, 5);
         searchTiles(false);
-        assertEquals(400, tiles.size());
+        assertEquals(162, tiles.size());
+        total += tiles.size();
 
         subsampling.setSize(3, 3);
         searchTiles(false);
-        assertEquals(900, tiles.size());
+        assertEquals(450, tiles.size());
+        total += tiles.size();
 
         subsampling.setSize(1, 1);
         searchTiles(false);
-        assertEquals(18, tiles.size());
+        assertEquals(4050, tiles.size());
+        total += tiles.size();
+
+        assertEquals(4733, total);
     }
 }

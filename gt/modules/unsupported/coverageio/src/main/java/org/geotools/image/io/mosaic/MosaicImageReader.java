@@ -99,7 +99,8 @@ public class MosaicImageReader extends ImageReader {
     private transient ImageReader reading;
 
     /**
-     * The logging level for tiling information during reads.
+     * The logging level for tiling information during reads. Note that we choose a default
+     * level slightly higher than the intermediate results logged by {@link RTree}.
      */
     private Level level = Level.FINE;
 

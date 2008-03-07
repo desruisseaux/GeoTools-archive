@@ -16,11 +16,23 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.util.*; // We use really a lot of those imports.
+import java.util.Set;
+import java.util.Map;
+import java.util.List;
+import java.util.Queue;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
-import org.geotools.resources.XArray;
+
+import org.geotools.util.logging.Logging;
+import org.geotools.resources.OptionalDependencies;
 
 
 /**
@@ -36,7 +48,19 @@ import org.geotools.resources.XArray;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class RTree implements Comparator<GridNode> {
+final class RTree {
+    /**
+     * The logger for debugging information.
+     */
+    private static final Logger LOGGER = Logging.getLogger(RTree.class);
+
+    /**
+     * The logging level for printing a tree of the nodes obtained by {@link #searchTiles}. We
+     * use {@link Level#FINER} because it is slightly lower than the {@link MosaicImageReader}
+     * one, which logs the final {@link Tile} selected at {@link Level#FINE}.
+     */
+    private static final Level LEVEL = Level.FINER;
+
     /**
      * The root of the tree.
      */
@@ -90,6 +114,13 @@ final class RTree implements Comparator<GridNode> {
     private final Queue<Dimension> subsamplingToTry;
 
     /**
+     * Used in order to make sure that there is not tile with identical bounds. This is a
+     * simple check (checking for inclusion would be more generic), but this case is common
+     * enough and using an hash map for that is fast.
+     */
+    private final Map<Rectangle,TreeNode> distinctBounds;
+
+    /**
      * {@code true} if this {@code RTree} instance is currently in use by any thread, or
      * {@code false} if it is available for use.
      */
@@ -104,6 +135,7 @@ final class RTree implements Comparator<GridNode> {
         tmpReadRegion    = new Rectangle();
         subsamplingDone  = new HashSet<Dimension>();
         subsamplingToTry = new LinkedList<Dimension>();
+        distinctBounds   = new HashMap<Rectangle,TreeNode>();
     }
 
     /**
@@ -112,14 +144,6 @@ final class RTree implements Comparator<GridNode> {
     @Override
     public RTree clone() {
         return new RTree(root);
-    }
-
-    /**
-     * For sorting the tree nodes in the same order than in the array given to
-     * the {@link GridNode} constructor.
-     */
-    public int compare(final GridNode o1, final GridNode o2) {
-        return o1.index - o2.index;
     }
 
     /**
@@ -170,35 +194,32 @@ final class RTree implements Comparator<GridNode> {
      *       if {@link #allowSubsamplingChange} is {@code true}</li>
      * </ul>
      */
-    public Tile[] searchTiles() throws IOException {
-        assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty();
+    public List<Tile> searchTiles() throws IOException {
+        assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty() && distinctBounds.isEmpty();
         subsampling = new Dimension(xSubsampling, ySubsampling);
-        Map<Rectangle,TreeNode> candidates     = null;
-        Map<Rectangle,TreeNode> bestCandidates = null;
-        long lowestCost = Long.MAX_VALUE;
+        TreeNode bestCandidate = null;
         try {
             do {
-                if (candidates == bestCandidates) {
-                     // Works on a new map in order to protect 'bestCandidates' from changes.
-                    candidates = new LinkedHashMap<Rectangle,TreeNode>();
-                }
-                final TreeNode selected = addTileCandidate(root, candidates);
+                final TreeNode candidate = addTileCandidate(root);
                 /*
                  * We now have the final set of tiles for current subsampling. Checks if the cost
                  * of this set is lower than previous sets, and keep as "best candidates" if it is.
                  * If there is other subsamplings to try, we redo the process again in case we find
                  * cheaper set of tiles.
                  */
-                if (selected != null) {
-                    selected.filter(candidates);
-                    final long cost = selected.cost();
-                    if (cost < lowestCost) {
-                        lowestCost = cost;
-                        bestCandidates = candidates;
-                        setSubsampling(subsampling);
-                    } else {
-                        candidates.clear(); // Reuses the existing HashMap.
+                if (candidate != null) {
+                    try {
+                        candidate.filter(distinctBounds);
+                    } finally {
+                        distinctBounds.clear();
                     }
+                    if (bestCandidate != null) {
+                        if (!candidate.isCheaperThan(bestCandidate)) {
+                            continue;
+                        }
+                    }
+                    bestCandidate = candidate;
+                    setSubsampling(subsampling);
                 }
             } while ((subsampling = subsamplingToTry.poll()) != null);
         } finally {
@@ -209,15 +230,21 @@ final class RTree implements Comparator<GridNode> {
          * TODO: sort the result. I'm not sure that it is worth, but if we decide that it is,
          * we should use the Comparator<GridNode> implemented by this class.
          */
-        final Tile[] tiles = new Tile[bestCandidates.size()];
-        int count = 0;
-        for (final TreeNode node : bestCandidates.values()) {
-            final Tile tile = node.getUserObject();
-            if (tile != null) {
-                tiles[count++] = tile;
+        final List<Tile> tiles = new ArrayList<Tile>(distinctBounds.size());
+        if (bestCandidate != null) {
+            bestCandidate.getTiles(tiles);
+            if (LOGGER.isLoggable(LEVEL)) {
+                final String lineSeparator = System.getProperty("line.separator", "\n");
+                final StringBuilder message = new StringBuilder("Tiles count: ")
+                        .append(tiles.size()).append(lineSeparator);
+                OptionalDependencies.format(bestCandidate, message, lineSeparator);
+                final LogRecord record = new LogRecord(LEVEL, message.toString());
+                record.setSourceClassName("org.geotools.image.io.mosaic.TileManager");
+                record.setSourceMethodName("getTiles"); // This is the public API for this method.
+                LOGGER.log(record);
             }
         }
-        return XArray.resize(tiles, count);
+        return tiles;
     }
 
     /**
@@ -233,13 +260,13 @@ final class RTree implements Comparator<GridNode> {
      * @param  candidates The tiles that are under consideration during a search.
      * @return The tile to be read, or {@code null} if it doesn't intersect the area of interest.
      */
-    private TreeNode addTileCandidate(final TreeNode node, final Map<Rectangle,TreeNode> candidates)
+    private TreeNode addTileCandidate(final TreeNode node)
             throws IOException
     {
         if (!node.intersects(regionOfInterest)) {
             return null;
         }
-        TreeNode selectedTile = null;
+        TreeNode selected = null;
         final Tile tile = node.getUserObject();
         if (tile != null) {
             assert node.equals(tile.getAbsoluteRegion()) : tile;
@@ -270,38 +297,44 @@ final class RTree implements Comparator<GridNode> {
                 tmpReadRegion.setBounds(readRegion);
                 tmpSubsampling.setSize(subsampling);
                 final int cost = tile.countUnwantedPixelsFromAbsolute(tmpReadRegion, tmpSubsampling);
-                selectedTile = new TreeNode(tile, readRegion, cost);
+                selected = new TreeNode(tile, readRegion, cost);
             }
         }
+        /*
+         * At this point, we have processed the node given in argument. Now if there is any
+         * children, invokes this method recursively for each of them.
+         */
         if (!node.isLeaf()) {
-            /*
-             * If the region to read encompass entirely this node (otherwise reading a few childs
-             * may be cheaper) and if the children subsampling are not higher than the tile's one
-             * (they are usually not), then there is no need to continue down the tree since the
-             * childs can not do better than this node.
-             */
-            if (selectedTile != null) {
-                if (selectedTile.boundsEquals(node) && !tile.isFinerThan(subsampling)) {
-                    return selectedTile;
+            if (selected == null) {
+                selected = new TreeNode(null, node.intersection(regionOfInterest), 0);
+                for (final TreeNode child : node) {
+                    selected.addChild(addTileCandidate(child));
+                }
+                if (selected.isLeaf()) {
+                    return null;
                 }
             } else {
-                selectedTile = new TreeNode(null, node.intersection(regionOfInterest), 0);
-            }
-            /*
-             * Process the children, including children of children, etc. through recursive
-             * invocations of this method.
-             */
-            final long cost = selectedTile.cost();
-            for (final TreeNode child : node) {
-                selectedTile.addChild(addTileCandidate(child, candidates));
-            }
-            if (selectedTile.cost() - cost >= cost) {
-                selectedTile.setChildren(null);
-            } else {
-                selectedTile.clearTile(cost);
+                /*
+                 * If the region to read encompass entirely this node (otherwise reading a few childs
+                 * may be cheaper) and if the children subsampling are not higher than the tile's one
+                 * (they are usually not), then there is no need to continue down the tree since the
+                 * childs can not do better than this node.
+                 */
+                if (selected.equals(node) && !tile.isFinerThan(subsampling)) {
+                    return selected;
+                }
+                final long cost = selected.cost();
+                for (final TreeNode child : node) {
+                    selected.addChild(addTileCandidate(child));
+                }
+                if (selected.cost() - cost >= cost) {
+                    selected.setChildren(null);
+                } else {
+                    selected.clearTile(cost);
+                }
             }
         }
-        return selectedTile;
+        return selected;
     }
 
     /**

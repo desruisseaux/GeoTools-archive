@@ -146,7 +146,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * @param tileCost the cost to remove.
      */
     final void clearTile(final long tileCost) {
-        assert tile != null || tileCost == 0;
+        assert (tile == null) ? (tileCost == 0) : (tileCost >= 0);
         tile = null;
         cost -= tileCost;
     }
@@ -159,8 +159,8 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     final void addChild(final TreeNode child) {
         if (child != null) {
-            assert tile == null || super.contains(child) : child;
-            assert child.parent == null : child;
+            assert tile == null || contains(child) : child;
+            assert child.parent == null : child.parent;
             child.parent = this;
             if (lastChildren == null) {
                 lastChildren = firstChildren = child;
@@ -177,9 +177,9 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
-     * Set the children to the given collection. A null value remove all children.
+     * Set the children to the given array. A null value remove all children.
      */
-    public final void setChildren(final Collection<? extends TreeNode> children) {
+    public final void setChildren(final TreeNode[] children) {
         TreeNode child = firstChildren;
         while (child != null) {
             assert child.parent == this;
@@ -225,6 +225,32 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     public final long cost() {
         return cost;
+    }
+
+    /**
+     * Returns {@code true} if this node has a lower cost than the specified one.
+     */
+    public final boolean isCheaperThan(final TreeNode other) {
+        if (cost < other.cost) {
+            return true;
+        }
+        if (cost == other.cost) {
+            return getTileCount() < other.getTileCount();
+        }
+        return false;
+    }
+
+    /**
+     * Returns the number of non-null tiles, including in children.
+     */
+    private int getTileCount() {
+        int count = (tile != null) ? 1 : 0;
+        TreeNode child = firstChildren;
+        while (child != null) {
+            count += child.getTileCount();
+            child = child.nextSibling;
+        }
+        return count;
     }
 
     /**
@@ -432,7 +458,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * @return {@code true} if the given tile is presents in this tree.
      */
     private boolean contains(final Rectangle region, final Tile candidate, final boolean remove) {
-        if (boundsEquals(region)) {
+        if (equals(region)) {
             if (remove) {
                 tile = null;
             }
@@ -524,61 +550,104 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
 
     /**
      * Removes the nodes having the same bounding box than another tile. If such matchs are found,
-     * they are probably tiles at a different resolution. Retains the one which minimize the disk
-     * reading, and discard the other one. This check is not generic since we search for an exact
+     * they are probably tiles at a different resolution.  Retains the one which minimize the disk
+     * reading, and discards the other one. This check is not generic since we search for an exact
      * match, but this case is common enough. Handling it with a {@link java.util.HashMap} will
      * help to reduce the amount of tiles to handle in a more costly way later.
      */
     final void filter(final Map<Rectangle,TreeNode> overlaps) {
+        /*
+         * Must process children first because if any of them are removed, it will lowered
+         * the cost and consequently can change the decision taken at the end of this method.
+         */
         for (TreeNode child = firstChildren; child != null; child = child.nextSibling) {
             child.filter(overlaps);
         }
-        final TreeNode existing = overlaps.put(this, this);
-        if (existing != null) {
-            if (existing.cost > cost) {
-                existing.remove();
-            } else {
-                remove();
+        TreeNode existing = overlaps.put(this, this);
+        if (existing != null && existing != this) {
+            /*
+             * 
+             */
+            if (!isCheaperThan(existing)) {
                 overlaps.put(existing, existing);
+                if (existing.parent == this) {
+                    if (tile != null) {
+                        cost = 0;
+                        TreeNode child = firstChildren;
+                        while (child != null) {
+                            cost += child.cost;
+                            child = child.nextSibling;
+                        }
+                        tile = null;
+                    }
+                    return;
+                }
+                existing = this;
             }
+            existing.remove();
+            existing.removeFrom(overlaps);
         }
     }
 
     /**
-     * Tests if the bounds are equals to the specified rectangle, not taking in account
-     * subsampling or any other information that may be contained in subclasses.
+     *
      */
-    final boolean boundsEquals(final Rectangle other) {
-        return super.equals(other);
+    private void removeFrom(final Map<Rectangle,TreeNode> overlaps) {
+        final TreeNode existing = overlaps.remove(this);
+        if (existing != this) {
+            overlaps.put(existing, existing);
+        }
+        TreeNode child = firstChildren;
+        while (child != null) {
+            child.removeFrom(overlaps);
+            child = child.nextSibling;
+        }
     }
 
     /**
-     * Compares this tree with the specified one for equality. Note that we inherit the
-     * {@link #hashCode} method from {@link Rectangle}, which is suffisient for meeting
-     * the consistency requirement.  The quality of the hash code value does not really
-     * matter since this tree is not aimed to be inserted in a hash map.
+     * Copies to the specified list the tiles in this node and every children nodes.
+     */
+    final void getTiles(final List<Tile> tiles) {
+        if (tile != null) {
+            tiles.add(tile);
+        }
+        TreeNode child = firstChildren;
+        while (child != null) {
+            child.getTiles(tiles);
+            child = child.nextSibling;
+        }
+    }
+
+    /**
+     * Compares this rectangle with the specified one for equality. This method
+     * <strong>must</strong> be semantically identical to {@link Rectangle#equals}
+     * and the inherited {@link Rectangle#hashCode} must be unchanged. This is required
+     * for proper working of {@link #filter}.
      */
     @Override
     public final boolean equals(final Object other) {
+        return (other == this) || super.equals(other);
+    }
+
+    /**
+     * Compares this tree and all its chilren with the specified one for equality.
+     */
+    public final boolean deepEquals(final TreeNode other) {
         if (other == this) {
             return true;
         }
-        if (!super.equals(other)) {
+        if (!equals(other) || !Utilities.equals(tile, other.tile)) {
             return false;
         }
-        if (!(other instanceof TreeNode)) {
-            return true; // For consistency with Rectangle.equals which accepts arbitrary Rectangle.
-        }
-        final TreeNode that = (TreeNode) other;
-        if (!Utilities.equals(this.tile, that.tile)) {
-            return false;
-        }
-        final Iterator<TreeNode> it1 = this.iterator();
-        final Iterator<TreeNode> it2 = that.iterator();
+        final Iterator<TreeNode> it1 = this .iterator();
+        final Iterator<TreeNode> it2 = other.iterator();
         while (it1.hasNext()) {
-            if (!it2.hasNext() || !Utilities.equals(it1.next(), it2.next())) {
+            if (!it2.hasNext()) {
                 return false;
             }
+            final TreeNode t1 = it1.next();
+            final TreeNode t2 = it2.next();
+            return (t1 == t2) || (t1 != null && t1.deepEquals(t2));
         }
         return !it2.hasNext();
     }
@@ -590,10 +659,16 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     @Override
     public final String toString() {
+        String text;
         if (tile != null) {
-            return tile.toString();
+            text = tile.toString();
+        } else {
+            text = super.toString();
+            text = text.substring(text.lastIndexOf('.') + 1);
         }
-        final String string = super.toString();
-        return string.substring(string.lastIndexOf('.') + 1);
+        if (!isLeaf()) {
+            text = text + " (" + getChildCount() + " childs)";
+        }
+        return text;
     }
 }

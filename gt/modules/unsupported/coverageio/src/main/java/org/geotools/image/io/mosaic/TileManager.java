@@ -251,7 +251,6 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             final RTree    tree  = new RTree(root);
             final RTree[]  trees = new RTree[CONCURRENT_THREADS];
             trees[0] = tree;
-// TODO     root.setReadOnly(tree);
             assert root.containsAll(allTiles);
             this.trees = trees; // Save last so it is saved only on success.
         }
@@ -318,7 +317,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             tree.regionOfInterest = region;
             tree.setSubsampling(subsampling);
             tree.subsamplingChangeAllowed = subsamplingChangeAllowed;
-            values = UnmodifiableArrayList.wrap(tree.searchTiles());
+            values = tree.searchTiles();
             subsampling.setSize(tree.xSubsampling, tree.ySubsampling);
             tree.regionOfInterest = null; // Just as a safety (not really required).
         } finally {

@@ -16,6 +16,7 @@
  */
 package org.geotools.resources;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeModel;
@@ -28,6 +29,8 @@ import org.w3c.dom.Node;
 
 /**
  * Bridges to optional dependencies (especially {@code widget-swing} module).
+ *
+ * @todo Most methods of this class need to move as a {@code Trees} class in a {@code util} module.
  *
  * @since 2.0
  * @source $URL$
@@ -138,48 +141,27 @@ public final class OptionalDependencies {
      * @param last   Indique si les niveaux précédents sont en train d'écrire leurs derniers items.
      * @return       Le tableau {@code last}, qui peut éventuellement avoir été agrandit.
      */
-    private static boolean[] toString(final TreeModel model, final Object node,
-                                      final StringBuilder buffer, final int level, boolean[] last,
-                                      final String lineSeparator)
+    private static boolean[] format(final TreeModel model, final Object node,
+                                    final Appendable buffer, final int level, boolean[] last,
+                                    final String lineSeparator) throws IOException
     {
         for (int i=0; i<level; i++) {
             if (i != level-1) {
-                buffer.append(last[i] ? '\u00A0' : '\u2502')
-                      .append("\u00A0\u00A0\u00A0");
+                buffer.append(last[i] ? '\u00A0' : '\u2502').append("\u00A0\u00A0\u00A0");
             } else {
-                buffer.append(last[i] ? '\u2514': '\u251C')
-                      .append("\u2500\u2500\u2500");
+                buffer.append(last[i] ? '\u2514' : '\u251C').append("\u2500\u2500\u2500");
             }
         }
-        buffer.append(node).append(lineSeparator);
+        buffer.append(String.valueOf(node)).append(lineSeparator);
         if (level >= last.length) {
             last = XArray.resize(last, level*2);
         }
         final int count = model.getChildCount(node);
         for (int i=0; i<count; i++) {
             last[level] = (i == count-1);
-            last = toString(model, model.getChild(node,i), buffer, level+1, last, lineSeparator);
+            last = format(model, model.getChild(node,i), buffer, level+1, last, lineSeparator);
         }
         return last;
-    }
-
-    /**
-     * Returns a graphical representation  of the specified tree model. This representation can
-     * be printed to the {@linkplain System#out standard output stream} (for example) if it uses
-     * a monospaced font and supports unicode.
-     *
-     * @param  tree The tree to format.
-     * @param  root First node to format.
-     * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
-     */
-    private static String toString(final TreeModel tree, final Object root) {
-        if (root == null) {
-            return null;
-        }
-        final StringBuilder buffer = new StringBuilder();
-        toString(tree, root, buffer, 0, new boolean[64],
-                 System.getProperty("line.separator", "\n"));
-        return buffer.toString();
     }
 
     /**
@@ -195,7 +177,19 @@ public final class OptionalDependencies {
      * @return A string representation of the tree, or {@code null} if it doesn't contain any node.
      */
     public static String toString(final TreeModel tree) {
-        return toString(tree, tree.getRoot());
+        final Object root = tree.getRoot();
+        if (root == null) {
+            return null;
+        }
+        final StringBuilder buffer = new StringBuilder();
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        try {
+            format(tree, root, buffer, 0, new boolean[64], lineSeparator);
+        } catch (IOException e) {
+            // Should never happen when writting into a StringBuilder.
+            throw new AssertionError(e);
+        }
+        return buffer.toString();
     }
 
     /**
@@ -212,5 +206,51 @@ public final class OptionalDependencies {
      */
     public static String toString(final TreeNode node) {
         return toString(new DefaultTreeModel(node, true));
+    }
+
+    /**
+     * Writes a graphical representation of the specified tree model in the given buffer.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     *
+     * @param  tree          The tree to format.
+     * @param  buffer        Where to format the tree.
+     * @param  lineSeparator The line separator, or {@code null} for the system default.
+     * @throws IOException if an error occured while writting in the given buffer.
+     *
+     * @since 2.5
+     */
+    public static void format(final TreeModel tree, final Appendable buffer, String lineSeparator)
+            throws IOException
+    {
+        final Object root = tree.getRoot();
+        if (root != null) {
+            if (lineSeparator == null) {
+                lineSeparator = System.getProperty("line.separator", "\n");
+            }
+            format(tree, root, buffer, 0, new boolean[64], lineSeparator);
+        }
+    }
+
+    /**
+     * Writes a graphical representation of the specified tree in the given buffer.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     *
+     * @param  node          The root node of the tree to format.
+     * @param  buffer        Where to format the tree.
+     * @param  lineSeparator The line separator, or {@code null} for the system default.
+     * @throws IOException if an error occured while writting in the given buffer.
+     *
+     * @since 2.5
+     */
+    public static void format(final TreeNode node, final Appendable buffer, String lineSeparator)
+            throws IOException
+    {
+        format(new DefaultTreeModel(node, true), buffer, lineSeparator);
     }
 }

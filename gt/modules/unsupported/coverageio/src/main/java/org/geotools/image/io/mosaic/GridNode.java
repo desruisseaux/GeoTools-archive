@@ -18,6 +18,7 @@ package org.geotools.image.io.mosaic;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Comparator;
 import java.util.Collections;
@@ -53,7 +54,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
     /**
      * The index, used for preserving order compared to the user-specified one.
      */
-    protected final int index;
+    private final int index;
 
     /**
      * The subsamplings. Valid values are greater than zero.
@@ -67,6 +68,32 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      * {@link RTree}.
      */
     private boolean overlaps;
+
+    /**
+     * Comparator for sorting tiles by descreasing area and subsamplings. The
+     * {@linkplain GridNode#GridNode(Tile[]) constructor} expects this order for inserting
+     * a tile into the smallest tile that can contains it. If two tiles cover the same area,
+     * then they are sorted by descreasing subsamplings. The intend is that tiles sorted last
+     * are usually the ones with finest resolution no matter if the layout is "constant area"
+     * or "constant tile size".
+     * <p>
+     * If two tiles have the same area and subsampling, then their order is unchanged on the
+     * basis that initial order, when sorted by {@link TileManager}, should be efficient for
+     * reading tiles sequentially.
+     */
+    private static final Comparator<GridNode> LARGEST_FIRST = new Comparator<GridNode>() {
+        public int compare(final GridNode n1, final GridNode n2) {
+            long a1 = (long) n1.width * (long) n1.height;
+            long a2 = (long) n2.width * (long) n2.height;
+            if (a1 > a2) return -1; // Greatest values first
+            if (a1 < a2) return +1;
+            a1 = (long) n1.xSubsampling * (long) n1.ySubsampling;
+            a2 = (long) n2.xSubsampling * (long) n2.ySubsampling;
+            if (a1 > a2) return -1;
+            if (a1 < a2) return +1;
+            return 0;
+        }
+    };
 
     /**
      * Creates a node for the specified bounds with no subsampling and no tile.
@@ -108,7 +135,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
         for (int i=0; i<tiles.length; i++) {
             nodes[i] = new GridNode(tiles[i], i);
         }
-        Arrays.sort(nodes);
+        Arrays.sort(nodes, LARGEST_FIRST);
         /*
          * Special case: checks if the first node contains all subsequent nodes. If this is true,
          * then there is no need to keep the special root TreeNode with the tile field set to null.
@@ -153,7 +180,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             }
             if (!parent.overlaps) {
                 for (final TreeNode existing : parent) {
-                    if (child.intersects(existing) && !child.boundsEquals(existing)) {
+                    if (child.intersects(existing) && !child.equals(existing)) {
                         parent.overlaps = true;
                         break;
                     }
@@ -268,13 +295,12 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
         if (!overlaps) {
             return;
         }
-              List<GridNode> toProcess = new LinkedList<GridNode>();
-        final List<GridNode> children  = new LinkedList<GridNode>();
-        final List<GridNode> retained  = new LinkedList<GridNode>();
+        List<GridNode> toProcess = new LinkedList<GridNode>();
+        final List<GridNode> retained = new ArrayList<GridNode>();
         for (final TreeNode child : this) {
             toProcess.add((GridNode) child);
         }
-        setChildren(null); // Necessary in order to gives children to other nodes.
+        setChildren(null); // Necessary in order to give children to other nodes.
         int bestIndex=0, bestDistance=0;
         /*
          * The loop below is for processing a group of nodes. A "group of nodes" is either
@@ -310,7 +336,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
                          * in the method javadoc above). Otherwise remove it from the toProcess list
                          * and search for an other tile.
                          */
-                        if (added.boundsEquals(candidate)) {
+                        if (added.equals(candidate)) {
                             retained.add(candidate);
                         } else {
                             removed.add(candidate);
@@ -346,13 +372,14 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             }
             assert toProcess.isEmpty() : toProcess;
             assert Collections.disjoint(retained, removed);
-            final GridNode child = new GridNode(this);
-            child.setChildren(retained);
-            children.add(child);
-            toProcess = removed;
+            final TreeNode[] sorted = retained.toArray(new TreeNode[retained.size()]);
             retained.clear();
+            Arrays.sort(sorted);
+            final GridNode child = new GridNode(this);
+            child.setChildren(sorted);
+            addChild(child);
+            toProcess = removed;
         }
-        setChildren(children);
         overlaps = false;
     }
 
@@ -371,29 +398,12 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
     }
 
     /**
-     * Comparator for sorting tiles by descreasing area and subsamplings. The
-     * {@linkplain GridNode#GridNode(Tile[]) constructor} expects this order for inserting
-     * a tile into the smallest tile that can contains it. If two tiles cover the same area,
-     * then they are sorted by descreasing subsamplings. The intend is that tiles sorted last
-     * are usually the ones with finest resolution no matter if the layout is "constant area"
-     * or "constant tile size".
-     * <p>
-     * If two tiles have the same area and subsampling, then their order is unchanged on the
-     * basis that initial order, when sorted by {@link TileManager}, should be efficient for
-     * reading tiles sequentially.
+     * Comparator for sorting tiles in the same order than the one specified at construction time.
      * <p>
      * This method is inconsistent with {@link #equals}. It is okay for our usage of it,
      * which should be restricted to this {@link GridNode} package-privated class only.
      */
     public int compareTo(final GridNode that) {
-        long a1 = (long) this.width * (long) this.height;
-        long a2 = (long) that.width * (long) that.height;
-        if (a1 > a2) return -1; // Greatest values first
-        if (a1 < a2) return +1;
-        a1 = (long) this.xSubsampling * (long) this.ySubsampling;
-        a2 = (long) that.xSubsampling * (long) that.ySubsampling;
-        if (a1 > a2) return -1;
-        if (a1 < a2) return +1;
-        return 0;
+        return index - that.index;
     }
 }

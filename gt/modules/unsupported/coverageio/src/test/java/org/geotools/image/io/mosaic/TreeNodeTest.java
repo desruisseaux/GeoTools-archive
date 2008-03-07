@@ -99,7 +99,7 @@ public class TreeNodeTest extends TestBase {
         for (int i=0; i<targetTiles.length; i += 10) {
             assertTrue(tree2.remove(targetTiles[i]));
         }
-        assertFalse(root.equals(tree2));
+        assertFalse(root.deepEquals(tree2));
         for (int i=0; i<20; i++) {
             roi.x      = random.nextInt(bounds.width);
             roi.y      = random.nextInt(bounds.height);
@@ -128,7 +128,6 @@ public class TreeNodeTest extends TestBase {
      */
     public void testRTree() throws IOException {
         final RTree tree = new RTree(root);
-// TODO root.setReadOnly(tree);
         if (false) {
             show(root);
         }
@@ -198,7 +197,7 @@ public class TreeNodeTest extends TestBase {
             assertEquals(message, tile.getAbsoluteRegion(), node);
             assertEquals(message, node, tile.getAbsoluteRegion()); // Tests reflexibility.
         } else if (parent != null) {
-            assertTrue(message, node.boundsEquals(parent));
+            assertTrue(message, node.equals(parent));
         }
 
         if (level != branchPoint) {
