@@ -72,6 +72,7 @@ import org.geotools.geometry.jts.JTS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -1037,17 +1038,18 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
-                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
-                        .getCRS();
-                if (crs != null)
-                    envelope = JTS.toGeographic(envelope, crs);
-                state.expandDirtyBounds(envelope);
+                final GeometryDescriptor defaultGeometry = wrapped.getSchema(typeName).getDefaultGeometry();
+                if(defaultGeometry != null) {
+                    CoordinateReferenceSystem crs = defaultGeometry.getCRS();
+                    if (crs != null)
+                        envelope = JTS.toGeographic(envelope, crs);
+                    state.expandDirtyBounds(envelope);
+                }
             }
 
             // setup for altering tables (and ensure a versioned state is
             // attached to the transaction
             conn = state.getConnection();
-            st = conn.createStatement();
             PkDescriptor pk = getPrimaryKeyConstraintName(conn, typeName);
             if (pk == null)
                 throw new DataSourceException("Cannot version tables without primary keys");
@@ -1059,6 +1061,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             }
 
             // drop the old primary key
+            st = conn.createStatement();
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " DROP CONSTRAINT "
                     + pk.name);
 
