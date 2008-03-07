@@ -1309,7 +1309,7 @@ public abstract class JDBC1DataStore implements DataStore {
 				atb.setBinding(type);
 				atb.setMinOccurs(min);
 				atb.setMaxOccurs(1);
-				atb.setNillable(nillable);
+//				atb.setNillable(nillable);
 				return atb.buildDescriptor(columnName);
 			}
 		} catch (SQLException e) {
