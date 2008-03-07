@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -876,6 +877,15 @@ public class DataUtilities {
         if( type==Boolean.class){
         	return Boolean.FALSE;
         }
+        if( type==Timestamp.class)
+            return new Timestamp(System.currentTimeMillis());
+        if( type==java.sql.Date.class)
+            return new java.sql.Date(System.currentTimeMillis());
+        if( type==java.sql.Time.class)
+            return new java.sql.Time(System.currentTimeMillis());
+        if( type==java.util.Date.class)
+            return new java.util.Date();
+        
         
         GeometryFactory fac=new GeometryFactory();
         Coordinate coordinate = new Coordinate(0, 0);
