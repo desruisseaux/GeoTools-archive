@@ -158,7 +158,7 @@ public class Encoder {
     private boolean namespaceAware = true;
 
     /** true if we are encoding a full document */
-    private boolean encodeFullDocument = true;
+    private boolean inline = false;
 
     /**
      * Logger logger;
@@ -279,11 +279,25 @@ public class Encoder {
      * True if we are encoding a full document, false if the xml headers should be omitted
      * (the encoder is used to generate part of a large document)
      * @param encodeFullDocument
+     * 
+     * @deprecated use {@link #setInline(boolean)}.
+     * 
      */
     public void setEncodeFullDocument(boolean encodeFullDocument) {
-        this.encodeFullDocument = encodeFullDocument;
+        this.inline = encodeFullDocument;
     }
 
+    /**
+     * Sets the encoder to "inline" mode.
+     * <p>
+     * When this flag is set {@link #encode(Object, QName, ContentHandler)} should
+     * be used to encode.
+     * </p>
+     */
+    public void setInline(boolean inline) {
+        this.inline = inline;
+    }
+    
     /**
      * Sets the schema location for a particular namespace uri.
      * <p>
@@ -358,6 +372,11 @@ public class Encoder {
      */
     public void encode(Object object, QName name, OutputStream out)
         throws IOException {
+        if ( inline ) {
+            String msg = "Must use 'encode(Object,QName,ContentHandler)' when inline flag is set";
+            throw new IllegalStateException( msg );
+        }
+        
         //create the document seriaizer
         XMLSerializer xmls = null;
 
@@ -385,7 +404,7 @@ public class Encoder {
         throws IOException, SAXException {
         serializer = handler;
 
-        if (encodeFullDocument) {
+        if (!inline) {
             serializer.startDocument();
         }
 
@@ -771,7 +790,7 @@ O:
             }
         }
 
-        if (encodeFullDocument) {
+        if (!inline) {
             serializer.endDocument();
         }
     }
