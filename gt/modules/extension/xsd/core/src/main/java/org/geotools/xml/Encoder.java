@@ -284,7 +284,7 @@ public class Encoder {
      * 
      */
     public void setEncodeFullDocument(boolean encodeFullDocument) {
-        this.inline = encodeFullDocument;
+        this.inline = !encodeFullDocument;
     }
 
     /**
