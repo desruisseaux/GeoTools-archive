@@ -71,6 +71,14 @@ import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.minimap.JMiniMap;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
+import org.geotools.gui.swing.propertyedit.LayerCRSPropertyPanel;
+import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
+import org.geotools.gui.swing.propertyedit.LayerGeneralPanel;
+import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.filterproperty.JCQLPropertyPanel;
+import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
+import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
 import org.geotools.gui.swing.toolbox.tooltree.JToolTree;
 import org.geotools.gui.swing.toolbox.tooltree.ToolTreeListener;
 import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
@@ -308,7 +316,23 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new SeparatorItem());
         popup.addItem(new DeleteItem(tree));                //all
         popup.addItem(new SeparatorItem());
-        popup.addItem(new LayerPropertyItem());             //layer
+
+        LayerPropertyItem property = new LayerPropertyItem();
+        List<PropertyPanel> lstproperty = new ArrayList<PropertyPanel>();
+        lstproperty.add(new LayerGeneralPanel());
+        lstproperty.add(new LayerCRSPropertyPanel());
+
+        LayerFilterPropertyPanel filters = new LayerFilterPropertyPanel();
+        filters.addPropertyPanel(new JCQLPropertyPanel());
+        lstproperty.add(filters);
+
+        LayerStylePropertyPanel styles = new LayerStylePropertyPanel();
+        styles.addPropertyPanel(new JSimpleStylePanel());
+        styles.addPropertyPanel(new JXMLStylePanel());
+        lstproperty.add(styles);
+
+
+        popup.addItem(property);             //layer
         popup.addItem(new ContextPropertyItem());           //context
 
         popup.addItem(new RuleMinScaleItem());
