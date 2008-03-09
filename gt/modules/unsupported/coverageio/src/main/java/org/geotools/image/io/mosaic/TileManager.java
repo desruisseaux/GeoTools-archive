@@ -276,7 +276,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * Releases a tree acquired by {@link #getTree}. We do not synchronize
      * because {@link RTree#inUse} is declared as a volatile field.
      */
-    private void release(final RTree tree) {
+    private synchronized void release(final RTree tree) {
         // Safety for avoiding NullPointerException to be thrown in 'finally' block.
         if (tree != null) {
             tree.inUse = false;

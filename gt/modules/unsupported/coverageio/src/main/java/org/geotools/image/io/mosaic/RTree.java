@@ -118,13 +118,13 @@ final class RTree {
      * simple check (checking for inclusion would be more generic), but this case is common
      * enough and using an hash map for that is fast.
      */
-    private final Map<Rectangle,TreeNode> distinctBounds;
+    private final Map<Rectangle,SelectedNode> distinctBounds;
 
     /**
      * {@code true} if this {@code RTree} instance is currently in use by any thread, or
      * {@code false} if it is available for use.
      */
-    volatile boolean inUse;
+    boolean inUse;
 
     /**
      * Creates a RTree using the given root node.
@@ -135,7 +135,7 @@ final class RTree {
         tmpReadRegion    = new Rectangle();
         subsamplingDone  = new HashSet<Dimension>();
         subsamplingToTry = new LinkedList<Dimension>();
-        distinctBounds   = new HashMap<Rectangle,TreeNode>();
+        distinctBounds   = new HashMap<Rectangle,SelectedNode>();
     }
 
     /**
@@ -197,10 +197,10 @@ final class RTree {
     public List<Tile> searchTiles() throws IOException {
         assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty() && distinctBounds.isEmpty();
         subsampling = new Dimension(xSubsampling, ySubsampling);
-        TreeNode bestCandidate = null;
+        SelectedNode bestCandidate = null;
         try {
             do {
-                final TreeNode candidate = addTileCandidate(root);
+                final SelectedNode candidate = addTileCandidate(root);
                 /*
                  * We now have the final set of tiles for current subsampling. Checks if the cost
                  * of this set is lower than previous sets, and keep as "best candidates" if it is.
@@ -228,7 +228,7 @@ final class RTree {
         }
         /*
          * TODO: sort the result. I'm not sure that it is worth, but if we decide that it is,
-         * we should use the Comparator<GridNode> implemented by this class.
+         * we could use the Comparator<GridNode> implemented by the GridNode class.
          */
         final List<Tile> tiles = new ArrayList<Tile>(distinctBounds.size());
         if (bestCandidate != null) {
@@ -261,13 +261,11 @@ final class RTree {
      * @param  candidates The tiles that are under consideration during a search.
      * @return The tile to be read, or {@code null} if it doesn't intersect the area of interest.
      */
-    private TreeNode addTileCandidate(final TreeNode node)
-            throws IOException
-    {
+    private SelectedNode addTileCandidate(final TreeNode node) throws IOException {
         if (!node.intersects(regionOfInterest)) {
             return null;
         }
-        TreeNode selected = null;
+        SelectedNode selected = null;
         final Tile tile = node.getUserObject();
         if (tile != null) {
             assert node.equals(tile.getAbsoluteRegion()) : tile;
@@ -298,7 +296,7 @@ final class RTree {
                 tmpReadRegion.setBounds(readRegion);
                 tmpSubsampling.setSize(subsampling);
                 final int cost = tile.countUnwantedPixelsFromAbsolute(tmpReadRegion, tmpSubsampling);
-                selected = new TreeNode(tile, readRegion, cost);
+                selected = new SelectedNode(tile, readRegion, cost);
             }
         }
         /*
@@ -307,7 +305,7 @@ final class RTree {
          */
         if (!node.isLeaf()) {
             if (selected == null) {
-                selected = new TreeNode(null, node.intersection(regionOfInterest), 0);
+                selected = new SelectedNode(null, node.intersection(regionOfInterest), 0);
                 for (final TreeNode child : node) {
                     selected.addChild(addTileCandidate(child));
                 }
@@ -324,14 +322,15 @@ final class RTree {
                 if (selected.equals(node) && !tile.isFinerThan(subsampling)) {
                     return selected;
                 }
-                final long cost = selected.cost();
+                final long cost = selected.cost;
                 for (final TreeNode child : node) {
                     selected.addChild(addTileCandidate(child));
                 }
-                if (selected.cost() - cost >= cost) {
+                if (selected.cost - cost >= cost) {
                     selected.setChildren(null);
                 } else {
-                    selected.clearTile(cost);
+                    selected.tile = null;
+                    selected.cost -= cost;
                 }
             }
         }

@@ -111,7 +111,8 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      * @throws IOException if an I/O operation was required and failed.
      */
     private GridNode(final Tile tile, final int index) throws IOException {
-        super(tile);
+        super(tile.getAbsoluteRegion());
+        this.tile = tile;
         final Dimension subsampling = tile.getSubsampling();
         xSubsampling = subsampling.width;
         ySubsampling = subsampling.height;
@@ -158,7 +159,8 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             }
         }
         if (root != null) {
-            setTile(root);
+            setBounds(root);
+            tile         = root.tile;
             index        = root.index;
             xSubsampling = root.xSubsampling;
             ySubsampling = root.ySubsampling;

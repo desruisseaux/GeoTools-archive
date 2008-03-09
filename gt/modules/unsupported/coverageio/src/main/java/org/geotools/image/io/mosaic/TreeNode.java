@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.util.Map;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collection;
@@ -30,9 +29,7 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * A tree node wrapping a {@link Tile}. It contains an estimation of the cost of reading this tile
- * and its children. This cost is adjusted during every addition or removal of nodes. Children are
- * managed as a linked list.
+ * Base class for tree node wrapping a {@link Tile}. Children are managed as a linked list.
  * <p>
  * This class extends {@link Rectangle} for pure opportunist reasons, in order to reduce the amount
  * of object created (because we will have thousands of TreeNodes) and for direct (no indirection,
@@ -49,18 +46,13 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     /**
      * For cross-version compatibility.
      */
-    private static final long serialVersionUID = -8611267926304778221L;
+    private static final long serialVersionUID = 1669511478839242773L;
 
     /**
      * The tile wrapped by this node, or {@code null} if we should read only the children,
      * not the tile itself.
      */
-    private Tile tile;
-
-    /**
-     * An estimation of the cost of reading this tile, including children.
-     */
-    private long cost;
+    protected Tile tile;
 
     /**
      * The parent, or {@code null} if none.
@@ -84,7 +76,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * stands for non-existant rectangle according {@link Rectangle} documentation.
      * Other fields (including subsamplings) are set to 0 or {@code null}.
      */
-    public TreeNode() {
+    protected TreeNode() {
         super(-1, -1);
     }
 
@@ -96,68 +88,16 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
-     * Creates a node for a single tile.
-     *
-     * @param  tile  The tile.
-     * @throws IOException if an I/O operation was required and failed.
-     */
-    protected TreeNode(final Tile tile) throws IOException {
-        super(tile.getAbsoluteRegion());
-        this.tile = tile;
-        /*
-         * This constructor is invoked by StoredTreeNode which doesn't really has any use
-         * of the cost. We set it to the amount of pixels to be read for informative purpose,
-         * but we could change that in a future version.
-         */
-        final Rectangle bounds = tile.getRegion();
-        cost = (long) bounds.width * (long) bounds.height;
-    }
-
-    /**
-     * Creates a new node for the given tile.
-     *
-     * @param tile The tile to wrap.
-     * @param readRegion The region to be read.
-     * @param cost An estimation of the cost of reading the given region of the given tile.
-     */
-    TreeNode(final Tile tile, final Rectangle readRegion, final int cost) {
-        super(readRegion);
-        this.tile = tile;
-        this.cost = cost;
-        assert !isEmpty();
-    }
-
-    /**
-     * Sets the tile to the same value than the given node. Both this node and the given one
-     * are expected to be {@linkplain #isLeaf leaf} (this condition is required for keeping
-     * the cost accurate). This method is not public because this condition is checked only
-     * through assertions.
-     */
-    final void setTile(final TreeNode node) {
-        assert isRoot() && isLeaf() && node.isLeaf();
-        super.setBounds(node);
-        tile = node.tile;
-        cost = node.cost;
-    }
-
-    /**
-     * Clears the tile.
-     *
-     * @param tileCost the cost to remove.
-     */
-    final void clearTile(final long tileCost) {
-        assert (tile == null) ? (tileCost == 0) : (tileCost >= 0);
-        tile = null;
-        cost -= tileCost;
-    }
-
-    /**
      * Adds the given tile as a child of this tile. This method do nothing if the given tile
      * is null (which is typically the case when it doesn't intercept the region of interest).
      * <p>
-     * This method is not public because it has pre-conditions checked by {@code assert} statements.
+     * Note that this method has pre-conditions checked by {@code assert} statements. If the
+     * {@link TreeNode} class become public, we would need to performs inconditional checks.
+     *
+     * @throws ClassCastException If a subclass has some restrictions about the kind
+     *         of child accepted, and the given child doesn't meet those restrictions.
      */
-    final void addChild(final TreeNode child) {
+    public void addChild(final TreeNode child) throws ClassCastException {
         if (child != null) {
             assert child.isRoot() && (tile == null || contains(child)) : child;
             child.parent = this;
@@ -168,21 +108,16 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
                 lastChildren.nextSibling = child;
                 lastChildren = child;
             }
-            TreeNode p = this;
-            do {
-                p.cost += child.cost;
-            } while ((p = p.parent) != null);
         }
     }
 
     /**
      * Set the children to the given array. A null value remove all children.
      */
-    public final void setChildren(final TreeNode[] children) {
+    public void setChildren(final TreeNode[] children) {
         TreeNode child = firstChildren;
         while (child != null) {
             assert child.parent == this;
-            cost -= child.cost;
             final TreeNode next = child.nextSibling;
             child.previousSibling = null;
             child.nextSibling     = null;
@@ -200,7 +135,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     /**
      * Removes this tile and all its children from the tree.
      */
-    public final void remove() {
+    public void remove() {
         if (previousSibling != null) {
             previousSibling.nextSibling = nextSibling;
         }
@@ -214,38 +149,16 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
             if (parent.lastChildren == this) {
                 parent.lastChildren = previousSibling;
             }
-            do {
-                parent.cost -= cost;
-            } while ((parent = parent.parent) != null);
+            parent = null;
         }
         previousSibling = null;
         nextSibling = null;
     }
 
     /**
-     * Returns the estimated cost of reading this tile and its children.
-     */
-    public final long cost() {
-        return cost;
-    }
-
-    /**
-     * Returns {@code true} if this node has a lower cost than the specified one.
-     */
-    public final boolean isCheaperThan(final TreeNode other) {
-        if (cost < other.cost) {
-            return true;
-        }
-        if (cost == other.cost) {
-            return getTileCount() < other.getTileCount();
-        }
-        return false;
-    }
-
-    /**
      * Returns the number of non-null tiles, including in children.
      */
-    private int getTileCount() {
+    final int getTileCount() {
         int count = (tile != null) ? 1 : 0;
         TreeNode child = firstChildren;
         while (child != null) {
@@ -558,65 +471,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
-     * Removes the nodes having the same bounding box than another tile. If such matchs are found,
-     * they are probably tiles at a different resolution.  Retains the one which minimize the disk
-     * reading, and discards the other one. This check is not generic since we search for an exact
-     * match, but this case is common enough. Handling it with a {@link java.util.HashMap} will
-     * help to reduce the amount of tiles to handle in a more costly way later.
-     */
-    final void filter(final Map<Rectangle,TreeNode> overlaps) {
-        /*
-         * Must process children first because if any of them are removed, it will lowered
-         * the cost and consequently can change the decision taken at the end of this method.
-         */
-        for (TreeNode child = firstChildren; child != null; child = child.nextSibling) {
-            child.filter(overlaps);
-        }
-        TreeNode existing = overlaps.put(this, this);
-        if (existing != null && existing != this) {
-            if (!isCheaperThan(existing)) {
-                /*
-                 * A cheaper tiles existed for the same bounds. Reinsert the previous tile in the
-                 * map. We will delete this node from the tree later, except if the previous node
-                 * is a children of this node. In the later case, we can't remove completly this
-                 * node since it would remove its children as well, so we just nullify the tile.
-                 */
-                overlaps.put(existing, existing);
-                if (existing.parent == this) {
-                    if (tile != null) {
-                        cost = 0;
-                        TreeNode child = firstChildren;
-                        while (child != null) {
-                            cost += child.cost;
-                            child = child.nextSibling;
-                        }
-                        tile = null;
-                    }
-                    return;
-                }
-                existing = this;
-            }
-            existing.remove();
-            existing.removeFrom(overlaps);
-        }
-    }
-
-    /**
-     * Removes this node and all its children from the given map.
-     */
-    private void removeFrom(final Map<Rectangle,TreeNode> overlaps) {
-        final TreeNode existing = overlaps.remove(this);
-        if (existing != this) {
-            overlaps.put(existing, existing);
-        }
-        TreeNode child = firstChildren;
-        while (child != null) {
-            child.removeFrom(overlaps);
-            child = child.nextSibling;
-        }
-    }
-
-    /**
      * Copies to the specified list the tiles in this node and every children nodes.
      */
     final void getTiles(final List<Tile> tiles) {
@@ -694,20 +548,24 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      *
      * @return The total number of nodes.
      */
-    final int checkValidity() {
+    int checkValidity() {
         int count = 1;
-        long childrenCost = 0;
         TreeNode child = firstChildren;
         if (child != null) {
             if (child.previousSibling != null) {
                 throw new AssertionError(this);
             }
-            while (true) {
+            if (isLeaf() || !getAllowsChildren()) {
+                throw new AssertionError(this);
+            }
+            for (int index=0; ; index++) {
                 if (child.parent != this) {
                     throw new AssertionError(child);
                 }
+                if (getIndex(child) != index) {
+                    throw new AssertionError(child);
+                }
                 count += child.checkValidity();
-                childrenCost += child.cost;
                 final TreeNode next = child.nextSibling;
                 if (next == null) {
                     break;
@@ -722,9 +580,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
             }
         }
         if (child != lastChildren) {
-            throw new AssertionError(this);
-        }
-        if (childrenCost < 0 || cost < childrenCost) {
             throw new AssertionError(this);
         }
         if (tile != null) {

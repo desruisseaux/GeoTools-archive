@@ -84,14 +84,16 @@ public class TileManagerTest extends TestBase {
      * same collection than previous invocation of {@link #searchTiles}. The purpose of this method
      * is to ensure that the automatic adjustment of subsampling works.
      */
-    private void searchSameTiles(final int xSubsampling, final int ySubsampling) throws IOException {
-        final Collection<Tile> expected = tiles;
-        final Dimension selected = new Dimension(subsampling);
-        subsampling.setSize(xSubsampling, ySubsampling);
-        searchTiles(selected);
-        assertNotSame(expected, tiles);
-        assertEquals (expected, tiles);
-        subsampling.setSize(selected);
+    private void searchSameTiles(final int xRequested, final int yRequested, final int expected,
+                                 final int xExpected,  final int yExpected)
+            throws IOException
+    {
+        final Collection<Tile> selected = tiles;
+        subsampling.setSize(xRequested, yRequested);
+        searchTiles(new Dimension(expected, expected));
+        assertNotSame(selected, tiles);
+        assertEquals (selected, tiles);
+        assertEquals (new Dimension(xExpected, yExpected), subsampling);
     }
 
     /**
@@ -104,51 +106,51 @@ public class TileManagerTest extends TestBase {
         searchTiles(null);
         assertEquals(1, tiles.size());
         total += tiles.size();
-        searchSameTiles(100, 120);
-        searchSameTiles(90,  100);
-        searchSameTiles(400, 400);
+        searchSameTiles(100,120,  90,  90, 90);
+        searchSameTiles( 90,100,  90,  90, 90);
+        searchSameTiles(400,400,  90, 360,360);
 
         subsampling.setSize(45, 45);
         searchTiles(null);
         assertEquals(2, tiles.size());
         total += tiles.size();
-        searchSameTiles(50, 60);
-        searchSameTiles(45, 70);
-        searchSameTiles(45, 90);
+        searchSameTiles(50,60,  45,  45,45);
+        searchSameTiles(45,70,  45,  45,45);
+        searchSameTiles(45,90,  45,  45,90);
 
         subsampling.setSize(15, 15);
         searchTiles(null);
         assertEquals(18, tiles.size());
         total += tiles.size();
-        searchSameTiles(15, 20);
-        searchSameTiles(30, 70);
-        searchSameTiles(18, 27);
+        searchSameTiles(15,20,  15,  15,15);
+        searchSameTiles(30,70,  15,  15,45);
+        searchSameTiles(18,27,  15,  15,15);
 
         subsampling.setSize(9, 9);
         searchTiles(null);
         assertEquals(50, tiles.size());
         total += tiles.size();
-        searchSameTiles(10, 20);
-        searchSameTiles(31, 11);
-        searchSameTiles(97, 13);
+        searchSameTiles(10,20,  9,   9,18);
+        searchSameTiles(31,11,  9,  27, 9);
+        searchSameTiles(97,13,  9,  90, 9);
 
-        subsampling.setSize(5, 5);
+        subsampling.setSize(5,5);
         searchTiles(null);
         assertEquals(162, tiles.size());
         total += tiles.size();
-        searchSameTiles(7, 12);
+        searchSameTiles(7,12,  5,  5,10);
 
-        subsampling.setSize(3, 3);
+        subsampling.setSize(3,3);
         searchTiles(null);
         assertEquals(450, tiles.size());
         total += tiles.size();
-        searchSameTiles(4, 3);
+        searchSameTiles(4,3,  3,  3,3);
 
-        subsampling.setSize(1, 1);
+        subsampling.setSize(1,1);
         searchTiles(null);
         assertEquals(4050, tiles.size());
         total += tiles.size();
-        searchSameTiles(2, 1);
+        searchSameTiles(2,1,  1,  2,1);
 
         assertEquals(4733, total);
     }
