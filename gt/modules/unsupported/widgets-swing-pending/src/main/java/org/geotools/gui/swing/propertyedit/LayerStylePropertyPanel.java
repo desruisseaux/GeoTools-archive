@@ -33,11 +33,6 @@ public class LayerStylePropertyPanel extends MultiPropertyPanel {
     /** Creates new form DefaultMapContextCRSEditPanel */
     public LayerStylePropertyPanel() {
         super();
-
-        addPropertyPanel(new JSimpleStylePanel());
-        //addPropertyPanel(new JScaleStylePanel());
-        //addPropertyPanel(new JUniqueStylePanel());
-        addPropertyPanel(new JXMLStylePanel());
     }
 
     /** This method is called from within the constructor to
@@ -52,11 +47,11 @@ public class LayerStylePropertyPanel extends MultiPropertyPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 487, Short.MAX_VALUE)
+            .add(0, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 322, Short.MAX_VALUE)
+            .add(0, 0, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

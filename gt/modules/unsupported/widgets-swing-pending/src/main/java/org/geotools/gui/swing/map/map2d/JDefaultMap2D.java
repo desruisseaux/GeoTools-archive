@@ -17,8 +17,9 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
 
+import javax.swing.plaf.DimensionUIResource;
 import org.geotools.gui.swing.map.map2d.decoration.DefaultInformationDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.MapDecoration;
 import org.geotools.gui.swing.map.map2d.event.RenderingStrategyEvent;
@@ -38,13 +40,15 @@ import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration;
 import org.geotools.gui.swing.map.map2d.event.Map2DEvent;
 import org.geotools.map.event.MapLayerListEvent;
-import org.geotools.map.event.MapLayerListListener;
 
 /**
  * Default implementation of Map2D
  * @author Johann Sorel
  */
-public class JDefaultMap2D extends JPanel implements Map2D,MapLayerListListener,PropertyChangeListener {
+public class JDefaultMap2D extends javax.swing.JPanel implements 
+        org.geotools.gui.swing.map.map2d.Map2D,
+        org.geotools.map.event.MapLayerListListener,
+        java.beans.PropertyChangeListener {
 
     /**
      * Action state of the map widget
@@ -79,8 +83,12 @@ public class JDefaultMap2D extends JPanel implements Map2D,MapLayerListListener,
      */
     public JDefaultMap2D() {
         this.THIS_MAP = this;
-
+        init();        
+    }
+    
+    private void init(){
         setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(150,150));
         mapDecorationPane.setLayout(new BufferLayout());
         userDecorationPane.setLayout(new BufferLayout());
         mainDecorationPane.setLayout(new BufferLayout());
@@ -98,8 +106,10 @@ public class JDefaultMap2D extends JPanel implements Map2D,MapLayerListListener,
         mapDecorationPane.add(renderingStrategy.getComponent(), new Integer(0));
         mapDecorationPane.revalidate();
 
-        setOpaque(false);
+        setBackground(Color.WHITE);
+        setOpaque(true);
     }
+    
 
     private void fireStrategyChanged(RenderingStrategy oldOne, RenderingStrategy newOne) {
         Map2DEvent mce = new Map2DEvent(this, actionState, oldOne, newOne);

@@ -18,11 +18,9 @@ package org.geotools.gui.swing.contexttree.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.io.Serializable;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.renderer.CellContext;
@@ -35,7 +33,7 @@ import org.jdesktop.swingx.renderer.TableCellContext;
  * 
  * @author johann sorel
  */
-public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer, Serializable {
+public class DefaultCellRenderer implements javax.swing.table.TableCellRenderer, org.jdesktop.swingx.RolloverRenderer, java.io.Serializable {
     
     protected ComponentProvider componentController;
     private CellContext<JTable> cellContext;

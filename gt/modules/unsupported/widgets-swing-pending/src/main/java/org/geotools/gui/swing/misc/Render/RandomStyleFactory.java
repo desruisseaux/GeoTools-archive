@@ -47,6 +47,12 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.styling.Halo;
+import org.geotools.styling.HaloImpl;
+import org.geotools.styling.Rule;
+import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
+import org.opengis.filter.expression.Expression;
 
 /**
  *
@@ -54,7 +60,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class RandomStyleFactory {
     
-    private final static StyleBuilder sb = new StyleBuilder();
+    private StyleBuilder sb = null;
     
     private final String[] POINT_SHAPES = {"square","circle","triangle","star","cross","x"};
     private final int[] SIZES = {8,10,12,14,16};
@@ -64,6 +70,69 @@ public class RandomStyleFactory {
         Color.GRAY,Color.GREEN.darker(),Color.LIGHT_GRAY,
         Color.ORANGE,Color.RED,Color.YELLOW.darker()};
     
+    
+    public RandomStyleFactory(){        
+        try{
+            sb = new StyleBuilder();
+        }catch(Exception e){}
+    }
+    
+    
+    //------------------duplicates----------------------------------------------
+    
+    public Style duplicate(Style style){
+        DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
+        style.accept( xerox );
+        return (Style) xerox.getCopy();
+    }
+    
+    public FeatureTypeStyle duplicate(FeatureTypeStyle fts){
+        DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
+        fts.accept( xerox );
+        return (FeatureTypeStyle) xerox.getCopy();
+    }
+    
+    public Rule duplicate(Rule rule){
+        DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
+        rule.accept( xerox );
+        return (Rule) xerox.getCopy();
+    }
+    
+    public Symbolizer duplicate(Symbolizer symbol){
+        DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
+        symbol.accept( xerox );
+        return (Symbolizer) xerox.getCopy();
+    }
+    
+    
+    //----------------------creation--------------------------------------------
+    
+    public PointSymbolizer createPointSymbolizer(){
+        Fill fill = sb.createFill(randomColor(), 1);
+                Stroke stroke = sb.createStroke(randomColor(), 1);
+                Mark mark = sb.createMark(randomPointShape(), fill, stroke  );
+                Graphic gra = sb.createGraphic();
+                gra.setOpacity( sb.literalExpression(1) );
+                gra.setMarks(new Mark[]{mark});
+                gra.setSize(sb.literalExpression(randomPointSize()));
+                return sb.createPointSymbolizer(gra);
+    }
+    
+    public LineSymbolizer createLineSymbolizer(){
+        return sb.createLineSymbolizer(randomColor(),randomWidth());
+    }
+    
+    public PolygonSymbolizer createPolygonSymbolizer(){
+        Color col = randomColor();
+                Fill fill = sb.createFill(col, 0.6f);
+                Stroke stroke = sb.createStroke(col, 1);
+                stroke.setOpacity(sb.literalExpression(1f));
+                return sb.createPolygonSymbolizer(stroke, fill);
+    }
+    
+    public RasterSymbolizer createRasterSymbolizer(){
+        return sb.createRasterSymbolizer();
+    }
     
     public Style createPolygonStyle(){
         Style style = null;
@@ -90,23 +159,11 @@ public class RandomStyleFactory {
             Class cla = type.getBinding();
             
             if( cla.equals(Polygon.class) || cla.equals(MultiPolygon.class) ){
-                Color col = randomColor();
-                Fill fill = sb.createFill(col, 0.6f);
-                Stroke stroke = sb.createStroke(col, 1);
-                stroke.setOpacity(sb.literalExpression(1f));
-                PolygonSymbolizer pls = sb.createPolygonSymbolizer(stroke, fill);
-                ps = pls;
+                ps = createPolygonSymbolizer();
             }else if( cla.equals(LineString.class) || cla.equals(MultiLineString.class) ){
-                ps = sb.createLineSymbolizer(randomColor(),randomWidth());
-            }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){
-                Fill fill = sb.createFill(randomColor(), 1);
-                Stroke stroke = sb.createStroke(randomColor(), 1);
-                Mark mark = sb.createMark(randomPointShape(), fill, stroke  );
-                Graphic gra = sb.createGraphic();
-                gra.setOpacity( sb.literalExpression(1) );
-                gra.setMarks(new Mark[]{mark});
-                gra.setSize(sb.literalExpression(randomPointSize()));
-                ps = sb.createPointSymbolizer(gra);
+                ps = createLineSymbolizer();
+            }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){                
+                ps = createPointSymbolizer();
             }
                         
         } catch (Exception ex) {
@@ -182,6 +239,9 @@ public class RandomStyleFactory {
         
         return bi;
     }
+    
+    
+    //-----------------------random---------------------------------------------
     
     public int randomPointSize(){
         return SIZES[ ((int)(Math.random() * SIZES.length)) ];

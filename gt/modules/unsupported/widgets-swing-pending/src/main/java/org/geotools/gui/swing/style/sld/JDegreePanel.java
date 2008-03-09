@@ -30,7 +30,13 @@ public class JDegreePanel extends javax.swing.JPanel {
      */
     public JDegreePanel() {
         initComponents();
+        init();
+    }
+    
+    private void init(){
         clock.setPan(this);
+        exptxt.setType(JExpressionPanel.EXP_TYPE.NUMBER);
+        
     }
 
     /**

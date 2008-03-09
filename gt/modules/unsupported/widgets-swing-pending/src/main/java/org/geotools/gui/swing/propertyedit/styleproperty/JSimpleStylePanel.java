@@ -104,20 +104,28 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
         if (layer != null) {
             if (layer.getFeatureSource() != null) {
                 removeAll();
-
+                
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
                 if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
-                    detail = new JRasterSymbolizerPanel(layer);
+                    detail = new JRasterSymbolizerPanel();
+                    detail.setLayer(layer);
+                    detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {
-                    detail = new JPolygonSymbolizerPanel(layer);
+                    detail = new JPolygonSymbolizerPanel();
+                    detail.setLayer(layer);
+                    detail.setStyle(layer.getStyle());     
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(MultiLineString.class) || val.equals(LineString.class)) {
-                    detail = new JLineSymbolizerPanel(layer);
+                    detail = new JLineSymbolizerPanel();
+                    detail.setLayer(layer);
+                    detail.setStyle(layer.getStyle());                    
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Point.class) || val.equals(MultiPoint.class)) {
-                    detail = new JPointSymbolizerPanel(layer);
+                    detail = new JPointSymbolizerPanel();
+                    detail.setLayer(layer);
+                    detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else {        
                     detail = null;

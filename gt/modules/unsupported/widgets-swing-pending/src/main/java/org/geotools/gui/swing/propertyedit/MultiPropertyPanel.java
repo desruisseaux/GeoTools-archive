@@ -148,11 +148,11 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
         pan_subprop.setLayout(pan_subpropLayout);
         pan_subpropLayout.setHorizontalGroup(
             pan_subpropLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 456, Short.MAX_VALUE)
+            .add(0, 29, Short.MAX_VALUE)
         );
         pan_subpropLayout.setVerticalGroup(
             pan_subpropLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 326, Short.MAX_VALUE)
+            .add(0, 175, Short.MAX_VALUE)
         );
 
         lbl_title.setTitle("Style");
@@ -165,12 +165,12 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(lbl_title, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+                    .add(lbl_title, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
                     .add(pan_subprop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(lbl_title, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 21, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

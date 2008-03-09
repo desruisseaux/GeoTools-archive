@@ -77,19 +77,19 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     /**
      * Geometry factory for JTS geometry creation
      */
-    protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    protected GeometryFactory GEOMETRY_FACTORY = null;
     /**
      * Facilities factory to duplicate MapLayers
      */
-    protected final FacilitiesFactory FACILITIES_FACTORY = new FacilitiesFactory();
+    protected FacilitiesFactory FACILITIES_FACTORY = null;
     /**
      * Style builder for sld style creation
      */
-    protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
+    protected StyleBuilder STYLE_BUILDER = null;
     /**
      * Filter factory 2
      */
-    protected final FilterFactory2 FILTER_FACTORY_2 = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+    protected FilterFactory2 FILTER_FACTORY_2 = null;
     
     private final RenderingStrategy selectionStrategy = new SingleBufferedImageStrategy();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
@@ -106,8 +106,20 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
      */
     public JDefaultSelectableMap2D() {
         super();
+        
+        //I made it like this so that matisse handle this widget
+        try{
+            GEOMETRY_FACTORY = new GeometryFactory();
+            FACILITIES_FACTORY = new FacilitiesFactory();
+            STYLE_BUILDER = new StyleBuilder();
+            FILTER_FACTORY_2 = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+        }catch(Exception e){}
+        init();
+    }
+    
+    private void init(){
         selectionStrategy.setContext(selectionMapContext);
-        addMapDecoration(selectedDecoration);
+        addMapDecoration(selectedDecoration);        
     }
 
     /**

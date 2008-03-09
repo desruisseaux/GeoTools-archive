@@ -18,6 +18,7 @@ package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
+import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 
@@ -26,18 +27,26 @@ import org.geotools.styling.Symbolizer;
  */
 public interface SymbolizerPanel {
 
+    
+    public void setLayer(MapLayer layer);
+    
+    public MapLayer getLayer();
+    
     /**
      * 
      * @return return a Point,ligne,polygon or raster symbolizer
      */
     public Symbolizer getSymbolizer();
     
+    public void setSymbolizer(Symbolizer symbol);
     
     /**
      * 
      * @return return a Style with only one rule and the symbolizer
      */
     public Style getStyle();
+    
+    public void setStyle(Style style);
             
     /**
      * 

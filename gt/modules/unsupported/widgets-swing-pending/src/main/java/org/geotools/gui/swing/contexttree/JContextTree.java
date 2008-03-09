@@ -19,7 +19,7 @@ package org.geotools.gui.swing.contexttree;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 
-import javax.swing.JComponent;
+import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
@@ -51,14 +51,18 @@ import org.geotools.map.MapContext;
  * is based on a JXTreeTable.
  * @author johann sorel
  */
-public class JContextTree extends JComponent{
+public class JContextTree extends javax.swing.JPanel{
 
-    private final TreeTable treetable;
+    private TreeTable treetable;
     
     /**
      * build a default JContextTree.
      */
     public JContextTree(){
+        init();
+    }
+    
+    private void init(){
         treetable = new TreeTable(this);
         
         JScrollPane pane = new JScrollPane(treetable);
@@ -66,9 +70,11 @@ public class JContextTree extends JComponent{
         pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
         setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(250,100));
         
         add(BorderLayout.CENTER,pane);
     }
+    
         
     /**
      * get the Popupmenu manager

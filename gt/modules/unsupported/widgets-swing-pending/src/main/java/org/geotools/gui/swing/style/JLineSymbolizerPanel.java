@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import java.util.Map;
 import javax.swing.JComponent;
 
 import org.geotools.map.MapLayer;
@@ -34,23 +35,19 @@ import org.geotools.styling.Symbolizer;
  *
  * @author johann sorel
  */
-public class JLineSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
-
+public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geotools.gui.swing.style.SymbolizerPanel {
   
-
-    private MapLayer layer;
+    private MapLayer layer = null;
     
-    /** Creates new form LineStylePanel
-     * @param layer the layer style to edit
+    /** 
+     * Creates new form JLineSymbolizerPanel
      */
-    public JLineSymbolizerPanel(MapLayer layer) {
+    public JLineSymbolizerPanel() {
         initComponents();
-
-        this.layer = layer;
-        parse(layer.getStyle());
-
-        tab_demo.setSLDSource("/org/geotools/gui/swing/propertyedit/styleproperty/defaultset/linestyles.sld");
-
+        init();
+    }
+    
+    private void init(){
         tab_demo.addMouseListener(new MouseListener() {
 
             public void mouseClicked(MouseEvent e) {
@@ -58,7 +55,7 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
                 Point p = e.getPoint();
                 ligne = tab_demo.rowAtPoint(p);
                 if(ligne<tab_demo.getModel().getRowCount() && ligne>=0)
-                parse((Symbolizer) tab_demo.getModel().getValueAt(ligne, 0));
+                setSymbolizer((LineSymbolizer) tab_demo.getModel().getValueAt(ligne, 0));
             }
 
             public void mousePressed(MouseEvent e) {
@@ -74,9 +71,40 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             }
         });
     }
+    
+    public void setDemoSymbolizers(Map<Symbolizer,String> symbols){
+        tab_demo.setMap(symbols);        
+    }
+    
+    public Map<Symbolizer,String> getDemoSymbolizers(){
+        return tab_demo.getMap();
+    }
+    
+    public void setLayer(MapLayer layer){
+        this.layer = layer;
+        GuiStroke.setLayer(layer);
+    }
+    
+    public MapLayer getLayer(){
+        return layer;
+    }
+ 
+    public void setSymbolizer(Symbolizer symbol) {
 
-    private void parse(Style style) {
+        if (symbol instanceof LineSymbolizer) {
+            LineSymbolizer sym = (LineSymbolizer) symbol;
 
+            GuiStroke.parseStroke(sym.getStroke());            
+            GuiStroke.setLayer(layer);
+        }
+    }
+
+    public LineSymbolizer getSymbolizer(){                
+        StyleBuilder sb = new StyleBuilder();     
+        return sb.createLineSymbolizer( GuiStroke.getStroke() );
+    }
+    
+    public void setStyle(Style style){
         FeatureTypeStyle[] sty = style.getFeatureTypeStyles();
 
         Rule[] rules = sty[0].getRules();
@@ -87,27 +115,15 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             if (r.getFilter() == null) {
                 Symbolizer[] symbolizers = r.getSymbolizers();
                 for (int j = 0; j < symbolizers.length; j++) {
-                    parse(symbolizers[j]);
+                    
+                if (symbolizers[j] instanceof LineSymbolizer) {
+                    setSymbolizer((LineSymbolizer)symbolizers[j]);
+                }
                 }
             }
         }
     }
-
-    private void parse(Symbolizer symbol) {
-
-        if (symbol instanceof LineSymbolizer) {
-            LineSymbolizer sym = (LineSymbolizer) symbol;
-
-            GuiStroke.parseStroke(sym.getStroke());            
-            GuiStroke.setLayer(layer);
-        }
-    }
-
-    public Symbolizer getSymbolizer(){                
-        StyleBuilder sb = new StyleBuilder();     
-        return sb.createLineSymbolizer( GuiStroke.getStroke() );
-    }
-        
+    
     public Style getStyle() {
         StyleBuilder sb = new StyleBuilder();               
         Style style = sb.createStyle();
@@ -127,39 +143,16 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel2 = new javax.swing.JPanel();
+        jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
+        GuiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_demo = new org.geotools.gui.swing.style.sld.JDemoTable();
-        GuiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-
-        tab_demo.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(tab_demo);
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
-        );
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
-        GuiStroke.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("border"))); // NOI18N
+        jXTitledSeparator1.setTitle(bundle.getString("border")); // NOI18N
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        jScrollPane1.setViewportView(tab_demo);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -167,25 +160,31 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(GuiStroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 271, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(GuiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
+                .add(12, 12, 12)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, GuiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
+                        .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(GuiStroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.geotools.gui.swing.style.sld.JStrokePanel GuiStroke;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
     private org.geotools.gui.swing.style.sld.JDemoTable tab_demo;
     // End of variables declaration//GEN-END:variables
+
 }

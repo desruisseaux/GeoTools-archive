@@ -40,7 +40,6 @@ import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -48,7 +47,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  *
  * @author johann sorel
  */
-final class TreeTable extends JXTreeTable {
+final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
 
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/contexttree/Bundle");
     /**
@@ -100,8 +99,8 @@ final class TreeTable extends JXTreeTable {
      * the buffer containing the cutted/copied datas
      */
     private final List<Object> buffer = new ArrayList<Object>();
-    private final JContextTreePopup popupManager;
-    private final TreeSelectionManager selectionManager;
+    private JContextTreePopup popupManager;
+    private TreeSelectionManager selectionManager;
     /**
      * String added to layer name use when paste/duplicate
      */
@@ -113,7 +112,13 @@ final class TreeTable extends JXTreeTable {
      */
     TreeTable(JContextTree frame) {
         super(new ContextTreeModel(frame));
-
+        
+        init(frame);
+    }
+    
+    private void init(JContextTree frame){
+        
+        putClientProperty("JTree.lineStyle", "Angled");
         selectionManager = new TreeSelectionManager(frame);
         popupManager = new JContextTreePopup(this, frame);
 
@@ -132,7 +137,6 @@ final class TreeTable extends JXTreeTable {
 
 
         getTreeSelectionModel().addTreeSelectionListener(selectionManager);
-
     }
 
     /**

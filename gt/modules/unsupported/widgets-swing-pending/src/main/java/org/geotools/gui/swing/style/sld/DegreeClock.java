@@ -25,25 +25,28 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 /**
  *
  * @author johann sorel
  */
-class DegreeClock extends JComponent implements MouseMotionListener, MouseListener{
+class DegreeClock extends javax.swing.JPanel implements MouseMotionListener, MouseListener{
 
     private double degree = 0;
     public JDegreePanel pan = null;
-    int X = 0;
-    int Y = 0;
+    int X = WIDTH/2;
+    int Y = HEIGHT/2;
     
     /**
      * clock component to edit degrees
      */
     DegreeClock(){
         super();
+        init();
+    }
+    
+    private void init(){
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         setDegree(0);

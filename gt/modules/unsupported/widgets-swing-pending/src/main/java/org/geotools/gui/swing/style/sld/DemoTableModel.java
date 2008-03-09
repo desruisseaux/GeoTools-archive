@@ -17,15 +17,19 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyledLayerDescriptor;
+import org.geotools.styling.Symbolizer;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 
@@ -34,33 +38,44 @@ import org.geotools.xml.Parser;
  * @author johann sorel
  */
 public class DemoTableModel extends AbstractTableModel implements TableModel {
-
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/styleproperty/defaultset/Bundle"); 
     
-    Rule[] rules = null;
+    private Map<Symbolizer,String> map = new HashMap<Symbolizer,String>();
 
     /**
      * 
      * @param demofile sld file containing style exemples
      */
-    public DemoTableModel(String demofile) {
+    public DemoTableModel() {
+        super();
 
-        Configuration configuration = new SLDConfiguration();
-        Parser parser = new Parser(configuration);
-
-        InputStream input = DemoTableModel.class.getResourceAsStream(demofile);
-
-        try {
-            StyledLayerDescriptor sld = (StyledLayerDescriptor) parser.parse( input );
-            rules = SLD.styles(sld)[0].getFeatureTypeStyles()[0].getRules();
-        } catch (Exception e) {
-            rules = new Rule[0];
-            e.printStackTrace();
-        }
+//        Configuration configuration = new SLDConfiguration();
+//        Parser parser = new Parser(configuration);
+//
+//        InputStream input = DemoTableModel.class.getResourceAsStream(demofile);
+//
+//        try {
+//            BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/styleproperty/defaultset/Bundle");
+//            
+//            StyledLayerDescriptor sld = (StyledLayerDescriptor) parser.parse( input );
+//            map = SLD.styles(sld)[0].getFeatureTypeStyles()[0].getRules();
+//        } catch (Exception e) {
+//            map = new Rule[0];
+////            e.printStackTrace();
+//        }
     }
+    
+    public void setMap(Map<Symbolizer,String> map){
+        this.map = new HashMap<Symbolizer, String>(map);
+        fireTableDataChanged();
+    }
+    
+    public Map<Symbolizer,String> getMap(){
+        return new HashMap<Symbolizer, String>(map);
+    }
+    
 
     public int getRowCount() {
-        return rules.length;
+        return map.size();
     }
 
     public int getColumnCount() {
@@ -68,18 +83,11 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
+                
         if (columnIndex == 0) {
-            return rules[rowIndex].getSymbolizers()[0];
-        } else if (columnIndex == 1) {
-            
-            String str = null;
-            try{
-                str = BUNDLE.getString( rules[rowIndex].getName() );
-            }catch(Exception e){      
-                str = "-missing key- " + rules[rowIndex].getName();
-            }
-            
-            return str;
+            return map.keySet().toArray()[rowIndex];
+        } else if (columnIndex == 1) {                   
+            return map.get(map.keySet().toArray()[rowIndex]);
         }
         return "n/a";
     }

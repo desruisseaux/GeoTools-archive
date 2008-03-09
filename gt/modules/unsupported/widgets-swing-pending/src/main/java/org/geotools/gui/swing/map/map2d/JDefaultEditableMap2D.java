@@ -50,10 +50,10 @@ import org.geotools.gui.swing.map.map2d.event.Map2DEditionEvent;
 public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
 
     private final SingleBufferedImageStrategy memoryStrategy = new SingleBufferedImageStrategy();
-    private final MapContext memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+    private MapContext memoryMapContext = null;
     private final BufferComponent memoryPane = new BufferComponent();
     private MapLayer editionLayer = null;
-    private EditionHandler editionHandler = new DefaultEditionHandler();
+    private EditionHandler editionHandler = null;
     
     private PointSymbolizer pointSymbol = null;
     private LineSymbolizer lineSymbol = null;
@@ -64,8 +64,20 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
      */
     public JDefaultEditableMap2D() {
         super();
-
-        initSymbols();
+        init();
+        
+    }
+    
+    private void init(){
+        
+        //I made it like this so that matisse handle this widget
+        try{
+            memoryMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+            editionHandler = new DefaultEditionHandler();
+            initSymbols();
+        }catch(Exception e){}
+        
+        
         
         addMapDecoration(memoryPane);
 
@@ -73,7 +85,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         memoryStrategy.setAutoRefreshEnabled(false);
         memoryStrategy.setContext(memoryMapContext);
 
-        editionHandler.install(this);
+        try{
+            editionHandler.install(this);
+        }catch(Exception e){}
     }
     
     private void initSymbols(){
@@ -290,7 +304,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     //---------------------PRIVATE CLASSES--------------------------------------
     
 
-    private class BufferComponent extends JComponent implements MapDecoration {
+    private class BufferComponent extends javax.swing.JComponent implements MapDecoration {
 
         public BufferComponent() {
             setLayout(new BorderLayout());

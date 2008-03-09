@@ -15,7 +15,6 @@
  */
 package org.geotools.gui.swing.contexttree.renderer;
 
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -24,7 +23,7 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author johann sorel
  */
-public abstract class RenderAndEditComponent extends JPanel {
+public abstract class RenderAndEditComponent extends javax.swing.JPanel {
 
     /**
      * Abstrat class extending JPanel, can be used for Render and Edition Cell
@@ -32,9 +31,13 @@ public abstract class RenderAndEditComponent extends JPanel {
      */
     public RenderAndEditComponent() {
         super();
-        setBorder(new EmptyBorder(1, 1, 1, 1));
-    }
+        init();
+    }   
 
+    private void init(){
+        setBorder(new EmptyBorder(1, 1, 1, 1));        
+    }
+    
     /**
      * initialize the component with the target object
      * 

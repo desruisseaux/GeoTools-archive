@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
-    private GTRenderer renderer;
+    private GTRenderer renderer = null;
     private DrawingThread thread;
     private BufferComponent comp;
     private MapContext buffercontext;
@@ -55,16 +55,21 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     @Override
     protected JComponent init() {
-        renderer = new ShapefileRenderer();
+        
+        mustupdate = false;
+        
         thread = new DrawingThread();
         comp = new BufferComponent();
         buffercontext = new OneLayerContext();
-        GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        mustupdate = false;
-
-        opimizeRenderer();
         thread.start();
         return comp;
+    }
+    
+    private void testRenderer(){
+        if(renderer == null){
+            renderer = new ShapefileRenderer();
+            opimizeRenderer();
+        }
     }
 
     private void opimizeRenderer() {
@@ -101,7 +106,8 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     }
 
     public synchronized BufferedImage createBufferImage(MapContext context) {
-
+        testRenderer();
+        GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
         synchronized (renderer) {
             Rectangle newRect = comp.getBounds();
@@ -232,9 +238,9 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
-    private class BufferComponent extends JComponent {
+    private class BufferComponent extends javax.swing.JComponent {
 
-        private BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        private BufferedImage img = null;
 
         public void setBuffer(BufferedImage buf) {
             img = buf;

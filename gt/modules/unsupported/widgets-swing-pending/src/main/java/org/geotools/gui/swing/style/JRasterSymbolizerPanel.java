@@ -18,6 +18,7 @@ package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
+import org.geotools.gui.swing.style.sld.JExpressionPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -32,19 +33,21 @@ import org.geotools.styling.Symbolizer;
  */
 public class JRasterSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel{
     
-    
+    private MapLayer layer = null;
     
     /** Creates new form RasterStylePanel
      * @param layer the layer style to edit
      */
-    public JRasterSymbolizerPanel(MapLayer layer) {
-        super();
+    public JRasterSymbolizerPanel() {
         initComponents();
-        
-        exp_opacity.setLayer(layer);
+        init();
     }
     
-    private void parse(Style style) {
+    private void init(){
+        GuiOpacity.setType(JExpressionPanel.EXP_TYPE.NUMBER);
+    }
+    
+    public void setStyle(Style style) {
 
         FeatureTypeStyle[] sty = style.getFeatureTypeStyles();
 
@@ -56,29 +59,13 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
             if (r.getFilter() == null) {
                 Symbolizer[] symbolizers = r.getSymbolizers();
                 for (int j = 0; j < symbolizers.length; j++) {
-                    parse(symbolizers[j]);
+                    setSymbolizer(symbolizers[j]);
                 }
             }
         }
     }
-
-    private void parse(Symbolizer symbol) {
-
-        if (symbol instanceof RasterSymbolizer) {
-            RasterSymbolizer sym = (RasterSymbolizer) symbol;
-
-            exp_opacity.setExpression( sym.getOpacity() );
-        }
-    }
     
-    public Symbolizer getSymbolizer(){
-        StyleBuilder sb = new StyleBuilder();
-        RasterSymbolizer sym = sb.createRasterSymbolizer();
-        sym.setOpacity(exp_opacity.getExpression());        
-        return sym;
-    }
-    
-     public Style getStyle(){
+    public Style getStyle(){
         StyleBuilder sb = new StyleBuilder();
 
         Style style = sb.createStyle();
@@ -86,7 +73,23 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
 
         return style;
     }
+
+    public void setSymbolizer(Symbolizer symbol) {
+
+        if (symbol instanceof RasterSymbolizer) {
+            RasterSymbolizer sym = (RasterSymbolizer) symbol;
+
+            GuiOpacity.setExpression( sym.getOpacity() );
+        }
+    }
     
+    public Symbolizer getSymbolizer(){
+        StyleBuilder sb = new StyleBuilder();
+        RasterSymbolizer sym = sb.createRasterSymbolizer();
+        sym.setOpacity(GuiOpacity.getExpression());        
+        return sym;
+    }
+        
     public JComponent getComponent(){
         return this;
     }
@@ -100,7 +103,7 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        exp_opacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiOpacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("opacity")); // NOI18N
@@ -113,24 +116,33 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(exp_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 111, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .add(GuiOpacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(52, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(exp_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, GuiOpacity, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel exp_opacity;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiOpacity;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
+
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
+        GuiOpacity.setLayer(layer);
+    }
+
+    public MapLayer getLayer() {
+        return layer;
+    }
     
 }

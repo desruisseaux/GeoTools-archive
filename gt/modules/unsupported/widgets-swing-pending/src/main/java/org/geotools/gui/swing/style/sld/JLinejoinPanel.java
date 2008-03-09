@@ -13,9 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
+import javax.swing.Icon;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
@@ -27,22 +27,22 @@ import org.opengis.filter.expression.Expression;
  */
 public class JLinejoinPanel extends javax.swing.JPanel {
     
+    private static final Icon ICON_ROUND = IconBundle.getResource().getIcon("16_linejoin_round");
+    private static final Icon ICON_MITRE = IconBundle.getResource().getIcon("16_linejoin_mitre");
+    private static final Icon ICON_BEVEL = IconBundle.getResource().getIcon("16_linejoin_bevel");
+    private static final Icon ICON_EXP = IconBundle.getResource().getIcon("16_expression");
+    
     private MapLayer layer = null;
     private Expression exp = null;
-    
-    
+
     /** 
      * Creates new form JLinecapPanel 
      */
     public JLinejoinPanel() {
         initComponents();
-        but_round.setIcon( IconBundle.getResource().getIcon("16_linejoin_round"));
-        but_mitre.setIcon( IconBundle.getResource().getIcon("16_linejoin_mitre"));
-        but_bevel.setIcon( IconBundle.getResource().getIcon("16_linejoin_bevel"));
-        
         but_round.setSelected(true);
     }
-    
+
     /**
      * 
      * @param layer the layer style to edit
@@ -50,57 +50,86 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     public void setLayer(MapLayer layer) {
         this.layer = layer;
     }
-    
-    
+
     /**
      * 
      * @param exp String to parse
      */
-    public void setLineJoin(String exp){
-                
-        if( "bevel".equals(exp.toLowerCase()) )
+    public void setLineJoin(String exp) {
+
+        if ("bevel".equals(exp.toLowerCase())) {
             but_bevel.setSelected(true);
-        else if( "mitre".equals(exp.toLowerCase()) )
+            but_bevel.setContentAreaFilled(true);
+            but_mitre.setContentAreaFilled(false);
+            but_round.setContentAreaFilled(false);
+        } else if ("mitre".equals(exp.toLowerCase())) {
             but_mitre.setSelected(true);
-        else 
-            but_round.setSelected(true);        
+            but_bevel.setContentAreaFilled(false);
+            but_mitre.setContentAreaFilled(true);
+            but_round.setContentAreaFilled(false);
+        } else if ("round".equals(exp.toLowerCase())) {
+            but_round.setSelected(true);
+            but_bevel.setContentAreaFilled(false);
+            but_mitre.setContentAreaFilled(false);
+            but_round.setContentAreaFilled(true);
+        } else {
+            but_bevel.setContentAreaFilled(false);
+            but_mitre.setContentAreaFilled(false);
+            but_round.setContentAreaFilled(false);
+        }
     }
-    
+
     /**
      * 
      * @param exp Expression of the linejoin
      */
-    public void setLineJoin(Expression exp){
-                
+    public void setLineJoin(Expression exp) {
+
         this.exp = exp;
         if (exp != null) {
             if (exp.toString().toLowerCase().equals("bevel")) {
                 but_bevel.setSelected(true);
+                but_bevel.setContentAreaFilled(true);
+                but_mitre.setContentAreaFilled(false);
+                but_round.setContentAreaFilled(false);
             } else if (exp.toString().toLowerCase().equals("mitre")) {
                 but_mitre.setSelected(true);
+                but_bevel.setContentAreaFilled(false);
+                but_mitre.setContentAreaFilled(true);
+                but_round.setContentAreaFilled(false);
             } else if (exp.toString().toLowerCase().equals("round")) {
                 but_round.setSelected(true);
+                but_bevel.setContentAreaFilled(false);
+                but_mitre.setContentAreaFilled(false);
+                but_round.setContentAreaFilled(true);
+            } else {
+                but_bevel.setContentAreaFilled(false);
+                but_mitre.setContentAreaFilled(false);
+                but_round.setContentAreaFilled(false);
             }
+        } else {
+            but_bevel.setContentAreaFilled(false);
+            but_mitre.setContentAreaFilled(false);
+            but_round.setContentAreaFilled(false);
         }
-              
+
     }
-       
-    
+
     /**
      * 
      * @return Expression : new Expression of LineJoin
      */
-    public Expression getLineJoin(){
-        
-        if(exp != null){
+    public Expression getLineJoin() {
+
+        if (exp != null) {
             return exp;
-        }else{
+        } else {
             StyleBuilder sb = new StyleBuilder();
             return sb.literalExpression("round");
         }
-               
+
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -116,6 +145,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
 
         buttonGroup1.add(but_round);
+        but_round.setIcon(ICON_ROUND);
+        but_round.setBorderPainted(false);
+        but_round.setContentAreaFilled(false);
         but_round.setIconTextGap(0);
         but_round.setMargin(new java.awt.Insets(2, 2, 2, 2));
         but_round.addActionListener(new java.awt.event.ActionListener() {
@@ -125,6 +157,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         });
 
         buttonGroup1.add(but_bevel);
+        but_bevel.setIcon(ICON_BEVEL);
+        but_bevel.setBorderPainted(false);
+        but_bevel.setContentAreaFilled(false);
         but_bevel.setIconTextGap(0);
         but_bevel.setMargin(new java.awt.Insets(2, 2, 2, 2));
         but_bevel.addActionListener(new java.awt.event.ActionListener() {
@@ -134,7 +169,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         });
 
         buttonGroup1.add(but_mitre);
-        but_mitre.setText(" ");
+        but_mitre.setIcon(ICON_MITRE);
+        but_mitre.setBorderPainted(false);
+        but_mitre.setContentAreaFilled(false);
         but_mitre.setIconTextGap(0);
         but_mitre.setMargin(new java.awt.Insets(2, 2, 2, 2));
         but_mitre.addActionListener(new java.awt.event.ActionListener() {
@@ -143,8 +180,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
             }
         });
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        jButton1.setText(bundle.getString("shortexpression")); // NOI18N
+        jButton1.setIcon(ICON_EXP);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
         jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -170,45 +208,45 @@ public class JLinejoinPanel extends javax.swing.JPanel {
             .add(but_round)
             .add(but_bevel)
             .add(but_mitre)
-            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
         );
 
         layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round, jButton1}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
-
     private void jButton1actionDialogLineCap(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1actionDialogLineCap
         JExpressionDialog dialog = new JExpressionDialog();
-        
+
         dialog.setModal(true);
         dialog.setLocationRelativeTo(jButton1);
         dialog.setLayer(layer);
         dialog.setExpression(exp);
         dialog.setVisible(true);
-        
+
         exp = dialog.getExpression();
-        
+
         but_bevel.setSelected(false);
         but_round.setSelected(false);
         but_mitre.setSelected(false);
+        but_bevel.setContentAreaFilled(false);
+        but_mitre.setContentAreaFilled(false);
+        but_round.setContentAreaFilled(false);
     }//GEN-LAST:event_jButton1actionDialogLineCap
 
     private void but_roundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_roundActionPerformed
-       StyleBuilder sb = new StyleBuilder();
-       exp = sb.literalExpression("round");   
+        StyleBuilder sb = new StyleBuilder();
+        setLineJoin( sb.literalExpression("round"));   
     }//GEN-LAST:event_but_roundActionPerformed
 
     private void but_bevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_bevelActionPerformed
         StyleBuilder sb = new StyleBuilder();
-        exp = sb.literalExpression("bevel");
+        setLineJoin( sb.literalExpression("bevel"));
     }//GEN-LAST:event_but_bevelActionPerformed
 
     private void but_mitreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_mitreActionPerformed
         StyleBuilder sb = new StyleBuilder();
-        exp = sb.literalExpression("mitre");
+        setLineJoin( sb.literalExpression("mitre"));
     }//GEN-LAST:event_but_mitreActionPerformed
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton but_bevel;
     private javax.swing.JToggleButton but_mitre;
@@ -216,7 +254,4 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
-
-    
-    
 }

@@ -21,7 +21,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
@@ -33,9 +32,9 @@ import org.geotools.styling.Symbolizer;
  *
  * @author johann sorel
  */
-public final class StyleComponent extends RenderAndEditComponent {
+public final class StyleComponent extends org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent {
     
-    private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
+    private RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private MapLayer layer = null;
     private Symbolizer symbol = null;
     
@@ -44,6 +43,11 @@ public final class StyleComponent extends RenderAndEditComponent {
      * create new instance
      */
     public StyleComponent(){
+        super();   
+        init();
+    }
+    
+    private void init(){
         
         addMouseListener(new MouseListener() {
 
@@ -66,20 +70,21 @@ public final class StyleComponent extends RenderAndEditComponent {
 
             public void mouseExited(MouseEvent e) {
             }
-        });
+        });     
         
-    }
+    }       
     
-           
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);      
         
+        if(RANDOM_STYLE_FACTORY != null){
         if( layer != null ){
             g.drawImage( RANDOM_STYLE_FACTORY.createGlyph(layer), (getWidth()-16)/2,(getHeight()-16)/2,this);
         }
         else if( symbol != null ){
             g.drawImage( RANDOM_STYLE_FACTORY.createGlyph(symbol), (getWidth()-16)/2,(getHeight()-16)/2,this);
+        }
         }
     }
 

@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import java.util.Map;
 import javax.swing.JComponent;
 
 import org.geotools.map.MapLayer;
@@ -34,20 +35,18 @@ import org.geotools.styling.Symbolizer;
  *
  * @author  johann sorel
  */
-public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
+public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.geotools.gui.swing.style.SymbolizerPanel {
 
+    private MapLayer layer = null;
+    
     /** Creates new form LineStylePanel
-     * @param layer the layer style to edit
      */
-    public JPolygonSymbolizerPanel(MapLayer layer) {
+    public JPolygonSymbolizerPanel() {
         initComponents();
+        init();        
+    }
 
-        parse(layer.getStyle());
-
-        GuiFill.setLayer(layer);
-        GuiStroke.setLayer(layer);        
-
-        tab_demo.setSLDSource("/org/geotools/gui/swing/propertyedit/styleproperty/defaultset/polygonstyles.sld");
+    private void init(){
         tab_demo.addMouseListener(new MouseListener() {
 
             public void mouseClicked(MouseEvent e) {
@@ -55,7 +54,7 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
                 Point p = e.getPoint();
                 ligne = tab_demo.rowAtPoint(p);
                 if (ligne < tab_demo.getModel().getRowCount() && ligne >= 0) {
-                    parse((Symbolizer) tab_demo.getModel().getValueAt(ligne, 0));
+                    setSymbolizer((Symbolizer) tab_demo.getModel().getValueAt(ligne, 0));
                 }
             }
 
@@ -72,8 +71,16 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
             }
         });
     }
-
-    private void parse(Style style) {
+    
+    public void setDemoSymbolizers(Map<Symbolizer,String> symbols){
+        tab_demo.setMap(symbols);        
+    }
+    
+    public Map<Symbolizer,String> getDemoSymbolizers(){
+        return tab_demo.getMap();
+    }
+    
+    public void setStyle(Style style) {
 
         FeatureTypeStyle[] sty = style.getFeatureTypeStyles();
 
@@ -85,13 +92,22 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
             if (r.getFilter() == null) {
                 Symbolizer[] symbolizers = r.getSymbolizers();
                 for (int j = 0; j < symbolizers.length; j++) {
-                    parse(symbolizers[j]);
+                    setSymbolizer(symbolizers[j]);
                 }
             }
         }
     }
+    
+    public Style getStyle() {
+        StyleBuilder sb = new StyleBuilder();
 
-    private void parse(Symbolizer symbol) {
+        Style style = sb.createStyle();
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(getSymbolizer()));
+
+        return style;
+    }
+
+    public void setSymbolizer(Symbolizer symbol) {
 
         if (symbol instanceof PolygonSymbolizer) {
             PolygonSymbolizer sym = (PolygonSymbolizer) symbol;
@@ -108,17 +124,18 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
         return ps;
     }
 
-    public Style getStyle() {
-        StyleBuilder sb = new StyleBuilder();
-
-        Style style = sb.createStyle();
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(getSymbolizer()));
-
-        return style;
-    }
-
     public JComponent getComponent() {
         return this;
+    }
+    
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
+        GuiFill.setLayer(layer);
+        GuiStroke.setLayer(layer);
+    }
+
+    public MapLayer getLayer() {
+        return layer;
     }
 
     /** This method is called from within the constructor to
@@ -129,30 +146,20 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        GuiFill = new org.geotools.gui.swing.style.sld.JFillPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_demo = new org.geotools.gui.swing.style.sld.JDemoTable();
+        jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
+        GuiFill = new org.geotools.gui.swing.style.sld.JFillPanel();
+        jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
         GuiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
-        GuiFill.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("fill"))); // NOI18N
-
         jScrollPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-
-        tab_demo.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
         jScrollPane1.setViewportView(tab_demo);
 
-        GuiStroke.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("border"))); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
+        jXTitledSeparator1.setTitle(bundle.getString("fill")); // NOI18N
+
+        jXTitledSeparator2.setTitle(bundle.getString("border")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -161,10 +168,12 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(GuiStroke, 0, 268, Short.MAX_VALUE)
-                    .add(GuiFill, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 268, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .add(GuiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(GuiFill, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jXTitledSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -172,11 +181,15 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
+                        .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(GuiFill, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(GuiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .add(jXTitledSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(GuiStroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -184,6 +197,10 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements Symbo
     private org.geotools.gui.swing.style.sld.JFillPanel GuiFill;
     private org.geotools.gui.swing.style.sld.JStrokePanel GuiStroke;
     private javax.swing.JScrollPane jScrollPane1;
+    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
+    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator2;
     private org.geotools.gui.swing.style.sld.JDemoTable tab_demo;
     // End of variables declaration//GEN-END:variables
+
+    
 }
