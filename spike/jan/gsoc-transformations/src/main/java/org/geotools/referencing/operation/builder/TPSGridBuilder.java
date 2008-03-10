@@ -45,7 +45,7 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @param env Envelope of generated grid
      * @throws TransformException
      */
-    public TPSGridBuilder(List vectors, double dx, double dy, Envelope env)
+    public TPSGridBuilder(List<MappedPosition> vectors, double dx, double dy, Envelope env)
         throws TransformException, NoSuchIdentifierException {
         this(vectors, dx, dy, env, IdentityTransform.create(2));
     }
@@ -60,17 +60,17 @@ public class TPSGridBuilder extends WarpGridBuilder {
      * @param realToGrid Transformation from real to grid coordinates (when working with images)
      * @throws TransformException
      */
-    public TPSGridBuilder(List vectors, double dx, double dy, Envelope envelope,
+    public TPSGridBuilder(List<MappedPosition> vectors, double dx, double dy, Envelope envelope,
         MathTransform realToGrid) throws TransformException, NoSuchIdentifierException {
         super(vectors, dx, dy, envelope, realToGrid);     
     }
 
-    protected float[] computeWarpGrid(ParameterValueGroup WarpParams)
+    protected float[] computeWarpGrid(GridParameters gridParams)
         throws TransformException {
     	
     	TPSInterpolation dxInterpolation = new TPSInterpolation(buildPositionsMap(0));
     	TPSInterpolation dyInterpolation = new TPSInterpolation(buildPositionsMap(1));
     	
-        return interpolateWarpGrid(WarpParams, dxInterpolation, dyInterpolation);    	      
+        return interpolateWarpGrid(gridParams, dxInterpolation, dyInterpolation);    	      
     }
 }

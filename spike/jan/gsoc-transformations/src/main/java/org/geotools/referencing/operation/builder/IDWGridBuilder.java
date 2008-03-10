@@ -64,11 +64,11 @@ public class IDWGridBuilder extends WarpGridBuilder {
         super(vectors, dx, dy, envelope, realToGrid);
     }
 
-    protected float[] computeWarpGrid(ParameterValueGroup WarpParams)
+    protected float[] computeWarpGrid(GridParameters gridParams)
         throws TransformException {
         IDWInterpolation dxInterpolation = new IDWInterpolation(buildPositionsMap(0));        
         IDWInterpolation dyInterpolation = new IDWInterpolation(buildPositionsMap(1));
 
-        return interpolateWarpGrid(WarpParams, dxInterpolation, dyInterpolation);
+        return interpolateWarpGrid(gridParams, dxInterpolation, dyInterpolation);
     }
 }

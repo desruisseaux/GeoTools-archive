@@ -44,7 +44,7 @@ public class WarpGridBuilderTest extends TestCase {
     DefaultEngineeringCRS l;
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
     private boolean show = false;
-    private boolean write = false;
+    private boolean write = true;
  
     private String path="/home/jezekjan/tmp/";
     /**

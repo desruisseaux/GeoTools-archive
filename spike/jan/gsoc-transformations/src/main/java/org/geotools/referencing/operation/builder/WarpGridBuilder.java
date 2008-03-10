@@ -88,12 +88,12 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * List of Mapped Positions in local coordinates (transformed by worldToGrid
 	 * transformation)
 	 */
-	List<MappedPosition> localpositions = new ArrayList<MappedPosition>();
+	final List<MappedPosition> localpositions ;//= new ArrayList<MappedPosition>();
 
 	// List /*<MappedPosition>*/ worldpositions ;
 
 	/** GridValues like maxx maxt dx dy etc.. */
-	GridParamValues globalValues;
+	GridParameters gridParameters;
 
 	/** RealToGrid Math Transform */
 	MathTransform worldToGrid;
@@ -134,9 +134,11 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 			throws MismatchedSizeException, MismatchedDimensionException,
 			MismatchedReferenceSystemException, TransformException,
 			NoSuchIdentifierException {
+		
 		this.worldToGrid = worldToGrid;
 
-		this.globalValues = new GridParamValues(envelope, worldToGrid, dx, dy);
+		this.gridParameters = GridParameters.createGridParameters(envelope, dx, dy,
+				(AffineTransform2D) worldToGrid, true);
 
 		super.setMappedPositions(vectors);
 
@@ -145,11 +147,36 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		this.envelope = envelope;
 	}
 
+	/*protected WarpGridBuilder(List<MappedPosition> vectors, GridParameters params){
+		
+		super.setMappedPositions(vectors);
+		localpositions = vectors;
+		this.gridParameters = params;
+	}*/
+	public WarpGridBuilder(List<MappedPosition> vectors, double dx, double dy,
+			Envelope envelope) throws MismatchedSizeException,
+			MismatchedDimensionException, MismatchedReferenceSystemException,
+			TransformException, NoSuchIdentifierException {
+		this(vectors, dx, dy, envelope, getIdntityTransform());
+
+	}
+
+	private static MathTransform getIdntityTransform() {
+		GeneralMatrix M = new GeneralMatrix(3, 3);
+		double[] m0 = { 1, 0, 0 };
+		double[] m1 = { 0, 1, 0 };
+		double[] m2 = { 0, 0, 1 };
+		M.setRow(0, m0);
+		M.setRow(1, m1);
+		M.setRow(2, m2);
+		return ProjectiveTransform.create(M);
+	}
+
 	public List<MappedPosition> getGridMappedPositions()
 			throws MismatchedDimensionException, TransformException {
 		if (localpositions == null) {
-			localpositions = transformMPToGrid(getMappedPositions(),
-					worldToGrid);
+		//	localpositions = transformMPToGrid(getMappedPositions(),
+			//		worldToGrid);
 		}
 
 		return localpositions;
@@ -164,16 +191,16 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * @return Map
 	 * @throws TransformException
 	 */
-	protected HashMap<DirectPosition, Double> buildPositionsMap(int dim)
+	protected HashMap<DirectPosition, Float> buildPositionsMap(int dim)
 			throws TransformException {
-		HashMap<DirectPosition, Double> poitnsToDeltas = new HashMap<DirectPosition, Double>();
+		HashMap<DirectPosition, Float> poitnsToDeltas = new HashMap<DirectPosition, Float>();
 
 		for (Iterator<MappedPosition> i = this.getGridMappedPositions()
 				.iterator(); i.hasNext();) {
 			MappedPosition mp = ((MappedPosition) i.next());
-			poitnsToDeltas.put(mp.getSource(),
-					mp.getSource().getCoordinates()[dim]
-							- mp.getTarget().getCoordinates()[dim]);
+			poitnsToDeltas.put(mp.getSource(), new Float(mp.getSource()
+					.getCoordinates()[dim]
+					- mp.getTarget().getCoordinates()[dim]));
 		}
 
 		return poitnsToDeltas;
@@ -219,15 +246,14 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * @see org.geotools.referencing.operation.builder.MathTransformBuilder#computeMathTransform()
 	 */
 	protected MathTransform computeMathTransform() throws FactoryException {
-		warpPositions = getWarpPositions();
+		//warpPositions = getWarpPositions();
 
 		/** Add the last parameter - warp positions * */
-		globalValues.WarpGridParameters.parameter("warpPositions").setValue(
-				warpPositions);
+		gridParameters.setWarpPositions(getWarpPositions());
 
 		/** Use provider and values to get proper transformation * */
 		WarpGridTransform2D wt = (WarpGridTransform2D) (new WarpGridTransform2D.Provider())
-				.createMathTransform(globalValues.getWarpGridParameters());
+				.createMathTransform(gridParameters.getWarpGridParameters());
 
 		wt.setWorldtoGridTransform(this.worldToGrid);
 
@@ -240,7 +266,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 			throw new FactoryException(Errors
 					.format(ErrorKeys.NONINVERTIBLE_TRANSFORM), e);
 		}
-	
+
 		return wt;
 	}
 
@@ -260,7 +286,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 *             when problems in world to grid system occurs
 	 * 
 	 */
-	abstract protected float[] computeWarpGrid(ParameterValueGroup values)
+	abstract protected float[] computeWarpGrid(GridParameters parameters/*ParameterValueGroup values*/)
 			throws TransformException, FactoryException;
 
 	/**
@@ -273,33 +299,32 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * @return
 	 * @throws TransformException
 	 */
-	protected float[] interpolateWarpGrid(ParameterValueGroup WarpParams,
+	protected float[] interpolateWarpGrid(GridParameters gridParams,
 			AbstractInterpolation dxInterp, AbstractInterpolation dyInterp)
 			throws TransformException {
-		float[] warpPositions = (float[]) WarpParams.parameter("warpPositions")
-				.getValue();
+		float[] warpPositions = (float[]) gridParams.getWarpPositions();//.parameter("warpPositions").getValue();
 
-		for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
-			for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
+		for (int i = 0; i <= gridParams.getYNumber(); i++) {
+			for (int j = 0; j <= gridParams.getXNumber(); j++) {
 				DirectPosition2D dp = new DirectPosition2D(
-						WarpParams.parameter("xStart").intValue()
-								+ (j * WarpParams.parameter("xStep").intValue()),
-						WarpParams.parameter("yStart").intValue()
-								+ (i * WarpParams.parameter("yStep").intValue()));
+						gridParams.getXStart()
+								+ (j * gridParams.getXStep()),
+						gridParams.getYStart()
+								+ (i * gridParams.getYStep()));
 
 				double x = -dxInterp.getValue(dp)
-						+ (j * WarpParams.parameter("xStep").intValue())
-						+ WarpParams.parameter("xStart").intValue();
+						+ (j * gridParams.getXStep())
+						+ gridParams.getXStart();
 				double y = -dyInterp.getValue(dp)
-						+ (i * WarpParams.parameter("yStep").intValue())
-						+ WarpParams.parameter("yStart").intValue();
+						+ (i * gridParams.getYStep())
+						+ gridParams.getYStart();
 
-				warpPositions[(i * ((1 + WarpParams.parameter("xNumCells")
-						.intValue()) * 2))
+				warpPositions[(i * ((1 + gridParams.getXNumber()
+						) * 2))
 						+ (2 * j)] = (float) x;
 
-				warpPositions[(i * ((1 + WarpParams.parameter("xNumCells")
-						.intValue()) * 2))
+				warpPositions[(i * ((1 + gridParams.getYNumber()
+						) * 2))
 						+ (2 * j) + 1] = (float) y;
 			}
 		}
@@ -325,7 +350,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	private float[] getWarpPositions() throws FactoryException {
 		if (warpPositions == null) {
 			try {
-				warpPositions = computeWarpGrid(globalValues.WarpGridParameters);
+				warpPositions = computeWarpGrid(gridParameters);
 			} catch (TransformException e) {
 				throw new FactoryException(Errors
 						.format(ErrorKeys.CANT_TRANSFORM_VALID_POINTS), e);
@@ -345,7 +370,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 */
 	public float[][] getDxGrid() throws FactoryException {
 		if ((dxgrid == null) || (dxgrid.length == 0)) {
-			ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+			ParameterValueGroup WarpParams = gridParameters.getWarpGridParameters();
 			final int xNumCells = WarpParams.parameter("xNumCells").intValue();
 			final int yNumCells = WarpParams.parameter("yNumCells").intValue();
 			final int xStep = WarpParams.parameter("xStep").intValue();
@@ -380,7 +405,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 */
 	public float[][] getDyGrid() throws FactoryException {
 		if ((dygrid == null) || (dygrid.length == 0)) {
-			ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+			ParameterValueGroup WarpParams = gridParameters.getWarpGridParameters();
 			final int xNumCells = WarpParams.parameter("xNumCells").intValue();
 			final int yNumCells = WarpParams.parameter("yNumCells").intValue();
 			final int xStep = WarpParams.parameter("xStep").intValue();
@@ -417,7 +442,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 */
 	public File writeDeltaFile(int dim, String path) throws IOException,
 			FactoryException {
-		ParameterValueGroup WarpParams = globalValues.WarpGridParameters;
+		ParameterValueGroup WarpParams = gridParameters.getWarpGridParameters();
 		final float[] warpPositions = (float[]) WarpParams.parameter(
 				"warpPositions").getValue();
 		File file = new File(path);
@@ -504,7 +529,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * 
 	 * return warpPos; }
 	 */
-	
+
 	public WritableRaster getDxRaster() throws FactoryException {
 		float[][] values;
 		values = getDxGrid();
@@ -559,13 +584,12 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		return raster;
 	}
 
-
 	/**
 	 * 
 	 * @return Number of y Grid Cells
 	 */
 	public int getHeight() {
-		return globalValues.getWarpGridParameters().parameter("yNumCells")
+		return gridParameters.getWarpGridParameters().parameter("yNumCells")
 				.intValue();
 	}
 
@@ -579,13 +603,10 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		this.height = height;
 
 		try {
-			this.globalValues = new GridParamValues(envelope, worldToGrid,
+			this.gridParameters = GridParameters.createGridParameters(envelope,
 					this.envelope.getLength(0) / width, this.envelope
 							.getLength(1)
-							/ height);
-		} catch (NoSuchIdentifierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+							/ height, (AffineTransform2D) worldToGrid, true);
 		} catch (TransformException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -601,7 +622,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	 * @return Number of grid cells width
 	 */
 	public int getWidth() {
-		return globalValues.getWarpGridParameters().parameter("xNumCells")
+		return gridParameters.getWarpGridParameters().parameter("xNumCells")
 				.intValue();
 	}
 
@@ -615,13 +636,11 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		this.width = width;
 
 		try {
-			this.globalValues = new GridParamValues(envelope, worldToGrid,
+			this.gridParameters = GridParameters.createGridParameters(envelope, 
 					this.envelope.getLength(0) / width, this.envelope
 							.getLength(1)
-							/ height);
-		} catch (NoSuchIdentifierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+							/ height, (AffineTransform2D) worldToGrid, true);
+		
 		} catch (TransformException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -643,7 +662,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 	public MathTransform getWorldToGrid() {
 		MathTransform mt = null;
 
-		mt = this.globalValues.getGridToCRS();
+		mt = worldToGrid;//this.gridValues.getGridToCRS();
 
 		return mt;
 	}
@@ -660,7 +679,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		this.warpPositions = null;
 		this.dxgrid = null;
 		this.dygrid = null;
-		this.localpositions = null;
+		//this.localpositions = null;
 	}
 
 	public void setMappedPositions(List<MappedPosition> positions)
@@ -672,13 +691,8 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		super.setMappedPositions(positions);
 	}
 
-	/**
-	 * Takes care about parameters
-	 * 
-	 * @author jezekjan
-	 * 
-	 */
-	private static class GridParamValues {
+	/*
+	private static class GGridParamValues {
 		private ParameterValueGroup WarpGridParameters;
 
 		private MathTransform trans;
@@ -696,13 +710,13 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		 *            y step
 		 * @throws TransformException
 		 */
-		public GridParamValues(Envelope env, MathTransform trans, double dx,
+	/*	public GGridParamValues(Envelope env, MathTransform trans, double dx,
 				double dy) throws TransformException, NoSuchIdentifierException {
 			Envelope dxdy = new Envelope2D(env.getCoordinateReferenceSystem(),
 					env.getMinimum(0), env.getMinimum(1), dx, dy);
 
 			/* Transforms dx, dy and envelope to grid system */
-			dxdy = CRS.transform(trans, dxdy);
+	/*		dxdy = CRS.transform(trans, dxdy);
 
 			Envelope gridEnv = CRS.transform(trans, env);
 
@@ -735,7 +749,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 									.intValue() + 1)]);
 
 			this.trans = calculateWorldToGrid(WarpGridParameters, gridEnv, env,
-					(AffineTransform2D) trans);
+					(MathTransform) trans);// (AffineTransform2D) trans);
 		}
 
 		/**
@@ -748,8 +762,8 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		 * @param trans
 		 * @return
 		 */
-		private MathTransform calculateWorldToGrid(ParameterValueGroup params,
-				Envelope gridenv, Envelope wenv, AffineTransform2D trans) {
+	/*	private MathTransform calculateWorldToGrid(ParameterValueGroup params,
+				Envelope gridenv, Envelope wenv, MathTransform trans) {
 			GeneralMatrix M = new GeneralMatrix(3, 3);
 			// double xScale =gridenv.getLength(0)/
 			// (WarpGridParameters.parameter("xNumCells").intValue());
@@ -799,7 +813,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		 * @param warpPos
 		 *            array of grid warp positions
 		 */
-		public void setWarpGridPositions(float[] warpPos) {
+	/*	public void setWarpGridPositions(float[] warpPos) {
 			WarpGridParameters.parameter("warpPositions").setValue(warpPos);
 		}
 
@@ -808,13 +822,13 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 		 * 
 		 * @return warp grid positions
 		 */
-		public ParameterValueGroup getWarpGridParameters() {
+	/*	public ParameterValueGroup getWarpGridParameters() {
 			return WarpGridParameters;
 		}
 
 		public MathTransform getGridToCRS() {
 			return trans;
 		}
-	}
+	}*/
 
 }

@@ -1,0 +1,146 @@
+package org.geotools.referencing.operation.builder;
+
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.referencing.operation.transform.WarpGridTransform2D;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.TransformException;
+
+/**
+ * @author jezekjan
+ * 
+ */
+
+class GridParameters {
+
+	final private double xStep;
+	final private double yStep;
+	final private double xStart;
+	final private double yStart;
+	final private int xNumber;
+	final private int yNumber;
+	
+	//final private AffineTransform2D trans;
+	private float[] warpPositions;
+
+	/**
+	 * 
+	 */
+
+	private GridParameters(double xstep, double ystep, double xstart,
+			double ystart, int xnumber, int ynumber) {
+		super();
+		xStep = xstep;
+		yStep = ystep;
+		xStart = xstart;
+		yStart = ystart;
+		xNumber = xnumber; 
+		yNumber = ynumber; 		
+		
+		
+		warpPositions = new float[2 * (xnumber + 1) * (ynumber + 1)];
+
+	}
+
+	private GridParameters(int xstep, int ystep, int xstart, int ystart,
+			int xnumber, int ynumber) {
+		super();
+		xStep = xstep;
+		yStep = ystep;
+		xStart = xstart;
+		yStart = ystart;
+		xNumber = xnumber;
+		yNumber = ynumber;
+		
+		warpPositions = new float[2 * (xnumber + 1) * (ynumber + 1)];
+
+	}
+
+	public static GridParameters createGridParameters(Envelope env, double dx,
+			double dy, AffineTransform2D trans, boolean isInteger)
+			throws TransformException {
+
+		if (isInteger) {
+			GeneralEnvelope transEnv = CRS.transform(trans, env);
+
+			int iDx = (new Double(Math.round(dx * trans.getScaleX())))
+					.intValue();
+			int iDy = (new Double(Math.round(dy * trans.getScaleY())))
+					.intValue();
+			int xNum = (new Double(Math.ceil(transEnv.getLength(0) / iDx)))
+					.intValue();
+			int yNum = (new Double(Math.ceil(transEnv.getLength(0) / iDy)))
+					.intValue();
+			int xMin = (new Double(Math.round(transEnv.getMinimum(0)))
+					.intValue());
+			int yMin = (new Double(Math.round(transEnv.getMinimum(0)))
+					.intValue());
+
+			return new GridParameters(iDx, iDy, xMin, yMin, xNum, yNum);
+		} else {
+			
+			int xNum = (new Double(Math.ceil(env.getLength(0) / dx)))
+					.intValue();
+			int yNum = (new Double(Math.ceil(env.getLength(1) / dy)))
+					.intValue();
+
+			return new GridParameters(dx, dy, env.getMinimum(0), env
+					.getMinimum(1), xNum, yNum);
+		}
+	}
+
+	/*
+	 * private static GridParameters createInstance(double xstep, double ystep,
+	 * double xstart, double ystart, int xnumber, int ynumber){ return new
+	 * GridParameters(xstep, ystep, xstart, ystart, xnumber, ynumber) ; }
+	 */
+	public double getXStep() {
+		return xStep;
+	}
+
+	public double getYStep() {
+		return yStep;
+	}
+
+	public double getXStart() {
+		return xStart;
+	}
+
+	public double getYStart() {
+		return yStart;
+	}
+
+	public int getXNumber() {
+		return xNumber;
+	}
+
+	public int getYNumber() {
+		return yNumber;
+	}
+	
+	public void setWarpPositions(float[] positions) {
+		this.warpPositions = positions;
+	}
+	public float[] getWarpPositions() {
+		return warpPositions;
+	}
+	
+	public ParameterValueGroup getWarpGridParameters() {
+		ParameterValueGroup WarpGridParameters = new ParameterGroup(
+				WarpGridTransform2D.Provider.PARAMETERS);
+		WarpGridParameters.parameter("xStart").setValue(new Double(this.xStart).intValue());
+		WarpGridParameters.parameter("yStart").setValue(new Double(this.yStart).intValue());				
+		WarpGridParameters.parameter("xStep").setValue(new Double(this.xStep).intValue());				
+		WarpGridParameters.parameter("yStep").setValue(new Double(this.yStep).intValue());				
+		WarpGridParameters.parameter("xNumCells").setValue(new Double(xNumber).intValue());	
+		WarpGridParameters.parameter("yNumCells").setValue(new Double(yNumber).intValue());				
+
+		WarpGridParameters.parameter("warpPositions").setValue(warpPositions);
+				
+		return WarpGridParameters;
+	}
+
+}

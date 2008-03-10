@@ -2,8 +2,7 @@ package org.geotools.referencing.operation.builder;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import junit.framework.Assert;
 import junit.framework.Test;
@@ -19,7 +18,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.builder.algorithm.TPSInterpolation;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class InterpolationTest extends TestCase {
@@ -65,11 +63,11 @@ public class InterpolationTest extends TestCase {
 
     	
     	// Define at each point the values to be interpolated; we do this in a HashMap
-    	HashMap<DirectPosition, Double> pointsAndValues = new HashMap();
-    	pointsAndValues.put(a,  new Double(6.5456));
-    	pointsAndValues.put(b,  new Double(1.541906));
-    	pointsAndValues.put(c,  new Double(-9.54456));
-    	pointsAndValues.put(d,  new Double(7.2345));
+    	Map<DirectPosition, Float> pointsAndValues = new HashMap();
+    	pointsAndValues.put(a,  new Float(6.5456));
+    	pointsAndValues.put(b,  new Float(1.541906));
+    	pointsAndValues.put(c,  new Float(-9.54456));
+    	pointsAndValues.put(d,  new Float(7.2345));
 
 
     	//now we can construct the Interpolation Object

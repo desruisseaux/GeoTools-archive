@@ -18,9 +18,11 @@ package org.geotools.referencing.operation.builder.algorithm;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
-import org.geotools.referencing.operation.matrix.GeneralMatrix;
 
 /**
  * Implementation of TPS Interpolation based on thin plate spline (TPS) algorithm
@@ -83,7 +85,7 @@ public class TPSInterpolation extends AbstractInterpolation {
         result.mul(L, V);
     }*/ 
     
-   public TPSInterpolation(HashMap/*<DirectPosition, float>*/ positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
+   public TPSInterpolation(Map<DirectPosition, Float> positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
        super(positions, xNumOfCells, yNumOfCells, envelope);
 
     L = new GeneralMatrix(number + 3, number + 3);
@@ -216,11 +218,10 @@ public class TPSInterpolation extends AbstractInterpolation {
     private GeneralMatrix fillVMatrix(int dim) {
         V = new GeneralMatrix(number + 3, 1);
 
-        Iterator iter = getPositions().keySet().iterator();
+        Iterator<DirectPosition> iter = getPositions().keySet().iterator();
 
-        for (int i = 0; i < number; i++) {
-            //DirectPostio mp = ((MappedPosition) getGridMappedPositions().get(i));           
-            V.setElement(i, 0, (Double) getPositions().get(iter.next()));
+        for (int i = 0; i < number; i++) {           
+            V.setElement(i, 0, getPositions().get(iter.next()));
         }
 
         V.setElement(V.getNumRow() - 3, 0, 0);

@@ -354,7 +354,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         		Integer.class, null, null);
 
         /** Descriptor for the warpPositions parameter value. This the target coordinates of weach cell (not deltas) */
-        public static final ParameterDescriptor WARP_POSITIONS = new DefaultParameterDescriptor("warpPositions",
+        public static final ParameterDescriptor<float[]> WARP_POSITIONS = new DefaultParameterDescriptor("warpPositions",
                 float[].class, null, null);
 
         /**

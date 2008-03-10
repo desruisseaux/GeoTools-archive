@@ -55,7 +55,7 @@ public class RSGridBuilder extends WarpGridBuilder {
      * @throws MismatchedReferenceSystemException
      * @throws TransformException
      */
-    public RSGridBuilder(List vectors, double dx, double dy, Envelope envelope,
+    public RSGridBuilder(List<MappedPosition> vectors, double dx, double dy, Envelope envelope,
         MathTransform realToGrid)
         throws MismatchedSizeException, MismatchedDimensionException, NoSuchIdentifierException,
             MismatchedReferenceSystemException, TransformException, TriangulationException {
@@ -77,7 +77,7 @@ public class RSGridBuilder extends WarpGridBuilder {
         DirectPosition p3 = new DirectPosition2D(
                 p2.getOrdinate(0), p0.getOrdinate(1));
         
-        List gridMP = super.getGridMappedPositions();
+        List<MappedPosition> gridMP = super.getGridMappedPositions();
         CoordinateReferenceSystem crs = ((MappedPosition)gridMP.get(0)).getSource().getCoordinateReferenceSystem();
         p0 = new DirectPosition2D(crs, p0.getOrdinate(0), p0.getOrdinate(1));
         p1 = new DirectPosition2D(crs, p1.getOrdinate(0), p1.getOrdinate(1));
@@ -98,19 +98,19 @@ public class RSGridBuilder extends WarpGridBuilder {
      * @param values general values of grid
      * @return generated grid
      */
-    private float[] generateSourcePoints(ParameterValueGroup values) {
-        float[] sourcePoints = ((float[]) values.parameter("warpPositions").getValue());
+    private float[] generateSourcePoints(GridParameters gridParams) {
+        float[] sourcePoints = ((float[]) gridParams.getWarpPositions());//values.parameter("warpPositions").getValue());
 
-        for (int i = 0; i <= values.parameter("yNumCells").intValue(); i++) {
-            for (int j = 0; j <= values.parameter("xNumCells").intValue(); j++) {
-                float x = (j * values.parameter("xStep").intValue())
-                    + values.parameter("xStart").intValue();
-                float y = (i * values.parameter("yStep").intValue())
-                    + values.parameter("yStart").intValue();
+        for (int i = 0; i <= gridParams.getYNumber(); i++) {
+            for (int j = 0; j <= gridParams.getXNumber(); j++) {
+                float x = new Double((j * gridParams.getXStep())
+                    + gridParams.getXStart()).floatValue();
+                float y = new Double((i * gridParams.getYStep())
+                    + gridParams.getYStart()).floatValue();
 
-                sourcePoints[(i * ((1 + values.parameter("xNumCells").intValue()) * 2)) + (2 * j)] = (float) x;
+                sourcePoints[(i * ((1 + gridParams.getXNumber()) * 2)) + (2 * j)] = (float) x;
 
-                sourcePoints[(i * ((1 + values.parameter("xNumCells").intValue()) * 2)) + (2 * j)
+                sourcePoints[(i * ((1 + gridParams.getXNumber()) * 2)) + (2 * j)
                 + 1] = (float) y;
             }
         }
@@ -122,8 +122,8 @@ public class RSGridBuilder extends WarpGridBuilder {
      * Computes target grid.
      * @return computed target grid.
      */
-    protected float[] computeWarpGrid(ParameterValueGroup values) throws FactoryException {
-        float[] source = generateSourcePoints(values);
+    protected float[] computeWarpGrid(GridParameters gridParams) throws FactoryException {
+        float[] source = generateSourcePoints(gridParams);
 
       
       try {

@@ -41,7 +41,7 @@ public class IDWInterpolation extends AbstractInterpolation {
      * @param dy Value of step in y direction between generated cells
      * @param envelope Envelope that should be filled by generated grid
      */
-    public IDWInterpolation(HashMap/*<DirectPosition, float>*/ positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
+    public IDWInterpolation(HashMap<DirectPosition, Float> positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
         super(positions, xNumOfCells, yNumOfCells, envelope);
     }
 
@@ -135,7 +135,7 @@ public class IDWInterpolation extends AbstractInterpolation {
             double distance = ((Double) nearest.get(dp)).doubleValue();
             double weight = (1 / Math.pow(distance, 2));
 
-            sumdValue = sumdValue + (float) ((Double) (this.getPositions().get(dp)) * weight);
+            sumdValue = sumdValue + (float) ( (this.getPositions().get(dp)) * weight);
 
             sumweight = sumweight + weight;
         }

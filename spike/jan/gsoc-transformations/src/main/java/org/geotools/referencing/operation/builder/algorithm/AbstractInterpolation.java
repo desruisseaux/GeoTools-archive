@@ -40,7 +40,7 @@ import org.opengis.referencing.operation.TransformException;
 public abstract class AbstractInterpolation {
 	
 	/** Known values at positions*/
-    private final Map /*<DirectPosition, float>*/ positions;
+    private final Map<DirectPosition, Float> positions;
     
     /** Grid spacing in x */    
     private double dx;
@@ -70,7 +70,7 @@ public abstract class AbstractInterpolation {
      *
      * @param positions keys - point (DirectPosition), values - point values
      */
-    public AbstractInterpolation(Map /*<DirectPosition, float>*/ positions) {
+    public AbstractInterpolation(Map <DirectPosition, Float> positions) {
         this.positions = positions;
         this.dx = 0;
         this.dy = 0;
@@ -80,7 +80,7 @@ public abstract class AbstractInterpolation {
         this.yNumCells = 0;
     }
 
-    public AbstractInterpolation(Map /*<DirectPosition, float>*/ positions, int xNumOfCells,
+    public AbstractInterpolation(Map <DirectPosition, Float> positions, int xNumOfCells,
         int yNumOfCells, Envelope env) {
         this.positions = positions;
         this.xNumCells = xNumOfCells;
@@ -244,7 +244,7 @@ public abstract class AbstractInterpolation {
         return yNumCells;
     }
 
-    public Map getPositions() {
+    public Map<DirectPosition, Float> getPositions() {
         return positions;
     }
 }

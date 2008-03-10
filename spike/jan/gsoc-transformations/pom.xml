@@ -15,7 +15,7 @@
   <groupId>org.geotools.transformations</groupId>
   <artifactId>gsoc-transformations</artifactId>
   <packaging>jar</packaging>
-  <version>mvn.0-SNAPSHOT</version>
+  <version>SNAPSHOT</version>
   <name>gsoc-transformations</name>
   <url>http://maven.apache.org</url>
 
