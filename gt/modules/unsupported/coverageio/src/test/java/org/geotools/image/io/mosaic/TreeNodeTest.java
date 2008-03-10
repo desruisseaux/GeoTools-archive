@@ -61,7 +61,7 @@ public class TreeNodeTest extends TestBase {
         assertEquals(root, root);
         assertTrue (root.containsAll(manager.getTiles()));
         assertFalse(root.containsAll(Arrays.asList(sourceTiles)));
-        assertTrue (RTree.dense(root, root));
+        assertTrue (((GridNode) root).isDense(root));
         final Rectangle bounds = new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2);
         final Rectangle roi = new Rectangle();
         final Random random = new Random(4353223575290515986L);

@@ -18,6 +18,7 @@ package org.geotools.image.io.mosaic;
 
 import java.util.Map;
 import java.awt.Rectangle;
+import org.geotools.resources.OptionalDependencies;
 
 
 /**
@@ -36,16 +37,12 @@ final class SelectedNode extends TreeNode {
     protected long cost;
 
     /**
-     * Creates a new node for the given tile.
+     * Creates a new node for the given region.
      *
-     * @param tile The tile to wrap.
      * @param readRegion The region to be read.
-     * @param cost An estimation of the cost of reading the given region of the given tile.
      */
-    SelectedNode(final Tile tile, final Rectangle readRegion, final int cost) {
+    SelectedNode(final Rectangle readRegion) {
         super(readRegion);
-        this.tile = tile;
-        this.cost = cost;
         assert !isEmpty();
     }
 
@@ -70,10 +67,10 @@ final class SelectedNode extends TreeNode {
     }
 
     /**
-     * Set the children to the given array. A null value remove all children.
+     * Removes all children.
      */
     @Override
-    public void setChildren(final TreeNode[] children) {
+    public void removeChildren() {
         final long removed = childrenCost();
         if (removed != 0) {
             SelectedNode parent = this;
@@ -81,7 +78,7 @@ final class SelectedNode extends TreeNode {
                 parent.cost -= removed;
             } while ((parent = (SelectedNode) parent.getParent()) != null);
         }
-        super.setChildren(children);
+        super.removeChildren();
     }
 
     /**
@@ -147,7 +144,6 @@ final class SelectedNode extends TreeNode {
                  * is a children of this node. In the later case, we can't remove completly this
                  * node since it would remove its children as well, so we just nullify the tile.
                  */
-                overlaps.put(existing, existing);
                 if (existing.getParent() == this) {
                     if (tile != null) {
                         tile = null;
@@ -155,34 +151,44 @@ final class SelectedNode extends TreeNode {
                     }
                     return;
                 }
+                overlaps.put(existing, existing);
                 existing = this;
             }
             existing.remove();
             existing.removeFrom(overlaps);
+            assert overlaps.get(existing) != existing;
         }
     }
 
     /**
-     * Removes this node and all its children from the given map.
+     * Removes all children from the given map. Note that we do not removes this node directly
+     * because the corresponding Map.Entry is presumed already used by an other node.
      */
     private void removeFrom(final Map<Rectangle,SelectedNode> overlaps) {
-        final SelectedNode existing = overlaps.remove(this);
-        if (existing != this) {
-            overlaps.put(existing, existing);
-        }
         for (final TreeNode child : this) {
-            ((SelectedNode) child).removeFrom(overlaps);
+            final SelectedNode node = (SelectedNode) child;
+            node.removeFrom(overlaps);
+            final SelectedNode existing = overlaps.remove(node);
+            if (existing != null && existing != node) {
+                overlaps.put(existing, existing);
+            }
         }
     }
 
     /**
-     * Invoked in assertion for checking the validity of the whole tree.
+     * Invoked in assertion for checking the validity of the whole tree. Returns a string
+     * representation of this selection as a tree. We do not override {@link #toString}
+     * because the later is used for formatting the nodes in the tree.
      */
     @Override
-    int checkValidity() {
+    String checkValidity() {
         if (childrenCost() > cost) {
             throw new AssertionError(this);
         }
-        return super.checkValidity();
+        String message = super.checkValidity();
+        if (isRoot()) {
+            message = OptionalDependencies.toString(this);
+        }
+        return message;
     }
 }

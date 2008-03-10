@@ -976,7 +976,7 @@ public class Tile implements Comparable<Tile>, Serializable {
         count -= count / (subsampling.width * subsampling.height);
         count += (region.height - toRead.height) * region.width;
         count += (region.width  - toRead.width)  * toRead.height; // Really 'toRead', not 'region'
-        assert count >= 0 && count <= toRead.width * toRead.height : count;
+        assert count >= 0 && count <= width * height : count;
         return count;
     }
 

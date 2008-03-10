@@ -96,12 +96,6 @@ final class RTree {
     private final Dimension tmpSubsampling;
 
     /**
-     * A modified value of the region to read.
-     * This is a temporary value modified during searchs.
-     */
-    private final Rectangle tmpReadRegion;
-
-    /**
      * The subsampling done so far. This is used during
      * search and emptied once the search is finished.
      */
@@ -132,7 +126,6 @@ final class RTree {
     public RTree(final TreeNode root) {
         this.root = root;
         tmpSubsampling   = new Dimension();
-        tmpReadRegion    = new Rectangle();
         subsamplingDone  = new HashSet<Dimension>();
         subsamplingToTry = new LinkedList<Dimension>();
         distinctBounds   = new HashMap<Rectangle,SelectedNode>();
@@ -232,7 +225,7 @@ final class RTree {
          */
         final List<Tile> tiles = new ArrayList<Tile>(distinctBounds.size());
         if (bestCandidate != null) {
-            assert bestCandidate.checkValidity() >= 0 : bestCandidate;
+            assert bestCandidate.checkValidity() != null : bestCandidate;
             bestCandidate.getTiles(tiles);
             if (LOGGER.isLoggable(LEVEL)) {
                 final String lineSeparator = System.getProperty("line.separator", "\n");
@@ -293,10 +286,10 @@ final class RTree {
                  * Computes the cost that reading this tile would have.
                  */
                 final Rectangle readRegion = node.intersection(regionOfInterest);
-                tmpReadRegion.setBounds(readRegion);
+                selected = new SelectedNode(readRegion);
+                selected.tile = tile;
                 tmpSubsampling.setSize(subsampling);
-                final int cost = tile.countUnwantedPixelsFromAbsolute(tmpReadRegion, tmpSubsampling);
-                selected = new SelectedNode(tile, readRegion, cost);
+                selected.cost = tile.countUnwantedPixelsFromAbsolute(readRegion, tmpSubsampling);
             }
         }
         /*
@@ -305,12 +298,18 @@ final class RTree {
          */
         if (!node.isLeaf()) {
             if (selected == null) {
-                selected = new SelectedNode(null, node.intersection(regionOfInterest), 0);
+                selected = new SelectedNode(node.intersection(regionOfInterest));
                 for (final TreeNode child : node) {
                     selected.addChild(addTileCandidate(child));
                 }
                 if (selected.isLeaf()) {
-                    return null;
+                    selected = null;
+                } else {
+                    final TreeNode child = selected.getChild();
+                    if (child != null && child.equals(selected)) {
+                        selected.removeChildren();
+                        selected = (SelectedNode) child;
+                    }
                 }
             } else {
                 /*
@@ -318,6 +317,8 @@ final class RTree {
                  * may be cheaper) and if the children subsampling are not higher than the tile's one
                  * (they are usually not), then there is no need to continue down the tree since the
                  * childs can not do better than this node.
+                 *
+                 * TODO: Checks if the children fill completly the bounds (i.e. are "dense").
                  */
                 if (selected.equals(node) && !tile.isFinerThan(subsampling)) {
                     return selected;
@@ -327,7 +328,7 @@ final class RTree {
                     selected.addChild(addTileCandidate(child));
                 }
                 if (selected.cost - cost >= cost) {
-                    selected.setChildren(null);
+                    selected.removeChildren();
                 } else {
                     selected.tile = null;
                     selected.cost -= cost;
@@ -338,23 +339,10 @@ final class RTree {
     }
 
     /**
-     * Returns {@code true} if the rectangles in the given collection fill completly the given
-     * ROI with no empty space.
-     *
-     * @todo This method is not yet correctly implemented. For now we performs a naive check
-     *       which is suffisient for common {@link TileLayout}. We may need to revisit this
-     *       method in a future version.
+     * Returns a string representation of this tree, including children.
      */
-    static boolean dense(final Rectangle roi, final Iterable<? extends Rectangle> regions) {
-        Rectangle bounds = null;
-        for (final Rectangle rect : regions) {
-            final Rectangle inter = roi.intersection(rect);
-            if (bounds == null) {
-                bounds = inter;
-            } else {
-                bounds.add(inter); // See java.awt.Rectangle javadoc for empty rectangle handling.
-            }
-        }
-        return bounds == null || bounds.equals(roi);
+    @Override
+    public String toString() {
+        return OptionalDependencies.toString(root);
     }
 }

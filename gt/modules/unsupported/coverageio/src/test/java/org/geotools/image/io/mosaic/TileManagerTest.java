@@ -154,4 +154,28 @@ public class TileManagerTest extends TestBase {
 
         assertEquals(4733, total);
     }
+
+    /**
+     * Tests a few specific regions. They are region that were known to be have issues at
+     * some point in the development process of the mosaic package. They should now be fixed.
+     */
+    public void testSpecific() throws IOException {
+        regionOfInterest.x      = 31375;
+        regionOfInterest.y      =  8488;
+        regionOfInterest.width  = 16708;
+        regionOfInterest.height =  3812;
+        subsampling.width       =    23;
+        subsampling.height      =    23;
+        searchTiles(new Dimension(15,15));
+        assertEquals(2, tiles.size());
+
+        regionOfInterest.x      = 80898;
+        regionOfInterest.y      = 21411;
+        regionOfInterest.width  =  4792;
+        regionOfInterest.height =  3190;
+        subsampling.width       =     6;
+        subsampling.height      =     6;
+        searchTiles(new Dimension(3,3));
+        assertEquals(4, tiles.size());
+    }
 }

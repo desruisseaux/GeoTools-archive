@@ -112,9 +112,9 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
-     * Set the children to the given array. A null value remove all children.
+     * Removes all children.
      */
-    public void setChildren(final TreeNode[] children) {
+    public void removeChildren() {
         TreeNode child = firstChildren;
         while (child != null) {
             assert child.parent == this;
@@ -125,11 +125,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
             child = next;
         }
         firstChildren = lastChildren = null;
-        if (children != null) {
-            for (TreeNode newChild : children) {
-                addChild(newChild);
-            }
-        }
     }
 
     /**
@@ -189,7 +184,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * Returns {@code true} if this node has no parent. Note that having no parent
      * implies having no sibling neither (otherwise the tree would be malformed).
      */
-    private boolean isRoot() {
+    public final boolean isRoot() {
         return parent == null && previousSibling == null && nextSibling == null;
     }
 
@@ -209,6 +204,13 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      */
     public final boolean getAllowsChildren() {
         return !super.isEmpty();
+    }
+
+    /**
+     * If this node has exactly one child, returns that child. Otherwise returns {@code null}.
+     */
+    public final TreeNode getChild() {
+        return (firstChildren == lastChildren) ? firstChildren : null;
     }
 
     /**
@@ -546,10 +548,11 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
      * invoked in an {@code assert} statement, so we do not want to repeat the assertion status
      * check in every line of this method.
      *
-     * @return The total number of nodes.
+     * @return A string representation of the state of this tree. Default implementation returns an
+     *         empty string, but subclasses may override this method with more detailled message.
+     *         This string is not used directly by this class, but we provide it as a useful
      */
-    int checkValidity() {
-        int count = 1;
+    String checkValidity() {
         TreeNode child = firstChildren;
         if (child != null) {
             if (child.previousSibling != null) {
@@ -565,7 +568,7 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
                 if (getIndex(child) != index) {
                     throw new AssertionError(child);
                 }
-                count += child.checkValidity();
+                child.checkValidity();
                 final TreeNode next = child.nextSibling;
                 if (next == null) {
                     break;
@@ -596,6 +599,6 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
                 throw new AssertionError(this);
             }
         }
-        return count;
+        return "";
     }
 }
