@@ -57,9 +57,11 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -86,6 +88,7 @@ import org.opengis.referencing.operation.TransformException;
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
     
+
 	/** The {@link Logger} for this {@link AbstractGridCoverage2DReader}. */
 	private final static Logger LOGGER = Logging
 			.getLogger("org.geotools.data.coverage.grid");
@@ -880,4 +883,14 @@ public abstract class AbstractGridCoverage2DReader implements
 //       info.setTitle( subname );
 //       return info;
 //   }
+   
+   /**
+	 * Forcing disposal of this {@link AbstractGridCoverage2DReader} which may
+	 * keep an {@link ImageInputStream} open.
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		dispose();
+		super.finalize();
+	}
 }

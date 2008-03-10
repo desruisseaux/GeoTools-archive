@@ -25,7 +25,10 @@ import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
 
 /**
  * An {@link AbstractGridCoverageWriter} is the base class for all
@@ -115,6 +118,17 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	public void setMetadataValue(String name, String value) throws IOException,
 			MetadataNameNotFoundException {
 		throw new UnsupportedOperationException("Unsupported method");
+	}
+
+
+	/**
+	 * Forcing the disposal of this {@link AbstractGridCoverageWriter} which may
+	 * keep a reference to an open {@link ImageOutputStream}
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
 	}
 
 
