@@ -56,9 +56,7 @@ public final class ECWFormatFactory implements GridFormatFactorySpi {
 
 			Class
 					.forName("it.geosolutions.imageio.plugins.ecw.ECWImageReaderSpi");
-			available = ECWImageReaderSpi.isAvailable();
-			final ECWImageReaderSpi spi = new ECWImageReaderSpi();
-			available = available && spi.isDriverAvailable();
+			available = new ECWImageReaderSpi().isAvailable();
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("ECWFormatFactory is availaible.");
 		} catch (ClassNotFoundException cnf) {

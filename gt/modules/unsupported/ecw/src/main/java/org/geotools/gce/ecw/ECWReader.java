@@ -346,15 +346,21 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Close the {@code InStream} {@code ImageInputStream} if we open it up on
-	 * purpose toread header info for this {@link AbstractGridCoverage2DReader}.
-	 * If the stream cannot be closed, we just reset and mark it.
+	 * Close the {@code InStream} {@code ImageInputStream} if if we open it up
+	 * on purpose toread header info for this
+	 * {@link AbstractGridCoverage2DReader}. If the stream cannot be closed, we
+	 * just reset and mark it.
 	 * 
 	 * @throws IOException
 	 */
 	private void finalStreamPreparation() throws IOException {
 		if (closeMe)
-			inStream.close();
+			try {
+				inStream.close();
+			} catch (Throwable e) {
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+			}
 		else {
 			inStream.reset();
 			inStream.mark();
@@ -746,8 +752,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 		{
 			final ImageReader reader = readerSPI.createReaderInstance();
 			reader.setInput(input,true,true);
-			reader.read(imageChoice,readP);
-			ecwCoverage=PlanarImage.wrapRenderedImage(reader.read(imageChoice));
+			ecwCoverage=PlanarImage.wrapRenderedImage(reader.read(imageChoice,readP));
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
