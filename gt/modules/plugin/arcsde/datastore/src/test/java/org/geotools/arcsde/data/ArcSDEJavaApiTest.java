@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
@@ -43,11 +44,14 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
+import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeShapeFilter;
 import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
+import com.esri.sde.sdk.client.SeVersion;
 
 /**
  * Exercises the ArcSDE Java API to ensure our assumptions are correct.
@@ -260,6 +264,40 @@ public class ArcSDEJavaApiTest extends TestCase {
     }
 
     /**
+     * 
+     * @param whereClause
+     *            where clause, may be null
+     * @param spatFilters
+     *            spatial filters, may be null
+     * @return the sde calculated counts for the given filter
+     * @throws Exception
+     */
+    private int getTempTableCount(final String whereClause, final SeFilter[] spatFilters)
+            throws Exception {
+        String typeName = testData.getTemp_table();
+        String[] columns = { "INT32_COL" };
+
+        SeSqlConstruct sql = new SeSqlConstruct(typeName);
+        if (whereClause != null) {
+            sql.setWhere(whereClause);
+        }
+        SeQuery query = new SeQuery(conn, columns, sql);
+        SeQueryInfo qInfo = new SeQueryInfo();
+        qInfo.setConstruct(sql);
+
+        if (spatFilters != null) {
+            query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatFilters);
+        }
+
+        SeTable.SeTableStats tableStats = query.calculateTableStatistics("INT32_COL",
+                SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+
+        int actualCount = tableStats.getCount();
+        query.close();
+        return actualCount;
+    }
+
+    /**
      * DOCUMENT ME!
      * 
      * @throws Exception
@@ -270,18 +308,10 @@ public class ArcSDEJavaApiTest extends TestCase {
             String typeName = testData.getTemp_table();
             String where = "INT32_COL < 5";
             int expCount = 4;
+            int actualCount;
 
-            String[] columns = { "INT32_COL" };
-            SeSqlConstruct sql = new SeSqlConstruct(typeName, where);
-            SeQuery query = new SeQuery(conn, columns, sql);
-            SeQueryInfo qInfo = new SeQueryInfo();
-            qInfo.setConstruct(sql);
-
-            SeTable.SeTableStats tableStats = query.calculateTableStatistics("INT32_COL",
-                    SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
-
-            assertEquals(expCount, tableStats.getCount());
-            query.close();
+            actualCount = getTempTableCount(where, null);
+            assertEquals(expCount, actualCount);
 
             // add a bounding box filter and verify both spatial and non spatial
             // constraints affects the COUNT statistics
@@ -291,21 +321,15 @@ public class ArcSDEJavaApiTest extends TestCase {
             SeShape filterShape = new SeShape(layer.getCoordRef());
             filterShape.generateRectangle(extent);
 
-            query = new SeQuery(conn, columns, sql);
-
             SeShapeFilter bboxFilter = new SeShapeFilter(typeName, layer.getSpatialColumn(),
                     filterShape, SeFilter.METHOD_ENVP, true);
             SeFilter[] spatFilters = { bboxFilter };
 
-            query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatFilters);
-
             expCount = 1;
-            tableStats = query.calculateTableStatistics("INT32_COL",
-                    SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
 
-            int resultCount = tableStats.getCount();
+            actualCount = getTempTableCount(where, spatFilters);
 
-            assertEquals(expCount, resultCount);
+            assertEquals(expCount, actualCount);
         } catch (SeException e) {
             LOGGER.warning(e.getSeError().getErrDesc());
             e.printStackTrace();
@@ -715,8 +739,8 @@ public class ArcSDEJavaApiTest extends TestCase {
             UnavailableArcSDEConnectionException {
         final SeLayer layer = new SeLayer(conn);
         /*
-         * Create a qualified table name with current user's name and the
-         * name of the table to be created, "EXAMPLE".
+         * Create a qualified table name with current user's name and the name
+         * of the table to be created, "EXAMPLE".
          */
         final String tableName = (conn.getUser() + ".NOTENDSWITHGEOM");
         final SeTable table = new SeTable(conn, tableName);
@@ -815,9 +839,10 @@ public class ArcSDEJavaApiTest extends TestCase {
             table.addColumn(colDefs[4]);
             table.addColumn(colDefs[5]);
             table.addColumn(colDefs[6]);
-        //} catch (SeException e) {
-        //    LOGGER.throwing(this.getClass().getName(), "testCreateNonStandardSchema", e);
-        //    throw e;
+            // } catch (SeException e) {
+            // LOGGER.throwing(this.getClass().getName(),
+            // "testCreateNonStandardSchema", e);
+            // throw e;
         } finally {
             try {
                 table.delete();
@@ -875,7 +900,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         final ArcSDEPooledConnection transConn;
 
         final SeTable tempTable = testData.getTempTable();
-        //final SeLayer tempLayer = testData.getTempLayer();
+        // final SeLayer tempLayer = testData.getTempLayer();
 
         testData.truncateTempTable();
 
@@ -937,5 +962,155 @@ public class ArcSDEJavaApiTest extends TestCase {
             transConn.close();
             // conn.close(); closed at tearDown
         }
+    }
+
+    /**
+     * Creates a versioned table with two versions, the default one and another
+     * one, makes edits over the default one, checks states are consistent in
+     * both
+     * 
+     * @throws Exception
+     */
+    public void testEditVersionedTable_DefaultVersion() throws Exception {
+        final SeTable versionedTable = createVersionedTable();
+
+        // create a new version
+        SeVersion defaultVersion;
+        SeVersion newVersion;
+        {
+            defaultVersion = new SeVersion(conn, SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+            defaultVersion.getInfo();
+
+            newVersion = new SeVersion(conn, SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+            // newVersion.getInfo();
+            newVersion.setName(conn.getUser() + ".GeoToolsTestVersion");
+            newVersion.setParentName(defaultVersion.getName());
+            newVersion.setDescription(defaultVersion.getName()
+                    + " child for GeoTools ArcSDE unit tests");
+            // do not require ArcSDE to create a unique name if the required
+            // version already exists
+            boolean uniqueName = false;
+            try {
+                newVersion.create(uniqueName, newVersion);
+            } catch (SeException e) {
+                int sdeError = e.getSeError().getSdeError();
+                if (sdeError != -177) {
+                    throw e;
+                }
+                // "VERSION ALREADY EXISTS", ignore and continue..
+                newVersion.getInfo();
+            }
+        }
+
+        // edit default version
+        SeState defVersionState = new SeState(conn, defaultVersion.getStateId());
+        // create a new state as a child of the current one, the current one
+        // must be closed
+        if (defVersionState.isOpen()) {
+            defVersionState.close();
+        }
+        SeState newState1 = new SeState(conn);
+        newState1.create(defVersionState.getId());
+
+        try {
+            conn.startTransaction();
+            insertIntoVersionedTable(newState1, versionedTable.getName(), "name 1 state 1");
+            insertIntoVersionedTable(newState1, versionedTable.getName(), "name 2 state 1");
+            
+            newState1.close();
+
+            SeState newState2 = new SeState(conn);
+            SeObjectId parentStateId = newState1.getId();
+            newState2.create(parentStateId);
+
+            insertIntoVersionedTable(newState2, versionedTable.getName(), "name 1 state 2");
+
+            // Change the version's state pointer to the last edit state.
+            newVersion.changeState(newState2.getId());
+
+            // Trim the state tree.
+            newState2.trimTree(parentStateId, newState2.getId());
+            conn.commitTransaction();
+        } catch (SeException e) {
+            new ArcSdeException(e).printStackTrace();
+            throw e;
+        }
+    }
+
+    private void insertIntoVersionedTable(SeState state, String tableName, String nameField)
+            throws SeException {
+        SeInsert insert = new SeInsert(conn);
+        
+        SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
+        insert.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);
+        
+        insert.intoTable(tableName, new String[] { "NAME" });
+        SeRow row = insert.getRowToSet();
+        row.setString(0, "NAME 1");
+        insert.execute();
+        insert.close();
+    }
+
+    /**
+     * Creates a versioned table with a name column and a point SHAPE column
+     * 
+     * @return the versioned table created
+     * @throws Exception
+     *             any exception thrown by sde
+     */
+    private SeTable createVersionedTable() throws Exception {
+        SeLayer layer = new SeLayer(conn);
+        SeTable table;
+
+        /*
+         * Create a qualified table name with current user's name and the name
+         * of the table to be created, "EXAMPLE".
+         */
+        String tableName = (conn.getUser() + ".VERSIONED_EXAMPLE");
+        table = new SeTable(conn, tableName);
+        layer.setTableName("VERSIONED_EXAMPLE");
+
+        try {
+            table.delete();
+        } catch (Exception e) {
+            LOGGER.warning(e.getMessage());
+        }
+
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
+        boolean isNullable = true;
+        colDefs[0] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 25, 0,
+                isNullable);
+
+        table.create(colDefs, testData.getConfigKeyword());
+        layer.setSpatialColumnName("SHAPE");
+
+        layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK);
+        layer.setGridSizes(1100.0, 0.0, 0.0);
+        layer.setDescription("Layer Example");
+
+        SeExtent ext = new SeExtent(0.0, 0.0, 10000.0, 10000.0);
+        layer.setExtent(ext);
+
+        /*
+         * Define the layer's Coordinate Reference
+         */
+        SeCoordinateReference coordref = TestData.getGenericCoordRef();
+        layer.setCoordRef(coordref);
+
+        /*
+         * Spatially enable the new table...
+         */
+        layer.setCreationKeyword(testData.getConfigKeyword());
+        layer.create(3, 4);
+
+        // register the table as versioned
+        SeRegistration registration = new SeRegistration(conn, tableName);
+        registration.setMultiVersion(true);
+        registration.alter();
+
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine(" - Done.");
+        }
+        return table;
     }
 }
