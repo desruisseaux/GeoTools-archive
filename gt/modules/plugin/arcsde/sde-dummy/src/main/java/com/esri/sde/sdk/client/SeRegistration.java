@@ -19,4 +19,6 @@ public class SeRegistration {
 
     public boolean isView() {return false;}
 
+    public void setMultiVersion(boolean b) {}
+
 }
