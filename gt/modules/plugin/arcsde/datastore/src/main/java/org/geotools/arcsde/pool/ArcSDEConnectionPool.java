@@ -34,6 +34,7 @@ import org.geotools.data.DataSourceException;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeRelease;
 
 /**
  * Maintains <code>SeConnection</code>'s for a single set of connection
@@ -137,6 +138,15 @@ public class ArcSDEConnectionPool {
         try {
             for (int i = 0; i < minConnections; i++) {
                 preload[i] = (ArcSDEPooledConnection) this.pool.borrowObject();
+                if (i == 0) {
+                    SeRelease seRelease = preload[i].getRelease();
+                    String sdeDesc = seRelease.getDesc();
+                    int major = seRelease.getMajor();
+                    int minor = seRelease.getMinor();
+                    int bugFix = seRelease.getBugFix();
+                    String desc = "ArcSDE "+ major + "." + minor + "." + bugFix + " " + sdeDesc;
+                    LOGGER.info("Connected to " + desc);
+                }
             }
 
             for (int i = 0; i < minConnections; i++) {

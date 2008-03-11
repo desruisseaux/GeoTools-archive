@@ -678,7 +678,7 @@ public class ArcSDEDataStore implements DataStore {
             } catch (SeException e) {
                 throw new ArcSdeException("Error Parsing select: " + qualifiedSelect, e);
             }
-            FeatureTypeInfo typeInfo = ArcSDEAdapter.fetchSchema(conn, typeName, namespace,
+            FeatureTypeInfo typeInfo = ArcSDEAdapter.createInprocessViewSchema(conn, typeName, namespace,
                     qualifiedSelect, queryInfo);
 
             inProcessFeatureTypeInfos.put(typeName, typeInfo);

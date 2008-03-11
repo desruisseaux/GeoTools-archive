@@ -82,10 +82,10 @@ public class ArcSDEAdapter {
             .getLogger(ArcSDEAdapter.class.getPackage().getName());
 
     /** mappings of SDE attribute's types to Java ones */
-    private static final Map sde2JavaTypes = new HashMap();
+    private static final Map<Integer, Class<?>> sde2JavaTypes = new HashMap<Integer, Class<?>>();
 
     /** inverse of sdeTypes, maps Java types to SDE ones */
-    private static final Map java2SDETypes = new HashMap();
+    private static final Map<Class<?>, SdeTypeDef> java2SDETypes = new HashMap<Class<?>, SdeTypeDef>();
 
     static {
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_NSTRING), String.class);
@@ -233,7 +233,7 @@ public class ArcSDEAdapter {
      *             DOCUMENT ME!
      */
     private static SdeTypeDef getSdeType(Class attClass) throws IllegalArgumentException {
-        SdeTypeDef sdeType = (SdeTypeDef) java2SDETypes.get(attClass);
+        SdeTypeDef sdeType = java2SDETypes.get(attClass);
 
         if (sdeType == null) {
             throw new IllegalArgumentException("No SDE type mapping for " + attClass.getName());
@@ -316,9 +316,9 @@ public class ArcSDEAdapter {
     }
 
     /**
-     * Fetchs the schema for the "SQL SELECT" like view definition
+     * Creates a schema for the "SQL SELECT" like view definition
      */
-    public static FeatureTypeInfo fetchSchema(final ArcSDEPooledConnection conn,
+    public static FeatureTypeInfo createInprocessViewSchema(final ArcSDEPooledConnection conn,
             final String typeName, final String namespace, final PlainSelect qualifiedSelect,
             final SeQueryInfo queryInfo) throws IOException {
 
@@ -494,7 +494,7 @@ public class ArcSDEAdapter {
      * </ul>
      * </p>
      * <p>
-     * Currently <b>there're not</b> defined bindings for:
+     * Currently <b>there're no</b> bindings defined for:
      * <ul>
      * <li>{@link SeColumnDefinition#TYPE_XML}
      * <li>{@link SeColumnDefinition#TYPE_RASTER}
@@ -510,8 +510,8 @@ public class ArcSDEAdapter {
      * @return the java binding for the given sde data type or {@code null} if
      *         its not supported
      */
-    public static Class getJavaBinding(final Integer sdeType) {
-        Class javaClass = (Class) sde2JavaTypes.get(sdeType);
+    public static Class<?> getJavaBinding(final Integer sdeType) {
+        Class<?> javaClass = sde2JavaTypes.get(sdeType);
         return javaClass;
     }
 

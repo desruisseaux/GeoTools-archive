@@ -351,8 +351,8 @@ class ArcSDEQuery {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    private SeQuery createSeQueryForFetch(String[] propertyNames)
-            throws SeException, DataSourceException {
+    private SeQuery createSeQueryForFetch(String[] propertyNames) throws SeException,
+            DataSourceException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("constructing new sql query with connection: " + connection
                     + ", propnames: " + java.util.Arrays.asList(propertyNames)
@@ -453,8 +453,7 @@ class ArcSDEQuery {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo()
-            throws SeException, DataSourceException {
+    private SeQuery createSeQueryForQueryInfo() throws SeException, DataSourceException {
 
         SeQuery seQuery = new SeQuery(connection);
 
@@ -654,14 +653,17 @@ class ArcSDEQuery {
         } catch (SeException ex) {
             SeSqlConstruct sqlCons = this.filters.getSeSqlConstruct();
             String sql = (sqlCons == null) ? null : sqlCons.getWhere();
+            String tables = (sqlCons == null) ? null : Arrays.asList(sqlCons.getTables())
+                    .toString();
             if (ex.getSeError().getSdeError() == -288) {
                 // gah, the dreaded 'LOGFILE SYSTEM TABLES DO NOT EXIST' error.
                 // this error is worthless. Make it quiet, at least.
-                LOGGER
-                        .severe("ArcSDE is complaining that your 'LOGFILE SYSTEM TABLES DO NOT EXIST'.  This is an ignorable error.");
+                LOGGER.severe("ArcSDE is complaining that your 'LOGFILE SYSTEM "
+                        + "TABLES DO NOT EXIST'.  This is an ignorable error.");
             } else {
                 LOGGER.log(Level.SEVERE, "***********************\n" + ex.getSeError().getErrDesc()
-                        + "\nfilter: " + this.filters.getGeometryFilter() + "\nSQL: " + sql, ex);
+                        + "\ntables: " + tables + "\nfilter: " + this.filters.getGeometryFilter()
+                        + "\nSQL: " + sql, ex);
             }
         } finally {
             close(extentQuery);

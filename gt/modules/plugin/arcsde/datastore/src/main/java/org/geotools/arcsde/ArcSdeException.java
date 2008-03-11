@@ -56,11 +56,12 @@ public class ArcSdeException extends DataSourceException {
             sb.append(message);
         }
         if (error != null) {
+            int sdeError = error.getSdeError();
             String sdeErrMsg = error.getSdeErrMsg();
             String extErrMsg = error.getExtErrMsg();
             String errDesc = error.getErrDesc();
 
-            sb.append("[SDE error ").append(error.getSdeError());
+            sb.append("[SDE error ").append(sdeError);
             if (sdeErrMsg != null && !"".equals(sdeErrMsg)) {
                 sb.append(" ").append(sdeErrMsg);
             }
