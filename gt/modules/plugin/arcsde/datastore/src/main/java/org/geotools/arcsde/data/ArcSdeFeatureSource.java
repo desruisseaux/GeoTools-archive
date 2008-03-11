@@ -28,7 +28,6 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -70,7 +69,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     /**
      * @see FeatureSource#getInfo()
      */
-    public synchronized ResourceInfo getInfo() {
+    public synchronized ArcSdeResourceInfo getInfo() {
         if (this.resourceInfo == null) {
             this.resourceInfo = new ArcSdeResourceInfo(this.typeInfo, this);
         }
