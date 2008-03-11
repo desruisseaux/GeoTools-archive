@@ -137,9 +137,14 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             SimpleFeature first = firstFeature(fc);
             String s = (String) first.getAttribute("NAME");
             assertEquals("\u9ed1\u9f99\u6c5f\u7701", s);
-        } catch (UnsupportedCharsetException no) {
-            // this JDK has not been installed with the required
-            // lanaguage
+        } catch (UnsupportedCharsetException notInstalledInJRE){
+                // this just means you have not installed
+                // chinese support into your JRE
+                // (as such it represents a bad configuration
+                //  rather than a test failure)
+                // we only wanted to ensure that if you have Chinese support
+                // available - GeoTools can use it
+            }
         }
     }
 
