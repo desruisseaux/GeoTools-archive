@@ -263,6 +263,22 @@ class TreeNode extends Rectangle implements Iterable<TreeNode>, javax.swing.tree
     }
 
     /**
+     * Returns the first children, or {@code null} if none. Used as an alternative to the
+     * iterator, since profiling suggests that it has a perceptible cost.
+     */
+    final TreeNode firstChildren() {
+        return firstChildren;
+    }
+
+    /**
+     * Returns the next sibling, or {@code null} if none. Used as an alternative to the
+     * iterator, since profiling suggests that it has a perceptible cost.
+     */
+    final TreeNode nextSibling() {
+        return nextSibling;
+    }
+
+    /**
      * Returns an enumeration over the children. This method is provided for <cite>Swing</cite>
      * usage. When using {@link TreeNode} directly, consider using {@link #iterator} instead.
      */

@@ -186,11 +186,13 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
                 parent = smallest(child, false);
             }
             if (!parent.overlaps) {
-                for (final TreeNode existing : parent) {
+                TreeNode existing = parent.firstChildren();
+                while (existing != null) {
                     if (child.intersects(existing) && !child.equals(existing)) {
                         parent.overlaps = true;
                         break;
                     }
+                    existing = existing.nextSibling();
                 }
             }
             parent.addChild(child);
@@ -201,10 +203,12 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
          */
         if (getUserObject() == null) {
             assert (width | height) < 0 : this;
-            for (final TreeNode child : this) {
+            TreeNode child = firstChildren();
+            while (child != null) {
                 // No need to invoke setBounds for the first child since Rectangle.add(Rectangle)
                 // takes care of that if the width or height is negative (specified in javadoc).
                 add(child);
+                child = child.nextSibling();
             }
         }
         splitOverlappingChildren(); // Must be after bounds calculation.
@@ -225,9 +229,10 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
     private GridNode smallest(final Rectangle bounds, final boolean gridded) {
         GridNode smallest = this;
         long smallestArea = (long) width * (long) height;
-        for (final TreeNode child : this) {
+        GridNode child = (GridNode) firstChildren();
+        while (child != null) {
             if (child.contains(bounds)) {
-                final GridNode candidate = ((GridNode) child).smallest(bounds, gridded);
+                final GridNode candidate = child.smallest(bounds, gridded);
                 if (!gridded || candidate.isGridded(bounds)) {
                     final long area = (long) candidate.width * (long) candidate.height;
                     if (area < smallestArea) {
@@ -236,6 +241,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
                     }
                 }
             }
+            child = (GridNode) child.nextSibling();
         }
         return smallest;
     }
@@ -297,16 +303,20 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      */
     private void splitOverlappingChildren() {
         assert isLeaf() || !isEmpty() : this; // Requires that bounds has been computed.
-        for (final TreeNode child : this) {
-            ((GridNode) child).splitOverlappingChildren();
+        GridNode child = (GridNode) firstChildren();
+        while (child != null) {
+            child.splitOverlappingChildren();
+            child = (GridNode) child.nextSibling();
         }
         if (!overlaps) {
             return;
         }
         List<GridNode> toProcess = new LinkedList<GridNode>();
         final List<GridNode> retained = new ArrayList<GridNode>();
-        for (final TreeNode child : this) {
-            toProcess.add((GridNode) child);
+        child = (GridNode) firstChildren();
+        while (child != null) {
+            toProcess.add(child);
+            child = (GridNode) child.nextSibling();
         }
         removeChildren(); // Necessary in order to give children to other nodes.
         int bestIndex=0, bestDistance=0;
@@ -383,7 +393,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
             final GridNode[] sorted = retained.toArray(new GridNode[retained.size()]);
             retained.clear();
             Arrays.sort(sorted, LARGEST_FIRST);
-            final GridNode child = new GridNode(this);
+            child = new GridNode(this);
             assert child.isLeaf();
             for (TreeNode newChild : sorted) {
                 child.addChild(newChild);
@@ -400,11 +410,12 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      * subsampling.
      */
     private void postTreeCreation() {
-        for (final TreeNode node : this) {
-            final GridNode child = (GridNode) node;
+        GridNode child = (GridNode) firstChildren();
+        while (child != null) {
             child.postTreeCreation();
             if (child.xSubsampling > xSubsampling) xSubsampling = child.xSubsampling;
             if (child.ySubsampling > ySubsampling) ySubsampling = child.ySubsampling;
+            child = (GridNode) child.nextSibling();
         }
         dense = isDense(this, this);
     }

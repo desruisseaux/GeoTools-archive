@@ -100,8 +100,10 @@ final class SelectedNode extends TreeNode {
      */
     private long childrenCost() {
         long c = 0;
-        for (final TreeNode child : this) {
-            c += ((SelectedNode) child).cost;
+        SelectedNode child = (SelectedNode) firstChildren();
+        while (child != null) {
+            c += child.cost;
+            child = (SelectedNode) child.nextSibling();
         }
         assert cost >= c;
         return c;
@@ -132,8 +134,10 @@ final class SelectedNode extends TreeNode {
          * Must process children first because if any of them are removed, it will lowered
          * the cost and consequently can change the decision taken at the end of this method.
          */
-        for (final TreeNode child : this) {
-            ((SelectedNode) child).filter(overlaps);
+        SelectedNode child = (SelectedNode) firstChildren();
+        while (child != null) {
+            child.filter(overlaps);
+            child = (SelectedNode) child.nextSibling();
         }
         SelectedNode existing = overlaps.put(this, this);
         if (existing != null && existing != this) {
@@ -165,13 +169,14 @@ final class SelectedNode extends TreeNode {
      * because the corresponding Map.Entry is presumed already used by an other node.
      */
     private void removeFrom(final Map<Rectangle,SelectedNode> overlaps) {
-        for (final TreeNode child : this) {
-            final SelectedNode node = (SelectedNode) child;
-            node.removeFrom(overlaps);
-            final SelectedNode existing = overlaps.remove(node);
-            if (existing != null && existing != node) {
+        SelectedNode child = (SelectedNode) firstChildren();
+        while (child != null) {
+            child.removeFrom(overlaps);
+            final SelectedNode existing = overlaps.remove(child);
+            if (existing != null && existing != child) {
                 overlaps.put(existing, existing);
             }
+            child = (SelectedNode) child.nextSibling();
         }
     }
 
