@@ -208,17 +208,17 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         mergeBuffers();
 
         MapContext context = getContext();
-        if (context.getLayerCount() == 1) {
-            try {
-                ReferencedEnvelope env = context.getLayerBounds();
-
-                if (env != null) {
-                    setMapArea(env);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
+//        if (context.getLayerCount() == 1) {
+//            try {
+//                ReferencedEnvelope env = context.getLayerBounds();
+//
+//                if (env != null) {
+//                    setMapArea(env);
+//                }
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
     }
 
     public void layerRemoved(MapLayerListEvent event) {

@@ -203,19 +203,19 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
     
     public void layerAdded(MapLayerListEvent event) {
 
-        if (getContext().getLayerCount() == 1) {
-            try {
-                ReferencedEnvelope env = getContext().getLayerBounds();
-
-                if (env != null) {
-                    setMapArea(env);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else {
+//        if (getContext().getLayerCount() == 1) {
+//            try {
+//                ReferencedEnvelope env = getContext().getLayerBounds();
+//
+//                if (env != null) {
+//                    setMapArea(env);
+//                }
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+//        } else {
             testRefresh();
-        }
+//        }
     }
 
     public void layerRemoved(MapLayerListEvent event) {
