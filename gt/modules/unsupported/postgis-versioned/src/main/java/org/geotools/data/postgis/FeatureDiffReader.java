@@ -317,8 +317,10 @@ public class FeatureDiffReader {
     }
 
     protected void finalize() throws Throwable {
-    	LOGGER.warning("There's code leaaving the feature diff readers open!");
-        close();
+        if(createdReader != null || deletedReader != null || fvReader != null || tvReader != null) {
+            LOGGER.warning("There's code leaaving the feature diff readers open!");
+            close();
+        }
     }
 
 }
