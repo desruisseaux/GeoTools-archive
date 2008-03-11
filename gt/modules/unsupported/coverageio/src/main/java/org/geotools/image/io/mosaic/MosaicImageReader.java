@@ -1075,22 +1075,32 @@ public class MosaicImageReader extends ImageReader {
                 final Rectangle tileRegion = tile.getAbsoluteRegion();
                 final Rectangle regionToRead = tileRegion.intersection(sourceRegion);
                 /*
-                 * Computes the location of the region to read relative to the source region requested
-                 * by the user, and make sure that this location is a multiple of subsampling (if any).
-                 * The region to read may become smaller as a result of this calculation, i.e. the
-                 * value of its (x,y) location may increase, never reduce.
+                 * Computes the location of the region to read relative to the source region
+                 * requested by the user, and make sure that this location is a multiple of
+                 * subsampling (if any). The region to read may become bigger by one pixel
+                 * (in tile units) as a result of this calculation.
                  */
                 int xOffset = (regionToRead.x - sourceRegion.x) % xSubsampling;
                 int yOffset = (regionToRead.y - sourceRegion.y) % ySubsampling;
                 if (xOffset != 0) {
-                    xOffset -= xSubsampling;
                     regionToRead.x     -= xOffset;
                     regionToRead.width += xOffset;
+                    if (regionToRead.x < tileRegion.x) {
+                        regionToRead.x = tileRegion.x;
+                        if (regionToRead.width > tileRegion.width) {
+                            regionToRead.width = tileRegion.width;
+                        }
+                    }
                 }
                 if (yOffset != 0) {
-                    yOffset -= ySubsampling;
                     regionToRead.y      -= yOffset;
                     regionToRead.height += yOffset;
+                    if (regionToRead.y < tileRegion.y) {
+                        regionToRead.y = tileRegion.y;
+                        if (regionToRead.height > tileRegion.height) {
+                            regionToRead.height = tileRegion.height;
+                        }
+                    }
                 }
                 if (regionToRead.isEmpty()) {
                     continue;
@@ -1105,7 +1115,6 @@ public class MosaicImageReader extends ImageReader {
                     destinationOffset.x = destRegion.x + xOffset;
                     destinationOffset.y = destRegion.y + yOffset;
                 }
-                assert sourceRegion.contains(regionToRead) : regionToRead;
                 assert tileRegion  .contains(regionToRead) : regionToRead;
                 regionToRead.translate(-tileRegion.x, -tileRegion.y);
                 /*
