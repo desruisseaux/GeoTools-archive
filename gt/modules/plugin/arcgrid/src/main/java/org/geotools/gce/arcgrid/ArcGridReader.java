@@ -214,7 +214,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 	/**
 	 * Close the {@link InStream} {@link ImageInputStream} if we open it up on
-	 * purpose toread header info for this {@link AbstractGridCoverage2DReader}.
+	 * purpose to read header info for this {@link AbstractGridCoverage2DReader}.
 	 * If the stream cannot be closed, we just reset and mark it.
 	 * 
 	 * @throws IOException
@@ -274,11 +274,11 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		closeMe = true;
 		// //
 		//
-		// URL to FIle
+		// URL to File
 		//
 		// //
-		// if it is a URL ponting to a File I convert it to a file,
-		// otherwis, later on, I will try to get an inputstream out of it.
+		// if it is a URL pointing to a File I convert it to a file,
+		// otherwise, later on, I will try to get an inputstream out of it.
 		if (input instanceof URL) {
 			// URL that point to a file
 			final URL sourceURL = ((URL) input);

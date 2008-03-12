@@ -777,7 +777,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * This method just tries to close the underlying {@link ImageInputStream}.
 	 */
 	public void dispose() {
-		if (inStream != null) {
+		if (inStream != null&&closeMe ) {
 			try {
 				inStream.close();
 			} catch (IOException e) {

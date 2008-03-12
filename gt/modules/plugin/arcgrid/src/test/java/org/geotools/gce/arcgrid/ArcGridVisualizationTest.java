@@ -24,6 +24,7 @@ import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -76,44 +77,6 @@ public final class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 		junit.textui.TestRunner.run(ArcGridVisualizationTest.class);
 	}
 
-	public void testVisualization() throws Exception {
-
-		LOGGER.info("testing visualization of precip30min.asc");
-		// read in the grid coverage
-		final GridCoverageReader reader = new ArcGridReader(TestData.file(this,
-				"arcgrid/precip30min.asc"));
-
-		ParameterValueGroup params;
-		params = reader.getFormat().getReadParameters();
-
-		final GeneralEnvelope envelope = new GeneralEnvelope(new double[] {
-				-180, -90 }, new double[] { 180, 90 });
-		envelope.setCoordinateReferenceSystem(CRS.decode("EPSG:4326"));
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 400, 300)), envelope));
-		GeneralParameterValue[] gpv = { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
-		
-		assertTrue(CoverageUtilities.hasRenderingCategories(gc));
-
-		if (TestData.isInteractiveTest()) {
-			gc.show();
-		} else
-			gc.getRenderedImage().getData();
-		if (TestData.isInteractiveTest()) {
-			// printing CRS information
-			LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());
-			LOGGER.info(gc.getEnvelope().toString());
-		}
-
-	}
-	
 	/**
 	 * This test tries to read GZipped ascii grids first by supplying the
 	 * {@link ArcGridReader} with a {@link File} that points to a gzipped
@@ -156,10 +119,10 @@ public final class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 			gc3.show();
 			gc4.show();
 		} else {
-			gc1.getRenderedImage().getData();
-			gc2.getRenderedImage().getData();
-			gc3.getRenderedImage().getData();
-			gc4.getRenderedImage().getData();
+			PlanarImage.wrapRenderedImage(gc1.getRenderedImage()).getTiles();
+			PlanarImage.wrapRenderedImage(gc2.getRenderedImage()).getTiles();
+			PlanarImage.wrapRenderedImage(gc3.getRenderedImage()).getTiles();
+			PlanarImage.wrapRenderedImage(gc4.getRenderedImage()).getTiles();
 		}
 	}
 
