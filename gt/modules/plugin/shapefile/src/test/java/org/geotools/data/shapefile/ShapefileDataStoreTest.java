@@ -146,7 +146,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 // available - GeoTools can use it
             }
         }
-    }
+    
 
     public void testNamespace() throws Exception {
         ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
