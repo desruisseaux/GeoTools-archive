@@ -19,7 +19,7 @@ public class DateFunctionTest extends TestCase {
         
         Function f = ff.function("dateParse", new Expression[]{pattern, year});
         Calendar cal = f.evaluate(null , Calendar.class);
-        System.out.println(cal);
+        //System.out.println(cal);
         assertEquals(1975, cal.get(Calendar.YEAR));
     }
     
