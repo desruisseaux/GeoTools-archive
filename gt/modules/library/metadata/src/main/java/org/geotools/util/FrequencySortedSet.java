@@ -17,12 +17,12 @@
 package org.geotools.util;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
@@ -37,7 +37,7 @@ import java.util.SortedSet;
  * An optional boolean argument in the constructor allows the construction of set in reversed
  * order (most frequently added elements first, less frequently added last). This is similar
  * but not identical to creating a defaut {@code FrequencySortedSet} and iterating through it
- * in reverse order. The difference is that is elements added the same amount of time will still
+ * in reverse order. The difference is that elements added the same amount of time will still
  * be traversed in their insertion order.
  *
  * @since 2.5
@@ -56,7 +56,7 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      * ordinary hash map because we want to preserve insertion order for elements that occur at
      * the same frequency.
      */
-    private final Map<E,Integer> count = new LinkedHashMap<E,Integer>();
+    private final Map<E,Integer> count;
 
     /**
      * {@code +1} if the element should be sorted in the usual order, or {@code -1}
@@ -67,7 +67,7 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
     /**
      * Elements in sorted order, or {@code null} if not yet computed.
      */
-    private transient List<E> sorted;
+    private transient E[] sorted;
 
     /**
      * The frequency for each {@linkplain #sorted} element. This array is invalid
@@ -83,12 +83,24 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
     }
 
     /**
-     * Creates an initially empty set.
+     * Creates an initially empty set with the default initial capacity.
      *
      * @param reversed {@code true} if the elements should be sorted in reverse order
      *        (most frequent element first, less frequent last).
      */
     public FrequencySortedSet(final boolean reversed) {
+        this(16, reversed);
+    }
+
+    /**
+     * Creates an initially empty set with the specified initial capacity.
+     *
+     * @param initialCapacity The initial capacity.
+     * @param reversed {@code true} if the elements should be sorted in reverse order
+     *        (most frequent element first, less frequent last).
+     */
+    public FrequencySortedSet(final int initialCapacity, final boolean reversed) {
+        count = new LinkedHashMap<E,Integer>(initialCapacity);
         order = reversed ? -1 : +1;
     }
 
@@ -127,8 +139,8 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      * Returns {@code true} if this set contains the specified element.
      */
     @Override
-    public boolean contains(Object o) {
-        return count.containsKey(o);
+    public boolean contains(final Object element) {
+        return count.containsKey(element);
     }
 
     /**
@@ -159,7 +171,61 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      */
     public Iterator<E> iterator() {
         ensureSorted();
-        return sorted.iterator();
+        return new Iter();
+    }
+
+    /**
+     * Iterator over sorted elements.
+     */
+    private final class Iter implements Iterator<E> {
+        /**
+         * A copy of {@link FrequencySortedSet#sorted} at the time this iterator has been created.
+         * Used because the {@code sorted} array is set to {@code null} when {@link #remove()} is
+         * invoked.
+         */
+        private final E[] elements;
+
+        /**
+         * Index of the next element to return.
+         */
+        private int index;
+
+        /**
+         * Creates an new iterator.
+         */
+        Iter() {
+            elements = sorted;
+        }
+
+        /**
+         * Returns {@code true} if there is more elements to return.
+         */
+        public boolean hasNext() {
+            return index < elements.length;
+        }
+
+        /**
+         * Return the next element.
+         */
+        public E next() {
+            if (index >= elements.length) {
+                throw new NoSuchElementException();
+            }
+            return elements[index++];
+        }
+
+        /**
+         * Remove the last elements returned by {@link #next}.
+         */
+        public void remove() {
+            if (index == 0) {
+                throw new IllegalStateException();
+            }
+            if (!FrequencySortedSet.this.remove(elements[index - 1])) {
+                // Could also be ConcurrentModificationException - we do not differentiate.
+                throw new IllegalStateException();
+            }
+        }
     }
 
     /**
@@ -198,9 +264,8 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      */
     public E first() throws NoSuchElementException {
         ensureSorted();
-        final int length = sorted.size();
-        if (length != 0) {
-            return sorted.get(0);
+        if (sorted.length != 0) {
+            return sorted[0];
         } else {
             throw new NoSuchElementException();
         }
@@ -221,9 +286,9 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      */
     public E last() throws NoSuchElementException {
         ensureSorted();
-        final int length = sorted.size();
+        final int length = sorted.length;
         if (length != 0) {
-            return sorted.get(length - 1);
+            return sorted[length - 1];
         } else {
             throw new NoSuchElementException();
         }
@@ -235,26 +300,23 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
      * frequent last (or the converse if this set has been created for reverse order). If some
      * elements appear at the same frequency, then their ordering will be preserved.
      */
+    @SuppressWarnings("unchecked")
     private void ensureSorted() {
         if (sorted != null) {
             return;
         }
-        @SuppressWarnings("unchecked")
         final Map.Entry<E,Integer>[] entries = count.entrySet().toArray(new Map.Entry[count.size()]);
         Arrays.sort(entries, COMPARATOR);
         final int length = entries.length;
-
-        @SuppressWarnings("unchecked")
-        final E[] keys = (E[]) new Object[length];
+        sorted = (E[]) new Object[length];
         if (frequencies == null || frequencies.length != length) {
             frequencies = new int[length];
         }
         for (int i=0; i<length; i++) {
             final Map.Entry<E,Integer> entry = entries[i];
-            keys[i] = entry.getKey();
+            sorted[i] = entry.getKey();
             frequencies[i] = Math.abs(entry.getValue());
         }
-        sorted = Arrays.asList(keys);
     }
 
     /**
@@ -323,15 +385,20 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
     @Override
     public Object[] toArray() {
         ensureSorted();
-        return sorted.toArray();
+        return sorted.clone();
     }
 
     /**
      * Returns the content of this set as an array.
      */
     @Override
-    public <T> T[] toArray(final T[] array) {
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] array) {
         ensureSorted();
-        return sorted.toArray(array);
+        if (array.length < sorted.length) {
+            array = (T[]) Array.newInstance(array.getClass().getComponentType(), sorted.length);
+        }
+        System.arraycopy(sorted, 0, array, 0, sorted.length);
+        return array;
     }
 }

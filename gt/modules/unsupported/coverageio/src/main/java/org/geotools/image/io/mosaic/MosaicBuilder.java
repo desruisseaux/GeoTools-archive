@@ -597,8 +597,11 @@ public class MosaicBuilder {
      *   <li>{@link #setUntiledImageBounds}</li>
      *   <li>{@link #setTileReaderSpi}</li>
      * </ul>
+     *
+     * @throws IOException if an I/O operation was required and failed. The default implementation
+     *         does not perform any I/O, but subclasses are allowed to do so.
      */
-    public TileManager createTileManager() {
+    public TileManager createTileManager() throws IOException {
         tileReaderSpi = getTileReaderSpi();
         if (tileReaderSpi == null) {
             // TODO: We may try to detect automatically the Spi in a future version.

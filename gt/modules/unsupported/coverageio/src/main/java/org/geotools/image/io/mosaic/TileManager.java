@@ -31,9 +31,11 @@ import javax.swing.tree.TreeModel;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.FrequencySortedSet;
 import org.geotools.util.Comparators;
 
 
@@ -147,7 +149,7 @@ public class TileManager implements Serializable {
         final Set<ImageReaderSpi> providers;
         final Map<ReaderInputPair,List<Tile>> tilesByInput;
         tilesByInput = new LinkedHashMap<ReaderInputPair, List<Tile>>();
-        providers    = new LinkedHashSet<ImageReaderSpi>(4);
+        providers    = new FrequencySortedSet<ImageReaderSpi>(4, true);
         for (final Tile tile : tiles) {
             tile.checkGeometryValidity();
             final ImageReaderSpi  spi = tile.getImageReaderSpi();
@@ -193,14 +195,21 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      *
      * @param gridToCRS The "grid to CRS" transform.
      * @throws IllegalStateException if a transform was already assigned to at least one tile.
+     * @throws IOException if an I/O operation was required and failed.
      */
     public synchronized void setGridToCRS(final AffineTransform gridToCRS)
-            throws IllegalStateException
+            throws IllegalStateException, IOException
     {
+        if (geometry != null) {
+            throw new IllegalStateException();
+        }
         final Map<Dimension,AffineTransform> shared = new HashMap<Dimension,AffineTransform>();
+        AffineTransform at = new XAffineTransform(gridToCRS);
+        shared.put(new Dimension(1,1), at);
+        geometry = new ImageGeometry(getRegion(), at);
         for (final Tile tile : tiles) {
             final Dimension subsampling = tile.getSubsampling();
-            AffineTransform at = shared.get(subsampling);
+            at = shared.get(subsampling);
             if (at == null) {
                 at = new AffineTransform(gridToCRS);
                 at.scale(subsampling.width, subsampling.height);
@@ -212,13 +221,17 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     }
 
     /**
-     * Returns all image reader providers used by the tiles. The set will typically contains
-     * only one element, but more are allowed.
+     * Returns the grid geometry, including the "<cite>grid to real world</cite>" transform.
+     * This information is typically available only when {@linkplain AffineTransform affine
+     * transform} were explicitly given to {@linkplain Tile#Tile(ImageReaderSpi,Object,int,
+     * Dimension,AffineTransform) tile constructor}.
      *
-     * @see MosaicImageReader#getTileReaderSpis
+     * @return The grid geometry, or {@code null} if this information is not available.
+     *
+     * @see Tile#getGridToCRS
      */
-    public Set<ImageReaderSpi> getImageReaderSpis() {
-        return providers;
+    public ImageGeometry getGridGeometry() {
+        return geometry;
     }
 
     /**
@@ -281,6 +294,66 @@ fill:   for (final List<Tile> sameInputs : asArray) {
         if (tree != null) {
             tree.inUse = false;
         }
+    }
+
+    /**
+     * Returns all image reader providers used by the tiles. The set will typically contains
+     * only one element, but more are allowed. In the later case, the entries in the set are
+     * sorted from the most frequently used provider to the less frequently used.
+     *
+     * @see MosaicImageReader#getTileReaderSpis
+     */
+    public Set<ImageReaderSpi> getImageReaderSpis() {
+        return providers;
+    }
+
+    /**
+     * Creates a tile with a {@linkplain Tile#getRegion region} big enough for containing
+     * {@linkplain #getTiles every tiles}. The created tile has a {@linkplain Tile#getSubsampling
+     * subsampling} of (1,1). This is sometime useful for creating a "virtual" image representing
+     * the assembled mosaic as a whole.
+     *
+     * @param  provider
+     *              The image reader provider to be given to the created tile, or {@code null} for
+     *              inferring it automatically. In the later case the provider is inferred from the
+     *              input suffix if any (e.g. the {@code ".png"} extension in a filename), or
+     *              failing that most frequently used provider is selected.
+     * @param  input
+     *              The input to be given to the created tile. It doesn't need to be an existing
+     *              {@linkplain java.io.File file} or URI since this method will not attempt to
+     *              read it.
+     * @param  imageIndex
+     *              The image index to be given to the created tile (usually 0).
+     * @return A global tile big enough for containing every tiles in this manager.
+     * @throws NoSuchElementException
+     *              If this manager do not contains at least one tile.
+     * @throws IOException
+     *              If an I/O operation was required and failed.
+     */
+    public Tile createGlobalTile(ImageReaderSpi provider, final Object input, final int imageIndex)
+            throws NoSuchElementException, IOException
+    {
+        if (provider == null) {
+            // Following line may throw the NoSuchElementException documented in javadoc.
+            provider = getImageReaderSpis().iterator().next();
+            ImageReaderSpi inferred = Tile.getImageReaderSpi(input);
+            if (inferred != null && inferred != provider) {
+                final Collection<String> f1 = Arrays.asList(provider.getFormatNames());
+                final Collection<String> f2 = Arrays.asList(inferred.getFormatNames());
+                if (!f1.containsAll(f2)) {
+                    provider = inferred;
+                }
+            }
+        }
+        final Tile tile;
+        final ImageGeometry geometry = getGridGeometry();
+        if (geometry == null) {
+            tile = new Tile(provider, input, imageIndex, getRegion());
+        } else {
+            tile = new Tile(provider, input, imageIndex, geometry.getGridRange());
+            tile.setGridToCRS(geometry.getGridToCRS());
+        }
+        return tile;
     }
 
     /**
@@ -352,20 +425,6 @@ fill:   for (final List<Tile> sameInputs : asArray) {
             }
         }
         return tileSize;
-    }
-
-    /**
-     * Returns the grid geometry, including the "<cite>grid to real world</cite>" transform.
-     * This information is typically available only when {@linkplain AffineTransform affine
-     * transform} were explicitly given to {@linkplain Tile#Tile(ImageReaderSpi,Object,int,
-     * Dimension,AffineTransform) tile constructor}.
-     *
-     * @return The grid geometry, or {@code null} if this information is not available.
-     *
-     * @see Tile#getGridToCRS
-     */
-    public ImageGeometry getGridGeometry() {
-        return geometry;
     }
 
     /**
@@ -458,7 +517,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         allTiles = UnmodifiableArrayList.wrap(tiles);
-        providers = new LinkedHashSet<ImageReaderSpi>(4);
+        providers = new FrequencySortedSet<ImageReaderSpi>(4, true);
         for (final Tile tile : tiles) {
             providers.add(tile.getImageReaderSpi());
         }

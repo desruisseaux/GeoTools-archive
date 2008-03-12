@@ -578,7 +578,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * Returns an image reader provider inferred from the given input,
      * or {@code null} if none can be found without ambiguity.
      */
-    private static ImageReaderSpi getImageReaderSpi(final Object input) {
+    static ImageReaderSpi getImageReaderSpi(final Object input) {
         ImageReaderSpi provider = null;
         final String path = getInputName(input);
         if (path != null) {
