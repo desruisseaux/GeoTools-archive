@@ -28,6 +28,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
+import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -43,7 +44,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 
-import com.esri.sde.sdk.client.SeConnection;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -185,8 +185,8 @@ public class ArcSDEQueryTest extends TestCase {
 
     private ArcSDEQuery getQueryFiltered() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
-        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,
-                FIDReader.NULL_READER, ArcSdeVersionHandler.NONVERSIONED_HANDLER);
+        FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, connection);
+        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,fti.getFidStrategy(), new AutoCommitDefaultVersionHandler());
         return this.queryFiltered;
     }
 
@@ -203,12 +203,14 @@ public class ArcSDEQueryTest extends TestCase {
 
         // should nevel do this, just to assert it is
         // not closed by returned to the pool
-        SeConnection conn = queryAll.connection;
+        ArcSDEPooledConnection conn = queryAll.connection;
 
         queryAll.close();
 
-        assertNull(queryAll.connection);
+        assertNotNull(queryAll.connection);
         assertFalse(conn.isClosed());
+        
+        conn.close();
     }
 
     /**
@@ -233,6 +235,8 @@ public class ArcSDEQueryTest extends TestCase {
         } catch (IllegalStateException e) {
             // ok
         }
+        
+        queryAll.connection.close();
     }
 
     /**
@@ -249,10 +253,14 @@ public class ArcSDEQueryTest extends TestCase {
         }
         reader.close();
 
-        int calculated = getQueryAll().calculateResultCount();
+        ArcSDEQuery q = getQueryAll();
+        int calculated = q.calculateResultCount();
+        q.connection.close();
         assertEquals(read, calculated);
 
-        calculated = getQueryFiltered().calculateResultCount();
+        q = getQueryFiltered();
+        calculated = q.calculateResultCount();
+        q.connection.close();
         assertEquals(FILTERING_COUNT, calculated);
     }
 

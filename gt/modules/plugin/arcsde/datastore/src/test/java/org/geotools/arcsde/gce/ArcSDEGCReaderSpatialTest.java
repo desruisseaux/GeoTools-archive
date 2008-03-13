@@ -17,13 +17,19 @@
 package org.geotools.arcsde.gce;
 
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
-import java.util.Properties;
 
+import javax.imageio.ImageIO;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
+import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -36,197 +42,166 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeRasterAttr;
+import com.esri.sde.sdk.client.SeRasterColumn;
+
 /**
- * Tests the functionality of the ArcSDE raster-display package to read rasters
- * from an ArcSDE database
+ * Tests the functionality of the ArcSDE raster-display package to read rasters from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEGCReaderSpatialTest.java $
- * @version $Id: ArcSDEGCReaderSpatialTest.java 28048 2007-11-26 12:53:18Z
- *          groldan $
+ * @source $URL$
+ * @version $Id$
  */
 public class ArcSDEGCReaderSpatialTest extends TestCase {
 
-    private CoordinateReferenceSystem crs;
+	private static RasterTestData rasterTestData;
+	private static String sderasterurlbase;
 
-    private GridGeometry2D highRes;
+	/**
+	 * Creates a new ArcSDEConnectionPoolTest object.
+	 * 
+	 */
+	public ArcSDEGCReaderSpatialTest(String name) throws Exception {
+		super(name);
+	}
 
-    private GridGeometry2D medRes;
+	public static Test suite() {
+		TestSuite suite = new TestSuite();
+		suite.addTestSuite(ArcSDEGCReaderSpatialTest.class);
 
-    private GridGeometry2D lowRes;
+		TestSetup wrapper = new TestSetup(suite) {
+			@Override
+			protected void setUp() throws Exception {
+				oneTimeSetUp();
+			}
 
-    private GridGeometry2D realWordlExampleRes;
+			@Override
+			protected void tearDown() throws Exception {
+				oneTimeTearDown();
+			}
+		};
+		return wrapper;
+	}
 
-    private Properties conProps;
+	private static void oneTimeSetUp() throws Exception {
 
-    /**
-     * Creates a new ArcSDEConnectionPoolTest object.
-     * 
-     */
-    public ArcSDEGCReaderSpatialTest(String name) throws Exception {
-        super(name);
-    }
+		rasterTestData = new RasterTestData();
+		rasterTestData.setUp();
+		rasterTestData.load1bitRaster();
+		//rasterTestData.loadRGBRaster();
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+		ArcSDEConnectionConfig config = rasterTestData.getTestData().getConnectionPool().getConfig();
+		// format is sde://user:pass@sdehost:port/[dbname]#rasterTableName
+		StringBuffer urlbuilder = new StringBuffer("sde://");
+		urlbuilder.append(config.getUserName()).append(":").append(config.getUserPassword());
+		urlbuilder.append("@").append(config.getServerName()).append(":").append(config.getPortNumber()).append("/");
+		urlbuilder.append(config.getDatabaseName()).append("#");
 
-        // one-time setup
-        if (conProps != null)
-            return;
+		sderasterurlbase = urlbuilder.toString();
+	}
 
-        conProps = new Properties();
-        String propsFile = "raster-testparams.properties";
-        InputStream in = org.geotools.test.TestData.openStream(null, propsFile);
-        conProps.load(in);
-        in.close();
+	private static void oneTimeTearDown() throws Exception {
+		rasterTestData.tearDown();
+		rasterTestData.getTestData().tearDown(true, true);
+	}
 
-        crs = CRS.decode("EPSG:26986");
-        highRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(1000, 1000)),
-                new ReferencedEnvelope(150000.0, 151000.0, 900000.0, 901000.0, crs));
-        medRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500, 500)),
-                new ReferencedEnvelope(150000.0, 151000.0, 900000.0, 901000.0, crs));
-        lowRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(200, 200)),
-                new ReferencedEnvelope(30000.0, 300000.0, 630000.0, 900000.0, crs));
-        realWordlExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(256, 128)),
-                new ReferencedEnvelope(33000.25, 330000.225, 774000.25, 983400.225, crs));
-        new GridGeometry2D(new GeneralGridRange(new Rectangle(500,
-                285)), new ReferencedEnvelope(33000.25, 332999.75, 782500.143, 953499.857, crs));
+	public void testGetArcSDERasterFormat() throws Exception {
 
-    }
+		Format f = new ArcSDERasterFormatFactory().createFormat();
+		assertNotNull(f);
 
-    public void testGetArcSDERasterFormat() throws Exception {
+	}
 
-        Format f = new ArcSDERasterFormatFactory().createFormat();
-        assertNotNull(f);
+	public void donttestGetArcSDEGC2DReader() throws Exception {
 
-    }
+		// some test urls:
+		// sde://user:pass@alexandria.massgis.state.ma.us/gis#GISDATA.IMG_COQ2005
+		// sde://user:pass@alexandria.massgis.state.ma.us/#GISDATA.IMG_COQ2005;LZERO_ORIGIN_TILE=0,1438
+		// sde://user:pass@alexandria.massgis.state.ma.us/#GISDATA.IMG_COQ2005;FAIL_GRACEFULLY=blahblahblah
 
-    public void testGetArcSDEGC2DReader() throws Exception {
+		Format f = new ArcSDERasterFormatFactory().createFormat();
 
-        final String sdeUrl1 = conProps.getProperty("testrasterurl1");
-        final String sdeUrl2 = conProps.getProperty("testrasterurl2");
-        final String sdeUrl3 = conProps.getProperty("testrasterurl3");
-        final String sdeUrl4 = conProps.getProperty("testrasterurl4");
+		File hack = new File(sderasterurlbase + rasterTestData.get1bitRasterTableName());
+		assertTrue(((AbstractGridFormat) f).accepts(hack));
+		AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(hack);
+		assertNotNull(r);
+		assertNotNull(r.getOriginalEnvelope());
+		assertNotNull(r.getOriginalGridRange());
 
-        Format f = new ArcSDERasterFormatFactory().createFormat();
+		final String sdeUrl2 = sderasterurlbase + rasterTestData.get1bitRasterTableName() + ";LZERO_ORIGIN_TILE=0,100";
+		assertTrue(((AbstractGridFormat) f).accepts(sdeUrl2));
+		r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sdeUrl2);
+		assertNotNull(r);
+		assertNotNull(r.getOriginalEnvelope());
+		assertNotNull(r.getOriginalGridRange());
 
-        File hack = new File(sdeUrl1);
-        assertTrue(((AbstractGridFormat) f).accepts(hack));
-        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(hack);
-        assertNotNull(r);
-        assertNotNull(r.getOriginalEnvelope());
-        assertNotNull(r.getOriginalGridRange());
+		final String sdeUrl3 = sderasterurlbase + rasterTestData.get1bitRasterTableName() + ";FAIL_GRACEFULLY=blahblah";
+		assertTrue(((AbstractGridFormat) f).accepts(sdeUrl3));
+		r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sdeUrl3);
+		assertNotNull(r);
+		assertNotNull(r.getOriginalEnvelope());
+		assertNotNull(r.getOriginalGridRange());
 
-        assertTrue(((AbstractGridFormat) f).accepts(sdeUrl2));
-        r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sdeUrl2);
-        assertNotNull(r);
-        assertNotNull(r.getOriginalEnvelope());
-        assertNotNull(r.getOriginalGridRange());
+	}
 
-        assertTrue(((AbstractGridFormat) f).accepts(sdeUrl3));
-        r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sdeUrl3);
-        assertNotNull(r);
-        assertNotNull(r.getOriginalEnvelope());
-        assertNotNull(r.getOriginalGridRange());
+	public void testRead1bitCoverageExact() throws Exception {
 
-        assertTrue(((AbstractGridFormat) f).accepts(sdeUrl4));
-        r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sdeUrl4);
-        assertNotNull(r);
-        assertNotNull(r.getOriginalEnvelope());
-        assertNotNull(r.getOriginalGridRange());
+		final String oneBitTableName = rasterTestData.get1bitRasterTableName();
+		
+		GridCoverage2D gc;
+		Format f = new ArcSDERasterFormatFactory().createFormat();
+		AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sderasterurlbase + oneBitTableName);
 
-    }
+		SeRasterAttr ras = rasterTestData.getRasterAttributes(oneBitTableName, new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+		int totalheight = ras.getImageHeightByLevel(0);
+		int totalwidth = ras.getImageWidthByLevel(0);
+		SeExtent ext = ras.getExtentByLevel(0);
+		
+		GeneralParameterValue[] requestParams = new Parameter[1];
+		GridGeometry2D ggr2d = new GridGeometry2D(new GeneralGridRange(new Rectangle(totalwidth, totalheight)), new ReferencedEnvelope(ext.getMinX(), ext.getMaxX(), ext.getMinY(), ext.getMaxY(), r.getCrs()));
 
-    public void testRead3BandCoverage() throws Exception {
+		requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, ggr2d);
+		gc = (GridCoverage2D) r.read(requestParams);
+		assertNotNull(gc);
+		//ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
 
-        String threebandurl = conProps.getProperty("threebandrasterurl");
+		final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+		BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
 
-        GridCoverage2D gc;
-        Format f = new ArcSDERasterFormatFactory().createFormat();
-        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(threebandurl);
+		assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(gc.geophysics(true).getRenderedImage(), originalImage));
+	}
+	
+	public void testRead1bitCoverageReproject() throws Exception {
 
-        GeneralParameterValue[] requestParams = new Parameter[1];
+		final String oneBitTableName = rasterTestData.get1bitRasterTableName();
+		
+		GridCoverage2D gc;
+		Format f = new ArcSDERasterFormatFactory().createFormat();
+		AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(sderasterurlbase + oneBitTableName);
 
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, highRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("threebandOutput1.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "threeBandOutput1.png"));
+		SeRasterAttr ras = rasterTestData.getRasterAttributes(oneBitTableName, new Rectangle(0, 0, 0, 0), 0, new int[] { 1 });
+		int totalheight = ras.getImageHeightByLevel(0);
+		int totalwidth = ras.getImageWidthByLevel(0);
+		SeExtent ext = ras.getExtentByLevel(0);
+		
+		CoordinateReferenceSystem origCrs = r.getCrs();
+		ReferencedEnvelope originalFullEnv = new ReferencedEnvelope(ext.getMinX(), ext.getMaxX(), ext.getMinY(), ext.getMaxY(), origCrs);
+		ReferencedEnvelope wgs84FullEnv = originalFullEnv.transform(CRS.decode("EPSG:4326"), true);
+		
+		GeneralParameterValue[] requestParams = new Parameter[1];
+		GridGeometry2D ggr2d = new GridGeometry2D(new GeneralGridRange(new Rectangle(totalwidth, totalheight)), wgs84FullEnv);
 
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, medRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("threeBandOutput2.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "threeBandOutput2.png"));
+		requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, ggr2d);
+		gc = (GridCoverage2D) r.read(requestParams);
+		assertNotNull(gc);
+		//ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
 
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, lowRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("threeBandOutput3.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "threeBandOutput3.png"));
+		//err...there's really nothing to compare it to, I guess...
+		//final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+		//BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
 
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,
-                realWordlExampleRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("threeBandOutput4.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "threeBandOutput4.png"));
-    }
+		//assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(gc.geophysics(true).getRenderedImage(), originalImage));
+	}
 
-    public void testRead4BandCoverage() throws Exception {
-
-        String fourbandurl = conProps.getProperty("fourbandrasterurl");
-
-        GridCoverage2D gc;
-        Format f = new ArcSDERasterFormatFactory().createFormat();
-        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(fourbandurl);
-
-        GeneralParameterValue[] requestParams = new Parameter[1];
-
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, highRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("fourbandOutput1.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "fourbandOutput1.png"));
-
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, medRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("fourbandOutput2.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "fourbandOutput2.png"));
-
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, lowRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("fourbandOutput3.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "fourbandOutput3.png"));
-
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,
-                realWordlExampleRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        // ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new
-        // File("fourbandOutput4.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(gc
-                .geophysics(true).getRenderedImage(), "fourbandOutput4.png"));
-    }
 }

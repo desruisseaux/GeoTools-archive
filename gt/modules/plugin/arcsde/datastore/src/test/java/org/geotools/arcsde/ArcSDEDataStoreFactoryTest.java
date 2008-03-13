@@ -176,7 +176,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
     public void testCreateDataStoreWithInProcessViews() throws IOException, SeException {
         ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
         try {
-            InProcessViewSupportTestData.setUp(conn);
+            InProcessViewSupportTestData.setUp(conn, testData);
         } finally {
             conn.close();
         }

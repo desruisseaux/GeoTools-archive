@@ -16,104 +16,60 @@
  */
 package org.geotools.arcsde.gce;
 
-import java.awt.Rectangle;
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
 import org.geotools.arcsde.ArcSDERasterFormatFactory;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.GridRange2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
-import org.geotools.referencing.CRS;
 import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Tests the functionality of the ArcSDE raster-display package to read rasters
- * from an ArcSDE database
+ * Tests the functionality of the ArcSDE raster-display package to read rasters from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEGCReaderWorkingTest.java $
- * @version $Id: ArcSDEGCReaderWorkingTest.java 28599 2008-01-04 10:35:26Z
- *          simboss $
+ * @source $URL$
+ * @version $Id$
  */
 public class ArcSDEGCReaderWorkingTest extends TestCase {
 
-    private CoordinateReferenceSystem crs;
+	/**
+	 * Creates a new ArcSDEConnectionPoolTest object.
+	 * 
+	 */
+	public ArcSDEGCReaderWorkingTest(String name) throws Exception {
+		super(name);
+	}
 
-    private GridGeometry2D southShoreExampleRes;
+	public void testWorkingExample() throws Exception {
 
-    private Properties conProps;
+		String realWorldUrl = "sde://massgis:massgis@env-fp-phoenix:5151/gis#GISDATA.IMG_IMPERVIOUSSURFACE";
 
-    /**
-     * Creates a new ArcSDEConnectionPoolTest object.
-     * 
-     */
-    public ArcSDEGCReaderWorkingTest(String name) throws Exception {
-        super(name);
+		GridCoverage2D gc;
+		Format f = new ArcSDERasterFormatFactory().createFormat();
+		AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f).getReader(realWorldUrl);
 
-        conProps = new Properties();
-        String propsFile = "liverasterdatasets.properties";
-        URL conParamsSource = org.geotools.test.TestData.url(new ArcSDEPyramidTest(""), propsFile);
+		GeneralParameterValue[] requestParams = new Parameter[1];
 
-        InputStream in = conParamsSource.openStream();
-        if (in == null) {
-            throw new IllegalStateException("cannot find test params: "
-                    + conParamsSource.toExternalForm());
-        }
-        conProps.load(in);
-        in.close();
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        crs = CRS.decode("EPSG:26986");
-        new GridGeometry2D(new GeneralGridRange(new Rectangle(500,
-                285)), new ReferencedEnvelope(33000.25, 332999.75, 782500.143, 953499.857, crs));
-
-        // x=0,y=0,width=500,height=285] envelope -- [222,175.135 m
-        // 800,289.513 m , 294,775.014 m 841,671.444 m]
-        southShoreExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500, 285)),
-                new ReferencedEnvelope(222175.135, 294775.014, 800289.513, 841671.444, crs));
-
-    }
-
-    public void testWorkingExample() throws Exception {
-
-        String fourbandurl = conProps.getProperty("fourbandurl");
-
-        GridCoverage2D gc;
-        Format f = new ArcSDERasterFormatFactory().createFormat();
-        AbstractGridCoverage2DReader r = (AbstractGridCoverage2DReader) ((AbstractGridFormat) f)
-                .getReader(fourbandurl);
-
-        GeneralParameterValue[] requestParams = new Parameter[1];
-
-        // requestParams[0] = new
-        // Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,statewideRealWorldExampleRes);
-        requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,
-                southShoreExampleRes);
-        gc = (GridCoverage2D) r.read(requestParams);
-        assertNotNull(gc);
-        try {
-            ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File(
-                    "workingTestOutput1.png"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		// requestParams[0] = new
+		// Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D,statewideRealWorldExampleRes);
+		GridRange imageRange = new GridRange2D(0, 0, 128, 128);
+		ReferencedEnvelope env = new ReferencedEnvelope(33000.5, 248000.45, 774000.5, 983400.45, r.getCrs());
+		GridGeometry2D gg2d = new GridGeometry2D(imageRange, env);
+		requestParams[0] = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D, gg2d);
+		gc = (GridCoverage2D) r.read(requestParams);
+		assertNotNull(gc);
+		
+		ImageIO.write(gc.geophysics(true).getRenderedImage(), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+	}
 }

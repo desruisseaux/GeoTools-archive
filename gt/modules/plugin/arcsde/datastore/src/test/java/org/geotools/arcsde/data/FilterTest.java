@@ -256,7 +256,7 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
-        double minx = -180;
+        double minx = -179;
         double maxx = -170;
         double miny = -90;
         double maxy = -80;

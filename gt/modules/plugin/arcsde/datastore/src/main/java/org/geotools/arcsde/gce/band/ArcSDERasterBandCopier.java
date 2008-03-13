@@ -32,6 +32,8 @@ public abstract class ArcSDERasterBandCopier {
         ArcSDERasterBandCopier ret;
         if (sePixelType == SeRaster.SE_PIXEL_TYPE_8BIT_U) {
             ret = new UnsignedByteBandCopier();
+        } else if (sePixelType == SeRaster.SE_PIXEL_TYPE_1BIT) {
+        	ret = new OneBitBandCopier();
         } else {
             throw new IllegalArgumentException(
                     "Don't know how to create ArcSDE band reader for pixel type " + sePixelType);

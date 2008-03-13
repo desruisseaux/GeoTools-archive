@@ -184,7 +184,7 @@ public class SDEJavaApiJoinTest extends TestCase {
 
         ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
         try {
-            InProcessViewSupportTestData.setUp(conn);
+            InProcessViewSupportTestData.setUp(conn, testData);
         } finally {
             conn.close();
         }

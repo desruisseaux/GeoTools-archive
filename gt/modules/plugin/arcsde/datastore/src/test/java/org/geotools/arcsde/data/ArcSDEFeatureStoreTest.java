@@ -685,13 +685,20 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             final SimpleFeature feature2 = iterator.next();
             iterator.close();
 
-            Polygon actual1 = (Polygon) feature1.getAttribute(defaultGeometry.getLocalName());
-            Polygon actual2 = (Polygon) feature2.getAttribute(defaultGeometry.getLocalName());
+            //Note that for tables that are ambiguous about what types of geometries
+            //they store (as this table is), ArcSDE will "compress" a stored geometry
+            //to it's simplest representation.  So in case the defaultGeometry.getBinding()
+            //returns "Geometry", do instanceof checks to verify what kind of geometry
+            //you're getting back
+            Geometry actual1 = (Geometry) feature1.getAttribute(defaultGeometry.getLocalName());
+            Geometry actual2 = (Geometry) feature2.getAttribute(defaultGeometry.getLocalName());
             System.out.println(actual1);
             System.out.println(modif1);
 
-            assertTrue(modif1.equals(actual1));
-            assertTrue(modif2.equals(actual2));
+            //there's some rounding that goes on inside SDE.  Need to do some simple buffering to make sure
+            //we're not getting rounding errors
+            assertTrue(modif1.buffer(.01).contains(actual1));
+            assertTrue(modif2.buffer(.01).contains(actual2));
         } finally {
             try {
                 store.removeFeatures(fid1Filter);
@@ -982,7 +989,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * @throws Exception
      */
     public void testTransactionStateDiff() throws Exception {
-        testData.insertTestData();
+    	testData.createTempTable(true);
+        //testData.insertTestData();
 
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTemp_table();

@@ -123,7 +123,7 @@ public class ArcSDEGCReaderSymbolizedTest extends TestCase {
         // ImageIO.write(((GridCoverage2D)
         // rsp.recolorCoverage(gc)).geophysics(true).getRenderedImage(), "PNG",
         // new File("threeBandRecolored.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(
+        assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
                 ((GridCoverage2D) rsp.recolorCoverage(gc)).geophysics(true).getRenderedImage(),
                 "threeBandRecolored.png"));
 
@@ -133,7 +133,7 @@ public class ArcSDEGCReaderSymbolizedTest extends TestCase {
         // ImageIO.write(((GridCoverage2D)
         // rsp.recolorCoverage(gc)).geophysics(false).getRenderedImage(), "PNG",
         // new File("fourBandRecolored.png"));
-        assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(
+        assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
                 ((GridCoverage2D) rsp.recolorCoverage(gc)).geophysics(true).getRenderedImage(),
                 "fourBandRecolored.png"));
 

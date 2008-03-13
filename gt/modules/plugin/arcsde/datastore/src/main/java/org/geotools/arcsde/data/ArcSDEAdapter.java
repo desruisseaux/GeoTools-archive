@@ -648,15 +648,10 @@ public class ArcSDEAdapter {
         // type.
         // In that case, it is *highly* recomended that it support all the
         // geometry types, so we can safely return Geometry.class. If this
-        // is
-        // not
-        // the case and the shape type supports just a few geometry types,
-        // then
-        // we give it a chance and return Geometry.class anyway, but be
-        // aware
-        // that transactions over that layer could fail if a Geometry that
-        // is
-        // not supported is tried for insertion.
+        // is not the case and the shape type supports just a few geometry types,
+        // then we give it a chance and return Geometry.class anyway, but be
+        // aware that transactions over that layer could fail if a Geometry that
+        // is not supported is tried for insertion.
         if ((isPoint + isLineString + isPolygon) > 1) {
             clazz = Geometry.class;
 

@@ -71,7 +71,7 @@ public class InProcessViewSupportTestData {
 
     public static final String typeName = "MasterChildTest";
 
-    public static void setUp(ArcSDEPooledConnection conn) throws SeException, DataSourceException,
+    public static void setUp(ArcSDEPooledConnection conn, TestData td) throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
 
         testCrs = DefaultGeographicCRS.WGS84;
@@ -87,15 +87,15 @@ public class InProcessViewSupportTestData {
 
         MASTER = conn.getUser() + "." + MASTER_UNQUALIFIED;
         CHILD = conn.getUser() + "." + CHILD_UNQUALIFIED;
-        createMasterTable(conn);
-        createChildTable(conn);
+        createMasterTable(conn, td);
+        createChildTable(conn, td);
 
         registerViewParams = new HashMap();
         registerViewParams.put("sqlView.1.typeName", typeName);
         registerViewParams.put("sqlView.1.sqlQuery", masterChildSql);
     }
 
-    private static void createMasterTable(ArcSDEPooledConnection conn) throws SeException,
+    private static void createMasterTable(ArcSDEPooledConnection conn, TestData td) throws SeException,
             DataSourceException, UnavailableArcSDEConnectionException {
         SeTable table = new SeTable(conn, MASTER);
         SeLayer layer = null;
@@ -113,7 +113,7 @@ public class InProcessViewSupportTestData {
         colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
         colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0, false);
 
-        table.create(colDefs, "DEFAULTS");
+        table.create(colDefs, td.getConfigKeyword());
 
         layer.setSpatialColumnName("SHAPE");
         layer.setShapeTypes(SeLayer.SE_POINT_TYPE_MASK);
@@ -121,13 +121,15 @@ public class InProcessViewSupportTestData {
         layer.setDescription("Geotools sde pluing join support testing master table");
         SeCoordinateReference coordref = new SeCoordinateReference();
         coordref.setCoordSysByDescription(testCrs.toWKT());
+        
+        layer.setCreationKeyword(td.getConfigKeyword());
         layer.create(3, 4);
 
         insertMasterData(conn, layer);
         LOGGER.info("successfully created master table " + layer.getQualifiedName());
     }
 
-    private static void createChildTable(ArcSDEPooledConnection conn) throws DataSourceException,
+    private static void createChildTable(ArcSDEPooledConnection conn, TestData td) throws DataSourceException,
             UnavailableArcSDEConnectionException, SeException {
         SeTable table = new SeTable(conn, CHILD);
         try {
@@ -145,7 +147,7 @@ public class InProcessViewSupportTestData {
         colDefs[3] = new SeColumnDefinition("DESCRIPTION", SeColumnDefinition.TYPE_STRING, 255, 0,
                 false);
 
-        table.create(colDefs, "DEFAULTS");
+        table.create(colDefs, td.getConfigKeyword());
 
         /*
          * SeRegistration tableRegistration = new SeRegistration(conn, CHILD);

@@ -98,7 +98,10 @@ public class ArcSDEPyramidTest extends TestCase {
         assertTrue(ret.image.width == 150 && ret.image.height == 150);
     }
 
-    public void testArcSDEPyramidThreeBand() throws Exception {
+    /*
+     * NEED TO PORT TO NEW RASTER TEST FRAMEWORK (use RasterTestData, loadable sample data, etc)
+     */
+    public void donttestArcSDEPyramidThreeBand() throws Exception {
 
         ArcSDEPooledConnection scon = pool.getConnection();
         SeRasterAttr rAttr;
@@ -143,6 +146,9 @@ public class ArcSDEPyramidTest extends TestCase {
 
     }
 
+    /*
+     * NEED TO PORT TO NEW RASTER TEST FRAMEWORK (use RasterTestData, loadable sample data, etc)
+     */
     public void testArcSDEPyramidFourBand() throws Exception {
 
         ArcSDEPooledConnection scon = pool.getConnection();

@@ -210,7 +210,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
@@ -218,7 +218,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
@@ -227,7 +227,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
             if (scon != null && !scon.isClosed())
@@ -284,7 +284,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
@@ -298,7 +298,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
@@ -313,7 +313,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
             if (scon != null)
@@ -365,7 +365,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
@@ -373,7 +373,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
@@ -382,7 +382,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
             if (scon != null)
@@ -440,7 +440,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
@@ -454,7 +454,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(100, 100));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "2.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "2.png"));
 
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
@@ -469,7 +469,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             rParam.setDestinationOffset(new Point(0, 0));
             reader.read(8, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "3.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
             if (scon != null && !scon.isClosed())
@@ -517,7 +517,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
         } catch (Exception e) {
             throw e;
@@ -573,7 +573,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             reader.read(9, rParam);
             // ImageIO.write(image, "PNG", new File(imgPrefix + "1.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
         } finally {
             if (scon != null && !scon.isClosed())

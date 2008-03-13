@@ -8,7 +8,7 @@ public class ArcSDERasterTestSuite {
     public static Test suite() throws Exception {
         TestSuite suite = new TestSuite();
 
-        suite.addTestSuite(UnsignedByteBandCopierTest.class);
+        suite.addTestSuite(BandCopierTest.class);
         suite.addTestSuite(ArcSDEPyramidTest.class);
         suite.addTestSuite(ArcSDEImageIOReaderFunctionalTest.class);
         suite.addTestSuite(ArcSDEImageIOReaderOutputFormatsTest.class);

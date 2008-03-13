@@ -41,7 +41,7 @@ import com.esri.sde.sdk.client.SeRasterAttr;
  */
 public class ArcSDEPyramid {
 
-    ArrayList pyramidList;
+    ArrayList<ArcSDEPyramidLevel> pyramidList;
 
     int tileWidth, tileHeight;
 
@@ -59,7 +59,7 @@ public class ArcSDEPyramid {
             throws DataSourceException {
         try {
             final int numLevels = rasterAttributes.getMaxLevel() + 1;
-            pyramidList = new ArrayList(numLevels);
+            pyramidList = new ArrayList<ArcSDEPyramidLevel>(numLevels);
 
             tileWidth = rasterAttributes.getTileWidth();
             tileHeight = rasterAttributes.getTileHeight();
@@ -95,7 +95,7 @@ public class ArcSDEPyramid {
     }
 
     public ArcSDEPyramidLevel getPyramidLevel(int level) {
-        return (ArcSDEPyramidLevel) pyramidList.get(level);
+        return pyramidList.get(level);
     }
 
     public int getNumLevels() {

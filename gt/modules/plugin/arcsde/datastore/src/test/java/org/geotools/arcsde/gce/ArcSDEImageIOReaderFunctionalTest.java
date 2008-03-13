@@ -19,20 +19,21 @@ package org.geotools.arcsde.gce;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
+import java.io.File;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -41,321 +42,539 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRasterAttr;
 import com.esri.sde.sdk.client.SeRasterBand;
+import com.esri.sde.sdk.client.SeRasterColumn;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 
 /**
- * Tests the functionality of the ArcSDE raster-display package to read rasters
- * from an ArcSDE database
+ * Tests the functionality of the ArcSDE raster-display package to read rasters from an ArcSDE database
  * 
  * @author Saul Farber, (based on ArcSDEPoolTest by Gabriel Roldan)
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/ArcSDEImageIOReaderFunctionalTest.java $
- * @version $Id: ArcSDEImageIOReaderFunctionalTest.java 28048 2007-11-26
- *          12:53:18Z groldan $
+ * @source $URL$
+ * @version $Id$
  */
 public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
-    private static Logger LOGGER = org.geotools.util.logging.Logging
-            .getLogger("org.geotools.arcsde.gce");
+	private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.gce");
 
-    private Properties conProps;
+	static RasterTestData rasterTestData;
+	static HashMap<String, Object> fourBandReaderProps, threeBandReaderProps, oneBitReaderProps;
+	static SeRasterAttr rattrThreeBand, rattrFourBand, rattrOneBit;
 
-    private ArcSDEConnectionPool pool = null;
+	/**
+	 * Creates a new ArcSDEConnectionPoolTest object.
+	 * 
+	 * Lots of one-time setup operations in here. Rather than re-do everything for each test, it's just done once in the class constructor.
+	 * 
+	 * Not sure how this jives with JUnits testing framework though...
+	 * 
+	 */
+	public ArcSDEImageIOReaderFunctionalTest(String name) throws Exception {
+		super(name);
+	}
 
-    private HashMap fourBandReaderProps, threeBandReaderProps;
+	public static Test suite() {
+		TestSuite suite = new TestSuite();
+		suite.addTestSuite(ArcSDEImageIOReaderFunctionalTest.class);
 
-    private SeRasterAttr rasterAttrThreeBand, rasterAttrFourBand;
+		TestSetup wrapper = new TestSetup(suite) {
+			@Override
+			protected void setUp() throws Exception {
+				oneTimeSetUp();
+			}
 
-    /**
-     * Creates a new ArcSDEConnectionPoolTest object.
-     * 
-     * Lots of one-time setup operations in here. Rather than re-do everything
-     * for each test, it's just done once in the class constructor.
-     * 
-     * Not sure how this jives with JUnits testing framework though...
-     * 
-     */
-    public ArcSDEImageIOReaderFunctionalTest(String name) throws Exception {
-        super(name);
-    }
+			@Override
+			protected void tearDown() throws Exception {
+				oneTimeTearDown();
+			}
+		};
+		return wrapper;
+	}
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+	private static void oneTimeSetUp() throws Exception {
 
-        // do the setup one-time only.
-        if (conProps != null)
-            return;
+		rasterTestData = new RasterTestData();
+		rasterTestData.setUp();
+		rasterTestData.load1bitRaster();
+		rasterTestData.loadRGBRaster();
 
-        InputStream in = org.geotools.test.TestData.url(null, "raster-testparams.properties")
-                .openStream();
-        conProps = new Properties();
-        conProps.load(in);
-        in.close();
+		ArcSDEPooledConnection scon = null;
+		SeQuery q = null;
+		ArcSDEPyramid pyramid;
+		SeRow r;
+		String tableName;
+		try {
 
-        ArcSDEConnectionConfig connectionConfig = new ArcSDEConnectionConfig(conProps);
-        pool = ArcSDEConnectionPoolFactory.getInstance().createPool(connectionConfig);
+			// Set up a pyramid and readerprops for the sample three-band imagery
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+			tableName = rasterTestData.getRGBRasterTableName();
+			q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+			q.prepareQuery();
+			q.execute();
+			r = q.fetch();
+			rattrThreeBand = r.getRaster(0);
+			q.close();
 
-        ArcSDEPooledConnection scon = null;
-        SeQuery q = null;
-        ArcSDEPyramid pyramid;
-        SeRow r;
-        CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
-        String tableName;
-        try {
+			SeRasterColumn rcol = new SeRasterColumn(scon, rattrThreeBand.getRasterColumnId());
 
-            // Set up a pyramid and readerprops for the four-band 2005 imagery
-            scon = pool.getConnection();
-            tableName = conProps.getProperty("fourbandtable");
-            q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
-            q.prepareQuery();
-            q.execute();
-            r = q.fetch();
-            rasterAttrFourBand = r.getRaster(0);
-            pyramid = new ArcSDEPyramid(rasterAttrFourBand, crs);
+			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSys().toString());
+			pyramid = new ArcSDEPyramid(rattrThreeBand, crs);
 
-            fourBandReaderProps = new HashMap();
-            fourBandReaderProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
-            fourBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
-            fourBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
-        } catch (SeException se) {
-            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-            throw se;
-        } finally {
-            if (q != null)
-                q.close();
-            if (scon != null) {
-                scon.close();
-            }
-        }
+			threeBandReaderProps = new HashMap<String, Object>();
+			threeBandReaderProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
+			threeBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
+			threeBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
+		} catch (SeException se) {
+			LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+			throw se;
+		} finally {
+			if (q != null)
+				q.close();
+			if (scon != null) {
+				scon.close();
+			}
+		}
+		
+		try {
 
-        try {
+			// Set up a pyramid and readerprops for the sample 1-bit imagery
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+			tableName = rasterTestData.get1bitRasterTableName();
+			q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+			q.prepareQuery();
+			q.execute();
+			r = q.fetch();
+			rattrOneBit = r.getRaster(0);
+			q.close();
 
-            scon = pool.getConnection();
-            tableName = conProps.getProperty("threebandtable");
-            q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
-            q.prepareQuery();
-            q.execute();
-            r = q.fetch();
-            rasterAttrThreeBand = r.getRaster(0);
-            pyramid = new ArcSDEPyramid(rasterAttrThreeBand, crs);
+			SeRasterColumn rcol = new SeRasterColumn(scon, rattrOneBit.getRasterColumnId());
 
-            threeBandReaderProps = new HashMap();
-            threeBandReaderProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
-            threeBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
-            threeBandReaderProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
-        } catch (SeException se) {
-            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-            throw se;
-        } finally {
-            if (q != null)
-                q.close();
-            if (scon != null) {
-                scon.close();
-            }
-        }
-    }
+			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSys().toString());
+			pyramid = new ArcSDEPyramid(rattrOneBit, crs);
 
-    /**
-     * Tests reading the first three bands of a 4-band image (1 = RED, 2 =
-     * GREEN, 3 = BLUE, 4 = NEAR_INFRARED) into a TYPE_INT_RGB image.
-     * 
-     * Bands are mapped as follows: rasterband 1 => image band 0 rasterband 2 =>
-     * image band 1 rasterband 3 => image band 2
-     * 
-     */
-    public void testReadOutsideImageBounds() throws Exception {
+			oneBitReaderProps = new HashMap<String, Object>();
+			oneBitReaderProps.put(ArcSDERasterReaderSpi.PYRAMID, pyramid);
+			oneBitReaderProps.put(ArcSDERasterReaderSpi.RASTER_TABLE, tableName);
+			oneBitReaderProps.put(ArcSDERasterReaderSpi.RASTER_COLUMN, "RASTER");
+		} catch (SeException se) {
+			LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+			throw se;
+		} finally {
+			if (q != null)
+				q.close();
+			if (scon != null) {
+				scon.close();
+			}
+		}
+	}
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
-                .createReaderInstance(fourBandReaderProps);
+	private static void oneTimeTearDown() throws Exception {
+		rasterTestData.tearDown();
+		rasterTestData.getTestData().tearDown(true, true);
+	}
 
-        ArcSDEPooledConnection scon = null;
-        try {
-            scon = pool.getConnection();
+	/**
+	 * Tests reading the first three bands of a 4-band image (1 = RED, 2 = GREEN, 3 = BLUE, 4 = NEAR_INFRARED) into a TYPE_INT_RGB image.
+	 * 
+	 * Bands are mapped as follows: rasterband 1 => image band 0 rasterband 2 => image band 1 rasterband 3 => image band 2
+	 * 
+	 */
+	public void testReadOutsideRGBImageBounds() throws Exception {
 
-            SeRasterBand[] bands = rasterAttrFourBand.getBands();
-            HashMap bandMapper = new HashMap();
-            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
-            // blue band
-            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
-            // green band
-            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
 
-            BufferedImage image;
-            int[] opaque;
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
-            ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
-            rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0, 0, 100, 100));
-            image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-            opaque = new int[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < opaque.length; i++) {
-                opaque[i] = opaque[i] = 0xff000000;
-            }
-            rParam.setDestination(image);
-            rParam.setBandMapper(bandMapper);
+			SeRasterBand[] bands = rattrThreeBand.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
 
-            reader.read(9, rParam);
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+			bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
+			bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
-            // ImageIO.write(image, "PNG", new
-            // File("testReadOutsideImageBounds.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
-                    conProps.getProperty("testReadOutsideImageBounds.image")));
+			BufferedImage image;
+			int[] opaque;
 
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
-        }
-    }
+			final Point dataOffset = new Point(950, 950);
+			final int w = 300, h = 300;
 
-    public void testReadOffsetImage() throws Exception {
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1, 2, 3 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					image.setRGB(x, y, 0xffffffff);
+				}
+			}
+			rParam.setDestination(image);
+			rParam.setBandMapper(bandMapper);
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
-                .createReaderInstance(fourBandReaderProps);
+			reader.read(0, rParam);
 
-        ArcSDEPooledConnection scon = null;
-        try {
-            scon = pool.getConnection();
+			// ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.rgbraster");
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
 
-            SeRasterBand[] bands = rasterAttrFourBand.getBands();
-            HashMap bandMapper = new HashMap();
-            // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
-            // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
-            // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+			final int sourcemaxw = Math.min(rattrThreeBand.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrThreeBand.getImageHeightByLevel(0) - dataOffset.y, h);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image.getSubimage(0, 0, sourcemaxw, sourcemaxh), originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh)));
 
-            BufferedImage image;
-            int[] opaque;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
 
-            ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+	public void testReadOffsetRGBImage() throws Exception {
 
-            image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
-            opaque = new int[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < opaque.length; i++) {
-                opaque[i] = 0xff000000;
-            }
-            image.getSampleModel().setSamples(0, 0, image.getWidth(), image.getHeight(), 3, opaque,
-                    image.getRaster().getDataBuffer());
-            rParam.setDestination(image);
-            rParam.setDestinationOffset(new Point(100, 100));
-            rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0, 0, 100, 100));
-            rParam.setBandMapper(bandMapper);
-            reader.read(8, rParam);
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
 
-            // ImageIO.write(image, "PNG", new File("testReadOffsetImage.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
-                    conProps.getProperty("testReadOffsetImage.image")));
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
-        } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
-        }
-    }
+			SeRasterBand[] bands = rattrThreeBand.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
 
-    public void testReadOffLeftImage() throws Exception {
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+			bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
+			bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
-                .createReaderInstance(fourBandReaderProps);
+			BufferedImage image;
+			int[] opaque;
 
-        ArcSDEPooledConnection scon = null;
-        try {
-            scon = pool.getConnection();
+			final Point dataOffset = new Point(0, 0);
+			final Point imageOffset = new Point(100, 100);
+			final int w = 1200, h = 1200;
 
-            SeRasterBand[] bands = rasterAttrFourBand.getBands();
-            HashMap bandMapper = new HashMap();
-            // red band
-            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
-            // blue band
-            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
-            // green band
-            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_INT_RGB);
 
-            BufferedImage image;
-            int[] opaque;
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1, 2, 3 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
 
-            ArcSDERasterImageReadParam rParam;
+			reader.read(0, rParam);
 
-            rParam = new ArcSDERasterImageReadParam();
-            rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0, 0, 67, 86));
-            image = new BufferedImage(294, 207, BufferedImage.TYPE_INT_ARGB);
-            opaque = new int[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < opaque.length; i++) {
-                opaque[i] = opaque[i] = 0xff000000;
-            }
-            rParam.setDestination(image);
-            rParam.setBandMapper(bandMapper);
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.rgbraster");
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
 
-            reader.read(11, rParam);
+			final int sourcemaxw = Math.min(rattrThreeBand.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrThreeBand.getImageHeightByLevel(0) - dataOffset.y, h);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh), originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh)));
 
-            // ImageIO.write(image, "PNG", new
-            // File("testReadOffLeftImage.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
-                    conProps.getProperty("testReadOffLeftImage.image")));
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageTileAligned() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
-        }
-    }
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
-    public void testReadStateWide() throws Exception {
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
 
-        ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
-                .createReaderInstance(fourBandReaderProps);
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
 
-        ArcSDEPooledConnection scon = null;
-        try {
-            scon = pool.getConnection();
+			BufferedImage image;
 
-            SeRasterBand[] bands = rasterAttrFourBand.getBands();
-            HashMap bandMapper = new HashMap();
-            // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
-            // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
-            // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+			final Point dataOffset = new Point(0, 0);
+			final Point imageOffset = new Point(0, 0);
+			final int w = 256, h = 256;
 
-            BufferedImage image;
-            int[] opaque;
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
 
-            ArcSDERasterImageReadParam rParam;
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
 
-            rParam = new ArcSDERasterImageReadParam();
-            rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
-            rParam.setSourceRegion(new Rectangle(0, 16, 586, 335));
-            image = new BufferedImage(587, 335, BufferedImage.TYPE_INT_ARGB);
-            opaque = new int[image.getWidth() * image.getHeight()];
-            for (int i = 0; i < opaque.length; i++) {
-                opaque[i] = opaque[i] = 0xff000000;
-            }
-            rParam.setDestination(image);
-            rParam.setBandMapper(bandMapper);
+			reader.read(0, rParam);
 
-            reader.read(10, rParam);
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
 
-            // ImageIO.write(image, "PNG", new File("testReadStateWide.png"));
-            assertTrue("Image from SDE isn't what we expected.", RasterTestUtils.imageEquals(image,
-                    conProps.getProperty("testReadStateWide.image")));
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
 
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
-        }
-    }
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageByteAligned() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
+
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+
+			BufferedImage image;
+
+			final Point dataOffset = new Point(8, 8);
+			final Point imageOffset = new Point(0, 0);
+			final int w = 256, h = 256;
+
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
+
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
+
+			reader.read(0, rParam);
+
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageDataOffset1() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
+
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+
+			BufferedImage image;
+
+			final Point dataOffset = new Point(3, 3);
+			final Point imageOffset = new Point(0, 0);
+			final int w = 128, h = 128;
+
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
+
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
+
+			reader.read(0, rParam);
+
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageDataOffset2() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
+
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+
+			BufferedImage image;
+
+			final Point dataOffset = new Point(15, 15);
+			final Point imageOffset = new Point(0, 0);
+			final int w = 176, h = 176;
+
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
+
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
+
+			reader.read(0, rParam);
+
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			//ImageIO.write(originalImage.getSubimage(0, 0, 200, 200), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + "-original.png"));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageTargetImageOffset1() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
+
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+
+			BufferedImage image;
+
+			final Point dataOffset = new Point(0, 0);
+			final Point imageOffset = new Point(5, 5);
+			final int w = 176, h = 176;
+
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
+
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
+
+			reader.read(0, rParam);
+
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			//ImageIO.write(originalImage.getSubimage(0, 0, 200, 200), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + "-original.png"));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
+	
+	public void testRead1bitImageTargetImageBeyondBoundaries1() throws Exception {
+		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
+
+		ArcSDEPooledConnection scon = null;
+		try {
+			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+
+			SeRasterBand[] bands = rattrOneBit.getBands();
+			HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
+
+			bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+
+			BufferedImage image;
+
+			final Point dataOffset = new Point(400, 400);
+			final Point imageOffset = new Point(30, 30);
+			final int w = 176, h = 176;
+
+			image = new BufferedImage(w + imageOffset.x, h + imageOffset.y, BufferedImage.TYPE_BYTE_BINARY);
+
+			ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+			rParam.setSourceBands(new int[] { 1 });
+			rParam.setConnection(scon);
+			rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
+			rParam.setDestination(image);
+			rParam.setDestinationOffset(imageOffset);
+			rParam.setBandMapper(bandMapper);
+
+			reader.read(0, rParam);
+
+			//ImageIO.write(image, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+			final String rasFileName = rasterTestData.getRasterTestDataProperty("sampledata.onebitraster");
+
+			final int sourcemaxw = Math.min(rattrOneBit.getImageWidthByLevel(0) - dataOffset.x, w);
+			final int sourcemaxh = Math.min(rattrOneBit.getImageHeightByLevel(0) - dataOffset.y, h);
+			BufferedImage originalImage = ImageIO.read(org.geotools.test.TestData.getResource(null, rasFileName));
+			//ImageIO.write(originalImage.getSubimage(0, 0, 200, 200), "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + "-original.png"));
+			originalImage = originalImage.getSubimage(dataOffset.x, dataOffset.y, sourcemaxw, sourcemaxh);
+			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+					image.getSubimage(imageOffset.x, imageOffset.y, sourcemaxw, sourcemaxh),
+					originalImage));
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (scon != null && !scon.isClosed())
+				scon.close();
+		}
+	}
 }

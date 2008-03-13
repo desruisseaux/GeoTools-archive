@@ -112,6 +112,13 @@ public class ArcSDEPyramidLevel {
     public ReferencedEnvelope getEnvelope() {
         return new ReferencedEnvelope(this.envelope);
     }
+    
+    /**
+     * @return The total number of pixels in the image at this level
+     */
+    public Dimension getSize() {
+    	return size;
+    }
 
     @Override
     public String toString() {
