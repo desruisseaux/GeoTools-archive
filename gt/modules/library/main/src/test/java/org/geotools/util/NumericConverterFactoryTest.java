@@ -14,7 +14,6 @@ public class NumericConverterFactoryTest extends TestCase {
 	}
 	
 	public void testIntegral() throws Exception {
-		
 		//to byte
 		assertEquals( new Byte( (byte)127 ), convert( new Byte( (byte)127 ), Byte.class ) );
 		assertEquals( new Byte( (byte)127 ), convert( new Short( (short)127 ), Byte.class ) );
@@ -125,9 +124,34 @@ public class NumericConverterFactoryTest extends TestCase {
 	public void testStringToInteger() throws Exception {
 	    assertEquals( new Integer(127), convert( "127", Integer.class ) );
 	    assertEquals( new Integer(127), convert( " 127 ", Integer.class ) );
+	    assertEquals( new Integer(3), convert( " 3.0 ", Integer.class ) );
+	    assertEquals( new Integer(-3), convert( "-3.0 ", Integer.class ) );
+	    assertEquals( new Integer(3000), convert( "3000.0 ", Integer.class ) );
+	    assertEquals( new Integer(3000), convert( "3000,0 ", Integer.class ) );	    
+	}
+	public void testStringToDouble() throws Exception {
+	    assertEquals( new Double(4.4), convert( "4.4", Double.class ) );	    
+        assertEquals( new Double(127), convert( "127", Double.class ) );
+        assertEquals( new Double(127), convert( " 127 ", Double.class ) );
+        assertEquals( new Double(3), convert( " 3.0 ", Double.class ) );
+        assertEquals( new Double(-3), convert( "-3.0 ", Double.class ) );
+        assertEquals( new Double(3000), convert( "3000.0 ", Double.class ) );
+    }
+	
+	public void testStringToNumber() throws Exception {
+	    assertEquals( new Double(4.4), convert( "4.4", Number.class ));
 	}
 	
 	Object convert( Object source, Class target ) throws Exception {
 		return factory.createConverter( source.getClass(), target, null ).convert( source, target );
+	}
+	
+	public static void testIntegralHandling(){
+	    assertEquals( "3", NumericConverterFactory.toIntegral("3"));
+	    assertEquals( "3", NumericConverterFactory.toIntegral("3.0"));
+	    assertEquals( "-3", NumericConverterFactory.toIntegral("-3"));
+	    assertEquals( "-3", NumericConverterFactory.toIntegral("-3.0"));
+	    assertEquals( "3000", NumericConverterFactory.toIntegral("3000.0"));
+	    assertEquals( "3000", NumericConverterFactory.toIntegral("3000,0"));
 	}
 }

@@ -108,6 +108,11 @@ import org.opengis.filter.spatial.Within;
 public class Filters {
 	/** <code>NOTFOUND</code> indicates int value was unavailable */
 	public static final int NOTFOUND = -1;
+
+	/**
+	 * Set to true to start throwing exceptions when org.geotools.filter.Filter is used.
+	 */
+    private static final boolean STRICT = false;
 	
 	FilterFactory ff;
 	
@@ -121,48 +126,110 @@ public class Filters {
 		ff = factory;
 	}
     
-    public static Filter and( org.opengis.filter.FilterFactory ff, Filter a, Filter b ){
-        ArrayList list = new ArrayList();
-        if( a instanceof And){
-            And some = (And) a;            
+	/**
+	 * Safe version of FilterFactory *and* that is willing to combine
+	 * filter1 and filter2 correctly in the even either of them is already
+	 * an And filter.
+	 * 
+	 * @param ff
+	 * @param filter1
+	 * @param filter2
+	 * @return And
+	 */
+    public static Filter and( org.opengis.filter.FilterFactory ff, Filter filter1, Filter filter2 ){
+        ArrayList<Filter> list = new ArrayList<Filter>(2);
+        if( filter1 == null ){
+            // ignore
+        }
+        else if( filter1 instanceof And){
+            And some = (And) filter1;            
             list.addAll( some.getChildren() );
         }
         else {
-            list.add( a );
+            list.add( filter1 );
         }
-        if( b instanceof And){
-            And more = (And) b;            
+        
+        if( filter2 == null ){
+            // ignore
+        }
+        else if( filter2 instanceof And){
+            And more = (And) filter2;            
             list.addAll( more.getChildren() );
         }
         else {
-            list.add( b );
+            list.add( filter2 );
         }
-        return ff.and( list );
+        
+        if( list.size() == 0 ){
+            return Filter.EXCLUDE;
+        }
+        else if( list.size() == 1 ){
+            return list.get(0);
+        }
+        else {
+            return ff.and( list );
+        }
     }
-    public static Filter or( org.opengis.filter.FilterFactory ff, Filter a, Filter b ){
-        ArrayList list = new ArrayList();
-        if( a instanceof Or){
-            Or some = (Or) a;            
+    /**
+     * Safe version of FilterFactory *or* that is willing to combine
+     * filter1 and filter2 correctly in the even either of them is already
+     * an Or filter.
+     * 
+     * @param ff
+     * @param filter1
+     * @param filter2
+     * @return
+     */
+    public static Filter or( org.opengis.filter.FilterFactory ff, Filter filter1, Filter filter2 ){
+        ArrayList<Filter> list = new ArrayList<Filter>();
+        if( filter1 == null ){
+            // ignore
+        }
+        else if( filter1 instanceof Or){
+            Or some = (Or) filter1;            
             list.addAll( some.getChildren() );
         }
         else {
-            list.add( a );
+            list.add( filter1 );
         }
-        if( b instanceof Or){
-            Or more = (Or) b;            
+        
+        if( filter2 == null){
+            // ignore
+        }
+        else if( filter2 instanceof Or){
+            Or more = (Or) filter2;            
             list.addAll( more.getChildren() );
         }
         else {
-            list.add( b );
+            list.add( filter2 );
         }
-        return ff.or( list );
-    }  
+        
+        if( list.size() == 0 ){
+            return Filter.EXCLUDE;
+        }
+        else if( list.size() == 1 ){
+            return list.get(0);
+        }
+        else {
+            return ff.or( list );
+        }
+    }
     
     /**
      * Safely visit the provided filter.
+     * <p>
+     * This method handles the case of:
+     * <ul>
+     * <li>Filter.INCLUDES: will call FilterVisitor2 method if available
+     * <li>Filter.EXCLUDES: will call FilterVisitor2 method if available
+     * <li>org.geotools.filter.Filter: will visit
+     * </ul>
+     * Please note that when called with a strict *org.opengis.filter.Filter* this
+     * method will fail with a ClassCastException
      * 
      * @param filter
      * @param visitor
+     * @deprecated Please update your code to a org.opengis.filter.FilterVisitor
      */
     public static void accept( org.opengis.filter.Filter filter, FilterVisitor visitor ){        
        if( filter == Filter.EXCLUDE ){
@@ -182,8 +249,18 @@ public class Filters {
            ((org.geotools.filter.Filter) filter).accept( visitor );
        }
        else {
-           throw new ClassCastException("Please update your code to a org.opengis.filter.FilterVisitor");
-       }
+           if( STRICT ){
+               // don't even try ..
+               throw new ClassCastException("Please update your code to a org.opengis.filter.FilterVisitor");
+           }
+           // Copy the provided filter into the old org.geotools.filter.Filter api           
+           FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+           DuplicatingFilterVisitor xerox = new DuplicatingFilterVisitor( ff );           
+           org.geotools.filter.Filter copy = (org.geotools.filter.Filter) filter.accept( xerox, ff );
+           
+           // Visit the resulting copy
+           copy.accept(visitor);
+       }       
     }
     /**
      * Deep copy the filter.
@@ -211,7 +288,7 @@ public class Filters {
      * AFTER: filter instanceof Contains
      * </code></pre>
      * @param filter
-     * @deprecated please use instanceof
+     * @deprecated please use instanceof checks
      */
     public static short getFilterType( org.opengis.filter.Filter filter ){
         if( filter == org.opengis.filter.Filter.EXCLUDE ) return FilterType.ALL;
@@ -250,13 +327,26 @@ public class Filters {
         return 0;
     }
     /**
-     * Uses number( expr ), will turn result into an interger, or NOTFOUND
-     *
+     * Obtain the provided Expression as an integer.
+     * <p>
+     * This method is quickly used to safely check Literal expressions.
+     * 
      * @param expr
-     *
      * @return int value of first Number, or NOTFOUND
      */
     public static int asInt( Expression expr ) {
+        if( expr == null ) return NOTFOUND;
+        try {
+            Integer number = expr.evaluate( null, Integer.class );
+            if( number == null ){
+                return NOTFOUND;
+            }
+            return number;
+        }
+        catch( NullPointerException npe ){
+            return NOTFOUND; // well that was not unexpected
+        }
+        /*
         Number number = (Number) asType(expr, Number.class);
  	
         if (number != null) {
@@ -275,54 +365,55 @@ public class Filters {
         
         //no dice
         return NOTFOUND;
+        */
     }
 
     /**
-     * Uses string( expr ), will turn result into a String
+     * Obtain the provided Expression as a String.
+     * <p>
+     * This method only reliably works when the Expression is a Literal.
      *
      * @param expr
      *
-     * @return value of first String
+     * @return Expression as a String, or null
      */
     public static String asString(Expression expr) {
-        String string = (String) asType(expr, String.class);
-
-        return string;
+        if( expr == null ) return null;
+        try {
+            return expr.evaluate( null, String.class );
+        }
+        catch( NullPointerException npe){
+            // must be a more complicated expression than a literal
+            return null;            
+        }
     }
 
     /**
-     * Uses number( expr ), will turn result into an interger, or NaN.
-     *
+     * Obtain the provided Expression as a double.
      * @param expr
-     *
      * @return int value of first Number, or Double.NaN
      */
     public static double asDouble(Expression expr) {
-        Number number = (Number) asType(expr, Number.class);
-
-        if (number != null) {
+        if( expr != null ) {
+            return Double.NaN;
+        }        
+        try {
+            Double number = expr.evaluate(null, Double.class );
+            if( number == null ) {
+                return Double.NaN;
+            }   
             return number.doubleValue();
         }
-        
-        //try for a string
-        String string = (String) asType(expr,String.class);
-        if (string != null) {
-        	//try parsing into a double
-        	try {
-        		return Double.parseDouble(string);
-        	}
-        	catch(NumberFormatException e) {}
+        catch( NullPointerException npe){
+            // must be a more complicated expression than a literal
+            return Double.NaN;            
         }
-
-        //too bad
-        return Double.NaN;
     }
     
     /**
-     * Navigate through the expression seaching for TYPE.
-     * 
+     * Navigate through the expression searching for something that can be a TYPE.
      * <p>
-     * This will work even with dynamic expression that would normall require a
+     * This will work even with dynamic expression that would normally require a
      * feature. It works especially well when the Expression is a Literal
      * literal (which is usually the case).
      * </p>
@@ -335,33 +426,30 @@ public class Filters {
      * </code></pre>
      * </p>
      *
-     * @param expr This only really works for downcasting literals to a value
+     * @param expr This only really works for down casting literals to a value
      * @param Target type
      *
      * @return expr smunched into indicated type
+     * @deprecated This is not a good idea; use expr.evaulate( null, TYPE )
      */
-    public static Object asType(Expression expr, Class TYPE) {
-        // TODO use the new converters stuff
+    public static <T> T asType(Expression expr, Class<T> TYPE) {
         if (expr == null) {
             return null;
-        }
+        }        
+        if( STRICT ){
+            return expr.evaluate(null, TYPE );
+        }        
         else if (expr instanceof Literal) {
-        		Literal literal = (Literal) expr;
-            Object value = literal.getValue();
-
-            if (TYPE.isInstance(value)) {
-                return value;
-            }
+        		Literal literal = (Literal) expr;        		
+        	return (T) literal.evaluate(null, TYPE );            
         }
         else if (expr instanceof Function) {
         		Function function = (Function) expr;
         		List params = function.getParameters();
-            // JG - fix me this looks really wrong?
-            // taking the first parameter that matches?
             if ( params != null && params.size() != 0 ) {
                 for (int i = 0; i < params.size(); i++) {
                     Expression e = (Expression) params.get(i);
-                    Object value = asType(e, TYPE);
+                    T value = asType(e, TYPE);
 
                     if (value != null) {
                         return value;
@@ -371,7 +459,7 @@ public class Filters {
         }
         else {
             try { // this is a bad idea, not expected to work much
-                Object value = expr.evaluate(null, TYPE );
+                T value = expr.evaluate(null, TYPE );
 
                 if (TYPE.isInstance(value)) {
                     return value;

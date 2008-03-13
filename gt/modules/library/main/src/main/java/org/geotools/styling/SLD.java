@@ -33,11 +33,9 @@ import org.geotools.filter.Filters;
 
 
 /**
- * Utility class for working with Geotools SLD objects.
- * 
+ * Utility class for working with GeoTools SLD objects.
  * <p>
  * This class assumes a subset of the SLD specification:
- * 
  * <ul>
  * <li>
  * Single Rule - matching Filter.INCLUDE
@@ -47,13 +45,11 @@ import org.geotools.filter.Filters;
  * </li>
  * </ul>
  * </p>
- * 
  * <p>
  * When you start to branch out to SLD information that contains multiple rules
  * you will need to modify this class.
  * </p>
  *
- * @since 0.7.0
  * @source $URL$
  */
 public class SLD {
@@ -84,14 +80,23 @@ public class SLD {
         return strokeColor(stroke);
     }
 
+    /**
+     * @deprecated please use color( stroke )
+     * 
+     * @param stroke
+     * @return SLD.color( stroke )
+     */
     public static Color strokeColor(Stroke stroke) {
+        return color( stroke );
+    }
+
+    public static Color color(Stroke stroke) {
         if (stroke == null) {
             return null;
         }
-
         return color(stroke.getColor());
     }
-
+    
     public static Color color(Fill fill) {
         if (fill == null) {
             return null;
@@ -1192,21 +1197,6 @@ public class SLD {
     }
 
     /**
-     * This method is here for backwards compatability.
-     *
-     * @param expr DOCUMENT ME!
-     * @param TYPE DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @see org.geotools.filter.Filters#value(Expression, Class)
-     * @deprecated
-     */
-    public static Object value(Expression expr, Class TYPE) {
-        return Filters.asType(expr, TYPE);
-    }
-
-    /**
      * Navigate through the expression finding the first mentioned Color.
      * 
      * <p>
@@ -1225,7 +1215,8 @@ public class SLD {
         if (expr == null) {
             return null;
         }
-
+        return expr.evaluate(null, Color.class );
+        /*
         Color color = (Color) value(expr, Color.class);
 
         if (color != null) {
@@ -1243,8 +1234,8 @@ public class SLD {
         } catch (NumberFormatException badRGB) {
             // unavailable
         }
-
         return null;
+        */
     }
 
     /**
@@ -1255,7 +1246,7 @@ public class SLD {
      * @return DOCUMENT ME!
      *
      * @see Filters#intValue(Expression)
-     * @deprecated
+     * @deprecated Use expr.evaulate( null, Integer.class )
      */
     public static int intValue(Expression expr) {
         return Filters.asInt(expr);
@@ -1287,20 +1278,6 @@ public class SLD {
      */
     public static double doubleValue(Expression expr) {
         return Filters.asDouble(expr);
-    }
-
-    /**
-     * This method is here for backward compatability.
-     *
-     * @param expr DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @see Filters#number(Expression)
-     * @deprecated
-     */
-    public static Number number(Expression expr) {
-        return (Number) Filters.asType(expr, Number.class);
     }
 
     /**

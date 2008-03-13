@@ -34,7 +34,7 @@ public interface StyleFactory2 extends StyleFactory {
      * @param geometryPropertyName With respect to this geometry
      * @param graphic Used to draw a backdrop behind label
      *
-     * @return DOCUMENT ME!
+     * @return TextSymbolizer2 allowing for a backdrop behind text label
      */
     public TextSymbolizer2 createTextSymbolizer(Fill fill, Font[] fonts, Halo halo,
         Expression label, LabelPlacement labelPlacement, String geometryPropertyName,

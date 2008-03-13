@@ -226,7 +226,9 @@ public class AttributeTypeTest extends TestCase {
         
         type = AttributeTypeFactory.newAttributeType("testAttribute", Number.class, true);
         assertEquals(3d,((Number)type.parse(new Long(3))).doubleValue(),0);
-        assertEquals(4.4d,((Number)type.parse("4.4")).doubleValue(),0);
+        
+        Number number = (Number)type.parse("4.4");
+        assertEquals( 4.4d, number.doubleValue(),0);
         type = AttributeTypeFactory.newAttributeType("testAttribute", Number.class, true);
         
         

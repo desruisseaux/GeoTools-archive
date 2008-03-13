@@ -101,21 +101,21 @@ public final class Converters {
 	 * @param target The type of the converted value.
 	 * @param hints Any hints for the converter factory.
 	 *
-	 * @return The converted value as an instnace of target, or <code>null</code> if a converter
+	 * @return The converted value as an instance of target, or <code>null</code> if a converter
 	 * could not be found.
 	 *
 	 * @since 2.4
 	 */
 	public static Object convert( Object source, Class target, Hints hints ) {
 		//cant convert null
-                if ( source == null )
+        if ( source == null )
 			return null;
 
-                //handle case of source being a direct instance of target
-                // up front
-                if ( source.getClass().equals( target ) ) {
-                    return source;
-                }
+        //handle case of source being a direct instance of target
+        // up front
+        if ( source.getClass().equals( target ) ) {
+            return source;
+        }
 
 
 		for ( Iterator i = factories().iterator(); i.hasNext(); ) {

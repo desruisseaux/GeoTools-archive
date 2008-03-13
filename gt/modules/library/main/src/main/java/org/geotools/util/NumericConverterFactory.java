@@ -17,6 +17,7 @@ package org.geotools.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.NumberFormat;
 
 import org.geotools.factory.Hints;
 
@@ -126,28 +127,12 @@ public class NumericConverterFactory implements ConverterFactory {
                     }
     			}
 		    } else if (source instanceof String) {
-		        String s = (String) source;
-		        
+		        String s = (String) source;		        
 		        //ensure we trim any space off the string
 		        s = s.trim();
-		        
-		        //textual
-                if ( Long.class.equals( target ) ) {
-                    return new Long(s);
-                }
-                if ( Integer.class.equals( target ) ) {
-                    return new Integer(s);
-                }
-                if ( Short.class.equals( target ) ) {
-                    return new Short(s);
-                }
-                if ( Byte.class.equals( target ) ) {
-                    return new Byte(s);
-                }
-                if ( BigInteger.class.equals( target ) ) {
-                    return new BigInteger(s);
-                }
-            
+
+                String integral = toIntegral(s);
+                
                 //floating point
                 if ( Double.class.equals( target ) ) {
                     return new Double(s);
@@ -159,18 +144,39 @@ public class NumericConverterFactory implements ConverterFactory {
                     return new BigDecimal(s);
                 }
                 
-                //fallback.  If you ask for Number, you get our 'best guess'
+
+                
+		        //textual
+                if ( Long.class.equals( target ) ) {
+                    return new Long(integral);
+                }
+                if ( Integer.class.equals( target ) ) {
+                    return new Integer(integral);
+                }
+                if ( Short.class.equals( target ) ) {
+                    return new Short(integral);
+                }
+                if ( Byte.class.equals( target ) ) {
+                    return new Byte(integral);
+                }
+                if ( BigInteger.class.equals( target ) ) {
+                    return new BigInteger(integral);
+                }
+                            
+                // fallback.  If you ask for Number, you get our 'best guess'
                 if (Number.class.equals( target )) {
-                    try {
-                        return new Integer(s);
-                    } catch (Exception e) {
-                    }
-                    
-                    try {
-                        return new BigInteger(s);
-                    } catch (Exception e) {
-                    }
-                    
+                    if( integral.equals(s)){
+                        // we think this is an integer of some sort
+                        try {
+                            return new Integer(integral);
+                        } catch (Exception e) {
+                        }
+                        
+                        try {
+                            return new BigInteger(integral);
+                        } catch (Exception e) {
+                        }                            
+                    }                    
                     try {
                         return new Double(s);
                     } catch (Exception e) {
@@ -185,6 +191,31 @@ public class NumericConverterFactory implements ConverterFactory {
 		    //nothing matched.  Return null.
 		    return null;
 		}
+
 	}
 
+	/**
+	 * Extract the integral part out of a decimal format string. 
+	 * @param s
+	 * @return integral component of decimal representation
+	 */
+	static String toIntegral( String s ) {
+	    //NumberFormat format = NumberFormat.getInstance();
+	    
+	    int radex = -1; // last non numeric character to account for "." vs "," seperators
+        for( int i=s.length()-1; i>0; i--){
+            char ch = s.charAt(i);
+            if( !Character.isDigit(ch) && '-' != ch){
+                radex = i;
+                break;
+            }
+        }
+        if( radex != -1 ){
+           // text is formatted in decimal but floating point format supplied
+            return s.substring(0, radex );                    
+        }
+        else {
+            return s;
+        }
+    }
 }
