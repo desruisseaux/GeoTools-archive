@@ -394,7 +394,7 @@ public class Filters {
      * @return int value of first Number, or Double.NaN
      */
     public static double asDouble(Expression expr) {
-        if( expr != null ) {
+        if( expr == null ) {
             return Double.NaN;
         }        
         try {
