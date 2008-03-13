@@ -21,4 +21,6 @@ public class SeRegistration {
 
     public void setMultiVersion(boolean b) {}
 
+    public void getInfo() throws SeException{}
+
 }

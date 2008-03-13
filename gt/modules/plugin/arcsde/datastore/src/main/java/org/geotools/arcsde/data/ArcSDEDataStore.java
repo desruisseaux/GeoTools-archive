@@ -285,7 +285,8 @@ public class ArcSDEDataStore implements DataStore {
                     definitionQuery, viewSelectStatement);
         } else {
             final FIDReader fidStrategy = typeInfo.getFidStrategy();
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy);
+            final boolean isMultiversioned = typeInfo.isVersioned();
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy, isMultiversioned);
         }
 
         // /sdeQuery.execute();

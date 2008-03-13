@@ -2,7 +2,7 @@ package com.esri.sde.sdk.client;
 
 import com.esri.sde.sdk.client.SeTable.SeTableStats;
 
-public class SeQuery {
+public class SeQuery extends SeStreamOp {
 	
 	public SeQuery(SeConnection c)throws SeException {}
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
@@ -12,9 +12,6 @@ public class SeQuery {
 	public void prepareQuery()throws SeException {}
 	public void prepareQueryInfo(SeQueryInfo i)throws SeException {}
 	public SeExtent calculateLayerExtent(SeQueryInfo i) { return null; }
-	public void close() throws SeException {}
-	public void execute()throws SeException {}
-	public void flushBufferedWrites() {}
 	public void cancel(boolean b) {}
 	public void setRowLocking(int i) {}
 	public SeRow fetch() throws SeException{ return null; }

@@ -181,14 +181,14 @@ public class ArcSDEQueryTest extends TestCase {
     private ArcSDEQuery getQueryAll() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
         this._queryAll = ArcSDEQuery
-                .createQuery(connection, ftype, Query.ALL, FIDReader.NULL_READER);
+                .createQuery(connection, ftype, Query.ALL, FIDReader.NULL_READER, false);
         return this._queryAll;
     }
 
     private ArcSDEQuery getQueryFiltered() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
         this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,
-                FIDReader.NULL_READER);
+                FIDReader.NULL_READER, false);
         return this.queryFiltered;
     }
 

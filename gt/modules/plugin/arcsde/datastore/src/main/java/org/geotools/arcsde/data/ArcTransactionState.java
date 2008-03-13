@@ -32,6 +32,9 @@ import org.geotools.data.Transaction;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeObjectId;
+import com.esri.sde.sdk.client.SeState;
+import com.esri.sde.sdk.client.SeVersion;
 
 /**
  * Externalizes transactional state for <code>ArcSDEFeatureWriter</code>
@@ -62,6 +65,10 @@ final class ArcTransactionState implements Transaction.State {
      * rollback.
      */
     private final Set<String> typesChanged = new HashSet<String>();
+
+    public SeState currentVersionState;
+    public SeObjectId initialStateId;
+    public SeVersion defaultVersion;
 
     /**
      * Creates a new ArcTransactionState object.
@@ -111,6 +118,16 @@ final class ArcTransactionState implements Transaction.State {
         final ArcSDEPooledConnection connection = this.connection;
         connection.getLock().lock();
         try {
+            if (this.currentVersionState != null) {
+                SeObjectId parentStateId = initialStateId;
+                // Change the version's state pointer to the last edit state.
+                defaultVersion.changeState(currentVersionState.getId());
+
+                // Trim the state tree.
+
+                currentVersionState.trimTree(parentStateId, currentVersionState.getId());
+            }
+
             connection.commitTransaction();
             // and keep editing
             connection.setTransactionAutoCommit(0);

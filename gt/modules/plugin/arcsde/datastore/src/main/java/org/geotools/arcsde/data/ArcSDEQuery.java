@@ -48,11 +48,14 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
+import com.esri.sde.sdk.client.SeVersion;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -109,6 +112,8 @@ class ArcSDEQuery {
 
     private Object[] previousRowValues;
 
+    private boolean isMultiversioned;
+
     /**
      * Creates a new SDEQuery object.
      * 
@@ -118,6 +123,7 @@ class ArcSDEQuery {
      *            the schema with all the attributes as expected.
      * @param filterSet
      *            DOCUMENT ME!
+     * @param isMultiversioned
      * 
      * @throws DataSourceException
      *             DOCUMENT ME!
@@ -125,11 +131,13 @@ class ArcSDEQuery {
      * @see prepareQuery
      */
     private ArcSDEQuery(final ArcSDEPooledConnection connection, final SimpleFeatureType schema,
-            final FilterSet filterSet, final FIDReader fidReader) throws DataSourceException {
+            final FilterSet filterSet, final FIDReader fidReader, boolean isMultiversioned)
+            throws DataSourceException {
         this.connection = connection;
         this.schema = schema;
         this.filters = filterSet;
         this.fidReader = fidReader;
+        this.isMultiversioned = isMultiversioned;
     }
 
     /**
@@ -142,12 +150,15 @@ class ArcSDEQuery {
      *            when done.
      * @param fullSchema
      * @param query
+     * @param isMultiversioned
+     *            whether the table is versioned, if so, the default version and
+     *            current state will be used for the SeQuery
      * @return
      * @throws IOException
      */
     public static ArcSDEQuery createQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType fullSchema, final Query query, final FIDReader fidReader)
-            throws IOException {
+            final SimpleFeatureType fullSchema, final Query query, final FIDReader fidReader,
+            boolean isMultiversioned) throws IOException {
 
         Filter filter = query.getFilter();
 
@@ -161,7 +172,7 @@ class ArcSDEQuery {
                 querySchema, null, null, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader);
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, isMultiversioned);
         return sdeQuery;
     }
 
@@ -209,7 +220,7 @@ class ArcSDEQuery {
                 querySchema, definitionQuery, viewSelectStatement, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader);
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, false);
         return sdeQuery;
     }
 
@@ -361,6 +372,7 @@ class ArcSDEQuery {
         }
 
         SeQuery seQuery = new SeQuery(connection);
+        setQueryVersionState(seQuery);
 
         SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
         if (LOGGER.isLoggable(Level.FINER)) {
@@ -377,6 +389,7 @@ class ArcSDEQuery {
             if (-51 == e.getSeError().getSdeError()) {
                 seQuery.close();
                 seQuery = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
+                setQueryVersionState(seQuery);
                 seQuery.prepareQuery();
             } else {
                 throw new ArcSdeException(e);
@@ -456,7 +469,7 @@ class ArcSDEQuery {
     private SeQuery createSeQueryForQueryInfo() throws SeException, DataSourceException {
 
         SeQuery seQuery = new SeQuery(connection);
-
+        setQueryVersionState(seQuery);
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
 
         if (spatialConstraints.length > 0) {
@@ -466,6 +479,27 @@ class ArcSDEQuery {
         }
 
         return seQuery;
+    }
+
+    /**
+     * If the table being queried is multi versioned (we have a flag indicating
+     * it), retrieves the default version and its current version state to use
+     * for the query object
+     * 
+     * @param seQuery
+     * @throws SeException
+     */
+    private void setQueryVersionState(SeQuery seQuery) throws SeException {
+        if (!isMultiversioned) {
+            return;
+        }
+        SeVersion defaultVersion = new SeVersion(connection,
+                SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+        defaultVersion.getInfo();
+        SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
+        SeObjectId currentStateId = defaultVersion.getStateId();
+        System.out.println("Setting SeQuery state id " + currentStateId.longValue());
+        seQuery.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
     }
 
     /**
@@ -503,7 +537,8 @@ class ArcSDEQuery {
                         definitionQuery, viewSelectStatement);
             } else {
                 final FIDReader fidStrategy = typeInfo.getFidStrategy();
-                countQuery = createQuery(connection, fullSchema, query, fidStrategy);
+                final boolean versioned = typeInfo.isVersioned();
+                countQuery = createQuery(connection, fullSchema, query, fidStrategy, versioned);
             }
             count = countQuery.calculateResultCount();
         } finally {
@@ -537,7 +572,9 @@ class ArcSDEQuery {
             boundsQuery = createInprocessViewQuery(connection, fullSchema, realQuery,
                     definitionQuery, viewSelectStatement);
         } else {
-            boundsQuery = createQuery(connection, fullSchema, realQuery, FIDReader.NULL_READER);
+            final boolean versioned = typeInfo.isVersioned();
+            boundsQuery = createQuery(connection, fullSchema, realQuery, FIDReader.NULL_READER,
+                    versioned);
         }
 
         Envelope queryExtent = null;

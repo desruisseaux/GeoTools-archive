@@ -31,6 +31,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataStore;
@@ -64,15 +65,14 @@ import org.opengis.filter.identity.FeatureId;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
@@ -152,6 +152,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         if (testData == null) {
             oneTimeSetUp();
         }
+        testData.truncateTempTable();
     }
 
     @Override
@@ -621,29 +622,14 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
     public void testUpdateAdjacentPolygonsTransaction() throws Exception {
         final WKTReader reader = new WKTReader();
-        final MultiPolygon p1 = (MultiPolygon) reader
-                .read("MULTIPOLYGON(((-10 -10, -10 10, 0 10, 0 -10, -10 -10)))");
-        final MultiPolygon p2 = (MultiPolygon) reader
-                .read("MULTIPOLYGON(((0 -10, 0 10, 10 10, 10 -10, 0 -10)))");
+        final Polygon p1 = (Polygon) reader
+                .read("POLYGON((-10 -10, -10 10, 0 10, 0 -10, -10 -10))");
+        final Polygon p2 = (Polygon) reader.read("POLYGON((0 -10, 0 10, 10 10, 10 -10, 0 -10))");
 
-        final MultiPolygon modif1 = (MultiPolygon) reader
-                .read("MULTIPOLYGON (((-10 -10, -10 10, 5 10, -5 -10, -10 -10)))");
-        final MultiPolygon modif2 = (MultiPolygon) reader
-                .read("MULTIPOLYGON (((-5 -10, 5 10, 10 10, 10 -10, -5 -10)))");
-
-        // final MultiPolygon p1 = (MultiPolygon) reader
-        // .read("MULTIPOLYGON (((320000 545000, 320000 545100, 320100 545100,
-        // 320100 545000, 320000 545000)))");
-        // final MultiPolygon p2 = (MultiPolygon) reader
-        // .read("MULTIPOLYGON (((320100 545000, 320100 545100, 320200 545100,
-        // 320200 545000, 320100 545000)))");
-        //
-        // final MultiPolygon modif1 = (MultiPolygon) reader
-        // .read("MULTIPOLYGON (((320000 545000, 320000 545100, 320150 545100,
-        // 320050 545000, 320000 545000)))");
-        // final MultiPolygon modif2 = (MultiPolygon) reader
-        // .read("MULTIPOLYGON (((320050 545000, 320150 545100, 320200 545100,
-        // 320200 545000, 320050 545000)))");
+        final Polygon modif1 = (Polygon) reader
+                .read("POLYGON ((-10 -10, -10 10, 5 10, -5 -10, -10 -10))");
+        final Polygon modif2 = (Polygon) reader
+                .read("POLYGON ((-5 -10, 5 10, 10 10, 10 -10, -5 -10))");
 
         final String typeName = testData.getTemp_table(); // "SDE.CJ_TST_1";
         final ArcSDEDataStore dataStore = testData.getDataStore();
@@ -707,12 +693,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             final SimpleFeature feature2 = iterator.next();
             iterator.close();
 
-            MultiPolygon actual1 = (MultiPolygon) feature1.getAttribute(defaultGeometry
-                    .getLocalName());
-            MultiPolygon actual2 = (MultiPolygon) feature2.getAttribute(defaultGeometry
-                    .getLocalName());
+            Polygon actual1 = (Polygon) feature1.getAttribute(defaultGeometry.getLocalName());
+            Polygon actual2 = (Polygon) feature2.getAttribute(defaultGeometry.getLocalName());
             System.out.println(actual1);
-            System.out.println(actual2);
+            System.out.println(modif1);
+
             assertTrue(modif1.equals(actual1));
             assertTrue(modif2.equals(actual2));
         } finally {
@@ -1318,41 +1303,72 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
-    // this is a test over a legacy table, it doesn't work as the tabe is
-    // versioned,
-    // so I'm just commenting it out
-    public void _testSdeEditTableAutoCommit() throws Exception {
-        final ArcSDEDataStore dataStore = testData.getDataStore();
-
-        String[] typeNames = dataStore.getTypeNames();
-        SeConnection conn = dataStore.getConnectionPool().getConnection();
+    public void testEditVersionedTable() throws Exception {
         try {
-            for (String tname : typeNames) {
-                final SeRegistration reg = new SeRegistration(conn, tname);
-                final boolean multiVersion = reg.isMultiVersion();
-                System.out.println(tname + " is versioned: " + multiVersion);
-                if (multiVersion) {
-                    //@todo: handle versioned sde table
+            final String tableName;
+            {
+                SeConnection conn = testData.getConnectionPool().getConnection();
+                try {
+                    SeTable versionedTable = testData.createVersionedTable(conn);
+                    tableName = versionedTable.getQualifiedName();
+                } finally {
+                    conn.close();
                 }
             }
-        } finally {
-            conn.close();
+
+            final ArcSDEDataStore dataStore = testData.getDataStore();
+            FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore
+                    .getFeatureSource(tableName);
+            final FeatureStore<SimpleFeatureType, SimpleFeature> store;
+            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
+                    .getFeatureSource(tableName);
+
+            Transaction transaction = new DefaultTransaction();
+            store.setTransaction(transaction);
+
+            ArcSdeResourceInfo info = (ArcSdeResourceInfo) store.getInfo();
+            assertTrue(info.isVersioned());
+
+            final SimpleFeatureType schema = store.getSchema();
+
+            final int initialCount = store.getCount(Query.ALL);
+            assertEquals(0, initialCount);
+
+            final WKTReader reader = new WKTReader();
+            Object[] content = new Object[2];
+            SimpleFeature feature;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
+            int count;
+
+            content[0] = "Feature name 1";
+            content[1] = reader.read("POINT (0 0)");
+            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
+            collection = DataUtilities.collection(feature);
+
+            store.addFeatures(collection);
+
+            count = store.getCount(Query.ALL);
+            assertEquals(1, count);
+
+            content[0] = "Feature name 2";
+            content[1] = reader.read("POINT (1 1)");
+            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
+            collection = DataUtilities.collection(feature);
+
+            store.addFeatures(collection);
+
+            count = store.getCount(Query.ALL);
+            assertEquals(2, count);
+
+            assertEquals(0, source.getCount(Query.ALL));
+
+            transaction.commit();
+            
+            assertEquals(2, source.getCount(Query.ALL));
+
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
         }
-
-        final FeatureStore<SimpleFeatureType, SimpleFeature> store = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
-                .getFeatureSource("SDE.EDIT");
-        final SimpleFeatureType schema = store.getSchema();
-
-        SimpleFeature feature = SimpleFeatureBuilder.build(schema, (Object[]) null, (String) null);
-        String wellKnownText = "MULTIPOLYGON (((366895.32237292314 611939.927599425, 387372.27837891673 610847.8321985407, 373713.3856197129 585537.3264777199, 366895.32237292314 611939.927599425)))";
-        Geometry polygon = new WKTReader().read(wellKnownText);
-        feature.setAttribute("SHAPE", polygon);
-        feature.setAttribute("ID_BLOC", "_test_");
-        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = DataUtilities
-                .collection(feature);
-
-        store.addFeatures(collection);
-
     }
 
     /**

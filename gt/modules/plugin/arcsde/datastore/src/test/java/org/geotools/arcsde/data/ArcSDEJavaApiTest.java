@@ -34,6 +34,7 @@ import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
+import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
@@ -44,7 +45,6 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
-import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeShapeFilter;
@@ -265,23 +265,36 @@ public class ArcSDEJavaApiTest extends TestCase {
 
     /**
      * 
+     * @param conn
+     *            the connection to use in obtaining the query result count
+     * @param tableName
+     *            the name of the table to query
      * @param whereClause
      *            where clause, may be null
      * @param spatFilters
      *            spatial filters, may be null
+     * @param the
+     *            state identifier to query over a versioned table, may be
+     *            {@code null}
      * @return the sde calculated counts for the given filter
      * @throws Exception
      */
-    private int getTempTableCount(final String whereClause, final SeFilter[] spatFilters)
+    private static int getTempTableCount(final SeConnection conn, final String tableName,
+            final String whereClause, final SeFilter[] spatFilters, final SeState state)
             throws Exception {
-        String typeName = testData.getTemp_table();
-        String[] columns = { "INT32_COL" };
 
-        SeSqlConstruct sql = new SeSqlConstruct(typeName);
+        String[] columns = { "*" };
+
+        SeSqlConstruct sql = new SeSqlConstruct(tableName);
         if (whereClause != null) {
             sql.setWhere(whereClause);
         }
         SeQuery query = new SeQuery(conn, columns, sql);
+
+        if (state != null) {
+            SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
+            query.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);
+        }
         SeQueryInfo qInfo = new SeQueryInfo();
         qInfo.setConstruct(sql);
 
@@ -310,7 +323,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             int expCount = 4;
             int actualCount;
 
-            actualCount = getTempTableCount(where, null);
+            actualCount = getTempTableCount(conn, typeName, where, null, null);
             assertEquals(expCount, actualCount);
 
             // add a bounding box filter and verify both spatial and non spatial
@@ -327,7 +340,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 
             expCount = 1;
 
-            actualCount = getTempTableCount(where, spatFilters);
+            actualCount = getTempTableCount(conn, typeName, where, spatFilters, null);
 
             assertEquals(expCount, actualCount);
         } catch (SeException e) {
@@ -972,7 +985,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @throws Exception
      */
     public void testEditVersionedTable_DefaultVersion() throws Exception {
-        final SeTable versionedTable = createVersionedTable();
+        final SeTable versionedTable = testData.createVersionedTable(conn);
 
         // create a new version
         SeVersion defaultVersion;
@@ -1014,19 +1027,19 @@ public class ArcSDEJavaApiTest extends TestCase {
 
         try {
             conn.startTransaction();
-            insertIntoVersionedTable(newState1, versionedTable.getName(), "name 1 state 1");
-            insertIntoVersionedTable(newState1, versionedTable.getName(), "name 2 state 1");
-            
+            testData.insertIntoVersionedTable(conn, newState1, versionedTable.getName(), "name 1 state 1");
+            testData.insertIntoVersionedTable(conn, newState1, versionedTable.getName(), "name 2 state 1");
+
             newState1.close();
 
             SeState newState2 = new SeState(conn);
             SeObjectId parentStateId = newState1.getId();
             newState2.create(parentStateId);
 
-            insertIntoVersionedTable(newState2, versionedTable.getName(), "name 1 state 2");
+            testData.insertIntoVersionedTable(conn, newState2, versionedTable.getName(), "name 1 state 2");
 
             // Change the version's state pointer to the last edit state.
-            newVersion.changeState(newState2.getId());
+            defaultVersion.changeState(newState2.getId());
 
             // Trim the state tree.
             newState2.trimTree(parentStateId, newState2.getId());
@@ -1035,82 +1048,20 @@ public class ArcSDEJavaApiTest extends TestCase {
             new ArcSdeException(e).printStackTrace();
             throw e;
         }
+
+        // we edited the default version, lets query the default version and the
+        // new version and assert they have the correct feature count
+        SeObjectId defaultVersionStateId = defaultVersion.getStateId();
+        defVersionState = new SeState(conn, defaultVersionStateId);
+        int defVersionCount = getTempTableCount(conn, versionedTable.getName(), null, null,
+                defVersionState);
+        assertEquals(3, defVersionCount);
+
+        SeState newVersionState = new SeState(conn, newVersion.getStateId());
+        int newVersionCount = getTempTableCount(conn, versionedTable.getName(), null, null,
+                newVersionState);
+        assertEquals(0, newVersionCount);
     }
 
-    private void insertIntoVersionedTable(SeState state, String tableName, String nameField)
-            throws SeException {
-        SeInsert insert = new SeInsert(conn);
-        
-        SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
-        insert.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);
-        
-        insert.intoTable(tableName, new String[] { "NAME" });
-        SeRow row = insert.getRowToSet();
-        row.setString(0, "NAME 1");
-        insert.execute();
-        insert.close();
-    }
-
-    /**
-     * Creates a versioned table with a name column and a point SHAPE column
-     * 
-     * @return the versioned table created
-     * @throws Exception
-     *             any exception thrown by sde
-     */
-    private SeTable createVersionedTable() throws Exception {
-        SeLayer layer = new SeLayer(conn);
-        SeTable table;
-
-        /*
-         * Create a qualified table name with current user's name and the name
-         * of the table to be created, "EXAMPLE".
-         */
-        String tableName = (conn.getUser() + ".VERSIONED_EXAMPLE");
-        table = new SeTable(conn, tableName);
-        layer.setTableName("VERSIONED_EXAMPLE");
-
-        try {
-            table.delete();
-        } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
-        }
-
-        SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
-        boolean isNullable = true;
-        colDefs[0] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 25, 0,
-                isNullable);
-
-        table.create(colDefs, testData.getConfigKeyword());
-        layer.setSpatialColumnName("SHAPE");
-
-        layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK);
-        layer.setGridSizes(1100.0, 0.0, 0.0);
-        layer.setDescription("Layer Example");
-
-        SeExtent ext = new SeExtent(0.0, 0.0, 10000.0, 10000.0);
-        layer.setExtent(ext);
-
-        /*
-         * Define the layer's Coordinate Reference
-         */
-        SeCoordinateReference coordref = TestData.getGenericCoordRef();
-        layer.setCoordRef(coordref);
-
-        /*
-         * Spatially enable the new table...
-         */
-        layer.setCreationKeyword(testData.getConfigKeyword());
-        layer.create(3, 4);
-
-        // register the table as versioned
-        SeRegistration registration = new SeRegistration(conn, tableName);
-        registration.setMultiVersion(true);
-        registration.alter();
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine(" - Done.");
-        }
-        return table;
-    }
+   
 }

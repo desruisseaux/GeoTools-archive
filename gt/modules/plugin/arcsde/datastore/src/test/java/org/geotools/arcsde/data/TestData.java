@@ -43,9 +43,11 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
+import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -954,5 +956,80 @@ public class TestData {
          * Spatially enable the new table...
          */
         layer.create(3, 4);
+    }
+
+    /**
+     * Creates a versioned table with a name column and a point SHAPE column
+     * 
+     * @return the versioned table created
+     * @throws Exception
+     *             any exception thrown by sde
+     */
+    public SeTable createVersionedTable(final SeConnection conn) throws Exception {
+        SeLayer layer = new SeLayer(conn);
+        SeTable table;
+    
+        /*
+         * Create a qualified table name with current user's name and the name
+         * of the table to be created, "EXAMPLE".
+         */
+        String tableName = (conn.getUser() + ".VERSIONED_EXAMPLE");
+        table = new SeTable(conn, tableName);
+        layer.setTableName("VERSIONED_EXAMPLE");
+    
+        try {
+            table.delete();
+        } catch (Exception e) {
+            //ignore, the table didn't exist already
+        }
+    
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
+        boolean isNullable = true;
+        colDefs[0] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 25, 0,
+                isNullable);
+    
+        table.create(colDefs, getConfigKeyword());
+        layer.setSpatialColumnName("SHAPE");
+    
+        layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK);
+        layer.setGridSizes(1100.0, 0.0, 0.0);
+        layer.setDescription("Layer Example");
+    
+        SeExtent ext = new SeExtent(0.0, 0.0, 10000.0, 10000.0);
+        layer.setExtent(ext);
+    
+        /*
+         * Define the layer's Coordinate Reference
+         */
+        SeCoordinateReference coordref = getGenericCoordRef();
+        layer.setCoordRef(coordref);
+    
+        /*
+         * Spatially enable the new table...
+         */
+        layer.setCreationKeyword(getConfigKeyword());
+        layer.create(3, 4);
+    
+        // register the table as versioned
+        SeRegistration registration = new SeRegistration(conn, tableName);
+        registration.setMultiVersion(true);
+        registration.alter();
+    
+    
+        return table;
+    }
+    
+    public void insertIntoVersionedTable(SeConnection conn, SeState state, String tableName,
+            String nameField) throws SeException {
+        SeInsert insert = new SeInsert(conn);
+
+        SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
+        insert.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);
+
+        insert.intoTable(tableName, new String[] { "NAME" });
+        SeRow row = insert.getRowToSet();
+        row.setString(0, "NAME 1");
+        insert.execute();
+        insert.close();
     }
 }
