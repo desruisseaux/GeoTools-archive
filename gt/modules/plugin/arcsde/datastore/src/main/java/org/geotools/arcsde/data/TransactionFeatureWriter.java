@@ -18,9 +18,7 @@ package org.geotools.arcsde.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -29,17 +27,11 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeObjectId;
-import com.esri.sde.sdk.client.SeState;
-import com.esri.sde.sdk.client.SeStreamOp;
-
 /**
  * A FeatureWriter aware of transactions.
  * 
  * @author Gabriel Roldan (TOPP)
- * @version $Id: TransactionFeatureWriter.java 28045 2007-11-25 22:56:34Z
- *          groldan $
+ * @version $Id$
  * @since 2.5
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/TransactionFeatureWriter.java $
@@ -49,82 +41,54 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
 
     /**
      * <p>
-     * 
      * </p>
      * 
      * @param fidReader
      * @param featureType
      * @param filteredContent
      * @param listenerManager
-     * @param transactionalConnection
-     *            the {@link ArcSDEPooledConnection} to work over, with a
+     * @param transactionalConnection the {@link ArcSDEPooledConnection} to work over, with a
      *            {@link ArcSDEPooledConnection#isTransactionActive() transaction active}
-     * @param transaction
-     *            a transaction <b>already configured</b> with the
+     * @param transaction a transaction <b>already configured</b> with the
      *            {@link ArcTransactionState} needed for this writer to work.
      * @throws NoSuchElementException
      * @throws IOException
      */
-    public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-            final ArcTransactionState state, final FeatureListenerManager listenerManager)
-            throws NoSuchElementException, IOException {
+    public TransactionFeatureWriter(final FIDReader fidReader,
+                                    final SimpleFeatureType featureType,
+                                    final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+                                    final ArcTransactionState state,
+                                    final FeatureListenerManager listenerManager) throws NoSuchElementException,
+                                                                                 IOException {
 
-        super(fidReader, featureType, filteredContent, state.getConnection(), listenerManager);
+        super(fidReader, featureType, filteredContent, state.getConnection(), listenerManager,
+                state.getVersionHandler());
         this.state = state;
         assert state.getConnection().isTransactionActive();
 
-        if (defaultVersion != null) {
-            synchronized (state) {
-                if (state.currentVersionState == null) {
-                    try {
-                        LOGGER.info("closing current state and creating new edit state");
-                        ///System.out.println("closing current state and creating new edit state");
-                        currentState.close();
-                        final SeObjectId parentStateId = currentState.getId();
-                        currentState = new SeState(connection);
-                        currentState.create(parentStateId);
-
-                        // Change the version's state pointer to the last edit
-                        // state.
-                        defaultVersion.changeState(currentState.getId());
-
-                        //System.out.println(defaultVersion.getStateId().longValue());
-                        state.currentVersionState = currentState;
-                        state.defaultVersion = defaultVersion;
-                        state.initialStateId = parentStateId;
-                    } catch (SeException e) {
-                        throw new ArcSdeException(e);
-                    }
-                }
-            }
-        }
     }
 
     /**
-     * Overrides createStream so if the table is versioned instead of creating a
-     * new state the one being used for the whole transaction is set to the
-     * stream object
+     * Overrides createStream so if the table is versioned instead of creating a new state the one
+     * being used for the whole transaction is set to the stream object
      */
-    @Override
-    protected SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
-            DataSourceException {
-        final SeStreamOp streamOp = super.createStream(streamType);
-        final SeState transactionVersionState = state.currentVersionState;
-        if (transactionVersionState != null) {
-            // we're versioned and as inside a transaction we use this single
-            // state for the whole transaction. The state will be trimmed by the
-            // ArcTransactionState at commit time
-            SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
-            SeObjectId currentStateId = transactionVersionState.getId();
-            streamOp.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
-        }
-        return streamOp;
-    }
-
+    // @Override
+    // protected SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
+    // DataSourceException {
+    // final SeStreamOp streamOp = super.createStream(streamType);
+    // final SeState transactionVersionState = state.currentVersionState;
+    // if (transactionVersionState != null) {
+    // // we're versioned and as inside a transaction we use this single
+    // // state for the whole transaction. The state will be trimmed by the
+    // // ArcTransactionState at commit time
+    // SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
+    // SeObjectId currentStateId = transactionVersionState.getId();
+    // streamOp.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
+    // }
+    // return streamOp;
+    // }
     /**
-     * Overrides to not close the connection as it's the transaction
-     * responsibility.
+     * Overrides to not close the connection as it's the transaction responsibility.
      * 
      * @see FeatureWriter#close()
      */

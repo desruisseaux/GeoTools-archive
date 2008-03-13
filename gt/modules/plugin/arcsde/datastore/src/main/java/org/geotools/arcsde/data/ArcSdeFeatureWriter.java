@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
@@ -53,11 +54,9 @@ import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
-import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeStreamOp;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeUpdate;
-import com.esri.sde.sdk.client.SeVersion;
 import com.esri.sde.sdk.client.SeTable.SeTableIdRange;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -89,15 +88,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     protected FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent;
 
     /**
-     * Builder for new Features this writer creates when next() is called and
-     * hasNext() == false
+     * Builder for new Features this writer creates when next() is called and hasNext() == false
      */
     protected final SimpleFeatureBuilder featureBuilder;
 
     /**
-     * Map of {row index/mutable column names} in the SeTable structure. Not to
-     * be accessed directly, but through
-     * {@link #getMutableColumnNames(ArcSDEPooledConnection)}
+     * Map of {row index/mutable column names} in the SeTable structure. Not to be accessed
+     * directly, but through {@link #getMutableColumnNames(ArcSDEPooledConnection)}
      */
     private LinkedHashMap<Integer, String> mutableColumnNames;
 
@@ -112,8 +109,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     private SeTable cachedTable;
 
     /**
-     * The feature at the current index. No need to maintain any sort of
-     * collection of features as this writer works a feature at a time.
+     * The feature at the current index. No need to maintain any sort of collection of features as
+     * this writer works a feature at a time.
      */
     protected SimpleFeature feature;
 
@@ -125,24 +122,23 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     protected final FeatureListenerManager listenerManager;
 
     /**
-     * Default version, used when a table is registered as multiversioned,
-     * assigned at this class' constructor
+     * version handler to delegate setting up and handling database version states
      */
-    protected final SeVersion defaultVersion;
+    private final ArcSdeVersionHandler versionHandler;
 
-    protected SeState initialState;
-
-    protected SeState currentState;
-
-    public ArcSdeFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-            final ArcSDEPooledConnection connection, final FeatureListenerManager listenerManager)
-            throws IOException {
+    public ArcSdeFeatureWriter(final FIDReader fidReader,
+                               final SimpleFeatureType featureType,
+                               final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
+                               final ArcSDEPooledConnection connection,
+                               final FeatureListenerManager listenerManager,
+                               final ArcSdeVersionHandler versionHandler) throws IOException {
 
         assert fidReader != null;
         assert featureType != null;
         assert filteredContent != null;
         assert connection != null;
+        assert listenerManager != null;
+        assert versionHandler != null;
 
         this.fidReader = fidReader;
         this.featureType = featureType;
@@ -150,51 +146,55 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         this.connection = connection;
         this.listenerManager = listenerManager;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
+        this.versionHandler = versionHandler;
 
-        try {
-            final String typeName = getLayer().getQualifiedName();
-            SeRegistration registration = new SeRegistration(connection, typeName);
-            registration.getInfo();
-            final boolean isMultiversioned = registration.isMultiVersion();
-            if (isMultiversioned) {
-                LOGGER.info(typeName + " is versioned, retrieving default version");
-                System.out.println(typeName + " is versioned, retrieving default version");
-                defaultVersion = new SeVersion(connection,
-                        SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
-                defaultVersion.getInfo();
-                SeObjectId initialStateId = defaultVersion.getStateId();
-                LOGGER.info("default version is " + defaultVersion.getName() + " ("
-                        + initialStateId.longValue() + ")");
-                System.out.println("default version is " + defaultVersion.getName() + " ("
-                        + initialStateId.longValue() + ")");
-                SeState currState = new SeState(connection, initialStateId);
-                if (!currState.isOpen()) {
-                    throw new IllegalStateException(
-                            "Current versioning state for the default version is closed: "
-                                    + initialStateId.longValue());
-                }
-                initialState = currState;
-                this.currentState = currState;
-            }else{
-                defaultVersion = null;
-            }
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
+        // try {
+        // final String typeName = getLayer().getQualifiedName();
+        // SeRegistration registration = new SeRegistration(connection,
+        // typeName);
+        // registration.getInfo();
+        // final boolean isMultiversioned = registration.isMultiVersion();
+        // if (isMultiversioned) {
+        // LOGGER.info(typeName + " is versioned, retrieving default version");
+        // System.out.println(typeName + " is versioned, retrieving default
+        // version");
+        // defaultVersion = new SeVersion(connection,
+        // SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+        // defaultVersion.getInfo();
+        // SeObjectId initialStateId = defaultVersion.getStateId();
+        // LOGGER.info("default version is " + defaultVersion.getName() + " ("
+        // + initialStateId.longValue() + ")");
+        // System.out.println("default version is " + defaultVersion.getName() +
+        // " ("
+        // + initialStateId.longValue() + ")");
+        // SeState currState = new SeState(connection, initialStateId);
+        // if (!currState.isOpen()) {
+        // throw new IllegalStateException(
+        // "Current versioning state for the default version is closed: "
+        // + initialStateId.longValue());
+        // }
+        // initialState = currState;
+        // this.currentState = currState;
+        // }else{
+        // defaultVersion = null;
+        // }
+        // } catch (SeException e) {
+        // throw new ArcSdeException(e);
+        // }
     }
 
     /**
-     * Creates the type of arcsde stream operation specified by the
-     * {@code streamType} class and,if the working layer is of a versioned
-     * table, sets up the stream to being editing the default database version.
+     * Creates the type of arcsde stream operation specified by the {@code streamType} class and,if
+     * the working layer is of a versioned table, sets up the stream to being editing the default
+     * database version.
      * 
      * @param streamType
      * @return
      * @throws SeException
-     * @throws DataSourceException
+     * @throws IOException
      */
-    protected SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
-            DataSourceException {
+    private SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
+            IOException {
         SeStreamOp streamOp;
 
         if (SeInsert.class == streamType) {
@@ -207,13 +207,14 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             throw new IllegalArgumentException("Unrecognized stream type: " + streamType);
         }
 
+        versionHandler.setUpStream(connection, streamOp);
+
         return streamOp;
     }
 
     /**
-     * Closes up a given arcsde stream operation and, if the table being edited
-     * is versioned, updates its version state identifier to the one used by
-     * this stream.
+     * Closes up a given arcsde stream operation and, if the table being edited is versioned,
+     * updates its version state identifier to the one used by this stream.
      * 
      * @param editStream
      * @throws SeException
@@ -236,28 +237,6 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         if (connection != null) {
             connection.close();
             connection = null;
-        }
-
-        finishEditing();
-    }
-
-    /**
-     * Needs to be called when closing this writer, so if the table is versioned
-     * the final edit state is trimmed with the initial edit state.
-     * 
-     * @throws ArcSdeException
-     */
-    protected final void finishEditing() throws ArcSdeException {
-        if (initialState != null && initialState != currentState) {
-            SeObjectId initialStateId = initialState.getId();
-            SeObjectId currentStateId = currentState.getId();
-            System.out.println("Trimming versions " + initialStateId.longValue() + " to "
-                    + currentStateId.longValue());
-            try {
-                currentState.trimTree(initialStateId, currentStateId);
-            } catch (SeException e) {
-                throw new ArcSdeException(e);
-            }
         }
     }
 
@@ -333,7 +312,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 connection.commitTransaction();
             }
             fireRemoved(feature);
+            versionHandler.editOperationWritten(seDelete);
         } catch (SeException e) {
+            versionHandler.editOperationFailed(seDelete);
             if (handleTransaction) {
                 try {
                     connection.rollbackTransaction();
@@ -435,61 +416,66 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * The db row to modify is obtained from the feature id.
      * </p>
      * 
-     * @param modifiedFeature
-     *            the newly create Feature to insert.
-     * @param layer
-     *            the layer where to insert the feature.
-     * @param connection
-     *            the connection to use for the insert operation. Its auto
-     *            commit mode determines whether the operation takes effect
-     *            immediately or not.
+     * @param modifiedFeature the newly create Feature to insert.
+     * @param layer the layer where to insert the feature.
+     * @param connection the connection to use for the insert operation. Its auto commit mode
+     *            determines whether the operation takes effect immediately or not.
+     * @throws IOException
      * @throws SeException
-     *             if thrown by any sde stream method
+     * @throws SeException if thrown by any sde stream method
      * @throws IOException
      */
     private void updateRow(final SimpleFeature modifiedFeature, final SeLayer layer)
-            throws SeException, NoSuchElementException, IOException {
+            throws SeException, IOException {
+
         final SeUpdate updateStream = (SeUpdate) createStream(SeUpdate.class);
         // updateStream.setWriteMode(true);
 
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
-        final SeRow row;
-        final LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
-        {
-            String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
-                    .toArray(new String[0]);
-            String typeName = featureType.getTypeName();
+        try {
+            final SeRow row;
+            LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
+            {
+                String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
+                        .toArray(new String[0]);
+                String typeName = featureType.getTypeName();
 
-            final String fid = modifiedFeature.getID();
-            final long numericFid = ArcSDEAdapter.getNumericFid(fid);
-            final SeObjectId seObjectId = new SeObjectId(numericFid);
-            row = updateStream.singleRow(seObjectId, typeName, rowColumnNames);
+                final String fid = modifiedFeature.getID();
+                final long numericFid = ArcSDEAdapter.getNumericFid(fid);
+                final SeObjectId seObjectId = new SeObjectId(numericFid);
+                row = updateStream.singleRow(seObjectId, typeName, rowColumnNames);
+            }
+
+            setRowProperties(modifiedFeature, seCoordRef, mutableColumns, row);
+            updateStream.execute();
+            // updateStream.flushBufferedWrites();
+            updateStream.close();
+            versionHandler.editOperationWritten(updateStream);
+        } catch (NoSuchElementException e) {
+            versionHandler.editOperationFailed(updateStream);
+            throw e;
+        } catch (IOException e) {
+            versionHandler.editOperationFailed(updateStream);
+            throw e;
+        } catch (SeException e) {
+            versionHandler.editOperationFailed(updateStream);
+            throw e;
         }
-
-        setRowProperties(modifiedFeature, seCoordRef, mutableColumns, row);
-        updateStream.execute();
-        // updateStream.flushBufferedWrites();
-        updateStream.close();
     }
 
     /**
      * Inserts a feature into an SeLayer.
      * 
-     * @param newFeature
-     *            the newly create Feature to insert.
-     * @param layer
-     *            the layer where to insert the feature.
-     * @param connection
-     *            the connection to use for the insert operation. Its auto
-     *            commit mode determines whether the operation takes effect
-     *            immediately or not.
-     * @throws SeException
-     *             if thrown by any sde stream method
+     * @param newFeature the newly create Feature to insert.
+     * @param layer the layer where to insert the feature.
+     * @param connection the connection to use for the insert operation. Its auto commit mode
+     *            determines whether the operation takes effect immediately or not.
+     * @throws SeException if thrown by any sde stream method
      * @throws IOException
      */
     private Number insertSeRow(final SimpleFeature newFeature, final SeLayer layer)
-            throws SeException, IOException {
+            throws IOException, SeException {
 
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
@@ -504,28 +490,38 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             newFeature.setAttribute(fidReader.getFidColumn(), newId);
         }
         SeInsert insertStream = (SeInsert) createStream(SeInsert.class);
-        {
-            String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
-                    .toArray(new String[0]);
+        try {
 
-            String typeName = featureType.getTypeName();
-            insertStream.intoTable(typeName, rowColumnNames);
-            insertStream.setWriteMode(true);
+            {
+                String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
+                        .toArray(new String[0]);
+
+                String typeName = featureType.getTypeName();
+                insertStream.intoTable(typeName, rowColumnNames);
+                insertStream.setWriteMode(true);
+            }
+
+            final SeRow row = insertStream.getRowToSet();
+
+            setRowProperties(newFeature, seCoordRef, mutableColumns, row);
+            insertStream.execute();
+
+            if (fidReader instanceof FIDReader.SdeManagedFidReader) {
+                SeObjectId newRowId = insertStream.lastInsertedRowId();
+                newId = Long.valueOf(newRowId.longValue());
+            }
+
+            insertStream.flushBufferedWrites();
+            closeStream(insertStream);
+            versionHandler.editOperationWritten(insertStream);
+
+        } catch (SeException e) {
+            versionHandler.editOperationFailed(insertStream);
+            throw e;
+        } catch (IOException e) {
+            versionHandler.editOperationFailed(insertStream);
+            throw e;
         }
-
-        final SeRow row = insertStream.getRowToSet();
-
-        setRowProperties(newFeature, seCoordRef, mutableColumns, row);
-
-        insertStream.execute();
-
-        if (fidReader instanceof FIDReader.SdeManagedFidReader) {
-            SeObjectId newRowId = insertStream.lastInsertedRowId();
-            newId = Long.valueOf(newRowId.longValue());
-        }
-
-        insertStream.flushBufferedWrites();
-        closeStream(insertStream);
 
         // TODO: handle SHAPE fid strategy (actually such a table shouldn't be
         // editable)
@@ -533,12 +529,11 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     /**
-     * Sets the SeRow property values by index, taking the index from the
-     * mutableColumns keys and the values from <code>feature</code>, using
-     * the mutableColumns values to get the feature properties by name.
+     * Sets the SeRow property values by index, taking the index from the mutableColumns keys and
+     * the values from <code>feature</code>, using the mutableColumns values to get the feature
+     * properties by name.
      * 
-     * @param feature
-     *            the Feature where to get the property values from
+     * @param feature the Feature where to get the property values from
      * @param seCoordRef
      * @param mutableColumns
      * @param row
@@ -546,7 +541,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @throws IOException
      */
     private void setRowProperties(final SimpleFeature feature,
-            final SeCoordinateReference seCoordRef, Map<Integer, String> mutableColumns,
+            final SeCoordinateReference seCoordRef,
+            Map<Integer, String> mutableColumns,
             final SeRow row) throws SeException, IOException {
 
         // Now set the values for the new row here...
@@ -563,8 +559,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     /**
-     * Called when the layer row id is user managed to ask ArcSDE for the next
-     * available ID.
+     * Called when the layer row id is user managed to ask ArcSDE for the next available ID.
      * 
      * @return
      * @throws IOException
@@ -604,21 +599,22 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     /**
-     * Used to set a value on an SeRow object. The values is converted to the
-     * appropriate type based on an inspection of the SeColumnDefintion object.
+     * Used to set a value on an SeRow object. The values is converted to the appropriate type based
+     * on an inspection of the SeColumnDefintion object.
      * 
      * @param row
      * @param index
      * @param convertedValue
      * @param coordRef
-     * 
-     * @throws SeException
-     *             DOCUMENT ME!
-     * @throws IOException
-     *             DOCUMENT ME!
+     * @throws SeException DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
      */
-    private void setRowValue(final SeRow row, final int index, final Object value,
-            final SeCoordinateReference coordRef, final String attName, final String typeName,
+    private void setRowValue(final SeRow row,
+            final int index,
+            final Object value,
+            final SeCoordinateReference coordRef,
+            final String attName,
+            final String typeName,
             final String fid) throws SeException, IOException {
 
         final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
@@ -682,13 +678,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     }
 
     /**
-     * Returns the row index and column names for all the mutable properties in
-     * the sde layer. That is, those properties whose type is not
-     * {@link SeRegistration#SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE}, which are
-     * used as row id columns managed by arcsde.
+     * Returns the row index and column names for all the mutable properties in the sde layer. That
+     * is, those properties whose type is not
+     * {@link SeRegistration#SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE}, which are used as row id
+     * columns managed by arcsde.
      * 
-     * @return a map keyed by mutable column name and valued by the index of the
-     *         mutable column name in the SeTable structure
+     * @return a map keyed by mutable column name and valued by the index of the mutable column name
+     *         in the SeTable structure
      * @throws IOException
      * @throws NoSuchElementException
      * @throws SeException
@@ -768,8 +764,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     /**
      * Checks if <code>feature</code> has been created by this writer
      * <p>
-     * A Feature is created but not yet inserted if its id starts with
-     * {@link #NEW_FID_PREFIX}
+     * A Feature is created but not yet inserted if its id starts with {@link #NEW_FID_PREFIX}
      * </p>
      * 
      * @param aFeature

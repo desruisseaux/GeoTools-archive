@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -89,9 +90,8 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     /**
-     * Builds a test suite for all this class' tests with per suite
-     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
-     * directed to {@link #oneTimeTearDown()}
+     * Builds a test suite for all this class' tests with per suite initialization directed to
+     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
      * 
      * @return
      */
@@ -131,12 +131,10 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
+     * obtain test tables names and is used as parameter to find the DataStore
      * 
-     * @throws Exception
-     *             DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
      */
     @Override
     protected void setUp() throws Exception {
@@ -180,15 +178,15 @@ public class ArcSDEQueryTest extends TestCase {
 
     private ArcSDEQuery getQueryAll() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
-        this._queryAll = ArcSDEQuery
-                .createQuery(connection, ftype, Query.ALL, FIDReader.NULL_READER, false);
+        this._queryAll = ArcSDEQuery.createQuery(connection, ftype, Query.ALL,
+                FIDReader.NULL_READER, ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return this._queryAll;
     }
 
     private ArcSDEQuery getQueryFiltered() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
         this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,
-                FIDReader.NULL_READER, false);
+                FIDReader.NULL_READER, ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return this.queryFiltered;
     }
 

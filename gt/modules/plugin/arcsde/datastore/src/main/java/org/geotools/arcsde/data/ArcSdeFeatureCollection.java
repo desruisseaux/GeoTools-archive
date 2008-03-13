@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -35,9 +36,8 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * FeatureCollection<SimpleFeatureType, SimpleFeature> implementation that
- * works over an {@link ArcSDEFeatureReader} or one of the decorators over it
- * returned by
+ * FeatureCollection<SimpleFeatureType, SimpleFeature> implementation that works over an
+ * {@link ArcSDEFeatureReader} or one of the decorators over it returned by
  * {@link ArcSDEDataStore#getFeatureReader(Query, ArcSDEPooledConnection, boolean)}.
  * 
  * @author Gabriel Roldan (TOPP)
@@ -79,10 +79,11 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
                 final ArcSDEDataStore dataStore = featureSource.getDataStore();
                 DefaultQuery excludeFilterQuery = new DefaultQuery(this.query);
                 excludeFilterQuery.setFilter(Filter.EXCLUDE);
-                
+
                 final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-                reader = dataStore.getFeatureReader(excludeFilterQuery, conn, false);
-                
+                reader = dataStore.getFeatureReader(excludeFilterQuery, conn, false,
+                        ArcSdeVersionHandler.NONVERSIONED_HANDLER);
+
                 this.childrenSchema = reader.getFeatureType();
                 reader.close();
             } catch (IOException e) {
@@ -133,8 +134,9 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
         final ArcSDEDataStore dataStore = featureSource.getDataStore();
         final ArcSDEPooledConnection connection = getConnection();
 
+        ArcSdeVersionHandler versionHandler = featureSource.getVersionHandler();
         final FeatureReader<SimpleFeatureType, SimpleFeature> reader = dataStore.getFeatureReader(
-                query, connection, false);
+                query, connection, false, versionHandler);
         // slight optimization here: store the child features schema if not yet
         // done
         if (this.childrenSchema == null) {

@@ -23,6 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
+import org.geotools.arcsde.data.versioning.TransactionDefaultVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
@@ -37,8 +39,7 @@ import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeVersion;
 
 /**
- * Externalizes transactional state for <code>ArcSDEFeatureWriter</code>
- * instances.
+ * Externalizes transactional state for <code>ArcSDEFeatureWriter</code> instances.
  * 
  * @author Jake Fear
  * @author Gabriel Roldan
@@ -51,8 +52,8 @@ final class ArcTransactionState implements Transaction.State {
             .getLogger(ArcTransactionState.class.getPackage().getName());
 
     /**
-     * Transactional connection this state works upon, held until commit(),
-     * rollback() or close() is called.
+     * Transactional connection this state works upon, held until commit(), rollback() or close() is
+     * called.
      */
     private ArcSDEPooledConnection connection;
 
@@ -61,54 +62,67 @@ final class ArcTransactionState implements Transaction.State {
     private final FeatureListenerManager listenerManager;
 
     /**
-     * Set of typename changed to fire changed events for at commit and
-     * rollback.
+     * Set of typename changed to fire changed events for at commit and rollback.
      */
     private final Set<String> typesChanged = new HashSet<String>();
 
     public SeState currentVersionState;
+
     public SeObjectId initialStateId;
+
     public SeVersion defaultVersion;
+
+    private ArcSdeVersionHandler versionHandler = ArcSdeVersionHandler.NONVERSIONED_HANDLER;
 
     /**
      * Creates a new ArcTransactionState object.
      * 
      * @param listenerManager
-     * 
-     * @param pool
-     *            connection pool where to grab a connection and hold it while
-     *            there's a transaction open (signaled by any use of
-     *            {@link #getConnection()}
+     * @param pool connection pool where to grab a connection and hold it while there's a
+     *            transaction open (signaled by any use of {@link #getConnection()}
      */
     private ArcTransactionState(ArcSDEPooledConnection connection,
-            final FeatureListenerManager listenerManager) {
+                                final FeatureListenerManager listenerManager) {
         this.connection = connection;
         this.listenerManager = listenerManager;
+    }
+
+    private void setupVersioningHandling() throws IOException {
+        // create a versioned handler only if not already settled up, as this method
+        // may be called for each layer inside a transaction
+        if (versionHandler == ArcSdeVersionHandler.NONVERSIONED_HANDLER) {
+            versionHandler = new TransactionDefaultVersionHandler(connection);
+        }
+    }
+
+    /**
+     * @return
+     */
+    public ArcSdeVersionHandler getVersionHandler() {
+        return versionHandler;
     }
 
     /**
      * Registers a feature change event over a feature type.
      * <p>
-     * To be called by {@link TransactionFeatureWriter#write()} so this state
-     * can fire a changed event at {@link #commit()} and {@link #rollback()}.
+     * To be called by {@link TransactionFeatureWriter#write()} so this state can fire a changed
+     * event at {@link #commit()} and {@link #rollback()}.
      * </p>
      * 
-     * @param typeName
-     *            the type name of the feature changed
-     *            (inserted/removed/modified).
+     * @param typeName the type name of the feature changed (inserted/removed/modified).
      */
     public void addChange(final String typeName) {
         typesChanged.add(typeName);
     }
 
     /**
-     * Commits the transaction and returns the connection to the pool. A new one
-     * will be grabbed when needed.
+     * Commits the transaction and returns the connection to the pool. A new one will be grabbed
+     * when needed.
      * <p>
      * Preconditions:
      * <ul>
-     * <li>{@link #setTransaction(Transaction)} already called with non
-     * <code>null</code> argument.
+     * <li>{@link #setTransaction(Transaction)} already called with non <code>null</code>
+     * argument.
      * <li>
      * </ul>
      * </p>
@@ -129,6 +143,7 @@ final class ArcTransactionState implements Transaction.State {
             }
 
             connection.commitTransaction();
+            versionHandler.commitEditState();
             // and keep editing
             connection.setTransactionAutoCommit(0);
             connection.startTransaction();
@@ -157,6 +172,7 @@ final class ArcTransactionState implements Transaction.State {
         final ArcSDEPooledConnection connection = this.connection;
         connection.getLock().lock();
         try {
+            versionHandler.rollbackEditState();
             connection.rollbackTransaction();
             // and keep editing
             connection.setTransactionAutoCommit(0);
@@ -173,8 +189,8 @@ final class ArcTransactionState implements Transaction.State {
     }
 
     /**
-     * Fires the per typename changes registered through
-     * {@link #addChange(String)} and clears the changes cache.
+     * Fires the per typename changes registered through {@link #addChange(String)} and clears the
+     * changes cache.
      */
     private void fireChanges(final boolean commit) {
         for (String typeName : typesChanged) {
@@ -192,11 +208,9 @@ final class ArcTransactionState implements Transaction.State {
 
     /**
      * @see Transaction.State#setTransaction(Transaction)
-     * @param transaction
-     *            transaction information, <code>null</code> signals this
-     *            state lifecycle end.
-     * @throws IllegalStateException
-     *             if close() is called while a transaction is in progress
+     * @param transaction transaction information, <code>null</code> signals this state lifecycle
+     *            end.
+     * @throws IllegalStateException if close() is called while a transaction is in progress
      */
     public void setTransaction(final Transaction transaction) {
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
@@ -218,11 +232,9 @@ final class ArcTransactionState implements Transaction.State {
     }
 
     /**
-     * If this state has been closed throws an unchecked exception as its
-     * clearly a broken workflow.
+     * If this state has been closed throws an unchecked exception as its clearly a broken workflow.
      * 
-     * @throws IllegalStateException
-     *             if the transaction state has been closed.
+     * @throws IllegalStateException if the transaction state has been closed.
      */
     private void failIfClosed() throws IllegalStateException {
         if (connection == null) {
@@ -231,8 +243,7 @@ final class ArcTransactionState implements Transaction.State {
     }
 
     /**
-     * Releases resources and invalidates this state (signaled by setting the
-     * connection to null)
+     * Releases resources and invalidates this state (signaled by setting the connection to null)
      */
     private void close() {
         if (connection == null) {
@@ -279,8 +290,8 @@ final class ArcTransactionState implements Transaction.State {
     }
 
     /**
-     * Used only within the package to provide access to a single connection on
-     * which this transaction is being conducted.
+     * Used only within the package to provide access to a single connection on which this
+     * transaction is being conducted.
      * 
      * @return connection
      * @throws UnavailableArcSDEConnectionException
@@ -300,19 +311,19 @@ final class ArcTransactionState implements Transaction.State {
     /**
      * Grab the ArcTransactionState (when not using AUTO_COMMIT).
      * <p>
-     * As of GeoTools 2.5 we store the TransactionState using the connection
-     * pool as a key.
+     * As of GeoTools 2.5 we store the TransactionState using the connection pool as a key.
      * </p>
      * 
-     * @param transaction
-     *            non autocommit transaction
+     * @param transaction non autocommit transaction
      * @param listenerManager
-     * @return the ArcTransactionState stored in the transaction with
-     *         <code>connectionPool</code> as key.
+     * @param versioned
+     * @return the ArcTransactionState stored in the transaction with <code>connectionPool</code>
+     *         as key.
      */
     public static ArcTransactionState getState(final Transaction transaction,
-            final ArcSDEConnectionPool connectionPool, final FeatureListenerManager listenerManager)
-            throws IOException {
+            final ArcSDEConnectionPool connectionPool,
+            final FeatureListenerManager listenerManager,
+            final boolean versioned) throws IOException {
         ArcTransactionState state;
 
         synchronized (ArcTransactionState.class) {
@@ -342,6 +353,12 @@ final class ArcTransactionState implements Transaction.State {
                 state = new ArcTransactionState(connection, listenerManager);
                 transaction.putState(connectionPool, state);
             }
+        }
+
+        // if only one of the tables being handled by this transaction state is
+        // versioned setHandleVersioned has to be set
+        if (versioned) {
+            state.setupVersioningHandling();
         }
         return state;
     }

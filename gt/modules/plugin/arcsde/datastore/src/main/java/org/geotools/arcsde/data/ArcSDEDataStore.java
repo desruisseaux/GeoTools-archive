@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
+import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -79,8 +81,7 @@ public class ArcSDEDataStore implements DataStore {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.arcsde.data");
 
     /**
-     * Manages listener lists for FeatureSource<SimpleFeatureType,
-     * SimpleFeature> implementation
+     * Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementation
      */
     final FeatureListenerManager listenerManager = new FeatureListenerManager();
 
@@ -105,9 +106,7 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool
-     *            pool of {@link ArcSDEPooledConnection} this datastore works
-     *            upon.
+     * @param connPool pool of {@link ArcSDEPooledConnection} this datastore works upon.
      */
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool) {
         this(connPool, null);
@@ -116,13 +115,10 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool
-     *            pool of {@link ArcSDEPooledConnection} this datastore works
-     *            upon.
-     * @param namespaceUri
-     *            namespace URI for the {@link SimpleFeatureType}s,
-     *            {@link AttributeType}s, and {@link AttributeDescriptor}s
-     *            created by this datastore. May be <code>null</code>.
+     * @param connPool pool of {@link ArcSDEPooledConnection} this datastore works upon.
+     * @param namespaceUri namespace URI for the {@link SimpleFeatureType}s, {@link AttributeType}s,
+     *            and {@link AttributeDescriptor}s created by this datastore. May be
+     *            <code>null</code>.
      */
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool, final String namespaceUri) {
         this.connectionPool = connPool;
@@ -154,16 +150,12 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * List of type names; should be a list of all feature classes.
      * 
-     * @return the list of full qualified feature class names on the ArcSDE
-     *         database this DataStore works on. An ArcSDE full qualified class
-     *         name is composed of three dot separated strings:
-     *         "DATABASE.USER.CLASSNAME", wich is usefull enough to use it as
-     *         namespace
-     * 
-     * @throws RuntimeException
-     *             if an exception occurs while retrieving the list of
-     *             registeres feature classes on the backend, or while obtaining
-     *             the full qualified name of one of them
+     * @return the list of full qualified feature class names on the ArcSDE database this DataStore
+     *         works on. An ArcSDE full qualified class name is composed of three dot separated
+     *         strings: "DATABASE.USER.CLASSNAME", wich is usefull enough to use it as namespace
+     * @throws RuntimeException if an exception occurs while retrieving the list of registeres
+     *             feature classes on the backend, or while obtaining the full qualified name of one
+     *             of them
      */
     public String[] getTypeNames() throws IOException {
         List<String> layerNames = new ArrayList<String>(connectionPool.getAvailableLayerNames());
@@ -203,17 +195,23 @@ public class ArcSDEDataStore implements DataStore {
     public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
             final Transaction transaction) throws IOException {
         assert query != null;
-        assert query.getTypeName() != null;
+        final String typeName = query.getTypeName();
+        assert typeName != null;
         assert query.getFilter() != null;
         assert transaction != null;
 
         ArcSDEPooledConnection connection;
+        ArcSdeVersionHandler versionHandler = ArcSdeVersionHandler.NONVERSIONED_HANDLER;
         {
+            final FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(typeName);
+            final boolean versioned = featureTypeInfo.isVersioned();
+
             if (Transaction.AUTO_COMMIT.equals(transaction)) {
                 connection = connectionPool.getConnection();
             } else {
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
-                        connectionPool, listenerManager);
+                        connectionPool, listenerManager, versioned);
+                versionHandler = state.getVersionHandler();
                 connection = state.getConnection();
             }
         }
@@ -222,38 +220,33 @@ public class ArcSDEDataStore implements DataStore {
         // if it's not inside a transaction.
         final boolean handleConnection = true;
         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query,
-                connection, handleConnection);
+                connection, handleConnection, versionHandler);
 
         return reader;
     }
 
     /**
-     * Returns an {@link ArcSDEFeatureReader} for the given query that works
-     * against the given connection.
+     * Returns an {@link ArcSDEFeatureReader} for the given query that works against the given
+     * connection.
      * <p>
-     * Explicitly stating the connection to use allows for the feature reader to
-     * fetch the differences (additions/modifications/deletions) made while a
-     * transaction is in progress.
+     * Explicitly stating the connection to use allows for the feature reader to fetch the
+     * differences (additions/modifications/deletions) made while a transaction is in progress.
      * </p>
      * 
-     * @param query
-     *            the Query containing the request criteria
-     * @param connection
-     *            the connection to use to retrieve content. It'll be closed by
-     *            the returned FeatureReader<SimpleFeatureType, SimpleFeature>
-     *            only if the connection does not has a
-     *            {@link ArcSDEPooledConnection#isTransactionActive() transaction in progress}.
-     * @param readerClosesConnection
-     *            flag indicating whether the reader should auto-close the
-     *            connection when exhausted/closed. <code>false</code>
-     *            indicates never close it as its being used as the streamed
-     *            content of a feature writer.
+     * @param query the Query containing the request criteria
+     * @param connection the connection to use to retrieve content. It'll be closed by the returned
+     *            FeatureReader<SimpleFeatureType, SimpleFeature> only if the connection does not
+     *            has a {@link ArcSDEPooledConnection#isTransactionActive() transaction in progress}.
+     * @param readerClosesConnection flag indicating whether the reader should auto-close the
+     *            connection when exhausted/closed. <code>false</code> indicates never close it as
+     *            its being used as the streamed content of a feature writer.
      * @return
      * @throws IOException
      */
     FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
-            final ArcSDEPooledConnection connection, final boolean readerClosesConnection)
-            throws IOException {
+            final ArcSDEPooledConnection connection,
+            final boolean readerClosesConnection,
+            final ArcSdeVersionHandler versionHandler) throws IOException {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
@@ -285,8 +278,8 @@ public class ArcSDEDataStore implements DataStore {
                     definitionQuery, viewSelectStatement);
         } else {
             final FIDReader fidStrategy = typeInfo.getFidStrategy();
-            final boolean isMultiversioned = typeInfo.isVersioned();
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy, isMultiversioned);
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy,
+                    versionHandler);
         }
 
         // /sdeQuery.execute();
@@ -322,18 +315,18 @@ public class ArcSDEDataStore implements DataStore {
 
     /**
      * @see DataStore#getFeatureSource(String)
-     * @return {@link FeatureSource} or {@link FeatureStore} depending on if the
-     *         user has write permissions over <code>typeName</code>
+     * @return {@link FeatureSource} or {@link FeatureStore} depending on if the user has write
+     *         permissions over <code>typeName</code>
      */
     public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource(final String typeName)
             throws IOException {
         final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
-
+        final ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, Transaction.AUTO_COMMIT);
         FeatureSource<SimpleFeatureType, SimpleFeature> fsource;
         if (typeInfo.isWritable()) {
-            fsource = new ArcSdeFeatureStore(typeInfo, this);
+            fsource = new ArcSdeFeatureStore(typeInfo, this, versionHandler);
         } else {
-            fsource = new ArcSdeFeatureSource(typeInfo, this);
+            fsource = new ArcSdeFeatureSource(typeInfo, this, versionHandler);
         }
         return fsource;
     }
@@ -350,21 +343,54 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * 
+     * @param typeName
+     * @param transaction
+     * @return
+     * @throws IOException
+     */
+    ArcSdeVersionHandler getVersionHandler(final String typeName, final Transaction transaction)
+            throws IOException {
+        ArcSdeVersionHandler versionHandler = ArcSdeVersionHandler.NONVERSIONED_HANDLER;
+        {
+            final FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(typeName);
+            final boolean versioned = featureTypeInfo.isVersioned();
+
+            if (Transaction.AUTO_COMMIT.equals(transaction)) {
+                if (versioned) {
+                    versionHandler = new AutoCommitDefaultVersionHandler();
+                }
+            } else {
+                ArcTransactionState state;
+                state = ArcTransactionState.getState(transaction, connectionPool, listenerManager,
+                        versioned);
+                versionHandler = state.getVersionHandler();
+            }
+        }
+        return versionHandler;
+    }
+
+    /**
      * @see DataStore#getFeatureWriter(String, Filter, Transaction)
      */
     public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriter(final String typeName,
-            final Filter filter, final Transaction transaction) throws IOException {
+            final Filter filter,
+            final Transaction transaction) throws IOException {
         // get the connection the streamed writer content has to work over
         // so the reader and writer share it
         final ArcSDEPooledConnection connection;
         final ArcTransactionState state;
+        final boolean versioned;
+        final ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, transaction);
         {
+            final FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(typeName);
+            versioned = featureTypeInfo.isVersioned();
+
             if (Transaction.AUTO_COMMIT.equals(transaction)) {
                 connection = connectionPool.getConnection();
                 state = null;
             } else {
-                state = ArcTransactionState.getState(transaction, connectionPool, listenerManager);
+                state = ArcTransactionState.getState(transaction, connectionPool, listenerManager,
+                        versioned);
                 connection = state.getConnection();
             }
         }
@@ -379,16 +405,16 @@ public class ArcSDEDataStore implements DataStore {
             final DefaultQuery query = new DefaultQuery(typeName, filter);
             // don't let the reader close the connection as the writer needs it
             final boolean closeConnection = false;
-            final FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query,
-                    connection, closeConnection);
+            final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
+            reader = getFeatureReader(query, connection, closeConnection, versionHandler);
 
-            FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
+            final FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
             final FIDReader fidReader = typeInfo.getFidStrategy();
 
             if (Transaction.AUTO_COMMIT == transaction) {
                 writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection,
-                        listenerManager);
+                        listenerManager, versionHandler);
             } else {
                 // if there's a transaction, the reader and the writer will
                 // share the connection held in the transaction state
@@ -421,8 +447,8 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @see DataStore#getFeatureWriterAppend(String, Transaction)
      */
-    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(
-            final String typeName, final Transaction transaction) throws IOException {
+    public FeatureWriter<SimpleFeatureType, SimpleFeature> getFeatureWriterAppend(final String typeName,
+            final Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.EXCLUDE, transaction);
     }
 
@@ -443,8 +469,7 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * This operation is not supported at this version of the GeoTools ArcSDE
-     * plugin.
+     * This operation is not supported at this version of the GeoTools ArcSDE plugin.
      * 
      * @see DataStore#updateSchema(String, SimpleFeatureType)
      */
@@ -454,8 +479,7 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Delegates to {@link #getFeatureSource(String)} with
-     * {@code name.getLocalPart()}
+     * Delegates to {@link #getFeatureSource(String)} with {@code name.getLocalPart()}
      * 
      * @since 2.5
      * @see DataAccess#getFeatureSource(Name)
@@ -466,8 +490,8 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Returns the same list of names than {@link #getTypeNames()} meaning the
-     * returned Names have no namespace set.
+     * Returns the same list of names than {@link #getTypeNames()} meaning the returned Names have
+     * no namespace set.
      * 
      * @since 2.5
      * @see DataAccess#getNames()
@@ -505,16 +529,15 @@ public class ArcSDEDataStore implements DataStore {
     // ////// NON API Methods /////////
 
     /**
-     * Returns the unsupported part of the passed filter, so a
-     * FilteringFeatureReader will be constructed upon it. Otherwise it will
-     * just return the same filter.
-     * 
+     * Returns the unsupported part of the passed filter, so a FilteringFeatureReader will be
+     * constructed upon it. Otherwise it will just return the same filter.
      * <p>
      * If the complete filter is supported, returns <code>Filter.INCLUDE</code>
      * </p>
      */
     private org.opengis.filter.Filter getUnsupportedFilter(final FeatureTypeInfo typeInfo,
-            final Filter filter, final ArcSDEPooledConnection conn) {
+            final Filter filter,
+            final ArcSDEPooledConnection conn) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
@@ -605,25 +628,21 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
-     * Creates a given FeatureType on the ArcSDE instance this DataStore is
-     * running over.
+     * Creates a given FeatureType on the ArcSDE instance this DataStore is running over.
      * <p>
-     * This deviation from the {@link DataStore#createSchema(SimpleFeatureType)}
-     * API is to allow the specification of ArcSDE specific hints for the
-     * "Feature Class" to create:
+     * This deviation from the {@link DataStore#createSchema(SimpleFeatureType)} API is to allow the
+     * specification of ArcSDE specific hints for the "Feature Class" to create:
      * <ul>
      * At this time the following hints may be passed:
-     * <li><b>configuration.keywords</b>: database configuration keyword to
-     * use for the newly create feature type. In not present,
-     * <code>"DEFAULTS"</code> will be used.</li>
-     * <li><b>rowid.column.name</b>: indicates the name of the table column to
-     * set up as the unique identifier, and thus to be used as feature id.</li>
-     * <li><b>rowid.column.type</b>: The row id column type. Must be one of
-     * the following allowed values: <code>"NONE"</code>, <code>"USER"</code>,
-     * <code>"SDE"</code> in order to set up the row id column name to not be
-     * managed at all, to be user managed or to be managed by ArcSDE,
-     * respectively. Refer to the ArcSDE documentation for an explanation of the
-     * meanings of those terms.</li>
+     * <li><b>configuration.keywords</b>: database configuration keyword to use for the newly
+     * create feature type. In not present, <code>"DEFAULTS"</code> will be used.</li>
+     * <li><b>rowid.column.name</b>: indicates the name of the table column to set up as the
+     * unique identifier, and thus to be used as feature id.</li>
+     * <li><b>rowid.column.type</b>: The row id column type. Must be one of the following allowed
+     * values: <code>"NONE"</code>, <code>"USER"</code>, <code>"SDE"</code> in order to set
+     * up the row id column name to not be managed at all, to be user managed or to be managed by
+     * ArcSDE, respectively. Refer to the ArcSDE documentation for an explanation of the meanings of
+     * those terms.</li>
      * </ul>
      * </p>
      * 
@@ -679,8 +698,8 @@ public class ArcSDEDataStore implements DataStore {
             } catch (SeException e) {
                 throw new ArcSdeException("Error Parsing select: " + qualifiedSelect, e);
             }
-            FeatureTypeInfo typeInfo = ArcSDEAdapter.createInprocessViewSchema(conn, typeName, namespace,
-                    qualifiedSelect, queryInfo);
+            FeatureTypeInfo typeInfo = ArcSDEAdapter.createInprocessViewSchema(conn, typeName,
+                    namespace, qualifiedSelect, queryInfo);
 
             inProcessFeatureTypeInfos.put(typeName, typeInfo);
         } finally {
@@ -704,8 +723,7 @@ public class ArcSDEDataStore implements DataStore {
      * </ul>
      * 
      * @param select
-     * @throws UnsupportedOperationException
-     *             if any of the unsupported constructs are found on
+     * @throws UnsupportedOperationException if any of the unsupported constructs are found on
      *             <code>select</code>
      */
     private void verifyQueryIsSupported(PlainSelect select) throws UnsupportedOperationException {

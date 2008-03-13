@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
@@ -50,8 +51,10 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
 
     private Transaction transaction = Transaction.AUTO_COMMIT;
 
-    public ArcSdeFeatureStore(final FeatureTypeInfo typeInfo, final ArcSDEDataStore arcSDEDataStore) {
-        super(typeInfo, arcSDEDataStore);
+    public ArcSdeFeatureStore(final FeatureTypeInfo typeInfo,
+                              final ArcSDEDataStore arcSDEDataStore,
+                              final ArcSdeVersionHandler versionHandler) {
+        super(typeInfo, arcSDEDataStore, versionHandler);
     }
 
     /**
@@ -64,8 +67,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * Sets this FeatureStore transaction.
      * <p>
-     * If transaction is not auto commit, initiates an
-     * {@link ArcTransactionState} with the dataStore's connection pool as key.
+     * If transaction is not auto commit, initiates an {@link ArcTransactionState} with the
+     * dataStore's connection pool as key.
      * </p>
      * 
      * @see FeatureStore#setTransaction(Transaction)
@@ -95,8 +98,10 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
                 // set the transaction state so it grabs a connection and
                 // starts
                 // a transaction on it
+                final boolean versioned = this.typeInfo.isVersioned();
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
-                        connectionPool, dataStore.listenerManager);
+                        connectionPool, dataStore.listenerManager, versioned);
+                versionHandler = state.getVersionHandler();
                 LOGGER.finer("ArcSDE transaction initialized: " + state);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
@@ -132,8 +137,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature>)
      */
-    public Set<String> addFeatures(
-            final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
+    public Set<String> addFeatures(final FeatureCollection<SimpleFeatureType, SimpleFeature> collection)
             throws IOException {
         // System.err.println(">>addFeatures called at " +
         // Thread.currentThread().getName());
@@ -205,7 +209,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
      */
-    public void modifyFeatures(final AttributeDescriptor[] attributes, final Object[] values,
+    public void modifyFeatures(final AttributeDescriptor[] attributes,
+            final Object[] values,
             final Filter filter) throws IOException {
         final ArcSDEPooledConnection connection = getConnection();
         connection.getLock().lock();
@@ -241,7 +246,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     /**
      * @see FeatureStore#modifyFeatures(AttributeDescriptor, Object, Filter)
      */
-    public final void modifyFeatures(final AttributeDescriptor type, final Object value,
+    public final void modifyFeatures(final AttributeDescriptor type,
+            final Object value,
             final Filter filter) throws IOException {
         modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, }, filter);
     }
@@ -289,7 +295,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     }
 
     /**
-     * 
      * @see FeatureStore#setFeatures(FeatureReader)
      */
     public void setFeatures(final FeatureReader<SimpleFeatureType, SimpleFeature> reader)
@@ -327,11 +332,10 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     }
 
     /**
-     * Truncates (removes all the features in) the ArcSDE table named
-     * <code>typeName</code> by using an SeTable with the provided
-     * <code>connection</code>. This means if the connection has a
-     * transaction in progress, the truncation takes effect upon commit,
-     * otherwise it takes effect immediately.
+     * Truncates (removes all the features in) the ArcSDE table named <code>typeName</code> by
+     * using an SeTable with the provided <code>connection</code>. This means if the connection
+     * has a transaction in progress, the truncation takes effect upon commit, otherwise it takes
+     * effect immediately.
      * 
      * @param typeName
      * @param connection
@@ -364,9 +368,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
 
     /**
      * If current transaction is not auto commit, grabs the connection from the
-     * {@link ArcTransactionState#getConnection() transaction state} using the
-     * datastore's connection pool as key. Otherwise asks the pool for a new
-     * connection.
+     * {@link ArcTransactionState#getConnection() transaction state} using the datastore's
+     * connection pool as key. Otherwise asks the pool for a new connection.
      */
     @Override
     protected ArcSDEPooledConnection getConnection() throws IOException,

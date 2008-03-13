@@ -28,4 +28,14 @@ public class SeState {
     public void trimTree(SeObjectId from, SeObjectId to) throws SeException {
     }
 
+    public void delete() throws SeException{
+    }
+
+    public SeObjectId getParentId() {
+        return null;
+    }
+
+    public void open()throws SeException {
+    }
+
 }

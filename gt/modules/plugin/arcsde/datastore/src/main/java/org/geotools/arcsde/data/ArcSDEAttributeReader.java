@@ -32,8 +32,8 @@ import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeShape;
 
 /**
- * Implements an attribute reader that is aware of the particulars of ArcSDE.
- * This class sends its logging to the log named "org.geotools.data".
+ * Implements an attribute reader that is aware of the particulars of ArcSDE. This class sends its
+ * logging to the log named "org.geotools.data".
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
@@ -55,28 +55,25 @@ class ArcSDEAttributeReader implements AttributeReader {
     private SdeRow currentRow;
 
     /**
-     * the unique id of the current feature. -1 means the feature id was not
-     * retrieved
+     * the unique id of the current feature. -1 means the feature id was not retrieved
      */
     private long currentFid = -1;
 
     /**
-     * the builder for the geometry type of the schema's default geometry, or
-     * null if the geometry attribute is not included in the schema
+     * the builder for the geometry type of the schema's default geometry, or null if the geometry
+     * attribute is not included in the schema
      */
     private ArcSDEGeometryBuilder geometryBuilder;
 
     /**
-     * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used
-     * to efficiently create String FIDs from the SeShape feature id, which is a
-     * long number.
+     * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used to efficiently create
+     * String FIDs from the SeShape feature id, which is a long number.
      */
     private StringBuffer fidPrefix;
 
     /**
-     * lenght of the prefix string for creating string based feature ids, used
-     * to truncate the <code>fidPrefix</code> and append it the SeShape's
-     * feature id number
+     * lenght of the prefix string for creating string based feature ids, used to truncate the
+     * <code>fidPrefix</code> and append it the SeShape's feature id number
      */
     private int fidPrefixLen;
 
@@ -86,8 +83,8 @@ class ArcSDEAttributeReader implements AttributeReader {
     private FIDReader fidReader;
 
     /**
-     * flag to avoid the processing done in <code>hasNext()</code> if next()
-     * was not called between calls to hasNext()
+     * flag to avoid the processing done in <code>hasNext()</code> if next() was not called
+     * between calls to hasNext()
      */
     private boolean hasNextAlreadyCalled = false;
 
@@ -96,13 +93,12 @@ class ArcSDEAttributeReader implements AttributeReader {
     /**
      * Flag indicating whether to close or not the connection.
      * <p>
-     * If <code>true</code> the connection is automatically closed when the
-     * reader is exhausted or then {@link #close()} is called. Otherwise it is
-     * untouched. Rationale being an {@link ArcSDEFeatureReader} using this
-     * attribute reader may be acting as the streamed content for a
-     * FeatureWriter and sharing the connection, so closing the connection
-     * becomes the responsibility of the feature writer, or it might be returned
-     * to the pool while the writer is still using it.
+     * If <code>true</code> the connection is automatically closed when the reader is exhausted or
+     * then {@link #close()} is called. Otherwise it is untouched. Rationale being an
+     * {@link ArcSDEFeatureReader} using this attribute reader may be acting as the streamed content
+     * for a FeatureWriter and sharing the connection, so closing the connection becomes the
+     * responsibility of the feature writer, or it might be returned to the pool while the writer is
+     * still using it.
      * </p>
      */
     private boolean handleConnectionClosing;
@@ -110,25 +106,18 @@ class ArcSDEAttributeReader implements AttributeReader {
     /**
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
-     * @param query
-     *            the {@link SeQuery} wrapper where to fetch rows from. Must NOT
-     *            be already {@link ArcSDEQuery#execute() executed}.
-     * 
-     * @param connection
-     *            the connection the <code>query</code> is being ran over.
-     *            This attribute reader will close it only if it does not have a
-     *            transaction in progress.
-     * 
-     * @param handleConnectionClosing
-     *            whether to close or not the connection when done. Useful to
-     *            allow a feature reader working over this attribute reader to
-     *            stream out the filtered content of an
-     *            {@link AutoCommitFeatureWriter}.
-     * 
+     * @param query the {@link SeQuery} wrapper where to fetch rows from. Must NOT be already
+     *            {@link ArcSDEQuery#execute() executed}.
+     * @param connection the connection the <code>query</code> is being ran over. This attribute
+     *            reader will close it only if it does not have a transaction in progress.
+     * @param handleConnectionClosing whether to close or not the connection when done. Useful to
+     *            allow a feature reader working over this attribute reader to stream out the
+     *            filtered content of an {@link AutoCommitFeatureWriter}.
      * @throws IOException
      */
-    public ArcSDEAttributeReader(final ArcSDEQuery query, final ArcSDEPooledConnection connection,
-            final boolean handleConnectionClosing) throws IOException {
+    public ArcSDEAttributeReader(final ArcSDEQuery query,
+                                 final ArcSDEPooledConnection connection,
+                                 final boolean handleConnectionClosing) throws IOException {
         this.query = query;
         this.connection = connection;
         this.handleConnectionClosing = handleConnectionClosing;
@@ -146,7 +135,8 @@ class ArcSDEAttributeReader implements AttributeReader {
             Class geometryClass = geomType.getType().getBinding();
             this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
         }
-        // get the lock before executing the query so streams don't get confused
+        // get the lock before executing the query so streams don't get confused,
+        // and keep it until close() is called on this class
         connection.getLock().lock();
         try {
             query.execute();
@@ -171,9 +161,8 @@ class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * Closes the associated query object and, if this attribute reader is not
-     * being run over a connection with a transaction in progress, closes the
-     * connection too.
+     * Closes the associated query object and, if this attribute reader is not being run over a
+     * connection with a transaction in progress, closes the connection too.
      */
     public void close() throws IOException {
         if (query != null) {
@@ -231,13 +220,10 @@ class ArcSDEAttributeReader implements AttributeReader {
     }
 
     /**
-     * Retrieves the next row, or throws a DataSourceException if not more rows
-     * are available.
+     * Retrieves the next row, or throws a DataSourceException if not more rows are available.
      * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public void next() throws IOException {
         if (this.currentRow == null) {
@@ -250,17 +236,11 @@ class ArcSDEAttributeReader implements AttributeReader {
     /**
      * DOCUMENT ME!
      * 
-     * @param index
-     *            DOCUMENT ME!
-     * 
+     * @param index DOCUMENT ME!
      * @return DOCUMENT ME!
-     * 
-     * @throws IOException
-     *             never, since the feature retrieve was done in
-     *             <code>hasNext()</code>
-     * @throws ArrayIndexOutOfBoundsException
-     *             if <code>index</code> is outside the bounds of the schema
-     *             attribute's count
+     * @throws IOException never, since the feature retrieve was done in <code>hasNext()</code>
+     * @throws ArrayIndexOutOfBoundsException if <code>index</code> is outside the bounds of the
+     *             schema attribute's count
      */
     public Object read(int index) throws IOException, ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
@@ -269,9 +249,8 @@ class ArcSDEAttributeReader implements AttributeReader {
             try {
                 SeShape shape = (SeShape) value;
                 /**
-                 * Class geomClass =
-                 * ArcSDEAdapter.getGeometryType(shape.getType());
-                 * geometryBuilder = GeometryBuilder.builderFor(geomClass);
+                 * Class geomClass = ArcSDEAdapter.getGeometryType(shape.getType()); geometryBuilder =
+                 * GeometryBuilder.builderFor(geomClass);
                  */
                 value = geometryBuilder.construct(shape);
             } catch (SeException e) {

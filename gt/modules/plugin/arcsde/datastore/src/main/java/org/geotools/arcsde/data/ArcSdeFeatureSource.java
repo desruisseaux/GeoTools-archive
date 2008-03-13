@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
@@ -49,15 +50,20 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
 
     private ArcSdeResourceInfo resourceInfo;
 
-    public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo, final ArcSDEDataStore dataStore) {
+    protected ArcSdeVersionHandler versionHandler;
+
+    public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo,
+                               final ArcSDEDataStore dataStore,
+                               final ArcSdeVersionHandler versionHandler) {
         this.typeInfo = typeInfo;
         this.dataStore = dataStore;
+        this.versionHandler = versionHandler;
     }
 
     /**
-     * Returns the same name than the feature type (ie,
-     * {@code getSchema().getName()} to honor the simple feature land common
-     * practice of calling the same both the Features produces and their types
+     * Returns the same name than the feature type (ie, {@code getSchema().getName()} to honor the
+     * simple feature land common practice of calling the same both the Features produces and their
+     * types
      * 
      * @since 2.5
      * @see FeatureSource#getName()
@@ -98,9 +104,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * @return The bounding box of the query or null if unknown and too
-     *         expensive for the method to calculate or any errors occur.
-     * 
+     * @return The bounding box of the query or null if unknown and too expensive for the method to
+     *         calculate or any errors occur.
      * @see FeatureSource#getBounds(Query)
      */
     public final ReferencedEnvelope getBounds(final Query query) throws IOException {
@@ -118,11 +123,10 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * 
      * @param namedQuery
      * @param connection
-     * @return The bounding box of the query or null if unknown and too
-     *         expensive for the method to calculate or any errors occur.
+     * @return The bounding box of the query or null if unknown and too expensive for the method to
+     *         calculate or any errors occur.
      * @throws DataSourceException
      * @throws IOException
      */
@@ -143,7 +147,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
         // extent.getMinY(), extent
         // .getMaxY());
         // } else {
-        ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery);
+        ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery, versionHandler);
         // }
 
         if (ev != null) {
@@ -188,14 +192,14 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     protected int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
             throws IOException {
         final int count;
-        count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery);
+        count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery, versionHandler);
         return count;
     }
 
     /**
-     * convenient way to get a connection for {@link #getBounds()} and
-     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get
-     * the connection from the transaction instead of the pool.
+     * convenient way to get a connection for {@link #getBounds()} and {@link #getCount(Query)}.
+     * {@link ArcSdeFeatureStore} overrides to get the connection from the transaction instead of
+     * the pool.
      * 
      * @return
      * @throws IOException
@@ -266,5 +270,9 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     public final Set getSupportedHints() {
         return Collections.EMPTY_SET;
+    }
+
+    public ArcSdeVersionHandler getVersionHandler() {
+        return versionHandler;
     }
 }

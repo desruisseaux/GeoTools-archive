@@ -94,9 +94,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     private static TestData testData;
 
     /**
-     * Builds a test suite for all this class' tests with per suite
-     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
-     * directed to {@link #oneTimeTearDown()}
+     * Builds a test suite for all this class' tests with per suite initialization directed to
+     * {@link #oneTimeSetUp()} and per suite clean up directed to {@link #oneTimeTearDown()}
      * 
      * @return
      */
@@ -137,12 +136,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object,
-     * wich is used to obtain test tables names and is used as parameter to find
-     * the DataStore
+     * loads {@code test-data/testparams.properties} into a Properties object, wich is used to
+     * obtain test tables names and is used as parameter to find the DataStore
      * 
-     * @throws Exception
-     *             DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
      */
     @Override
     protected void setUp() throws Exception {
@@ -230,9 +227,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * Tests that all the features that match a filter based on attribute only
-     * filters (aka non spatial filters), are deleted correctly. This test
-     * assumes that there are no duplicate values in the test data.
+     * Tests that all the features that match a filter based on attribute only filters (aka non
+     * spatial filters), are deleted correctly. This test assumes that there are no duplicate values
+     * in the test data.
      * 
      * @throws Exception
      */
@@ -275,22 +272,17 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
     /**
      * Tests the creation of new feature types, with CRS and all.
-     * 
      * <p>
-     * This test also ensures that the arcsde datastore is able of creating
-     * schemas where the geometry attribute is not the last one. This is
-     * important since to do so, the ArcSDE datastore must break the usual way
-     * of creating schemas with the ArcSDE Java API, in which one first creates
-     * the (non spatially enabled) "table" with all the non spatial attributes
-     * and finally creates the "layer", adding the spatial attribute to the
-     * previously created table. So, this test ensures the datastore correctly
-     * works arround this limitation.
+     * This test also ensures that the arcsde datastore is able of creating schemas where the
+     * geometry attribute is not the last one. This is important since to do so, the ArcSDE
+     * datastore must break the usual way of creating schemas with the ArcSDE Java API, in which one
+     * first creates the (non spatially enabled) "table" with all the non spatial attributes and
+     * finally creates the "layer", adding the spatial attribute to the previously created table.
+     * So, this test ensures the datastore correctly works arround this limitation.
      * </p>
      * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws SchemaException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws SchemaException DOCUMENT ME!
      * @throws SeException
      */
     public void _testCreateSchema() throws IOException, SchemaException, SeException {
@@ -341,9 +333,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * Add features to a FeatureWriter with a {@link Transaction} and ensure if
-     * the transaction was not committed, a request gets no features, and when
-     * the transaction is committed the query returns it.
+     * Add features to a FeatureWriter with a {@link Transaction} and ensure if the transaction was
+     * not committed, a request gets no features, and when the transaction is committed the query
+     * returns it.
      * 
      * @throws Exception
      */
@@ -714,13 +706,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * Tests the writing of features with autocommit transaction.
      * 
-     * @param geometryClass
-     *            DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
-     * @throws IllegalArgumentException
-     *             DOCUMENT ME!
+     * @param geometryClass DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
     private void testInsertAutoCommit(Class<? extends Geometry> geometryClass) throws Exception {
         final String typeName = testData.getTemp_table();
@@ -740,10 +728,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         /*
          * final int[] featureAddedEventCount = { 0 };
          * 
-         * fsource.addFeatureListener(new FeatureListener() { public void
-         * changed(FeatureEvent evt) { if (evt.getEventType() !=
-         * FeatureEvent.FEATURES_ADDED) { throw new IllegalArgumentException(
-         * "Expected FEATURES_ADDED event, got " + evt.getEventType()); }
+         * fsource.addFeatureListener(new FeatureListener() { public void changed(FeatureEvent evt) {
+         * if (evt.getEventType() != FeatureEvent.FEATURES_ADDED) { throw new
+         * IllegalArgumentException( "Expected FEATURES_ADDED event, got " + evt.getEventType()); }
          * 
          * ++featureAddedEventCount[0]; } });
          */
@@ -772,9 +759,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         assertEquals(testFeatures.size() + initialCount, fcount);
 
         /*
-         * String msg = "a FEATURES_ADDED event should have been called " +
-         * features.size() + " times"; assertEquals(msg, features.size(),
-         * featureAddedEventCount[0]);
+         * String msg = "a FEATURES_ADDED event should have been called " + features.size() + "
+         * times"; assertEquals(msg, features.size(), featureAddedEventCount[0]);
          */
     }
 
@@ -884,8 +870,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * Tests the writing of features with real transactions
      * 
-     * @throws UnsupportedOperationException
-     *             DOCUMENT ME!
+     * @throws UnsupportedOperationException DOCUMENT ME!
      */
     public void testFeatureWriterTransaction() throws Exception {
         // the table populated here is test friendly since it can hold
@@ -945,17 +930,15 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         assertEquals(writeCount, fcount);
 
         /*
-         * String msg = "a FEATURES_ADDED event should have been called " +
-         * features.size() + " times"; assertEquals(msg, features.size(),
-         * featureAddedEventCount[0]);
+         * String msg = "a FEATURES_ADDED event should have been called " + features.size() + "
+         * times"; assertEquals(msg, features.size(), featureAddedEventCount[0]);
          */
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @throws UnsupportedOperationException
-     *             DOCUMENT ME!
+     * @throws UnsupportedOperationException DOCUMENT ME!
      */
     public void testFeatureWriterAppend() throws Exception {
         // the table populated here is test friendly since it can hold
@@ -993,8 +976,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * Ensure modified features for a given FeatureStore are returned by
-     * subsequent queries even if the transaction has not been committed.
+     * Ensure modified features for a given FeatureStore are returned by subsequent queries even if
+     * the transaction has not been committed.
      * 
      * @throws Exception
      */
@@ -1179,10 +1162,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
 
     /**
-     * Simultate an application where one thread works over a transaction adding
-     * features while another thread accesses the same FeatureStore with a
-     * query. Archetypical use case being a udig addFeatures command sends calls
-     * addFeatures and the rendering thread does getFeatures.
+     * Simultate an application where one thread works over a transaction adding features while
+     * another thread accesses the same FeatureStore with a query. Archetypical use case being a
+     * udig addFeatures command sends calls addFeatures and the rendering thread does getFeatures.
      */
     public void testTransactionMultithreadAccess() throws Exception {
         testData.insertTestData();
@@ -1303,7 +1285,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
-    public void testEditVersionedTable() throws Exception {
+    public void testEditVersionedTableTransaction() throws Exception {
         try {
             final String tableName;
             {
@@ -1363,7 +1345,82 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertEquals(0, source.getCount(Query.ALL));
 
             transaction.commit();
-            
+
+            assertEquals(2, source.getCount(Query.ALL));
+
+            content[0] = "Feature name 3";
+            content[1] = reader.read("POINT (2 2)");
+            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
+            collection = DataUtilities.collection(feature);
+
+            store.addFeatures(collection);
+
+            count = store.getCount(Query.ALL);
+            assertEquals(3, count);
+
+            assertEquals(2, source.getCount(Query.ALL));
+            transaction.rollback();
+            assertEquals(2, store.getCount(Query.ALL));
+
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
+        }
+    }
+
+    public void testEditVersionedTableAutoCommit() throws Exception {
+        try {
+            final String tableName;
+            {
+                SeConnection conn = testData.getConnectionPool().getConnection();
+                try {
+                    SeTable versionedTable = testData.createVersionedTable(conn);
+                    tableName = versionedTable.getQualifiedName();
+                } finally {
+                    conn.close();
+                }
+            }
+
+            final ArcSDEDataStore dataStore = testData.getDataStore();
+            FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore
+                    .getFeatureSource(tableName);
+            final FeatureStore<SimpleFeatureType, SimpleFeature> store;
+            store = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
+                    .getFeatureSource(tableName);
+
+            ArcSdeResourceInfo info = (ArcSdeResourceInfo) store.getInfo();
+            assertTrue(info.isVersioned());
+
+            final SimpleFeatureType schema = store.getSchema();
+
+            final int initialCount = store.getCount(Query.ALL);
+            assertEquals(0, initialCount);
+
+            final WKTReader reader = new WKTReader();
+            Object[] content = new Object[2];
+            SimpleFeature feature;
+            FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
+            int count;
+
+            content[0] = "Feature name 1";
+            content[1] = reader.read("POINT (0 0)");
+            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
+            collection = DataUtilities.collection(feature);
+
+            store.addFeatures(collection);
+
+            count = store.getCount(Query.ALL);
+            assertEquals(1, count);
+
+            content[0] = "Feature name 2";
+            content[1] = reader.read("POINT (1 1)");
+            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
+            collection = DataUtilities.collection(feature);
+
+            store.addFeatures(collection);
+
+            count = store.getCount(Query.ALL);
+            assertEquals(2, count);
+
             assertEquals(2, source.getCount(Query.ALL));
 
         } catch (SeException e) {
@@ -1374,8 +1431,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     /**
      * DOCUMENT ME!
      * 
-     * @param args
-     *            DOCUMENT ME!
+     * @param args DOCUMENT ME!
      */
     public static void main(String[] args) {
         junit.textui.TestRunner.run(ArcSDEFeatureStoreTest.class);

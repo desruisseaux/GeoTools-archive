@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
@@ -48,19 +49,16 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.esri.sde.sdk.client.SeState;
 import com.esri.sde.sdk.client.SeTable;
-import com.esri.sde.sdk.client.SeVersion;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Wrapper class for SeQuery to hold a SeConnection until close() is called and
- * provide utility methods.
+ * Wrapper class for SeQuery to hold a SeConnection until close() is called and provide utility
+ * methods.
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
@@ -73,10 +71,9 @@ class ArcSDEQuery {
             .getLogger(ArcSDEQuery.class.getName());
 
     /**
-     * The connection to the ArcSDE server obtained when first created the
-     * SeQuery in <code>getSeQuery</code>. It is retained until
-     * <code>close()</code> is called. Do not use it directly, but through
-     * <code>getConnection()</code>.
+     * The connection to the ArcSDE server obtained when first created the SeQuery in
+     * <code>getSeQuery</code>. It is retained until <code>close()</code> is called. Do not use
+     * it directly, but through <code>getConnection()</code>.
      * <p>
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
@@ -84,23 +81,21 @@ class ArcSDEQuery {
     final ArcSDEPooledConnection connection;
 
     /**
-     * The exact feature type this query is about to request from the arcsde
-     * server. It could have less attributes than the ones of the actual table
-     * schema, in which case only those attributes will be requested.
+     * The exact feature type this query is about to request from the arcsde server. It could have
+     * less attributes than the ones of the actual table schema, in which case only those attributes
+     * will be requested.
      */
     private SimpleFeatureType schema;
 
     /**
-     * The query built using the constraints given by the geotools Query. It
-     * must not be accessed directly, but through <code>getSeQuery()</code>,
-     * since it is lazyly created
+     * The query built using the constraints given by the geotools Query. It must not be accessed
+     * directly, but through <code>getSeQuery()</code>, since it is lazyly created
      */
     private SeQuery query;
 
     /**
-     * Holds the geotools Filter that originated this query from which can parse
-     * the sql where clause and the set of spatial filters for the ArcSDE Java
-     * API
+     * Holds the geotools Filter that originated this query from which can parse the sql where
+     * clause and the set of spatial filters for the ArcSDE Java API
      */
     private ArcSDEQuery.FilterSet filters;
 
@@ -112,53 +107,49 @@ class ArcSDEQuery {
 
     private Object[] previousRowValues;
 
-    private boolean isMultiversioned;
+    private ArcSdeVersionHandler versioningHandler;
 
     /**
      * Creates a new SDEQuery object.
      * 
-     * @param connection
-     *            the connection attached to the life cycle of this query
-     * @param schema
-     *            the schema with all the attributes as expected.
-     * @param filterSet
-     *            DOCUMENT ME!
-     * @param isMultiversioned
-     * 
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     * 
+     * @param connection the connection attached to the life cycle of this query
+     * @param schema the schema with all the attributes as expected.
+     * @param filterSet DOCUMENT ME!
+     * @param versioningHandler used to transparently set up SeQuery streams pointing to the propper
+     *            version edit state when appropriate
+     * @throws DataSourceException DOCUMENT ME!
      * @see prepareQuery
      */
-    private ArcSDEQuery(final ArcSDEPooledConnection connection, final SimpleFeatureType schema,
-            final FilterSet filterSet, final FIDReader fidReader, boolean isMultiversioned)
-            throws DataSourceException {
+    private ArcSDEQuery(final ArcSDEPooledConnection connection,
+                        final SimpleFeatureType schema,
+                        final FilterSet filterSet,
+                        final FIDReader fidReader,
+                        ArcSdeVersionHandler versioningHandler) throws DataSourceException {
         this.connection = connection;
         this.schema = schema;
         this.filters = filterSet;
         this.fidReader = fidReader;
-        this.isMultiversioned = isMultiversioned;
+        this.versioningHandler = versioningHandler;
     }
 
     /**
-     * Creates a Query to be executed over a registered ArcSDE layer (whether it
-     * is from a table or a spatial view).
+     * Creates a Query to be executed over a registered ArcSDE layer (whether it is from a table or
+     * a spatial view).
      * 
-     * @param conn
-     *            the connection the query works over. As its managed by the
-     *            calling code its the calling code responsibility to close it
-     *            when done.
+     * @param conn the connection the query works over. As its managed by the calling code its the
+     *            calling code responsibility to close it when done.
      * @param fullSchema
      * @param query
-     * @param isMultiversioned
-     *            whether the table is versioned, if so, the default version and
+     * @param isMultiversioned whether the table is versioned, if so, the default version and
      *            current state will be used for the SeQuery
      * @return
      * @throws IOException
      */
     public static ArcSDEQuery createQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType fullSchema, final Query query, final FIDReader fidReader,
-            boolean isMultiversioned) throws IOException {
+            final SimpleFeatureType fullSchema,
+            final Query query,
+            final FIDReader fidReader,
+            final ArcSdeVersionHandler versioningHandler) throws IOException {
 
         Filter filter = query.getFilter();
 
@@ -172,24 +163,23 @@ class ArcSDEQuery {
                 querySchema, null, null, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, isMultiversioned);
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, versioningHandler);
         return sdeQuery;
     }
 
     /**
-     * Creates a query to be executed over an inprocess view (a view defined by
-     * a SQL SELECT statement at the datastore configuration)
+     * Creates a query to be executed over an inprocess view (a view defined by a SQL SELECT
+     * statement at the datastore configuration)
      * 
      * @return the newly created ArcSDEQuery.
-     * 
-     * @throws IOException
-     *             see <i>throws DataSourceException</i> bellow.
+     * @throws IOException see <i>throws DataSourceException</i> bellow.
      * @see ArcSDEDataStore#registerView(String, PlainSelect)
      */
     public static ArcSDEQuery createInprocessViewQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType fullSchema, final Query query,
-            final SeQueryInfo definitionQuery, final PlainSelect viewSelectStatement)
-            throws IOException {
+            final SimpleFeatureType fullSchema,
+            final Query query,
+            final SeQueryInfo definitionQuery,
+            final PlainSelect viewSelectStatement) throws IOException {
 
         final Filter filter = query.getFilter();
         final FIDReader fidReader = FIDReader.NULL_READER;
@@ -220,25 +210,22 @@ class ArcSDEQuery {
                 querySchema, definitionQuery, viewSelectStatement, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, false);
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader,
+                ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return sdeQuery;
     }
 
     /**
-     * Returns a {@link SimpleFeatureType} whichs a "view" of the
-     * <code>fullSchema</code> adapted as per the required query property
-     * names.
+     * Returns a {@link SimpleFeatureType} whichs a "view" of the <code>fullSchema</code> adapted
+     * as per the required query property names.
      * 
-     * @param query
-     *            the query containing the list of property names required by
-     *            the output schema and the {@link Filter query predicate} from
-     *            which to fetch required properties to be used at runtime
-     *            filter evaluation.
-     * @param fullSchema
-     *            a feature type representing an ArcSDE layer full schema.
-     * @return a FeatureType derived from <code>fullSchema</code> which
-     *         contains the property names required by the <code>query</code>
-     *         and the ones referenced in the query filter.
+     * @param query the query containing the list of property names required by the output schema
+     *            and the {@link Filter query predicate} from which to fetch required properties to
+     *            be used at runtime filter evaluation.
+     * @param fullSchema a feature type representing an ArcSDE layer full schema.
+     * @return a FeatureType derived from <code>fullSchema</code> which contains the property
+     *         names required by the <code>query</code> and the ones referenced in the query
+     *         filter.
      * @throws DataSourceException
      */
     private static SimpleFeatureType getQuerySchema(final Query query,
@@ -308,9 +295,12 @@ class ArcSDEQuery {
         return this.fidReader;
     }
 
-    public static ArcSDEQuery.FilterSet createFilters(SeLayer layer, SimpleFeatureType schema,
-            Filter filter, SeQueryInfo qInfo, PlainSelect viewSelect, FIDReader fidReader)
-            throws NoSuchElementException, IOException {
+    public static ArcSDEQuery.FilterSet createFilters(SeLayer layer,
+            SimpleFeatureType schema,
+            Filter filter,
+            SeQueryInfo qInfo,
+            PlainSelect viewSelect,
+            FIDReader fidReader) throws NoSuchElementException, IOException {
 
         ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(layer, filter, schema, qInfo,
                 viewSelect, fidReader);
@@ -319,9 +309,7 @@ class ArcSDEQuery {
     }
 
     /**
-     * Returns the stream used to fetch rows, creating it if it was not yet
-     * created.
-     * 
+     * Returns the stream used to fetch rows, creating it if it was not yet created.
      * 
      * @throws SeException
      * @throws IOException
@@ -339,31 +327,23 @@ class ArcSDEQuery {
     }
 
     /**
-     * creates an SeQuery with the filters provided to the constructor and
-     * returns it. Queries created with this method can be used to execute and
-     * fetch results. They cannot be used for other operations, such as
-     * calculating layer extents, or result count.
+     * creates an SeQuery with the filters provided to the constructor and returns it. Queries
+     * created with this method can be used to execute and fetch results. They cannot be used for
+     * other operations, such as calculating layer extents, or result count.
      * <p>
-     * Difference with
-     * {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is tha
-     * this function tells <code>SeQuery.setSpatialConstraints</code> to NOT
-     * return geometry based bitmasks, which are needed for calculating the
-     * query extent and result count, but not for fetching SeRows.
+     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is tha this
+     * function tells <code>SeQuery.setSpatialConstraints</code> to NOT return geometry based
+     * bitmasks, which are needed for calculating the query extent and result count, but not for
+     * fetching SeRows.
      * </p>
      * 
-     * @param propertyNames
-     *            names of attributes to build the query for, respecting order
-     * 
+     * @param propertyNames names of attributes to build the query for, respecting order
      * @return DOCUMENT ME!
-     * 
-     * @throws SeException
-     *             if the ArcSDE Java API throws it while creating the SeQuery
-     *             or setting it the spatial constraints.
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws SeException if the ArcSDE Java API throws it while creating the SeQuery or setting it
+     *             the spatial constraints.
+     * @throws IOException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForFetch(String[] propertyNames) throws SeException,
-            DataSourceException {
+    private SeQuery createSeQueryForFetch(String[] propertyNames) throws SeException, IOException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("constructing new sql query with connection: " + connection
                     + ", propnames: " + java.util.Arrays.asList(propertyNames)
@@ -442,31 +422,23 @@ class ArcSDEQuery {
     }
 
     /**
-     * creates an SeQuery with the filters provided to the constructor and
-     * returns it. Queries created with this method are to be used for
-     * calculating layer extents and result counts. These queries cannot be
-     * executed or used to fetch results.
+     * creates an SeQuery with the filters provided to the constructor and returns it. Queries
+     * created with this method are to be used for calculating layer extents and result counts.
+     * These queries cannot be executed or used to fetch results.
      * <p>
-     * Difference with
-     * {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is tha
-     * this function tells <code>SeQuery.setSpatialConstraints</code> to
-     * return geometry based bitmasks, which are needed for calculating the
-     * query extent and result count, but not for fetching SeRows.
+     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is tha this
+     * function tells <code>SeQuery.setSpatialConstraints</code> to return geometry based
+     * bitmasks, which are needed for calculating the query extent and result count, but not for
+     * fetching SeRows.
      * </p>
      * 
-     * 
-     * @param propertyNames
-     *            names of attributes to build the query for, respecting order
-     * 
+     * @param propertyNames names of attributes to build the query for, respecting order
      * @return DOCUMENT ME!
-     * 
-     * @throws SeException
-     *             if the ArcSDE Java API throws it while creating the SeQuery
-     *             or setting it the spatial constraints.
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws SeException if the ArcSDE Java API throws it while creating the SeQuery or setting it
+     *             the spatial constraints.
+     * @throws IOException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo() throws SeException, DataSourceException {
+    private SeQuery createSeQueryForQueryInfo() throws SeException, IOException {
 
         SeQuery seQuery = new SeQuery(connection);
         setQueryVersionState(seQuery);
@@ -482,24 +454,14 @@ class ArcSDEQuery {
     }
 
     /**
-     * If the table being queried is multi versioned (we have a flag indicating
-     * it), retrieves the default version and its current version state to use
-     * for the query object
+     * If the table being queried is multi versioned (we have a flag indicating it), retrieves the
+     * default version and its current version state to use for the query object
      * 
      * @param seQuery
-     * @throws SeException
+     * @throws IOException
      */
-    private void setQueryVersionState(SeQuery seQuery) throws SeException {
-        if (!isMultiversioned) {
-            return;
-        }
-        SeVersion defaultVersion = new SeVersion(connection,
-                SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
-        defaultVersion.getInfo();
-        SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
-        SeObjectId currentStateId = defaultVersion.getStateId();
-        System.out.println("Setting SeQuery state id " + currentStateId.longValue());
-        seQuery.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
+    private void setQueryVersionState(SeQuery seQuery) throws IOException {
+        versioningHandler.setUpStream(connection, seQuery);
     }
 
     /**
@@ -524,7 +486,9 @@ class ArcSDEQuery {
      * Convenient method to just calculate the result count of a given query.
      */
     public static int calculateResultCount(final ArcSDEPooledConnection connection,
-            final FeatureTypeInfo typeInfo, final Query query) throws IOException {
+            final FeatureTypeInfo typeInfo,
+            final Query query,
+            final ArcSdeVersionHandler versioningHandler) throws IOException {
 
         ArcSDEQuery countQuery = null;
         final int count;
@@ -537,8 +501,8 @@ class ArcSDEQuery {
                         definitionQuery, viewSelectStatement);
             } else {
                 final FIDReader fidStrategy = typeInfo.getFidStrategy();
-                final boolean versioned = typeInfo.isVersioned();
-                countQuery = createQuery(connection, fullSchema, query, fidStrategy, versioned);
+                countQuery = createQuery(connection, fullSchema, query, fidStrategy,
+                        versioningHandler);
             }
             count = countQuery.calculateResultCount();
         } finally {
@@ -550,11 +514,12 @@ class ArcSDEQuery {
     }
 
     /**
-     * Convenient method to just calculate the resulting bound box of a given
-     * query.
+     * Convenient method to just calculate the resulting bound box of a given query.
      */
     public static Envelope calculateQueryExtent(final ArcSDEPooledConnection connection,
-            final FeatureTypeInfo typeInfo, final Query query) throws IOException {
+            final FeatureTypeInfo typeInfo,
+            final Query query,
+            final ArcSdeVersionHandler versioningHandler) throws IOException {
 
         final SimpleFeatureType fullSchema = typeInfo.getFeatureType();
         final String defaultGeomAttName = fullSchema.getDefaultGeometry().getLocalName();
@@ -572,9 +537,8 @@ class ArcSDEQuery {
             boundsQuery = createInprocessViewQuery(connection, fullSchema, realQuery,
                     definitionQuery, viewSelectStatement);
         } else {
-            final boolean versioned = typeInfo.isVersioned();
             boundsQuery = createQuery(connection, fullSchema, realQuery, FIDReader.NULL_READER,
-                    versioned);
+                    versioningHandler);
         }
 
         Envelope queryExtent = null;
@@ -592,21 +556,17 @@ class ArcSDEQuery {
     }
 
     /**
-     * if the query has been parsed as just a where clause filter, or has no
-     * filter at all, the result count calculation is optimized by selecting a
-     * <code>count()</code> single row. If the filter involves any kind of
-     * spatial filter, such as BBOX, the calculation can't be optimized by this
-     * way, because the ArcSDE Java API throws a <code>"DATABASE LEVEL
+     * if the query has been parsed as just a where clause filter, or has no filter at all, the
+     * result count calculation is optimized by selecting a <code>count()</code> single row. If
+     * the filter involves any kind of spatial filter, such as BBOX, the calculation can't be
+     * optimized by this way, because the ArcSDE Java API throws a <code>"DATABASE LEVEL
      * ERROR OCURRED"</code>
-     * exception. So, in this case, a query over the shape field is made and the
-     * result is traversed counting the number of rows inside a while loop
+     * exception. So, in this case, a query over the shape field is made and the result is traversed
+     * counting the number of rows inside a while loop
      * 
      * @return DOCUMENT ME!
-     * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public int calculateResultCount() throws IOException {
         LOGGER.fine("about to calculate result count");
@@ -657,15 +617,12 @@ class ArcSDEQuery {
     }
 
     /**
-     * Returns the envelope for all features within the layer that pass any SQL
-     * construct, state, or spatial constraints for the stream.
+     * Returns the envelope for all features within the layer that pass any SQL construct, state, or
+     * spatial constraints for the stream.
      * 
      * @return DOCUMENT ME!
-     * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public Envelope calculateQueryExtent() throws IOException {
         Envelope envelope = null;
@@ -733,9 +690,9 @@ class ArcSDEQuery {
     /**
      * Closes the query.
      * <p>
-     * The {@link ArcSDEPooledConnection connection} used by the query is not
-     * closed by this operation as it was provided by the calling code and thus
-     * it is its responsibility to handle the connection life cycle.
+     * The {@link ArcSDEPooledConnection connection} used by the query is not closed by this
+     * operation as it was provided by the calling code and thus it is its responsibility to handle
+     * the connection life cycle.
      * </p>
      */
     public void close() {
@@ -746,10 +703,8 @@ class ArcSDEQuery {
     /**
      * Tells the server to execute a stream operation.
      * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public void execute() throws IOException {
         try {
@@ -764,14 +719,11 @@ class ArcSDEQuery {
     // //////////////////////////////////////////////////////////////////////
 
     /**
-     * Initializes a stream with a query using a selected set of columns and an
-     * SeSqlConstruct object for the where clause. The where clause can?t
-     * contain any ORDER BY or GROUP BY clauses.
+     * Initializes a stream with a query using a selected set of columns and an SeSqlConstruct
+     * object for the where clause. The where clause can?t contain any ORDER BY or GROUP BY clauses.
      * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     // public void prepareQuery() throws IOException {
     // try {
@@ -784,11 +736,8 @@ class ArcSDEQuery {
      * Fetches an SeRow of data.
      * 
      * @return DOCUMENT ME!
-     * 
-     * @throws IOException
-     *             (DataSourceException) if the fetching fails
-     * @throws IllegalStateException
-     *             if the query was already closed or {@link #execute()} hastn't
+     * @throws IOException (DataSourceException) if the fetching fails
+     * @throws IllegalStateException if the query was already closed or {@link #execute()} hastn't
      *             been called yet
      */
     public SdeRow fetch() throws IOException, IllegalStateException {
@@ -817,16 +766,12 @@ class ArcSDEQuery {
     }
 
     /**
-     * Sets the spatial filters on the query using SE_OPTIMIZE as the policy for
-     * spatial index search
+     * Sets the spatial filters on the query using SE_OPTIMIZE as the policy for spatial index
+     * search
      * 
-     * @param filters
-     *            a set of spatial constraints to filter upon
-     * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
+     * @param filters a set of spatial constraints to filter upon
+     * @throws IOException DOCUMENT ME!
+     * @throws DataSourceException DOCUMENT ME!
      */
     public void setSpatialConstraints(SeFilter[] filters) throws IOException {
         try {
@@ -878,15 +823,14 @@ class ArcSDEQuery {
         private FilterToSQLSDE _sqlEncoder;
 
         /**
-         * Holds the ArcSDE Java API definition of the geometry related filters
-         * this datastore implementation supports natively.
+         * Holds the ArcSDE Java API definition of the geometry related filters this datastore
+         * implementation supports natively.
          */
         private SeFilter[] sdeSpatialFilters;
 
         /**
-         * Holds the ArcSDE Java API definition of the <strong>non</strong>
-         * geometry related filters this datastore implementation supports
-         * natively.
+         * Holds the ArcSDE Java API definition of the <strong>non</strong> geometry related
+         * filters this datastore implementation supports natively.
          */
         private SeSqlConstruct sdeSqlConstruct;
 
@@ -895,13 +839,15 @@ class ArcSDEQuery {
         /**
          * Creates a new FilterSet object.
          * 
-         * @param sdeLayer
-         *            DOCUMENT ME!
-         * @param sourceFilter
-         *            DOCUMENT ME!
+         * @param sdeLayer DOCUMENT ME!
+         * @param sourceFilter DOCUMENT ME!
          */
-        public FilterSet(SeLayer sdeLayer, Filter sourceFilter, SimpleFeatureType ft,
-                SeQueryInfo definitionQuery, PlainSelect layerSelectStatement, FIDReader fidReader) {
+        public FilterSet(SeLayer sdeLayer,
+                         Filter sourceFilter,
+                         SimpleFeatureType ft,
+                         SeQueryInfo definitionQuery,
+                         PlainSelect layerSelectStatement,
+                         FIDReader fidReader) {
             assert sdeLayer != null;
             assert sourceFilter != null;
             assert ft != null;
@@ -916,11 +862,10 @@ class ArcSDEQuery {
         }
 
         /**
-         * Given the <code>Filter</code> passed to the constructor, unpacks it
-         * to three different filters, one for the supported SQL based filter,
-         * another for the supported Geometry based filter, and the last one for
-         * the unsupported filter. All of them can be retrieved from its
-         * corresponding getter.
+         * Given the <code>Filter</code> passed to the constructor, unpacks it to three different
+         * filters, one for the supported SQL based filter, another for the supported Geometry based
+         * filter, and the last one for the unsupported filter. All of them can be retrieved from
+         * its corresponding getter.
          */
         private void createGeotoolsFilters() {
             FilterToSQLSDE sqlEncoder = getSqlEncoder();
@@ -951,14 +896,12 @@ class ArcSDEQuery {
         }
 
         /**
-         * Returns an SeQueryInfo that can be used to retrieve a set of SeRows
-         * from an ArcSDE layer or a layer with joins. The SeQueryInfo object
-         * lacks the set of column names to fetch. It is the responsibility of
-         * the calling code to call setColumns(String []) on the returned object
-         * to specify which properties to fetch.
+         * Returns an SeQueryInfo that can be used to retrieve a set of SeRows from an ArcSDE layer
+         * or a layer with joins. The SeQueryInfo object lacks the set of column names to fetch. It
+         * is the responsibility of the calling code to call setColumns(String []) on the returned
+         * object to specify which properties to fetch.
          * 
-         * @param unqualifiedPropertyNames
-         *            non null, possibly empty, list of property names to fetch
+         * @param unqualifiedPropertyNames non null, possibly empty, list of property names to fetch
          * @return
          * @throws SeException
          * @throws DataSourceException
@@ -1021,13 +964,10 @@ class ArcSDEQuery {
         /**
          * DOCUMENT ME!
          * 
-         * @return the SeSqlConstruct corresponding to the given SeLayer and SQL
-         *         based filter. Should never return null.
-         * 
-         * @throws DataSourceException
-         *             if an error occurs encoding the sql filter to a SQL where
-         *             clause, or creating the SeSqlConstruct for the given
-         *             layer and where clause.
+         * @return the SeSqlConstruct corresponding to the given SeLayer and SQL based filter.
+         *         Should never return null.
+         * @throws DataSourceException if an error occurs encoding the sql filter to a SQL where
+         *             clause, or creating the SeSqlConstruct for the given layer and where clause.
          */
         public SeSqlConstruct getSeSqlConstruct() throws DataSourceException {
             if (this.sdeSqlConstruct == null) {
@@ -1062,16 +1002,12 @@ class ArcSDEQuery {
         }
 
         /**
-         * Lazily creates the array of <code>SeShapeFilter</code> objects that
-         * map the corresponding geometry related filters included in the
-         * original <code>org.geotools.data.Query</code> passed to the
-         * constructor.
+         * Lazily creates the array of <code>SeShapeFilter</code> objects that map the
+         * corresponding geometry related filters included in the original
+         * <code>org.geotools.data.Query</code> passed to the constructor.
          * 
-         * @return an array with the spatial filters to be applied to the
-         *         SeQuery, or null if none.
-         * 
-         * @throws DataSourceException
-         *             DOCUMENT ME!
+         * @return an array with the spatial filters to be applied to the SeQuery, or null if none.
+         * @throws DataSourceException DOCUMENT ME!
          */
         public SeFilter[] getSpatialFilters() throws DataSourceException {
             if (this.sdeSpatialFilters == null) {
@@ -1094,10 +1030,9 @@ class ArcSDEQuery {
         /**
          * DOCUMENT ME!
          * 
-         * @return the subset, non geometry related, of the original filter this
-         *         datastore implementation supports natively, or
-         *         <code>Filter.INCLUDE</code> if the original Query does not
-         *         contains non spatial filters that we can deal with at the
+         * @return the subset, non geometry related, of the original filter this datastore
+         *         implementation supports natively, or <code>Filter.INCLUDE</code> if the
+         *         original Query does not contains non spatial filters that we can deal with at the
          *         ArcSDE Java API side.
          */
         public Filter getSqlFilter() {
@@ -1107,11 +1042,9 @@ class ArcSDEQuery {
         /**
          * DOCUMENT ME!
          * 
-         * @return the geometry related subset of the original filter this
-         *         datastore implementation supports natively, or
-         *         <code>Filter.INCLUDE</code> if the original Query does not
-         *         contains spatial filters that we can deal with at the ArcSDE
-         *         Java API side.
+         * @return the geometry related subset of the original filter this datastore implementation
+         *         supports natively, or <code>Filter.INCLUDE</code> if the original Query does
+         *         not contains spatial filters that we can deal with at the ArcSDE Java API side.
          */
         public Filter getGeometryFilter() {
             return (this.geometryFilter == null) ? Filter.INCLUDE : this.geometryFilter;
@@ -1120,9 +1053,8 @@ class ArcSDEQuery {
         /**
          * DOCUMENT ME!
          * 
-         * @return the part of the original filter this datastore implementation
-         *         does not supports natively, or <code>Filter.INCLUDE</code>
-         *         if we support the whole Query filter.
+         * @return the part of the original filter this datastore implementation does not supports
+         *         natively, or <code>Filter.INCLUDE</code> if we support the whole Query filter.
          */
         public Filter getUnsupportedFilter() {
             return (this.unsupportedFilter == null) ? Filter.INCLUDE : this.unsupportedFilter;
