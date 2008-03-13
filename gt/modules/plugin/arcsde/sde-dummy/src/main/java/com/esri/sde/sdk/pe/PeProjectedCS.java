@@ -1,6 +1,6 @@
 package com.esri.sde.sdk.pe;
 
-public class PeProjectedCS {
+public class PeProjectedCS extends PeCoordinateSystem {
     
     public PeProjectedCS(String s) throws PeProjectionException {}
     

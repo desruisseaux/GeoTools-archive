@@ -20,6 +20,7 @@ public class SeRow {
 	public void setString(int i, String s) {}
 	public void setTime(int i, Calendar c) {}
 	public void setShape(int i, SeShape s) {}
+	public void setRaster(int i, SeRasterAttr a) {}
 	public SeRasterAttr getRaster(int i) { return null; }
 	public SeRasterTile getRasterTile() { return null; }
 	public short getNumColumns() { return -1; }
