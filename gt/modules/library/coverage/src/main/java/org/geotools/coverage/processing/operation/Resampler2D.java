@@ -50,6 +50,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.geometry.Envelope;
 
 import org.geotools.coverage.GridSampleDimension;
@@ -67,6 +68,7 @@ import org.geotools.referencing.operation.AbstractCoordinateOperationFactory;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -92,6 +94,22 @@ final class Resampler2D extends GridCoverage2D {
      * For compatibility during cross-version serialization.
      */
     private static final long serialVersionUID = -8593569923766544474L;
+
+    /**
+     * The corner to use for performing calculation. By default {@link GridGeometry#getGridToCRS()}
+     * maps to pixel center (as of OGC specification). In JAI, the transforms rather map to the
+     * upper left corner.
+     *
+     * @todo Left to CENTER for now because we need to pass this argument to {@link GridGeometry2D}
+     *       constructors.
+     */
+    private static final PixelOrientation CORNER = PixelOrientation.CENTER; //UPPER_LEFT;
+
+    /**
+     * When an empirical adjustement of the Warp transform seems necessary, the amount of
+     * subdivisions to try.
+     */
+    private static final int EMPIRICAL_ADJUSTMENT_STEPS = 16;
 
     /**
      * Small tolerance threshold for floating point number comparaisons.
@@ -230,8 +248,8 @@ final class Resampler2D extends GridCoverage2D {
                     final GridGeometry2D sourceGG = sourceCoverage.getGridGeometry();
                     final MathTransform  gridToCRS;
                     switch (envelope.getDimension()) {
-                        case 2:  gridToCRS = sourceGG.getGridToCRS2D(); break;
-                        default: gridToCRS = sourceGG.getGridToCRS();   break;
+                        case 2:  gridToCRS = sourceGG.getGridToCRS2D(CORNER); break;
+                        default: gridToCRS = sourceGG.getGridToCRS(CORNER);   break;
                     }
                     targetGG = new GridGeometry2D(gridToCRS, envelope);
                     automaticGG = false;
@@ -312,15 +330,15 @@ final class Resampler2D extends GridCoverage2D {
              *       have already detected that this resample is not doing anything.
              */
             if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
-                step1    = sourceGG.getGridToCRS(); // Really sourceGG, not targetGG
+                step1    = sourceGG.getGridToCRS(CORNER); // Really sourceGG, not targetGG
                 step2    = IdentityTransform.create(step1.getTargetDimensions());
                 step3    = step1.inverse();
                 allSteps = IdentityTransform.create(step1.getSourceDimensions());
                 targetGG = new GridGeometry2D(targetGG.getGridRange(), step1, targetCRS);
             } else {
-                step1    = targetGG.getGridToCRS();
+                step1    = targetGG.getGridToCRS(CORNER);
                 step2    = IdentityTransform.create(step1.getTargetDimensions());
-                step3    = sourceGG.getGridToCRS().inverse();
+                step3    = sourceGG.getGridToCRS(CORNER).inverse();
                 allSteps = mtFactory.createConcatenatedTransform(step1, step3);
                 if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE)) {
                     /*
@@ -344,7 +362,7 @@ final class Resampler2D extends GridCoverage2D {
             final CoordinateOperation operation = factory.createOperation(sourceCRS, targetCRS);
             final boolean force2D = (sourceCRS != compatibleSourceCRS);
             step2          = factory.createOperation(targetCRS, compatibleSourceCRS).getMathTransform();
-            step3          = (force2D ? sourceGG.getGridToCRS2D() : sourceGG.getGridToCRS()).inverse();
+            step3          = (force2D ? sourceGG.getGridToCRS2D(CORNER) : sourceGG.getGridToCRS(CORNER)).inverse();
             sourceEnvelope = sourceCoverage.getEnvelope(); // Don't force this one to 2D.
             targetEnvelope = CRS.transform(operation, sourceEnvelope);
             targetEnvelope.setCoordinateReferenceSystem(targetCRS);
@@ -368,12 +386,12 @@ final class Resampler2D extends GridCoverage2D {
                 final GridRange targetGR;
                 targetGR = force2D ? new GeneralGridRange(sourceGG.getGridRange2D()) : sourceGG.getGridRange();
                 targetGG = new GridGeometry2D(targetGR, targetEnvelope);
-                step1    = targetGG.getGridToCRS();
+                step1    = targetGG.getGridToCRS(CORNER);
             } else if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
                 targetGG = new GridGeometry2D(targetGG.getGridRange(), targetEnvelope);
-                step1    = targetGG.getGridToCRS();
+                step1    = targetGG.getGridToCRS(CORNER);
             } else {
-                step1 = targetGG.getGridToCRS();
+                step1 = targetGG.getGridToCRS(CORNER);
                 if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE)) {
                     GeneralEnvelope gridRange = CRS.transform(step1.inverse(), targetEnvelope);
                     // According OpenGIS specification, GridGeometry maps pixel's center.
@@ -541,7 +559,7 @@ final class Resampler2D extends GridCoverage2D {
                 if (automaticGG) {
                     // Cheapest approach: just update 'gridToCRS'.
                     MathTransform mtr;
-                    mtr = sourceGG.getGridToCRS();
+                    mtr = sourceGG.getGridToCRS(CORNER);
                     mtr = mtFactory.createConcatenatedTransform(mtr,  step2.inverse());
                     targetGG = new GridGeometry2D(sourceGG.getGridRange(), mtr, targetCRS);
                     /*
@@ -586,12 +604,13 @@ final class Resampler2D extends GridCoverage2D {
                 }
                 // -------- End of JAI bug workaround --------
                 operation = "Warp";
-                final Warp warp;
-                if (allSteps2D instanceof AffineTransform) {
-                    warp = new WarpAffine((AffineTransform) allSteps2D);
-                } else {
-                    warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D) allSteps2D);
-                }
+                final boolean checkTarget =
+                        layout.getMinX  (sourceImage) == targetBB.x &&
+                        layout.getMinY  (sourceImage) == targetBB.y &&
+                        layout.getWidth (sourceImage) == targetBB.width &&
+                        layout.getHeight(sourceImage) == targetBB.height;
+                final Warp warp = createWarp(sourceCoverage.getName(), sourceBB,
+                        checkTarget ? targetBB : null, (MathTransform2D) allSteps2D, mtFactory);
                 paramBlk.add(warp).add(interpolation).add(background);
             }
         }
@@ -613,7 +632,7 @@ final class Resampler2D extends GridCoverage2D {
         upper[targetGG.gridDimensionY] = targetImage.getMaxY();
         final GridRange actualGR = new GeneralGridRange(lower, upper);
         if (!targetGR.equals(actualGR)) {
-            MathTransform gridToCRS = targetGG.getGridToCRS();
+            MathTransform gridToCRS = targetGG.getGridToCRS(CORNER);
             targetGG = new GridGeometry2D(actualGR, gridToCRS, targetCRS);
             if (!automaticGR) {
                 log(Loggings.getResources(locale).getLogRecord(Level.WARNING,
@@ -784,6 +803,8 @@ final class Resampler2D extends GridCoverage2D {
         if (targetGG.isDefined(GridGeometry2D.GRID_TO_CRS) &&
             sourceGG.isDefined(GridGeometry2D.GRID_TO_CRS))
         {
+            // No needs to ask for a transform relative to a corner
+            // since we will not apply a transformation here.
             if (!targetGG.getGridToCRS().equals(sourceGG.getGridToCRS())) {
                 return false;
             }
@@ -804,6 +825,71 @@ final class Resampler2D extends GridCoverage2D {
             upper[i] = gridRange.getUpper(i);
         }
         return new GeneralEnvelope(lower, upper);
+    }
+
+    /**
+     * Creates a warp for the given transform.
+     *
+     * @param  name       The coverage name, for information purpose.
+     * @param  sourceBB   Bounding box of source image, or {@code null}.
+     * @param  targetBB   Bounding box of target image, or {@code null}.
+     * @param  allSteps2D Transform from target to source CRS.
+     * @param  mtFactory  A math transform factory in case new transforms need to be created.
+     * @return The warp.
+     * @throws FactoryException if the warp can't be created.
+     */
+    private static Warp createWarp(final CharSequence name, final Rectangle sourceBB, final Rectangle targetBB,
+                                   final MathTransform2D allSteps2D, final MathTransformFactory mtFactory)
+            throws FactoryException
+    {
+        MathTransform2D transform = allSteps2D;
+        Rectangle actualBB = null;
+        int step = 0;
+        do {
+            /*
+             * Following block is usually not executed, unless we detected after the Warp object
+             * creation that we need to perform some empirical adjustment. The difference between
+             * the actual and expected bounding boxes should be only 1 pixel.
+             */
+            if (actualBB != null) {
+                final double scaleX     = 1 - ((double) sourceBB.width  / (double) actualBB.width);
+                final double scaleY     = 1 - ((double) sourceBB.height / (double) actualBB.height);
+                final double translateX = sourceBB.x - actualBB.x;
+                final double translateY = sourceBB.y - actualBB.y;
+                final double factor = (double) step / (double) EMPIRICAL_ADJUSTMENT_STEPS;
+                final AffineTransform2D adjustment = new AffineTransform2D(
+                        1 - scaleX*factor, 0, 0, 1 - scaleY*factor, translateX*factor, translateY*factor);
+                transform = (MathTransform2D) mtFactory.createConcatenatedTransform(allSteps2D, adjustment);
+            }
+            /*
+             * Creates the warp object, trying to optimize to WarpAffine if possible. The transform
+             * should have been computed in such a way that the target rectangle, when transformed,
+             * matches exactly the source rectangle. Checks if the bounding boxes calculated by the
+             * Warp object match the expected ones. In the usual case where they do, we are done.
+             * Otherwise we assume that the difference is caused by rounding error and we will try
+             * progressive empirical adjustment in order to get the rectangles to fit.
+             */
+            final Warp warp;
+            if (transform instanceof AffineTransform) {
+                warp = new WarpAffine((AffineTransform) transform);
+            } else {
+                warp = WarpTransform2D.getWarp(name, transform);
+            }
+            if (sourceBB == null || targetBB == null) {
+                return warp;
+            }
+            actualBB = warp.mapSourceRect(sourceBB); // May be null
+            if (actualBB == null || targetBB.contains(sourceBB)) {
+                return warp;
+            }
+            actualBB = warp.mapDestRect(targetBB); // Should never be null.
+            if (sourceBB.contains(actualBB)) {
+                return warp;
+            }
+            // The loop below intentionally tries one more iteration than the constant in case we need
+            // to apply slightly more than the above scale and translation because of rounding errors.
+        } while (step++ <= EMPIRICAL_ADJUSTMENT_STEPS);
+        throw new FactoryException(Errors.format(ErrorKeys.CANT_REPROJECT_$1, name));
     }
 
     /**

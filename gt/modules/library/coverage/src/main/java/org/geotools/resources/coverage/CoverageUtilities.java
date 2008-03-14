@@ -504,23 +504,20 @@ public final class CoverageUtilities {
         return scale < EPS; // This is enough for returning 'false' if 'scale' is NaN.
 //      return Math.abs(at.getShearX()) < EPS && Math.abs(at.getShearY()) < EPS;
     }
-    
+
     /**
-     * This method is responsible for computing the resolutions for the provided grid 2 world
-     * transformation
+     * Computes the resolutions for the provided "grid to world" transformation
+     * The returned resolution array is of length of 2.
      *
-     * <P>
-     * It is worth to note that the returned resolution array is of length of 2.
-     * 
-     * @param raster2Model
-     *            The grid to world transformation
+     * @param gridToCRS
+     *            The grid to world transformation.
      */
-    public final static double[] getResolution(AffineTransform raster2model){
+    public final static double[] getResolution(final AffineTransform gridToCRS) {
         double[] requestedRes = null;
-        if ((raster2model != null)) {
+        if (gridToCRS != null) {
             requestedRes = new double[2];
-            requestedRes[0] = XAffineTransform.getScaleX0(raster2model);
-            requestedRes[1] = XAffineTransform.getScaleY0(raster2model);
+            requestedRes[0] = XAffineTransform.getScaleX0(gridToCRS);
+            requestedRes[1] = XAffineTransform.getScaleY0(gridToCRS);
         }
         return requestedRes;
     }

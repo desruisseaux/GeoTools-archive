@@ -1126,10 +1126,27 @@ public class MosaicImageReader extends ImageReader {
                 subsampling.setSize(tile.getSubsampling());
                 assert xSubsampling % subsampling.width  == 0 : subsampling;
                 assert ySubsampling % subsampling.height == 0 : subsampling;
-                regionToRead.width  += regionToRead.x % subsampling.width;
-                regionToRead.height += regionToRead.y % subsampling.height;
-                regionToRead.x      /= subsampling.width;
-                regionToRead.y      /= subsampling.height;
+                /*
+                 * Transform the region to read from "absolute" coordinates to "relative to tile"
+                 * coordinates. We want to round x and y toward negative infinity, which require
+                 * special processing for negative numbers since integer arithmetic round toward
+                 * zero. The xOffset and yOffset values are the remainding of the division which
+                 * will be added to the width and height in order to get (xmax, ymax) unchanged.
+                 */
+                xOffset = regionToRead.x % subsampling.width;
+                yOffset = regionToRead.y % subsampling.height;
+                regionToRead.x /= subsampling.width;
+                regionToRead.y /= subsampling.height;
+                if (xOffset < 0) {
+                    regionToRead.x--;
+                    xOffset = subsampling.width - xOffset;
+                }
+                if (yOffset < 0) {
+                    regionToRead.y--;
+                    yOffset = subsampling.height - yOffset;
+                }
+                regionToRead.width  += xOffset;
+                regionToRead.height += yOffset;
                 regionToRead.width  /= subsampling.width;
                 regionToRead.height /= subsampling.height;
                 subsampling.width  = xSubsampling / subsampling.width;
