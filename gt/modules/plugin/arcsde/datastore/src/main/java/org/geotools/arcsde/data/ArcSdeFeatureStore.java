@@ -111,29 +111,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
         this.transaction = transaction;
     }
 
-    //
-    // /**
-    // * Overrides {@link ArcSdeFeatureSource#getFeatures(Query)} to return a
-    // * transaction aware collection.
-    // *
-    // * @see ArcSDEDataStore#getFeatureReader(Query, Transaction)
-    // */
-    // @Override
-    // public FeatureCollection<SimpleFeatureType, SimpleFeature>
-    // getFeatures(Query query) throws IOException {
-    // FeatureCollection<SimpleFeatureType, SimpleFeature> collection = new
-    // DefaultFeatureResults(this, query);
-    // return collection;
-    // // final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
-    // // final Transaction transaction = getTransaction();
-    // // final FeatureReader<SimpleFeatureType, SimpleFeature> featureReader =
-    // ds.getFeatureReader(query,
-    // transaction);
-    // // final FeatureCollection<SimpleFeatureType, SimpleFeature> collection =
-    // DataUtilities.collection(featureReader);
-    // // return collection;
-    // }
-
     /**
      * @see FeatureStore#addFeatures(FeatureCollection<SimpleFeatureType, SimpleFeature>)
      */

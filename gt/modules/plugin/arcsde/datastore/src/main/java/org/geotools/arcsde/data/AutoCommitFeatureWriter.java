@@ -49,42 +49,7 @@ class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
         super(fidReader, featureType, filteredContent, connection, listenerManager, versionHandler);
     }
 
-    /**
-     * Overrides createStream so if the table is versioned a new edit state is created and attached
-     * to the stream object
-     */
-    // @Override
-    // protected SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
-    // DataSourceException {
-    // final SeStreamOp streamOp = super.createStream(streamType);
-    //
-    // if (defaultVersion != null) {
-    // // the table is versioned
-    // // edit default version
-    // if (currentState.isOpen()) {
-    // LOGGER.info("closing current state and creating new edit state");
-    // System.out.println("closing current state and creating new edit state");
-    // currentState.close();
-    // }
-    // final SeObjectId parentStateId = currentState.getId();
-    // currentState = new SeState(connection);
-    // currentState.create(parentStateId);
-    //
-    // // set the version state pointer to the laste edit state
-    // SeObjectId currentStateId = currentState.getId();
-    // System.out
-    // .println("Changing default version state from "
-    // + defaultVersion.getStateId().longValue() + " to "
-    // + currentStateId.longValue());
-    // defaultVersion.changeState(currentStateId);
-    // ///System.out.println(defaultVersion.getStateId().longValue());
-    //
-    // SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
-    // streamOp.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
-    // }
-    //
-    // return streamOp;
-    // }
+    
     @Override
     protected void doFireFeaturesAdded(String typeName, ReferencedEnvelope bounds) {
         listenerManager.fireFeaturesAdded(typeName, Transaction.AUTO_COMMIT, bounds, false);

@@ -19,7 +19,6 @@ package org.geotools.arcsde.gce;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,7 +194,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 			bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
 			BufferedImage image;
-			int[] opaque;
+			//int[] opaque;
 
 			final Point dataOffset = new Point(950, 950);
 			final int w = 300, h = 300;
@@ -247,7 +246,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 			bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
 			BufferedImage image;
-			int[] opaque;
+			//int[] opaque;
 
 			final Point dataOffset = new Point(0, 0);
 			final Point imageOffset = new Point(100, 100);

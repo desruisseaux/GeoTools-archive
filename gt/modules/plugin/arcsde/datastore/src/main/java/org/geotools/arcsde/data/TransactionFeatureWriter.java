@@ -69,25 +69,6 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
     }
 
     /**
-     * Overrides createStream so if the table is versioned instead of creating a new state the one
-     * being used for the whole transaction is set to the stream object
-     */
-    // @Override
-    // protected SeStreamOp createStream(Class<? extends SeStreamOp> streamType) throws SeException,
-    // DataSourceException {
-    // final SeStreamOp streamOp = super.createStream(streamType);
-    // final SeState transactionVersionState = state.currentVersionState;
-    // if (transactionVersionState != null) {
-    // // we're versioned and as inside a transaction we use this single
-    // // state for the whole transaction. The state will be trimmed by the
-    // // ArcTransactionState at commit time
-    // SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
-    // SeObjectId currentStateId = transactionVersionState.getId();
-    // streamOp.setState(currentStateId, differencesId, SeState.SE_STATE_DIFF_NOCHECK);
-    // }
-    // return streamOp;
-    // }
-    /**
      * Overrides to not close the connection as it's the transaction responsibility.
      * 
      * @see FeatureWriter#close()

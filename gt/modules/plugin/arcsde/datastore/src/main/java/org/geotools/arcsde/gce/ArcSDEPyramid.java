@@ -119,7 +119,7 @@ public class ArcSDEPyramid {
         double reqXRes = requestEnvelope.getWidth() / pixelDimensions.width;
         double reqYRes = requestEnvelope.getHeight() / pixelDimensions.height;
 
-        ArcSDEPyramidLevel[] pyramidInfo = (ArcSDEPyramidLevel[]) pyramidList
+        ArcSDEPyramidLevel[] pyramidInfo = pyramidList
                 .toArray(new ArcSDEPyramidLevel[pyramidList.size()]);
 
         int targetLevel = 0;
