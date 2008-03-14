@@ -1332,8 +1332,10 @@ public final class CRS {
         } else {
             destination = XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
         }
-        // Attempt the 'equalsEpsilon' assertion only if source and destination are not same.
-        assert (destination == envelope) || XRectangle2D.equalsEpsilon(destination,
+        // Attempt the 'equalsEpsilon' assertion only if source and destination are not same and
+        // if the target envelope is Float or Double (this assertion doesn't work with integers).
+        assert (destination == envelope || !(destination instanceof Rectangle2D.Double ||
+                destination instanceof Rectangle2D.Float)) || XRectangle2D.equalsEpsilon(destination,
                 transform(transform, new Envelope2D(null, envelope)).toRectangle2D()) : destination;
         return destination;
     }

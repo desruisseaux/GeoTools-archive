@@ -1115,17 +1115,19 @@ public class MosaicImageReader extends ImageReader {
                     destinationOffset.x = destRegion.x + xOffset;
                     destinationOffset.y = destRegion.y + yOffset;
                 }
-                assert tileRegion  .contains(regionToRead) : regionToRead;
+                assert tileRegion.contains(regionToRead) : regionToRead;
                 regionToRead.translate(-tileRegion.x, -tileRegion.y);
                 /*
                  * Sets the parameters to be given to the tile reader. We don't use any subsampling
                  * offset because it has already been calculated in the region to read. Note that
-                 * the tile subsampling should be a dividor of image subsampling; this condition must
+                 * the tile subsampling should be a divisor of image subsampling; this condition must
                  * have been checked by the tile manager when it selected the tiles to be returned.
                  */
                 subsampling.setSize(tile.getSubsampling());
                 assert xSubsampling % subsampling.width  == 0 : subsampling;
                 assert ySubsampling % subsampling.height == 0 : subsampling;
+                regionToRead.width  += regionToRead.x % subsampling.width;
+                regionToRead.height += regionToRead.y % subsampling.height;
                 regionToRead.x      /= subsampling.width;
                 regionToRead.y      /= subsampling.height;
                 regionToRead.width  /= subsampling.width;
