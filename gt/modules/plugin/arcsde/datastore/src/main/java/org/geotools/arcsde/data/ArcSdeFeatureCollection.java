@@ -32,6 +32,7 @@ import org.geotools.feature.FeatureReaderIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -100,14 +101,24 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
      */
     @Override
     public final ReferencedEnvelope getBounds() {
+        ReferencedEnvelope bounds;
         try {
             final ArcSDEPooledConnection connection = getConnection();
-            return featureSource.getBounds(query, connection);
+            bounds = featureSource.getBounds(query, connection);
+            if (bounds == null) {
+                bounds = new ReferencedEnvelope(getCRS());
+            }
         } catch (IOException e) {
-            return new ReferencedEnvelope((CoordinateReferenceSystem) null);
+            bounds = new ReferencedEnvelope(getCRS());
         } finally {
             closeConnection();
         }
+        return bounds;
+    }
+    
+    private CoordinateReferenceSystem getCRS(){
+        GeometryDescriptor defaultGeometry = this.featureSource.getSchema().getDefaultGeometry();
+        return defaultGeometry == null? null : defaultGeometry.getCRS();
     }
 
     @Override
