@@ -38,32 +38,28 @@ import com.esri.sde.sdk.client.SeRelease;
 
 /**
  * Maintains <code>SeConnection</code>'s for a single set of connection
- * properties (for instance: by server, port, user and password) in a pooled way
+ * properties (for instance: by server, port, user and password) in a pool
+ * to recycle used connections. 
  * 
  * <p>
- * Since sde connections are not jdbc connections, I can't use Sean's excellent
- * connection pool. So I'll borrow most of it.
- * </p>
- * 
- * <p>
- * This connection pool is configurable in the sense that some parameters can be
+ * We are making use of an Apache Commons ObjectPool to maintain connections. This
+ * connection pool is configurable in the sense that some parameters can be
  * passed to establish the pooling policy. To pass parameters to the connection
- * pool, you should set some properties in the parameters Map passed to
- * SdeDataStoreFactory.createDataStore, wich will invoke
+ * pool, you should set properties in the parameters Map passed to
+ * SdeDataStoreFactory.createDataStore, which will invoke
  * SdeConnectionPoolFactory to get the SDE instance's pool singleton. That
  * instance singleton will be created with the preferences passed the first time
- * createDataStore is called for a given SDE instance/user, if subsecuent calls
+ * createDataStore is called for a given SDE instance/user, if subsequent calls
  * change that preferences, they will be ignored.
  * </p>
  * 
  * <p>
  * The expected optional parameters that you can set up in the argument Map for
  * createDataStore are:
- * 
  * <ul>
- * <li> pool.minConnections Integer, tells the minimun number of open
+ * <li> pool.minConnections Integer, tells the minimum number of open
  * connections the pool will maintain opened </li>
- * <li> pool.maxConnections Integer, tells the maximun number of open
+ * <li> pool.maxConnections Integer, tells the maximum number of open
  * connections the pool will create and maintain opened </li>
  * <li> pool.timeOut Integer, tells how many milliseconds a calling thread is
  * guaranteed to wait before getConnection() throws an
@@ -105,13 +101,11 @@ public class ArcSDEConnectionPool {
      * 
      * @param config
      *            holds connection options such as server, user and password, as
-     *            well as tuning options as maximun number of connections
+     *            well as tuning options as maximum number of connections
      *            allowed
      * 
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     * @throws NullPointerException
-     *             DOCUMENT ME!
+     * @throws DataSourceException If connection could not be established
+     * @throws NullPointerException If config is null
      */
     protected ArcSDEConnectionPool(ArcSDEConnectionConfig config) throws DataSourceException {
         if (config == null) {
