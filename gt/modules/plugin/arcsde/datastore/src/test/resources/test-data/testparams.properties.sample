@@ -3,12 +3,13 @@
 #
 #Modify it to adapt to your ArcSDE environment
 
+#dbtype is a fixed value
 dbtype=arcsde
-server=
-port=5151
-instance=
-user=
-password=
+server=<your server name here>
+port=<db port number, usually 5151>
+instance=<your arcsde instance name, use to be sde for a default installation>
+user=<your db user name>
+password=<your db user password>
 pool.minConnections=1
 pool.maxConnections=2
 pool.timeOut=1000
