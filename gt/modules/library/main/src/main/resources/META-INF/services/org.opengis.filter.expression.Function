@@ -102,6 +102,7 @@ org.geotools.filter.function.FilterFunction_in9
 org.geotools.filter.function.FilterFunction_in10
 org.geotools.filter.function.FilterFunction_dateParse
 org.geotools.filter.function.FilterFunction_dateFormat
+org.geotools.filter.function.IdFunction
 org.geotools.filter.function.math.FilterFunction_IEEEremainder
 org.geotools.filter.function.math.FilterFunction_abs
 org.geotools.filter.function.math.FilterFunction_abs_2
@@ -134,3 +135,4 @@ org.geotools.filter.function.math.FilterFunction_sqrt
 org.geotools.filter.function.math.FilterFunction_tan
 org.geotools.filter.function.math.FilterFunction_toDegrees
 org.geotools.filter.function.math.FilterFunction_toRadians
+org.geotools.filter.function.math.PiFunction
