@@ -58,45 +58,6 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
         }
     }
 
-    // private void setUpNewVersionForThisTransaction() throws IOException {
-    // try {
-    // defaultVersion.getInfo();
-    // // initialStateId = defaultVersion.getStateId();
-    //
-    // thisTransactionVersion = createNewVersionForThisTransaction();
-    // // create a new state for this temporal version
-    // final SeState parentState = new SeState(connection, thisTransactionVersion.getStateId());
-    // if (parentState.isOpen()) {
-    // parentState.close();
-    // }
-    // transactionState = new SeState(connection);
-    // transactionState.create(parentState.getId());
-    // } catch (SeException e) {
-    // throw new ArcSdeException(e);
-    // }
-    // }
-    //
-    // /**
-    // * Creates a new datbase version for the life-time of the transaction this handler works upon.
-    // * This new version should be merged to the default one if necessary (commit), and shall
-    // deleted
-    // * at either {@link #rollbackEditState()} or {@link #commitEditState()}.
-    // *
-    // * @return
-    // * @throws SeException
-    // */
-    // private SeVersion createNewVersionForThisTransaction() throws SeException {
-    // final String parentVersionName = SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME;
-    // SeVersion newVersion = new SeVersion(connection, parentVersionName);
-    // newVersion.setParentName(parentVersionName);
-    // newVersion.setName("GeoTools Transaction");
-    // newVersion
-    // .setDescription("Temporal version created by GeoTools during a transaction lifetime");
-    // final boolean dbCreatesUniqueName = true;
-    // newVersion.create(dbCreatesUniqueName, defaultVersion);
-    // return newVersion;
-    // }
-
     /**
      * Called by ArcSdeFeatureWriter.createStream
      * 
@@ -155,6 +116,7 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
         }
         try {
             SeObjectId transactionStateId = transactionState.getId();
+            defaultVersion.getInfo();
             defaultVersion.changeState(transactionStateId);
             //transactionState.trimTree(initialStateId, transactionStateId);
             transactionState = null;
