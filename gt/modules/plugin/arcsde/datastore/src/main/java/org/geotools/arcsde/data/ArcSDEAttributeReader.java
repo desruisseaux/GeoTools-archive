@@ -30,6 +30,14 @@ import org.opengis.feature.type.GeometryDescriptor;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeShape;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Implements an attribute reader that is aware of the particulars of ArcSDE. This class sends its
@@ -40,7 +48,7 @@ import com.esri.sde.sdk.client.SeShape;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEAttributeReader.java $
  * @version $Id$
  */
-class ArcSDEAttributeReader implements AttributeReader {
+final class ArcSDEAttributeReader implements AttributeReader {
     /** Shared package's logger */
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.data");
@@ -58,12 +66,6 @@ class ArcSDEAttributeReader implements AttributeReader {
      * the unique id of the current feature. -1 means the feature id was not retrieved
      */
     private long currentFid = -1;
-
-    /**
-     * the builder for the geometry type of the schema's default geometry, or null if the geometry
-     * attribute is not included in the schema
-     */
-    private ArcSDEGeometryBuilder geometryBuilder;
 
     /**
      * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used to efficiently create
@@ -87,6 +89,11 @@ class ArcSDEAttributeReader implements AttributeReader {
      * between calls to hasNext()
      */
     private boolean hasNextAlreadyCalled = false;
+
+    /**
+     * Declared binding for the schema's default geometry
+     */
+    private final Class<? extends Geometry> schemaGeometryClass;
 
     private ArcSDEPooledConnection connection;
 
@@ -132,8 +139,9 @@ class ArcSDEAttributeReader implements AttributeReader {
         final GeometryDescriptor geomType = schema.getDefaultGeometry();
 
         if (geomType != null) {
-            Class geometryClass = geomType.getType().getBinding();
-            this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
+            this.schemaGeometryClass = (Class<? extends Geometry>) geomType.getType().getBinding();
+        } else {
+            this.schemaGeometryClass = null;
         }
         // get the lock before executing the query so streams don't get confused,
         // and keep it until close() is called on this class
@@ -244,21 +252,42 @@ class ArcSDEAttributeReader implements AttributeReader {
      */
     public Object read(int index) throws IOException, ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
-
-        if (schema.getAttribute(index) instanceof GeometryDescriptor) {
+        if (value instanceof SeShape) {
             try {
-                SeShape shape = (SeShape) value;
-                /**
-                 * Class geomClass = ArcSDEAdapter.getGeometryType(shape.getType()); geometryBuilder =
-                 * GeometryBuilder.builderFor(geomClass);
-                 */
+                final SeShape shape = (SeShape) value;
+                final Class<? extends Geometry> actualGeomtryClass;
+                actualGeomtryClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
+                final ArcSDEGeometryBuilder geometryBuilder;
+                geometryBuilder = ArcSDEGeometryBuilder.builderFor(actualGeomtryClass);
                 value = geometryBuilder.construct(shape);
+                if (!this.schemaGeometryClass.isAssignableFrom(actualGeomtryClass)) {
+                    value = adaptGeometry((Geometry) value, schemaGeometryClass);
+                }
+                System.out.println(value);
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
         }
 
         return value;
+    }
+
+    private Geometry adaptGeometry(final Geometry value, Class<? extends Geometry> targetType) {
+        final Class<? extends Geometry> currentClass = value.getClass();
+        final GeometryFactory factory = value.getFactory();
+
+        Geometry adapted;
+        if (MultiPoint.class == targetType && Point.class == currentClass) {
+            adapted = factory.createMultiPoint(value.getCoordinates());
+        } else if (MultiLineString.class == targetType && LineString.class == currentClass) {
+            adapted = factory.createMultiLineString(new LineString[] { (LineString) value });
+        } else if (MultiPolygon.class == targetType && Polygon.class == currentClass) {
+            adapted = factory.createMultiPolygon(new Polygon[] { (Polygon) value });
+        } else {
+            throw new IllegalArgumentException("Don't know how to adapt " + currentClass.getName()
+                    + " to " + targetType.getName());
+        }
+        return adapted;
     }
 
     public Object[] readAll() throws ArrayIndexOutOfBoundsException, IOException {
