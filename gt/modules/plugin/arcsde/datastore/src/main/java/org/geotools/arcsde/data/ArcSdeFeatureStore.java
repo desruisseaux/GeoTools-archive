@@ -136,14 +136,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
                     writer.write();
                     featureIds.add(newFeature.getID());
                 }
-            } catch (IOException e) {
-                // it was all wrong, let's rollback the transaction as we don't
-                // know
-                // where things messed up
-                if (Transaction.AUTO_COMMIT != transaction) {
-                    transaction.rollback();
-                }
-                throw e;
             } finally {
                 iterator.close();
                 writer.close();
