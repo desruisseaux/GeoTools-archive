@@ -57,6 +57,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -78,7 +79,7 @@ import com.esri.sde.sdk.client.SeQueryInfo;
  */
 public class ArcSDEDataStore implements DataStore {
 
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.arcsde.data");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
     /**
      * Manages listener lists for FeatureSource<SimpleFeatureType, SimpleFeature> implementation
