@@ -98,6 +98,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      */
     private LinkedHashMap<Integer, String> mutableColumnNames;
 
+    private LinkedHashMap<Integer, String> insertableColumnNames;
+
     /**
      * Not to be accessed directly, but through {@link #getLayer()}
      */
@@ -147,40 +149,6 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         this.listenerManager = listenerManager;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
         this.versionHandler = versionHandler;
-
-        // try {
-        // final String typeName = getLayer().getQualifiedName();
-        // SeRegistration registration = new SeRegistration(connection,
-        // typeName);
-        // registration.getInfo();
-        // final boolean isMultiversioned = registration.isMultiVersion();
-        // if (isMultiversioned) {
-        // LOGGER.info(typeName + " is versioned, retrieving default version");
-        // System.out.println(typeName + " is versioned, retrieving default
-        // version");
-        // defaultVersion = new SeVersion(connection,
-        // SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
-        // defaultVersion.getInfo();
-        // SeObjectId initialStateId = defaultVersion.getStateId();
-        // LOGGER.info("default version is " + defaultVersion.getName() + " ("
-        // + initialStateId.longValue() + ")");
-        // System.out.println("default version is " + defaultVersion.getName() +
-        // " ("
-        // + initialStateId.longValue() + ")");
-        // SeState currState = new SeState(connection, initialStateId);
-        // if (!currState.isOpen()) {
-        // throw new IllegalStateException(
-        // "Current versioning state for the default version is closed: "
-        // + initialStateId.longValue());
-        // }
-        // initialState = currState;
-        // this.currentState = currState;
-        // }else{
-        // defaultVersion = null;
-        // }
-        // } catch (SeException e) {
-        // throw new ArcSdeException(e);
-        // }
     }
 
     /**
@@ -435,7 +403,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
 
         try {
             final SeRow row;
-            LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
+            LinkedHashMap<Integer, String> mutableColumns = getUpdatableColumnNames();
             {
                 String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
                         .toArray(new String[0]);
@@ -482,28 +450,27 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         Number newId = null;
 
         // this returns only the mutable attributes
-        LinkedHashMap<Integer, String> mutableColumns = getMutableColumnNames();
-        if (fidReader instanceof FIDReader.UserManagedFidReader) {
-            newId = getNextAvailableUserManagedId();
-            // set the userId value on the feature so its grabbed from it at
-            // setRowProperties
-            newFeature.setAttribute(fidReader.getFidColumn(), newId);
-        }
-        SeInsert insertStream = (SeInsert) createStream(SeInsert.class);
+        LinkedHashMap<Integer, String> insertColumns = getInsertableColumnNames();
+        final SeInsert insertStream = (SeInsert) createStream(SeInsert.class);
         try {
-
+            final SeRow row;
             {
-                String[] rowColumnNames = new ArrayList<String>(mutableColumns.values())
+                // ensure we get the next sequence id when the fid is user managed
+                // and include it in the attributes to set
+                if (fidReader instanceof FIDReader.UserManagedFidReader) {
+                    newId = getNextAvailableUserManagedId();
+                    final int rowIdIndex = fidReader.getColumnIndex();
+                    newFeature.setAttribute(rowIdIndex, newId);
+                }
+                String[] rowColumnNames = new ArrayList<String>(insertColumns.values())
                         .toArray(new String[0]);
-
                 String typeName = featureType.getTypeName();
                 insertStream.intoTable(typeName, rowColumnNames);
                 insertStream.setWriteMode(true);
+                row = insertStream.getRowToSet();
             }
 
-            final SeRow row = insertStream.getRowToSet();
-
-            setRowProperties(newFeature, seCoordRef, mutableColumns, row);
+            setRowProperties(newFeature, seCoordRef, insertColumns, row);
             insertStream.execute();
 
             if (fidReader instanceof FIDReader.SdeManagedFidReader) {
@@ -511,7 +478,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 newId = Long.valueOf(newRowId.longValue());
             }
 
-            insertStream.flushBufferedWrites();
+            // insertStream.flushBufferedWrites();
             closeStream(insertStream);
             versionHandler.editOperationWritten(insertStream);
 
@@ -553,8 +520,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             seRowIndex = entry.getKey().intValue();
             attName = entry.getValue();
             value = feature.getAttribute(attName);
-            setRowValue(row, seRowIndex, value, seCoordRef, attName, feature.getType()
-                    .getTypeName(), feature.getID());
+            setRowValue(row, seRowIndex, value, seCoordRef, attName);
         }
     }
 
@@ -606,74 +572,77 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @param index
      * @param convertedValue
      * @param coordRef
-     * @throws SeException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
+     * @param attName for feedback purposes only in case of failure
+     * @throws IOException if failed to set the row value
      */
     private void setRowValue(final SeRow row,
             final int index,
             final Object value,
             final SeCoordinateReference coordRef,
-            final String attName,
-            final String typeName,
-            final String fid) throws SeException, IOException {
+            final String attName) throws IOException {
 
-        final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
+        try {
+            final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
 
-        final int colType = seColumnDefinition.getType();
+            final int colType = seColumnDefinition.getType();
 
-        // the actual value to be set, converted to the appropriate type where
-        // needed
-        Object convertedValue = value;
-        if (colType == SeColumnDefinition.TYPE_INT16) {
-            convertedValue = Converters.convert(convertedValue, Short.class);
-            row.setShort(index, (Short) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_INT32) {
-            convertedValue = Converters.convert(convertedValue, Integer.class);
-            row.setInteger(index, (Integer) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_INT64) {
-            convertedValue = Converters.convert(convertedValue, Long.class);
-            row.setLong(index, (Long) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_FLOAT32) {
-            convertedValue = Converters.convert(convertedValue, Float.class);
-            row.setFloat(index, (Float) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_FLOAT64) {
-            convertedValue = Converters.convert(convertedValue, Double.class);
-            row.setDouble(index, (Double) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_STRING
-                || colType == SeColumnDefinition.TYPE_NSTRING
-                || colType == SeColumnDefinition.TYPE_CLOB
-                || colType == SeColumnDefinition.TYPE_NCLOB) {
-            convertedValue = Converters.convert(convertedValue, String.class);
-            row.setString(index, (String) convertedValue);
-        } else if (colType == SeColumnDefinition.TYPE_DATE) {
-            // @todo REVISIT: is converters already ready for date->calendar?
-            if (convertedValue != null) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime((Date) convertedValue);
-                row.setTime(index, calendar);
-            } else {
-                row.setTime(index, null);
-            }
-        } else if (colType == SeColumnDefinition.TYPE_SHAPE) {
-            if (convertedValue != null) {
-                final Geometry geom = (Geometry) convertedValue;
-                IsValidOp validator = new IsValidOp(geom);
-                if (!validator.isValid()) {
-                    TopologyValidationError validationError = validator.getValidationError();
-                    String validationErrorMessage = validationError.getMessage();
-                    Coordinate coordinate = validationError.getCoordinate();
-                    String errorMessage = "Topology validation error at or near point "
-                            + coordinate + ": " + validationErrorMessage;
-                    throw new DataSourceException("Invalid geometry passed to " + typeName + "."
-                            + attName + "\n Geomerty: " + geom + "\n" + errorMessage);
+            // the actual value to be set, converted to the appropriate type where
+            // needed
+            Object convertedValue = value;
+            if (colType == SeColumnDefinition.TYPE_INT16) {
+                convertedValue = Converters.convert(convertedValue, Short.class);
+                row.setShort(index, (Short) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_INT32) {
+                convertedValue = Converters.convert(convertedValue, Integer.class);
+                row.setInteger(index, (Integer) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_INT64) {
+                convertedValue = Converters.convert(convertedValue, Long.class);
+                row.setLong(index, (Long) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_FLOAT32) {
+                convertedValue = Converters.convert(convertedValue, Float.class);
+                row.setFloat(index, (Float) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_FLOAT64) {
+                convertedValue = Converters.convert(convertedValue, Double.class);
+                row.setDouble(index, (Double) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_STRING
+                    || colType == SeColumnDefinition.TYPE_NSTRING
+                    || colType == SeColumnDefinition.TYPE_CLOB
+                    || colType == SeColumnDefinition.TYPE_NCLOB) {
+                convertedValue = Converters.convert(convertedValue, String.class);
+                row.setString(index, (String) convertedValue);
+            } else if (colType == SeColumnDefinition.TYPE_DATE) {
+                // @todo REVISIT: is converters already ready for date->calendar?
+                if (convertedValue != null) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime((Date) convertedValue);
+                    row.setTime(index, calendar);
+                } else {
+                    row.setTime(index, null);
                 }
-                ArcSDEGeometryBuilder geometryBuilder;
-                geometryBuilder = ArcSDEGeometryBuilder.builderFor(geom.getClass());
-                SeShape shape = geometryBuilder.constructShape(geom, coordRef);
-                row.setShape(index, shape);
-            } else {
-                row.setShape(index, null);
+            } else if (colType == SeColumnDefinition.TYPE_SHAPE) {
+                if (convertedValue != null) {
+                    final Geometry geom = (Geometry) convertedValue;
+                    IsValidOp validator = new IsValidOp(geom);
+                    if (!validator.isValid()) {
+                        TopologyValidationError validationError = validator.getValidationError();
+                        String validationErrorMessage = validationError.getMessage();
+                        Coordinate coordinate = validationError.getCoordinate();
+                        String errorMessage = "Topology validation error at or near point "
+                                + coordinate + ": " + validationErrorMessage;
+                        throw new DataSourceException("Invalid geometry passed to "
+                                + this.featureType.getTypeName() + "." + attName + "\n Geomerty: "
+                                + geom + "\n" + errorMessage);
+                    }
+                    ArcSDEGeometryBuilder geometryBuilder;
+                    geometryBuilder = ArcSDEGeometryBuilder.builderFor(geom.getClass());
+                    SeShape shape = geometryBuilder.constructShape(geom, coordRef);
+                    row.setShape(index, shape);
+                } else {
+                    row.setShape(index, null);
+                }
             }
+        } catch (SeException e) {
+            throw new ArcSdeException(e);
         }
     }
 
@@ -689,7 +658,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * @throws NoSuchElementException
      * @throws SeException
      */
-    private LinkedHashMap<Integer, String> getMutableColumnNames() throws NoSuchElementException,
+    private LinkedHashMap<Integer, String> getUpdatableColumnNames() throws NoSuchElementException,
             IOException, SeException {
         if (mutableColumnNames == null) {
             // We are going to inspect the column defintions in order to
@@ -729,6 +698,38 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         }
 
         return this.mutableColumnNames;
+    }
+
+    private LinkedHashMap<Integer, String> getInsertableColumnNames()
+            throws NoSuchElementException, IOException, SeException {
+        if (insertableColumnNames == null) {
+            // We are going to inspect the column defintions in order to
+            // determine which attributes are actually mutable...
+            final SeColumnDefinition[] columnDefinitions = getTable().describe();
+            final String shapeAttributeName;
+            shapeAttributeName = getLayer().getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
+
+            // use LinkedHashMap to respect column order
+            LinkedHashMap<Integer, String> columnList = new LinkedHashMap<Integer, String>();
+
+            SeColumnDefinition columnDefinition;
+            String columnName;
+            int usedIndex = 0;
+            for (int actualIndex = 0; actualIndex < columnDefinitions.length; actualIndex++) {
+                columnDefinition = columnDefinitions[actualIndex];
+                columnName = columnDefinition.getName();
+
+                if (fidReader instanceof FIDReader.SdeManagedFidReader
+                        && columnName.equals(shapeAttributeName)) {
+                    continue;
+                }
+                columnList.put(Integer.valueOf(usedIndex), columnName);
+                usedIndex++;
+            }
+            this.insertableColumnNames = columnList;
+        }
+
+        return this.insertableColumnNames;
     }
 
     private SeTable getTable() throws DataSourceException {
