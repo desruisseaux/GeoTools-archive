@@ -193,7 +193,7 @@ final class RTree {
         SelectedNode bestCandidate = null;
         try {
             do {
-                final SelectedNode candidate = addTileCandidate(root);
+                final SelectedNode candidate = addTileCandidate(root, Long.MAX_VALUE);
                 /*
                  * We now have the final set of tiles for current subsampling. Checks if the cost
                  * of this set is lower than previous sets, and keep as "best candidates" if it is.
@@ -246,15 +246,16 @@ final class RTree {
      * itself recursively for scanning the child nodes down the tree.
      * <p>
      * If this method <em>added</em> some tiles to the reading process, their region (identical to
-     * the keys in the {@code candidates} hash map) are {@linkplain SelectedNode#addChild added as
-     * child} of the returned object. The children does not include tiles that <em>replaced</em>
+     * the keys in the {@link #distinctBounds} hash map) are {@linkplain SelectedNode#addChild added
+     * as child} of the returned object. The children does not include tiles that <em>replaced</em>
      * existing ones rather than adding a new ones.
      *
      * @param  node The root of the subtree to examine.
+     * @param  costLimit Stop the children searchs if the cost exceed this amount.
      * @param  candidates The tiles that are under consideration during a search.
      * @return The tile to be read, or {@code null} if it doesn't intersect the area of interest.
      */
-    private SelectedNode addTileCandidate(final TreeNode node) throws IOException {
+    private SelectedNode addTileCandidate(final TreeNode node, long costLimit) throws IOException {
         if (!node.intersects(regionOfInterest)) {
             return null;
         }
@@ -293,47 +294,72 @@ final class RTree {
             }
         }
         /*
-         * At this point, we have processed the node given in argument. Now if there is any
-         * children, invokes this method recursively for each of them.
+         * At this point, we have processed the node given in argument. If the tile was not selected
+         * (typically because its resolution is not suitable), we will create a node without tile to
+         * be used as a container for allowing the search to continue with children.
          */
-        if (!node.isLeaf()) {
-            if (selected == null) {
-                selected = new SelectedNode(node.intersection(regionOfInterest));
-                for (final TreeNode child : node) {
-                    selected.addChild(addTileCandidate(child));
-                }
-                if (selected.isLeaf()) {
-                    selected = null;
-                } else {
-                    final TreeNode child = selected.getChild();
-                    if (child != null && child.equals(selected)) {
-                        selected.removeChildren();
-                        selected = (SelectedNode) child;
-                    }
-                }
-            } else {
-                /*
-                 * If the region to read encompass entirely this node (otherwise reading a few childs
-                 * may be cheaper) and if the children subsampling are not higher than the tile's one
-                 * (they are usually not), then there is no need to continue down the tree since the
-                 * childs can not do better than this node.
-                 *
-                 * TODO: Checks if the children fill completly the bounds (i.e. are "dense").
-                 */
-                if (selected.equals(node) && !tile.isFinerThan(subsampling)) {
-                    return selected;
-                }
-                final long cost = selected.cost;
-                for (final TreeNode child : node) {
-                    selected.addChild(addTileCandidate(child));
-                }
-                if (selected.cost - cost >= cost) {
-                    selected.removeChildren();
-                } else {
-                    selected.tile = null;
-                    selected.cost -= cost;
-                }
+        if (node.isLeaf()) {
+            return selected;
+        }
+        final long cost;
+        if (selected == null) {
+            selected = new SelectedNode(node.intersection(regionOfInterest));
+            cost = selected.cost; // Should be 0.
+        } else {
+            /*
+             * If the region to read encompass entirely this node (otherwise reading a few childs
+             * may be cheaper) and if the children subsampling are not higher than the tile's one
+             * (they are usually not), then there is no need to continue down the tree since the
+             * childs can not do better than this node.
+             *
+             * TODO: Checks if the children fill completly the bounds (i.e. are "dense").
+             */
+            cost = selected.cost;
+            if (cost == 0 || (selected.equals(node) && !tile.isFinerThan(subsampling))) {
+                return selected;
             }
+            if (cost < costLimit) {
+                costLimit = cost;
+            }
+        }
+        /*
+         * If there is any children, invokes this method recursively for each of them. The later
+         * search will be canceled before completion (in order to save CPU time) if the children
+         * cost exceed the given maximum cost, usually the cost of the parent tile.
+         */
+        for (final TreeNode child : node) {
+            selected.addChild(addTileCandidate(child, costLimit));
+            if (selected.cost - cost >= costLimit) {
+                /*
+                 * Children are going to be too costly, so stop the search immediately. If the
+                 * selected node has a tile,  remove the children in order to get the selected
+                 * tile used instead. If the selected node has no tile, then keep the children
+                 * even if they are incomplete in order to let the invoker known that we reached
+                 * the cost limit.
+                 */
+                if (selected.tile != null) {
+                    selected.removeChildren();
+                }
+                return selected;
+            }
+        }
+        /*
+         * At this point, we decided to keep the children in replacement of the selected
+         * tile. Clears the tile, adjust the cost remove an indirection level if we can.
+         */
+        selected.tile = null;
+        selected.cost -= cost;
+        if (selected.isLeaf()) {
+            // The 'selected' node was just a container and we found no children,
+            // so it is not worth to returns it.
+            return null;
+        }
+        final TreeNode child = selected.getChild();
+        if (child != null && child.equals(selected)) {
+            // Founds exactly one child and this child has the same bounding box than
+            // the selected node. Returns the child directly for saving one indirection.
+            selected.removeChildren();
+            selected = (SelectedNode) child;
         }
         return selected;
     }
