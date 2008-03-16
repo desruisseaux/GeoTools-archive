@@ -133,22 +133,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     protected ReferencedEnvelope getBounds(final Query namedQuery,
             final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
         Envelope ev;
-        // final String typeName = namedQuery.getTypeName();
-        // if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
-        // LOGGER.finer("getting bounds of entire layer. Using optimized SDE
-        // call.");
-        // // we're really asking for a bounds of the WHOLE layer,
-        // // let's just ask SDE metadata for that, rather than doing
-        // // an
-        // // expensive query
-        // SeLayer thisLayer = connection.getLayer(typeName);
-        // SeExtent extent = thisLayer.getExtent();
-        // ev = new Envelope(extent.getMinX(), extent.getMaxX(),
-        // extent.getMinY(), extent
-        // .getMaxY());
-        // } else {
         ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery, versionHandler);
-        // }
 
         if (ev != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
@@ -197,9 +182,12 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     }
 
     /**
-     * convenient way to get a connection for {@link #getBounds()} and {@link #getCount(Query)}.
-     * {@link ArcSdeFeatureStore} overrides to get the connection from the transaction instead of
-     * the pool.
+     * Returns a connection from the datastore's connection pool.
+     * <p>
+     * This is convenient way to get a connection for {@link #getBounds()} and
+     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get the connection from
+     * the transaction instead of the pool.
+     * </p>
      * 
      * @return
      * @throws IOException

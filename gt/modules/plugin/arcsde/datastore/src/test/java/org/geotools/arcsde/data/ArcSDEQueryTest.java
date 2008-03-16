@@ -41,6 +41,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 
@@ -186,7 +187,8 @@ public class ArcSDEQueryTest extends TestCase {
     private ArcSDEQuery getQueryFiltered() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
         FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, connection);
-        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,fti.getFidStrategy(), new AutoCommitDefaultVersionHandler());
+        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery, fti
+                .getFidStrategy(), new AutoCommitDefaultVersionHandler());
         return this.queryFiltered;
     }
 
@@ -209,7 +211,7 @@ public class ArcSDEQueryTest extends TestCase {
 
         assertNotNull(queryAll.connection);
         assertFalse(conn.isClosed());
-        
+
         conn.close();
     }
 
@@ -235,7 +237,7 @@ public class ArcSDEQueryTest extends TestCase {
         } catch (IllegalStateException e) {
             // ok
         }
-        
+
         queryAll.connection.close();
     }
 
@@ -268,35 +270,39 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCalculateQueryExtent() throws Exception {
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
-                typeName).getFeatures();
-        FeatureIterator<SimpleFeature> reader = features.features();
-        ReferencedEnvelope real = new ReferencedEnvelope();
-        while (reader.hasNext()) {
-            real.include(reader.next().getBounds());
+        {
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features = dstore.getFeatureSource(
+                    typeName).getFeatures();
+            FeatureIterator<SimpleFeature> reader = features.features();
+            SimpleFeatureType featureType = features.getSchema();
+            GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+            ReferencedEnvelope real = new ReferencedEnvelope(defaultGeometry.getCRS());
+            while (reader.hasNext()) {
+                real.include(reader.next().getBounds());
+            }
+
+            // TODO: make calculateQueryExtent to return ReferencedEnvelope
+            ArcSDEQuery queryAll = getQueryAll();
+            Envelope actual = queryAll.calculateQueryExtent();
+            Envelope expected = new Envelope(real);
+            assertNotNull(actual);
+            assertEquals(expected, actual);
+
         }
+        {
+            FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = dstore
+                    .getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
+            ReferencedEnvelope real = new ReferencedEnvelope();
+            while (featureReader.hasNext()) {
+                real.include(featureReader.next().getBounds());
+            }
 
-        // TODO: make calculateQueryExtent to return ReferencedEnvelope
-        Envelope actual = getQueryAll().calculateQueryExtent();
-        Envelope expected = new Envelope(real);
-
-        assertNotNull(actual);
-        assertEquals(expected, actual);
-
-        reader.close();
-
-        FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = dstore.getFeatureReader(
-                filteringQuery, Transaction.AUTO_COMMIT);
-        real = new ReferencedEnvelope();
-        while (featureReader.hasNext()) {
-            real.include(featureReader.next().getBounds());
+            Envelope actual = getQueryFiltered().calculateQueryExtent();
+            assertNotNull(actual);
+            Envelope expected = new Envelope(real);
+            assertEquals(expected, actual);
+            featureReader.close();
         }
-
-        actual = getQueryFiltered().calculateQueryExtent();
-        assertNotNull(actual);
-        expected = new Envelope(real);
-        assertEquals(expected, actual);
-        featureReader.close();
     }
 
     private void assertEquals(Envelope e1, Envelope e2) {

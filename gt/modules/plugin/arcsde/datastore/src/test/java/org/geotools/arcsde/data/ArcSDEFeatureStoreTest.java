@@ -685,18 +685,19 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             final SimpleFeature feature2 = iterator.next();
             iterator.close();
 
-            //Note that for tables that are ambiguous about what types of geometries
-            //they store (as this table is), ArcSDE will "compress" a stored geometry
-            //to it's simplest representation.  So in case the defaultGeometry.getBinding()
-            //returns "Geometry", do instanceof checks to verify what kind of geometry
-            //you're getting back
+            // Note that for tables that are ambiguous about what types of geometries
+            // they store (as this table is), ArcSDE will "compress" a stored geometry
+            // to it's simplest representation. So in case the defaultGeometry.getBinding()
+            // returns "Geometry", do instanceof checks to verify what kind of geometry
+            // you're getting back
             Geometry actual1 = (Geometry) feature1.getAttribute(defaultGeometry.getLocalName());
             Geometry actual2 = (Geometry) feature2.getAttribute(defaultGeometry.getLocalName());
             System.out.println(actual1);
             System.out.println(modif1);
 
-            //there's some rounding that goes on inside SDE.  Need to do some simple buffering to make sure
-            //we're not getting rounding errors
+            // there's some rounding that goes on inside SDE. Need to do some simple buffering to
+            // make sure
+            // we're not getting rounding errors
             assertTrue(modif1.buffer(.01).contains(actual1));
             assertTrue(modif2.buffer(.01).contains(actual2));
         } finally {
@@ -989,8 +990,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * @throws Exception
      */
     public void testTransactionStateDiff() throws Exception {
-    	testData.createTempTable(true);
-        //testData.insertTestData();
+        testData.createTempTable(true);
+        // testData.insertTestData();
 
         final DataStore ds = testData.getDataStore();
         final String typeName = testData.getTemp_table();
@@ -1331,7 +1332,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             int count;
 
             content[0] = "Feature name 1";
-            content[1] = reader.read("POINT (0 0)");
+            content[1] = reader.read("POINT (10 10)");
             feature = SimpleFeatureBuilder.build(schema, content, (String) null);
             collection = DataUtilities.collection(feature);
 
@@ -1339,9 +1340,26 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
             count = store.getCount(Query.ALL);
             assertEquals(1, count);
+            assertEquals(0, source.getCount(Query.ALL));
+
+            {
+                FeatureIterator<SimpleFeature> features = store.getFeatures().features();
+                SimpleFeature f = features.next();
+                features.close();
+                Object obj = f.getDefaultGeometry();
+                assertTrue(obj instanceof Point);
+                Point p = (Point) obj;
+                double x = p.getX();
+                double y = p.getY();
+                assertEquals(10D, x, 1E-5);
+                assertEquals(10D, y, 1E-5);
+            }
+
+            transaction.commit();
+            assertEquals(1, source.getCount(Query.ALL));
 
             content[0] = "Feature name 2";
-            content[1] = reader.read("POINT (1 1)");
+            content[1] = reader.read("POINT (2 2)");
             feature = SimpleFeatureBuilder.build(schema, content, (String) null);
             collection = DataUtilities.collection(feature);
 
@@ -1350,25 +1368,24 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             count = store.getCount(Query.ALL);
             assertEquals(2, count);
 
-            assertEquals(0, source.getCount(Query.ALL));
-
-            transaction.commit();
-
-            assertEquals(2, source.getCount(Query.ALL));
-
-            content[0] = "Feature name 3";
-            content[1] = reader.read("POINT (2 2)");
-            feature = SimpleFeatureBuilder.build(schema, content, (String) null);
-            collection = DataUtilities.collection(feature);
-
-            store.addFeatures(collection);
-
-            count = store.getCount(Query.ALL);
-            assertEquals(3, count);
-
-            assertEquals(2, source.getCount(Query.ALL));
+            assertEquals(1, source.getCount(Query.ALL));
             transaction.rollback();
-            assertEquals(2, store.getCount(Query.ALL));
+            assertEquals(1, store.getCount(Query.ALL));
+
+            transaction.close();
+
+            {
+                FeatureIterator<SimpleFeature> features = source.getFeatures().features();
+                SimpleFeature f = features.next();
+                features.close();
+                Object obj = f.getDefaultGeometry();
+                assertTrue(obj instanceof Point);
+                Point p = (Point) obj;
+                double x = p.getX();
+                double y = p.getY();
+                assertEquals(10D, x, 1E-5);
+                assertEquals(10D, y, 1E-5);
+            }
 
         } catch (SeException e) {
             throw new ArcSdeException(e);

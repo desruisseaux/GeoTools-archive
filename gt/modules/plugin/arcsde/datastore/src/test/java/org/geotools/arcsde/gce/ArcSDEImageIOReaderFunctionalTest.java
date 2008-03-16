@@ -116,7 +116,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
 			SeRasterColumn rcol = new SeRasterColumn(scon, rattrThreeBand.getRasterColumnId());
 
-			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSys().toString());
+			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSysDescription());
 			pyramid = new ArcSDEPyramid(rattrThreeBand, crs);
 
 			threeBandReaderProps = new HashMap<String, Object>();
@@ -148,7 +148,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
 			SeRasterColumn rcol = new SeRasterColumn(scon, rattrOneBit.getRasterColumnId());
 
-			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSys().toString());
+			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSysDescription());
 			pyramid = new ArcSDEPyramid(rattrOneBit, crs);
 
 			oneBitReaderProps = new HashMap<String, Object>();
