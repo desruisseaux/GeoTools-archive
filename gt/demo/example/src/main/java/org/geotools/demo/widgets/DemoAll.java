@@ -331,7 +331,8 @@ public class DemoAll extends javax.swing.JFrame {
         styles.addPropertyPanel(new JXMLStylePanel());
         lstproperty.add(styles);
 
-
+        property.setPropertyPanels(lstproperty);
+        
         popup.addItem(property);             //layer
         popup.addItem(new ContextPropertyItem());           //context
 
