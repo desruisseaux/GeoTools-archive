@@ -16,12 +16,12 @@
 package org.geotools.filter.spatial;
 
 import org.geotools.filter.AttributeExpressionImpl;
-import org.geotools.filter.AttributeExpressionImpl2;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilterImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 
@@ -38,11 +38,24 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 		
 		//backwards compat with old type system
 		this.filterType = GEOMETRY_BBOX;
+		if(e1 != null)
+		    setExpression1(e1);
+		if(e2 != null)
+		    setExpression2(e2);
 	}
 
 	public String getPropertyName() {
-        PropertyName propertyName = (PropertyName) getExpression1();
-        return propertyName.getPropertyName();
+	    // BBOX filters can be also created setting the expressions directly, and some
+	    // old code sets the property name the other way around, try to handle this silliness
+	    if(getExpression1() instanceof PropertyName) {
+            PropertyName propertyName = (PropertyName) getExpression1();
+            return propertyName.getPropertyName();
+	    } else if(getExpression2() instanceof PropertyName) {
+	        PropertyName propertyName = (PropertyName) getExpression2();
+            return propertyName.getPropertyName();
+	    } else {
+	        return null;
+	    }
 	}
 
 	public void setPropertyName(String propertyName) {
@@ -114,6 +127,33 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);
+	}
+	
+	public void setExpression1(Expression expression) {
+        // BBOX filters can be also created setting the expressions directly, and some
+        // old code sets the property name the other way around, try to handle this silliness
+	    updateMinMaxFields(expression);
+	    super.setExpression1(expression);
+	}
+	
+	public void setExpression2(Expression expression) {
+        // BBOX filters can be also created setting the expressions directly, and some
+        // old code sets the property name the other way around, try to handle this silliness
+	    updateMinMaxFields(expression);
+        super.setExpression2(expression);
+	}
+	
+	private void updateMinMaxFields(Expression expression) {
+	    if(expression instanceof Literal) {
+    	    Literal bbox = (Literal) expression;
+    	    Envelope env = (Envelope) bbox.evaluate(null, Envelope.class);
+    	    if(env == null)
+    	        return;
+    	    minx = env.getMinX();
+    	    maxx = env.getMaxX();
+    	    miny = env.getMinY();
+            maxy = env.getMaxY();
+	    }
 	}
 
 }
