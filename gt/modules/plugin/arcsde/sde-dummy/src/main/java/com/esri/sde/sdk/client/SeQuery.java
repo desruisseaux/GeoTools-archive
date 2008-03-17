@@ -4,7 +4,9 @@ import com.esri.sde.sdk.client.SeTable.SeTableStats;
 
 public class SeQuery extends SeStreamOp {
 	
-	public SeQuery(SeConnection c)throws SeException {}
+	public static short SE_SPATIAL_FIRST = 0;
+
+    public SeQuery(SeConnection c)throws SeException {}
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
 	
 	public static /* GEOT-947 final*/ short SE_OPTIMIZE = 0;

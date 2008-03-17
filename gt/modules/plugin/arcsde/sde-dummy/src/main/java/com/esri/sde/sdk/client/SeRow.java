@@ -12,7 +12,7 @@ public class SeRow {
 	
 	public SeColumnDefinition[] getColumns() { return null; }
 	public Object getObject(int i) throws SeException { return null; }
-	public SeColumnDefinition getColumnDef(int i) { return null; }
+	public SeColumnDefinition getColumnDef(int i) throws SeException{ return null; }
 	public void setInteger(int i, Integer b) {}
 	public void setShort(int i, Short s) {}
 	public void setFloat(int i, Float f) {}
@@ -27,6 +27,7 @@ public class SeRow {
 	public int getIndicator(int i) { return -1; }
     public Level getInteger(int i) throws SeException {return null;}
     public void setLong(int index, Long value) {}
+    public SeShape getShape(int i) {return null;}
 	
 	
 }
