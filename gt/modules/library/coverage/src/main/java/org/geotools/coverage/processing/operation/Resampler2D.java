@@ -828,7 +828,9 @@ final class Resampler2D extends GridCoverage2D {
     }
 
     /**
-     * Creates a warp for the given transform.
+     * Creates a warp for the given transform. This method performs some empirical adjustment
+     * for working around the {@link ArrayIndexOutOfBoundsException} which occurs sometime in
+     * {@code MlibWarpPolynomialOpImage.computeTile(...)}.
      *
      * @param  name       The coverage name, for information purpose.
      * @param  sourceBB   Bounding box of source image, or {@code null}.
@@ -875,6 +877,10 @@ final class Resampler2D extends GridCoverage2D {
             } else {
                 warp = WarpTransform2D.getWarp(name, transform);
             }
+            if (true) {
+                return warp;
+            }
+            // remainder is disabled for now since it break Geoserver build.
             if (sourceBB == null || targetBB == null) {
                 return warp;
             }
