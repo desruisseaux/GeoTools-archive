@@ -37,6 +37,7 @@ import org.geotools.styling.Symbolizer;
  */
 public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geotools.gui.swing.style.SymbolizerPanel {
   
+    private LineSymbolizer symbol = null;
     private MapLayer layer = null;
     
     /** 
@@ -45,6 +46,12 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
     public JLineSymbolizerPanel() {
         initComponents();
         init();
+    }
+    
+    public void apply(){
+        if(symbol!= null){
+            symbol.setStroke(GuiStroke.getStroke());
+        }
     }
     
     private void init(){
@@ -89,19 +96,24 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
         return layer;
     }
  
-    public void setSymbolizer(Symbolizer symbol) {
+    public void setSymbolizer(Symbolizer sym) {
 
-        if (symbol instanceof LineSymbolizer) {
-            LineSymbolizer sym = (LineSymbolizer) symbol;
+        if (sym instanceof LineSymbolizer) {
+            symbol = (LineSymbolizer) sym;
 
-            GuiStroke.parseStroke(sym.getStroke());            
+            GuiStroke.parseStroke(symbol.getStroke());            
             GuiStroke.setLayer(layer);
         }
     }
 
-    public LineSymbolizer getSymbolizer(){                
-        StyleBuilder sb = new StyleBuilder();     
-        return sb.createLineSymbolizer( GuiStroke.getStroke() );
+    public LineSymbolizer getSymbolizer(){ 
+        
+        if(symbol == null){
+            StyleBuilder sb = new StyleBuilder();
+            symbol = sb.createLineSymbolizer();
+        }        
+        apply();        
+        return symbol;
     }
     
     public void setStyle(Style style){

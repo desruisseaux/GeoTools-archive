@@ -14,25 +14,18 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit;
-
-
-import javax.swing.ImageIcon;
-
-import org.geotools.gui.swing.icon.IconBundle;
+package org.geotools.gui.swing.style.sld;
 
 /**
- *
- * @author  johann sorel
+ * @author johann sorel
  */
-public class LayerStylePropertyPanel extends MultiPropertyPanel {
-
-
-    /** Creates new form DefaultMapContextCRSEditPanel */
-    public LayerStylePropertyPanel() {
-        super();
+public class JLabelPlacementPanel extends javax.swing.JPanel {
+    
+    /** Creates new form JLabelPlacementPanel */
+    public JLabelPlacementPanel() {
+        initComponents();
     }
-
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -45,29 +38,16 @@ public class LayerStylePropertyPanel extends MultiPropertyPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
+            .add(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
+            .add(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public String getTitle() {
-        return BUNDLE.getString("style");
-    }
-
-    @Override
-    public ImageIcon getIcon() {
-        return IconBundle.getResource().getIcon("16_style");
-    }
-
-    @Override
-    public String getToolTip() {
-        return BUNDLE.getString("style");
-    }
-
+    
 }

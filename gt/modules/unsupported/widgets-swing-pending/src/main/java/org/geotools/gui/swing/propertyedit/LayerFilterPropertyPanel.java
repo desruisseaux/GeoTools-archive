@@ -20,7 +20,6 @@ package org.geotools.gui.swing.propertyedit;
 import javax.swing.ImageIcon;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.propertyedit.filterproperty.JCQLPropertyPanel;
 
 /**
  *
@@ -32,8 +31,6 @@ public class LayerFilterPropertyPanel extends MultiPropertyPanel {
     /** Creates new form DefaultMapLayerQueryPanel */
     public LayerFilterPropertyPanel() {
         super();
-
-        addPropertyPanel( new JCQLPropertyPanel());
     }
 
 

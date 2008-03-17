@@ -13,64 +13,66 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+package org.geotools.gui.swing.filter;
 
-package org.geotools.gui.swing.propertyedit.filterproperty;
-
-import java.awt.Component;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.geotools.data.DefaultQuery;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.FilterToCQL;
 import org.geotools.gui.swing.misc.FilterToCQLException;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 
 /**
- *
  * @author  johann sorel
  */
-public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPanel{
-    
+public class JCQLFilterPanel extends javax.swing.JPanel implements FilterPanel{
+
+    private static ResourceBundle bundle = ResourceBundle.getBundle("org/geotools/gui/swing/propertyedit/filterproperty/Bundle");
+    private Filter filter = null;
     private MapLayer layer;
-    
+
     /** Creates new form JCQLPropertyPanel */
-    public JCQLPropertyPanel() {
+    public JCQLFilterPanel() {
         initComponents();
-        
+
         lst_basic.addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                append(lst_basic.getSelectedValue().toString());
+                Object value = lst_basic.getSelectedValue();
+                append(value.toString());
             }
         });
 
         lst_gis.addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                append(lst_gis.getSelectedValue().toString());
+                Object value = lst_gis.getSelectedValue();
+                append(value.toString());
             }
         });
 
         lst_field.addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                append(lst_field.getSelectedValue().toString());
+                Object value = lst_field.getSelectedValue();
+                append(value.toString());
             }
         });
-        
+
     }
-    
+
     private void append(String val) {
         if (!txt_cql.getText().endsWith(val)) {
 
@@ -88,38 +90,40 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
             txt_error.setText(" ");
             return flt;
         } catch (CQLException e) {
-            txt_error.setText(BUNDLE.getString("cql_error"));
+            txt_error.setText(bundle.getString("cql_error"));
             return null;
         }
     }
-    
-    private void parse(){
-        
+
+    private void parse(Filter filter) {
+
+        FilterToCQL visitor = new FilterToCQL();
+
+        try {
+            txt_cql.setText(visitor.encodeToString(layer.getQuery().getFilter()));
+        } catch (FilterToCQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void parse(MapLayer layer) {
         lst_field.removeAll();
 
-            Collection<PropertyDescriptor> col = layer.getFeatureSource().getSchema().getProperties();
-            Iterator<PropertyDescriptor> it = col.iterator();
+        Collection<PropertyDescriptor> col = layer.getFeatureSource().getSchema().getProperties();
+        Iterator<PropertyDescriptor> it = col.iterator();
 
-            PropertyDescriptor desc;
-            Vector<String> vec = new Vector<String>();
-            while (it.hasNext()) {
-                desc = it.next();
-                vec.add(desc.getName().toString());
-            }
+        PropertyDescriptor desc;
+        Vector<String> vec = new Vector<String>();
+        while (it.hasNext()) {
+            desc = it.next();
+            vec.add(desc.getName().toString());
+        }
 
-            FilterToCQL visitor = new FilterToCQL();
-            
-            try{
-                txt_cql.setText( visitor.encodeToString(layer.getQuery().getFilter()));
-            }catch(FilterToCQLException e){
-                
-            }
-            
-            lst_field.setListData(vec);
-        
+
+        lst_field.setListData(vec);
     }
-    
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -216,8 +220,6 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -232,30 +234,43 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
     private javax.swing.JTextArea txt_cql;
     private javax.swing.JLabel txt_error;
     // End of variables declaration//GEN-END:variables
-
-    public void setTarget(Object target) {
-        if (target instanceof MapLayer) {
-            layer = (MapLayer) target;
-            parse();
+    
+    public void setFilter(Filter filter) {
+        if (filter == null) {
+            throw new NullPointerException();
         }
+
+        this.filter = filter;
+        parse(filter);
     }
 
-    public void apply() {
-        
+    public Filter getFilter() {
         Filter flt = verifyQuery(txt_cql.getText());
 
         if (flt == null) {
             flt = Filter.INCLUDE;
         }
-        layer.setQuery(new DefaultQuery("cqlfilter", flt));
+        filter = flt;        
+        return filter;
     }
 
-    public void reset() {
-        parse();
+    public void setLayer(MapLayer layer) {
+
+        if (layer == null) {
+            throw new NullPointerException();
+        }
+
+        this.layer = layer;
+        parse(layer);
     }
 
+    public MapLayer getLayer() {
+        return layer;
+    }
+ 
+        
     public String getTitle() {
-        return BUNDLE.getString("cqlfilter");
+        return bundle.getString("cqlfilter");
     }
 
     public ImageIcon getIcon() {
@@ -265,9 +280,8 @@ public class JCQLPropertyPanel extends javax.swing.JPanel implements PropertyPan
     public String getToolTip() {
         return null;
     }
-
-    public Component getPanel() {
+       
+    public JComponent getComponent() {
         return this;
     }
-    
 }

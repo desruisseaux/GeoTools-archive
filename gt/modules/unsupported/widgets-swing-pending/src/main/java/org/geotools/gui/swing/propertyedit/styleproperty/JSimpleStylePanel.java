@@ -37,6 +37,8 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.style.JTextSymbolizerPanel;
+import org.geotools.styling.TextSymbolizer;
 
 /**
  *
@@ -127,15 +129,18 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );
-                } else {        
+                } else if (val.equals(TextSymbolizer.class) ) {
+                    detail = new JTextSymbolizerPanel();
+                    detail.setLayer(layer);
+                    detail.setStyle(layer.getStyle());     
+                    add(BorderLayout.CENTER, detail.getComponent() );
+                }else {        
                     detail = null;
                     add(BorderLayout.CENTER,new JLabel("<b>" + BUNDLE.getString("unknown_simplestyle") + "</b>"));
                 }
             }
         }
     }
-
-    
 
     public void reset() {
         parse();

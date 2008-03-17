@@ -14,18 +14,17 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.style;
+package org.geotools.gui.swing.filter;
 
 import javax.swing.JComponent;
 
 import org.geotools.map.MapLayer;
-import org.geotools.styling.Style;
-import org.geotools.styling.Symbolizer;
+import org.opengis.filter.Filter;
 
 /**
  * @author Johann Sorel
  */
-public interface SymbolizerPanel extends StyleFeatureEditor{
+public interface FilterPanel {
 
     
     public void setLayer(MapLayer layer);
@@ -33,18 +32,13 @@ public interface SymbolizerPanel extends StyleFeatureEditor{
     public MapLayer getLayer();
     
     /**
-     * @return return a Point,ligne,polygon or raster symbolizer
+     * 
+     * @return return the editer Filter
      */
-    public Symbolizer getSymbolizer();
+    public Filter getFilter();
     
-    public void setSymbolizer(Symbolizer symbol);
-      
-    /**
-     * @return return a Style with only one rule and the symbolizer
-     */
-    public Style getStyle();
+    public void setFilter(Filter filter);
     
-    public void setStyle(Style style);
             
     /**
      * 

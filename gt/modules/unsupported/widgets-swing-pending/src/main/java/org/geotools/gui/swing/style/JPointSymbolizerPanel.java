@@ -41,6 +41,7 @@ import org.geotools.styling.Symbolizer;
  */
 public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geotools.gui.swing.style.SymbolizerPanel {
 
+    private PointSymbolizer symbol = null;
     private MapLayer layer = null;
 
     /** Creates new form LineStylePanel
@@ -49,6 +50,22 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
     public JPointSymbolizerPanel() {
         initComponents();
         init();
+    }
+
+    public void apply() {
+
+        if (symbol != null) {
+            StyleBuilder sb = new StyleBuilder();
+
+            Fill fill = sb.createFill(gui_color.getExpression(), gui_opacity.getExpression());
+            Mark mark = sb.createMark(gui_jcb_forme.getSelectedItem().toString(), fill, gui_stroke.getStroke());
+            Graphic gra = sb.createGraphic();
+            gra.setOpacity(gui_opacity.getExpression());
+            gra.setMarks(new Mark[]{mark});
+            gra.setRotation(gui_orientation.getExpression());
+            gra.setSize(gui_size.getExpression());
+            symbol.setGraphic(gra);
+        }
     }
 
     private void init() {
@@ -90,15 +107,14 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
         });
     }
 
-    public void setDemoSymbolizers(Map<Symbolizer,String> symbols){
-        tab_demo.setMap(symbols);        
+    public void setDemoSymbolizers(Map<Symbolizer, String> symbols) {
+        tab_demo.setMap(symbols);
     }
-    
-    public Map<Symbolizer,String> getDemoSymbolizers(){
+
+    public Map<Symbolizer, String> getDemoSymbolizers() {
         return tab_demo.getMap();
     }
-    
-    
+
     public void setLayer(MapLayer layer) {
         this.layer = layer;
         gui_color.setLayer(layer);
@@ -112,20 +128,19 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
         return layer;
     }
 
-    public void setSymbolizer(Symbolizer symbol) {
-        if (symbol instanceof PointSymbolizer) {
+    public void setSymbolizer(Symbolizer sym) {
+        if (sym instanceof PointSymbolizer) {
             StyleBuilder sb = new StyleBuilder();
-            PointSymbolizer sym = (PointSymbolizer) symbol;
+            symbol = (PointSymbolizer) sym;
 
-            Graphic gra = sym.getGraphic();
+            Graphic gra = symbol.getGraphic();
 
-            gui_stroke.parseStroke(SLD.stroke(sym));
+            gui_stroke.parseStroke(SLD.stroke(symbol));
 
             gui_size.setExpression(gra.getSize());
             gui_orientation.setExpression(gra.getRotation());
-            gui_color.setExpression(sb.colorExpression(SLD.pointFill(sym)));
+            gui_color.setExpression(sb.colorExpression(SLD.pointFill(symbol)));
             gui_opacity.setExpression(gra.getOpacity());
-
 
             Mark mark = SLD.pointMark(layer.getStyle());
             if (mark != null) {
@@ -137,18 +152,13 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
     }
 
     public Symbolizer getSymbolizer() {
-        StyleBuilder sb = new StyleBuilder();
 
-        Fill fill = sb.createFill(gui_color.getExpression(), gui_opacity.getExpression());
-        Mark mark = sb.createMark(gui_jcb_forme.getSelectedItem().toString(), fill, gui_stroke.getStroke());
-        Graphic gra = sb.createGraphic();
-        gra.setOpacity(gui_opacity.getExpression());
-        gra.setMarks(new Mark[]{mark});
-        gra.setRotation(gui_orientation.getExpression());
-        gra.setSize(gui_size.getExpression());
-        PointSymbolizer ps = sb.createPointSymbolizer(gra);
-
-        return ps;
+        if (symbol == null) {
+            StyleBuilder sb = new StyleBuilder();
+            symbol = sb.createPointSymbolizer();
+        }
+        apply();
+        return symbol;
     }
 
     public void setStyle(Style style) {

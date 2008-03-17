@@ -33,6 +33,7 @@ import org.geotools.styling.Symbolizer;
  */
 public class JRasterSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel{
     
+    private RasterSymbolizer symbol = null;
     private MapLayer layer = null;
     
     /** Creates new form RasterStylePanel
@@ -41,6 +42,12 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     public JRasterSymbolizerPanel() {
         initComponents();
         init();
+    }
+    
+    public void apply(){
+        if(symbol != null){            
+            symbol.setOpacity(GuiOpacity.getExpression()); 
+        }
     }
     
     private void init(){
@@ -74,20 +81,22 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
         return style;
     }
 
-    public void setSymbolizer(Symbolizer symbol) {
+    public void setSymbolizer(Symbolizer sym) {
 
-        if (symbol instanceof RasterSymbolizer) {
-            RasterSymbolizer sym = (RasterSymbolizer) symbol;
-
-            GuiOpacity.setExpression( sym.getOpacity() );
+        if (sym instanceof RasterSymbolizer) {
+            symbol = (RasterSymbolizer) sym;
+            GuiOpacity.setExpression( symbol.getOpacity() );
         }
     }
     
     public Symbolizer getSymbolizer(){
-        StyleBuilder sb = new StyleBuilder();
-        RasterSymbolizer sym = sb.createRasterSymbolizer();
-        sym.setOpacity(GuiOpacity.getExpression());        
-        return sym;
+        
+        if(symbol == null){
+            StyleBuilder sb = new StyleBuilder();
+            symbol = sb.createRasterSymbolizer();            
+        }
+        apply();       
+        return symbol;
     }
         
     public JComponent getComponent(){

@@ -37,6 +37,7 @@ import org.geotools.styling.Symbolizer;
  */
 public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.geotools.gui.swing.style.SymbolizerPanel {
 
+    private PolygonSymbolizer symbol = null;
     private MapLayer layer = null;
     
     /** Creates new form LineStylePanel
@@ -46,6 +47,13 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.g
         init();        
     }
 
+    public void apply(){
+        if(symbol!= null){
+            symbol.setStroke(GuiStroke.getStroke());
+            symbol.setFill(GuiFill.getFill());
+        }
+    }
+    
     private void init(){
         tab_demo.addMouseListener(new MouseListener() {
 
@@ -107,21 +115,25 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.g
         return style;
     }
 
-    public void setSymbolizer(Symbolizer symbol) {
+    public void setSymbolizer(Symbolizer sym) {
 
-        if (symbol instanceof PolygonSymbolizer) {
-            PolygonSymbolizer sym = (PolygonSymbolizer) symbol;
+        if (sym instanceof PolygonSymbolizer) {
+            symbol = (PolygonSymbolizer) sym;
 
-            GuiFill.parseFill(sym.getFill());
-            GuiStroke.parseStroke(sym.getStroke());
+            GuiFill.parseFill(symbol.getFill());
+            GuiStroke.parseStroke(symbol.getStroke());
         }
     }
 
     public Symbolizer getSymbolizer() {
-        StyleBuilder sb = new StyleBuilder();
-
-        Symbolizer ps = sb.createPolygonSymbolizer(GuiStroke.getStroke(), GuiFill.getFill());
-        return ps;
+                
+        if(symbol == null){
+            StyleBuilder sb = new StyleBuilder();
+            symbol = sb.createPolygonSymbolizer();
+        }
+        
+        apply();
+        return symbol;
     }
 
     public JComponent getComponent() {

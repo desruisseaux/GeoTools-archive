@@ -16,8 +16,6 @@
 
 package org.geotools.gui.swing.style.sld;
 
-
-
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Fill;
 import org.geotools.styling.StyleBuilder;
@@ -35,8 +33,7 @@ public class JFillPanel extends javax.swing.JPanel {
         initComponents();
         
         GuiFillColor.setType(JExpressionPanel.EXP_TYPE.COLOR);
-        GuiFillColor.setType(JExpressionPanel.EXP_TYPE.NUMBER);
-                
+        GuiFillAlpha.setType(JExpressionPanel.EXP_TYPE.NUMBER);                
     }
 
     /**

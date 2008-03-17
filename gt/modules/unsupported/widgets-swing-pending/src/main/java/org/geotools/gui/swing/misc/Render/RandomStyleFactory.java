@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.misc.Render;
 
 import java.awt.Color;
@@ -59,205 +58,204 @@ import org.opengis.filter.expression.Expression;
  * @author johann sorel
  */
 public class RandomStyleFactory {
-    
+
     private StyleBuilder sb = null;
-    
-    private final String[] POINT_SHAPES = {"square","circle","triangle","star","cross","x"};
-    private final int[] SIZES = {8,10,12,14,16};
-    private final int[] WIDTHS = {1,2};
+    private final String[] POINT_SHAPES = {"square", "circle", "triangle", "star", "cross", "x"};
+    private final int[] SIZES = {8, 10, 12, 14, 16};
+    private final int[] WIDTHS = {1, 2};
     private final Color[] COLORS = {
-        Color.BLACK,Color.BLUE,Color.CYAN,Color.DARK_GRAY,
-        Color.GRAY,Color.GREEN.darker(),Color.LIGHT_GRAY,
-        Color.ORANGE,Color.RED,Color.YELLOW.darker()};
-    
-    
-    public RandomStyleFactory(){        
-        try{
+        Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY,
+        Color.GRAY, Color.GREEN.darker(), Color.LIGHT_GRAY,
+        Color.ORANGE, Color.RED, Color.YELLOW.darker()
+    };
+
+    public RandomStyleFactory() {
+        try {
             sb = new StyleBuilder();
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
     }
-    
-    
+
     //------------------duplicates----------------------------------------------
-    
-    public Style duplicate(Style style){
+    public Style duplicate(Style style) {
         DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
-        style.accept( xerox );
+        style.accept(xerox);
         return (Style) xerox.getCopy();
     }
-    
-    public FeatureTypeStyle duplicate(FeatureTypeStyle fts){
+
+    public FeatureTypeStyle duplicate(FeatureTypeStyle fts) {
         DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
-        fts.accept( xerox );
+        fts.accept(xerox);
         return (FeatureTypeStyle) xerox.getCopy();
     }
-    
-    public Rule duplicate(Rule rule){
+
+    public Rule duplicate(Rule rule) {
         DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
-        rule.accept( xerox );
+        rule.accept(xerox);
         return (Rule) xerox.getCopy();
     }
-    
-    public Symbolizer duplicate(Symbolizer symbol){
+
+    public Symbolizer duplicate(Symbolizer symbol) {
         DuplicatingStyleVisitor xerox = new DuplicatingStyleVisitor();
-        symbol.accept( xerox );
+        symbol.accept(xerox);
         return (Symbolizer) xerox.getCopy();
     }
-    
-    
+
     //----------------------creation--------------------------------------------
-    
-    public PointSymbolizer createPointSymbolizer(){
+    public PointSymbolizer createPointSymbolizer() {
         Fill fill = sb.createFill(randomColor(), 1);
-                Stroke stroke = sb.createStroke(randomColor(), 1);
-                Mark mark = sb.createMark(randomPointShape(), fill, stroke  );
-                Graphic gra = sb.createGraphic();
-                gra.setOpacity( sb.literalExpression(1) );
-                gra.setMarks(new Mark[]{mark});
-                gra.setSize(sb.literalExpression(randomPointSize()));
-                return sb.createPointSymbolizer(gra);
+        Stroke stroke = sb.createStroke(randomColor(), 1);
+        Mark mark = sb.createMark(randomPointShape(), fill, stroke);
+        Graphic gra = sb.createGraphic();
+        gra.setOpacity(sb.literalExpression(1));
+        gra.setMarks(new Mark[]{mark});
+        gra.setSize(sb.literalExpression(randomPointSize()));
+        return sb.createPointSymbolizer(gra);
     }
-    
-    public LineSymbolizer createLineSymbolizer(){
-        return sb.createLineSymbolizer(randomColor(),randomWidth());
+
+    public LineSymbolizer createLineSymbolizer() {
+        return sb.createLineSymbolizer(randomColor(), randomWidth());
     }
-    
-    public PolygonSymbolizer createPolygonSymbolizer(){
+
+    public PolygonSymbolizer createPolygonSymbolizer() {
         Color col = randomColor();
-                Fill fill = sb.createFill(col, 0.6f);
-                Stroke stroke = sb.createStroke(col, 1);
-                stroke.setOpacity(sb.literalExpression(1f));
-                return sb.createPolygonSymbolizer(stroke, fill);
+        Fill fill = sb.createFill(col, 0.6f);
+        Stroke stroke = sb.createStroke(col, 1);
+        stroke.setOpacity(sb.literalExpression(1f));
+        return sb.createPolygonSymbolizer(stroke, fill);
     }
-    
-    public RasterSymbolizer createRasterSymbolizer(){
+
+    public RasterSymbolizer createRasterSymbolizer() {
         return sb.createRasterSymbolizer();
     }
-    
-    public Style createPolygonStyle(){
+
+    public Style createPolygonStyle() {
         Style style = null;
-        
-        PolygonSymbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
+
+        PolygonSymbolizer ps = sb.createPolygonSymbolizer(randomColor(), randomWidth());
         ps.getFill().setOpacity(sb.literalExpression(0.6f));
-        
+
         style = sb.createStyle();
         style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-        
+
         return style;
     }
-    
-    public Style createRandomVectorStyle(FeatureSource<SimpleFeatureType, SimpleFeature> fs){
+
+    public Style createRandomVectorStyle(FeatureSource<SimpleFeatureType, SimpleFeature> fs) {
         Style style = null;
-        
-        Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
-                
+
+        Symbolizer ps = sb.createPolygonSymbolizer(randomColor(), randomWidth());
+
         try {
-            FeatureType typ = fs.getSchema();            
+            FeatureType typ = fs.getSchema();
             AttributeDescriptor att = typ.getDefaultGeometry();
             AttributeType type = att.getType();
-                        
+
             Class cla = type.getBinding();
-            
-            if( cla.equals(Polygon.class) || cla.equals(MultiPolygon.class) ){
+
+            if (cla.equals(Polygon.class) || cla.equals(MultiPolygon.class)) {
                 ps = createPolygonSymbolizer();
-            }else if( cla.equals(LineString.class) || cla.equals(MultiLineString.class) ){
+            } else if (cla.equals(LineString.class) || cla.equals(MultiLineString.class)) {
                 ps = createLineSymbolizer();
-            }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){                
+            } else if (cla.equals(Point.class) || cla.equals(MultiPoint.class)) {
                 ps = createPointSymbolizer();
             }
-                        
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         style = sb.createStyle();
         style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-        
+
         return style;
     }
-    
+
     public Style createRasterStyle() {
         Style style = null;
-        
+
         RasterSymbolizer raster = sb.createRasterSymbolizer();
-        
+
         style = sb.createStyle(raster);
         return style;
     }
-    
-    public BufferedImage createGlyph(MapLayer layer){
+
+    public BufferedImage createGlyph(MapLayer layer) {
         BufferedImage bi = null;
-        
-        if(layer != null){
-            if( layer.getFeatureSource() != null ){
-                                
-                
+
+        if (layer != null) {
+            if (layer.getFeatureSource() != null) {
+
+
                 FeatureTypeStyle[] fts = layer.getStyle().getFeatureTypeStyles();
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
-                                
-                
-                if ( layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")){
-                    bi = Glyph.grid(Color.RED,Color.GREEN,Color.BLUE,Color.YELLOW);
-                } else if( val.equals(Polygon.class) || val.equals(MultiPolygon.class) ){
-                    bi = Glyph.Polygon( fts[0].getRules()[0] );
-                }else if( val.equals(MultiLineString.class) || val.equals(LineString.class) ){
-                    bi = Glyph.line( fts[0].getRules()[0] );
-                }else if( val.equals(Point.class) || val.equals(MultiPoint.class) ){
-                    bi = Glyph.point( fts[0].getRules()[0] );
-                }else{
-                    bi = Glyph.grid(Color.RED,Color.GREEN,Color.BLUE,Color.YELLOW);
+
+                if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
+                    bi = Glyph.grid(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+                } else {
+                    bi = createGlyph(fts[0].getRules()[0].getSymbolizers()[0]);
                 }
+
+//                if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {
+//
+//                    bi = Glyph.Polygon(fts[0].getRules()[0]);
+//                } else if (val.equals(MultiLineString.class) || val.equals(LineString.class)) {
+//                    bi = Glyph.line(fts[0].getRules()[0]);
+//                } else if (val.equals(Point.class) || val.equals(MultiPoint.class)) {
+//                    bi = Glyph.point(fts[0].getRules()[0]);
+//                } else {
+//                    bi = Glyph.grid(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+//                }
             }
         }
-        
+
         return bi;
     }
-    
-    public BufferedImage createGlyph(Symbolizer symbol){
-        BufferedImage bi = null;
-        
-        if( symbol != null){
-            
-                if( symbol instanceof PolygonSymbolizer  ){
-                    bi = Glyph.polygon( 
-                            SLD.polyColor(((PolygonSymbolizer)symbol)), 
-                            SLD.polyFill(((PolygonSymbolizer)symbol)), 
-                            SLD.polyWidth(((PolygonSymbolizer)symbol)));
-                }else if( symbol instanceof LineSymbolizer ){
-                    bi = Glyph.line( 
-                            SLD.lineColor(((LineSymbolizer)symbol)), 
-                            SLD.lineWidth(((LineSymbolizer)symbol)));
-                }else if( symbol instanceof PointSymbolizer ){
-                    bi = Glyph.point( 
-                            SLD.pointColor(((PointSymbolizer)symbol)), 
-                            SLD.pointFill(((PointSymbolizer)symbol)));
-                }else{
-                    bi = Glyph.grid(Color.RED,Color.GREEN,Color.BLUE,Color.YELLOW);
-                }
-            
+
+    public BufferedImage createGlyph(Symbolizer symbol) {
+        BufferedImage bi = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+
+        if (symbol != null) {
+
+            if (symbol instanceof PolygonSymbolizer) {
+                bi = Glyph.polygon(
+                        SLD.polyColor(((PolygonSymbolizer) symbol)),
+                        SLD.polyFill(((PolygonSymbolizer) symbol)),
+                        SLD.polyWidth(((PolygonSymbolizer) symbol)));
+            } else if (symbol instanceof LineSymbolizer) {
+                bi = Glyph.line(
+                        SLD.lineColor(((LineSymbolizer) symbol)),
+                        SLD.lineWidth(((LineSymbolizer) symbol)));
+            } else if (symbol instanceof PointSymbolizer) {
+                bi = Glyph.point(
+                        SLD.pointColor(((PointSymbolizer) symbol)),
+                        SLD.pointFill(((PointSymbolizer) symbol)));
+            } else if (symbol instanceof TextSymbolizer) {
+                bi = Glyph.point(
+                        SLD.textFontFill(((TextSymbolizer) symbol)),
+                        SLD.textHaloFill(((TextSymbolizer) symbol)));
+            } else {
+                bi = Glyph.grid(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+            }
         }
-        
+
         return bi;
     }
-    
-    
+
     //-----------------------random---------------------------------------------
-    
-    public int randomPointSize(){
-        return SIZES[ ((int)(Math.random() * SIZES.length)) ];
+    public int randomPointSize() {
+        return SIZES[((int) (Math.random() * SIZES.length))];
     }
-    
-    public int randomWidth(){
-        return WIDTHS[ ((int)(Math.random() * WIDTHS.length)) ];
+
+    public int randomWidth() {
+        return WIDTHS[((int) (Math.random() * WIDTHS.length))];
     }
-    
-    public String randomPointShape(){
-        return POINT_SHAPES[ ((int)(Math.random() * POINT_SHAPES.length)) ];
+
+    public String randomPointShape() {
+        return POINT_SHAPES[((int) (Math.random() * POINT_SHAPES.length))];
     }
-    
-    public Color randomColor(){
-        return COLORS[ ((int)(Math.random() * COLORS.length)) ];
+
+    public Color randomColor() {
+        return COLORS[((int) (Math.random() * COLORS.length))];
     }
-    
-    
 }
