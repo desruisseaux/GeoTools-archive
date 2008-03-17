@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 
@@ -38,6 +39,7 @@ import org.opengis.referencing.datum.PixelInCell;
 import org.geotools.math.XMath;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.grid.GridRange2D;
+import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -797,6 +799,11 @@ public class MosaicBuilder {
         private final boolean writeTiles;
 
         /**
+         * The input tile managers, or {@code null} if none.
+         */
+        TileManager[] inputTiles;
+
+        /**
          * The tiles created by {@link MosaicBuilder#createTileManager}.
          * Will be set by {@link #filter} and read by {@link MosaicBuilder}.
          */
@@ -828,7 +835,9 @@ public class MosaicBuilder {
             bounds.height = reader.getHeight(inputIndex);
             // Sets only after successful reading of image size.
             if (reader instanceof MosaicImageReader) {
-                reader = ((MosaicImageReader) reader).getTileReader();
+                final MosaicImageReader mosaic = (MosaicImageReader) reader;
+                inputTiles = mosaic.getInput();
+                reader = mosaic.getTileReader();
             }
             if (reader != null) { // May be null as a result of above line.
                 final ImageReaderSpi spi = reader.getOriginatingProvider();
@@ -841,6 +850,17 @@ public class MosaicBuilder {
             setOutput(tiles);
             return true;
         }
+
+        /**
+         * Invoked when a tile is about to be written. Delegates to a method that users can
+         * override. Inconditionnaly returns {@code true} since filtering would be misleading
+         * (because the tiles would still declared in the {@link TileManager} to be created).
+         */
+        @Override
+        protected boolean filter(Tile tile, ImageWriteParam parameters) throws IOException {
+            onTileWrite(tile, parameters);
+            return super.filter(tile, parameters);
+        }
     }
 
     /**
@@ -852,7 +872,7 @@ public class MosaicBuilder {
      * untiled images, organized in tiles as specified by the {@link TileManager} to be returned
      * and saved to disk. This work is done using a default {@link MosaicImageWriter}.
      *
-     * @param input      The untiled image input, typically as a {@link File}.
+     * @param input The image input, typically as a {@link File} or an other {@link TileManager}.
      * @param inputIndex Index of image to read, typically 0.
      * @param writeTiles If {@code true}, tiles are created and saved to disk.
      * @throws IOException if an error occured while reading the untiled image or (only if
@@ -886,7 +906,25 @@ public class MosaicBuilder {
         final Writer writer = new Writer(inputIndex, writeTiles);
         writer.setLogLevel(getLogLevel());
         writer.writeFromInput(input, inputIndex, 0);
-        return writer.tiles;
+        TileManager tiles = writer.tiles;
+        /*
+         * Before to returns the tile manager, if no geometry has been inferred from the target
+         * tiles (typically because no setEnvelope(...) has not been invoked), then inherit the
+         * geometry from the source tile, if there is any. This operation is conservative and
+         * performed only on a "best effort" basis.
+         */
+        if (tiles.geometry == null) {
+            if (writer.inputTiles != null) {
+                for (final TileManager candidate : writer.inputTiles) {
+                    final ImageGeometry geometry = candidate.getGridGeometry();
+                    if (geometry != null) {
+                        tiles.setGridToCRS(geometry.getGridToCRS());
+                        break;
+                    }
+                }
+            }
+        }
+        return tiles;
     }
 
     /**
@@ -927,5 +965,19 @@ public class MosaicBuilder {
         final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
         mapper.setGridType(PixelInCell.CELL_CORNER);
         return mapper;
+    }
+
+    /**
+     * Invoked automatically when a tile is about to be written. The default implementation does
+     * nothing. Subclasses can override this method in order to set custom write parameters. The
+     * {@linkplain ImageWriteParam#setSourceRegion source region} and
+     * {@linkplain ImageWriteParam#setSourceSubsampling source subsampling} should not be set
+     * since they will be inconditionnaly overwritten by the caller.
+     *
+     * @param  tile The tile to be written.
+     * @param  parameters The parameters to be given to the {@linkplain ImageWriter image writer}.
+     * @throws IOException if an I/O operation was required and failed.
+     */
+    protected void onTileWrite(Tile tile, ImageWriteParam parameters) throws IOException {
     }
 }

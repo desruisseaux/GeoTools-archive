@@ -17,6 +17,7 @@
 package org.geotools.image.io.mosaic;
 
 import java.util.*; // We use really a lot of those imports.
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -31,7 +32,6 @@ import javax.swing.tree.TreeModel;
 
 import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
-import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -112,9 +112,8 @@ public class TileManager implements Serializable {
     private transient Dimension tileSize;
 
     /**
-     * The grid geometry, including the "<cite>grid to real world</cite>" transform.  This is
-     * provided by {@link TileManagerFactory} when this information is available and returned
-     * by {@link #getGridGeometry}, but is not used by this class.
+     * The grid geometry, including the "<cite>grid to real world</cite>" transform.
+     * This is provided by {@link TileManagerFactory} when this information is available.
      */
     ImageGeometry geometry;
 
@@ -227,10 +226,37 @@ fill:   for (final List<Tile> sameInputs : asArray) {
      * Dimension,AffineTransform) tile constructor}.
      *
      * @return The grid geometry, or {@code null} if this information is not available.
+     * @throws IOException if an I/O operation was required and failed.
      *
      * @see Tile#getGridToCRS
      */
-    public ImageGeometry getGridGeometry() {
+    public ImageGeometry getGridGeometry() throws IOException {
+        if (geometry == null) {
+            /*
+             * The gridToCRS transform is the same one than the one of the tile having origin at
+             * (0,0) and subsampling of (1,1).  So we search for exactly this tile and currently
+             * accept no other one. In a future version we could accept an other tile (but which
+             * one?) and translate the affine transform...  But the result could be wrong if the
+             * gridToCRS transform is not computed by RegionCalculator. Only the particular tile
+             * searched by current implementation should be okay in all cases.
+             */
+            for (final Tile tile : tiles) {
+                final Dimension subsampling = tile.getSubsampling();
+                if (subsampling.width != 1 || subsampling.height != 1) {
+                    continue;
+                }
+                final Point origin = tile.getLocation();
+                if (origin.x != 0 || origin.y != 0) {
+                    continue;
+                }
+                final AffineTransform gridToCRS = tile.getGridToCRS();
+                if (gridToCRS == null) {
+                    continue;
+                }
+                geometry = new ImageGeometry(getRegion(), gridToCRS);
+                break;
+            }
+        }
         return geometry;
     }
 

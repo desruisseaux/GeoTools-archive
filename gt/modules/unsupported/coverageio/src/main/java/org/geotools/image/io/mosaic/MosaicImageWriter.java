@@ -195,7 +195,7 @@ public class MosaicImageWriter extends ImageWriter {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
         }
         final int bytesPerPixel;
-        final Collection<Tile> tiles;
+        final List<Tile> tiles;
         if (isWriteEnabled()) {
             tiles = new LinkedList<Tile>(managers[outputIndex].getTiles());
             /*
@@ -303,9 +303,11 @@ public class MosaicImageWriter extends ImageWriter {
                 sourceRegion.height /= imageSubsampling.height;
                 final ImageWriter writer = getImageWriter(tile, image);
                 final ImageWriteParam wp = writer.getDefaultWriteParam();
-                wp.setSourceRegion(sourceRegion);
-                wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
-                writer.write(null, new IIOImage(image, null, null), wp);
+                if (filter(tile, wp)) {
+                    wp.setSourceRegion(sourceRegion);
+                    wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
+                    writer.write(null, new IIOImage(image, null, null), wp);
+                }
                 close(writer.getOutput(), tile.getInput());
                 writer.dispose();
                 it.remove();
@@ -376,7 +378,7 @@ public class MosaicImageWriter extends ImageWriter {
      * @param imageSubsampling Where to store the subsampling to use for reading the tile.
      *        This is an output parameter only.
      */
-    private static Tile getEnclosingTile(final Collection<Tile> tiles, final TreeNode tree,
+    private static Tile getEnclosingTile(final List<Tile> tiles, final TreeNode tree,
                                          final Dimension imageSubsampling,
                                          final int maximumPixelCount)
             throws IOException
@@ -448,7 +450,7 @@ public class MosaicImageWriter extends ImageWriter {
              * Retains the tile with the largest filtered collection of sub-tiles.
              */
             final int tileCount = enclosed.size();
-            if (tileCount > subtileCount) {
+            if (selectedTile == null || tileCount > subtileCount) {
                 selectedTile = tile;
                 subtileCount = tileCount;
                 imageSubsampling.setSize(finerSubsampling);
@@ -501,6 +503,22 @@ public class MosaicImageWriter extends ImageWriter {
      * @throws IOException if an error occured while inspecting or configuring the writer.
      */
     protected boolean filter(final ImageWriter writer) throws IOException {
+        return true;
+    }
+
+    /**
+     * Invoked automatically when a tile is about to be written. The default implementation does
+     * nothing. Subclasses can override this method in order to set custom write parameters. The
+     * {@linkplain ImageWriteParam#setSourceRegion source region} and
+     * {@linkplain ImageWriteParam#setSourceSubsampling source subsampling} should not be set
+     * since they will be inconditionnaly overwritten by the caller.
+     *
+     * @param  tile The tile to be written.
+     * @param  parameters The parameters to be given to the {@linkplain ImageWriter image writer}.
+     * @return {@code true} if the tile should be written, or {@code false} if it should be skipped.
+     * @throws IOException if an I/O operation was required and failed.
+     */
+    protected boolean filter(final Tile tile, final ImageWriteParam parameters) throws IOException {
         return true;
     }
 

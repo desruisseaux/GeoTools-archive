@@ -85,7 +85,7 @@ public abstract class AbstractMetadata {
      * interfaces defined in the {@linkplain #getStandard metadata standard} implemented
      * by this class.
      */
-    public Class getInterface() {
+    public Class<?> getInterface() {
         // No need to sychronize, since this method do not depends on property values.
         return getStandard().getInterface(getClass());
     }
