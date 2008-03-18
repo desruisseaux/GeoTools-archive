@@ -30,6 +30,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.wfs.WFSDataStoreFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
@@ -40,6 +41,9 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.PropertyName;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -66,7 +70,7 @@ public class WFSDataStoreReadTest extends TestCase {
         m.put(WFSDataStoreFactory.URL.key,server);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // not debug
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(1000000)); //for debug
-        return (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
+        return (WFS_1_0_0_DataStore)(new WFSDataStoreFactory()).createDataStore(m);
 
         }catch(java.net.SocketException se){
             se.printStackTrace();
@@ -80,19 +84,22 @@ public class WFSDataStoreReadTest extends TestCase {
         WFS_1_0_0_DataStore wfs = getDataStore(url);
         System.out.println("FeatureTypeTest + "+url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
-        assertNotNull("Null featureType in ["+i+"]",wfs.getTypeNames()[i]);
-        System.out.println("FT name = "+wfs.getTypeNames()[i]);
+        
+        String typeName = wfs.getTypeNames()[i];
+        assertNotNull("Null featureType in ["+i+"]",typeName);
+        
+        //System.out.println("FT name = "+typeName);
         if(get){
             // get
-            SimpleFeatureType ft = wfs.getSchemaGet(wfs.getTypeNames()[i]);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue(wfs.getTypeNames()[i]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
+            SimpleFeatureType ft = wfs.getSchemaGet(typeName);
+            assertNotNull("GET DescribeFeatureType for "+typeName+" was null",ft);
+            assertTrue("GET "+typeName+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
         }
         if(post){
             // post
-            SimpleFeatureType ft = wfs.getSchemaPost(wfs.getTypeNames()[i]);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
+            SimpleFeatureType ft = wfs.getSchemaPost(typeName);
+            assertNotNull("POST DescribeFeatureType for "+typeName+" resulted in null",ft);
+            assertTrue("POST "+typeName+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
         }
         }catch(java.net.SocketException se){
             se.printStackTrace();
@@ -229,41 +236,38 @@ public class WFSDataStoreReadTest extends TestCase {
        /** Request a subset of available properties 
      * @throws IllegalFilterException */
     public static void doFeatureReaderWithBBox(URL url, boolean get, boolean post, int i, Envelope bbox) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
-        if( url == null ) return; // test distabled (must be site specific)                
+        if( url == null ) return; // test disabled (must be site specific)                
         try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
         WFS_1_0_0_DataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
-        assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
-        SimpleFeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
+        
+        String typeName = wfs.getTypeNames()[i];
+        assertNotNull("Null featureType in [0]",typeName);
+        SimpleFeatureType featureType = wfs.getSchema(typeName);
+        
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
-        
-        
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        
-        DefaultQuery query = new DefaultQuery(ft.getTypeName());
-        BBoxExpression theBBox = factory.createBBoxExpression( bbox );
-        AttributeExpression theGeom = factory.createAttributeExpression( ft, ft.getDefaultGeometry().getLocalName() );
-        
-        GeometryFilter filter = factory.createGeometryFilter( FilterType.GEOMETRY_BBOX );
-        filter.addLeftGeometry( theGeom );
-        filter.addRightGeometry( theBBox );
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        DefaultQuery query = new DefaultQuery(featureType.getTypeName());
+        PropertyName theGeom = ff.property( featureType.getDefaultGeometry().getName() );
+        Filter filter = ff.bbox( theGeom, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), "EPSG:4326" );
+                
         query.setFilter( filter );
         //query.setMaxFeatures(3);
         if(get){
             //  get
-             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+            FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+            assertNotNull("GET "+typeName+" FeatureType was null",featureType);
+            assertTrue("GET "+typeName+ " must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
             int j=0;while(fr.hasNext()){fr.next();j++;}
             System.out.println("bbox selected "+j+" Features");
             fr.close();
         }if(post){
             //  post
 
-             FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
+            FeatureReader<SimpleFeatureType, SimpleFeature> fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+            assertNotNull("POST "+typeName+"FeatureType was null",featureType);
+            assertTrue("POST "+typeName+"must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
             int j=0;while(fr.hasNext()){fr.next();j++;}
             System.out.println("bbox selected "+j+" Features");
             fr.close();

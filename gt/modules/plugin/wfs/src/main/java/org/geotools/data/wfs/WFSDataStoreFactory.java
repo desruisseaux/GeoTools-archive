@@ -51,6 +51,9 @@ import org.geotools.wfs.v_1_1_0.data.WFS110ProtocolHandler;
 import org.geotools.wfs.v_1_1_0.data.WFS_1_1_0_DataStore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -313,6 +316,27 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             String namespace = rootElement.getNamespaceURI();
             if (!WFS.NAMESPACE.equals(namespace)
                     || !WFS.WFS_Capabilities.getLocalPart().equals(localName)) {
+                if( "http://www.opengis.net/ows".equals( namespace ) && "ExceptionReport".equals(localName)){
+                    StringBuffer message = new StringBuffer();
+                    Element exception = (Element) rootElement.getElementsByTagNameNS("*", "Exception").item(0);                  
+                    if( exception == null ){
+                        throw new DataSourceException( "Exception Report when requesting capabilities" );
+                    }
+                    Node exceptionCode = exception.getAttributes().getNamedItem("exceptionCode");
+                    Node locator = exception.getAttributes().getNamedItem("locator");
+                    Node exceptionText = exception.getElementsByTagNameNS("*", "ExceptionText").item(0);         
+                    
+                    message.append("Exception Report ");
+                    String text = exceptionText.getTextContent();
+                    if( text != null ){
+                        message.append( text.trim() );
+                    }
+                    message.append( " Exception Code:" );                    
+                    message.append( exceptionCode.getTextContent() );
+                    message.append( " Locator: " );
+                    message.append( locator.getTextContent() );
+                    throw new DataSourceException( message.toString() );
+                }
                 throw new DataSourceException("Expected " + WFS.WFS_Capabilities + " but was "
                         + namespace + "#" + localName);
             }
@@ -321,7 +345,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         final String capsVersion = rootElement.getAttribute("version");
         final Version version = Version.find(capsVersion);
 
-        if (Version.v1_0_0 == version) {
+        if (true || Version.v1_0_0 == version) {
             InputStream reader = new ByteArrayInputStream(wfsCapabilitiesRawData);
             final WFS100ProtocolHandler protocolHandler = new WFS100ProtocolHandler(reader,
                     connectionFac);

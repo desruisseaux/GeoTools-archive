@@ -20,21 +20,35 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.ows.FeatureSetDescription;
+import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxFilterVisitor;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.filter.FilterEncodingPreProcessor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -70,6 +84,47 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
                 COMPLIANCE_LEVEL);
     }
 
+    protected CoordinateReferenceSystem syncQueryCRS( String typeName, Filter serverFilter) {
+        // TODO modify bbox requests here
+        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(store.capabilities,
+                typeName);
+
+        Envelope maxbbox = null;
+        CoordinateReferenceSystem dataCRS = null;
+        
+        if (fsd.getSRS() != null) {
+            // reproject this filter!
+            try {
+                dataCRS = CRS.decode( fsd.getSRS() );
+                MathTransform toDataCRS = CRS.findMathTransform(DefaultGeographicCRS.WGS84, dataCRS);
+                maxbbox = JTS.transform(fsd.getLatLongBoundingBox(), null, toDataCRS, 10);
+            } catch (FactoryException e) {
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
+                maxbbox = null;
+            } catch (MismatchedDimensionException e) {
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
+                maxbbox = null;
+            } catch (TransformException e) {
+                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
+                maxbbox = null;
+            }
+        } else {
+            maxbbox = fsd.getLatLongBoundingBox();
+        }
+        
+        // Rewrite request if we have a maxbox
+        if (maxbbox != null) {
+            WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
+            Filters.accept(serverFilter, clipVisitor);
+        } else { // give up an request everything
+            WFS_1_0_0_DataStore.LOGGER.log(Level.FINE,
+                    "Unable to clip your query against the latlongboundingbox element");
+            // filters[0] = Filter.EXCLUDE; // uncoment this line to just give
+            // up
+        }
+        return dataCRS;
+    }
+    
     /**
      * Makes seperate requests between fetching the features using a normal filter and a seperate request for fetching features using
      * the FID filter.

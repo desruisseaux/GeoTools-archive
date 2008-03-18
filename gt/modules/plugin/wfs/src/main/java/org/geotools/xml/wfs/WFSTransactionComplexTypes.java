@@ -64,6 +64,8 @@ import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
 import org.geotools.xml.wfs.WFSSchema.WFSElement;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -913,13 +915,15 @@ public class WFSTransactionComplexTypes {
             // find element definition
             // should exist when original from a WFS ...
             SimpleFeature f = a.getFeature();
-            Schema schema = SchemaFactory.getInstance(f.getFeatureType().getName().getNamespaceURI() );
+            SimpleFeatureType featureType = f.getFeatureType();
+            Name name = featureType.getName();            
+            Schema schema = SchemaFactory.getInstance( name.getNamespaceURI() );
             Element[] els = schema.getElements();
             Element e = null;
 
             if (els != null) {
                 for (int i = 0; i < els.length; i++){
-	                String typeName = f.getFeatureType().getTypeName();
+	                String typeName = featureType.getTypeName();
 	                if (typeName.indexOf(':')>=0) {
 	                   	typeName = typeName.substring(typeName.indexOf(':')+1);
 	                }

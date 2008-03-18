@@ -40,6 +40,7 @@ import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.NameImpl;
 import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -81,7 +82,10 @@ public class WFSFeatureSource extends AbstractFeatureSource implements
      * @see FeatureSource#getName()
      */
     public Name getName() {
-       throw new UnsupportedOperationException("not yet implemented");
+        if( featureSetDescription != null && featureSetDescription.getNamespace() != null ){
+            return new NameImpl( featureSetDescription.getNamespace().toString(), fname );
+        }
+        return new NameImpl( fname );
     }
 
     /**

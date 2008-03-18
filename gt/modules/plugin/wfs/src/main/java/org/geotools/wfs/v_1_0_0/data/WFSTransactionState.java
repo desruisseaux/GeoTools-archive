@@ -141,7 +141,8 @@ public class WFSTransactionState implements State {
             if (actions.isEmpty())
                 continue;
 
-            if (ds.preferredProtocol == POST && (transactionResult == null)) {
+            //if (ds.preferredProtocol == POST && 
+            if (transactionResult == null) {
                 try {
                     transactionResult = commitPost(actions);
                 } catch (OperationNotSupportedException e) {
@@ -220,12 +221,12 @@ public class WFSTransactionState implements State {
 
     private TransactionResult commitPost(List toCommit) throws OperationNotSupportedException,
             IOException, SAXException {
+        
         URL postUrl = ds.capabilities.getTransaction().getPost();
-
         // System.out.println("POST Commit URL = "+postUrl);
-
         if (postUrl == null) {
-            return null;
+            throw new UnsupportedOperationException("Capabilities document does not describe a valid POST url for Transaction");
+            //return null;
         }
 
         HttpURLConnection hc = ds.protocolHandler.getConnectionFactory().getConnection(postUrl,

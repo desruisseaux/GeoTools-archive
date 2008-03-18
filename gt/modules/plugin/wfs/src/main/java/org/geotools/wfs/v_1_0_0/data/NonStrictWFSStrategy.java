@@ -50,7 +50,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * geoserver but no other servers.
  * 
  * @author Jesse
- * 
  */
 class NonStrictWFSStrategy implements WFSStrategy {
 
@@ -59,7 +58,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
     public NonStrictWFSStrategy(WFS_1_0_0_DataStore store) {
         this.store = store;
     }
-
+    
     public  FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(Query query2, Transaction transaction) throws IOException {
         Query query = new DefaultQuery(query2);
         Filter processedFilter = store.processFilter(query.getFilter());
@@ -68,13 +67,12 @@ class NonStrictWFSStrategy implements WFSStrategy {
         Filter serverFilter;
         Filter postFilter;
         {
-            Filter[] filters1 = store.splitFilters(query, transaction); // [server][post]
-            Filter[] filters = filters1;
+            Filter[] filters = store.splitFilters(query, transaction); // [server][post]
             serverFilter = filters[0];
             postFilter = filters[1];
         }
 
-        CoordinateReferenceSystem dataCRS = clipBBox(query, serverFilter);
+        CoordinateReferenceSystem dataCRS = syncQueryCRS( query.getTypeName(), serverFilter);
 
         ((DefaultQuery) query).setFilter(serverFilter);
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = createFeatureReader(transaction, query);
@@ -177,44 +175,49 @@ class NonStrictWFSStrategy implements WFSStrategy {
         }
         return reader;
     }
-
-    protected CoordinateReferenceSystem clipBBox(Query query, Filter serverFilter) {
+    
+    /**
+     * If we are being exacting about folowing the WFS Capabilities.
+     * 
+     * @return true if we are being exacting about following the WFS Capabilities
+     */
+    protected boolean isStrict(){
+        return false;
+    }
+    /**
+     * Using the provided query; obtain a FeatureSetDescriptor and modify the provided serverFilter
+     * to be correct.
+     * <p>
+     * This method should modify the provided filter to make sure it agrees with a CoordinateReferenceSystem
+     * understood by the server; if we are being strict the implementation may also clip the requested bounds
+     * to that advertised as valid by the server (or by the data CRS).
+     * <p>
+     * @param query
+     * @param serverFilter
+     * @return CoordinateReferenceSystem to use when making the request (usually the data CRS for a WFS 1.0 Datastore)
+     */
+    protected CoordinateReferenceSystem syncQueryCRS( String typeName, Filter serverFilter) {
         // TODO modify bbox requests here
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(store.capabilities,
-                query.getTypeName());
+                typeName);
 
-        Envelope maxbbox = null;
         CoordinateReferenceSystem dataCRS = null;
+        
         if (fsd.getSRS() != null) {
-            // reproject this
+            // reproject this filter!
             try {
-                dataCRS = CRS.decode(fsd.getSRS());
-                MathTransform toDataCRS = CRS
-                        .findMathTransform(DefaultGeographicCRS.WGS84, dataCRS);
-                maxbbox = JTS.transform(fsd.getLatLongBoundingBox(), null, toDataCRS, 10);
+                dataCRS = CRS.decode( fsd.getSRS() );
             } catch (FactoryException e) {
                 WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
-                maxbbox = null;
             } catch (MismatchedDimensionException e) {
                 WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
-                maxbbox = null;
-            } catch (TransformException e) {
-                WFS_1_0_0_DataStore.LOGGER.warning(e.getMessage());
-                maxbbox = null;
             }
-        } else {
-            maxbbox = fsd.getLatLongBoundingBox();
         }
-        // Rewrite request if we have a mxxbox
-        if (maxbbox != null) {
-            WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
-            Filters.accept(serverFilter, clipVisitor);
-        } else { // give up an request everything
-            WFS_1_0_0_DataStore.LOGGER.log(Level.FINE,
-                    "Unable to clip your query against the latlongboundingbox element");
-            // filters[0] = Filter.EXCLUDE; // uncoment this line to just give
-            // up
-        }
+        // we are going to assume that to assume that we don't need to clip or
+        // anything; and just return the dataCRS
+        // Rewrite request if we have a maxbox
+        WFSBBoxFilterVisitor visitor = new WFSBBoxFilterVisitor(null);
+        Filters.accept(serverFilter, visitor);
         return dataCRS;
     }
 
