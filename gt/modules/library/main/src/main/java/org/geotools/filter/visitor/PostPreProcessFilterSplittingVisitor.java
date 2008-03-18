@@ -922,8 +922,20 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
 	        return ff.not(and);
 	    }
 
+    /**
+     * Visit the BBOX filter elements and make sure they are valid.
+     * <p>
+     * Any BBOX filter using a literal geometry will be changed to be a literal envelope
+     * based on the geometry internal envelope. If a max bounding box has been provided
+     * it will be used to clip this request envelope.
+     * <p> 
+     * @author Jody
+     */
     public static class WFSBBoxFilterVisitor implements org.geotools.filter.FilterVisitor {
         Envelope maxbbox;
+        public WFSBBoxFilterVisitor() {
+            this( null );
+        }
         public WFSBBoxFilterVisitor(Envelope fsd) {
             maxbbox = fsd;
         }
@@ -1045,21 +1057,23 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
                                     miny = bbox.getMinY();
                                     maxx = bbox.getMaxX();
                                     maxy = bbox.getMaxY();
-                                    if(minx < maxbbox.getMinX()){
-                                        minx = maxbbox.getMinX();
-                                        changed = true;
-                                    }
-                                    if(maxx > maxbbox.getMaxX()){
-                                        maxx = maxbbox.getMaxX();
-                                        changed = true;
-                                    }
-                                    if(miny < maxbbox.getMinY()){
-                                        miny = maxbbox.getMinY();
-                                        changed = true;
-                                    }
-                                    if(maxy > maxbbox.getMaxY()){
-                                        maxy = maxbbox.getMaxY();
-                                        changed = true;
+                                    if( maxbbox != null ){
+                                        if(minx < maxbbox.getMinX()){
+                                            minx = maxbbox.getMinX();
+                                            changed = true;
+                                        }
+                                        if(maxx > maxbbox.getMaxX()){
+                                            maxx = maxbbox.getMaxX();
+                                            changed = true;
+                                        }
+                                        if(miny < maxbbox.getMinY()){
+                                            miny = maxbbox.getMinY();
+                                            changed = true;
+                                        }
+                                        if(maxy > maxbbox.getMaxY()){
+                                            maxy = maxbbox.getMaxY();
+                                            changed = true;
+                                        }
                                     }
                                     if(changed){
                                         Envelope tmp = new Envelope(minx,maxx,miny,maxy);
