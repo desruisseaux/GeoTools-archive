@@ -66,6 +66,16 @@
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Cédric Briançon</name>
+      <id>cedricbr</id>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </developer>
   </developers>
 
   <contributors>
@@ -120,6 +130,23 @@
       <artifactId>log4j</artifactId>
       <scope>provided</scope>  <!-- Not required for default execution. -->
       <optional>true</optional>
+    </dependency>
+    <!--
+        This dependency is required in order to build on JDK that does not
+        contain JAXB annotations source code (before jdk1.6), and for jdk that
+        do not have the whole set of annotations. Indeed the JAXB 2.1.5 is
+        required, and for earliers-JDK (before 1.6.0 update 4), some annotations
+        are still lacking.
+        If the JDK used contains JAXB (at least a 2.1.5 version) with the
+        endorsed system for example, these annotations will be used instead of
+        this dependency, since the JDK classpath comes before this dependency at
+        compilation-time.
+    -->
+    <dependency>
+      <groupId>org.geotools.maven</groupId>
+      <artifactId>gt2-jaxb</artifactId>
+      <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
