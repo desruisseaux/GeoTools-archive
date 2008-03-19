@@ -51,17 +51,16 @@ public class WFSDataStoreFactoryTest extends TestCase {
         assertTrue(dsf.canProcess(params));
     }
 
-    // COMMENTED OUT SINCE IT'S BREAKING THE BUILD, PLEASE FIX AND PUT BACK IN SHAPE
-//    public void testCreateDataStoreWFS_1_1_0() throws IOException {
-//        String capabilitiesFile;
-//        capabilitiesFile = "geoserver_capabilities_1_1_0.xml";
-//        testCreateDataStore_WFS_1_1_0(capabilitiesFile);
-//
-//        capabilitiesFile = "deegree_capabilities_1_1_0.xml";
-//        testCreateDataStore_WFS_1_1_0(capabilitiesFile);
-//    }
+    public void testCreateDataStoreWFS_1_1_0() throws IOException {
+        String capabilitiesFile;
+        capabilitiesFile = "geoserver_capabilities_1_1_0.xml";
+        testCreateDataStore_WFS_1_1_0(capabilitiesFile);
 
-    private void testCreateDataStore_WFS_1_1_0(String capabilitiesFile) throws IOException {
+        capabilitiesFile = "deegree_capabilities_1_1_0.xml";
+        testCreateDataStore_WFS_1_1_0(capabilitiesFile);
+    }
+
+    private void testCreateDataStore_WFS_1_1_0(final String capabilitiesFile) throws IOException {
         // override caps loading not to set up an http connection at all but to
         // load the test file
         final WFSDataStoreFactory dsf = new WFSDataStoreFactory() {
@@ -78,7 +77,10 @@ public class WFSDataStoreFactoryTest extends TestCase {
             }
         };
         Map<String, Serializable> params = new HashMap<String, Serializable>();
-        URL capabilitiesUrl = TestData.getResource(this, capabilitiesFile);
+        final URL capabilitiesUrl = TestData.getResource(this, capabilitiesFile);
+        if(capabilitiesUrl == null){
+            throw new IllegalArgumentException(capabilitiesFile + " not found");
+        }
         params.put(WFSDataStoreFactory.URL.key, capabilitiesUrl);
 
         WFSDataStore dataStore = dsf.createDataStore(params);
