@@ -521,7 +521,8 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         queryString = queryString == null || "".equals(queryString.trim()) ? "" : queryString
                 .toUpperCase();
 
-        final Version defaultVersion = Version.highest();
+        //final Version defaultVersion = Version.highest();
+        final Version defaultVersion = Version.v1_0_0;
         // which version to use
         Version requestVersion = defaultVersion;
 
