@@ -151,7 +151,7 @@ public class Tile implements Comparable<Tile>, Serializable {
     /**
      * The image index to be given to the image reader for reading this tile.
      */
-    private final int imageIndex;
+    private final short imageIndex;
 
     /**
      * The subsampling relative to the tile having the finest resolution. If this tile is the
@@ -161,7 +161,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * This field should be considered as final. It is not final only because
      * {@link RegionCalculator} may computes its value automatically.
      */
-    private int xSubsampling, ySubsampling;
+    private short xSubsampling, ySubsampling;
 
     /**
      * The upper-left corner in the destination image. Should be considered as final, since
@@ -221,16 +221,14 @@ public class Tile implements Comparable<Tile>, Serializable {
         ensureNonNull("provider", provider);
         ensureNonNull("input",    input);
         ensureNonNull("location", location);
-        checkImageIndex(imageIndex);
         this.provider   = provider;
         this.input      = input;
-        this.imageIndex = imageIndex;
+        this.imageIndex = ensurePositive(imageIndex);
         this.x          = location.x;
         this.y          = location.y;
         if (subsampling != null) {
-            xSubsampling = subsampling.width;
-            ySubsampling = subsampling.height;
-            ensureValidSubsampling();
+            xSubsampling = ensureStrictlyPositive(subsampling.width);
+            ySubsampling = ensureStrictlyPositive(subsampling.height);
         } else {
             xSubsampling = ySubsampling = 1;
         }
@@ -276,18 +274,16 @@ public class Tile implements Comparable<Tile>, Serializable {
         if (region.isEmpty()) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, region));
         }
-        checkImageIndex(imageIndex);
         this.provider   = provider;
         this.input      = input;
-        this.imageIndex = imageIndex;
+        this.imageIndex = ensurePositive(imageIndex);
         this.x          = region.x;
         this.y          = region.y;
         this.width      = region.width;
         this.height     = region.height;
         if (subsampling != null) {
-            xSubsampling = subsampling.width;
-            ySubsampling = subsampling.height;
-            ensureValidSubsampling();
+            xSubsampling = ensureStrictlyPositive(subsampling.width);
+            ySubsampling = ensureStrictlyPositive(subsampling.height);
         } else {
             xSubsampling = ySubsampling = 1;
         }
@@ -333,10 +329,9 @@ public class Tile implements Comparable<Tile>, Serializable {
         ensureNonNull("provider",  provider);
         ensureNonNull("input",     input);
         ensureNonNull("gridToCRS", gridToCRS);
-        checkImageIndex(imageIndex);
         this.provider   = provider;
         this.input      = input;
-        this.imageIndex = imageIndex;
+        this.imageIndex = ensurePositive(imageIndex);
         if (region != null) {
             this.x = region.x;
             this.y = region.y;
@@ -393,15 +388,27 @@ public class Tile implements Comparable<Tile>, Serializable {
     }
 
     /**
+     * Ensures that the given value is positive and in the range of 16 bits number.
+     * Returns the value casted to a {@code short} type.
+     */
+    private static short ensurePositive(final int n) throws IllegalArgumentException {
+        if (n < 0 || n > Short.MAX_VALUE) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, n, 0, Short.MAX_VALUE));
+        }
+        return (short) n;
+    }
+
+    /**
      * Ensures that the subsampling is strictly positive. This method is invoked for checking
      * user-supplied arguments, as opposed to {@link #checkGeometryValidity} which checks if
      * the subsampling has been computed. Both methods differ in exception type for that reason.
      */
-    private void ensureValidSubsampling() throws IllegalArgumentException {
-        int n;
-        if ((n=xSubsampling) < 1 || (n=ySubsampling) < 1) {
+    static short ensureStrictlyPositive(final int n) throws IllegalArgumentException {
+        if (n < 1) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1, n));
         }
+        return ensurePositive(n);
     }
 
     /**
@@ -422,18 +429,6 @@ public class Tile implements Comparable<Tile>, Serializable {
     final void checkGeometryValidity() throws IllegalStateException {
         if (xSubsampling == 0 || ySubsampling == 0) {
             throw new IllegalStateException("Tile must be processed by TileManagerFactory.");
-        }
-    }
-
-    /**
-     * Ensures that the given image index is valid. The upper value ({@link Short#MAX_VALUE})
-     * is completly arbitrary and checked only as a safety in order to avoid unraisonable high
-     * values that are probably bugs.
-     */
-    private static void checkImageIndex(final int imageIndex) {
-        if (imageIndex < 0 || imageIndex > Short.MAX_VALUE) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, imageIndex));
         }
     }
 
@@ -766,9 +761,8 @@ public class Tile implements Comparable<Tile>, Serializable {
         if (xSubsampling != 0 || ySubsampling != 0) {
             throw new IllegalStateException(); // Should never happen.
         }
-        xSubsampling = subsampling.width;
-        ySubsampling = subsampling.height;
-        ensureValidSubsampling();
+        xSubsampling = ensureStrictlyPositive(subsampling.width);
+        ySubsampling = ensureStrictlyPositive(subsampling.height);
     }
 
     /**

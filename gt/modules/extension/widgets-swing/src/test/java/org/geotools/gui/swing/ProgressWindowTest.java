@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing;
 
-// J2Se dependencies
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.util.Locale;
@@ -25,12 +24,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.opengis.util.ProgressListener;
 import org.geotools.resources.Arguments;
-import org.geotools.util.ProgressListener;
 
 
 /**
- * Test {@link ProgressWindow}. The window will be displayed only if this test
+ * Tests {@link ProgressWindow}. The window will be displayed only if this test
  * is executed through its {@link #main main} method.
  *
  * @source $URL$
@@ -42,7 +41,7 @@ public class ProgressWindowTest extends TestCase {
     /** The source, if any.                */ private static String source;
     /** Text to put in the margin, if any. */ private static String margin;
     /** Warning to print, if any.          */ private static String warning;
-    /** {@code true} for enabling display. */ private static boolean display = !GraphicsEnvironment.isHeadless();
+    /** {@code true} for enabling display. */ private static boolean display = false;
 
     /**
      * Construct the test case.
@@ -88,7 +87,7 @@ public class ProgressWindowTest extends TestCase {
             progress.started();
             for (int i=0; i<=100; i++) {
                 progress.progress(i);
-                Thread.currentThread().sleep(20);
+                Thread.sleep(20);
                 if ((i==40 || i==80) && warning!=null) {
                     progress.warningOccurred(source, margin, warning);
                 }

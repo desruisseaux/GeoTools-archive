@@ -59,7 +59,7 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
     /**
      * The subsamplings. Valid values are greater than zero.
      */
-    protected int xSubsampling, ySubsampling;
+    protected short xSubsampling, ySubsampling;
 
     /**
      * {@code true} if at least one tile overlaps an other tile in direct {@linkplain #children}.
@@ -88,14 +88,14 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
      */
     private static final Comparator<GridNode> LARGEST_FIRST = new Comparator<GridNode>() {
         public int compare(final GridNode n1, final GridNode n2) {
-            long a1 = (long) n1.width * (long) n1.height;
-            long a2 = (long) n2.width * (long) n2.height;
+            final long a1 = (long) n1.width * (long) n1.height;
+            final long a2 = (long) n2.width * (long) n2.height;
             if (a1 > a2) return -1; // Greatest values first
             if (a1 < a2) return +1;
-            a1 = (long) n1.xSubsampling * (long) n1.ySubsampling;
-            a2 = (long) n2.xSubsampling * (long) n2.ySubsampling;
-            if (a1 > a2) return -1;
-            if (a1 < a2) return +1;
+            final int s1 = (int) n1.xSubsampling * (int) n1.ySubsampling;
+            final int s2 = (int) n2.xSubsampling * (int) n2.ySubsampling;
+            if (s1 > s2) return -1;
+            if (s1 < s2) return +1;
             return n1.index - n2.index;
         }
     };
@@ -119,8 +119,8 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
         super(tile.getAbsoluteRegion());
         this.tile = tile;
         final Dimension subsampling = tile.getSubsampling();
-        xSubsampling = subsampling.width;
-        ySubsampling = subsampling.height;
+        xSubsampling = Tile.ensureStrictlyPositive(subsampling.width);
+        ySubsampling = Tile.ensureStrictlyPositive(subsampling.height);
         this.index = index;
     }
 
