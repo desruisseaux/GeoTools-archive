@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
 class DegreeClock extends javax.swing.JPanel implements MouseMotionListener, MouseListener{
 
     private double degree = 0;
-    public JDegreePanel pan = null;
+    public JDegreePane pan = null;
     int X = WIDTH/2;
     int Y = HEIGHT/2;
     
@@ -56,7 +56,7 @@ class DegreeClock extends javax.swing.JPanel implements MouseMotionListener, Mou
      * 
      * @param pan related JdegreePanel
      */
-    void setPan(JDegreePanel pan) {
+    void setPan(JDegreePane pan) {
         this.pan = pan;
     }
     

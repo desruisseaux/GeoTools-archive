@@ -19,10 +19,10 @@ package org.geotools.gui.swing.style.sld;
 /**
  * @author johann sorel
  */
-public class JLabelPlacementPanel extends javax.swing.JPanel {
+public class JLabelPlacementPane extends javax.swing.JPanel {
     
     /** Creates new form JLabelPlacementPanel */
-    public JLabelPlacementPanel() {
+    public JLabelPlacementPane() {
         initComponents();
     }
     

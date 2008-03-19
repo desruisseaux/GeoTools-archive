@@ -105,13 +105,13 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="guiFamily">
+    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiFamily">
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="guiStyle">
+    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiStyle">
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="guiSize">
+    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiSize">
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="guiWeight">
+    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiWeight">
     </Component>
   </SubComponents>
 </Form>

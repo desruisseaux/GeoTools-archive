@@ -90,15 +90,10 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
         guiHalo = new org.geotools.gui.swing.style.sld.JHaloPanel();
         jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
         jPanel2 = new javax.swing.JPanel();
-        guiFonts = new org.geotools.gui.swing.style.sld.JFontsPanel();
         jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
-        guiFill = new org.geotools.gui.swing.style.sld.JFillPanel();
+        guiFill = new org.geotools.gui.swing.style.sld.JFillPane();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        exp_label = new org.geotools.gui.swing.style.sld.JExpressionPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        guiGeom = new org.geotools.gui.swing.style.sld.JGeomsPanel();
 
         jsp.setViewportView(tab_demo);
 
@@ -123,31 +118,10 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
 
         java.util.ResourceBundle bundle1 = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
         jXTitledSeparator1.setTitle(bundle1.getString("fill")); // NOI18N
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-            .add(guiFill, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
-            .add(guiFonts, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiFill, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jPanel2.add(jXTitledSeparator1);
+        jPanel2.add(guiFill);
 
         jLabel1.setText(bundle1.getString("label")); // NOI18N
-
-        jLabel2.setText(bundle1.getString("geometry")); // NOI18N
-
-        jScrollPane1.setViewportView(guiGeom);
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -156,24 +130,13 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(exp_label, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 141, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(138, Short.MAX_VALUE))
+                .addContainerGap(412, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-                        .add(exp_label, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jScrollPane1, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -205,7 +168,7 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
                         .add(6, 6, 6)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -213,9 +176,9 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
         this.layer = layer;
         guiFill.setLayer(layer);
         guiHalo.setLayer(layer);
-        guiFonts.setLayer(layer);
-        guiGeom.setLayer(layer);
-        exp_label.setLayer(layer);
+//        guiFonts.setLayer(layer);
+//        guiGeom.setLayer(layer);
+//        exp_label.setLayer(layer);
     }
 
     public MapLayer getLayer() {
@@ -239,9 +202,9 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             symbol = (TextSymbolizer) sym;
 
             guiFill.parseFill(symbol.getFill());
-            exp_label.setExpression(symbol.getLabel());
+//            exp_label.setExpression(symbol.getLabel());
             //guiGeom.setGeometryPropertyName(sym.getGeometryPropertyName());
-            guiFonts.setFonts(symbol.getFonts());
+//            guiFonts.setFonts(symbol.getFonts());
             guiHalo.setHalo( symbol.getHalo());
             
             symbol.getOptions();            
@@ -281,9 +244,9 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
     public void apply(){
         if(symbol!= null){
             symbol.setFill(guiFill.getFill());
-            symbol.setLabel(exp_label.getExpression());
-            symbol.setGeometryPropertyName(guiGeom.getGeometryPropertyName());
-            symbol.setFonts(guiFonts.getFonts());
+//            symbol.setLabel(exp_label.getExpression());
+//            symbol.setGeometryPropertyName(guiGeom.getGeometryPropertyName());
+//            symbol.setFonts(guiFonts.getFonts());
             symbol.setHalo(guiHalo.getHalo());
         }
     }
@@ -292,17 +255,12 @@ public class JTextSymbolizerPanel extends javax.swing.JPanel implements Symboliz
         return this;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel exp_label;
-    private org.geotools.gui.swing.style.sld.JFillPanel guiFill;
-    private org.geotools.gui.swing.style.sld.JFontsPanel guiFonts;
-    private org.geotools.gui.swing.style.sld.JGeomsPanel guiGeom;
+    private org.geotools.gui.swing.style.sld.JFillPane guiFill;
     private org.geotools.gui.swing.style.sld.JHaloPanel guiHalo;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator2;
     private javax.swing.JScrollPane jsp;

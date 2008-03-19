@@ -161,7 +161,7 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.g
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_demo = new org.geotools.gui.swing.style.sld.JDemoTable();
         jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
-        GuiFill = new org.geotools.gui.swing.style.sld.JFillPanel();
+        GuiFill = new org.geotools.gui.swing.style.sld.JFillPane();
         jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
         GuiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
 
@@ -206,7 +206,7 @@ public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements org.g
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JFillPanel GuiFill;
+    private org.geotools.gui.swing.style.sld.JFillPane GuiFill;
     private org.geotools.gui.swing.style.sld.JStrokePanel GuiStroke;
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;

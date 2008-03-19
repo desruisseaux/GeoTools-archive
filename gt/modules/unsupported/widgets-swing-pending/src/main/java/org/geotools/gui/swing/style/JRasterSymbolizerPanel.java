@@ -18,7 +18,7 @@ package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
-import org.geotools.gui.swing.style.sld.JExpressionPanel;
+import org.geotools.gui.swing.style.sld.JExpressionPane;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -51,7 +51,7 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     }
     
     private void init(){
-        GuiOpacity.setType(JExpressionPanel.EXP_TYPE.NUMBER);
+        GuiOpacity.setType(JExpressionPane.EXP_TYPE.NUMBER);
     }
     
     public void setStyle(Style style) {
@@ -112,7 +112,7 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        GuiOpacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiOpacity = new org.geotools.gui.swing.style.sld.JExpressionPane();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("opacity")); // NOI18N
@@ -141,7 +141,7 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiOpacity;
+    private org.geotools.gui.swing.style.sld.JExpressionPane GuiOpacity;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 

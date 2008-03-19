@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -35,22 +34,24 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
-import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Font;
 import org.geotools.styling.StyleBuilder;
 
+
+
+
 /**
  * @author johann sorel
  */
-public class JFontsPanel extends javax.swing.JPanel {
+public class JFontTable extends javax.swing.JPanel {
     
     private MapLayer layer = null;
     
-    private static final Icon ICO_UP = IconBundle.getResource().getIcon("");
-    private static final Icon ICO_DOWN = IconBundle.getResource().getIcon("");
-    private static final Icon ICO_NEW = IconBundle.getResource().getIcon("");
-    private static final Icon ICO_DELETE = IconBundle.getResource().getIcon("");
+//    private static final Icon ICO_UP = IconBundle.getResource().getIcon("");
+//    private static final Icon ICO_DOWN = IconBundle.getResource().getIcon("");
+//    private static final Icon ICO_NEW = IconBundle.getResource().getIcon("");
+//    private static final Icon ICO_DELETE = IconBundle.getResource().getIcon("");
     
     
     private final FontModel model = new FontModel(new Font[]{});
@@ -58,7 +59,7 @@ public class JFontsPanel extends javax.swing.JPanel {
     
     
     /** Creates new form JFontsPanel */
-    public JFontsPanel() {
+    public JFontTable() {
         initComponents();        
         init();
     }
@@ -208,9 +209,6 @@ public class JFontsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     
 }
-
-
-
 class FontModel extends AbstractTableModel{
 
     private List<Font> fonts = new ArrayList<Font>();
@@ -312,7 +310,7 @@ class FontRenderer extends DefaultTableCellRenderer{
 class FontEditor implements TableCellEditor{
     
     private MapLayer layer = null;    
-    private JFontPanel editpane = new JFontPanel();
+    private JFontPane editpane = new JFontPane();
     private JButton but = new JButton("SsIiGg84");
     private Font font = null;
     

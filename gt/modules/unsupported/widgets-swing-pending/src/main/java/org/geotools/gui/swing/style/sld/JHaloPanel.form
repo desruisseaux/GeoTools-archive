@@ -72,11 +72,11 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="guiRadius">
+        <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiRadius">
         </Component>
       </SubComponents>
     </Container>
-    <Component class="org.geotools.gui.swing.style.sld.JFillPanel" name="guiFill">
+    <Component class="org.geotools.gui.swing.style.sld.JFillPane" name="guiFill">
     </Component>
   </SubComponents>
 </Form>

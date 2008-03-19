@@ -48,11 +48,7 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
         init();
     }
     
-    public void apply(){
-        if(symbol!= null){
-            symbol.setStroke(GuiStroke.getStroke());
-        }
-    }
+    
     
     private void init(){
         tab_demo.addMouseListener(new MouseListener() {
@@ -89,7 +85,8 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
     
     public void setLayer(MapLayer layer){
         this.layer = layer;
-        GuiStroke.setLayer(layer);
+        guiStroke.setLayer(layer);
+        guiGeom.setLayer(layer);
     }
     
     public MapLayer getLayer(){
@@ -100,9 +97,9 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
 
         if (sym instanceof LineSymbolizer) {
             symbol = (LineSymbolizer) sym;
-
-            GuiStroke.parseStroke(symbol.getStroke());            
-            GuiStroke.setLayer(layer);
+            guiGeom.setGeometryPropertyName(symbol.getGeometryPropertyName());
+            guiStroke.parseStroke(symbol.getStroke());            
+            guiStroke.setLayer(layer);
         }
     }
 
@@ -114,6 +111,13 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
         }        
         apply();        
         return symbol;
+    }
+    
+    public void apply(){
+        if(symbol!= null){
+            symbol.setGeometryPropertyName(guiGeom.getGeometryPropertyName());
+            symbol.setStroke(guiStroke.getStroke());
+        }
     }
     
     public void setStyle(Style style){
@@ -156,9 +160,10 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
     private void initComponents() {
 
         jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
-        GuiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
+        guiStroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_demo = new org.geotools.gui.swing.style.sld.JDemoTable();
+        guiGeom = new org.geotools.gui.swing.style.sld.JGeomPane();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/Bundle"); // NOI18N
         jXTitledSeparator1.setTitle(bundle.getString("border")); // NOI18N
@@ -172,28 +177,33 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements org.geot
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(GuiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
-                .add(12, 12, 12)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(guiGeom, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(guiStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(guiGeom, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(GuiStroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(guiStroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JStrokePanel GuiStroke;
+    private org.geotools.gui.swing.style.sld.JGeomPane guiGeom;
+    private org.geotools.gui.swing.style.sld.JStrokePanel guiStroke;
     private javax.swing.JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
     private org.geotools.gui.swing.style.sld.JDemoTable tab_demo;

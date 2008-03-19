@@ -96,7 +96,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="org.geotools.gui.swing.style.sld.JDegreePanel" name="gui_orientation">
+        <Component class="org.geotools.gui.swing.style.sld.JDegreePane" name="gui_orientation">
         </Component>
         <Component class="javax.swing.JComboBox" name="gui_jcb_forme">
           <Properties>
@@ -212,7 +212,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="gui_size">
+        <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="gui_size">
         </Component>
         <Component class="javax.swing.JLabel" name="lbl_gen_color">
           <Properties>
@@ -221,7 +221,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="gui_color">
+        <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="gui_color">
         </Component>
         <Component class="javax.swing.JLabel" name="lbl_gen_alpha">
           <Properties>
@@ -230,7 +230,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="gui_opacity">
+        <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="gui_opacity">
         </Component>
       </SubComponents>
     </Container>

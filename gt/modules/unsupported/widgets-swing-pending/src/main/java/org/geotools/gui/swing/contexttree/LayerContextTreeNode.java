@@ -19,6 +19,7 @@ import javax.swing.ImageIcon;
 
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
@@ -53,17 +54,25 @@ public final class LayerContextTreeNode extends ContextTreeNode {
     public ImageIcon getIcon() {
         MapLayer layer = (MapLayer) getUserObject();
 
-        //choose icon from datastoretype
-        DataStore ds = (DataStore) layer.getFeatureSource().getDataStore();
+        
+        FeatureSource fs = layer.getFeatureSource();
 
-        if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
-            return ((layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE);
-        } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
-            return((layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE);
-        } else if (JDBC1DataStore.class.isAssignableFrom(ds.getClass())) {
-            return((layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE);
+        if (fs != null) {
+            
+            //choose icon from datastoretype
+            DataStore ds = (DataStore) fs.getDataStore();
+
+            if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
+                return ((layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE);
+            } else if (AbstractFileDataStore.class.isAssignableFrom(ds.getClass())) {
+                return ((layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE);
+            } else if (JDBC1DataStore.class.isAssignableFrom(ds.getClass())) {
+                return ((layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE);
+            } else {
+                return ((layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE);
+            }
         } else {
-            return((layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE);
+            return ((layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE);
         }
 
     }

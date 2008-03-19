@@ -76,7 +76,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JFillPanel" name="GuiFill">
+    <Component class="org.geotools.gui.swing.style.sld.JFillPane" name="GuiFill">
     </Component>
     <Component class="org.jdesktop.swingx.JXTitledSeparator" name="jXTitledSeparator2">
       <Properties>

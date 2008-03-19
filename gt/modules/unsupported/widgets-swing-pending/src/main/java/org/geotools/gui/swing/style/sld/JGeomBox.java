@@ -27,15 +27,17 @@ import org.geotools.map.MapLayer;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
 
+
 /**
  * @author johann sorel
  */
-public class JGeomsPanel extends JComboBox{
+
+public class JGeomBox extends JComboBox{
 
     private MapLayer layer = null;
     private String selectedGeom = "";
     
-    public JGeomsPanel(){
+    public JGeomBox(){
         setEnabled(false);
     }
     
@@ -83,7 +85,6 @@ public class JGeomsPanel extends JComboBox{
     }
     
 }
-
 class GeoModel extends DefaultComboBoxModel{
 
     private List<String> geoms;

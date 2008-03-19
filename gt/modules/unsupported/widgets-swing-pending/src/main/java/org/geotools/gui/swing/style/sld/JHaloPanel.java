@@ -35,7 +35,7 @@ public class JHaloPanel extends javax.swing.JPanel {
     }
     
     private void init(){
-        guiRadius.setType(JExpressionPanel.EXP_TYPE.NUMBER);        
+        guiRadius.setType(JExpressionPane.EXP_TYPE.NUMBER);        
     }
     
     public void setLayer(MapLayer layer){
@@ -77,8 +77,8 @@ public class JHaloPanel extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        guiRadius = new org.geotools.gui.swing.style.sld.JExpressionPanel();
-        guiFill = new org.geotools.gui.swing.style.sld.JFillPanel();
+        guiRadius = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        guiFill = new org.geotools.gui.swing.style.sld.JFillPane();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -124,8 +124,8 @@ public class JHaloPanel extends javax.swing.JPanel {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JFillPanel guiFill;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel guiRadius;
+    private org.geotools.gui.swing.style.sld.JFillPane guiFill;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiRadius;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables

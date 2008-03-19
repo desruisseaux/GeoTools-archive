@@ -23,22 +23,22 @@ import org.geotools.styling.StyleBuilder;
 /**
  * @author johann sorel
  */
-public class JFontPanel extends javax.swing.JPanel {
+public class JFontPane extends javax.swing.JPanel {
     
     private MapLayer layer = null;
     private Font font = new StyleBuilder().createFont("Arial", 12);
     
     /** Creates new form JfontPanel */
-    public JFontPanel() {
+    public JFontPane() {
         initComponents();
         init();
     }
     
     private void init(){
-        guiFamily.setType(JExpressionPanel.EXP_TYPE.OTHER);
-        guiSize.setType(JExpressionPanel.EXP_TYPE.NUMBER);
-        guiStyle.setType(JExpressionPanel.EXP_TYPE.OTHER);
-        guiWeight.setType(JExpressionPanel.EXP_TYPE.NUMBER);
+        guiFamily.setType(JExpressionPane.EXP_TYPE.OTHER);
+        guiSize.setType(JExpressionPane.EXP_TYPE.NUMBER);
+        guiStyle.setType(JExpressionPane.EXP_TYPE.OTHER);
+        guiWeight.setType(JExpressionPane.EXP_TYPE.NUMBER);
     }
     
     public void setSLDFont(Font font){        
@@ -90,10 +90,10 @@ public class JFontPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        guiFamily = new org.geotools.gui.swing.style.sld.JExpressionPanel();
-        guiStyle = new org.geotools.gui.swing.style.sld.JExpressionPanel();
-        guiSize = new org.geotools.gui.swing.style.sld.JExpressionPanel();
-        guiWeight = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        guiFamily = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        guiStyle = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        guiSize = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        guiWeight = new org.geotools.gui.swing.style.sld.JExpressionPane();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -154,10 +154,10 @@ public class JFontPanel extends javax.swing.JPanel {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel guiFamily;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel guiSize;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel guiStyle;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel guiWeight;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiFamily;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiSize;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiStyle;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiWeight;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

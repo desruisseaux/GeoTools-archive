@@ -45,7 +45,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="GuiOpacity">
+    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="GuiOpacity">
     </Component>
   </SubComponents>
 </Form>

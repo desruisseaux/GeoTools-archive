@@ -15,6 +15,9 @@
  */
 package org.geotools.gui.swing.style.sld;
 
+import javax.swing.Icon;
+import javax.swing.JDialog;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.StyleBuilder;
@@ -25,9 +28,11 @@ import org.geotools.styling.StyleBuilder;
  */
 public class JStrokePanel extends javax.swing.JPanel {
 
-    //private StyleBuilder sb = new StyleBuilder();
-    //private JExpressionDialog dialog = new JExpressionDialog();
+    
+    private static final Icon ICO_GRAPHIC = IconBundle.getResource().getIcon("16_paint_fill");
+    
     private MapLayer layer = null;
+    private Stroke stroke = null;
 
     /** 
      * Creates new form JStrokePanel 
@@ -40,13 +45,12 @@ public class JStrokePanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        GuiStrokeWidth.setType(JExpressionPanel.EXP_TYPE.NUMBER);
-        GuiStrokeAlpha.setType(JExpressionPanel.EXP_TYPE.NUMBER);
-        GuiStrokeColor.setType(JExpressionPanel.EXP_TYPE.COLOR);
+        GuiStrokeWidth.setType(JExpressionPane.EXP_TYPE.NUMBER);
+        GuiStrokeAlpha.setType(JExpressionPane.EXP_TYPE.OPACITY);
+        GuiStrokeColor.setType(JExpressionPane.EXP_TYPE.COLOR);
     }
 
     /**
-     * 
      * @param layer the layer style to edit
      */
     public void setLayer(MapLayer layer) {
@@ -63,10 +67,14 @@ public class JStrokePanel extends javax.swing.JPanel {
      * @param stroke the stroke to edit
      */
     public void parseStroke(Stroke stroke) {
+        
+        this.stroke = stroke;
+            
         if (stroke != null) {
             // TODO : not yet implemented
-            //Graphic graf = stroke.getGraphicFill();
-            //Graphic gras = stroke.getGraphicStroke();
+            stroke.getGraphicFill();
+            stroke.getGraphicStroke();
+            
             GuiStrokeLineCap.setLineCap(stroke.getLineCap());
             GuiStrokeLineJoin.setLineJoin(stroke.getLineJoin());
             GuiStrokeDashes.setDashes(stroke.getDashArray());
@@ -75,6 +83,7 @@ public class JStrokePanel extends javax.swing.JPanel {
             GuiStrokeColor.setExpression(stroke.getColor());
             GuiStrokeAlpha.setExpression(stroke.getOpacity());
         }
+        
     }
 
     /**
@@ -82,18 +91,26 @@ public class JStrokePanel extends javax.swing.JPanel {
      * @return Stroke : a new Stroke result from the edit panel
      */
     public Stroke getStroke() {
-        StyleBuilder sb = new StyleBuilder();
+        
+        if(stroke == null){
+            StyleBuilder sb = new StyleBuilder();
+            stroke = sb.createStroke(GuiStrokeColor.getExpression(), GuiStrokeWidth.getExpression());
+        }
 
-        Stroke stroke = sb.createStroke(GuiStrokeColor.getExpression(), GuiStrokeWidth.getExpression());
-        stroke.setLineCap(GuiStrokeLineCap.getLinecap());
-        stroke.setLineJoin(GuiStrokeLineJoin.getLineJoin());
-        stroke.setDashArray(GuiStrokeDashes.getDashes());
-        stroke.setDashOffset(GuiStrokeDashes.getOffset());
-        stroke.setOpacity(GuiStrokeAlpha.getExpression());
-
+        apply();
         return stroke;
     }
 
+    public void apply(){
+        if(stroke != null){
+            stroke.setLineCap(GuiStrokeLineCap.getLinecap());
+            stroke.setLineJoin(GuiStrokeLineJoin.getLineJoin());
+            stroke.setDashArray(GuiStrokeDashes.getDashes());
+            stroke.setDashOffset(GuiStrokeDashes.getOffset());
+            stroke.setOpacity(GuiStrokeAlpha.getExpression());
+        }
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -102,17 +119,19 @@ public class JStrokePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        GuiStrokeDashes = new org.geotools.gui.swing.style.sld.JDashPanel();
+        GuiStrokeDashes = new org.geotools.gui.swing.style.sld.JDashPane();
         jPanel2 = new javax.swing.JPanel();
         GuiStrokeLineCap = new org.geotools.gui.swing.style.sld.JLinecapPanel();
         GuiStrokeLineJoin = new org.geotools.gui.swing.style.sld.JLinejoinPanel();
         jPanel1 = new javax.swing.JPanel();
         lbl_b_width = new javax.swing.JLabel();
-        GuiStrokeWidth = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiStrokeWidth = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl_b_color = new javax.swing.JLabel();
-        GuiStrokeColor = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiStrokeColor = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl_b_alpha = new javax.swing.JLabel();
-        GuiStrokeAlpha = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiStrokeAlpha = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        butStroke = new javax.swing.JButton();
+        butFill = new javax.swing.JButton();
 
         GuiStrokeDashes.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -147,7 +166,7 @@ public class JStrokePanel extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(lbl_b_width)
@@ -160,8 +179,7 @@ public class JStrokePanel extends javax.swing.JPanel {
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(lbl_b_alpha)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(GuiStrokeAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(85, Short.MAX_VALUE))
+                        .add(GuiStrokeAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -179,32 +197,108 @@ public class JStrokePanel extends javax.swing.JPanel {
                     .add(GuiStrokeAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
+        butStroke.setIcon(ICO_GRAPHIC);
+        butStroke.setText(bundle.getString("stroke")); // NOI18N
+        butStroke.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butStrokeActionPerformed(evt);
+            }
+        });
+
+        butFill.setIcon(ICO_GRAPHIC);
+        butFill.setText(bundle.getString("fill")); // NOI18N
+        butFill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butFillActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(GuiStrokeDashes, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+            .add(GuiStrokeDashes, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(butFill, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                    .add(butStroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createSequentialGroup()
+                        .add(butStroke)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(butFill)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(GuiStrokeDashes, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void butStrokeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butStrokeActionPerformed
+                
+        JDialog dia = new JDialog();
+        
+        JGraphicPane pane = new JGraphicPane();
+        pane.setLayer(layer);
+        
+        if(stroke != null){
+            pane.setGraphic(stroke.getGraphicStroke());
+        }
+        
+        dia.setContentPane(pane);
+        dia.pack();
+        dia.setLocationRelativeTo(butStroke);
+        dia.setModal(true);
+        dia.setVisible(true);
+        
+        if(stroke == null){
+            stroke =  new StyleBuilder().createStroke() ;
+        }
+        stroke.setGraphicStroke(pane.getGraphic());
+        
+}//GEN-LAST:event_butStrokeActionPerformed
+
+    private void butFillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butFillActionPerformed
+        
+        JDialog dia = new JDialog();
+        
+        JGraphicPane pane = new JGraphicPane();
+        pane.setLayer(layer);
+        
+        if(stroke != null){
+            pane.setGraphic(stroke.getGraphicFill());
+        }
+        
+        dia.setContentPane(pane);
+        dia.pack();
+        dia.setLocationRelativeTo(butFill);
+        dia.setModal(true);
+        dia.setVisible(true);
+        
+        if(stroke == null){
+            stroke =  new StyleBuilder().createStroke() ;
+        }
+        stroke.setGraphicFill(pane.getGraphic());
+        
+    }//GEN-LAST:event_butFillActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiStrokeAlpha;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiStrokeColor;
-    private org.geotools.gui.swing.style.sld.JDashPanel GuiStrokeDashes;
+    private org.geotools.gui.swing.style.sld.JExpressionPane GuiStrokeAlpha;
+    private org.geotools.gui.swing.style.sld.JExpressionPane GuiStrokeColor;
+    private org.geotools.gui.swing.style.sld.JDashPane GuiStrokeDashes;
     private org.geotools.gui.swing.style.sld.JLinecapPanel GuiStrokeLineCap;
     private org.geotools.gui.swing.style.sld.JLinejoinPanel GuiStrokeLineJoin;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiStrokeWidth;
+    private org.geotools.gui.swing.style.sld.JExpressionPane GuiStrokeWidth;
+    private javax.swing.JButton butFill;
+    private javax.swing.JButton butStroke;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lbl_b_alpha;

@@ -44,7 +44,7 @@
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
-                          <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jPanel2" alignment="0" pref="257" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -98,31 +98,7 @@
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel2">
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jXTitledSeparator1" alignment="0" pref="209" max="32767" attributes="1"/>
-              <Component id="guiFill" alignment="0" pref="209" max="32767" attributes="1"/>
-              <Component id="guiFonts" alignment="0" max="32767" attributes="1"/>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Component id="jXTitledSeparator1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="guiFill" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="guiFonts" min="-2" max="-2" attributes="1"/>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
       <SubComponents>
-        <Component class="org.geotools.gui.swing.style.sld.JFontsPanel" name="guiFonts">
-        </Component>
         <Component class="org.jdesktop.swingx.JXTitledSeparator" name="jXTitledSeparator1">
           <Properties>
             <Property name="title" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -130,7 +106,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JFillPanel" name="guiFill">
+        <Component class="org.geotools.gui.swing.style.sld.JFillPane" name="guiFill">
         </Component>
       </SubComponents>
     </Container>
@@ -142,13 +118,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="exp_label" min="-2" pref="141" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="jLabel2" min="-2" max="-2" attributes="1"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" min="-2" max="-2" attributes="1"/>
-                  <EmptySpace pref="138" max="32767" attributes="0"/>
+                  <EmptySpace pref="412" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -156,14 +126,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="103" alignment="1" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="jLabel1" alignment="1" pref="22" max="32767" attributes="1"/>
-                          <Component id="exp_label" alignment="1" min="-2" max="-2" attributes="1"/>
-                      </Group>
-                      <Component id="jScrollPane1" alignment="1" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="jLabel2" alignment="0" pref="22" max="32767" attributes="1"/>
-                  </Group>
+                  <Component id="jLabel1" min="-2" pref="22" max="-2" attributes="1"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -177,26 +140,6 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.geotools.gui.swing.style.sld.JExpressionPanel" name="exp_label">
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel2">
-          <Properties>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/geotools/gui/swing/style/Bundle.properties" key="geometry" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
-          <AuxValues>
-            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-          </AuxValues>
-
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-          <SubComponents>
-            <Component class="org.geotools.gui.swing.style.sld.JGeomsPanel" name="guiGeom">
-            </Component>
-          </SubComponents>
-        </Container>
       </SubComponents>
     </Container>
   </SubComponents>

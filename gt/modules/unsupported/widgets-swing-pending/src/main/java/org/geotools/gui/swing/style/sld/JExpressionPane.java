@@ -19,6 +19,7 @@ import java.awt.Color;
 
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
+import javax.swing.SpinnerNumberModel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.SLD;
@@ -29,13 +30,14 @@ import org.opengis.filter.expression.Expression;
  *
  * @author  johann Sorel
  */
-public class JExpressionPanel extends javax.swing.JPanel {
+public class JExpressionPane extends javax.swing.JPanel {
 
     private static Icon ICON_COLOR = IconBundle.getResource().getIcon("JS16_color");
 
     public static enum EXP_TYPE {
         COLOR,
         NUMBER,
+        OPACITY,
         OTHER
     }
     private EXP_TYPE type = EXP_TYPE.OTHER;
@@ -46,7 +48,7 @@ public class JExpressionPanel extends javax.swing.JPanel {
     /** 
      * Creates new form JExpressionPanel 
      */
-    public JExpressionPanel() {
+    public JExpressionPane() {
         initComponents();
         parse();
     }
@@ -74,6 +76,15 @@ public class JExpressionPanel extends javax.swing.JPanel {
             case NUMBER :
                 pan_exp.removeAll();
                 pan_exp.add(jsp_exp);
+                jtf_exp.setEditable(false);
+                but_color.setVisible(false);
+                but_color.setEnabled(false);
+                but_color.setIcon(null);
+                break;
+            case OPACITY :
+                pan_exp.removeAll();
+                pan_exp.add(jsp_exp);
+                jsp_exp.setModel(new SpinnerNumberModel(Double.valueOf(1.0d), Double.valueOf(0.0d), Double.valueOf(1.0d), Double.valueOf(0.1d)));
                 jtf_exp.setEditable(false);
                 but_color.setVisible(false);
                 but_color.setEnabled(false);
@@ -145,11 +156,6 @@ public class JExpressionPanel extends javax.swing.JPanel {
      * @return Expression : new Expression
      */
     public Expression getExpression() {
-
-//        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
-//        Expression expr = ff.property(txt.getText());
-//        
-//        return expr;
 
         if (exp != null) {
             return exp;

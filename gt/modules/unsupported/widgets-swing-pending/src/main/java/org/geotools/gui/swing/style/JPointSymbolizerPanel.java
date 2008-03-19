@@ -22,7 +22,7 @@ import java.awt.event.MouseListener;
 import java.util.Map;
 import javax.swing.JComponent;
 
-import org.geotools.gui.swing.style.sld.JExpressionPanel;
+import org.geotools.gui.swing.style.sld.JExpressionPane;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -69,9 +69,9 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
     }
 
     private void init() {
-        gui_color.setType(JExpressionPanel.EXP_TYPE.COLOR);
-        gui_opacity.setType(JExpressionPanel.EXP_TYPE.NUMBER);
-        gui_size.setType(JExpressionPanel.EXP_TYPE.NUMBER);
+        gui_color.setType(JExpressionPane.EXP_TYPE.COLOR);
+        gui_opacity.setType(JExpressionPane.EXP_TYPE.NUMBER);
+        gui_size.setType(JExpressionPane.EXP_TYPE.NUMBER);
 
         gui_jcb_forme.addItem("square");
         gui_jcb_forme.addItem("circle");
@@ -198,7 +198,7 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
     private void initComponents() {
 
         jPanel6 = new javax.swing.JPanel();
-        gui_orientation = new org.geotools.gui.swing.style.sld.JDegreePanel();
+        gui_orientation = new org.geotools.gui.swing.style.sld.JDegreePane();
         gui_jcb_forme = new javax.swing.JComboBox();
         lbl_gen_forme = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -208,11 +208,11 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
         jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
         jPanel1 = new javax.swing.JPanel();
         lbl_gen_size = new javax.swing.JLabel();
-        gui_size = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        gui_size = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl_gen_color = new javax.swing.JLabel();
-        gui_color = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        gui_color = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl_gen_alpha = new javax.swing.JLabel();
-        gui_opacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        gui_opacity = new org.geotools.gui.swing.style.sld.JExpressionPane();
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -334,11 +334,11 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements org.geo
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_color;
+    private org.geotools.gui.swing.style.sld.JExpressionPane gui_color;
     private javax.swing.JComboBox gui_jcb_forme;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_opacity;
-    private org.geotools.gui.swing.style.sld.JDegreePanel gui_orientation;
-    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_size;
+    private org.geotools.gui.swing.style.sld.JExpressionPane gui_opacity;
+    private org.geotools.gui.swing.style.sld.JDegreePane gui_orientation;
+    private org.geotools.gui.swing.style.sld.JExpressionPane gui_size;
     private org.geotools.gui.swing.style.sld.JStrokePanel gui_stroke;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel6;
