@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
+ * @source $URL$
  */
 public class TempMemoryDataStore extends AbstractDataStore {
 

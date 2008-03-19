@@ -41,7 +41,7 @@ import org.opengis.util.InternationalString;
  * optimisations in case we were dealing with non-geo view of coverage.
  * 
  * @author Simone Giannecchini, GeoSolutions.
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/coverage/processing/BaseScaleOperationJAI $
+ * @source $URL$
  * @since 2.5
  */
 public class BaseScaleOperationJAI extends OperationJAI {

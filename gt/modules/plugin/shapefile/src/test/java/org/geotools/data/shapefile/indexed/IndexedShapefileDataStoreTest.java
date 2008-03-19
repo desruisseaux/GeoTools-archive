@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/shpLazyLoadingIndex/ext/shape/test/org/geotools/data/shapefile/indexed/ShapefileDataStoreTest.java $
- * @version $Id: ShapefileDataStoreTest.java 28476 2007-12-21 20:30:22Z jgarnett $
+ * @version $Id$
  * @author Ian Schneider
  */
 public class IndexedShapefileDataStoreTest extends TestCaseSupport {
