@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.resources.jaxb;
+package org.geotools.metadata;
 
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 

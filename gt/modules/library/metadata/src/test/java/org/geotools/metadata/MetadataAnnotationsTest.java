@@ -37,7 +37,7 @@ import org.geotools.metadata.iso.distribution.DistributionImpl;
 import org.geotools.metadata.iso.distribution.DistributorImpl;
 import org.geotools.metadata.iso.identification.DataIdentificationImpl;
 import org.geotools.metadata.iso.identification.IdentificationImpl;
-import org.geotools.resources.jaxb.NamespacePrefixMapperImpl;
+import org.geotools.metadata.NamespacePrefixMapperImpl;
 import org.geotools.util.Dummy;
 import org.geotools.util.GrowableInternationalString;
 import org.opengis.metadata.citation.ResponsibleParty;
