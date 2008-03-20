@@ -19,6 +19,9 @@
  */
 package org.geotools.metadata.iso.content;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.content.ContentInformation;
 import org.geotools.metadata.iso.MetadataEntity;
 
@@ -33,6 +36,9 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_ContentInformation", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlSeeAlso({CoverageDescriptionImpl.class, FeatureCatalogueDescriptionImpl.class})
+@XmlRootElement(name = "MD_ContentInformation")
 public class ContentInformationImpl extends MetadataEntity implements ContentInformation {
     /**
      * Serial number for interoperability with different versions.

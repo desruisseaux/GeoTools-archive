@@ -21,6 +21,10 @@ package org.geotools.metadata.iso;
 
 import java.util.Collection;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.MetadataExtensionInformation;
@@ -36,6 +40,10 @@ import org.opengis.metadata.MetadataExtensionInformation;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "extensionOnLineResource", "extendedElementInformation"
+})
+@XmlRootElement(name = "MD_MetadataExtensionInformation")
 public class MetadataExtensionInformationImpl extends MetadataEntity
         implements MetadataExtensionInformation
 {
@@ -75,6 +83,7 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
      * Information about on-line sources containing the community profile name and
      * the extended metadata elements. Information for all new metadata elements.
      */
+    @XmlElement(name = "extensionOnLineResource", required = false)
     public OnLineResource getExtensionOnLineResource() {
         return extensionOnLineResource;
     }
@@ -91,9 +100,10 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
      * Provides information about a new metadata element, not found in ISO 19115, which is
      * required to describe geographic data.
      */
+    @XmlElement(name = "extendedElementInformation", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<ExtendedElementInformation> getExtendedElementInformation() {
-        return extendedElementInformation = nonNullCollection(extendedElementInformation,
-                                                              ExtendedElementInformation.class);
+        return xmlOptional(extendedElementInformation = nonNullCollection(extendedElementInformation,
+                                                              ExtendedElementInformation.class));
     }
 
     /**
@@ -103,5 +113,27 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
             final Collection<? extends ExtendedElementInformation> newValues) {
         extendedElementInformation = copyCollection(newValues, extendedElementInformation,
                                                     ExtendedElementInformation.class);
+    }
+    
+        /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

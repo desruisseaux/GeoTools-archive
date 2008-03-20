@@ -19,6 +19,9 @@
  */
 package org.geotools.metadata.iso.extent;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.GeographicDescription;
 
@@ -33,6 +36,8 @@ import org.opengis.metadata.extent.GeographicDescription;
  *
  * @since 2.1
  */
+@XmlType(name = "EX_GeographicDescription")
+@XmlRootElement(name = "EX_GeographicDescription")
 public class GeographicDescriptionImpl extends GeographicExtentImpl
         implements GeographicDescription
 {
@@ -71,6 +76,7 @@ public class GeographicDescriptionImpl extends GeographicExtentImpl
     /**
      * Returns the identifier used to represent a geographic area.
      */
+     @XmlElement(name = "geographicIdentifier", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public Identifier getGeographicIdentifier() {
         return geographicIdentifier;
     }

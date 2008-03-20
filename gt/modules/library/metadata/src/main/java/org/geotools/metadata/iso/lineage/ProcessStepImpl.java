@@ -22,6 +22,9 @@ package org.geotools.metadata.iso.lineage;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.lineage.ProcessStep;
@@ -40,6 +43,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "description", "rationale", "date", "processors", "sources"
+})
+@XmlRootElement(name = "LI_ProcessStep")
 public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
     /**
      * Serial number for interoperability with different versions.
@@ -99,6 +106,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      /**
      * Returns the description of the event, including related parameters or tolerances.
      */
+    @XmlElement(name = "description", required = true)
     public InternationalString getDescription() {
         return description;
     }
@@ -114,6 +122,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
     /**
      * Returns the requirement or purpose for the process step.
      */
+    @XmlElement(name = "rationale", required = false)
     public InternationalString getRationale() {
         return rationale;
     }
@@ -130,6 +139,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Returns the date and time or range of date and time on or over which
      * the process step occurred.
      */
+    @XmlElement(name = "dateTime", required = false)
     public synchronized Date getDate() {
         return (date!=Long.MIN_VALUE) ? new Date(date) : null;
     }
@@ -147,8 +157,9 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Returns the identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
+    @XmlElement(name = "processor", required = false)
     public synchronized Collection<ResponsibleParty> getProcessors() {
-        return processors = nonNullCollection(processors, ResponsibleParty.class);
+        return xmlOptional(processors = nonNullCollection(processors, ResponsibleParty.class));
     }
 
     /**
@@ -163,8 +174,9 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Returns the information about the source data used in creating the data specified
      * by the scope.
      */
+    @XmlElement(name = "source", required = false)
     public synchronized Collection<Source> getSources() {
-        return sources = nonNullCollection(sources, Source.class);
+        return xmlOptional(sources = nonNullCollection(sources, Source.class));
     }
 
     /**

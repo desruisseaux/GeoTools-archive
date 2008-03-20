@@ -18,6 +18,9 @@
  */
 package org.geotools.metadata.iso.citation;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.MetadataEntity;
@@ -33,6 +36,10 @@ import org.geotools.util.SimpleInternationalString;
  * @since 2.1
  * @source $URL$
  */
+@XmlType(propOrder={
+    "name", "issueIdentification", "page"
+})
+@XmlRootElement(name = "CI_Series")
 public class SeriesImpl extends MetadataEntity implements Series {
     /**
      * Serial number for interoperability with different versions.
@@ -85,6 +92,7 @@ public class SeriesImpl extends MetadataEntity implements Series {
     /**
      * Returne the name of the series, or aggregate dataset, of which the dataset is a part.
      */
+    @XmlElement(name = "name", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public InternationalString getName() {
         return name;
     }
@@ -100,6 +108,7 @@ public class SeriesImpl extends MetadataEntity implements Series {
     /**
      * Returns information identifying the issue of the series.
      */
+    @XmlElement(name = "issueIdentification", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public String getIssueIdentification() {
         return issueIdentification;
     }
@@ -115,6 +124,7 @@ public class SeriesImpl extends MetadataEntity implements Series {
     /**
      * Returns details on which pages of the publication the article was published.
      */
+    @XmlElement(name = "page", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public String getPage() {
         return page;
     }

@@ -21,6 +21,9 @@ package org.geotools.metadata.iso.spatial;
 
 import java.util.Collection;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.Georectified;
@@ -43,6 +46,11 @@ import org.geotools.util.CheckedArrayList;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_Georectified", propOrder={
+    "checkPointAvailable", "checkPointDescription", /*"cornerPoints", "centerPoint", */"pointInPixel",
+    "transformationDimensionDescription", "transformationDimensionMapping"
+})
+@XmlRootElement(name = "MD_Georectified")
 public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements Georectified {
     /**
      * Serial number for interoperability with different versions.
@@ -130,6 +138,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Indication of whether or not geographic position points are available to test the
      * accuracy of the georeferenced grid data.
      */
+    @XmlElement(name = "checkPointAvailability", required = true)
     public boolean isCheckPointAvailable() {
         return checkPointAvailable;
     }
@@ -147,6 +156,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Description of geographic position points used to test the accuracy of the
      * georeferenced grid data.
      */
+    @XmlElement(name = "checkPointDescription", required = false)
     public InternationalString getCheckPointDescription() {
         return checkPointDescription;
     }
@@ -165,7 +175,10 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * and the grid coordinate of the cells at opposite ends of grid coverage along two
      * diagonals in the grid spatial dimensions. There are four corner points in a
      * georectified grid; at least two corner points along one diagonal are required.
+     * 
+     * @TODO: needs to annotate the geometry module before.
      */
+    //@XmlElement(name = "cornerPoints", required = false)
     public synchronized List<Point> getCornerPoints() {
         return cornerPoints = nonNullList(cornerPoints, Point.class);
     }
@@ -187,7 +200,10 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * Earth location in the coordinate system defined by the Spatial Reference System
      * and the grid coordinate of the cell halfway between opposite ends of the grid in the
      * spatial dimensions.
+     * 
+     * @TODO: needs to annotate the geometry module before.
      */
+    //@XmlElement(name = "centerPoint", required = false)
     public Point getCenterPoint() {
         return centerPoint;
     }
@@ -203,6 +219,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Point in a pixel corresponding to the Earth location of the pixel.
      */
+    @XmlElement(name = "pointInPixel", required = true)
     public PixelOrientation getPointInPixel() {
         return pointInPixel;
     }
@@ -218,6 +235,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Description of the information about which grid dimensions are the spatial dimensions.
      */
+    @XmlElement(name = "transformationDimensionDescription", required = false)
     public InternationalString getTransformationDimensionDescription() {
         return transformationDimensionDescription;
     }
@@ -233,9 +251,10 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Information about which grid dimensions are the spatial dimensions.
      */
+    @XmlElement(name = "transformationDimensionMapping", required = false)
     public synchronized Collection<InternationalString> getTransformationDimensionMapping() {
-        return transformationDimensionMapping = nonNullCollection(transformationDimensionMapping,
-                                                                  InternationalString.class);
+        return xmlOptional(transformationDimensionMapping = nonNullCollection(transformationDimensionMapping,
+                                                                  InternationalString.class));
     }
 
     /**

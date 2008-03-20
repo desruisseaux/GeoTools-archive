@@ -21,6 +21,8 @@ package org.geotools.metadata.iso;
 
 import java.util.Collection;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.PortrayalCatalogueReference;
 
@@ -35,6 +37,7 @@ import org.opengis.metadata.PortrayalCatalogueReference;
  *
  * @since 2.1
  */
+@XmlRootElement(name = "MD_PortrayalCatalogueReference")
 public class PortrayalCatalogueReferenceImpl extends MetadataEntity
         implements PortrayalCatalogueReference
 {
@@ -73,6 +76,7 @@ public class PortrayalCatalogueReferenceImpl extends MetadataEntity
     /**
      * Bibliographic reference to the portrayal catalogue cited.
      */
+    @XmlElement(name = "portrayalCatalogueCitation", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Citation> getPortrayalCatalogueCitations() {
         return portrayalCatalogueCitations = nonNullCollection(portrayalCatalogueCitations, Citation.class);
     }

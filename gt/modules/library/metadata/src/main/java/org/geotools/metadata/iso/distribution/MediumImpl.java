@@ -21,6 +21,10 @@ package org.geotools.metadata.iso.distribution;
 
 import java.util.Collection;
 import javax.units.Unit;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.distribution.Medium;
 import org.opengis.metadata.distribution.MediumFormat;
 import org.opengis.metadata.distribution.MediumName;
@@ -38,6 +42,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "name", "densities", "volumes", "mediumFormats", "mediumNote"
+})
+@XmlRootElement(name = "MD_Medium")
 public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Serial number for interoperability with different versions.
@@ -95,6 +103,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Returns the name of the medium on which the resource can be received.
      */
+    @XmlElement(name = "name", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public MediumName getName() {
         return name;
     }
@@ -110,6 +119,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Returns the units of measure for the recording density.
      */
+    //@XmlElement(name = "densityUnits", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public Unit getDensityUnits() {
         return densityUnits;
     }
@@ -126,6 +136,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
      * Returns the number of items in the media identified.
      * Returns {@code null} if unknown.
      */
+    @XmlElement(name = "volumes", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public Integer getVolumes() {
         return volumes;
     }
@@ -142,8 +153,9 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Returns the method used to write to the medium.
      */
+    @XmlElement(name = "mediumFormat", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<MediumFormat> getMediumFormats() {
-        return mediumFormats = nonNullCollection(mediumFormats, MediumFormat.class);
+        return xmlOptional(mediumFormats = nonNullCollection(mediumFormats, MediumFormat.class));
     }
 
     /**
@@ -156,6 +168,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Returns a description of other limitations or requirements for using the medium.
      */
+    @XmlElement(name = "mediumName", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public InternationalString getMediumNote() {
         return mediumNote;
     }
@@ -172,8 +185,9 @@ public class MediumImpl extends MetadataEntity implements Medium {
      * Returns the density at which the data is recorded.
      * The numbers should be greater than zero.
      */
+    @XmlElement(name = "density", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Double> getDensities() {
-        return densities = nonNullCollection(densities, Double.class);
+        return xmlOptional(densities = nonNullCollection(densities, Double.class));
     }
 
     /**
@@ -182,5 +196,27 @@ public class MediumImpl extends MetadataEntity implements Medium {
      */
     public synchronized void setDensities(final Collection<? extends Double> newValues) {
         densities = copyCollection(newValues, densities, Double.class);
+    }
+    
+    /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

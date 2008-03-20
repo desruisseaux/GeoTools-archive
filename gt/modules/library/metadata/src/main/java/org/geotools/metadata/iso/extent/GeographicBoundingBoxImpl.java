@@ -24,6 +24,10 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import static java.lang.Double.doubleToLongBits;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -31,6 +35,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 
 import org.geotools.resources.Utilities;
+import org.geotools.resources.jaxb.primitive.DoubleAdapter;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -46,6 +51,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  * @author Touraïvane
  */
+@XmlType(name = "EX_GeographicBoundingBox", propOrder={
+    "westBoundLongitude", "eastBoundLongitude", "southBoundLatitude", "northBoundLatitude"
+})
+@XmlRootElement(name = "EX_GeographicBoundingBox")
 public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         implements GeographicBoundingBox
 {
@@ -198,6 +207,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The western-most longitude between -180 and +180°.
      */
+    @XmlElement(name = "westBoundLongitude", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public double getWestBoundLongitude() {
         return westBoundLongitude;
     }
@@ -219,6 +229,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The eastern-most longitude between -180 and +180°.
      */
+    @XmlElement(name = "eastBoundLongitude", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public double getEastBoundLongitude() {
         return eastBoundLongitude;
     }
@@ -240,6 +251,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The southern-most latitude between -90 and +90°.
      */
+    @XmlElement(name = "southBoundLatitude", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public double getSouthBoundLatitude()  {
         return southBoundLatitude;
     }
@@ -261,6 +273,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @return The northern-most latitude between -90 and +90°.
      */
+    @XmlElement(name = "northBoundLatitude", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public double getNorthBoundLatitude()   {
         return northBoundLatitude;
     }

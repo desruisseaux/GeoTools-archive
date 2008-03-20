@@ -19,6 +19,8 @@
  */
 package org.geotools.metadata.iso.identification;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.identification.ServiceIdentification;
 
 
@@ -33,6 +35,8 @@ import org.opengis.metadata.identification.ServiceIdentification;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_ServiceIdentification")
+@XmlRootElement(name = "MD_ServiceIdentification")
 public class ServiceIdentificationImpl extends IdentificationImpl implements ServiceIdentification {
     /**
      * Serial number for compatibility with different versions.

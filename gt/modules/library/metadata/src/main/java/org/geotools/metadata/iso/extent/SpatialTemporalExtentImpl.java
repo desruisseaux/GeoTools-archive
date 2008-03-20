@@ -21,6 +21,8 @@ package org.geotools.metadata.iso.extent;
 
 import java.util.Collection;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.SpatialTemporalExtent;
 
@@ -37,6 +39,7 @@ import org.opengis.metadata.extent.SpatialTemporalExtent;
  *
  * @since 2.1
  */
+@XmlRootElement(name = "EX_SpatialTemporalExtent")
 public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements SpatialTemporalExtent {
     /**
      * Serial number for interoperability with different versions.
@@ -80,6 +83,7 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
      *
      * @return The list of geographic extents (never {@code null}).
      */
+    @XmlElement(name = "spatialExtent", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<GeographicExtent> getSpatialExtent() {
         return spatialExtent = nonNullCollection(spatialExtent, GeographicExtent.class);
     }

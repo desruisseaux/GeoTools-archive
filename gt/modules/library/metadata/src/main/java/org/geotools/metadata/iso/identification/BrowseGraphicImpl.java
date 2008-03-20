@@ -20,6 +20,9 @@
 package org.geotools.metadata.iso.identification;
 
 import java.net.URI;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.identification.BrowseGraphic;
 import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.MetadataEntity;
@@ -35,6 +38,8 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlRootElement(name = "MD_BrowseGraphic")
+@XmlType(propOrder={"fileName", "fileDescription", "fileType"})
 public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     /**
      * Serial number for compatibility with different versions.
@@ -103,6 +108,7 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
+    @XmlElement(name = "fileName", required = false)
     public URI getFileName() {
         return fileName;
     }
@@ -119,6 +125,7 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     /**
      * Text description of the illustration.
      */
+    @XmlElement(name = "fileDescription", required = false)
     public InternationalString getFileDescription() {
         return fileDescription;
     }
@@ -135,6 +142,7 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
      * Format in which the illustration is encoded.
      * Examples: CGM, EPS, GIF, JPEG, PBM, PS, TIFF, XWD.
      */
+    @XmlElement(name = "fileType", required = false)
     public String getFileType() {
         return fileType;
     }

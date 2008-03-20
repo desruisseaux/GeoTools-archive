@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.lineage;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.lineage.Lineage;
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.metadata.lineage.Source;
@@ -41,6 +45,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "statement", "processSteps", "sources"
+})
+@XmlRootElement(name = "LI_Lineage")
 public class LineageImpl extends MetadataEntity implements Lineage {
     /**
      * Serial number for interoperability with different versions.
@@ -84,6 +92,7 @@ public class LineageImpl extends MetadataEntity implements Lineage {
      * of a dataset. Should be provided only if {@linkplain ScopeImpl#getLevel scope level}
      * is {@linkplain ScopeCode#DATASET dataset} or {@linkplain ScopeCode#SERIES series}.
      */
+    @XmlElement(name = "statement", required = false)
     public InternationalString getStatement() {
         return statement;
     }
@@ -101,8 +110,9 @@ public class LineageImpl extends MetadataEntity implements Lineage {
      * Returns the information about an event in the creation process for the data
      * specified by the scope.
      */
+    @XmlElement(name = "processStep", required = false)
     public synchronized Collection<ProcessStep> getProcessSteps() {
-        return processSteps = nonNullCollection(processSteps, ProcessStep.class);
+        return xmlOptional(processSteps = nonNullCollection(processSteps, ProcessStep.class));
     }
 
     /**
@@ -116,8 +126,9 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
+    @XmlElement(name = "source", required = false)
     public synchronized Collection<Source> getSources() {
-        return sources = nonNullCollection(sources, Source.class);
+        return xmlOptional(sources = nonNullCollection(sources, Source.class));
     }
 
     /**
@@ -125,5 +136,27 @@ public class LineageImpl extends MetadataEntity implements Lineage {
      */
     public synchronized void setSources(final Collection<? extends Source> newValues) {
         sources = copyCollection(newValues, sources, Source.class);
+    }
+    
+    /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

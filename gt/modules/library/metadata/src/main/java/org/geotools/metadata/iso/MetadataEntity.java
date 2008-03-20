@@ -17,6 +17,7 @@ package org.geotools.metadata.iso;
 
 import java.io.Serializable;
 
+import java.util.Collection;
 import org.geotools.metadata.MetadataStandard;
 import org.geotools.metadata.ModifiableMetadata;
 import org.geotools.metadata.InvalidMetadataException;
@@ -41,6 +42,11 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
      */
     private static final long serialVersionUID = 5730550742604669102L;
 
+    /**
+     * A flag that indicates if a marshalling process from JAXB has been launched.
+     */
+    private transient ThreadLocal<Boolean> isMarshalling;
+    
     /**
      * Constructs an initially empty metadata entity.
      */
@@ -88,5 +94,42 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
         if (object == null) {
             throw new InvalidMetadataException(Errors.format(ErrorKeys.NULL_ATTRIBUTE_$1, name));
         }
+    }
+
+    /**
+     * Specify the value for the flag {@code isMarshalling}. If this flag is not instanciated,
+     * then a new boolean is created for this thread. Else the current value for this flag is 
+     * just set with the wished one.
+     * 
+     * @param marshalling The value the flag has to take.
+     */
+    protected final synchronized void isMarshalling(final boolean marshalling) {
+        if (isMarshalling == null) {
+            if (!marshalling) {
+                return;
+            }
+            isMarshalling = new ThreadLocal<Boolean>();
+        }
+        isMarshalling.set(marshalling);
+    }
+
+    /**
+     * Returns the collection specified if the flag {@code isMarshalling} is set to {@code false}.
+     * In this case the marshalling is not in process, because it has been called from another way,
+     * so we always return the collection.
+     * If we are marshalling the collection, then we do not want to return an empty collection.
+     * 
+     * @param elements The collection to return.
+     * @return The collection specified, or {@code null} if we are marshalling.
+     */
+    protected final <E> Collection<E> xmlOptional(final Collection<E> elements) {
+        if (elements != null && elements.isEmpty()) {
+            // Copy the reference in order to avoid the need for synchronization.
+            final ThreadLocal<Boolean> isMarshalling = this.isMarshalling;
+            if (isMarshalling != null && Boolean.TRUE.equals(isMarshalling.get())) {
+                return null;
+            }
+        }
+        return elements;
     }
 }

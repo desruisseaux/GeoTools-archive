@@ -19,6 +19,9 @@
  */
 package org.geotools.metadata.iso.spatial;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.geotools.metadata.iso.MetadataEntity;
@@ -34,6 +37,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "dimensionName", "dimensionSize", "resolution"
+})
+@XmlRootElement(name = "MD_Dimension")
 public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Serial number for interoperability with different versions.
@@ -81,6 +88,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Name of the axis.
      */
+    @XmlElement(name = "dimensionName", required = true)
     public DimensionNameType getDimensionName() {
         return dimensionName;
     }
@@ -96,6 +104,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Number of elements along the axis.
      */
+    @XmlElement(name = "dimensionSize", required = true)
     public Integer getDimensionSize() {
         return dimensionSize;
     }
@@ -111,6 +120,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Degree of detail in the grid dataset.
      */
+    @XmlElement(name = "resolution", required = false)
     public Double getResolution() {
         return resolution;
     }

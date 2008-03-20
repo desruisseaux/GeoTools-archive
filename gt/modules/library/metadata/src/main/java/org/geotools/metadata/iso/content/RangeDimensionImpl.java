@@ -19,6 +19,10 @@
  */
 package org.geotools.metadata.iso.content;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.content.RangeDimension;
 import org.opengis.util.InternationalString;
 import org.opengis.util.MemberName;
@@ -35,6 +39,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_RangeDimension", propOrder={"descriptor"}, 
+         namespace="http://www.w3.org/2001/XMLSchema-instance")
+@XmlSeeAlso({BandImpl.class})
+@XmlRootElement(name = "MD_RangeDimension")
 public class RangeDimensionImpl extends MetadataEntity implements RangeDimension {
     /**
      * Serial number for interoperability with different versions.
@@ -70,6 +78,8 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
     /**
      * Returns the number that uniquely identifies instances of bands of wavelengths
      * on which a sensor operates.
+     * 
+     * @TODO: needs to annotate the package org.geotools.util before.
      */
     public MemberName getSequenceIdentifier() {
         return sequenceIdentifier;
@@ -87,6 +97,8 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
     /**
      * Returns the description of the range of a cell measurement value.
      */
+    @XmlElement(name = "descriptor", required = false,
+                namespace = "http://www.isotc211.org/2005/gmd")
     public InternationalString getDescriptor() {
         return descriptor;
     }

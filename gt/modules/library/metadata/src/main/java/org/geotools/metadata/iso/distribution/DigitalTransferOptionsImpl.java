@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.distribution;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Medium;
@@ -37,6 +41,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "unitsOfDistribution", "transferSize", "onLines", "offLine"
+})
+@XmlRootElement(name = "MD_DigitalTransferOptions")
 public class DigitalTransferOptionsImpl extends MetadataEntity implements DigitalTransferOptions {
     /**
      * Serial number for interoperability with different versions.
@@ -83,6 +91,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Returne tiles, layers, geographic areas, etc., in which data is available.
      */
+    @XmlElement(name = "unitsOfDistribution", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public InternationalString getUnitsOfDistribution() {
         return unitsOfDistribution;
     }
@@ -100,6 +109,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
      * The transfer size is &gt; 0.0.
      * Returns {@code null} if the transfer size is unknown.
      */
+    @XmlElement(name = "transferSize", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public Double getTransferSize() {
         return transferSize;
     }
@@ -116,8 +126,9 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Returns information about online sources from which the resource can be obtained.
      */
+    @XmlElement(name = "onLine", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<OnLineResource> getOnLines() {
-        return onLines = nonNullCollection(onLines, OnLineResource.class);
+        return xmlOptional(onLines = nonNullCollection(onLines, OnLineResource.class));
     }
 
     /**
@@ -130,6 +141,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Returns information about offline media on which the resource can be obtained.
      */
+    @XmlElement(name = "offLine", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public Medium getOffLine() {
         return offLines;
     }
@@ -141,4 +153,27 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
         checkWritePermission();
         offLines = newValue;
     }
+    
+        /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
+    }
+    
 }

@@ -22,6 +22,10 @@ package org.geotools.metadata.iso;
 import java.util.Collection;
 import java.util.Locale;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.content.FeatureCatalogueDescription;
 import org.opengis.util.GenericName;
@@ -39,6 +43,10 @@ import org.geotools.metadata.iso.content.ContentInformationImpl;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "compliant", "language", "includeWithDataset", "featureTypes", "featureCatalogueCitations"
+})
+@XmlRootElement(name = "MD_FeatureCatalogueDescription")
 public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
        implements FeatureCatalogueDescription
 {
@@ -90,6 +98,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Returns whether or not the cited feature catalogue complies with ISO 19110.
      */
+    @XmlElement(name = "complianceCode", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public Boolean isCompliant() {
         return compliant;
     }
@@ -104,8 +113,9 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Returns the language(s) used within the catalogue
      */
+    @XmlElement(name = "language", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Locale> getLanguages() {
-        return language = nonNullCollection(language, Locale.class);
+        return xmlOptional(language = nonNullCollection(language, Locale.class));
     }
 
     /**
@@ -122,6 +132,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
      *
      * @todo Return type should be {@link Boolean}.
      */
+    @XmlElement(name = "includeWithDataset", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public boolean isIncludedWithDataset() {
         return includeWithDataset.booleanValue();
     }
@@ -136,6 +147,8 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
 
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
+     * 
+     * @TODO: needs to annotate the package org.geotools.util before.
      */
     public synchronized Collection<GenericName> getFeatureTypes() {
         return featureTypes = nonNullCollection(featureTypes, GenericName.class);
@@ -153,8 +166,9 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Returns the Complete bibliographic reference to one or more external feature catalogues.
      */
+    @XmlElement(name = "featureCatalogueCitation", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Citation> getFeatureCatalogueCitations() {
-        return featureCatalogueCitations = nonNullCollection(featureCatalogueCitations, Citation.class);
+        return xmlOptional(featureCatalogueCitations = nonNullCollection(featureCatalogueCitations, Citation.class));
     }
 
     /**
@@ -164,5 +178,27 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
             final Collection<? extends Citation> newValues)
     {
         featureCatalogueCitations = copyCollection(newValues, featureCatalogueCitations, Citation.class);
+    }
+    
+        /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

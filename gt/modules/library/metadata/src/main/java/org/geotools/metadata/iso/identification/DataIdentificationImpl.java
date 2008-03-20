@@ -23,6 +23,10 @@ import java.util.Collection;
 import java.util.Locale;
 import java.nio.charset.Charset;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.extent.Extent;
@@ -45,6 +49,9 @@ import org.opengis.util.InternationalString;
  *
  * @since 2.1
  */
+@XmlRootElement(name = "MD_DataIdentification")
+@XmlType(name = "MD_DataIdentification", propOrder={"spatialRepresentationTypes", "spatialResolutions", "language", "characterSets", 
+                    "topicCategories", "environmentDescription", "extent", "supplementalInformation"})
 public class DataIdentificationImpl extends IdentificationImpl implements DataIdentification {
     /**
      * Serial number for compatibility with different versions.
@@ -143,9 +150,10 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Method used to spatially represent geographic information.
      */
+    @XmlElement(name = "spatialRepresentationType", required = false)
     public synchronized Collection<SpatialRepresentationType> getSpatialRepresentationTypes() {
-        return spatialRepresentationTypes = nonNullCollection(spatialRepresentationTypes,
-                                                              SpatialRepresentationType.class);
+        return xmlOptional(spatialRepresentationTypes = nonNullCollection(spatialRepresentationTypes,
+                                                              SpatialRepresentationType.class));
     }
 
     /**
@@ -162,8 +170,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Factor which provides a general understanding of the density of spatial data
      * in the dataset.
      */
+    @XmlElement(name = "spatialResolution", required = false)
     public synchronized Collection<Resolution> getSpatialResolutions() {
-        return spatialResolutions = nonNullCollection(spatialResolutions, Resolution.class);
+        return xmlOptional(spatialResolutions = nonNullCollection(spatialResolutions, Resolution.class));
     }
 
     /**
@@ -179,6 +188,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Language(s) used within the dataset.
      */
+    @XmlElement(name = "language", required = true)
     public synchronized Collection<Locale> getLanguage() {
         return language = nonNullCollection(language, Locale.class);
     }
@@ -203,8 +213,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Full name of the character coding standard used for the dataset.
      */
+    @XmlElement(name = "characterSet", required = false)
     public synchronized Collection<CharacterSet> getCharacterSets() {
-        return characterSets = nonNullCollection(characterSets, CharacterSet.class);
+        return xmlOptional(characterSets = nonNullCollection(characterSets, CharacterSet.class));
     }
 
     /**
@@ -226,8 +237,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Main theme(s) of the datset.
      */
+    @XmlElement(name = "topicCategory", required = false)
     public synchronized Collection<TopicCategory> getTopicCategories()  {
-        return topicCategories = nonNullCollection(topicCategories, TopicCategory.class);
+        return xmlOptional(topicCategories = nonNullCollection(topicCategories, TopicCategory.class));
     }
 
     /**
@@ -289,6 +301,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Description of the dataset in the producers processing environment, including items
      * such as the software, the computer operating system, file name, and the dataset size.
      */
+    @XmlElement(name = "environmentDescription", required = false)
     public InternationalString getEnvironmentDescription() {
         return environmentDescription;
     }
@@ -305,8 +318,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Additional extent information including the bounding polygon, vertical, and temporal
      * extent of the dataset.
      */
+    @XmlElement(name = "extent", required = false)
     public synchronized Collection<Extent> getExtent() {
-        return extent = nonNullCollection(extent, Extent.class);
+        return xmlOptional(extent = nonNullCollection(extent, Extent.class));
     }
 
     /**
@@ -319,6 +333,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Any other descriptive information about the dataset.
      */
+    @XmlElement(name = "supplementalInformation", required = false)
     public InternationalString getSupplementalInformation() {
         return supplementalInformation;
     }
@@ -329,5 +344,27 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
    public synchronized void setSupplementalInformation(final InternationalString newValue)  {
         checkWritePermission();
         supplementalInformation = newValue;
+    }
+   
+   /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

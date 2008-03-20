@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.spatial;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.spatial.GeometricObjects;
 import org.opengis.metadata.spatial.TopologyLevel;
 import org.opengis.metadata.spatial.VectorSpatialRepresentation;
@@ -35,6 +39,10 @@ import org.opengis.metadata.spatial.VectorSpatialRepresentation;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_VectorSpatialRepresentation", propOrder={
+    "topologyLevel", "geometricObjects"
+})
+@XmlRootElement(name = "MD_VectorSpatialRepresentation")
 public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
         implements VectorSpatialRepresentation
 {
@@ -70,7 +78,8 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
 
     /**
      * Code which identifies the degree of complexity of the spatial relationships.
-    */
+     */
+    @XmlElement(name = "topologyLevel", required = false)
     public TopologyLevel getTopologyLevel() {
         return topologyLevel;
     }
@@ -86,8 +95,9 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
     /**
      * Information about the geometric objects used in the dataset.
      */
+    @XmlElement(name = "geometricObjects", required = false)
     public synchronized Collection<GeometricObjects> getGeometricObjects() {
-        return geometricObjects = nonNullCollection(geometricObjects, GeometricObjects.class);
+        return xmlOptional(geometricObjects = nonNullCollection(geometricObjects, GeometricObjects.class));
     }
 
     /**
@@ -97,5 +107,27 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
             final Collection<? extends GeometricObjects> newValues)
     {
         geometricObjects = copyCollection(newValues, geometricObjects, GeometricObjects.class);
+    }
+    
+    /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

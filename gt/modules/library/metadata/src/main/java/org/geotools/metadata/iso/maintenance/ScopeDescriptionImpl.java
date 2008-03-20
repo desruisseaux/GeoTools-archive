@@ -20,7 +20,9 @@
 package org.geotools.metadata.iso.maintenance;
 
 import java.util.Set;
-import java.util.Collections;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.maintenance.ScopeDescription;
 import org.geotools.metadata.iso.MetadataEntity;
 import org.opengis.feature.type.AttributeType;
@@ -37,6 +39,10 @@ import org.opengis.feature.type.FeatureType;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "dataset", "other"
+})
+@XmlRootElement(name = "MD_ScopeDescription")
 public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescription {
     /**
      * Serial number for interoperability with different versions.
@@ -160,6 +166,7 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
      *
      * @since 2.4
      */
+    @XmlElement(name = "dataset", required = true)
     public String getDataset() {
         return dataset;
     }
@@ -180,6 +187,7 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
      *
      * @since 2.4
      */
+    @XmlElement(name = "other", required = true)
     public String getOther() {
         return other;
     }

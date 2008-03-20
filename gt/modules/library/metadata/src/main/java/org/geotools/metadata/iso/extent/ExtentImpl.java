@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.extent;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
@@ -46,6 +50,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "description", "geographicElements", "temporalElements", "verticalElements"
+})
+@XmlRootElement(name = "EX_Extent")
 public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Serial number for interoperability with different versions.
@@ -103,6 +111,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Returns the spatial and temporal extent for the referring object.
      */
+    @XmlElement(name = "description", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public InternationalString getDescription() {
         return description;
     }
@@ -118,8 +127,9 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Provides geographic component of the extent of the referring object
      */
+    @XmlElement(name = "geographicElement", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<GeographicExtent> getGeographicElements() {
-        return geographicElements = nonNullCollection(geographicElements, GeographicExtent.class);
+        return xmlOptional(geographicElements = nonNullCollection(geographicElements, GeographicExtent.class));
     }
 
     /**
@@ -134,8 +144,9 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Provides temporal component of the extent of the referring object
      */
+    @XmlElement(name = "temporalElement", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<TemporalExtent> getTemporalElements() {
-        return temporalElements = nonNullCollection(temporalElements, TemporalExtent.class);
+        return xmlOptional(temporalElements = nonNullCollection(temporalElements, TemporalExtent.class));
     }
 
     /**
@@ -150,8 +161,9 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Provides vertical component of the extent of the referring object
      */
+    @XmlElement(name = "verticalElement", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<VerticalExtent> getVerticalElements() {
-        return verticalElements = nonNullCollection(verticalElements, VerticalExtent.class);
+        return xmlOptional(verticalElements = nonNullCollection(verticalElements, VerticalExtent.class));
     }
 
     /**
@@ -213,5 +225,27 @@ public class ExtentImpl extends MetadataEntity implements Extent {
             }
         }
         return candidate;
+    }
+    
+    /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

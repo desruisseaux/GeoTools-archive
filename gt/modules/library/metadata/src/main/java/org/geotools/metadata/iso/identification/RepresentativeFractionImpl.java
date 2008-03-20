@@ -18,6 +18,8 @@
  */
 package org.geotools.metadata.iso.identification;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.opengis.metadata.identification.RepresentativeFraction;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -33,6 +35,7 @@ import org.geotools.resources.i18n.Errors;
  *
  * @since 2.4
  */
+@XmlRootElement(name = "MD_RepresentativeFraction")
 public class RepresentativeFractionImpl extends Number implements RepresentativeFraction {
     /**
      * Serial number for compatibility with different versions.
@@ -42,8 +45,14 @@ public class RepresentativeFractionImpl extends Number implements Representative
     /**
      * The number below the line in a vulgar fraction.
      */
-    private final long denominator;
+    private long denominator;
 
+    /**
+     * Default empty constructor.
+     */
+    public RepresentativeFractionImpl() {
+    }
+    
     /**
      * Creates a new representative fraction from the specified denominator.
      */
@@ -113,11 +122,19 @@ public class RepresentativeFractionImpl extends Number implements Representative
     /**
      * Returns the number below the line in a vulgar fraction.
      */
+    @XmlElement(name = "denominator")
     public int getDenominator() {
         if (denominator < Integer.MIN_VALUE || denominator > Integer.MAX_VALUE) {
             throw new IllegalStateException(); // API change required.
         }
         return (int) denominator;
+    }
+    
+    /**
+     * Sets the denominator value.
+     */
+    public void setDenominator(final long denominator) {
+        this.denominator = denominator;
     }
 
     /**

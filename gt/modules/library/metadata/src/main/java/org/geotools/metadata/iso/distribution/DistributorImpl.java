@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.distribution;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distributor;
@@ -38,6 +42,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "distributorContact", "distributionOrderProcesses", "distributorFormats", "distributorTransferOptions"
+})
+@XmlRootElement(name = "MD_Distributor")
 public class DistributorImpl extends MetadataEntity implements Distributor {
     /**
      * Serial number for interoperability with different versions.
@@ -90,6 +98,7 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     /**
      * Party from whom the resource may be obtained. This list need not be exhaustive.
      */
+    @XmlElement(name = "distributorContact", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public ResponsibleParty getDistributorContact() {
         return distributorContact;
     }
@@ -106,9 +115,10 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
      * Provides information about how the resource may be obtained, and related
      * instructions and fee information.
      */
+    @XmlElement(name = "distributionOrderProcess", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<StandardOrderProcess> getDistributionOrderProcesses() {
-        return distributionOrderProcesses = nonNullCollection(distributionOrderProcesses,
-                                                              StandardOrderProcess.class);
+        return xmlOptional(distributionOrderProcesses = nonNullCollection(distributionOrderProcesses,
+                                                              StandardOrderProcess.class));
     }
 
     /**
@@ -125,8 +135,9 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     /**
      * Provides information about the format used by the distributor.
      */
+    @XmlElement(name = "distributorFormat", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Format> getDistributorFormats() {
-        return distributorFormats = nonNullCollection(distributorFormats, Format.class);
+        return xmlOptional(distributorFormats = nonNullCollection(distributorFormats, Format.class));
     }
 
     /**
@@ -139,9 +150,10 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     /**
      * Provides information about the technical means and media used by the distributor.
      */
+    @XmlElement(name = "distributorTransferOptions", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<DigitalTransferOptions> getDistributorTransferOptions() {
-        return distributorTransferOptions = nonNullCollection(distributorTransferOptions,
-                                                              DigitalTransferOptions.class);
+        return xmlOptional(distributorTransferOptions = nonNullCollection(distributorTransferOptions,
+                                                              DigitalTransferOptions.class));
     }
 
     /**
@@ -152,5 +164,27 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     {
         distributorTransferOptions = copyCollection(newValues, distributorTransferOptions,
                                                     DigitalTransferOptions.class);
+    }
+    
+    /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     * 
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     * 
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }

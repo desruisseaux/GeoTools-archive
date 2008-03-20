@@ -20,6 +20,9 @@
 package org.geotools.metadata.iso.extent;
 
 import javax.units.Unit;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.datum.VerticalDatum;
@@ -36,6 +39,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
+@XmlType(propOrder={
+    "minimumValue", "maximumValue"
+})
+@XmlRootElement(name = "EX_VerticalExtent")
 public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent {
     /**
      * Serial number for interoperability with different versions.
@@ -107,6 +114,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Returns the lowest vertical extent contained in the dataset.
      */
+    @XmlElement(name = "minimumValue", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public Double getMinimumValue() {
         return minimumValue;
     }
@@ -122,6 +130,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
     /**
      * Returns the highest vertical extent contained in the dataset.
      */
+    @XmlElement(name = "maximumValue", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public Double getMaximumValue() {
         return maximumValue;
     }
@@ -141,6 +150,8 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      *
      * @since 2.4
      */
+    // Need to annotate the referencing module of geotools before here.
+    //@XmlElement(name = "minimumValue", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public VerticalCRS getVerticalCRS() {
         return verticalCRS;
     }
@@ -163,6 +174,7 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      * This convenience method get the unit from the {@linkplain #getVerticalCRS vertical CRS},
      * if any.
      */
+    //@XmlElement(name = "unitOfMeasure", required = true, namespace = "http://www.isotc211.org/2005/gmd")
     public Unit getUnit()  {
         return (verticalCRS != null) ? verticalCRS.getCoordinateSystem().getAxis(0).getUnit() : null;
     }

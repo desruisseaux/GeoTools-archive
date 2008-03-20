@@ -20,6 +20,10 @@
 package org.geotools.metadata.iso.constraint;
 
 import java.util.Collection;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.util.InternationalString;
@@ -35,6 +39,10 @@ import org.opengis.util.InternationalString;
  *
  * @since 2.1
  */
+@XmlType(name = "MD_LegalConstraints", propOrder={
+    "accessConstraints", "useConstraints", "otherConstraints"
+})
+@XmlRootElement(name = "MD_LegalConstraints")
 public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstraints {
     /**
      * Serial number for interoperability with different versions.
@@ -80,8 +88,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Returns the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
+    @XmlElement(name = "accessConstraints", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Restriction> getAccessConstraints() {
-        return accessConstraints = nonNullCollection(accessConstraints, Restriction.class);
+        return xmlOptional(accessConstraints = nonNullCollection(accessConstraints, Restriction.class));
     }
 
     /**
@@ -98,8 +107,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Returns the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
+    @XmlElement(name = "useConstraints", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<Restriction> getUseConstraints() {
-        return useConstraints = nonNullCollection(useConstraints, Restriction.class);
+        return xmlOptional(useConstraints = nonNullCollection(useConstraints, Restriction.class));
     }
 
     /**
@@ -118,8 +128,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
+    @XmlElement(name = "otherConstraints", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public synchronized Collection<InternationalString> getOtherConstraints() {
-        return otherConstraints = nonNullCollection(otherConstraints, InternationalString.class);
+        return xmlOptional(otherConstraints = nonNullCollection(otherConstraints, InternationalString.class));
     }
 
     /**
@@ -129,5 +140,27 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
             final Collection<? extends InternationalString> newValues)
     {
         otherConstraints = copyCollection(newValues, otherConstraints, InternationalString.class);
+    }
+
+        /**
+     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * process is going to be done.
+     * This method is automatically called by JAXB, when the marshalling begins.
+     *
+     * @param marshaller Not used in this implementation.
+     */
+    private void beforeMarshal(Marshaller marshaller) {
+        isMarshalling(true);
+    }
+
+    /**
+     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * process is finished.
+     * This method is automatically called by JAXB, when the marshalling ends.
+     *
+     * @param marshaller Not used in this implementation
+     */
+    private void afterMarshal(Marshaller marshaller) {
+        isMarshalling(false);
     }
 }
