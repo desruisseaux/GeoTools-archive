@@ -35,9 +35,9 @@ public class FilteredSubsample extends BaseScaleOperationJAI {
 	 */
 	private static final long serialVersionUID = 652535074064952517L;
 
-	/**
-	 * 
-	 */
+        /**
+         * Constructs a default {@code "FilteredSubsample"} operation.
+         */
 	public FilteredSubsample() {
 		super("FilteredSubsample");
 	}

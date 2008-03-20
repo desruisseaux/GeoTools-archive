@@ -35,13 +35,13 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.util.InternationalString;
 
 /**
- * * This operation simply wraps JAI Extrema operations described by
+ * * This operation simply wraps JAI Histogram operations described by
  * {@link HistogramDescriptor} inside a GeoTools operation in order to make it
  * spatial-aware.
  * 
  * <p>
  * For the moment this is a very simple wrap. Plans on the 2.4 and successive
- * versions of this operation are to add the ability to to use spatial ROIs and
+ * versions of this operation are to add the ability to use spatial ROIs and
  * to specific Spatial subsampling. As of now, ROI has to be a Java2D
  * {@link Shape} subclass and the parameters to control x and y subsamplings got
  * to be Integer, which means pixel-aware.
@@ -73,10 +73,8 @@ import org.opengis.util.InternationalString;
  */
 public class Histogram extends AbstractStatisticsOperationJAI {
 
-
-
 	/**
-	 * 
+	 * Serial number for interoperability with different versions.
 	 */
 	private static final long serialVersionUID = -4256576399698278701L;
 
@@ -108,12 +106,12 @@ public class Histogram extends AbstractStatisticsOperationJAI {
 	}
 
 	/**
-	 * Prepare the {@link javax.media.jai.Histogram} property for this extream
+	 * Prepare the {@link javax.media.jai.Histogram} property for this histogram
 	 * operation.
 	 * 
 	 * <p>
 	 * See <a
-	 * href="http://download.java.net/media/jai/javadoc/1.1.3/jai-apidocs/javax/media/jai/operator/ExtremaDescriptor.html">ExtremaDescriptor</a>
+	 * href="http://download.java.net/media/jai/javadoc/1.1.3/jai-apidocs/javax/media/jai/operator/HistogramDescriptor.html">HistogramDescriptor</a>
 	 * for more info.
 	 * 
 	 * @see OperationJAI#getProperties(RenderedImage, CoordinateReferenceSystem,
@@ -126,7 +124,7 @@ public class Histogram extends AbstractStatisticsOperationJAI {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// If and only if data is a RenderedOp we prepare the properties for
-		// minimum and maximum as the output of the extrema operation.
+		// histogram as the output of the histogram operation.
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (data instanceof RenderedOp) {
@@ -145,5 +143,4 @@ public class Histogram extends AbstractStatisticsOperationJAI {
 		}
 		return super.getProperties(data, crs, name, toCRS, sources, parameters);
 	}
-
 }

@@ -51,7 +51,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * crop, i.e. cropping the underlying raster by providing a spatial
  * {@link Envelope} (if the envelope is not 2D only the 2D part of it will be
  * used). This means that, depending on the grid-to-world transformation
- * existing for the raster we want to crop the crop area in the raster space
+ * existing for the raster we want to crop, the crop area in the raster space
  * might not be a rectangle, hence JAI's crop may not suffice in order to shrink
  * the raster area we would obtain. For this purpose this operation make use of
  * either the JAI's Crop or Mosaic operations depending on the conditions in
@@ -69,7 +69,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * this problems we use a combination of JAI's crop and mosaic since the mosaic
  * can be used to crop a raster using a general ROI instead of a simple
  * rectangle. There is a negative effect though. Crop would not create a new
- * raster but simply forwards requests back to the origina one (it basically
+ * raster but simply forwards requests back to the original one (it basically
  * create a viewport on the source raster) while the mosaic operation creates a
  * new raster. We try to address this trade-off by providing the parameter
  * {@link Crop#ROI_OPTIMISATION_TOLERANCE}, which basically tells this
@@ -125,8 +125,8 @@ public class Crop extends Operation2D {
 			false); // Parameter is optional
 
 	/**
-	 * The parameter descriptor use to tell this operation to optimize the crop
-	 * using a Mosaic in where the are of the image we would not load is smaller
+	 * The parameter descriptor used to tell this operation to optimize the crop
+	 * using a Mosaic in where the area of the image we would not load is smaller
 	 * than ROI_OPTIMISATION_TOLERANCE*FULL_CROP.
 	 */
 	public static final ParameterDescriptor ROI_OPTIMISATION_TOLERANCE = new DefaultParameterDescriptor(
@@ -155,10 +155,9 @@ public class Crop extends Operation2D {
 			null, // Unit of measure
 			true); // Parameter is optional
 
-	/**
-	 * 
-	 * @throws OperationNotFoundException
-	 */
+        /**
+         * Constructs a default {@code "Crop"} operation.
+         */
 	public Crop() {
 		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS,
 				"CoverageCrop", new ParameterDescriptor[] { SOURCE_0,
@@ -167,8 +166,8 @@ public class Crop extends Operation2D {
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Applies a crop operation to a coverage.
 	 * 
 	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup,
 	 *      org.geotools.factory.Hints)
@@ -290,7 +289,7 @@ public class Crop extends Operation2D {
 			// that crops recursively the same coverage specifying each time an
 			// envelope whose URC is only a a scale quarter close to the LLC of
 			// the old one. We would never crop the raster but we would modify
-			// the grid-to-world trasnform each time.
+			// the grid-to-world transform each time.
 			//
 			// //
 			return source;

@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public abstract class AbstractStatisticsOperationJAI extends
 		OperationJAI {
-	//
+	
 	/** {@link Logger} for this class. */
 	public final static Logger LOGGER = Logging.getLogger("org.geotools.coverage.processing");
 
@@ -96,7 +96,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 			true);
 
 	/**
-	 * The parameter descriptor for the coordinate reference system.
+	 * The parameter descriptor for the Region Of Interest.
 	 */
 	public static final ParameterDescriptor ROI = new DefaultParameterDescriptor(
 			Citations.JAI, "roi", Polygon.class, // Value class (mandatory)
@@ -137,7 +137,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 	 * @param replacements
 	 *            {@link ImagingParameterDescriptors} that should replace the
 	 *            correspondent {@link ImagingParameters} in order to change the
-	 *            default behaviour they have inside JAI.
+	 *            default behavior they have inside JAI.
 	 */
 	public AbstractStatisticsOperationJAI(
 			OperationDescriptor operationDescriptor,
@@ -157,9 +157,15 @@ public abstract class AbstractStatisticsOperationJAI extends
 				new HashSet(REPLACED_DESCRIPTORS)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.geotools.coverage.processing.OperationJAI#prepareParameters(org.opengis.parameter.ParameterValueGroup)
+	/**
+     * Copies parameter values from the specified {@link ParameterValueGroup} to the
+     * {@link ParameterBlockJAI}
+     *
+     * @param parameters
+     *            The {@link ParameterValueGroup} to be copied.
+     * @return A copy of the provided {@link ParameterValueGroup} as a JAI block.
+     *
+     * @see org.geotools.coverage.processing.OperationJAI#prepareParameters(org.opengis.parameter.ParameterValueGroup)
 	 */
 	protected ParameterBlockJAI prepareParameters(ParameterValueGroup parameters) {
 		// /////////////////////////////////////////////////////////////////////
@@ -206,12 +212,11 @@ public abstract class AbstractStatisticsOperationJAI extends
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// Transcode the xPeriod and yPeriod params by applying the
-			// WorldToGRid
-			// transformation for the source coverage.
+			// Transcode the xPeriod and yPeriod parameters by applying the
+			// WorldToGrid transformation for the source coverage.
 			//
-			// I am assuming that the supplied values are in the same
-			// CRS as the source coverage. We here apply
+			// I am assuming that the supplied values are in the same CRS as the 
+			// source coverage. We here apply
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final double xPeriod = parameters.parameter("xPeriod")
@@ -271,8 +276,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 		} catch (Exception e) {
 			// //
 			//
-			// Something bad happened here Let's wrap and
-			// propagate the error.
+			// Something bad happened here Let's wrap and propagate the error.
 			//
 			// //
 			final CoverageProcessingException ce = new CoverageProcessingException(
@@ -282,16 +286,16 @@ public abstract class AbstractStatisticsOperationJAI extends
 	}
 
 	/**
-	 * Converte a JTS {@link Polygon}, which represents a ROI, int an AWT
+	 * Converte a JTS {@link Polygon}, which represents a ROI, into an AWT
 	 * {@link java.awt.Polygon} by means of the provided {@link MathTransform}.
 	 * 
 	 * @param roiInput
 	 *            the input ROI as a JTS {@link Polygon}.
 	 * @param worldToGridTransform
-	 *            the {@link MathTransform} to tapply to the input ROI.
+	 *            the {@link MathTransform} to apply to the input ROI.
 	 * @return an AWT {@link java.awt.Polygon}.
 	 * @throws TransformException
-	 *             in case the provided {@link MathTransform} chockes.
+	 *             in case the provided {@link MathTransform} chokes.
 	 */
 	private static java.awt.Polygon convertPolygon(final Polygon roiInput,
 			MathTransform worldToGridTransform) throws TransformException {

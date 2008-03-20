@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 final class CroppedCoverage2D extends GridCoverage2D {
 	/**
-	 * 
+	 * Serial number for interoperability with different versions.
 	 */
 	private static final long serialVersionUID = -501742139906901754L;
 
@@ -222,7 +222,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			layout = new ImageLayout(sourceImage);
 			layout.unsetTileLayout();
 			// At this point, only the color model and sample model are left
-			// valids.
+			// valid.
 		}
 		// crop will ignore minx, miny width and height
 		if ((layout.getValidMask() & (ImageLayout.TILE_WIDTH_MASK
@@ -264,7 +264,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			//
 			// Do we actually need to crop?
 			//
-			// If the intersecton envelope is empty or if the intersection
+			// If the intersection envelope is empty or if the intersection
 			// envelope is (almost) the same of the original envelope we just
 			// return (with different return values).
 			//

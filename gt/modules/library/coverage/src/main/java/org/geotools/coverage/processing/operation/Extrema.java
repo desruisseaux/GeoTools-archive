@@ -42,8 +42,8 @@ import org.opengis.util.InternationalString;
  * spatial-aware.
  * 
  * <p>
- * For the moment this is a very simple wrap. Plans on the 2.4 na successive
- * versions of this operation are to add the ability to to use spatial ROIs and
+ * For the moment this is a very simple wrap. Plans on the 2.4 and successive
+ * versions of this operation are to add the ability to use spatial ROIs and
  * to specific Spatial subsampling. As of now, ROI has to be a Java2D
  * {@link Shape} subclass and the parameters to control x and y subsamplings got
  * to be Integer, which means pixel-aware.
@@ -55,7 +55,7 @@ import org.opengis.util.InternationalString;
  * 
  * <p>
  * <strong>How to use this operation</strong> Here is a very simple example on
- * how to use this operation in order to the minimum and maixumum of the source
+ * how to use this operation in order to the minimum and maximum of the source
  * coverage.
  * 
  * <code>
@@ -100,8 +100,6 @@ public class Extrema extends AbstractStatisticsOperationJAI {
 
 	}
 
-
-
 	/**
 	 * This operation MUST be performed on the geophysics data for this
 	 * {@link GridCoverage2D}.
@@ -131,7 +129,7 @@ public class Extrema extends AbstractStatisticsOperationJAI {
 			MathTransform toCRS, GridCoverage2D[] sources, Parameters parameters) {
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// If and only if data is a RenderedOp we prepara the properties for
+		// If and only if data is a RenderedOp we prepar the properties for
 		// minimum and maximum as the output of the extrema operation.
 		//
 		// /////////////////////////////////////////////////////////////////////

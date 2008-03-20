@@ -32,13 +32,13 @@ import org.opengis.util.InternationalString;
 
 /**
  * Base class for providing capabilities to scale {@link GridCoverage2D} objects
- * using JAI scale opeartions.
+ * using JAI scale operations.
  * 
  * <p>
  * This class tries to handles all the problems related to scaling index-color
- * images in order to avoid strange results in the smothest possible way by
- * performing color expansions under the hood as needed. IOt may also apply some
- * optimisations in case we were dealing with non-geo view of coverage.
+ * images in order to avoid strange results in the smoothest possible way by
+ * performing color expansions under the hood as needed. It may also apply some
+ * optimizations in case we were dealing with non-geo view of coverage.
  * 
  * @author Simone Giannecchini, GeoSolutions.
  * @source $URL$
@@ -47,7 +47,7 @@ import org.opengis.util.InternationalString;
 public class BaseScaleOperationJAI extends OperationJAI {
 
 	/**
-	 * 
+	 * Serial number for interoperability with different versions.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -184,7 +184,7 @@ public class BaseScaleOperationJAI extends OperationJAI {
 			layout = new ImageLayout(sourceImage);
 			layout.unsetTileLayout();
 			// At this point, only the color model and sample model are left
-			// valids.
+			// valid.
 		}
 		if ((layout.getValidMask() & (ImageLayout.TILE_WIDTH_MASK
 				| ImageLayout.TILE_HEIGHT_MASK

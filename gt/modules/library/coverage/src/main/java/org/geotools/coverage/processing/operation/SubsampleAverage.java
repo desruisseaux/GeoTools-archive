@@ -20,8 +20,7 @@ import org.geotools.coverage.processing.BaseScaleOperationJAI;
 
 /**
  * This operation is simply a wrapper for the JAI SubsampleAverage operation which allows
- * me to arbitrarly scale a rendered image while smoothing it out.
-
+ * me to arbitrarily scale a rendered image while smoothing it out.
  * 
  * @author Simone Giannecchini, GeoSolutions.
  * @version $Id: SubsampleAverage.java 23157 2006-12-01 01:29:53Z desruisseaSubsampleAveragedCoverageator.SubsampleAverageDescriptor
@@ -31,14 +30,14 @@ import org.geotools.coverage.processing.BaseScaleOperationJAI;
  */
 public class SubsampleAverage extends BaseScaleOperationJAI {
 	
-	/**
-	 * 
-	 */
+       /**
+        * Serial number for interoperability with different versions.
+        */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * 
-	 */
+       /**
+        * Constructs a default {@code "SubsampleAverage"} operation.
+        */
 	public SubsampleAverage() {
 		super("SubsampleAverage");
 	}
