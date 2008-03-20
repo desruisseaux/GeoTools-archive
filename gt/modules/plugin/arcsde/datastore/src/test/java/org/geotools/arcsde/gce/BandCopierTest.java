@@ -43,23 +43,25 @@ import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 
 /**
- * Tests the functionality of the ArcSDE raster-display package to read rasters from an ArcSDE database.
- * 
- * This class in particular tests the class which reads data from the underlying raster tile and copies it to a java.awt.Raster for display.
+ * Tests the functionality of the ArcSDE raster-display package to read rasters from an ArcSDE
+ * database. This class in particular tests the class which reads data from the underlying raster
+ * tile and copies it to a java.awt.Raster for display.
  * 
  * @author Saul Farber
- * @source $URL$
+ * @source $URL:
+ *         http://gtsvn.refractions.net/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/gce/BandCopierTest.java $
  * @version $Id$
  */
 public class BandCopierTest extends TestCase {
 
-	private Logger LOGGER = Logging.getLogger(this.getClass());
-	private static RasterTestData rasterTestData;
+    private Logger LOGGER = Logging.getLogger(this.getClass());
 
-	public BandCopierTest(String name) {
-		super(name);
-	}
-	
+    private static RasterTestData rasterTestData;
+
+    public BandCopierTest(String name) {
+        super(name);
+    }
+
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(BandCopierTest.class);
@@ -78,161 +80,229 @@ public class BandCopierTest extends TestCase {
         return wrapper;
     }
 
-	private static void oneTimeSetUp() throws Exception {
-		if (rasterTestData == null) {
-			rasterTestData = new RasterTestData();
-			rasterTestData.setUp();
-			rasterTestData.load1bitRaster();
-			rasterTestData.loadRGBRaster();
-		}
-	}
+    private static void oneTimeSetUp() throws Exception {
+        if (rasterTestData == null) {
+            rasterTestData = new RasterTestData();
+            rasterTestData.setUp();
+            // rasterTestData.loadRGBColorMappedRaster();
+            rasterTestData.loadOneByteGrayScaleRaster();
+            rasterTestData.load1bitRaster();
+            rasterTestData.loadRGBRaster();
 
-	private static void oneTimeTearDown() throws Exception {
-		if (rasterTestData != null) {
-			rasterTestData.tearDown();
-		}
-	}
-	
-	public void testLiveOneBitAlignedRasterTile() throws Exception {
-		final String tableName = rasterTestData.get1bitRasterTableName();
-		
-		ArcSDEPooledConnection scon = null;
-		try {
-			ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
+        }
+    }
 
-			scon = pool.getConnection();
-			SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
-			q.prepareQuery();
-			q.execute();
-			SeRow r = q.fetch();
-			SeRasterAttr rAttr = r.getRaster(0);
+    private static void oneTimeTearDown() throws Exception {
+        if (rasterTestData != null) {
+            rasterTestData.tearDown();
+        }
+    }
 
-			int[] bands = new int[] { 1 };
-			SeRasterConstraint rConstraint = new SeRasterConstraint();
-			rConstraint.setBands(bands);
-			rConstraint.setLevel(0);
-			rConstraint.setEnvelope(0, 0, 0, 0);
-			rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+    public void donttestLiveOneBitAlignedRasterTile() throws Exception {
+        final String tableName = rasterTestData.get1bitRasterTableName();
 
-			q.queryRasterTile(rConstraint);
+        ArcSDEPooledConnection scon = null;
+        try {
+            ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-			BufferedImage fromSdeImage = new BufferedImage(128,128, BufferedImage.TYPE_BYTE_BINARY);
-			ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr.getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+            scon = pool.getConnection();
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            SeRasterAttr rAttr = r.getRaster(0);
 
-			SeRasterTile rTile = r.getRasterTile();
-			for (int i = 0; i < bands.length; i++) {
-				bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), 0, 0, i);
-				rTile = r.getRasterTile();
-			}
+            int[] bands = new int[] { 1 };
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bands);
+            rConstraint.setLevel(0);
+            rConstraint.setEnvelope(0, 0, 0, 0);
+            rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
 
-			ImageIO.write(fromSdeImage, "PNG", new File("/tmp/" + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
-			final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData.getRasterTestDataProperty("sampledata.onebitraster"));
-			BufferedImage originalImage = ImageIO.read(originalRasterFile);
+            q.queryRasterTile(rConstraint);
 
-			// Well, now we have an image tile. Does it have what we expect on it?
-			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
-			
-		} catch (SeException se) {
-			LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-		} finally {
-			if (scon != null)
-				scon.close();
-		}
-	}
-	
-	public void testLiveOneBitUnalignedRasterTile() throws Exception {
-		final String tableName = rasterTestData.get1bitRasterTableName();
-		
-		ArcSDEPooledConnection scon = null;
-		try {
-			ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
+            BufferedImage fromSdeImage = new BufferedImage(128, 128, BufferedImage.TYPE_BYTE_BINARY);
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
+                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
 
-			scon = pool.getConnection();
-			SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
-			q.prepareQuery();
-			q.execute();
-			SeRow r = q.fetch();
-			SeRasterAttr rAttr = r.getRaster(0);
+            SeRasterTile rTile = r.getRasterTile();
+            for (int i = 0; i < bands.length; i++) {
+                bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), 0, 0, i);
+                rTile = r.getRasterTile();
+            }
 
-			int[] bands = new int[] { 1 };
-			SeRasterConstraint rConstraint = new SeRasterConstraint();
-			rConstraint.setBands(bands);
-			rConstraint.setLevel(0);
-			rConstraint.setEnvelope(0, 0, 0, 0);
-			rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+            ImageIO.write(fromSdeImage, "PNG", new File("/tmp/"
+                    + Thread.currentThread().getStackTrace()[1].getMethodName() + ".png"));
+            final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData
+                    .getRasterTestDataProperty("sampledata.onebitraster"));
+            BufferedImage originalImage = ImageIO.read(originalRasterFile);
 
-			q.queryRasterTile(rConstraint);
-			
-			final int targetImgWidth = 67, targetImgHeight = 67;
-			final int imgxstart=38, imgystart=31;
+            // Well, now we have an image tile. Does it have what we expect on it?
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+                    fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
 
-			BufferedImage fromSdeImage = new BufferedImage(targetImgWidth,targetImgHeight, BufferedImage.TYPE_BYTE_BINARY);
-			ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr.getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+        } catch (SeException se) {
+            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+        } finally {
+            if (scon != null)
+                scon.close();
+        }
+    }
 
-			SeRasterTile rTile = r.getRasterTile();
-			for (int i = 0; i < bands.length; i++) {
-				bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), imgxstart, imgystart, i);
-				rTile = r.getRasterTile();
-			}
+    public void donttestLiveOneBitUnalignedRasterTile() throws Exception {
+        final String tableName = rasterTestData.get1bitRasterTableName();
 
-			final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData.getRasterTestDataProperty("sampledata.onebitraster"));
-			BufferedImage originalImage = ImageIO.read(originalRasterFile);
-			BufferedImage subImage = originalImage.getSubimage(imgxstart, imgystart, targetImgWidth, targetImgHeight);
+        ArcSDEPooledConnection scon = null;
+        try {
+            ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-			// Well, now we have an image tile. Does it have what we expect on it?
-			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(fromSdeImage, subImage));
-			
-		} catch (SeException se) {
-			LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-		} finally {
-			if (scon != null)
-				scon.close();
-		}
-	}
+            scon = pool.getConnection();
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            SeRasterAttr rAttr = r.getRaster(0);
 
-	public void testLiveRGBRasterTile() throws Exception {
-		final String tableName = rasterTestData.getRGBRasterTableName();
+            int[] bands = new int[] { 1 };
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bands);
+            rConstraint.setLevel(0);
+            rConstraint.setEnvelope(0, 0, 0, 0);
+            rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
 
-		ArcSDEPooledConnection scon = null;
-		try {
-			ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
+            q.queryRasterTile(rConstraint);
 
-			scon = pool.getConnection();
-			SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
-			q.prepareQuery();
-			q.execute();
-			SeRow r = q.fetch();
-			SeRasterAttr rAttr = r.getRaster(0);
+            final int targetImgWidth = 67, targetImgHeight = 67;
+            final int imgxstart = 38, imgystart = 31;
 
-			int[] bands = new int[] { 1, 2, 3 };
-			SeRasterConstraint rConstraint = new SeRasterConstraint();
-			rConstraint.setBands(bands);
-			rConstraint.setLevel(0);
-			rConstraint.setEnvelope(0, 0, 0, 0);
-			rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+            BufferedImage fromSdeImage = new BufferedImage(targetImgWidth, targetImgHeight,
+                    BufferedImage.TYPE_BYTE_BINARY);
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
+                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
 
-			q.queryRasterTile(rConstraint);
+            SeRasterTile rTile = r.getRasterTile();
+            for (int i = 0; i < bands.length; i++) {
+                bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), imgxstart, imgystart, i);
+                rTile = r.getRasterTile();
+            }
 
-			BufferedImage fromSdeImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-			ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr.getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+            final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData
+                    .getRasterTestDataProperty("sampledata.onebitraster"));
+            BufferedImage originalImage = ImageIO.read(originalRasterFile);
+            BufferedImage subImage = originalImage.getSubimage(imgxstart, imgystart,
+                    targetImgWidth, targetImgHeight);
 
-			SeRasterTile rTile = r.getRasterTile();
-			for (int i = 0; i < bands.length; i++) {
-				bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), 0, 0, i);
-				rTile = r.getRasterTile();
-			}
+            // Well, now we have an image tile. Does it have what we expect on it?
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+                    fromSdeImage, subImage));
 
-			final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData.getRasterTestDataProperty("sampledata.rgbraster"));
-			BufferedImage originalImage = ImageIO.read(originalRasterFile);
+        } catch (SeException se) {
+            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+        } finally {
+            if (scon != null)
+                scon.close();
+        }
+    }
 
-			// Well, now we have an image tile. Does it have what we expect on it?
-			assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
+    public void donttestLiveRGBRasterTile() throws Exception {
+        final String tableName = rasterTestData.getRGBRasterTableName();
 
-		} catch (SeException se) {
-			LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
-		} finally {
-			if (scon != null)
-				scon.close();
-		}
-	}
+        ArcSDEPooledConnection scon = null;
+        try {
+            ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
+
+            scon = pool.getConnection();
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            SeRasterAttr rAttr = r.getRaster(0);
+
+            int[] bands = new int[] { 1, 2, 3 };
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bands);
+            rConstraint.setLevel(0);
+            rConstraint.setEnvelope(0, 0, 0, 0);
+            rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+
+            q.queryRasterTile(rConstraint);
+
+            BufferedImage fromSdeImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
+                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+
+            SeRasterTile rTile = r.getRasterTile();
+            for (int i = 0; i < bands.length; i++) {
+                bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), 0, 0, i);
+                rTile = r.getRasterTile();
+            }
+
+            final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData
+                    .getRasterTestDataProperty("sampledata.rgbraster"));
+            BufferedImage originalImage = ImageIO.read(originalRasterFile);
+
+            // Well, now we have an image tile. Does it have what we expect on it?
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+                    fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
+
+        } catch (SeException se) {
+            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+        } finally {
+            if (scon != null)
+                scon.close();
+        }
+    }
+
+    public void testLiveGrayScaleRasterTile() throws Exception {
+        final String tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
+
+        ArcSDEPooledConnection scon = null;
+        try {
+            ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
+
+            scon = pool.getConnection();
+            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q.prepareQuery();
+            q.execute();
+            SeRow r = q.fetch();
+            SeRasterAttr rAttr = r.getRaster(0);
+
+            int[] bands = new int[] { 1 };
+            SeRasterConstraint rConstraint = new SeRasterConstraint();
+            rConstraint.setBands(bands);
+            rConstraint.setLevel(0);
+            rConstraint.setEnvelope(0, 0, 0, 0);
+            rConstraint.setInterleave(SeRaster.SE_RASTER_INTERLEAVE_BSQ);
+
+            q.queryRasterTile(rConstraint);
+
+            BufferedImage fromSdeImage = new BufferedImage(128, 128, BufferedImage.TYPE_BYTE_GRAY);
+            ArcSDERasterBandCopier bandCopier = ArcSDERasterBandCopier.getInstance(rAttr
+                    .getPixelType(), rAttr.getTileWidth(), rAttr.getTileHeight());
+
+            SeRasterTile rTile = r.getRasterTile();
+            for (int i = 0; i < bands.length; i++) {
+                bandCopier.copyPixelData(rTile, fromSdeImage.getRaster(), 0, 0, i);
+                rTile = r.getRasterTile();
+            }
+            ImageIO.write(fromSdeImage, "PNG", new File("/tmp/"
+                    + Thread.currentThread().getStackTrace()[1].getMethodName() + "-fromsde.png"));
+
+            final File originalRasterFile = org.geotools.test.TestData.file(null, rasterTestData
+                    .getRasterTestDataProperty("sampledata.onebyteonebandraster"));
+            BufferedImage originalImage = ImageIO.read(originalRasterFile);
+            ImageIO.write(originalImage.getSubimage(0, 0, 128, 128), "PNG", new File("/tmp/"
+                    + Thread.currentThread().getStackTrace()[1].getMethodName() + "-original.png"));
+
+            // Well, now we have an image tile. Does it have what we expect on it?
+            assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(
+                    fromSdeImage, originalImage.getSubimage(0, 0, 128, 128)));
+
+        } catch (SeException se) {
+            LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
+        } finally {
+            if (scon != null)
+                scon.close();
+        }
+    }
 }

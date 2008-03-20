@@ -18,7 +18,7 @@ pool.timeOut=1000
 #tables during testing
 configKeyword=DEFAULTS
 
-#specifies a SDE table name that can be used
+#specifies an SDE table name that can be used
 #to test the creation of feature types.
 #CAUTION: be sure you do not specify a table name which already
 #exists and that you don't have to loose!
