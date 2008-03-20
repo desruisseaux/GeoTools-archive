@@ -26,6 +26,8 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.logging.Logger;
+
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -49,6 +51,7 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -79,6 +82,12 @@ import org.geotools.resources.i18n.ErrorKeys;
 public abstract class MapProjection extends AbstractMathTransform
                 implements MathTransform2D, Serializable
 {
+ 
+    /**
+     * The projection package logger
+     */
+    protected static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.operation.projection");
+    
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -200,6 +209,14 @@ public abstract class MapProjection extends AbstractMathTransform
      * The inverse of this map projection. Will be created only when needed.
      */
     private transient MathTransform2D inverse;
+    
+    /**
+     * When true lat/lon coordinate ranges will be checked, and a WARNING log will be issued
+     * if they are out of their natural ranges (-180/180 for longitude, -90/90 for latitude).<br>
+     * To avoid excessive logging, this flag will be set to false after the first coordinate
+     * failing the checks is found.
+     */
+    protected boolean verifyCoordinateRanges = true;
 
     /**
      * Constructs a new map projection from the suplied parameters.
@@ -743,14 +760,17 @@ public abstract class MapProjection extends AbstractMathTransform
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
-        // Note: the following tests should not fails for NaN values.
-        if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-            throw new PointOutsideEnvelopeException(Errors.format(
-                    ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
-        }
-        if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-            throw new PointOutsideEnvelopeException(Errors.format(
-                    ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+        
+        if(verifyCoordinateRanges) {
+            // Note: the following tests should not fails for NaN values.
+            if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
+                LOGGER.warning(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+                verifyCoordinateRanges = false;
+            }
+            if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
+                LOGGER.warning(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+                verifyCoordinateRanges = false;
+            }
         }
         /*
          * Makes sure that the longitude before conversion stay within +/- PI radians. As a
@@ -929,13 +949,16 @@ public abstract class MapProjection extends AbstractMathTransform
             ptDst.setLocation(x,y);
 
             // Note: the following tests should not fails for NaN values.
-            if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                throw new PointOutsideEnvelopeException(Errors.format(
-                        ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
-            }
-            if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                throw new PointOutsideEnvelopeException(Errors.format(
-                        ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+            if(verifyCoordinateRanges) {
+                // Note: the following tests should not fails for NaN values.
+                if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
+                    LOGGER.warning(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+                    verifyCoordinateRanges = false;
+                }
+                if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
+                    LOGGER.warning(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+                    verifyCoordinateRanges = false;
+                }
             }
             assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
             return ptDst;
