@@ -1346,6 +1346,8 @@ public class ShapefileRenderer implements GTRenderer {
                     mt = op.getMathTransform();
                     bbox = bbox.transform(dataCRS, true, 10);
                 } catch (Exception e) {
+                    fireErrorEvent(e);
+                    LOGGER.log(Level.WARNING, "Could not reproject the bounding boxes, proceeding in non reprojecting mode", e);
                     op = null;
                     mt = null;
                 }

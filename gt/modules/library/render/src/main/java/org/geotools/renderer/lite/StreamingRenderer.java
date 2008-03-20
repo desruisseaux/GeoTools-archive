@@ -857,22 +857,14 @@ public final class StreamingRenderer implements GTRenderer {
 				query.setPropertyNames(attributes);
 				Envelope bounds = source.getBounds();
 				if (bounds != null && envelope.intersects(bounds)) {
-					LOGGER
-							.fine(new StringBuffer(
-									"Got a tranform exception while trying to de-project the current ")
-									.append(
-											"envelope, bboxs intersect therefore using envelope)")
-									.toString());
+					LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
+											"envelope, bboxs intersect therefore using envelope)", e);
 					filter = null;					
 					filter = createBBoxFilters(schema, attributes, envelope);
 					query.setFilter(filter);
 				} else {
-					LOGGER
-							.fine(new StringBuffer(
-									"Got a tranform exception while trying to de-project the current ")
-									.append(
-											"envelope, falling back on full data loading (no bbox query)")
-									.toString());
+					LOGGER.log(Level.WARNING, "Got a tranform exception while trying to de-project the current " +
+											"envelope, falling back on full data loading (no bbox query)", e);
 					query.setFilter(Filter.INCLUDE);
 				}
 				processRuleForQuery(styles, query);
