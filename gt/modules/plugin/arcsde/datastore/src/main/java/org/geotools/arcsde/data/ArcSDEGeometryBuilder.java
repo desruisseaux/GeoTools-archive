@@ -151,7 +151,7 @@ public abstract class ArcSDEGeometryBuilder {
      */
     public SeShape constructShape(final Geometry geometry, SeCoordinateReference seSrs)
             throws ArcSdeException {
-        if(geometry  == null){
+        if (geometry == null) {
             return null;
         }
         SeShape shape = null;
@@ -442,10 +442,14 @@ public abstract class ArcSDEGeometryBuilder {
         }
 
         /**
+         * @param shape the shape to create its JTS geometry equivalent. Can't be null.
          * @see ArcSDEGeometryBuilder#construct(SeShape)
          */
         @Override
         public Geometry construct(SeShape shape) throws SeException, DataSourceException {
+            if (shape == null || shape.isNil()) {
+                return getEmpty();
+            }
             Class realGeomClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
             if (realGeomClass == null) {
                 return null;

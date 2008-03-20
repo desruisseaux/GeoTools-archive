@@ -684,15 +684,24 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                     continue;
                 }
 
+                // ignore SeColumns for which we don't have a known mapping
+                final int sdeType = columnDefinition.getType();
+                if (SeColumnDefinition.TYPE_SHAPE != sdeType
+                        && null == ArcSDEAdapter.getJavaBinding(new Integer(sdeType))) {
+                    continue;
+                }
+
                 // We need to exclude read only types from the set of "mutable"
                 // column names.
                 final short rowIdType = columnDefinition.getRowIdType();
-                if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE != rowIdType) {
-                    columnList.put(Integer.valueOf(usedIndex), columnName);
-                    // only increment usedIndex if we added a mutable column to
-                    // the list
-                    usedIndex++;
+                if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE == rowIdType) {
+                    continue;
                 }
+
+                columnList.put(Integer.valueOf(usedIndex), columnName);
+                // only increment usedIndex if we added a mutable column to
+                // the list
+                usedIndex++;
             }
             this.mutableColumnNames = columnList;
         }
@@ -723,6 +732,14 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                         && columnName.equals(shapeAttributeName)) {
                     continue;
                 }
+
+                // ignore SeColumns for which we don't have a known mapping
+                final int sdeType = columnDefinition.getType();
+                if (SeColumnDefinition.TYPE_SHAPE != sdeType
+                        && null == ArcSDEAdapter.getJavaBinding(Integer.valueOf(sdeType))) {
+                    continue;
+                }
+
                 columnList.put(Integer.valueOf(usedIndex), columnName);
                 usedIndex++;
             }

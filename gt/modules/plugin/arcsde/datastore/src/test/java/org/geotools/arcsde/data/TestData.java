@@ -351,7 +351,7 @@ public class TestData {
             final SeTable table,
             final SeLayer layer,
             final String configKeyword) throws SeException {
-        SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[8];
 
         /*
          * Define the columns and their attributes for the table to be created. NOTE: The valid
@@ -374,6 +374,9 @@ public class TestData {
                 0, isNullable);
         colDefs[6] = new SeColumnDefinition(TEST_TABLE_COLS[5], SeColumnDefinition.TYPE_DATE, 1, 0,
                 isNullable);
+        // this is a blob one and should be ignored to all effects
+        colDefs[7] = new SeColumnDefinition("SE_ANNO_CAD_DATA", SeColumnDefinition.TYPE_BLOB, 1000,
+                0, isNullable);
 
         /*
          * Create the table using the DBMS default configuration keyword. Valid keywords are defined
@@ -697,7 +700,7 @@ public class TestData {
     private static MultiLineString createTestMultiLineString(final GeometryFactory gf,
             final int index) {
         Coordinate[] coords1 = { new Coordinate(0, 0), new Coordinate(1 + index, 1 + index) };
-        Coordinate[] coords2 = { new Coordinate(0, index), new Coordinate(index, 0) };
+        Coordinate[] coords2 = { new Coordinate(0, index), new Coordinate(index + 1, 0) };
         LineString[] lines = { gf.createLineString(coords1), gf.createLineString(coords2) };
 
         return gf.createMultiLineString(lines);
@@ -852,8 +855,8 @@ public class TestData {
 
         final boolean isNullable = true;
 
-        // ROW_ID, INT_COL, DATE_COL, STRING_COL
-        final int numCols = 4;
+        // ROW_ID, INT_COL, DATE_COL, STRING_COL, SE_ANNO_CAD_DATA
+        final int numCols = 5;
         final SeColumnDefinition[] colDefs = new SeColumnDefinition[numCols];
 
         // first column to be SDE managed feature id
@@ -864,6 +867,9 @@ public class TestData {
                 isNullable);
         colDefs[3] = new SeColumnDefinition("STRING_COL", SeColumnDefinition.TYPE_STRING, 25, 0,
                 isNullable);
+        // use a blob type just to make sure they're correctly ignored
+        colDefs[4] = new SeColumnDefinition("SE_ANNO_CAD_DATA", SeColumnDefinition.TYPE_BLOB, 4000,
+                0, isNullable);
 
         /*
          * Create the table using the DBMS default configuration keyword. Valid keywords are defined

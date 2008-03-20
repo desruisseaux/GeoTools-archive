@@ -96,7 +96,8 @@ public class ArcSDEAdapter {
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_FLOAT64), Double.class);
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_DATE), Date.class);
         // @TODO: not at all, only for capable open table with GeoServer
-        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_BLOB), byte[].class);
+        // sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),
+        // byte[].class);
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_CLOB), String.class);
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_NCLOB), String.class);
 
@@ -128,7 +129,8 @@ public class ArcSDEAdapter {
         java2SDETypes.put(Double.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 25, 4));
         java2SDETypes.put(Date.class, new SdeTypeDef(SeColumnDefinition.TYPE_DATE, 1, 0));
         java2SDETypes.put(Long.class, new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
-        java2SDETypes.put(byte[].class, new SdeTypeDef(SeColumnDefinition.TYPE_BLOB, 1, 0));
+        // java2SDETypes.put(byte[].class, new
+        // SdeTypeDef(SeColumnDefinition.TYPE_BLOB, 1, 0));
         java2SDETypes.put(Number.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 25, 4));
     }
 
@@ -465,7 +467,8 @@ public class ArcSDEAdapter {
      * <p>
      * Mappings are:
      * <ul>
-     * <li>{@link SeColumnDefinition#TYPE_BLOB}: byte[].class
+     * <li>{@link SeColumnDefinition#TYPE_BLOB}: byte[].class <b>this one is pending further
+     * development, not supported currently but just ignored</b>
      * <li>{@link SeColumnDefinition#TYPE_CLOB}: {@link String}.class
      * <li>{@link SeColumnDefinition#TYPE_DATE}: {@link Date}.class
      * <li>{@link SeColumnDefinition#TYPE_FLOAT32}: {@link Float}.class
@@ -666,7 +669,7 @@ public class ArcSDEAdapter {
     /**
      * Returns the most appropriate {@link Geometry} class that matches the shape's type.
      * 
-     * @param shape SeShape instance for which to infer the matching geometry class, may be null
+     * @param shape SeShape instance for which to infer the matching geometry class, can't be null
      * @return the Geometry subclass corresponding to the shape type
      * @throws SeException propagated if thrown by {@link SeShape#getType()}
      * @throws IllegalArgumentException if none of the JTS geometry classes can be matched to the
@@ -677,11 +680,9 @@ public class ArcSDEAdapter {
             throws SeException {
         final Class<? extends Geometry> clazz;
 
-        final int seShapeType = shape == null ? SeShape.TYPE_NIL : shape.getType();
+        final int seShapeType = shape.getType();
 
-        if (seShapeType == SeShape.TYPE_NIL) {
-            clazz = null;
-        } else if (seShapeType == SeShape.TYPE_LINE || seShapeType == SeShape.TYPE_SIMPLE_LINE) {
+        if (seShapeType == SeShape.TYPE_LINE || seShapeType == SeShape.TYPE_SIMPLE_LINE) {
             clazz = LineString.class;
         } else if (seShapeType == SeShape.TYPE_MULTI_LINE
                 || seShapeType == SeShape.TYPE_MULTI_SIMPLE_LINE) {

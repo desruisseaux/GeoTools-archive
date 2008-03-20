@@ -256,14 +256,18 @@ final class ArcSDEAttributeReader implements AttributeReader {
             try {
                 final SeShape shape = (SeShape) value;
                 final Class<? extends Geometry> actualGeomtryClass;
-                actualGeomtryClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
-                final ArcSDEGeometryBuilder geometryBuilder;
-                geometryBuilder = ArcSDEGeometryBuilder.builderFor(actualGeomtryClass);
-                value = geometryBuilder.construct(shape);
-                if (!this.schemaGeometryClass.isAssignableFrom(actualGeomtryClass)) {
-                    value = adaptGeometry((Geometry) value, schemaGeometryClass);
+                if (shape.isNil()) {
+                    // actualGeomtryClass = this.schemaGeometryClass;
+                    value = null;
+                } else {
+                    actualGeomtryClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
+                    final ArcSDEGeometryBuilder geometryBuilder;
+                    geometryBuilder = ArcSDEGeometryBuilder.builderFor(actualGeomtryClass);
+                    value = geometryBuilder.construct(shape);
+                    if (!this.schemaGeometryClass.isAssignableFrom(actualGeomtryClass)) {
+                        value = adaptGeometry((Geometry) value, schemaGeometryClass);
+                    }
                 }
-                System.out.println(value);
             } catch (SeException e) {
                 throw new ArcSdeException(e);
             }
