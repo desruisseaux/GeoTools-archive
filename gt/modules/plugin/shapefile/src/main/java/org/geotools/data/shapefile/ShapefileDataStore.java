@@ -178,7 +178,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         } else {
             this.useMemoryMappedBuffer = useMemoryMapped;
         }
-
+        this.useMemoryMappedBuffer = useMemoryMapped;
         this.dbfCharset = dbfCharset;
     }
 
