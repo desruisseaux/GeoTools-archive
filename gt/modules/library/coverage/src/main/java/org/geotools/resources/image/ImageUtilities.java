@@ -16,11 +16,12 @@
  */
 package org.geotools.resources.image;
 
+import java.awt.image.*;
 import java.awt.Dimension;
 import java.awt.RenderingHints;
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageReader;
@@ -568,5 +569,85 @@ public final class ImageUtilities {
             return JAI.create("Format", pbjFormat, hints);
         }
         return image;
+    }
+
+    /**
+     * Sets every samples in the given image to the given value. This method is typically used
+     * for clearing an image content.
+     *
+     * @param image The image to fill.
+     * @param value The value to to given to every samples.
+     */
+    public static void fill(final WritableRenderedImage image, final Number value) {
+        int y = image.getMinTileY();
+        for (int ny = image.getNumYTiles(); --ny >= 0;) {
+            int x = image.getMinTileX();
+            for (int nx = image.getNumXTiles(); --nx >= 0;) {
+                final WritableRaster raster = image.getWritableTile(x, y);
+                try {
+                    fill(raster.getDataBuffer(), value);
+                } finally {
+                    image.releaseWritableTile(x, y);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the content of all banks in the given data buffer to the specified value. We do not
+     * allow setting of different value for invidivual bank because the data buffer "banks" do
+     * not necessarly match the image "bands".
+     *
+     * @param buffer The data buffer to fill.
+     * @param value  The values to be given to every elements in the data buffer.
+     */
+    private static void fill(final DataBuffer buffer, final Number value) {
+        final int[] offsets = buffer.getOffsets();
+        final int size = buffer.getSize();
+        if (buffer instanceof DataBufferByte) {
+            final DataBufferByte data = (DataBufferByte) buffer;
+            final byte n = value.byteValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else if (buffer instanceof DataBufferShort) {
+            final DataBufferShort data = (DataBufferShort) buffer;
+            final short n = value.shortValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else if (buffer instanceof DataBufferUShort) {
+            final DataBufferUShort data = (DataBufferUShort) buffer;
+            final short n = value.shortValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else if (buffer instanceof DataBufferInt) {
+            final DataBufferInt data = (DataBufferInt) buffer;
+            final int n = value.intValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else if (buffer instanceof DataBufferFloat) {
+            final DataBufferFloat data = (DataBufferFloat) buffer;
+            final float n = value.floatValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else if (buffer instanceof DataBufferDouble) {
+            final DataBufferDouble data = (DataBufferDouble) buffer;
+            final double n = value.doubleValue();
+            for (int i=0; i<offsets.length; i++) {
+                final int offset = offsets[i];
+                Arrays.fill(data.getData(i), offset, offset + size, n);
+            }
+        } else {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE));
+        }
     }
 }

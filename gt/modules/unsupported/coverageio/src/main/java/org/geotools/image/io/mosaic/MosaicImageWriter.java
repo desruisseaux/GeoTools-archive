@@ -50,6 +50,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.logging.Logging;
 
 
@@ -253,6 +254,7 @@ public class MosaicImageWriter extends ImageWriter {
                     image = null;
                     continue;
                 }
+                ImageUtilities.fill(image, 0);
             }
             if (logReads) {
                 logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
