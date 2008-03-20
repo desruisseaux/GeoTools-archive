@@ -14,8 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.util;
+package org.geotools.resources.jaxb;
 
+import org.geotools.util.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class TextGroup {
      * {@code <LocalisedCharacterString>} in a single tags {@code <textGroup>}.
      */
     @XmlElementWrapper(name = "textGroup")
-    @XmlElement(name = "LocalisedCharacterString", required = true)
+    @XmlElement(name = "LocalisedCharacterString")
     public Collection<LocalisedCharacterString> getLocalised() {
         return localised;
     }

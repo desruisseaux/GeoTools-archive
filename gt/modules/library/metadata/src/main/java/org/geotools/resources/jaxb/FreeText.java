@@ -14,8 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.util;
+package org.geotools.resources.jaxb;
 
+import org.geotools.util.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.jaxb.metadata.InternationalStringAdapter;
@@ -55,7 +56,7 @@ public class FreeText extends InternationalStringAdapter {
      */
     public FreeText(final GrowableInternationalString text) {
         this.textGroup = new TextGroup(text);
-        this.text = (text == null) ? null : text.defaultValue;
+        this.text = (text == null) ? null : text.toString();
     }
 
     /**

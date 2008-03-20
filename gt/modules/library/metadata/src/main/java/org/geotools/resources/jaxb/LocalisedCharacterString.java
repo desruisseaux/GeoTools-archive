@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.util;
+package org.geotools.resources.jaxb;
 
 import java.util.Locale;
 import javax.xml.bind.annotation.XmlAttribute;
