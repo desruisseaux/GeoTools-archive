@@ -17,14 +17,14 @@
 package org.geotools.resources.jaxb.metadata;
 
 import javax.xml.bind.JAXBException;
-import org.geotools.util.FreeText;
+import org.geotools.resources.jaxb.FreeText;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.geotools.util.GrowableInternationalString;
-import org.geotools.util.LocalisedCharacterString;
+import org.geotools.resources.jaxb.LocalisedCharacterString;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.TextGroup;
+import org.geotools.resources.jaxb.TextGroup;
 import org.opengis.util.InternationalString;
 
 
