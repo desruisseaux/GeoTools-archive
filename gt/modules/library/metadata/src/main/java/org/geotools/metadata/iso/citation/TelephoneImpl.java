@@ -162,9 +162,9 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * 
      * @param marshaller Not used in this implementation.
      */
-    private void beforeMarshal(Marshaller marshaller) {
-        isMarshalling(true);
-    }
+///    private void beforeMarshal(Marshaller marshaller) {
+///        isMarshalling(true);
+///    }
 
     /**
      * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
@@ -173,7 +173,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * 
      * @param marshaller Not used in this implementation
      */
-    private void afterMarshal(Marshaller marshaller) {
-        isMarshalling(false);
-    }
+///    private void afterMarshal(Marshaller marshaller) {
+///        isMarshalling(false);
+///    }
 }
