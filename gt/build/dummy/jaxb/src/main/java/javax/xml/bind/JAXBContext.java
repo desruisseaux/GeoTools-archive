@@ -5,10 +5,8 @@
 package javax.xml.bind;
 
 import org.w3c.dom.Node;
-
 import java.util.Collections;
 import java.util.Map;
-import java.io.IOException;
 
 public abstract class JAXBContext {
     public static final String JAXB_CONTEXT_FACTORY = 

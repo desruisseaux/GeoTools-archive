@@ -12,8 +12,6 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 
-import javax.xml.transform.Source;
-
 @Retention(SOURCE)
 @Target({FIELD,METHOD,PARAMETER})
 public @interface XmlMimeType {

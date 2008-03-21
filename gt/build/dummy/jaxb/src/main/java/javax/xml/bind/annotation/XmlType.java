@@ -18,5 +18,3 @@ public @interface XmlType {
     static final class DEFAULT {}
     String factoryMethod() default "";
 }
-
-

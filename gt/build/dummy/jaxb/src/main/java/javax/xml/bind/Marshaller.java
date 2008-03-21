@@ -4,7 +4,6 @@
  */
 package javax.xml.bind;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.validation.Schema;
 import java.io.File;
