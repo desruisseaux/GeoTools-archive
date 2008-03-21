@@ -34,7 +34,7 @@ public enum ImageTypePolicy {
      * by every tiles. This is the most robust policy, but also the most expensive. This policy
      * should be selected when the tiles may be stored in heterogeneous formats.
      */
-    SUPPORTED_BY_ALL,
+    SUPPORTED_BY_ALL(true),
 
     /**
      * Returns {@linkplain javax.imageio.ImageTypeSpecifier type specifiers} that are supported
@@ -44,7 +44,7 @@ public enum ImageTypePolicy {
      * When Java assertions are enabled, {@linkplain MosaicImageReader} will ensures that this
      * policy produces the same result than the {@link #SUPPORTED_BY_ALL} policy.
      */
-    SUPPORTED_BY_ONE,
+    SUPPORTED_BY_ONE(true),
 
     /**
      * Returns a single {@linkplain javax.imageio.ImageTypeSpecifier type specifier} for images
@@ -52,5 +52,18 @@ public enum ImageTypePolicy {
      * be used only when tiles are known in advance to be compatible with the ARGB model, and
      * this model is wanted.
      */
-    ALWAYS_ARGB
+    ALWAYS_ARGB(false);
+
+    /**
+     * {@code true} if reading a single tile with this policy can be delegated directly to the
+     * underlying image reader as an optimization.
+     */
+    final boolean canDelegate;
+
+    /**
+     * Creates a new enum.
+     */
+    private ImageTypePolicy(final boolean canDelegate) {
+        this.canDelegate = canDelegate;
+    }
 }

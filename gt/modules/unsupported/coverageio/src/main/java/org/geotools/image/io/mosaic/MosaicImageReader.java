@@ -22,6 +22,7 @@ import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.Closeable;
 import java.io.IOException;
@@ -66,7 +67,8 @@ public class MosaicImageReader extends ImageReader {
     private static final boolean PRESERVE_DATA = true;
 
     /**
-     * Type arguments made of a single {@code int} value.
+     * Type arguments made of a single {@code int} value. Used with reflections in order to check
+     * if a method has been overriden (knowing that it is not the case allows some optimizations).
      */
     private static final Class<?>[] INTEGER_ARGUMENTS = {
         int.class
@@ -582,6 +584,20 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
+     * Returns the image type policy from the specified parameter.
+     * Fallback on the default policy if the parameter to not specify any.
+     */
+    private ImageTypePolicy getImageTypePolicy(final ImageReadParam param) {
+        if (param instanceof MosaicImageReadParam) {
+            final ImageTypePolicy policy = ((MosaicImageReadParam) param).getImageTypePolicy();
+            if (policy != null) {
+                return policy;
+            }
+        }
+        return getDefaultImageTypePolicy();
+    }
+
+    /**
      * Returns the policy for {@link #getImageTypes computing image types}. This is also
      * the policy used by {@linkplain #read read} method when none has been explicitly
      * {@linkplain MosaicImageReadParam#setImageTypePolicy set in read parameters}.
@@ -675,6 +691,10 @@ public class MosaicImageReader extends ImageReader {
     /**
      * Returns an image type which most closely represents the "raw" internal format of the
      * given set of tiles. If none is found, returns {@code null}.
+     * <p>
+     * If there is more than one supported types, this method will give preference to the type
+     * having transparency. We do that because we have no garantee that a tile exists for every
+     * area in an image to be read, and the empty area typically need to remain transparent.
      *
      * @param  tiles The tiles to iterate over.
      * @return A raw image type specifier acceptable for all tiles, or {@code null} if none.
@@ -685,22 +705,26 @@ public class MosaicImageReader extends ImageReader {
         final Set<ImageTypeSpecifier> rawTypes = new FrequencySortedSet<ImageTypeSpecifier>(true);
         final Set<ImageTypeSpecifier> allowed = getImageTypes(tiles, rawTypes);
         rawTypes.retainAll(allowed);
-        Iterator<ImageTypeSpecifier> it = rawTypes.iterator();
-        if (it.hasNext()) {
-            final ImageTypeSpecifier type = it.next();
-            if (it.hasNext()) {
-                // TODO: log some low-level warnings here.
+        boolean transparent = true;
+        do {
+            Iterator<ImageTypeSpecifier> it = rawTypes.iterator();
+            while (it.hasNext()) {
+                final ImageTypeSpecifier type = it.next();
+                if (!transparent || isTransparent(type)) {
+                    return type;
+                }
             }
-            return type;
-        }
-        /*
-         * No raw image reader type. Returns the first allowed type even if it is not "raw".
-         */
-        it = allowed.iterator();
-        if (it.hasNext()) {
-            // TODO: log some low-level warnings here.
-            return it.next();
-        }
+            // No raw image reader type. Returns the first allowed type even if it is not "raw".
+            it = allowed.iterator();
+            while (it.hasNext()) {
+                final ImageTypeSpecifier type = it.next();
+                if (!transparent || isTransparent(type)) {
+                    return type;
+                }
+            }
+            // If no type was found and if we were looking for a transparent
+            // type, searchs again for a type no matter its transparency.
+        } while ((transparent = !transparent) == false);
         return null;
     }
 
@@ -800,6 +824,13 @@ public class MosaicImageReader extends ImageReader {
             asList.add(types.next());
         }
         return expected.containsAll(asList) ? asList.iterator() : null;
+    }
+
+    /**
+     * Returns {@code true} if the given type has transparency.
+     */
+    private static boolean isTransparent(final ImageTypeSpecifier type) {
+        return type.getColorModel().getTransparency() != ColorModel.OPAQUE;
     }
 
     /**
@@ -974,7 +1005,8 @@ public class MosaicImageReader extends ImageReader {
         BufferedImage image = null;
         final Rectangle destRegion;
         final Point destinationOffset;
-        if (tiles.size() == 1) {
+        ImageTypePolicy policy = null;
+        if (tiles.size() == 1 && (policy = getImageTypePolicy(param)).canDelegate) {
             destRegion = null;
             if (subsamplingChangeAllowed) {
                 sourceRegion.setBounds(getSourceRegion(param, srcWidth, srcHeight));
@@ -998,12 +1030,8 @@ public class MosaicImageReader extends ImageReader {
                     imageType = param.getDestinationType();
                 }
                 if (imageType == null) {
-                    ImageTypePolicy policy = null;
-                    if (param instanceof MosaicImageReadParam) {
-                        policy = ((MosaicImageReadParam) param).getImageTypePolicy();
-                    }
                     if (policy == null) {
-                        policy = getDefaultImageTypePolicy();
+                        policy = getImageTypePolicy(param);
                     }
                     switch (policy) {
                         default: {

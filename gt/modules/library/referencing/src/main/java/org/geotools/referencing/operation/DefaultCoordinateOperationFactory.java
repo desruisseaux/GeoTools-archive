@@ -27,7 +27,6 @@ import javax.vecmath.SingularMatrixException;
 
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
@@ -51,6 +50,9 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import static org.geotools.referencing.AbstractIdentifiedObject.nameMatches;
+import static org.geotools.referencing.operation.ProjectionAnalyzer.createLinearConversion;
+
 
 /**
  * Creates {@linkplain CoordinateOperation coordinate operations}. This factory is capable to find
@@ -71,6 +73,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * The priority level for this factory.
      */
     static final int PRIORITY = NORMAL_PRIORITY;
+
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPS = 1E-10;
 
     /**
      * A unit of one millisecond.
@@ -407,8 +414,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
             throws FactoryException
     {
         final CartesianCS   STANDARD  = DefaultCartesianCS.GEOCENTRIC;
-        final GeodeticDatum candidate = (GeodeticDatum) crs.getDatum();
-        // TODO: Remove cast once we are allowed to compile against J2SE 1.5.
+        final GeodeticDatum candidate = crs.getDatum();
         if (equalsIgnorePrimeMeridian(candidate, datum)) {
             if (getGreenwichLongitude(candidate.getPrimeMeridian()) ==
                 getGreenwichLongitude(datum    .getPrimeMeridian()))
@@ -438,9 +444,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                     final boolean forceGreenwich)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-              GeodeticDatum datum = (GeodeticDatum) crs.getDatum();
-        final EllipsoidalCS cs    = (EllipsoidalCS) crs.getCoordinateSystem();
+              GeodeticDatum datum = crs.getDatum();
+        final EllipsoidalCS cs    = crs.getCoordinateSystem();
         final EllipsoidalCS STANDARD = (cs.getDimension() <= 2) ?
                                         DefaultEllipsoidalCS.GEODETIC_2D :
                                         DefaultEllipsoidalCS.GEODETIC_3D;
@@ -598,36 +603,6 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         return getGreenwichLongitude(pm, NonSI.DEGREE_ANGLE);
     }
 
-    /**
-     * Returns a conversion from a source to target projected CRS, if this conversion
-     * is representable as an affine transform. More specifically, if all projection
-     * parameters are identical except the following ones:
-     * <BR>
-     * <UL>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SCALE_FACTOR   scale_factor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_EASTING  false_easting}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_NORTHING false_northing}</LI>
-     * </UL>
-     *
-     * <P>Then the conversion between two projected CRS can sometime be represented as a linear
-     * conversion. For example if only false easting/northing differ, than the coordinate conversion
-     * is simply a translation. If no linear conversion has been found between the two CRS, then
-     * this method returns {@code null}.</P>
-     *
-     * @param  sourceCRS The source coordinate reference system.
-     * @param  targetCRS The target coordinate reference system.
-     * @return The conversion from {@code sourceCRS} to {@code targetCRS} as an
-     *         affine transform, or {@code null} if no linear transform has been found.
-     *
-     * @todo Delete and replace by a static import when we
-     *       will be allowed to compile against J2SE 1.5.
-     */
-    private static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
-                                                 final ProjectedCRS targetCRS)
-    {
-        return ProjectionAnalyzer.createLinearConversion(sourceCRS, targetCRS, 1E-10);
-    }
-
 
 
 
@@ -653,9 +628,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final TemporalCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final TemporalDatum sourceDatum = (TemporalDatum) sourceCRS.getDatum();
-        final TemporalDatum targetDatum = (TemporalDatum) targetCRS.getDatum();
+        final TemporalDatum sourceDatum = sourceCRS.getDatum();
+        final TemporalDatum targetDatum = targetCRS.getDatum();
         if (!equalsIgnoreMetadata(sourceDatum, targetDatum)) {
             throw new OperationNotFoundException(getErrorMessage(sourceDatum, targetDatum));
         }
@@ -665,9 +639,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * 1970 at 00:00 UTC.  We compute how much to add to a time in 'sourceCRS' in order
          * to get a time in 'targetCRS'. This "epoch shift" is in units of 'targetCRS'.
          */
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final TimeCS sourceCS = (TimeCS) sourceCRS.getCoordinateSystem();
-        final TimeCS targetCS = (TimeCS) targetCRS.getCoordinateSystem();
+        final TimeCS sourceCS = sourceCRS.getCoordinateSystem();
+        final TimeCS targetCS = targetCRS.getCoordinateSystem();
         final Unit targetUnit = targetCS.getAxis(0).getUnit();
         double epochShift = sourceDatum.getOrigin().getTime() -
                             targetDatum.getOrigin().getTime();
@@ -706,15 +679,13 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final VerticalCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final VerticalDatum sourceDatum = (VerticalDatum) sourceCRS.getDatum();
-        final VerticalDatum targetDatum = (VerticalDatum) targetCRS.getDatum();
+        final VerticalDatum sourceDatum = sourceCRS.getDatum();
+        final VerticalDatum targetDatum = targetCRS.getDatum();
         if (!equalsIgnoreMetadata(sourceDatum, targetDatum)) {
             throw new OperationNotFoundException(getErrorMessage(sourceDatum, targetDatum));
         }
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final VerticalCS sourceCS = (VerticalCS) sourceCRS.getCoordinateSystem();
-        final VerticalCS targetCS = (VerticalCS) targetCRS.getCoordinateSystem();
+        final VerticalCS sourceCS = sourceCRS.getCoordinateSystem();
+        final VerticalCS targetCS = targetCRS.getCoordinateSystem();
         final Matrix     matrix   = swapAndScaleAxis(sourceCS, targetCS);
         return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
     }
@@ -737,8 +708,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final VerticalCRS   targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast when we will be allowed to compile for J2SE 1.5.
-        if (VerticalDatumType.ELLIPSOIDAL.equals(((VerticalDatum) targetCRS.getDatum()).getVerticalDatumType())) {
+        if (VerticalDatumType.ELLIPSOIDAL.equals(targetCRS.getDatum().getVerticalDatumType())) {
             final Matrix matrix = swapAndScaleAxis(sourceCRS.getCoordinateSystem(),
                                                    targetCRS.getCoordinateSystem());
             return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
@@ -764,11 +734,10 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final GeographicCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final EllipsoidalCS sourceCS    = (EllipsoidalCS) sourceCRS.getCoordinateSystem();
-        final EllipsoidalCS targetCS    = (EllipsoidalCS) targetCRS.getCoordinateSystem();
-        final GeodeticDatum sourceDatum = (GeodeticDatum) sourceCRS.getDatum();
-        final GeodeticDatum targetDatum = (GeodeticDatum) targetCRS.getDatum();
+        final EllipsoidalCS sourceCS    = sourceCRS.getCoordinateSystem();
+        final EllipsoidalCS targetCS    = targetCRS.getCoordinateSystem();
+        final GeodeticDatum sourceDatum = sourceCRS.getDatum();
+        final GeodeticDatum targetDatum = targetCRS.getDatum();
         final PrimeMeridian sourcePM    = sourceDatum.getPrimeMeridian();
         final PrimeMeridian targetPM    = targetDatum.getPrimeMeridian();
         if (equalsIgnorePrimeMeridian(sourceDatum, targetDatum)) {
@@ -919,7 +888,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * This shorter path is essential for proper working of
          * createOperationStep(GeographicCRS,ProjectedCRS).
          */
-        final Matrix linear = createLinearConversion(sourceCRS, targetCRS);
+        final Matrix linear = createLinearConversion(sourceCRS, targetCRS, EPS);
         if (linear != null) {
             return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, linear);
         }
@@ -931,9 +900,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          *     target geographic CRS  ---(project)--->
          *     target projected CRS
          */
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final GeographicCRS sourceGeo = (GeographicCRS) sourceCRS.getBaseCRS();
-        final GeographicCRS targetGeo = (GeographicCRS) targetCRS.getBaseCRS();
+        final GeographicCRS sourceGeo = sourceCRS.getBaseCRS();
+        final GeographicCRS targetGeo = targetCRS.getBaseCRS();
         CoordinateOperation step1, step2, step3;
         step1 = tryDB(sourceCRS, sourceGeo); if (step1==null) step1 = createOperationStep(sourceCRS, sourceGeo);
         step2 = tryDB(sourceGeo, targetGeo); if (step2==null) step2 = createOperationStep(sourceGeo, targetGeo);
@@ -962,8 +930,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final ProjectedCRS  targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        GeographicCRS       base  = (GeographicCRS) targetCRS.getBaseCRS();
+        GeographicCRS       base  = targetCRS.getBaseCRS();
         CoordinateOperation step2 = targetCRS.getConversionFromBase();
         CoordinateOperation step1 = tryDB(sourceCRS, base);
         if (step1 == null) {
@@ -996,14 +963,13 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final GeographicCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final GeographicCRS base  = (GeographicCRS) sourceCRS.getBaseCRS();
+        final GeographicCRS base  = sourceCRS.getBaseCRS();
         CoordinateOperation step1 = sourceCRS.getConversionFromBase();
         CoordinateOperation step2 = tryDB(base, targetCRS);
         if (step2 == null) {
             step2 = createOperationStep(base, targetCRS);
         }
-        MathTransform   transform = step1.getMathTransform();
+        MathTransform transform = step1.getMathTransform();
         try {
             transform = transform.inverse();
         } catch (NoninvertibleTransformException exception) {
@@ -1030,9 +996,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final GeocentricCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final GeodeticDatum sourceDatum = (GeodeticDatum) sourceCRS.getDatum();
-        final GeodeticDatum targetDatum = (GeodeticDatum) targetCRS.getDatum();
+        final GeodeticDatum sourceDatum = sourceCRS.getDatum();
+        final GeodeticDatum targetDatum = targetCRS.getDatum();
         final CoordinateSystem sourceCS = sourceCRS.getCoordinateSystem();
         final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
         final double sourcePM, targetPM;
@@ -1126,14 +1091,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * units are metres or decimal degrees, prime meridian is Greenwich and height is measured
          * above the ellipsoid. However, the horizontal datum is preserved.
          */
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-
         final GeographicCRS normSourceCRS = normalize(sourceCRS, true);
-        final GeodeticDatum datum         = (GeodeticDatum) normSourceCRS.getDatum();
+        final GeodeticDatum datum         = normSourceCRS.getDatum();
         final GeocentricCRS normTargetCRS = normalize(targetCRS, datum);
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
-        final MathTransform     transform;
         final ParameterValueGroup   param;
         param = getMathTransformFactory().getDefaultParameters("Ellipsoid_To_Geocentric");
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
@@ -1160,13 +1122,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final GeographicCRS targetCRS)
             throws FactoryException
     {
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
         final GeographicCRS normTargetCRS = normalize(targetCRS, true);
-        final GeodeticDatum datum         = (GeodeticDatum) normTargetCRS.getDatum();
+        final GeodeticDatum datum         = normTargetCRS.getDatum();
         final GeocentricCRS normSourceCRS = normalize(sourceCRS, datum);
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
-        final MathTransform     transform;
         final ParameterValueGroup   param;
         param = getMathTransformFactory().getDefaultParameters("Geocentric_To_Ellipsoid");
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
@@ -1533,22 +1493,6 @@ search: for (int j=0; j<targets.length; j++) {
                    nameMatches(object2, object1.getName().getCode());
         }
         return false;
-    }
-
-    /**
-     * Returns {@code true} if either the primary name or at least
-     * one alias matches the specified string.
-     *
-     * @param  object The object to check.
-     * @param  name The name.
-     * @return {@code true} if the primary name of at least one alias
-     *         matches the specified {@code name}.
-     *
-     * @todo Delete and replace by a static import when we
-     *       will be allowed to compile against J2SE 1.5.
-     */
-    private static boolean nameMatches(final IdentifiedObject object, final String name) {
-        return AbstractIdentifiedObject.nameMatches(object, name);
     }
 
     /**

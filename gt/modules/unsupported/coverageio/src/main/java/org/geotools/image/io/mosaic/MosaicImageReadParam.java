@@ -155,7 +155,7 @@ public class MosaicImageReadParam extends ImageReadParam {
      *          The new policy, or {@code null} for reader
      *          {@linkplain MosaicImageReader#getDefaultImageTypePolicy default policy}.
      */
-    public void getImageTypePolicy(final ImageTypePolicy policy) {
+    public void setImageTypePolicy(final ImageTypePolicy policy) {
         imageTypePolicy = policy;
     }
 

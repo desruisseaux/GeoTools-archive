@@ -305,11 +305,10 @@ public class MosaicImageWriter extends ImageWriter {
                 sourceRegion.height /= imageSubsampling.height;
                 final ImageWriter writer = getImageWriter(tile, image);
                 final ImageWriteParam wp = writer.getDefaultWriteParam();
-                if (filter(tile, wp)) {
-                    wp.setSourceRegion(sourceRegion);
-                    wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
-                    writer.write(null, new IIOImage(image, null, null), wp);
-                }
+                onTileWrite(tile, wp);
+                wp.setSourceRegion(sourceRegion);
+                wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
+                writer.write(null, new IIOImage(image, null, null), wp);
                 close(writer.getOutput(), tile.getInput());
                 writer.dispose();
                 it.remove();
@@ -510,18 +509,20 @@ public class MosaicImageWriter extends ImageWriter {
 
     /**
      * Invoked automatically when a tile is about to be written. The default implementation does
-     * nothing. Subclasses can override this method in order to set custom write parameters. The
-     * {@linkplain ImageWriteParam#setSourceRegion source region} and
-     * {@linkplain ImageWriteParam#setSourceSubsampling source subsampling} should not be set
-     * since they will be inconditionnaly overwritten by the caller.
+     * nothing. Subclasses can override this method in order to set custom write parameters.
+     * <p>
+     * The {@linkplain ImageWriteParam#setSourceRegion source region} and
+     * {@linkplain ImageWriteParam#setSourceSubsampling source subsampling} parameters can not be
+     * set through this method. Their setting will be overwritten by the caller because their
+     * values depend on the strategy choosen by {@code MosaicImageWriter} for reading images,
+     * which itself depends on the amount of available memory.
      *
      * @param  tile The tile to be written.
      * @param  parameters The parameters to be given to the {@linkplain ImageWriter image writer}.
-     * @return {@code true} if the tile should be written, or {@code false} if it should be skipped.
+     *         This method is allowed to change the parameter values.
      * @throws IOException if an I/O operation was required and failed.
      */
-    protected boolean filter(final Tile tile, final ImageWriteParam parameters) throws IOException {
-        return true;
+    protected void onTileWrite(final Tile tile, ImageWriteParam parameters) throws IOException {
     }
 
     /**

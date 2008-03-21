@@ -183,7 +183,6 @@ public final class PredefinedObjectsTest extends TestCase {
      * Test serialization of various objects.
      */
     public void testSerialization() throws IOException, ClassNotFoundException {
-        if (true) return; // TODO: broken test, need to check why.
         serialize(DefaultCoordinateSystemAxis.X);
         serialize(DefaultCoordinateSystemAxis.GEOCENTRIC_X);
         serialize(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE);
@@ -191,8 +190,8 @@ public final class PredefinedObjectsTest extends TestCase {
         serialize(DefaultCartesianCS.GEOCENTRIC);
         serialize(DefaultEllipsoidalCS.GEODETIC_2D);
         serialize(DefaultEllipsoidalCS.GEODETIC_3D);
-        serialize(DefaultGeodeticDatum.WGS84);
         serialize(DefaultPrimeMeridian.GREENWICH);
+        serialize(DefaultGeodeticDatum.WGS84);
     }
 
     /**

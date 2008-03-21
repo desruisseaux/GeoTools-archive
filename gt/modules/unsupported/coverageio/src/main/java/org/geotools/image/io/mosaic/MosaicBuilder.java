@@ -250,19 +250,19 @@ public class MosaicBuilder {
      *
      * @throws IllegalArgumentException if no provider was found for the given name.
      */
-    public void setTileReaderSpi(String provider) throws IllegalArgumentException {
+    public void setTileReaderSpi(String format) throws IllegalArgumentException {
         ImageReaderSpi spi = null;
-        if (provider != null) {
-            provider = provider.trim();
+        if (format != null) {
+            format = format.trim();
             final IIORegistry registry = IIORegistry.getDefaultInstance();
             final Iterator<ImageReaderSpi> it=registry.getServiceProviders(ImageReaderSpi.class, true);
             do {
                 if (!it.hasNext()) {
                     throw new IllegalArgumentException(Errors.format(
-                            ErrorKeys.UNKNOW_IMAGE_FORMAT_$1, provider));
+                            ErrorKeys.UNKNOW_IMAGE_FORMAT_$1, format));
                 }
                 spi = it.next();
-            } while (!XArray.contains(spi.getFormatNames(), provider));
+            } while (!XArray.contains(spi.getFormatNames(), format));
         }
         setTileReaderSpi(spi);
     }
@@ -853,13 +853,11 @@ public class MosaicBuilder {
 
         /**
          * Invoked when a tile is about to be written. Delegates to a method that users can
-         * override. Inconditionnaly returns {@code true} since filtering would be misleading
-         * (because the tiles would still declared in the {@link TileManager} to be created).
+         * override.
          */
         @Override
-        protected boolean filter(Tile tile, ImageWriteParam parameters) throws IOException {
-            onTileWrite(tile, parameters);
-            return super.filter(tile, parameters);
+        protected void onTileWrite(Tile tile, ImageWriteParam parameters) throws IOException {
+            MosaicBuilder.this.onTileWrite(tile, parameters);
         }
     }
 
