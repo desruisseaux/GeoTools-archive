@@ -63,6 +63,14 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     private static final double EPSILON = 1E-10;
 
     /**
+     * Maximum length of temporary {@double[]} arrays to be created, used for performing
+     * transformations in batch. A value of 256 will consumes 2 kilobytes of memory. It is
+     * better to avoid too high values since allocating and initializing the array elements
+     * to zero have a cost.
+     */
+    private static final int TEMPORARY_ARRAY_LENGTH = 256;
+
+    /**
      * The first math transform.
      */
     public final MathTransform transform1;
@@ -93,7 +101,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         this.transform2 = transform2;
         if (!isValid()) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CONCATENATE_TRANSFORMS_$2,
-                                               getName(transform1), getName(transform2)));
+                      getName(transform1), getName(transform2)));
         }
     }
 
@@ -246,8 +254,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //
         if (dimSource==1 && dimTarget==1) {
             if (tr1 instanceof MathTransform1D && tr2 instanceof MathTransform1D) {
-                return new ConcatenatedTransformDirect1D((MathTransform1D)tr1,
-                                                         (MathTransform1D)tr2);
+                return new ConcatenatedTransformDirect1D((MathTransform1D) tr1,
+                                                         (MathTransform1D) tr2);
             } else {
                 return new ConcatenatedTransform1D(tr1, tr2);
             }
@@ -257,8 +265,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         //
         if (dimSource==2 && dimTarget==2) {
             if (tr1 instanceof MathTransform2D && tr2 instanceof MathTransform2D) {
-                return new ConcatenatedTransformDirect2D((MathTransform2D)tr1,
-                                                         (MathTransform2D)tr2);
+                return new ConcatenatedTransformDirect2D((MathTransform2D) tr1,
+                                                         (MathTransform2D) tr2);
             } else {
                 return new ConcatenatedTransform2D(tr1, tr2);
             }
@@ -315,7 +323,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
     @Override
-    public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
+    public DirectPosition transform(final DirectPosition ptSrc, final DirectPosition ptDst)
             throws TransformException
     {
         assert isValid();
@@ -326,36 +334,97 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
 
     /**
-     * Transforms a list of coordinate point ordinal values.
+     * Transforms a list of coordinate point ordinal values. The source points are first
+     * transformed by {@link #transform1}, then the intermediate points are transformed
+     * by {@link #transform2}. The transformations are performed without intermediate
+     * buffer if it can be avoided.
      */
-    public void transform(final double[] srcPts, final int srcOff,
-                          final double[] dstPts, final int dstOff, final int numPts)
-        throws TransformException
+    public void transform(final double[] srcPts, int srcOff,
+                          final double[] dstPts, int dstOff, int numPts)
+            throws TransformException
     {
         assert isValid();
-        //  Note: If we know that the transfert dimension is the same than source
-        //        and target dimension, then we don't need to use an intermediate
-        //        buffer. This optimization is done in ConcatenatedTransformDirect.
-        final double[] tmp = new double[numPts*transform1.getTargetDimensions()];
-        transform1.transform(srcPts, srcOff, tmp, 0, numPts);
-        transform2.transform(tmp, 0, dstPts, dstOff, numPts);
+        final int intermDim = transform1.getTargetDimensions();
+        final int targetDim = getTargetDimensions();
+        /*
+         * If the transfert dimension is not greater than the target dimension, then we
+         * don't need to use an intermediate buffer. Note that this optimization is done
+         * inconditionnaly in ConcatenatedTransformDirect.
+         */
+        if (intermDim <= targetDim) {
+            transform1.transform(srcPts, srcOff, dstPts, dstOff, numPts);
+            transform2.transform(dstPts, dstOff, dstPts, dstOff, numPts);
+            return;
+        }
+        if (numPts <= 0) {
+            return;
+        }
+        /*
+         * Creates a temporary array for the intermediate result. The array may be smaller than
+         * the length necessary for containing every coordinates. In such case the concatenated
+         * transform will need to be applied piecewise.
+         */
+        int numTmp = numPts;
+        int length = numTmp * intermDim;
+        if (length > TEMPORARY_ARRAY_LENGTH) {
+            numTmp = Math.max(1, TEMPORARY_ARRAY_LENGTH / intermDim);
+            length = numTmp * intermDim;
+        }
+        final double[] tmp = new double[length];
+        final int sourceDim = getSourceDimensions();
+        do {
+            if (numTmp > numPts) {
+                numTmp = numPts;
+            }
+            transform1.transform(srcPts, srcOff, tmp, 0, numTmp);
+            transform2.transform(tmp, 0, dstPts, dstOff, numTmp);
+            srcOff += numTmp * sourceDim;
+            dstOff += numTmp * targetDim;
+            numPts -= numTmp;
+        } while (numPts != 0);
     }
 
     /**
-     * Transforms a list of coordinate point ordinal values.
+     * Transforms a list of coordinate point ordinal values. The source points are first copied
+     * in a temporary array of type {@code double[]}, transformed by {@link #transform1} first,
+     * then by {@link #transform2} and finally the result is casted to {@code float} primitive
+     * type and stored in the destination array. The use of {@code double} primitive type for
+     * intermediate results is necesssary for reducing rounding errors.
      */
     @Override
-    public void transform(final float[] srcPts, final int srcOff,
-                          final float[] dstPts, final int dstOff, final int numPts)
-        throws TransformException
+    public void transform(final float[] srcPts, int srcOff,
+                          final float[] dstPts, int dstOff, int numPts)
+            throws TransformException
     {
         assert isValid();
-        //  Note: If we know that the transfert dimension is the same than source
-        //        and target dimension, then we don't need to use an intermediate
-        //        buffer. This optimization is done in ConcatenatedTransformDirect.
-        final float[] tmp = new float[numPts*transform1.getTargetDimensions()];
-        transform1.transform(srcPts, srcOff, tmp, 0, numPts);
-        transform2.transform(tmp, 0, dstPts, dstOff, numPts);
+        if (numPts <= 0) {
+            return;
+        }
+        final int sourceDim = getSourceDimensions();
+        final int targetDim = getTargetDimensions();
+        final int intermDim = transform1.getTargetDimensions();
+        final int dimension = Math.max(Math.max(sourceDim, targetDim), intermDim);
+        int numTmp = numPts;
+        int length = numTmp * dimension;
+        if (length > TEMPORARY_ARRAY_LENGTH) {
+            numTmp = Math.max(1, TEMPORARY_ARRAY_LENGTH / dimension);
+            length = numTmp * dimension;
+        }
+        final double[] tmp = new double[length];
+        do {
+            if (numTmp > numPts) {
+                numTmp = numPts;
+            }
+            for (int i=0; i<numTmp; i++) {
+                tmp[i] = srcPts[srcOff++];
+            }
+            transform1.transform(tmp, 0, tmp, 0, numTmp);
+            transform2.transform(tmp, 0, tmp, 0, numTmp);
+            for (int i=0; i<numTmp; i++) {
+                dstPts[dstOff++] = (float) tmp[i];
+            }
+            numPts -= numTmp;
+        } while (numPts != 0);
     }
 
     /**

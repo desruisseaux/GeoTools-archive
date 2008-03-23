@@ -25,7 +25,7 @@ import org.opengis.geometry.DirectPosition;
 /**
  * Concatenated transform where the transfert dimension is the same than source and target
  * dimension. This fact allows some optimizations, the most important one being the possibility
- * to avoid the use of an intermediate buffer.
+ * to avoid the use of an intermediate buffer in some case.
  *
  * @since 2.0
  * @source $URL$
@@ -82,16 +82,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
         transform2.transform(dstPts, dstOff, dstPts, dstOff, numPts);
     }
 
-    /**
-     * Transforms a list of coordinate point ordinal values.
-     */
-    @Override
-    public void transform(final float[] srcPts, final int srcOff,
-                          final float[] dstPts, final int dstOff, final int numPts)
-            throws TransformException
-    {
-        assert isValid();
-        transform1.transform(srcPts, srcOff, dstPts, dstOff, numPts);
-        transform2.transform(dstPts, dstOff, dstPts, dstOff, numPts);
-    }
+    // Do NOT override the transform(float[]...) version because we really need to use an
+    // intermediate buffer of type double[] for reducing rounding error. Otherwise some map
+    // projection degrades image quality in an unacceptable way.
 }
