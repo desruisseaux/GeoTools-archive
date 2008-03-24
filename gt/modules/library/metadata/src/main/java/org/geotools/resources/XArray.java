@@ -999,6 +999,25 @@ public final class XArray {
     }
 
     /**
+     * Returns {@code true} if the specified array contains the specified value, ignoring case.
+     * This method should be used only for very small arrays.
+     *
+     * @param  array The array to search in. May be {@code null}.
+     * @param  value The value to search.
+     * @return {@code true} if the array contains the value.
+     */
+    public static boolean containsIgnoreCase(final String[] array, final String value) {
+        if (array != null) {
+            for (final String element : array) {
+                if (value.equalsIgnoreCase(element)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns {@code true} if the specified array contains the specified value. This method
      * should be used only for very small arrays, or for search to be performed only once,
      * because it performs a linear search. If more than one search need to be done on the

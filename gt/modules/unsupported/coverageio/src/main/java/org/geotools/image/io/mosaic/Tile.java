@@ -586,7 +586,7 @@ public class Tile implements Comparable<Tile>, Serializable {
                 while (it.hasNext()) {
                     final ImageReaderSpi candidate = it.next();
                     final String[] candidateSuffixes = candidate.getFileSuffixes();
-                    if (XArray.contains(candidateSuffixes, suffix)) {
+                    if (XArray.containsIgnoreCase(candidateSuffixes, suffix)) {
                         if (provider != null) {
                             if (Arrays.equals(candidateSuffixes, suffixes)) {
                                 // E.g. we may have both CLIB and JSE version of PNG reader.
