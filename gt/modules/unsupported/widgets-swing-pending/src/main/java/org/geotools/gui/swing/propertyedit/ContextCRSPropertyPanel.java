@@ -38,7 +38,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author  johann sorel
  */
-public class ContextCRSPropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+public class ContextCRSPropertyPanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapContext context;
     private JCRSList liste = new JCRSList();
@@ -213,7 +213,7 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
         return "Projection";
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
 

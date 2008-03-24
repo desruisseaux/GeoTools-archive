@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Symbolizer;
 
@@ -53,7 +53,7 @@ public final class StyleComponent extends org.geotools.gui.swing.contexttree.ren
 
             public void mouseClicked(MouseEvent e) {
                 if( layer != null ){
-                    ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+                    ArrayList<PropertyPane> lst = new ArrayList<PropertyPane>();
                     lst.add(new LayerStylePropertyPanel());
                     JPropertyDialog.showDialog(lst, layer);
                 }

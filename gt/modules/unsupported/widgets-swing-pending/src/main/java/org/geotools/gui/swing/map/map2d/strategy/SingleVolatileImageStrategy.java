@@ -22,6 +22,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
@@ -348,6 +349,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             }
         }
         }
+
 }
     
 

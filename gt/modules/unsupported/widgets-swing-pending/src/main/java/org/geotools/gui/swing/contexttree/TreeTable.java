@@ -49,6 +49,9 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  */
 final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
 
+    
+    private static final TreePath[] EMPTY_PATH = {};
+    
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/contexttree/Bundle");
     /**
      * Default copy action used for Key Input
@@ -302,6 +305,11 @@ final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
     }
 
     public boolean onlyMapContexts(TreePath[] paths) {
+        
+        if(paths == null){
+            return false;
+        }
+        
         for (TreePath path : paths) {
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapContext)) {
                 return false;
@@ -321,6 +329,11 @@ final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
     
     
     public boolean onlyMapLayers(TreePath[] paths) {
+        
+        if(paths == null){
+            return false;
+        }
+        
         for (TreePath path : paths) {
             if (!(((ContextTreeNode) path.getLastPathComponent()).getUserObject() instanceof MapLayer)) {
                 return false;
@@ -384,6 +397,10 @@ final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
     boolean duplicateSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
+        if(selections == null){
+            selections = EMPTY_PATH;
+        }
+        
         if (canDuplicateSelection()) {
             FacilitiesFactory ff = new FacilitiesFactory();
 
@@ -462,6 +479,11 @@ final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
     boolean canDuplicateSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
+        if(selections == null){
+            selections = EMPTY_PATH;
+        }
+        
+        
         if (hasSelection(selections)) {
             return (onlyMapContexts(selections) || onlyMapLayers(selections));
         } else {
@@ -503,6 +525,10 @@ final class TreeTable extends org.jdesktop.swingx.JXTreeTable {
         if (canDeleteSelection()) {
             TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
+                    if(selections == null){
+            selections = EMPTY_PATH;
+        }
+            
             for (int i = selections.length - 1; i >= 0; i--) {
                 TreePath tp = selections[i];
 

@@ -18,6 +18,11 @@
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jsp_expStateChanged"/>
       </Events>
     </Component>
+    <Component class="javax.swing.JComboBox" name="jcb_exp">
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jcb_expItemStateChanged"/>
+      </Events>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="opaque" type="boolean" value="false"/>

@@ -22,6 +22,7 @@ import java.awt.event.ComponentEvent;
 import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Rectangle;
 import java.awt.event.ComponentListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.event.EventListenerList;
@@ -41,13 +42,14 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 public abstract class AbstractRenderingStrategy implements RenderingStrategy, MapLayerListListener {
 
     private final EventListenerList STRATEGY_LISTENERS = new EventListenerList();
-    private MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+    protected MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private Envelope oldMapArea = null;
     private Rectangle oldRect = null;
     private final JComponent comp;
     private boolean autorefresh = true;
     private boolean isPainting = false;
     protected Envelope mapArea = new Envelope(1, 10, 1, 10);
+    protected AffineTransform affineTransform = null;
 
     /**
      * create a default AbstractStrategy 
@@ -315,5 +317,13 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy, Ma
     public abstract void layerChanged(MapLayerListEvent event);
 
     public abstract void layerMoved(MapLayerListEvent event);
+
+    public AffineTransform getAffineTransform() {
+        return affineTransform;
+    }
+
+    public void setAffineTransform(AffineTransform affineTransform) {
+        this.affineTransform = affineTransform;
+    }
 
 }        

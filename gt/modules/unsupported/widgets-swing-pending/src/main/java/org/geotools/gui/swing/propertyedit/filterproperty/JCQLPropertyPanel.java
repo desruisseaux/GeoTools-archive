@@ -16,17 +16,16 @@
 
 package org.geotools.gui.swing.propertyedit.filterproperty;
 
-import java.awt.Component;
 import org.geotools.data.DefaultQuery;
 import org.geotools.gui.swing.filter.JCQLFilterPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 
 /**
  *
  * @author johann sorel
  */
-public class JCQLPropertyPanel extends JCQLFilterPanel implements PropertyPanel{
+public class JCQLPropertyPanel extends JCQLFilterPanel implements PropertyPane{
 
     
     private MapLayer layer;
@@ -56,8 +55,5 @@ public class JCQLPropertyPanel extends JCQLFilterPanel implements PropertyPanel{
     }
 
     
-    public Component getPanel() {
-        return getComponent();
-    }
 
 }

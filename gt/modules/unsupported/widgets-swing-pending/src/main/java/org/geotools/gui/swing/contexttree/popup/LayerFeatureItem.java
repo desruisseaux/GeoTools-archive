@@ -27,7 +27,7 @@ import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 
 
@@ -50,7 +50,7 @@ public class LayerFeatureItem extends JMenuItem implements TreePopupItem{
     private void init(){
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+                ArrayList<PropertyPane> lst = new ArrayList<PropertyPane>();
                 lst.add(new LayerFeaturePropertyPanel());
                 JPropertyDialog.showDialog(lst, layer);
                 

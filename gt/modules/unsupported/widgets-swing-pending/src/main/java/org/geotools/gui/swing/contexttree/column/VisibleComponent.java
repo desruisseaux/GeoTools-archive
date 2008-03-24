@@ -16,13 +16,17 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
 import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 
 /**
@@ -31,7 +35,14 @@ import org.geotools.map.MapLayer;
  */
 final class VisibleComponent extends RenderAndEditComponent{
 
-    private final JCheckBox check = new JCheckBox();
+    
+    
+    
+    
+    private final VisbleCheck check = new VisbleCheck(){
+        
+        
+    };
     private MapLayer layer = null;
     
     VisibleComponent(){
@@ -47,6 +58,7 @@ final class VisibleComponent extends RenderAndEditComponent{
                 }
             }
         });
+        
     }
     
     
@@ -54,6 +66,7 @@ final class VisibleComponent extends RenderAndEditComponent{
     public void parse(Object obj) {
        layer = null;
         
+       
         removeAll();
         if(obj instanceof Boolean){
             check.setSelected((Boolean)obj);
@@ -72,4 +85,22 @@ final class VisibleComponent extends RenderAndEditComponent{
         return check.isSelected();
     }
 
+   
+    
+}
+
+
+class VisbleCheck extends JCheckBox{
+    
+    
+    private static final ImageIcon ICO_VISIBLE = IconBundle.getResource().getIcon("16_visible");
+    private static final ImageIcon ICO_NOVISIBLE = IconBundle.getResource().getIcon("16_novisible");
+    
+     @Override
+        public void paintComponent(Graphics g){
+         
+            int x = (getWidth()-16)/2;
+            int y = (getHeight()-16)/2;
+            g.drawImage( (isSelected())?ICO_VISIBLE.getImage() : ICO_NOVISIBLE.getImage(), x,y, this);
+        }
 }

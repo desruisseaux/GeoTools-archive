@@ -17,10 +17,12 @@ package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
 
+import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
 import javax.swing.SpinnerNumberModel;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
@@ -30,14 +32,16 @@ import org.opengis.filter.expression.Expression;
  *
  * @author  johann Sorel
  */
-public class JExpressionPane extends javax.swing.JPanel {
+public class JExpressionPane extends javax.swing.JPanel{
 
     private static Icon ICON_COLOR = IconBundle.getResource().getIcon("JS16_color");
 
     public static enum EXP_TYPE {
+
         COLOR,
         NUMBER,
         OPACITY,
+        WELL_KNOWN_NAME,
         OTHER
     }
     private EXP_TYPE type = EXP_TYPE.OTHER;
@@ -50,6 +54,17 @@ public class JExpressionPane extends javax.swing.JPanel {
      */
     public JExpressionPane() {
         initComponents();
+        init();
+    }
+
+    private void init() {
+        jcb_exp.addItem("square");
+        jcb_exp.addItem("circle");
+        jcb_exp.addItem("triangle");
+        jcb_exp.addItem("star");
+        jcb_exp.addItem("cross");
+        jcb_exp.addItem("x");
+        jcb_exp.setSelectedItem("cross");
         parse();
     }
 
@@ -57,8 +72,8 @@ public class JExpressionPane extends javax.swing.JPanel {
         this.type = type;
         parse();
     }
-    
-    public EXP_TYPE getType(){
+
+    public EXP_TYPE getType() {
         return type;
     }
 
@@ -73,7 +88,7 @@ public class JExpressionPane extends javax.swing.JPanel {
                 but_color.setEnabled(true);
                 but_color.setIcon(ICON_COLOR);
                 break;
-            case NUMBER :
+            case NUMBER:
                 pan_exp.removeAll();
                 pan_exp.add(jsp_exp);
                 jtf_exp.setEditable(false);
@@ -81,10 +96,18 @@ public class JExpressionPane extends javax.swing.JPanel {
                 but_color.setEnabled(false);
                 but_color.setIcon(null);
                 break;
-            case OPACITY :
+            case OPACITY:
                 pan_exp.removeAll();
                 pan_exp.add(jsp_exp);
                 jsp_exp.setModel(new SpinnerNumberModel(Double.valueOf(1.0d), Double.valueOf(0.0d), Double.valueOf(1.0d), Double.valueOf(0.1d)));
+                jtf_exp.setEditable(false);
+                but_color.setVisible(false);
+                but_color.setEnabled(false);
+                but_color.setIcon(null);
+                break;
+            case WELL_KNOWN_NAME:
+                pan_exp.removeAll();
+                pan_exp.add(jcb_exp);
                 jtf_exp.setEditable(false);
                 but_color.setVisible(false);
                 but_color.setEnabled(false);
@@ -101,29 +124,26 @@ public class JExpressionPane extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * 
-     * @param layer the layer style to edit
-     */
     public void setLayer(MapLayer layer) {
         this.layer = layer;
     }
-    
-    public MapLayer getLayer(){
+
+    public MapLayer getLayer() {
         return layer;
     }
 
-    /**
-     * 
-     * @param exp the default expression
-     */
     public void setExpression(Expression exp) {
 
         this.exp = exp;
-        
+
         if (exp != null) {
             if (exp != Expression.NIL) {
                 jtf_exp.setText(exp.toString());
+
+                try {
+                    jcb_exp.setSelectedItem(exp.toString());
+                } catch (Exception e) {
+                }
             }
         }
 
@@ -140,10 +160,10 @@ public class JExpressionPane extends javax.swing.JPanel {
                 } catch (Exception e) {
                     jtf_exp.setBackground(Color.WHITE);
                 }
-            }else{
-                try{
+            } else {
+                try {
                     jsp_exp.setValue(Double.valueOf(exp.toString()));
-                }catch(Exception e){                    
+                } catch (Exception e) {
                 }
             }
         } else {
@@ -151,19 +171,17 @@ public class JExpressionPane extends javax.swing.JPanel {
             jsp_exp.setValue(1);
         }
     }
-    /**
-     * 
-     * @return Expression : new Expression
-     */
+
     public Expression getExpression() {
 
-        if (exp != null) {
-            return exp;
+        if (exp == null) {
+            exp = new StyleBuilder().literalExpression(jtf_exp.getText());
         }
-
-        StyleBuilder sb = new StyleBuilder();
-        return sb.literalExpression(jtf_exp.getText());
+        
+        return exp;
     }
+    
+    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -175,6 +193,7 @@ public class JExpressionPane extends javax.swing.JPanel {
 
         jtf_exp = new javax.swing.JTextField();
         jsp_exp = new javax.swing.JSpinner();
+        jcb_exp = new javax.swing.JComboBox();
         but_exp = new javax.swing.JButton();
         but_color = new javax.swing.JButton();
         pan_exp = new javax.swing.JPanel();
@@ -194,6 +213,12 @@ public class JExpressionPane extends javax.swing.JPanel {
         jsp_exp.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jsp_expStateChanged(evt);
+            }
+        });
+
+        jcb_exp.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcb_expItemStateChanged(evt);
             }
         });
 
@@ -257,12 +282,12 @@ public class JExpressionPane extends javax.swing.JPanel {
 
     private void jtf_expActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtf_expActionPerformed
         StyleBuilder sb = new StyleBuilder();
-        setExpression( sb.literalExpression(jtf_exp.getText()));
+        setExpression(sb.literalExpression(jtf_exp.getText()));
 }//GEN-LAST:event_jtf_expActionPerformed
 
     private void jtf_expFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtf_expFocusLost
         StyleBuilder sb = new StyleBuilder();
-        setExpression( sb.literalExpression(jtf_exp.getText()));
+        setExpression(sb.literalExpression(jtf_exp.getText()));
 }//GEN-LAST:event_jtf_expFocusLost
 
     private void but_colorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_colorActionPerformed
@@ -270,13 +295,13 @@ public class JExpressionPane extends javax.swing.JPanel {
 
         Color col = Color.WHITE;
         if (exp != null) {
-            try{
+            try {
                 Color origin = SLD.color(exp);
                 col = JColorChooser.showDialog(null, "", (origin != null) ? origin : Color.WHITE);
-            }catch(Exception e){
+            } catch (Exception e) {
                 col = JColorChooser.showDialog(null, "", Color.WHITE);
             }
-        }else{
+        } else {
             col = JColorChooser.showDialog(null, "", Color.WHITE);
         }
 
@@ -288,11 +313,25 @@ public class JExpressionPane extends javax.swing.JPanel {
         setExpression(sb.literalExpression(jsp_exp.getValue()));
     }//GEN-LAST:event_jsp_expStateChanged
 
+    private void jcb_expItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcb_expItemStateChanged
+        if (exp != null) {
+            StyleBuilder sb = new StyleBuilder();
+
+            Object obj = jcb_exp.getSelectedItem();
+            if (obj != null) {
+                exp = sb.literalExpression((String) obj);
+            }
+        }
+    }//GEN-LAST:event_jcb_expItemStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_color;
     private javax.swing.JButton but_exp;
+    private javax.swing.JComboBox jcb_exp;
     private javax.swing.JSpinner jsp_exp;
     private javax.swing.JTextField jtf_exp;
     private javax.swing.JPanel pan_exp;
     // End of variables declaration//GEN-END:variables
+
+    
 }

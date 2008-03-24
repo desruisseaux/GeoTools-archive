@@ -16,13 +16,16 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 
 import org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapLayer;
 
@@ -33,7 +36,7 @@ import org.geotools.map.MapLayer;
 final class SelectionComponent extends RenderAndEditComponent{
 
     private SelectableMap2D map;
-    private final JCheckBox check = new JCheckBox();
+    private final SelectionCheck check = new SelectionCheck();
     private MapLayer layer = null;
     
     SelectionComponent(){
@@ -88,3 +91,21 @@ final class SelectionComponent extends RenderAndEditComponent{
     }
 
 }
+
+
+
+class SelectionCheck extends JCheckBox{
+    
+    
+    private static final ImageIcon ICO_SELECT = IconBundle.getResource().getIcon("16_select");
+    private static final ImageIcon ICO_NOSELECT = IconBundle.getResource().getIcon("16_noselect");
+    
+     @Override
+        public void paintComponent(Graphics g){
+         
+            int x = (getWidth()-16)/2;
+            int y = (getHeight()-16)/2;
+            g.drawImage( (isSelected())?ICO_SELECT.getImage() : ICO_NOSELECT.getImage(), x,y, this);
+        }
+}
+

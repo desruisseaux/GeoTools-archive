@@ -16,6 +16,8 @@
 
 package org.geotools.gui.swing.style.sld;
 
+import java.awt.Component;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Font;
 import org.geotools.styling.StyleBuilder;
@@ -23,10 +25,10 @@ import org.geotools.styling.StyleBuilder;
 /**
  * @author johann sorel
  */
-public class JFontPane extends javax.swing.JPanel {
+public class JFontPane extends javax.swing.JPanel implements StyleElementEditor<Font>{
     
     private MapLayer layer = null;
-    private Font font = new StyleBuilder().createFont("Arial", 12);
+    private Font font = null;
     
     /** Creates new form JfontPanel */
     public JFontPane() {
@@ -41,7 +43,7 @@ public class JFontPane extends javax.swing.JPanel {
         guiWeight.setType(JExpressionPane.EXP_TYPE.NUMBER);
     }
     
-    public void setSLDFont(Font font){        
+    public void setEdited(Font font){        
         this.font = font;
         
         if(font != null){
@@ -52,17 +54,11 @@ public class JFontPane extends javax.swing.JPanel {
         }
     }
     
-    public Font getSLDFont(){
+    public Font getEdited(){
         if(font == null){
-            StyleBuilder sb = new StyleBuilder();
-            Font f = sb.createFont(guiFamily.getExpression(), guiStyle.getExpression(), guiWeight.getExpression(), guiSize.getExpression());
-            return f;
-        }else{
-            font.setFontFamily(guiFamily.getExpression());
-            font.setFontSize(guiSize.getExpression());
-            font.setFontStyle(guiStyle.getExpression());
-            font.setFontWeight(guiWeight.getExpression());
+            font = new StyleBuilder().createFont("arial",8);
         }
+        apply();
         return font;
     }
     
@@ -76,6 +72,19 @@ public class JFontPane extends javax.swing.JPanel {
     
     public MapLayer getLayer(){
         return layer;
+    }
+    
+    public void apply(){
+        if(font != null){
+            font.setFontFamily(guiFamily.getExpression());
+            font.setFontSize(guiSize.getExpression());
+            font.setFontStyle(guiStyle.getExpression());
+            font.setFontWeight(guiWeight.getExpression());
+        }
+    }
+    
+    public Component getComponent(){
+        return this;
     }
     
     /** This method is called from within the constructor to

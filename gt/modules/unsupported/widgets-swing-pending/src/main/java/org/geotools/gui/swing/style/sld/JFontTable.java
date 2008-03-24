@@ -13,83 +13,80 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
+import javax.swing.AbstractCellEditor;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.CellEditorListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
+import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Font;
 import org.geotools.styling.StyleBuilder;
 
-
-
-
 /**
  * @author johann sorel
  */
-public class JFontTable extends javax.swing.JPanel {
-    
+public class JFontTable extends javax.swing.JPanel implements StyleElementEditor<Font[]> {
+
     private MapLayer layer = null;
-    
-//    private static final Icon ICO_UP = IconBundle.getResource().getIcon("");
-//    private static final Icon ICO_DOWN = IconBundle.getResource().getIcon("");
-//    private static final Icon ICO_NEW = IconBundle.getResource().getIcon("");
-//    private static final Icon ICO_DELETE = IconBundle.getResource().getIcon("");
-    
-    
+    private static final Icon ICO_UP = IconBundle.getResource().getIcon("16_uparrow");
+    private static final Icon ICO_DOWN = IconBundle.getResource().getIcon("16_downarrow");
+    private static final Icon ICO_NEW = IconBundle.getResource().getIcon("16_add_data");
+    private static final Icon ICO_DELETE = IconBundle.getResource().getIcon("16_delete");
     private final FontModel model = new FontModel(new Font[]{});
     private final FontEditor editor = new FontEditor();
-    
-    
+
     /** Creates new form JFontsPanel */
     public JFontTable() {
-        initComponents();        
+        initComponents();
         init();
     }
-    
-    private void init(){
-        
+
+    private void init() {
         tabFonts.setTableHeader(null);
         tabFonts.setModel(model);
         tabFonts.getColumnModel().getColumn(0).setCellEditor(editor);
         tabFonts.setDefaultRenderer(Font.class, new FontRenderer());
         tabFonts.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
-    
-    public void setLayer(MapLayer layer){
+
+    public void setLayer(MapLayer layer) {
         editor.setLayer(layer);
         this.layer = layer;
     }
-    
-    public MapLayer getLayer(){
+
+    public MapLayer getLayer() {
         return layer;
     }
-    
-    public void setFonts(Font[] fonts){
+
+    public void setEdited(Font[] fonts) {
         model.setFonts(fonts);
     }
-    
-    public Font[] getFonts(){
+
+    public Font[] getEdited() {
         return model.getFonts();
     }
-    
+
+    public void apply() {
+    }
+
+    public Component getComponent() {
+        return this;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -107,29 +104,40 @@ public class JFontTable extends javax.swing.JPanel {
 
         jScrollPane1.setViewportView(tabFonts);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        guiUp.setText(bundle.getString("up")); // NOI18N
+        guiUp.setIcon(ICO_UP);
+        guiUp.setBorderPainted(false);
+        guiUp.setContentAreaFilled(false);
+        guiUp.setMargin(new java.awt.Insets(2, 2, 2, 2));
         guiUp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiUpActionPerformed(evt);
             }
         });
 
-        guiDown.setText(bundle.getString("down")); // NOI18N
+        guiDown.setIcon(ICO_DOWN);
+        guiDown.setBorderPainted(false);
+        guiDown.setContentAreaFilled(false);
+        guiDown.setMargin(new java.awt.Insets(2, 2, 2, 2));
         guiDown.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiDownActionPerformed(evt);
             }
         });
 
-        guiNew.setText(bundle.getString("new")); // NOI18N
+        guiNew.setIcon(ICO_NEW);
+        guiNew.setBorderPainted(false);
+        guiNew.setContentAreaFilled(false);
+        guiNew.setMargin(new java.awt.Insets(2, 2, 2, 2));
         guiNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiNewActionPerformed(evt);
             }
         });
 
-        guiDelete.setText(bundle.getString("delete")); // NOI18N
+        guiDelete.setIcon(ICO_DELETE);
+        guiDelete.setBorderPainted(false);
+        guiDelete.setContentAreaFilled(false);
+        guiDelete.setMargin(new java.awt.Insets(2, 2, 2, 2));
         guiDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guiDeleteActionPerformed(evt);
@@ -140,8 +148,8 @@ public class JFontTable extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(guiNew)
@@ -154,7 +162,6 @@ public class JFontTable extends javax.swing.JPanel {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(guiUp)
@@ -165,24 +172,24 @@ public class JFontTable extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(guiDelete)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
     private void guiUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiUpActionPerformed
         int index = tabFonts.getSelectionModel().getMinSelectionIndex();
-        
-        if(index >=0){
+
+        if (index >= 0) {
             Font f = (Font) model.getValueAt(index, 0);
-            model.moveUp(f);            
+            model.moveUp(f);
         }
 }//GEN-LAST:event_guiUpActionPerformed
 
     private void guiDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDownActionPerformed
         int index = tabFonts.getSelectionModel().getMinSelectionIndex();
-        
-        if(index >=0){
+
+        if (index >= 0) {
             Font f = (Font) model.getValueAt(index, 0);
-            model.moveDown(f);            
+            model.moveDown(f);
         }
 }//GEN-LAST:event_guiDownActionPerformed
 
@@ -192,13 +199,11 @@ public class JFontTable extends javax.swing.JPanel {
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
         int index = tabFonts.getSelectionModel().getMinSelectionIndex();
-        
-        if(index >=0){
-            model.deleteFont(index);        
+
+        if (index >= 0) {
+            model.deleteFont(index);
         }
     }//GEN-LAST:event_guiDeleteActionPerformed
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton guiDelete;
     private javax.swing.JButton guiDown;
@@ -207,63 +212,65 @@ public class JFontTable extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabFonts;
     // End of variables declaration//GEN-END:variables
-    
 }
-class FontModel extends AbstractTableModel{
+
+class FontModel extends AbstractTableModel {
 
     private List<Font> fonts = new ArrayList<Font>();
-    
-    FontModel(Font[] fonts){
-        for(Font f : fonts){
+
+    FontModel(Font[] fonts) {
+        for (Font f : fonts) {
             this.fonts.add(f);
         }
     }
-    
-    public void newFont(){
+
+    public void newFont() {
         StyleBuilder sb = new StyleBuilder();
         Font f = sb.createFont("arial", 12);
-        
+
         fonts.add(f);
-        int last = fonts.size()-1;
-        fireTableRowsInserted(last,last);
+        int last = fonts.size() - 1;
+        fireTableRowsInserted(last, last);
     }
-    
-    public void deleteFont(int index){
+
+    public void deleteFont(int index) {
         fonts.remove(index);
         fireTableRowsDeleted(index, index);
     }
-    
-    public void moveUp(Font f){
+
+    public void moveUp(Font f) {
         int index = fonts.indexOf(f);
-        if(index != 0){
+        if (index != 0) {
             fonts.remove(f);
-            fonts.add(index-1, f);
+            fonts.add(index - 1, f);
             fireTableDataChanged();
         }
     }
-    
-    public void moveDown(Font f){
+
+    public void moveDown(Font f) {
         int index = fonts.indexOf(f);
-        if(index != fonts.size()-1){
+        if (index != fonts.size() - 1) {
             fonts.remove(f);
-            fonts.add(index+1, f);
+            fonts.add(index + 1, f);
             fireTableDataChanged();
         }
     }
-    
-    public void setFonts(Font[] fonts){
+
+    public void setFonts(Font[] fonts) {
         this.fonts.clear();
-        
-        for(Font f : fonts){
-            this.fonts.add(f);
+
+        if (fonts != null) {
+            for (Font f : fonts) {
+                this.fonts.add(f);
+            }
         }
         fireTableDataChanged();
     }
-    
-    public Font[] getFonts(){
+
+    public Font[] getFonts() {
         return fonts.toArray(new Font[fonts.size()]);
     }
-    
+
     public int getRowCount() {
         return fonts.size();
     }
@@ -277,134 +284,105 @@ class FontModel extends AbstractTableModel{
         return true;
     }
 
-    
-    
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return Font.class;
     }
-    
+
     public Object getValueAt(int rowIndex, int columnIndex) {
         return fonts.get(rowIndex);
     }
-    
-} 
-class FontRenderer extends DefaultTableCellRenderer{
+}
+
+class FontRenderer extends DefaultTableCellRenderer {
 
     private String text = "SsIiGg84";
-    
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        
+
         JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
-        
+
         Font f = (Font) value;
-        java.awt.Font font = new java.awt.Font(f.getFontFamily().toString(),java.awt.Font.PLAIN,12);
+        java.awt.Font font = new java.awt.Font(f.getFontFamily().toString(), java.awt.Font.PLAIN, 12);
         lbl.setFont(font);
         return lbl;
     }
-    
 }
 
-
-class FontEditor implements TableCellEditor{
-    
-    private MapLayer layer = null;    
+class FontEditor extends AbstractCellEditor implements TableCellEditor {//implements TableCellEditor{
+    private MapLayer layer = null;
     private JFontPane editpane = new JFontPane();
     private JButton but = new JButton("SsIiGg84");
     private Font font = null;
-    
-    public FontEditor(){
+
+    public FontEditor() {
+        super();
         but.setBorderPainted(false);
-        but.setContentAreaFilled(false);
-        but.setBorder(null);
-        
+
         but.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(font != null){
-                    final JDialog dia = new JDialog();
-                    
-                    JPanel panel = new JPanel(new BorderLayout());
-                    
-                    //panneau de configuration                    
-                    editpane.setSLDFont(font);
-                    
-                    //panneau de validation
-                    JPanel bas = new JPanel(new FlowLayout(FlowLayout.RIGHT));                    
-                    JButton valider = new JButton("Ok");
-                    bas.add(valider);
-                    
-                    valider.addActionListener(new ActionListener() {
+                if (font != null) {
+                    JDialog dia = new JDialog();
 
-                        public void actionPerformed(ActionEvent e) {
-                            font = editpane.getSLDFont();
-                            dia.dispose();
-                        }
-                    });
-                                        
-                    panel.add(BorderLayout.CENTER,editpane);
-                    panel.add(BorderLayout.SOUTH,bas);
-                    
-                    dia.setContentPane(panel);
+                    //panneau d'edition           
+                    editpane.setEdited(font);
+
+                    dia.setContentPane(editpane);
                     dia.setLocationRelativeTo(but);
                     dia.pack();
                     dia.setModal(true);
                     dia.setVisible(true);
+
+                    font = editpane.getEdited();
                 }
             }
         });
     }
-    
-    public void setLayer(MapLayer layer){
+
+    public void setLayer(MapLayer layer) {
         this.layer = layer;
     }
-    
-    public MapLayer getLayer(){
+
+    public MapLayer getLayer() {
         return layer;
     }
-    
+
     public Object getCellEditorValue() {
-        return new StyleBuilder().createFont("Arial", 12);
+        return font;
     }
 
-    public boolean isCellEditable(EventObject e) {
-        return true;
-    }
-
+//    public boolean isCellEditable(EventObject e) {
+//        return true;
+//    }
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        
-        if(value != null && value instanceof Font){
-            font = (Font)value;
-            java.awt.Font f = new java.awt.Font(font.getFontFamily().toString(),java.awt.Font.PLAIN,12);
+
+        if (value != null && value instanceof Font) {
+            font = (Font) value;
+            java.awt.Font f = new java.awt.Font(font.getFontFamily().toString(), java.awt.Font.PLAIN, 12);
             but.setFont(f);
-        }else{
-            but.setFont( new java.awt.Font("Arial",java.awt.Font.PLAIN,12));
+        } else {
+            but.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 12));
             font = null;
         }
         return but;
     }
 
-    public boolean shouldSelectCell(EventObject anEvent) {
-        return true;
-    }
-
-    public boolean stopCellEditing() {
-        return true;
-    }
-
-    public void cancelCellEditing() {
-    }
-
-    public void addCellEditorListener(CellEditorListener l) {        
-    }
-    
-    public void removeCellEditorListener(CellEditorListener l) {
-    }
-
-
-
-    
-    
-    
+//    public boolean shouldSelectCell(EventObject anEvent) {
+//        return true;
+//    }
+//
+//    public boolean stopCellEditing() {
+//        return true;
+//    }
+//
+//    public void cancelCellEditing() {
+//    }
+//
+//    public void addCellEditorListener(CellEditorListener l) {        
+//    }
+//    
+//    public void removeCellEditorListener(CellEditorListener l) {
+//    }
 }

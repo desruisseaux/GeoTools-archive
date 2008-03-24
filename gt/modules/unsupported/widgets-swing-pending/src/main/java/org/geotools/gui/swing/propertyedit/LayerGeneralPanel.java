@@ -31,7 +31,7 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-public class LayerGeneralPanel extends javax.swing.JPanel implements PropertyPanel {
+public class LayerGeneralPanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapLayer layer = null;
     private final String title;
@@ -298,7 +298,7 @@ public class LayerGeneralPanel extends javax.swing.JPanel implements PropertyPan
         return title;
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

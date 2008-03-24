@@ -22,6 +22,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
@@ -40,6 +41,8 @@ import org.geotools.renderer.shape.ShapefileRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
 import java.lang.ref.WeakReference;
+
+
 
 /**
  * Optimize Strategy for edition. high memory needed
@@ -268,9 +271,10 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
             }
         }
         }
+
+    
+    
 }
-
-
 class DrawingThread extends Thread {
 
         private boolean dispose = false;

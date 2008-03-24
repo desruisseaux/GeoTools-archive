@@ -13,10 +13,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
-import org.geotools.gui.swing.style.StyleFeatureEditor;
+import java.awt.Component;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.StyleBuilder;
@@ -24,74 +24,80 @@ import org.geotools.styling.StyleBuilder;
 /**
  * @author johann sorel
  */
-public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEditor{
-    
-    
+public class JGraphicPane extends javax.swing.JPanel implements StyleElementEditor<Graphic> {
+
     private MapLayer layer = null;
     private Graphic graphic = null;
-    
+
     /** Creates new form JGraphicPanel */
     public JGraphicPane() {
         initComponents();
         init();
     }
-    
-    private void init(){
+
+    private void init() {
         guiOpacity.setType(JExpressionPane.EXP_TYPE.OPACITY);
         guiRotation.setType(JExpressionPane.EXP_TYPE.NUMBER);
         guiSize.setType(JExpressionPane.EXP_TYPE.NUMBER);
     }
-    
-    public void setLayer(MapLayer layer){
+
+    public void setLayer(MapLayer layer) {
         this.layer = layer;
         guiDisplacement.setLayer(layer);
         guiGeom.setLayer(layer);
         guiOpacity.setLayer(layer);
         guiRotation.setLayer(layer);
         guiSize.setLayer(layer);
+        guiExternal.setLayer(layer);
+        guiMark.setLayer(layer);
     }
-    
-    public MapLayer getLayer(){
+
+    public MapLayer getLayer() {
         return layer;
     }
-    
-    public void setGraphic(Graphic graphic){
-        
-        if(graphic != null){
-            guiDisplacement.setDisplacement(graphic.getDisplacement());
-            graphic.getExternalGraphics();
-            guiGeom.setGeometryPropertyName(graphic.getGeometryPropertyName());
-            graphic.getMarks();
+
+    public void setEdited(Graphic graphic) {
+
+        if (graphic != null) {
+            guiDisplacement.setEdited(graphic.getDisplacement());
+            guiGeom.setGeom(graphic.getGeometryPropertyName());
             guiOpacity.setExpression(graphic.getOpacity());
             guiRotation.setExpression(graphic.getRotation());
-            guiSize.setExpression( graphic.getSize());
-            graphic.getSymbols();                    
+            guiSize.setExpression(graphic.getSize());
+            // marks and external graphics are symbols so no need to handle this method
+            //graphic.getSymbols();        
+            guiMark.setEdited(graphic.getMarks());
+            guiExternal.setEdited(graphic.getExternalGraphics());
         }
         this.graphic = graphic;
     }
-    
-    public Graphic getGraphic(){
-        
-        if(graphic ==null){
-            StyleBuilder sb = new StyleBuilder();
-            graphic = sb.createGraphic();
+
+    public Graphic getEdited() {
+
+        if (graphic == null) {
+            graphic = new StyleBuilder().createGraphic();
         }
-        
+
         apply();
         return graphic;
     }
-    
-    public void apply(){
-        if(graphic != null){
-            graphic.setDisplacement(guiDisplacement.getDisplacement());
-            graphic.setGeometryPropertyName(guiGeom.getGeometryPropertyName());
+
+    public void apply() {
+        if (graphic != null) {
+            graphic.setDisplacement(guiDisplacement.getEdited());
+            graphic.setGeometryPropertyName(guiGeom.getGeom());
             graphic.setOpacity(guiOpacity.getExpression());
             graphic.setRotation(guiRotation.getExpression());
-            graphic.setSize(guiSize.getExpression());
+            graphic.setSize(guiSize.getExpression());            
+            graphic.setMarks(guiMark.getEdited());
+            graphic.setExternalGraphics(guiExternal.getEdited());
         }
     }
-    
-    
+
+    public Component getComponent() {
+        return this;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -109,6 +115,9 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEdit
         guiRotation = new org.geotools.gui.swing.style.sld.JExpressionPane();
         guiOpacity = new org.geotools.gui.swing.style.sld.JExpressionPane();
         guiDisplacement = new org.geotools.gui.swing.style.sld.JDisplacementPane();
+        jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
+        guiExternal = new org.geotools.gui.swing.style.sld.JExternalGraphicTable();
+        guiMark = new org.geotools.gui.swing.style.sld.JMarkTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -123,11 +132,17 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEdit
 
         guiDisplacement.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("displacement"))); // NOI18N
 
+        jXTitledSeparator2.setTitle(bundle.getString("symbol")); // NOI18N
+
+        guiExternal.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("external"))); // NOI18N
+
+        guiMark.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("mark"))); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -146,10 +161,16 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEdit
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(guiDisplacement, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(jXTitledSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(196, Short.MAX_VALUE)
-                .add(guiGeom, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap()
+                .add(guiGeom, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(guiMark, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(guiExternal, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(82, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -172,14 +193,19 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEdit
                             .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(guiOpacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                     .add(guiDisplacement, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jXTitledSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(guiMark, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(guiExternal, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.geotools.gui.swing.style.sld.JDisplacementPane guiDisplacement;
+    private org.geotools.gui.swing.style.sld.JExternalGraphicTable guiExternal;
     private org.geotools.gui.swing.style.sld.JGeomPane guiGeom;
+    private org.geotools.gui.swing.style.sld.JMarkTable guiMark;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiOpacity;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiRotation;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiSize;
@@ -187,6 +213,6 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleFeatureEdit
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
+    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator2;
     // End of variables declaration//GEN-END:variables
-    
 }

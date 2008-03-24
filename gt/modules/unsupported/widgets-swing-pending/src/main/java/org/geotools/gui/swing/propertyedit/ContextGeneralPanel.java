@@ -26,7 +26,7 @@ import org.geotools.map.MapContext;
  *
  * @author johann sorel
  */
-public class ContextGeneralPanel extends javax.swing.JPanel implements PropertyPanel{
+public class ContextGeneralPanel extends javax.swing.JPanel implements PropertyPane{
     
     private MapContext context = null;
     
@@ -110,7 +110,7 @@ public class ContextGeneralPanel extends javax.swing.JPanel implements PropertyP
         return "General";
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
     

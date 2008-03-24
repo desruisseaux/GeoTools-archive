@@ -42,8 +42,8 @@ public class JPropertyDialog extends JDialog{
     private JButton close = new JButton(BUNDLE.getString("close"));
     
     private JTabbedPane tabs = new JTabbedPane();    
-    private PropertyPanel activePanel = null;    
-    private ArrayList<PropertyPanel> panels = new ArrayList<PropertyPanel>();
+    private PropertyPane activePanel = null;    
+    private ArrayList<PropertyPane> panels = new ArrayList<PropertyPane>();
     
     /** Creates a new instance of ASDialog */
     private JPropertyDialog() {
@@ -61,13 +61,13 @@ public class JPropertyDialog extends JDialog{
         
         tabs.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                activePanel = (PropertyPanel)tabs.getSelectedComponent();
+                activePanel = (PropertyPane)tabs.getSelectedComponent();
             }
         });
         
         apply.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                for(PropertyPanel edit : panels){
+                for(PropertyPane edit : panels){
                     edit.apply();
                 }
             }
@@ -82,7 +82,7 @@ public class JPropertyDialog extends JDialog{
         
         close.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                for(PropertyPanel edit : panels){
+                for(PropertyPane edit : panels){
                     edit.apply();
                 }
                 dispose();
@@ -94,9 +94,9 @@ public class JPropertyDialog extends JDialog{
         
     }
     
-    public void addEditPanel(PropertyPanel pan){
+    public void addEditPanel(PropertyPane pan){
         panels.add(pan);        
-        tabs.addTab(pan.getTitle(),pan.getIcon(),pan.getPanel(),pan.getToolTip());        
+        tabs.addTab(pan.getTitle(),pan.getIcon(),pan.getComponent(),pan.getToolTip());        
     }
     
 
@@ -112,10 +112,10 @@ public class JPropertyDialog extends JDialog{
         super.setVisible(b);
     }
     
-    public static void showDialog(List<PropertyPanel> lst, Object target){
+    public static void showDialog(List<PropertyPane> lst, Object target){
         JPropertyDialog dia = new JPropertyDialog();
         
-        for(PropertyPanel pro : lst){
+        for(PropertyPane pro : lst){
             pro.setTarget(target);
             dia.addEditPanel(pro);
         }

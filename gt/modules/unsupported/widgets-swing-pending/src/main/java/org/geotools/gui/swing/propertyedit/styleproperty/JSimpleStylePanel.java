@@ -23,12 +23,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
-import org.geotools.gui.swing.style.JLineSymbolizerPanel;
-import org.geotools.gui.swing.style.JPointSymbolizerPanel;
-import org.geotools.gui.swing.style.JPolygonSymbolizerPanel;
-import org.geotools.gui.swing.style.JRasterSymbolizerPanel;
-import org.geotools.gui.swing.style.SymbolizerPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
+import org.geotools.gui.swing.style.JLineSymbolizerPane;
+import org.geotools.gui.swing.style.JPointSymbolizerPane;
+import org.geotools.gui.swing.style.JPolygonSymbolizerPane;
+import org.geotools.gui.swing.style.JRasterSymbolizerPane;
+import org.geotools.gui.swing.style.SymbolizerPane;
 import org.geotools.map.MapLayer;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -37,17 +37,17 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.gui.swing.style.JTextSymbolizerPanel;
+import org.geotools.gui.swing.style.JTextSymbolizerPane;
 import org.geotools.styling.TextSymbolizer;
 
 /**
  *
  * @author  johann sorel
  */
-public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPanel {
+public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapLayer layer;
-    private SymbolizerPanel detail = null;
+    private SymbolizerPane detail = null;
 
     /** Creates new form XMLStylePanel */
     public JSimpleStylePanel() {
@@ -75,7 +75,7 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public JComponent getPanel() {
+    public JComponent getComponent() {
         return this;
     }
 
@@ -110,27 +110,27 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
                 if (layer.getFeatureSource().getSchema().getName().getLocalPart().equals("GridCoverage")) {
-                    detail = new JRasterSymbolizerPanel();
+                    detail = new JRasterSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {
-                    detail = new JPolygonSymbolizerPanel();
+                    detail = new JPolygonSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(MultiLineString.class) || val.equals(LineString.class)) {
-                    detail = new JLineSymbolizerPanel();
+                    detail = new JLineSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());                    
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Point.class) || val.equals(MultiPoint.class)) {
-                    detail = new JPointSymbolizerPanel();
+                    detail = new JPointSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(TextSymbolizer.class) ) {
-                    detail = new JTextSymbolizerPanel();
+                    detail = new JTextSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
                     add(BorderLayout.CENTER, detail.getComponent() );

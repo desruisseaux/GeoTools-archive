@@ -26,9 +26,10 @@ import org.geotools.styling.Symbolizer;
 
 /**
  *
+ * @param T 
  * @author johann sorel
  */
-public class JDemoTable extends org.jdesktop.swingx.JXTable {
+public class JDemoTable<T extends Symbolizer> extends org.jdesktop.swingx.JXTable {
 
     private DemoTableModel model;
 
@@ -36,7 +37,7 @@ public class JDemoTable extends org.jdesktop.swingx.JXTable {
      * Table for style exemple
      */
     public JDemoTable() {
-        super(new DemoTableModel());
+        super(new DemoTableModel<T>());
         init();        
     }
         
@@ -60,11 +61,11 @@ public class JDemoTable extends org.jdesktop.swingx.JXTable {
     /**
      * @param map 
      */
-    public void setMap(Map<Symbolizer, String> map) {
+    public void setMap(Map<T, String> map) {
         model.setMap(map);
     }
 
-    public Map<Symbolizer, String> getMap() {
+    public Map<T, String> getMap() {
         return model.getMap();
     }
 }

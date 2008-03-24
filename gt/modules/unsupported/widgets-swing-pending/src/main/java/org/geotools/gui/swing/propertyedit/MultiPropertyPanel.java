@@ -35,10 +35,10 @@ import org.geotools.gui.swing.propertyedit.model.MultiTreeRenderer;
  *
  * @author  johann sorel
  */
-public abstract class MultiPropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+public abstract class MultiPropertyPanel extends javax.swing.JPanel implements PropertyPane {
 
-    private List<PropertyPanel> panels = new ArrayList<PropertyPanel>();
-    private PropertyPanel active = null;
+    private List<PropertyPane> panels = new ArrayList<PropertyPane>();
+    private PropertyPane active = null;
     private DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode("Styles"));
 
     /** Creates new form MultiPropertyPanel */
@@ -60,8 +60,8 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
                         final Object obj = node.getUserObject();
 
                         if (obj != null) {
-                            if (obj instanceof PropertyPanel) {
-                                setSelectedPropertyPanel((PropertyPanel) obj);
+                            if (obj instanceof PropertyPane) {
+                                setSelectedPropertyPanel((PropertyPane) obj);
                             }
                         }
                     }
@@ -69,7 +69,7 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
 
     }
 
-    public void addPropertyPanel(PropertyPanel panel) {
+    public void addPropertyPanel(PropertyPane panel) {
         if (panel != null) {
 
             if (!panels.contains(panel)) {
@@ -97,7 +97,7 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
     }
     return false;
     }*/
-    public boolean setSelectedPropertyPanel(final PropertyPanel panel) {
+    public boolean setSelectedPropertyPanel(final PropertyPane panel) {
 
         if (panel != null) {
             if (panels.contains(panel)) {
@@ -109,7 +109,7 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
 
                             public void run() {
                                 pan_subprop.removeAll();
-                                pan_subprop.add(panel.getPanel());
+                                pan_subprop.add(panel.getComponent());
                                 pan_subprop.revalidate();
                                 pan_subprop.repaint();
                             }
@@ -178,13 +178,13 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
         );
     }// </editor-fold>//GEN-END:initComponents
     public void setTarget(Object target) {
-        for (PropertyPanel pan : panels) {
+        for (PropertyPane pan : panels) {
             pan.setTarget(target);
         }
     }
 
     public void apply() {
-        for (PropertyPanel pan : panels) {
+        for (PropertyPane pan : panels) {
 
             if (pan.equals(active)) {
                 pan.apply();
@@ -195,7 +195,7 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
     }
 
     public void reset() {
-        for (PropertyPanel pan : panels) {
+        for (PropertyPane pan : panels) {
             pan.reset();
         }
     }
@@ -206,7 +206,7 @@ public abstract class MultiPropertyPanel extends javax.swing.JPanel implements P
 
     public abstract String getToolTip();
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -76,7 +76,7 @@ public final class VisibleTreeTableColumn extends TreeTableColumn {
     
     
     public Class getColumnClass() {
-        return Boolean.class;
+        return MapLayer.class;
     }
 
     

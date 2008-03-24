@@ -57,7 +57,7 @@ import org.geotools.gui.swing.datachooser.JPostGISDataPanel;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -192,7 +192,7 @@ public class DemoExplorer extends JFrame {
         //build up the tree
         LayerZoomItem zoom = new LayerZoomItem(map);
         LayerPropertyItem feature = new LayerPropertyItem();
-        List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+        List<PropertyPane> lst = new ArrayList<PropertyPane>();
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
 

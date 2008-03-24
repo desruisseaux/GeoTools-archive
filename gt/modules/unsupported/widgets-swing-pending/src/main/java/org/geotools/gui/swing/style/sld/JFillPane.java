@@ -13,9 +13,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JDialog;
+import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Fill;
 import org.geotools.styling.StyleBuilder;
@@ -23,9 +27,12 @@ import org.geotools.styling.StyleBuilder;
 /**
  * @author  johann sorel
  */
-public class JFillPane extends javax.swing.JPanel {
+public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<Fill>{
 
-    
+    private static final Icon ICO_GRAPHIC = IconBundle.getResource().getIcon("16_paint_fill");
+    private MapLayer layer = null;
+    private Fill fill = null;
+
     /** 
      * Creates new form JFillPanel 
      */
@@ -33,43 +40,53 @@ public class JFillPane extends javax.swing.JPanel {
         initComponents();
         
         guiColor.setType(JExpressionPane.EXP_TYPE.COLOR);
-        guiAlpha.setType(JExpressionPane.EXP_TYPE.OPACITY);                
+        guiBackground.setType(JExpressionPane.EXP_TYPE.COLOR);
+        guiAlpha.setType(JExpressionPane.EXP_TYPE.OPACITY);
     }
 
-    /**
-     * 
-     * @param layer the layer style to edit
-     */
-    public void setLayer(MapLayer layer){
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
         guiColor.setLayer(layer);
         guiAlpha.setLayer(layer);
     }
+
+    public MapLayer getLayer(){
+        return layer;
+    }
     
-    /**
-     * 
-     * @param fill The fill to edit
-     */
-    public void parseFill(Fill fill) {
+    public void setEdited(Fill fill) {
+        this.fill = fill;
         if (fill != null) {
-            // TODO : not yet implemented
-            //fill.getBackgroundColor();
-            //fill.getGraphicFill();
+            guiBackground.setExpression(fill.getBackgroundColor());
             guiColor.setExpression(fill.getColor());
             guiAlpha.setExpression(fill.getOpacity());
-            //Graphic graph = fill.getGraphicFill();
-            //graph.
+            //handle by a button
+            //fill.getGraphicFill();
         }
     }
 
-    /**
-     * 
-     * @return Fill : new Fill
-     */
-    public Fill getFill() {
-        StyleBuilder sb = new StyleBuilder();
-        return sb.createFill(guiColor.getExpression(), guiAlpha.getExpression());
+    public Fill getEdited() {
+
+        if (fill == null) {
+            fill = new StyleBuilder().createFill();
+        }
+
+        apply();
+        return fill;
     }
 
+    public void apply() {
+        if (fill != null) {
+            fill.setBackgroundColor(guiBackground.getExpression());
+            fill.setColor(guiColor.getExpression());
+            fill.setOpacity(guiAlpha.getExpression());
+        }
+    }
+
+    public Component getComponent(){
+        return this;
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -78,51 +95,113 @@ public class JFillPane extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        guiAlpha = new org.geotools.gui.swing.style.sld.JExpressionPane();
-        lbl2 = new javax.swing.JLabel();
+        butFill = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         lbl_color1 = new javax.swing.JLabel();
         guiColor = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        jLabel1 = new javax.swing.JLabel();
+        guiBackground = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        lbl2 = new javax.swing.JLabel();
+        guiAlpha = new org.geotools.gui.swing.style.sld.JExpressionPane();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
+        butFill.setIcon(ICO_GRAPHIC);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        lbl2.setText(bundle.getString("opacity")); // NOI18N
+        butFill.setText(bundle.getString("fill")); // NOI18N
+        butFill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                butFillActionPerformed(evt);
+            }
+        });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         lbl_color1.setText(bundle.getString("color")); // NOI18N
+
+        jLabel1.setText(bundle.getString("background")); // NOI18N
+
+        lbl2.setText(bundle.getString("opacity")); // NOI18N
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(lbl_color1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(guiBackground, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(lbl2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(lbl_color1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(guiBackground, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(lbl2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(lbl2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
-                        .add(lbl_color1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(butFill))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(lbl_color1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(lbl2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(butFill)
         );
     }// </editor-fold>//GEN-END:initComponents
+    private void butFillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_butFillActionPerformed
+        JDialog dia = new JDialog();
+
+        JGraphicPane pane = new JGraphicPane();
+        pane.setLayer(layer);
+
+        if (fill != null) {
+            pane.setEdited(fill.getGraphicFill());
+        }
+
+        dia.setContentPane(pane);
+        dia.pack();
+        dia.setLocationRelativeTo(butFill);
+        dia.setModal(true);
+        dia.setVisible(true);
+
+        if (fill == null) {
+            fill = new StyleBuilder().createFill();
+        }
+        fill.setGraphicFill(pane.getEdited());
+    }//GEN-LAST:event_butFillActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton butFill;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiAlpha;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiBackground;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiColor;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lbl2;
     private javax.swing.JLabel lbl_color1;
     // End of variables declaration//GEN-END:variables

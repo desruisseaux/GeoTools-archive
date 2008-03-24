@@ -16,30 +16,22 @@
 
 package org.geotools.gui.swing.style.sld;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import org.apache.commons.collections.map.HashedMap;
-import org.geotools.sld.SLDConfiguration;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
-import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.Parser;
 
 /**
  *
+ * @param T 
  * @author johann sorel
  */
-public class DemoTableModel extends AbstractTableModel implements TableModel {
+public class DemoTableModel<T extends Symbolizer> extends AbstractTableModel implements TableModel {
     
-    private Map<Symbolizer,String> map = new HashMap<Symbolizer,String>();
+    private Map<T,String> map = new HashMap<T,String>();
 
     /**
      * 
@@ -64,13 +56,13 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
 //        }
     }
     
-    public void setMap(Map<Symbolizer,String> map){
-        this.map = new HashMap<Symbolizer, String>(map);
+    public void setMap(Map<T,String> map){
+        this.map = new HashMap<T, String>(map);
         fireTableDataChanged();
     }
     
-    public Map<Symbolizer,String> getMap(){
-        return new HashMap<Symbolizer, String>(map);
+    public Map<T,String> getMap(){
+        return new HashMap<T, String>(map);
     }
     
 

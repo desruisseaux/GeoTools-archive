@@ -30,7 +30,7 @@ import org.geotools.gui.swing.propertyedit.LayerCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerGeneralPanel;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 
 /**
@@ -40,7 +40,7 @@ import org.geotools.map.MapLayer;
 public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
 
     private MapLayer layer;
-    private List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+    private List<PropertyPane> lst = new ArrayList<PropertyPane>();
 
     /** 
      * Creates a new instance of DefaultContextPropertyPop 
@@ -54,7 +54,7 @@ public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
      * set the list of PropertyPanel to use
      * @param liste
      */
-    public void setPropertyPanels(List<PropertyPanel> liste) {
+    public void setPropertyPanels(List<PropertyPane> liste) {
         lst.clear();
         lst.addAll(liste);
     }

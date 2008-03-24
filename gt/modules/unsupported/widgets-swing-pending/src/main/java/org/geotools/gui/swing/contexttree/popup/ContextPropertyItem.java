@@ -28,7 +28,7 @@ import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.ContextGeneralPanel;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapContext;
 
 /**
@@ -51,7 +51,7 @@ public class ContextPropertyItem extends JMenuItem implements TreePopupItem{
     private void init(){
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+                ArrayList<PropertyPane> lst = new ArrayList<PropertyPane>();
                 lst.add(new ContextGeneralPanel());
                 lst.add(new ContextCRSPropertyPanel());
                 JPropertyDialog.showDialog(lst, context);                

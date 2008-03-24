@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
 import java.util.ArrayList;
@@ -27,72 +26,73 @@ import org.geotools.map.MapLayer;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
 
-
 /**
  * @author johann sorel
  */
-
-public class JGeomBox extends JComboBox{
+public class JGeomBox extends JComboBox {
 
     private MapLayer layer = null;
     private String selectedGeom = "";
-    
-    public JGeomBox(){
+
+    public JGeomBox() {
         setEnabled(false);
     }
-    
-    public void setLayer(MapLayer layer){
-        
-        if(layer == null){
-            throw new NullPointerException();
-        }
-        
-        setEnabled(true);
-        
-        Collection<PropertyDescriptor> col = layer.getFeatureSource().getSchema().getProperties();
-        Iterator<PropertyDescriptor> ite = col.iterator();
-        
-        List<String> geoms = new ArrayList<String>();
-        
-        while(ite.hasNext()){
-            PropertyDescriptor desc = ite.next();
-            if(desc instanceof GeometryDescriptor){
-                geoms.add(desc.getName().toString());
+
+    public void setLayer(MapLayer layer) {
+
+        this.layer = layer;
+
+        setEnabled(layer != null);
+
+        if (layer != null) {
+            Collection<PropertyDescriptor> col = layer.getFeatureSource().getSchema().getProperties();
+            Iterator<PropertyDescriptor> ite = col.iterator();
+
+            List<String> geoms = new ArrayList<String>();
+
+            while (ite.hasNext()) {
+                PropertyDescriptor desc = ite.next();
+                if (desc instanceof GeometryDescriptor) {
+                    geoms.add(desc.getName().toString());
+                }
+            }
+
+            ComboBoxModel model = new GeoModel(geoms);
+            setModel(model);
+
+            if (!selectedGeom.equals("")) {
+                setSelectedItem(selectedGeom);
+            } else {
+                setSelectedIndex(0);
             }
         }
-        
-        ComboBoxModel model = new GeoModel(geoms);
-        setModel(model);
-        
-        setSelectedIndex(0);
-        
-        this.layer = layer;        
+
     }
-    
-    public MapLayer getLayer(){
+
+    public MapLayer getLayer() {
         return layer;
     }
-    
-    public String getGeometryPropertyName(){
-        return (String)getSelectedItem();
+
+    public String getGeom() {
+        return (String) getSelectedItem();
     }
-    
-    public void setGeometryPropertyName(String name){
+
+    public void setGeom(String name) {
         selectedGeom = name;
-        if(layer != null){
-            setSelectedItem(name);            
+        if (layer != null) {
+            setSelectedItem(name);
         }
     }
-    
 }
-class GeoModel extends DefaultComboBoxModel{
+
+class GeoModel extends DefaultComboBoxModel {
 
     private List<String> geoms;
-    
-    GeoModel(List<String> geoms){
+
+    GeoModel(List<String> geoms) {
         this.geoms = geoms;
     }
-    
+
     @Override
     public int getSize() {
         return geoms.size();
@@ -102,6 +102,5 @@ class GeoModel extends DefaultComboBoxModel{
     public Object getElementAt(int index) {
         return geoms.get(index);
     }
-    
 }
 

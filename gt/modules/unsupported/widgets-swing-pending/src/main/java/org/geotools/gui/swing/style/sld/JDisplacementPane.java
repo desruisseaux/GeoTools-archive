@@ -16,7 +16,8 @@
 
 package org.geotools.gui.swing.style.sld;
 
-import org.geotools.gui.swing.style.StyleFeatureEditor;
+import java.awt.Component;
+import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.StyleBuilder;
@@ -25,7 +26,7 @@ import org.geotools.styling.StyleBuilder;
  *
  * @author johann sorel
  */
-public class JDisplacementPane extends javax.swing.JPanel implements StyleFeatureEditor{
+public class JDisplacementPane extends javax.swing.JPanel implements StyleElementEditor<Displacement>{
     
     private MapLayer layer = null;
     private Displacement displacement = null;
@@ -50,8 +51,8 @@ public class JDisplacementPane extends javax.swing.JPanel implements StyleFeatur
     public MapLayer getLayer(){
         return layer;
     }
-    
-    public void setDisplacement(Displacement disp){
+        
+    public void setEdited(Displacement disp) {
         this.displacement = disp;
         
         if(displacement != null){
@@ -59,8 +60,9 @@ public class JDisplacementPane extends javax.swing.JPanel implements StyleFeatur
             guiY.setExpression(disp.getDisplacementY());            
         }
     }
+
     
-    public Displacement getDisplacement(){
+    public Displacement getEdited(){
         
         if(displacement == null){
             StyleBuilder sb = new StyleBuilder();
@@ -135,5 +137,11 @@ public class JDisplacementPane extends javax.swing.JPanel implements StyleFeatur
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
+
+    public Component getComponent() {
+        return this;
+    }
+
+    
     
 }

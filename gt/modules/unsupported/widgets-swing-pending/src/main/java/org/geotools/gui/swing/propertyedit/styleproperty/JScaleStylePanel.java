@@ -10,20 +10,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 
 /**
  *
  * @author  Administrateur
  */
-public class JScaleStylePanel extends javax.swing.JPanel implements PropertyPanel{
+public class JScaleStylePanel extends javax.swing.JPanel implements PropertyPane{
     
     /** Creates new form JScaleStylePanel */
     public JScaleStylePanel() {
         initComponents();
     }
     
-    public JComponent getPanel() {
+    public JComponent getComponent() {
         return this;
     }
 

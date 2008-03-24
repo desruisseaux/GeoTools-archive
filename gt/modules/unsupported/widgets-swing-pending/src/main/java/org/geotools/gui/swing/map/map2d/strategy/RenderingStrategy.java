@@ -23,10 +23,10 @@ import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.renderer.GTRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
 
 /**
  * Rendering Strategy is used to specify a memory management
@@ -90,11 +90,18 @@ public interface RenderingStrategy {
      * @return Envelope or null if no MapArea
      */
     public Envelope getMapArea();
-            
+    
     /**
-     * use for a complete reset of the strategy
+     * set affinetransform
+     * @param transform
      */
-    public void refresh();
+    public void setAffineTransform(AffineTransform transform);    
+    /**
+     * get the actual affinetransfrom
+     * @return AffineTransform
+     */
+    public AffineTransform getAffineTransform();
+    
         
     /**
      * get the visual component 
@@ -123,20 +130,21 @@ public interface RenderingStrategy {
      * manualy the refresh method
      * @param refresh 
      */
-    public void setAutoRefreshEnabled(boolean refresh);
-    
+    public void setAutoRefreshEnabled(boolean refresh);    
     /**
      * to see if the strategy is in auto refresh mode
      * @return boolean
      */
-    public boolean isAutoRefresh();
-    
+    public boolean isAutoRefresh();                
+    /**
+     * use for a complete reset of the strategy
+     */
+    public void refresh();
     /**
      * true if the strategy is currently painting
      * @return boolean
      */
-    public boolean isPainting();
-    
+    public boolean isPainting();    
     /**
      * must be call to remove all reference on the renderingstrategy.
      * to avoid memory leack.

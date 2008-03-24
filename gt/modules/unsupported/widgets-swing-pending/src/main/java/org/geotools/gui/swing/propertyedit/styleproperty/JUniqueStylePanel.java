@@ -10,14 +10,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 
 /**
  *
  * @author  Administrateur
  */
-public class JUniqueStylePanel extends javax.swing.JPanel implements PropertyPanel{
+public class JUniqueStylePanel extends javax.swing.JPanel implements PropertyPane{
     
     /** Creates new form JUniqueStylePanel */
     public JUniqueStylePanel() {
@@ -44,7 +44,7 @@ public class JUniqueStylePanel extends javax.swing.JPanel implements PropertyPan
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public JComponent getPanel() {
+    public JComponent getComponent() {
         return this;
     }
 

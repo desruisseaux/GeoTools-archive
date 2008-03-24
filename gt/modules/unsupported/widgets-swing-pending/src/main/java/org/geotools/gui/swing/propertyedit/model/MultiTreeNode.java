@@ -19,7 +19,7 @@ package org.geotools.gui.swing.propertyedit.model;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 
 /**
  *
@@ -27,12 +27,12 @@ import org.geotools.gui.swing.propertyedit.PropertyPanel;
  */
 public class MultiTreeNode extends DefaultMutableTreeNode{
     
-    private PropertyPanel pan;
+    private PropertyPane pan;
     
     /** Creates a new instance of MultiTreeNode 
      * @param panel 
      */
-    public MultiTreeNode(PropertyPanel panel) {
+    public MultiTreeNode(PropertyPane panel) {
         super(panel);
         pan = panel;
     }

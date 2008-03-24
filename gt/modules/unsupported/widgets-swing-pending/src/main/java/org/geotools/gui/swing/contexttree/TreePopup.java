@@ -70,6 +70,10 @@ final class TreePopup extends JPopupMenu {
                 selection = treetable.getTreeSelectionModel().getSelectionPaths();
                 
             }
+            
+            if(selection == null){
+                selection = new TreePath[0];
+            }
 
             for (TreePopupItem control : manager.controls) {
                 if (control.isValid(selection)) {

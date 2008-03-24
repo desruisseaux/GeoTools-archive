@@ -36,7 +36,7 @@ import org.opengis.referencing.IdentifiedObject;
  *
  * @author  johann sorel
  */
-public class LayerCRSPropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+public class LayerCRSPropertyPanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapLayer layer;
     private JCRSList liste = new JCRSList();
@@ -213,7 +213,7 @@ public class LayerCRSPropertyPanel extends javax.swing.JPanel implements Propert
         return "Projection";
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
 

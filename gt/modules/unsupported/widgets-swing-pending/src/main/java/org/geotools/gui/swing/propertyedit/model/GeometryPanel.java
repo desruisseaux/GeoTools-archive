@@ -20,13 +20,13 @@ import java.awt.Component;
 
 import javax.swing.ImageIcon;
 
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 
 /**
  *
  * @author  johann sorel
  */
-public class GeometryPanel extends javax.swing.JPanel implements PropertyPanel {
+public class GeometryPanel extends javax.swing.JPanel implements PropertyPane {
     
     /** Creates new form DefaultGeometryEditPanel */
     public GeometryPanel() {
@@ -52,7 +52,7 @@ public class GeometryPanel extends javax.swing.JPanel implements PropertyPanel {
         return null;
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
     

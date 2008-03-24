@@ -38,6 +38,7 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.geom.AffineTransform;
 
 /**
  * Not optimize Strategy, use a single bufferedImage. slow.
@@ -55,18 +56,18 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     @Override
     protected JComponent init() {
-        
+
         mustupdate = false;
-        
+
         thread = new DrawingThread();
         comp = new BufferComponent();
         buffercontext = new OneLayerContext();
         thread.start();
         return comp;
     }
-    
-    private void testRenderer(){
-        if(renderer == null){
+
+    private void testRenderer() {
+        if (renderer == null) {
             renderer = new ShapefileRenderer();
             opimizeRenderer();
         }
@@ -142,6 +143,40 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     }
 
+    public void setAffineTransform(AffineTransform affineTransform) {
+        this.affineTransform = affineTransform;
+
+        testRenderer();
+        GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+        synchronized (renderer) {
+            Rectangle newRect = comp.getBounds();
+            Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
+
+            if (mapRectangle.width > 0 && mapRectangle.height > 0) {
+                //NOT OPTIMIZED
+//            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+//            Graphics2D ig = buf.createGraphics();
+                //GraphicsConfiguration ACCELERATION 
+                BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
+                Graphics2D ig = buf.createGraphics();
+
+                renderer.stopRendering();
+                renderer.setContext(context);
+
+                try {
+                    renderer.paint((Graphics2D) ig, mapRectangle, affineTransform);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                comp.setBuffer(buf);
+            }
+        }
+
+
+    }
+
     @Override
     public BufferedImage getBufferImage() {
         return comp.getBuffer();
@@ -159,13 +194,12 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     }
 
     @Override
-     public void dispose(){
+    public void dispose() {
         super.dispose();
         thread.dispose();
     }
-    
+
     //-------------layer events-------------------------------------------------
-    
     public void layerAdded(MapLayerListEvent event) {
 
 //        if (getContext().getLayerCount() == 1) {
@@ -178,10 +212,10 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 //                ex.printStackTrace();
 //            }
 //        } else {
-            testRefresh();
+        testRefresh();
 //        }
     }
-    
+
     public void layerRemoved(MapLayerListEvent event) {
         testRefresh();
     }
@@ -198,18 +232,18 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     private class DrawingThread extends Thread {
 
         private boolean dispose = false;
-        
-        public void dispose(){
+
+        public void dispose() {
             dispose = true;
             wake();
         }
-        
+
         @Override
         public void run() {
 
             while (true && !dispose) {
-                
-                if(dispose){
+
+                if (dispose) {
                     break;
                 }
 

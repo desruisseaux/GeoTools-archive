@@ -119,7 +119,7 @@ class Provider extends ComponentProvider<JComponent>{
     
     /** Creates a new instance of SymbolRendererProvider */
     Provider(RenderAndEditComponent view) {
-        this.rendererComponent = view;
+        this.rendererComponent = view;        
     }
 
     @Override

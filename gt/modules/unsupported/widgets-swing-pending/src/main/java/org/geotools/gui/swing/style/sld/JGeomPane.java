@@ -28,28 +28,22 @@ public class JGeomPane extends javax.swing.JPanel {
         initComponents();
     }
     
-    public void setLayer(MapLayer layer){
-        
-        if(layer == null){
-            throw new NullPointerException();
-        }
-        
-        guiBox.setLayer(layer);
-        lbl.setEnabled(true);              
+    public void setLayer(MapLayer layer){                
+        guiBox.setLayer(layer);        
+        lbl.setEnabled( layer != null );              
     }
     
     public MapLayer getLayer(){
         return guiBox.getLayer();
     }
     
-    public String getGeometryPropertyName(){
-        return guiBox.getGeometryPropertyName();
+    public String getGeom(){
+        return guiBox.getGeom();
     }
     
-    public void setGeometryPropertyName(String name){
-        guiBox.setGeometryPropertyName(name);
-    }
-    
+    public void setGeom(String name){
+        guiBox.setGeom(name);
+    }    
     
     /** This method is called from within the constructor to
      * initialize the form.

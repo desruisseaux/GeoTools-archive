@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @author  johann sorel
  */
-public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapLayer layer = null;
     private FeatureSource<SimpleFeatureType, SimpleFeature> source = null;
@@ -227,7 +227,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         return "";
     }
 
-    public Component getPanel() {
+    public Component getComponent() {
         return this;
     }
 

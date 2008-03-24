@@ -16,14 +16,60 @@
 
 package org.geotools.gui.swing.style.sld;
 
+import java.awt.Component;
+import org.geotools.gui.swing.style.StyleElementEditor;
+import org.geotools.map.MapLayer;
+import org.geotools.styling.LinePlacement;
+import org.geotools.styling.StyleBuilder;
+
 /**
  * @author johann sorel
  */
-public class JLinePlacementPane extends javax.swing.JPanel {
+public class JLinePlacementPane extends javax.swing.JPanel implements StyleElementEditor<LinePlacement>{
     
-    /** Creates new form JLinePlacementPanel */
+    private MapLayer layer = null;
+    private LinePlacement placement = null;
+    
     public JLinePlacementPane() {
         initComponents();
+    }
+    
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
+        guiOffset.setLayer(layer);
+    }
+
+    public MapLayer getLayer() {
+        return layer;
+    }
+
+    public void setEdited(LinePlacement target) {
+        placement = target;
+        
+        if(placement != null){
+            guiOffset.setExpression(placement.getPerpendicularOffset());
+        }
+        
+    }
+
+    public LinePlacement getEdited() {
+        
+        if(placement == null){
+            placement = new StyleBuilder().createLinePlacement(1);
+        }
+        
+        apply();
+        return placement;
+    }
+
+    public void apply() {
+        if(placement != null){
+            placement.setPerpendicularOffset(guiOffset.getExpression());
+        }
+    }
+
+    public Component getComponent() {
+        return this;
     }
     
     /** This method is called from within the constructor to
@@ -34,20 +80,37 @@ public class JLinePlacementPane extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        guiOffset = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        jLabel1 = new javax.swing.JLabel();
+
+        setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("offset2")); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 400, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(guiOffset, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 300, Short.MAX_VALUE)
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, guiOffset, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiOffset;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
     
 }

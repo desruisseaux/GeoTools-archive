@@ -41,7 +41,7 @@ import javax.xml.transform.TransformerException;
 
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.filter.FileFilterFactory;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.SLDTransformer;
@@ -56,7 +56,7 @@ import org.geotools.xml.Parser;
  *
  * @author  johann sorel
  */
-public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel {
+public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPane {
 
     private MapLayer layer;
 
@@ -196,7 +196,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel 
         }
     }//GEN-LAST:event_actionExport
 
-    public JComponent getPanel() {
+    public JComponent getComponent() {
         return this;
     }
 
