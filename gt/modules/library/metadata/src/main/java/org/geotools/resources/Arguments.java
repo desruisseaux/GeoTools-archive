@@ -57,6 +57,12 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class Arguments {
     /**
+     * The code given to {@link System#exit} when this class exits because of an illegal
+     * user argument.
+     */
+    public static final int ILLEGAL_ARGUMENT_EXIT_CODE = 1;
+
+    /**
      * Command-line arguments. Elements are set to
      * {@code null} after they have been processed.
      */
@@ -69,8 +75,7 @@ public class Arguments {
     public final PrintWriter out;
 
     /**
-     * Error stream to the console. This output stream may use encoding
-     * specified in the {@code "-encoding"} argument, if presents.
+     * Error stream to the console.
      */
     public final PrintWriter err;
 
@@ -478,6 +483,6 @@ public class Arguments {
      */
     protected void illegalArgument(final Exception exception) {
         printSummary(exception);
-        System.exit(1);
+        System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
     }
 }
