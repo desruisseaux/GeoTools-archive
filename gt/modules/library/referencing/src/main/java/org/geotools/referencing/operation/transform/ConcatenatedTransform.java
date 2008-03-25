@@ -415,12 +415,14 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             if (numTmp > numPts) {
                 numTmp = numPts;
             }
-            for (int i=0; i<numTmp; i++) {
+            length = numTmp * sourceDim;
+            for (int i=0; i<length; i++) {
                 tmp[i] = srcPts[srcOff++];
             }
             transform1.transform(tmp, 0, tmp, 0, numTmp);
             transform2.transform(tmp, 0, tmp, 0, numTmp);
-            for (int i=0; i<numTmp; i++) {
+            length = numTmp * targetDim;
+            for (int i=0; i<length; i++) {
                 dstPts[dstOff++] = (float) tmp[i];
             }
             numPts -= numTmp;
