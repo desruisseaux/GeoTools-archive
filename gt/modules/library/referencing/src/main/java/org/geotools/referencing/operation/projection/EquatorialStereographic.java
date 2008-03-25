@@ -23,22 +23,18 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import static java.lang.Math.*;
 
 /**
  * The USGS equatorial case of the {@linkplain Stereographic stereographic} projection.
- * This is a special case of oblique stereographic projection for 
+ * This is a special case of oblique stereographic projection for
  * {@linkplain #latitudeOfOrigin latitude of origin} == 0.0.
  *
  * @since 2.4
@@ -53,7 +49,7 @@ public class EquatorialStereographic extends StereographicUSGS {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * A constant used in the transformations.
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
@@ -67,7 +63,7 @@ public class EquatorialStereographic extends StereographicUSGS {
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     protected EquatorialStereographic(final ParameterValueGroup parameters)
-            throws ParameterNotFoundException 
+            throws ParameterNotFoundException
     {
         this(parameters, Stereographic.Provider.PARAMETERS);
     }
@@ -80,7 +76,7 @@ public class EquatorialStereographic extends StereographicUSGS {
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     EquatorialStereographic(final ParameterValueGroup parameters,
-                            final ParameterDescriptorGroup descriptor) 
+                            final ParameterDescriptorGroup descriptor)
             throws ParameterNotFoundException
     {
         super(parameters, descriptor);
@@ -93,17 +89,18 @@ public class EquatorialStereographic extends StereographicUSGS {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    @Override
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-        final double chi = 2.0 * Math.atan(ssfn(y, Math.sin(y))) - (Math.PI/2);
-        final double cosChi = Math.cos(chi);
-        final double A = k0 / (1.0 + cosChi*Math.cos(x));    // typo in (12-29)
-        x = A * cosChi*Math.sin(x);
-        y = A * Math.sin(chi);
+        final double chi = 2.0 * atan(ssfn(y, sin(y))) - PI/2;
+        final double cosChi = cos(chi);
+        final double A = k0 / (1.0 + cosChi * cos(x));    // typo in (12-29)
+        x = A * cosChi * sin(x);
+        y = A * sin(chi);
 
         assert checkTransform(x, y, ptDst);
         if (ptDst != null) {
@@ -115,7 +112,7 @@ public class EquatorialStereographic extends StereographicUSGS {
 
 
     /**
-     * Provides the transform equations for the spherical case of the 
+     * Provides the transform equations for the spherical case of the
      * equatorial stereographic projection.
      *
      * @version $Id$
@@ -142,21 +139,22 @@ public class EquatorialStereographic extends StereographicUSGS {
          * (units in radians) and stores the result in {@code ptDst} (linear distance
          * on a unit sphere).
          */
+        @Override
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
-                throws ProjectionException 
+                throws ProjectionException
         {
             //Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-            final double coslat = Math.cos(y);
-            double f = 1.0 + coslat*Math.cos(x);
+            final double coslat = cos(y);
+            double f = 1.0 + coslat * cos(x);
             if (f < EPSILON) {
                 throw new ProjectionException(Errors.format(
                           ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
-            f = k0 / f;                   // (21-14)
-            x = f * coslat * Math.sin(x); // (21-2)
-            y = f * Math.sin(y);          // (21-13)
+            f = k0 / f;              // (21-14)
+            x = f * coslat * sin(x); // (21-2)
+            y = f * sin(y);          // (21-13)
 
             assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
@@ -170,24 +168,25 @@ public class EquatorialStereographic extends StereographicUSGS {
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
          * and stores the result in {@code ptDst}.
          */
+        @Override
         protected Point2D inverseTransformNormalized(double x, double y,Point2D ptDst)
-                throws ProjectionException 
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-            final double rho = Math.sqrt(x*x + y*y);
-            if (Math.abs(rho) < EPSILON) {
+            final double rho = hypot(x, y);
+            if (abs(rho) < EPSILON) {
                 y = 0.0;                     // latitudeOfOrigin
                 x = 0.0;
             } else {
-                final double c = 2.0 * Math.atan(rho / k0);
-                final double cosc = Math.cos(c);
-                final double sinc = Math.sin(c);
-                y = Math.asin(y * sinc/rho); // (20-14)  with phi1=0
+                final double c = 2.0 * atan(rho / k0);
+                final double cosc = cos(c);
+                final double sinc = sin(c);
+                y = asin(y * sinc/rho); // (20-14)  with phi1=0
                 final double t  = x*sinc;
                 final double ct = rho*cosc;
-                x = (Math.abs(t) < EPSILON && Math.abs(ct) < EPSILON) ? 0.0 : Math.atan2(t, ct);
+                x = (abs(t) < EPSILON && abs(ct) < EPSILON) ? 0.0 : atan2(t, ct);
             }
 
             assert checkInverseTransform(x, y, ptDst);

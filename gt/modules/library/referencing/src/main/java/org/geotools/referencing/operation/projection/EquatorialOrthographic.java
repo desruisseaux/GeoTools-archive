@@ -21,21 +21,18 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import static java.lang.Math.*;
+
 
 /**
- * The equatorial case of the {@link Orthographic} projection. This is a 
- * simplification of the oblique case for {@link #latitudeOfOrigin} == 0.0. 
+ * The equatorial case of the {@link Orthographic} projection. This is a
+ * simplification of the oblique case for {@link #latitudeOfOrigin} == 0.0.
  * Only the spherical form is given here.
  *
  * @todo this code is identical to the oblique except for 6 lines.
@@ -58,7 +55,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected EquatorialOrthographic(final ParameterValueGroup parameters) 
+    protected EquatorialOrthographic(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         super(parameters);
@@ -72,21 +69,22 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
+    @Override
     protected Point2D transformNormalized(double x, double y, Point2D ptDst)
             throws ProjectionException
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-        final double cosphi = Math.cos(y);
-        final double coslam = Math.cos(x);
+        final double cosphi = cos(y);
+        final double coslam = cos(x);
 
         if (cosphi * coslam < -EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
 
-        y = Math.sin(y);
-        x = cosphi * Math.sin(x);   
+        y = sin(y);
+        x = cosphi * sin(x);
 
         assert checkTransform(x, y, ptDst);
         if (ptDst != null) {
@@ -100,13 +98,14 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
+    @Override
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
             throws ProjectionException
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-        final double rho = Math.sqrt(x*x + y*y);
+        final double rho = hypot(x, y);
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPSILON) {
@@ -115,7 +114,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
             sinc = 1.0;
         }
 
-        final double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
+        final double cosc = sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
@@ -125,11 +124,11 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
             y = cosc * rho;
 
             // begin sinchk
-            if (Math.abs(phi) >= 1.0) {
-                phi = (phi < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+            if (abs(phi) >= 1.0) {
+                phi = (phi < 0.0) ? -PI/2.0 : PI/2.0;
             }
             else {
-                phi = Math.asin(phi);
+                phi = asin(phi);
             }
             // end sinchk
 
@@ -137,10 +136,10 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
                 if (x == 0.0) {
                     x = 0.0;
                 } else {
-                    x = (x < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+                    x = (x < 0.0) ? -PI/2.0 : PI/2.0;
                 }
             } else {
-                x = Math.atan2(x, y);
+                x = atan2(x, y);
             }
             y = phi;
         }

@@ -25,18 +25,18 @@
 package org.geotools.referencing.operation.projection;
 
 import java.awt.geom.Point2D;
-
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
-
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -126,17 +126,17 @@ public class ObliqueStereographic extends StereographicUSGS {
         super(parameters, descriptor);
 
         // Compute constants
-        final double sphi = Math.sin(latitudeOfOrigin);
-        double       cphi = Math.cos(latitudeOfOrigin);
+        final double sphi = sin(latitudeOfOrigin);
+        double       cphi = cos(latitudeOfOrigin);
         cphi  *= cphi;
-        R2     = 2.0 * Math.sqrt(1-excentricitySquared) / (1-excentricitySquared * sphi * sphi);
-        C      = Math.sqrt(1. + excentricitySquared * cphi * cphi / (1. - excentricitySquared));
-        phic0  = Math.asin(sphi / C);
-        sinc0  = Math.sin(phic0);
-        cosc0  = Math.cos(phic0);
+        R2     = 2.0 * sqrt(1-excentricitySquared) / (1-excentricitySquared * sphi * sphi);
+        C      = sqrt(1. + excentricitySquared * cphi * cphi / (1. - excentricitySquared));
+        phic0  = asin(sphi / C);
+        sinc0  = sin(phic0);
+        cosc0  = cos(phic0);
         ratexp = 0.5 * C * excentricity;
-        K      = Math.tan(0.5 * phic0 + Math.PI/4) /
-                    (Math.pow(Math.tan(0.5 * latitudeOfOrigin + Math.PI/4), C) *
+        K      = tan(0.5 * phic0 + PI/4) /
+                    (pow(tan(0.5 * latitudeOfOrigin + PI/4), C) *
                      srat(excentricity * sphi, ratexp));
     }
 
@@ -152,14 +152,13 @@ public class ObliqueStereographic extends StereographicUSGS {
         // Compute using USGS formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-        y = 2.0 * Math.atan(K * Math.pow(Math.tan(0.5 * y + Math.PI/4), C) *
-                            srat(excentricity * Math.sin(y), ratexp)) - Math.PI/2;
+        y = 2.0 * atan(K * pow(tan(0.5 * y + PI/4), C) * srat(excentricity * sin(y), ratexp)) - PI/2;
         x *= C;
-        final double sinc = Math.sin(y);
-        final double cosc = Math.cos(y);
-        final double cosl = Math.cos(x);
+        final double sinc = sin(y);
+        final double cosc = cos(y);
+        final double cosl = cos(x);
         final double k = R2 / (1.0 + sinc0 * sinc + cosc0 * cosc * cosl);
-        x = k * cosc * Math.sin(x);
+        x = k * cosc * sin(x);
         y = k * (cosc0 * sinc - sinc0 * cosc * cosl);
 
         assert checkTransform(x, y, ptDst, 0.1);
@@ -181,31 +180,31 @@ public class ObliqueStereographic extends StereographicUSGS {
         // Compute using USGS formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-        final double rho = Math.hypot(x, y);
-        if (Math.abs(rho) < EPSILON) {
+        final double rho = hypot(x, y);
+        if (abs(rho) < EPSILON) {
             x = 0.0;
             y = phic0;
         } else {
-            final double ce   = 2.0 * Math.atan2(rho, R2);
-            final double sinc = Math.sin(ce);
-            final double cosc = Math.cos(ce);
-            x = Math.atan2(x * sinc, rho * cosc0 * cosc - y * sinc0 * sinc);
+            final double ce   = 2.0 * atan2(rho, R2);
+            final double sinc = sin(ce);
+            final double cosc = cos(ce);
+            x = atan2(x * sinc, rho * cosc0 * cosc - y * sinc0 * sinc);
             y = (cosc * sinc0) + (y * sinc * cosc0 / rho);
 
-            if (Math.abs(y) >= 1.0) {
-                y = (y < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+            if (abs(y) >= 1.0) {
+                y = (y < 0.0) ? -PI/2.0 : PI/2.0;
             } else {
-                y = Math.asin(y);
+                y = asin(y);
             }
         }
 
         // Begin pj_inv_gauss(...) method inlined
         x /= C;
-        double num = Math.pow(Math.tan(0.5 * y + Math.PI/4.0)/K, 1.0/C);
+        double num = pow(tan(0.5 * y + PI/4.0)/K, 1.0/C);
         for (int i=MAXIMUM_ITERATIONS;;) {
-            double phi = 2.0 * Math.atan(num * srat(excentricity * Math.sin(y),
-                        -0.5 * excentricity)) - Math.PI/2.0;
-            if (Math.abs(phi - y) < ITERATION_TOLERANCE) {
+            double phi = 2.0 * atan(num * srat(excentricity * sin(y),
+                        -0.5 * excentricity)) - PI/2.0;
+            if (abs(phi - y) < ITERATION_TOLERANCE) {
                 break;
             }
             y = phi;
@@ -229,7 +228,7 @@ public class ObliqueStereographic extends StereographicUSGS {
      * A simple function used by the transforms.
      */
     private static double srat(double esinp, double exp) {
-        return Math.pow((1.0 - esinp) / (1.0 + esinp), exp);
+        return pow((1.0 - esinp) / (1.0 + esinp), exp);
     }
 
 

@@ -25,33 +25,39 @@ package org.geotools.referencing.operation.projection;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.TransformException;
 
+import org.geotools.math.XMath;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.logging.Logging;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -80,14 +86,13 @@ import org.geotools.util.logging.Logging;
  * @tutorial http://www.geotools.org/display/GEOTOOLS/How+to+add+new+projections
  */
 public abstract class MapProjection extends AbstractMathTransform
-                implements MathTransform2D, Serializable
+        implements MathTransform2D, Serializable
 {
- 
     /**
      * The projection package logger
      */
-    protected static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.operation.projection");
-    
+    protected static final Logger LOGGER = Logging.getLogger(MapProjection.class);
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -209,14 +214,24 @@ public abstract class MapProjection extends AbstractMathTransform
      * The inverse of this map projection. Will be created only when needed.
      */
     private transient MathTransform2D inverse;
-    
+
     /**
-     * When true lat/lon coordinate ranges will be checked, and a WARNING log will be issued
-     * if they are out of their natural ranges (-180/180 for longitude, -90/90 for latitude).<br>
-     * To avoid excessive logging, this flag will be set to false after the first coordinate
-     * failing the checks is found.
+     * When {@code true}, coordinate ranges will be checked, and a {@code WARNING} log will be
+     * issued if they are out of their natural ranges (-180/180&deg; for longitude, -90/90&deg;
+     * for latitude).
+     * <p>
+     * To avoid excessive logging, this flag will be set to {@code false} after the first
+     * coordinate failing the checks is found.
      */
-    protected boolean verifyCoordinateRanges = true;
+    protected transient boolean verifyCoordinateRanges = true;
+
+    /**
+     * Invoked on deserialization for setting the transient field values.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        verifyCoordinateRanges = true;
+    }
 
     /**
      * Constructs a new map projection from the suplied parameters.
@@ -268,7 +283,7 @@ public abstract class MapProjection extends AbstractMathTransform
         falseNorthing       = doubleValue(expected, AbstractProvider.FALSE_NORTHING,     values);
         isSpherical         = (semiMajor == semiMinor);
         excentricitySquared = 1.0 - (semiMinor * semiMinor) / (semiMajor * semiMajor);
-        excentricity        = Math.sqrt(excentricitySquared);
+        excentricity        = sqrt(excentricitySquared);
         globalScale         = scaleFactor * semiMajor;
         ensureLongitudeInRange(AbstractProvider.CENTRAL_MERIDIAN,   centralMeridian,  true);
         ensureLatitudeInRange (AbstractProvider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
@@ -325,7 +340,7 @@ public abstract class MapProjection extends AbstractMathTransform
         if (value instanceof Number) {
             v = ((Number) value).doubleValue();
             if (NonSI.DEGREE_ANGLE.equals(param.getUnit())) {
-                v = Math.toRadians(v);
+                v = toRadians(v);
             }
         } else {
             v = Double.NaN;
@@ -355,11 +370,11 @@ public abstract class MapProjection extends AbstractMathTransform
     static void ensureLatitudeEquals(final ParameterDescriptor name, double y, double expected)
             throws IllegalArgumentException
     {
-        if (!(Math.abs(Math.abs(y) - expected) < EPSILON)) {
-            y = Math.toDegrees(y);
+        if (!(abs(abs(y) - expected) < EPSILON)) {
+            y = toDegrees(y);
             final String n = name.getName().getCode();
             throw new InvalidParameterValueException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                    n, new Latitude(y)), n, y);
+                                                     n, new Latitude(y)), n, y);
         }
     }
 
@@ -375,12 +390,12 @@ public abstract class MapProjection extends AbstractMathTransform
     static void ensureLatitudeInRange(final ParameterDescriptor name, double y, final boolean edge)
             throws IllegalArgumentException
     {
-        if (edge ? (y>=Latitude.MIN_VALUE*Math.PI/180 && y<=Latitude.MAX_VALUE*Math.PI/180) :
-                   (y> Latitude.MIN_VALUE*Math.PI/180 && y< Latitude.MAX_VALUE*Math.PI/180))
+        if (edge ? (y >= Latitude.MIN_VALUE * PI/180  &&  y <= Latitude.MAX_VALUE * PI/180) :
+                   (y >  Latitude.MIN_VALUE * PI/180  &&  y <  Latitude.MAX_VALUE * PI/180))
         {
             return;
         }
-        y = Math.toDegrees(y);
+        y = toDegrees(y);
         throw new InvalidParameterValueException(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1,
                                                  new Latitude(y)), name.getName().getCode(), y);
     }
@@ -397,18 +412,63 @@ public abstract class MapProjection extends AbstractMathTransform
     static void ensureLongitudeInRange(final ParameterDescriptor name, double x, final boolean edge)
             throws IllegalArgumentException
     {
-        if (edge ? (x>=Longitude.MIN_VALUE*Math.PI/180 && x<=Longitude.MAX_VALUE*Math.PI/180) :
-                   (x> Longitude.MIN_VALUE*Math.PI/180 && x< Longitude.MAX_VALUE*Math.PI/180))
+        if (edge ? (x >= Longitude.MIN_VALUE * PI/180  &&  x <= Longitude.MAX_VALUE * PI/180) :
+                   (x >  Longitude.MIN_VALUE * PI/180  &&  x <  Longitude.MAX_VALUE * PI/180))
         {
             return;
         }
-        x = Math.toDegrees(x);
+        x = toDegrees(x);
         throw new InvalidParameterValueException(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1,
                                                  new Longitude(x)), name.getName().getCode(), x);
     }
 
     /**
-     * Set the value in a parameter group. This convenience method is used
+     * Verifies if the given coordinates are in the range of geographic coordinates. If they are
+     * not, then this method logs a warning and returns {@code true}. Otherwise this method does
+     * nothing and returns {@code false}.
+     *
+     * @param  tr The caller.
+     * @param  x The longitude in decimal degrees.
+     * @param  y The latitude in decimal degrees.
+     * @return {@code true} if the coordinates are not in the geographic range, in which case
+     *         a warning has been logged.
+     */
+    private static boolean verifyGeographicRanges(final AbstractMathTransform tr,
+                                                  final double x, final double y)
+    {
+        // Note: the following tests should not fails for NaN values.
+        final boolean xOut, yOut;
+        xOut = (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE));
+        yOut = (y < (Latitude .MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude .MAX_VALUE + ANGLE_TOLERANCE));
+        if (!xOut && !yOut) {
+            return false;
+        }
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append(Errors.format(ErrorKeys.OUT_OF_PROJECTION_VALID_AREA_$1, tr.getName()));
+        if (xOut) {
+            buffer.append(lineSeparator);
+            buffer.append(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
+        }
+        if (yOut) {
+            buffer.append(lineSeparator);
+            buffer.append(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+        }
+        final LogRecord record = new LogRecord(Level.WARNING, buffer.toString());
+        final String classe;
+        if (tr instanceof Inverse) {
+            classe = ((Inverse) tr).inverse().getClass().getName() + ".Inverse";
+        } else {
+            classe = tr.getClass().getName();
+        }
+        record.setSourceClassName(classe);
+        record.setSourceMethodName("transform");
+        LOGGER.log(record);
+        return true;
+    }
+
+    /**
+     * Sets the value in a parameter group. This convenience method is used
      * by subclasses for {@link #getParameterValues} implementation. Values
      * are automatically converted from radians to decimal degrees if needed.
      *
@@ -417,8 +477,8 @@ public abstract class MapProjection extends AbstractMathTransform
      * @param group     The group in which to set the value.
      * @param value     The value to set.
      */
-    final void set(final Collection       expected,
-                   final ParameterDescriptor param,
+    final void set(final Collection<GeneralParameterDescriptor> expected,
+                   final ParameterDescriptor<?> param,
                    final ParameterValueGroup group,
                    double value)
     {
@@ -430,9 +490,9 @@ public abstract class MapProjection extends AbstractMathTransform
                  * in order to avoid a bias when formatting a transform and
                  * parsing it again.
                  */
-                value = Math.toDegrees(value);
+                value = toDegrees(value);
                 double old = value;
-                value = XMath.fixRoundingError(value, 12);
+                value = XMath.trimDecimalFractionDigits(value, 4, 12);
                 if (value == old) {
                     /*
                      * The attempt to fix rounding error failed. Try again with the
@@ -441,7 +501,7 @@ public abstract class MapProjection extends AbstractMathTransform
                      * common in the EPSG database.
                      */
                     old *= 3;
-                    final double test = XMath.fixRoundingError(old, 12);
+                    final double test = XMath.trimDecimalFractionDigits(old, 4, 12);
                     if (test != old) {
                         value = test/3;
                     }
@@ -467,8 +527,7 @@ public abstract class MapProjection extends AbstractMathTransform
     @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterDescriptorGroup descriptor = getParameterDescriptors();
-        final Collection expected = descriptor.descriptors();
-        // TODO: remove the cast below once we will be allowed to use J2SE 1.5.
+        final Collection<GeneralParameterDescriptor> expected = descriptor.descriptors();
         final ParameterValueGroup values = descriptor.createValue();
         set(expected, AbstractProvider.SEMI_MAJOR,         values, semiMajor       );
         set(expected, AbstractProvider.SEMI_MINOR,         values, semiMinor       );
@@ -509,13 +568,13 @@ public abstract class MapProjection extends AbstractMathTransform
      * approximation. This is used for assertions only.
      */
     private double orthodromicDistance(final Point2D source, final Point2D target) {
-        final double y1 = Math.toRadians(source.getY());
-        final double y2 = Math.toRadians(target.getY());
-        final double dx = Math.toRadians(Math.abs(target.getX() - source.getX()) % 360);
-        double rho = Math.sin(y1)*Math.sin(y2) + Math.cos(y1)*Math.cos(y2)*Math.cos(dx);
+        final double y1 = toRadians(source.getY());
+        final double y2 = toRadians(target.getY());
+        final double dx = toRadians(abs(target.getX() - source.getX()) % 360);
+        double rho = sin(y1)*sin(y2) + cos(y1)*cos(y2)*cos(dx);
         if (rho>+1) {assert rho <= +(1+EPSILON) : rho; rho=+1;}
         if (rho<-1) {assert rho >= -(1+EPSILON) : rho; rho=-1;}
-        return Math.acos(rho) * semiMajor;
+        return acos(rho) * semiMajor;
     }
 
     /**
@@ -524,6 +583,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * calls {@code transform(...)}, which calls {@code inverse.transform(...)}, which
      * calls {@code transform(...)}, etc.).
      */
+    @SuppressWarnings("serial")
     private static final class CheckPoint extends Point2D.Double {
         public CheckPoint(final Point2D point) {
             super(point.getX(), point.getY());
@@ -571,8 +631,8 @@ public abstract class MapProjection extends AbstractMathTransform
                  */
                 throw new ProjectionException(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$4,
                           distance,
-                          new Longitude(longitude - Math.toDegrees(centralMeridian )),
-                          new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin)),
+                          new Longitude(longitude - toDegrees(centralMeridian )),
+                          new Latitude (latitude  - toDegrees(latitudeOfOrigin)),
                           getParameterDescriptors().getName().getCode()));
             }
         } catch (ProjectionException exception) {
@@ -625,7 +685,7 @@ public abstract class MapProjection extends AbstractMathTransform
                                          final Point2D expected, final double tolerance)
     {
         compare("latitude", expected.getY(), latitude, tolerance);
-        if (Math.abs(Math.PI/2 - Math.abs(latitude)) > EPSILON) {
+        if (abs(PI/2 - abs(latitude)) > EPSILON) {
             compare("longitude", expected.getX(), longitude, tolerance);
         }
         return tolerance < Double.POSITIVE_INFINITY;
@@ -648,10 +708,10 @@ public abstract class MapProjection extends AbstractMathTransform
      * radians. This is used for formatting an error message, if needed.
      */
     private static void compare(String variable, double expected, double actual, double tolerance) {
-        if (Math.abs(expected - actual) > tolerance) {
+        if (abs(expected - actual) > tolerance) {
             if (variable.charAt(0) == 'l') {
-                actual   = Math.toDegrees(actual);
-                expected = Math.toDegrees(expected);
+                actual   = toDegrees(actual);
+                expected = toDegrees(expected);
             }
             throw new AssertionError(Errors.format(ErrorKeys.TEST_FAILURE_$3, variable, expected, actual));
         }
@@ -760,15 +820,8 @@ public abstract class MapProjection extends AbstractMathTransform
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
-        
-        if(verifyCoordinateRanges) {
-            // Note: the following tests should not fails for NaN values.
-            if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                LOGGER.warning(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
-                verifyCoordinateRanges = false;
-            }
-            if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                LOGGER.warning(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+        if (verifyCoordinateRanges) {
+            if (verifyGeographicRanges(this, x, y)) {
                 verifyCoordinateRanges = false;
             }
         }
@@ -781,9 +834,9 @@ public abstract class MapProjection extends AbstractMathTransform
          * box from 30° to +180° would become 30° to -180°, which is probably not what the user
          * wanted.
          */
-        ptDst = transformNormalized(centralMeridian!=0 ?
-                                    rollLongitude(Math.toRadians(x) - centralMeridian) :
-                                    Math.toRadians(x), Math.toRadians(y), ptDst);
+        ptDst = transformNormalized(centralMeridian != 0 ?
+                                    rollLongitude(toRadians(x) - centralMeridian) :
+                                    toRadians(x), toRadians(y), ptDst);
         ptDst.setLocation(globalScale*ptDst.getX() + falseEasting,
                           globalScale*ptDst.getY() + falseNorthing);
 
@@ -901,6 +954,11 @@ public abstract class MapProjection extends AbstractMathTransform
      */
     private final class Inverse extends AbstractMathTransform.Inverse implements MathTransform2D {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -9138242780765956870L;
+
+        /**
          * Default constructor.
          */
         public Inverse() {
@@ -943,20 +1001,12 @@ public abstract class MapProjection extends AbstractMathTransform
              * box from 30° to +180° would become 30° to -180°, which is probably not what the user
              * wanted.
              */
-            final double x = Math.toDegrees(centralMeridian!=0 ?
+            final double x = toDegrees(centralMeridian != 0 ?
                              rollLongitude(ptDst.getX() + centralMeridian) : ptDst.getX());
-            final double y = Math.toDegrees(ptDst.getY());
+            final double y = toDegrees(ptDst.getY());
             ptDst.setLocation(x,y);
-
-            // Note: the following tests should not fails for NaN values.
-            if(verifyCoordinateRanges) {
-                // Note: the following tests should not fails for NaN values.
-                if (x < (Longitude.MIN_VALUE - ANGLE_TOLERANCE) || x > (Longitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                    LOGGER.warning(Errors.format(ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
-                    verifyCoordinateRanges = false;
-                }
-                if (y < (Latitude.MIN_VALUE - ANGLE_TOLERANCE) || y > (Latitude.MAX_VALUE + ANGLE_TOLERANCE)) {
-                    LOGGER.warning(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
+            if (verifyCoordinateRanges) {
+                if (verifyGeographicRanges(this, x, y)) {
                     verifyCoordinateRanges = false;
                 }
             }
@@ -1096,14 +1146,14 @@ public abstract class MapProjection extends AbstractMathTransform
      * @return The tolerance level for assertions, in meters.
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
-        final double delta = Math.abs(longitude - centralMeridian)/2 +
-                             Math.abs(latitude  - latitudeOfOrigin);
+        final double delta = abs(longitude - centralMeridian)/2 +
+                             abs(latitude  - latitudeOfOrigin);
         if (delta > 40) {
             // When far from the valid area, use a larger tolerance.
             return 1;
         }
         // Be less strict when the point is near an edge.
-        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : 1E-5;
+        return (abs(longitude) > 179) || (abs(latitude) > 89) ? 1E-1 : 1E-5;
     }
 
 
@@ -1168,13 +1218,13 @@ public abstract class MapProjection extends AbstractMathTransform
      * Iteratively solve equation (7-9) from Snyder.
      */
     final double cphi2(final double ts) throws ProjectionException {
-        final double eccnth = 0.5*excentricity;
-        double phi = (Math.PI/2) - 2.0*Math.atan(ts);
+        final double eccnth = 0.5 * excentricity;
+        double phi = (PI/2) - 2.0 * atan(ts);
         for (int i=0; i<MAXIMUM_ITERATIONS; i++) {
-            final double con  = excentricity*Math.sin(phi);
-            final double dphi = (Math.PI/2) - 2.0*Math.atan(ts * Math.pow((1-con)/(1+con), eccnth)) - phi;
+            final double con  = excentricity * sin(phi);
+            final double dphi = (PI/2) - 2.0*atan(ts * pow((1-con)/(1+con), eccnth)) - phi;
             phi += dphi;
-            if (Math.abs(dphi) <= ITERATION_TOLERANCE) {
+            if (abs(dphi) <= ITERATION_TOLERANCE) {
                 return phi;
             }
         }
@@ -1188,7 +1238,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * eccentricity squared}.
      */
     final double msfn(final double s, final double c) {
-        return c / Math.sqrt(1.0 - (s*s) * excentricitySquared);
+        return c / sqrt(1.0 - (s*s) * excentricitySquared);
     }
 
     /**
@@ -1200,8 +1250,8 @@ public abstract class MapProjection extends AbstractMathTransform
         /*
          * NOTE: change sign to get the equivalent of Snyder (7-7).
          */
-        return Math.tan(0.5 * ((Math.PI/2) - phi)) /
-               Math.pow((1-sinphi)/(1+sinphi), 0.5*excentricity);
+        return tan(0.5 * (PI/2 - phi)) /
+               pow((1-sinphi) / (1+sinphi), 0.5*excentricity);
     }
 
 
@@ -1283,21 +1333,6 @@ public abstract class MapProjection extends AbstractMathTransform
                     new NamedIdentifier(Citations.ESRI,    "Latitude_Of_Center"),
                     new NamedIdentifier(Citations.GEOTIFF, "NatOriginLat")
                     // ESRI uses "Latitude_Of_Center" in orthographic.
-                },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
-
-        /**
-         * The operation parameter descriptor for the {@linkplain Mercator#standardParallel standard
-         * parallel} parameter value. Valid values range is from -90 to 90°. Default value is 0.
-         *
-         * @deprecated Use {@link #STANDARD_PARALLEL_1} instead.
-         *             Not to be confused with {@link PolarStereographic.ProviderB#STANDARD_PARALLEL}.
-         */
-        public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.OGC,      "standard_parallel_1"),
-                    new NamedIdentifier(Citations.EPSG,     "Latitude of 1st standard parallel"),
-                    new NamedIdentifier(Citations.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -1424,7 +1459,7 @@ public abstract class MapProjection extends AbstractMathTransform
         {
             double v = MathTransformProvider.doubleValue(param, group);
             if (NonSI.DEGREE_ANGLE.equals(param.getUnit())) {
-                v = Math.toRadians(v);
+                v = toRadians(v);
             }
             return v;
         }

@@ -31,6 +31,7 @@ import javax.vecmath.SingularMatrixException;
 import javax.units.NonSI;
 import javax.units.SI;
 
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -53,19 +54,20 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
- * Provides a default implementation for most methods required by the
- * {@link MathTransform} interface. {@code AbstractMathTransform}
- * provides a convenient base class from which other transform classes
- * can be easily derived. In addition, {@code AbstractMathTransform}
- * implements methods required by the {@link MathTransform2D} interface,
- * but <strong>does not</strong> implements {@code MathTransform2D}.
- * Subclasses must declare <code>implements&nbsp;MathTransform2D</code>
+ * Provides a default implementation for most methods required by the {@link MathTransform}
+ * interface. {@code AbstractMathTransform} provides a convenient base class from which other
+ * transform classes can be easily derived. In addition, {@code AbstractMathTransform} implements
+ * methods required by the {@link MathTransform2D} interface, but <strong>does not</strong>
+ * implements {@code MathTransform2D}. Subclasses must declare {@code implements MathTransform2D}
  * themself if they know to maps two-dimensional coordinate systems.
  *
  * @since 2.0
@@ -83,6 +85,29 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
+     * Returns a name for this math transform (never {@code null}). This convenience methods
+     * returns the name of the {@linkplain #getParameterDescriptors parameter descriptors} if
+     * any, or the short class name otherwise.
+     *
+     * @return A name for this math transform (never {@code null}).
+     *
+     * @since 2.5
+     */
+    public String getName() {
+        final ParameterDescriptorGroup descriptor = getParameterDescriptors();
+        if (descriptor != null) {
+            final Identifier identifier = descriptor.getName();
+            if (identifier != null) {
+                final String code = identifier.getCode();
+                if (code != null) {
+                    return code;
+                }
+            }
+        }
+        return Classes.getShortClassName(this);
+    }
+
+    /**
      * Gets the dimension of input points.
      */
     public abstract int getSourceDimensions();
@@ -93,10 +118,10 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public abstract int getTargetDimensions();
 
     /**
-     * Returns the parameter descriptors for this math transform, or {@code null} if unknow.
-     * This method is similar to {@link OperationMethod#getParameters}, except that
-     * {@code MathTransform} returns parameters in standard units (usually
-     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE decimal degrees}).
+     * Returns the parameter descriptors for this math transform, or {@code null} if unknow. This
+     * method is similar to {@link OperationMethod#getParameters}, except that {@code MathTransform}
+     * returns parameters in standard units (usually {@linkplain SI#METER meters} or
+     * {@linkplain NonSI#DEGREE_ANGLE decimal degrees}).
      *
      * @return The parameter descriptors for this math transform, or {@code null}.
      *
@@ -107,12 +132,11 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Returns the parameter values for this math transform, or {@code null} if unknow.
-     * This method is similar to {@link Operation#getParameterValues}, except that
-     * {@code MathTransform} returns parameters in standard units (usually
-     * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE decimal degrees}).
-     * Since this method returns a copy of the parameter values, any change to a value
-     * will have no effect on this math transform.
+     * Returns the parameter values for this math transform, or {@code null} if unknow. This method
+     * is similar to {@link Operation#getParameterValues}, except that {@code MathTransform} returns
+     * parameters in standard units (usually {@linkplain SI#METER meters} or
+     * {@linkplain NonSI#DEGREE_ANGLE decimal degrees}). Since this method returns a copy of the
+     * parameter values, any change to a value will have no effect on this math transform.
      *
      * @return A copy of the parameter values for this math transform, or {@code null}.
      *
@@ -149,14 +173,14 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * The default implementation invokes {@link #transform(double[],int,double[],int,int)}
      * using a temporary array of doubles.
      *
-     * @param ptSrc the specified coordinate point to be transformed.
-     * @param ptDst the specified coordinate point that stores the result of transforming
-     *              {@code ptSrc}, or {@code null}.
-     * @return      the coordinate point after transforming {@code ptSrc} and storing the result in
-     *              {@code ptDst}.
-     * @throws MismatchedDimensionException if this transform doesn't map two-dimensional
+     * @param  ptSrc The specified coordinate point to be transformed.
+     * @param  ptDst The specified coordinate point that stores the result of transforming
+     *         {@code ptSrc}, or {@code null}.
+     * @return The coordinate point after transforming {@code ptSrc} and storing the result in
+     *         {@code ptDst}.
+     * @throws MismatchedDimensionException If this transform doesn't map two-dimensional
      *         coordinate systems.
-     * @throws TransformException if the point can't be transformed.
+     * @throws TransformException If the point can't be transformed.
      *
      * @see MathTransform2D#transform(Point2D,Point2D)
      */
@@ -179,9 +203,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Transforms the specified {@code ptSrc} and stores the result
-     * in {@code ptDst}. The default implementation invokes
-     * {@link #transform(double[],int,double[],int,int)}.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}. The default
+     * implementation delegates to {@link #transform(double[],int,double[],int,int)}.
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
@@ -282,7 +305,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      *                       transformation using {@code this}, or {@code null} if none.
      * @param  postTransform An optional affine transform to apply <em>after</em> the transformation
      *                       using {@code this}, or {@code null} if none.
-     * @param orientation    Base line of quadratic curves. Must be
+     * @param  orientation   Base line of quadratic curves. Must be
      *                       {@link ShapeUtilities#HORIZONTAL} or {@link ShapeUtilities#PARALLEL}).
      *
      * @return The transformed geometric shape.
@@ -737,6 +760,21 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * Constructs an inverse math transform.
          */
         protected Inverse() {
+        }
+
+        /**
+         * Returns a name for this math transform (never {@code null}). The default implementation
+         * returns the direct transform name concatenated with localized flavor (when available)
+         * of "(Inverse transform)".
+         *
+         * @return A name for this math transform (never {@code null}).
+         *
+         * @since 2.5
+         */
+        @Override
+        public String getName() {
+            return AbstractMathTransform.this.getName() +
+                    " (" + Vocabulary.format(VocabularyKeys.INVERSE_TRANSFORM) + ')';
         }
 
         /**

@@ -32,14 +32,14 @@ public class PointOutsideEnvelopeException extends ProjectionException {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4384490413772200352L;
-    
+
     /**
      * Constructs a new exception with no detail message.
      */
     public PointOutsideEnvelopeException() {
         super();
     }
-    
+
     /**
      * Constructs a new exception with the specified detail message.
      *

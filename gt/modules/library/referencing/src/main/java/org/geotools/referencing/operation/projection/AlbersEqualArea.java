@@ -5,7 +5,7 @@
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2000, Frank Warmerdam
  *   (C) 1995, Gerald Evenden
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,19 +15,17 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *    
+ *
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here. This derived work has
  *    been relicensed under LGPL with Frank Warmerdam's permission.
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
-import javax.units.NonSI;
 
-// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -35,7 +33,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
@@ -44,21 +41,23 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
+import static java.lang.Math.*;
+
 
 /**
  * Albers Equal Area Projection (EPSG code 9822). This is a conic projection
  * with parallels being unequally spaced arcs of concentric circles, more
  * closely spaced at north and south edges of the map. Merideans
- * are equally spaced radii of the same circles and intersect parallels at right 
+ * are equally spaced radii of the same circles and intersect parallels at right
  * angles. As the name implies, this projection minimizes distortion in areas.
  * <p>
  *
- * The "standard_parallel_2" parameter is optional and will be given the 
+ * The "standard_parallel_2" parameter is optional and will be given the
  * same value as "standard_parallel_1" if not set (creating a 1 standard parallel
- * projection). 
+ * projection).
  * <p>
  *
- * NOTE: formulae used below are from a port, to java, of the 
+ * NOTE: formulae used below are from a port, to java, of the
  *       'proj4' package of the USGS survey. USGS work is acknowledged here.
  * <p>
  *
@@ -80,29 +79,29 @@ import org.geotools.resources.i18n.Errors;
  * @version $Id$
  * @author Rueben Schulz
  */
-public class AlbersEqualArea extends MapProjection {       
+public class AlbersEqualArea extends MapProjection {
     /**
      * Maximum number of iterations for iterative computations.
      */
     private static final int MAXIMUM_ITERATIONS = 15;
-    
+
     /**
      * Difference allowed in iterative computations.
      */
     private static final double ITERATION_TOLERANCE = 1E-10;
-    
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-        
+
     /**
-     * Constants used by the spherical and elliptical Albers projection. 
+     * Constants used by the spherical and elliptical Albers projection.
      */
     private final double n, c, rho0;
 
     /**
-     * An error condition indicating iteration will not converge for the 
+     * An error condition indicating iteration will not converge for the
      * inverse ellipse. See Snyder (14-20)
      */
     private final double ec;
@@ -126,7 +125,7 @@ public class AlbersEqualArea extends MapProjection {
     protected AlbersEqualArea(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
         phi1 = doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters);
@@ -138,36 +137,36 @@ public class AlbersEqualArea extends MapProjection {
         ensureLatitudeInRange(Provider.STANDARD_PARALLEL_2, phi2, true);
 
         // Compute Constants
-        if (Math.abs(phi1 + phi2) < EPSILON) 
+        if (abs(phi1 + phi2) < EPSILON)
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
-                                               new Latitude(Math.toDegrees(phi1)),
-                                               new Latitude(Math.toDegrees(phi2))));
+                                               new Latitude(toDegrees(phi1)),
+                                               new Latitude(toDegrees(phi2))));
 
-        double  sinphi = Math.sin(phi1);
-        double  cosphi = Math.cos(phi1);
+        double  sinphi = sin(phi1);
+        double  cosphi = cos(phi1);
         double  n      = sinphi;
-        boolean secant = (Math.abs(phi1 - phi2) >= EPSILON);
+        boolean secant = (abs(phi1 - phi2) >= EPSILON);
         if (isSpherical) {
             if (secant) {
-                n = 0.5 * (n + Math.sin(phi2));
-            }           
+                n = 0.5 * (n + sin(phi2));
+            }
             c    = cosphi * cosphi + n*2 * sinphi;
-            rho0 = Math.sqrt(c - n*2 * Math.sin(latitudeOfOrigin)) /n;
+            rho0 = sqrt(c - n*2 * sin(latitudeOfOrigin)) /n;
             ec   = Double.NaN;
         } else {
             double m1 = msfn(sinphi, cosphi);
             double q1 = qsfn(sinphi);
             if (secant) { /* secant cone */
-                sinphi    = Math.sin(phi2);
-                cosphi    = Math.cos(phi2);
+                sinphi    = sin(phi2);
+                cosphi    = cos(phi2);
                 double m2 = msfn(sinphi, cosphi);
                 double q2 = qsfn(sinphi);
                 n = (m1 * m1 - m2 * m2) / (q2 - q1);
             }
             c = m1 * m1 + n * q1;
-            rho0 = Math.sqrt(c - n * qsfn(Math.sin(latitudeOfOrigin))) /n;
-            ec = 1.0 - .5 * (1.0-excentricitySquared) * 
-                 Math.log((1.0 - excentricity) / (1.0 + excentricity)) / excentricity;
+            rho0 = sqrt(c - n * qsfn(sin(latitudeOfOrigin))) /n;
+            ec = 1.0 - .5 * (1.0-excentricitySquared) *
+                 log((1.0 - excentricity) / (1.0 + excentricity)) / excentricity;
         }
         this.n = n;
     }
@@ -182,9 +181,10 @@ public class AlbersEqualArea extends MapProjection {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         set(expected, Provider.STANDARD_PARALLEL_1, values, phi1);
         set(expected, Provider.STANDARD_PARALLEL_2, values, phi2);
         return values;
@@ -195,15 +195,15 @@ public class AlbersEqualArea extends MapProjection {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         x *= n;
         double rho;
         if (isSpherical) {
-            rho = c - n*2 * Math.sin(y);
+            rho = c - n*2 * sin(y);
         } else {
-            rho = c - n * qsfn(Math.sin(y));
+            rho = c - n * qsfn(sin(y));
         }
 
         if (rho < 0.0) {
@@ -213,9 +213,9 @@ public class AlbersEqualArea extends MapProjection {
                 throw new ProjectionException(Errors.format(ErrorKeys.TOLERANCE_ERROR));
             }
         }
-        rho = Math.sqrt(rho) / n;
-        y   = rho0 - rho * Math.cos(x);
-        x   =        rho * Math.sin(x);
+        rho = sqrt(rho) / n;
+        y   = rho0 - rho * cos(x);
+        x   =        rho * sin(x);
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -228,38 +228,38 @@ public class AlbersEqualArea extends MapProjection {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         y = rho0 - y;
-        double rho = Math.sqrt(x*x + y*y);
+        double rho = hypot(x, y);
         if (rho > EPSILON) {
             if (n < 0.0) {
                 rho = -rho;
                 x   = -x;
                 y   = -y;
             }
-            x = Math.atan2(x, y) / n;
-            y =  rho*n;
+            x = atan2(x, y) / n;
+            y = rho * n;
             if (isSpherical) {
                 y = (c - y * y) / (n*2);
-                if (Math.abs(y) <= 1.0){
-                    y = Math.asin(y);
+                if (abs(y) <= 1.0){
+                    y = asin(y);
                 }
                 else {
-                    y = (y < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
-                }     
+                    y = (y < 0.0) ? -PI/2.0 : PI/2.0;
+                }
             } else {
                 y = (c - y*y) / n;
-                if (Math.abs(ec - Math.abs(y)) > EPSILON) {
+                if (abs(ec - abs(y)) > EPSILON) {
                     y = phi1(y);
                 } else {
-                    y = (y < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
-                } 
-            }   
+                    y = (y < 0.0) ? -PI/2.0 : PI/2.0;
+                }
+            }
         } else {
             x = 0.0;
-            y = n > 0.0 ? Math.PI/2.0 : - Math.PI/2.0;
+            y = n > 0.0 ? PI/2.0 : - PI/2.0;
         }
 
         if (ptDst != null) {
@@ -277,27 +277,27 @@ public class AlbersEqualArea extends MapProjection {
      */
     private double phi1(final double qs) throws ProjectionException {
         final double tone_es = 1 - excentricitySquared;
-        double phi = Math.asin(0.5 * qs);
+        double phi = asin(0.5 * qs);
         if (excentricity < EPSILON) {
             return phi;
         }
         for (int i=0; i<MAXIMUM_ITERATIONS; i++) {
-            final double sinpi = Math.sin(phi);
-            final double cospi = Math.cos(phi);
+            final double sinpi = sin(phi);
+            final double cospi = cos(phi);
             final double con   = excentricity * sinpi;
             final double com   = 1.0 - con*con;
-            final double dphi  = 0.5 * com*com / cospi * 
-                                 (qs/tone_es - sinpi / com + 0.5/excentricity * 
-                                 Math.log((1. - con) / (1. + con)));
+            final double dphi  = 0.5 * com*com / cospi *
+                                 (qs/tone_es - sinpi / com + 0.5/excentricity *
+                                 log((1. - con) / (1. + con)));
             phi += dphi;
-            if (Math.abs(dphi) <= ITERATION_TOLERANCE) {
+            if (abs(dphi) <= ITERATION_TOLERANCE) {
                 return phi;
             }
-        } 
+        }
         throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
 
-    /** 
+    /**
      * Calculates q, Snyder equation (3-12)
      *
      * @param sinphi sin of the latitude q is calculated for
@@ -308,7 +308,7 @@ public class AlbersEqualArea extends MapProjection {
         if (excentricity >= EPSILON) {
             final double con = excentricity * sinphi;
             return (one_es * (sinphi / (1. - con*con) -
-                   (0.5/excentricity) * Math.log((1.-con) / (1.+con))));
+                   (0.5/excentricity) * log((1.-con) / (1.+con))));
         } else {
             return sinphi + sinphi;
         }
@@ -317,6 +317,7 @@ public class AlbersEqualArea extends MapProjection {
     /**
      * Returns a hash value for this projection.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(c);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
@@ -325,6 +326,7 @@ public class AlbersEqualArea extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -382,7 +384,7 @@ public class AlbersEqualArea extends MapProjection {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -391,7 +393,8 @@ public class AlbersEqualArea extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<ConicProjection> getOperationType() {
             return ConicProjection.class;
         }
 

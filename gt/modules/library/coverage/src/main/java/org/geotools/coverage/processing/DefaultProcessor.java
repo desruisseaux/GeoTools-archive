@@ -100,10 +100,9 @@ public class DefaultProcessor extends AbstractProcessor {
     /**
      * The comparator for ordering operation names.
      */
-    private static final Comparator COMPARATOR = new Comparator() {
-        public int compare(final Object name1, final Object name2) {
-            return ((String) name1).toLowerCase().compareTo(
-                   ((String) name2).toLowerCase());
+    private static final Comparator<String> COMPARATOR = new Comparator<String>() {
+        public int compare(final String name1, final String name2) {
+            return name1.toLowerCase().compareTo(name2.toLowerCase());
         }
     };
 
@@ -113,7 +112,7 @@ public class DefaultProcessor extends AbstractProcessor {
      * keys are {@link String} objects, the operation name are actually case-insensitive
      * because of the comparator used in the sorted map.
      */
-    private final Map/*<String,Operation>*/ operations = new TreeMap(COMPARATOR);
+    private final Map<String,Operation> operations = new TreeMap<String,Operation>(COMPARATOR);
 
     /**
      * The rendering hints for JAI operations (never {@code null}).
@@ -169,6 +168,7 @@ public class DefaultProcessor extends AbstractProcessor {
      *       instance instead of this instance.</li>
      * </ul>
      */
+    @Override
     void setAsDefault() {
         hints.remove(Hints.GRID_COVERAGE_PROCESSOR);
     }
@@ -194,7 +194,7 @@ public class DefaultProcessor extends AbstractProcessor {
      */
     private void addOperation0(final Operation operation) throws IllegalStateException {
         final String name = operation.getName().trim();
-        final Operation old = (Operation) operations.put(name, operation);
+        final Operation old = operations.put(name, operation);
         if (old!=null && !old.equals(operation)) {
             operations.put(old.getName().trim(), old);
             throw new IllegalStateException(Errors.getResources(getLocale()).getString(
@@ -206,7 +206,7 @@ public class DefaultProcessor extends AbstractProcessor {
      * Retrieves grid processing operations information. Each operation information contains
      * the name of the operation as well as a list of its parameters.
      */
-    public synchronized Collection/*<Operation>*/ getOperations() {
+    public synchronized Collection<Operation> getOperations() {
         if (operations.isEmpty()) {
             scanForPlugins();
         }
@@ -226,7 +226,7 @@ public class DefaultProcessor extends AbstractProcessor {
         if (operations.isEmpty()) {
             scanForPlugins();
         }
-        final Operation operation = (Operation) operations.get(name);
+        final Operation operation = operations.get(name);
         if (operation != null) {
             return operation;
         }

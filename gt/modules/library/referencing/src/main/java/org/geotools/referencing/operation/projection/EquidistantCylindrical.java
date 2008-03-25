@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,12 +16,11 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
 
-// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -30,13 +29,14 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.FactoryException;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -45,7 +45,7 @@ import org.geotools.resources.i18n.Errors;
  * {@linkplain PlateCarree Plate Carree} or Equirectangular.
  *
  * This is used in, for example, <cite>WGS84 / Plate Carree</cite> (EPSG:32662).
- * 
+ *
  * <strong>References:</strong><ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
  *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
@@ -83,14 +83,14 @@ public class EquidistantCylindrical extends MapProjection {
     protected EquidistantCylindrical(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
         if (expected.contains(Provider.STANDARD_PARALLEL_1)) {
-            standardParallel = Math.abs(doubleValue(expected,
+            standardParallel = abs(doubleValue(expected,
                                         Provider.STANDARD_PARALLEL_1, parameters));
             ensureLatitudeInRange(Provider.STANDARD_PARALLEL_1, standardParallel, false);
-            cosStandardParallel = Math.cos(standardParallel);
+            cosStandardParallel = cos(standardParallel);
         } else {
             // standard parallel is the equator (Plate Carree or Equirectangular)
             standardParallel = 0;
@@ -109,10 +109,11 @@ public class EquidistantCylindrical extends MapProjection {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
         if (!Double.isNaN(standardParallel)) {
-            final Collection expected = getParameterDescriptors().descriptors();
+            final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
             set(expected, Provider.STANDARD_PARALLEL_1, values, standardParallel);
         }
         return values;
@@ -152,6 +153,7 @@ public class EquidistantCylindrical extends MapProjection {
     /**
      * Returns a hash value for this projection.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(standardParallel);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
@@ -160,6 +162,7 @@ public class EquidistantCylindrical extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -170,7 +173,7 @@ public class EquidistantCylindrical extends MapProjection {
             return equals(this.standardParallel,  that.standardParallel);
         }
         return false;
-    } 
+    }
 
 
 
@@ -239,7 +242,8 @@ public class EquidistantCylindrical extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<CylindricalProjection> getOperationType() {
             return CylindricalProjection.class;
         }
 

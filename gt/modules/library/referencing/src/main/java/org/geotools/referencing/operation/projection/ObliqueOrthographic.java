@@ -21,16 +21,13 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -51,7 +48,7 @@ public class ObliqueOrthographic extends Orthographic {
     /**
      * The sine of the {@link #latitudeOfOrigin}.
      */
-    private final double sinphi0; 
+    private final double sinphi0;
 
     /**
      * The cosine of the {@link #latitudeOfOrigin}.
@@ -64,12 +61,12 @@ public class ObliqueOrthographic extends Orthographic {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected ObliqueOrthographic(final ParameterValueGroup parameters) 
+    protected ObliqueOrthographic(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         super(parameters);
-        sinphi0 = Math.sin(latitudeOfOrigin);
-        cosphi0 = Math.cos(latitudeOfOrigin);
+        sinphi0 = sin(latitudeOfOrigin);
+        cosphi0 = cos(latitudeOfOrigin);
         ensureSpherical();
     }
 
@@ -81,16 +78,16 @@ public class ObliqueOrthographic extends Orthographic {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        final double cosphi = Math.cos(y);
-        final double coslam = Math.cos(x);
-        final double sinphi = Math.sin(y);
+        final double cosphi = cos(y);
+        final double coslam = cos(x);
+        final double sinphi = sin(y);
 
         if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
 
-        y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
-        x = cosphi * Math.sin(x);
+        y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;
+        x = cosphi * sin(x);
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -106,7 +103,7 @@ public class ObliqueOrthographic extends Orthographic {
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        final double rho = Math.sqrt(x*x + y*y);
+        final double rho = hypot(x, y);
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPSILON) {
@@ -115,7 +112,7 @@ public class ObliqueOrthographic extends Orthographic {
             sinc = 1.0;
         }
 
-        final double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
+        final double cosc = sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
@@ -125,11 +122,11 @@ public class ObliqueOrthographic extends Orthographic {
             x *= sinc * cosphi0;
 
             // begin sinchk
-            if (Math.abs(phi) >= 1.0) {
-                phi = (phi < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+            if (abs(phi) >= 1.0) {
+                phi = (phi < 0.0) ? -PI/2 : PI/2;
             }
             else {
-                phi = Math.asin(phi);
+                phi = asin(phi);
             }
             // end sinchk
 
@@ -137,10 +134,10 @@ public class ObliqueOrthographic extends Orthographic {
                 if (x == 0.0) {
                     x = 0.0;
                 } else {
-                    x = (x < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
+                    x = (x < 0.0) ? -PI/2 : PI/2;
                 }
             } else {
-                x = Math.atan2(x, y);
+                x = atan2(x, y);
             }
             y = phi;
         }

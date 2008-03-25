@@ -23,18 +23,16 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
 import java.util.Collection;
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -48,8 +46,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * <p>
  *
  * This implementation handles both the 1 and 2 stardard parallel cases.
- * For {@code Mercator_1SP} (EPSG code 9804), the line of contact is the equator. 
- * For {@code Mercator_2SP} (EPSG code 9805) lines of contact are symmetrical 
+ * For {@code Mercator_1SP} (EPSG code 9804), the line of contact is the equator.
+ * For {@code Mercator_2SP} (EPSG code 9805) lines of contact are symmetrical
  * about the equator.
  * <p>
  *
@@ -63,7 +61,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Mercator projection on MathWorld</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on RemoteSensing.org</A>
- * 
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -77,7 +75,7 @@ public abstract class Mercator extends MapProjection {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * Standard Parallel used for the {@link Mercator2SP} case.
      * Set to {@link Double#NaN} for the {@link Mercator1SP} case.
@@ -93,7 +91,7 @@ public abstract class Mercator extends MapProjection {
     protected Mercator(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
         if (expected.contains(AbstractProvider.STANDARD_PARALLEL_1)) {
@@ -101,14 +99,14 @@ public abstract class Mercator extends MapProjection {
             // the standard parallel.   The super-class constructor should have initialized
             // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
             // user implementation still provides a scale factor for its custom projections.
-            standardParallel = Math.abs(doubleValue(expected,
+            standardParallel = abs(doubleValue(expected,
                     AbstractProvider.STANDARD_PARALLEL_1, parameters));
             ensureLatitudeInRange(AbstractProvider.STANDARD_PARALLEL_1, standardParallel, false);
             if (isSpherical) {
-                scaleFactor *= Math.cos(standardParallel);
+                scaleFactor *= cos(standardParallel);
             }  else {
-                scaleFactor *= msfn(Math.sin(standardParallel),
-                                    Math.cos(standardParallel));
+                scaleFactor *= msfn(sin(standardParallel),
+                                    cos(standardParallel));
             }
             globalScale = scaleFactor * semiMajor;
         } else {
@@ -122,18 +120,18 @@ public abstract class Mercator extends MapProjection {
          * MapProjection superclass to merge this correction with the scale factor
          * in a single multiplication.
          */
-        final double sinPhi = Math.sin(latitudeOfOrigin);
-        globalScale *= (Math.cos(latitudeOfOrigin) /
-                (Math.sqrt(1 - excentricitySquared * sinPhi * sinPhi)));
+        final double sinPhi = sin(latitudeOfOrigin);
+        globalScale *= (cos(latitudeOfOrigin) / (sqrt(1 - excentricitySquared * sinPhi * sinPhi)));
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
         if (!Double.isNaN(standardParallel)) {
-            final Collection expected = getParameterDescriptors().descriptors();
+            final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
             set(expected, AbstractProvider.STANDARD_PARALLEL_1, values, standardParallel);
         }
         return values;
@@ -147,12 +145,12 @@ public abstract class Mercator extends MapProjection {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        if (Math.abs(y) > (Math.PI/2 - EPSILON)) {
+        if (abs(y) > (PI/2 - EPSILON)) {
             throw new ProjectionException(Errors.format(
-                    ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
+                    ErrorKeys.POLE_PROJECTION_$1, new Latitude(toDegrees(y))));
         }
 
-        y = -Math.log(tsfn(y, Math.sin(y)));
+        y = -log(tsfn(y, sin(y)));
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -160,7 +158,7 @@ public abstract class Mercator extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
@@ -168,7 +166,7 @@ public abstract class Mercator extends MapProjection {
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        y = Math.exp(-y);
+        y = exp(-y);
         y = cphi2(y);
 
         if (ptDst != null) {
@@ -205,17 +203,18 @@ public abstract class Mercator extends MapProjection {
          * (units in radians) and stores the result in {@code ptDst} (linear distance
          * on a unit sphere).
          */
+        @Override
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
-            if (Math.abs(y) > (Math.PI/2 - EPSILON)) {
+            if (abs(y) > (PI/2 - EPSILON)) {
                 throw new ProjectionException(Errors.format(
-                        ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
+                        ErrorKeys.POLE_PROJECTION_$1, new Latitude(toDegrees(y))));
             }
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-            y = Math.log(Math.tan((Math.PI/4) + 0.5*y));
+            y = log(tan(PI/4 + 0.5*y));
 
             assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
@@ -229,13 +228,14 @@ public abstract class Mercator extends MapProjection {
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
          * and stores the result in {@code ptDst} using equations for a sphere.
          */
+        @Override
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-            y = (Math.PI/2) - 2.0*Math.atan(Math.exp(-y));
+            y = PI/2 - 2.0*atan(exp(-y));
 
             assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
@@ -243,13 +243,14 @@ public abstract class Mercator extends MapProjection {
                 return ptDst;
             }
             return new Point2D.Double(x,y);
-        }      
+        }
     }
 
 
     /**
      * Returns a hash value for this projection.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(standardParallel);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
@@ -258,6 +259,7 @@ public abstract class Mercator extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization

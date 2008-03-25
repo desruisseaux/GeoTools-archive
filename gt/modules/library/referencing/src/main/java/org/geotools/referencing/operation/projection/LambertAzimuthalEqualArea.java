@@ -25,17 +25,18 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
-
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
-
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -106,10 +107,10 @@ public class LambertAzimuthalEqualArea extends MapProjection {
         /*
          * Detects the mode (oblique, etc.).
          */
-        final double t = Math.abs(latitudeOfOrigin);
-        if (Math.abs(t - Math.PI/2) < EPSILON_LATITUDE) {
+        final double t = abs(latitudeOfOrigin);
+        if (abs(t - PI/2) < EPSILON_LATITUDE) {
             mode = latitudeOfOrigin < 0.0 ? SOUTH_POLE : NORTH_POLE;
-        } else if (Math.abs(t) < EPSILON_LATITUDE) {
+        } else if (abs(t) < EPSILON_LATITUDE) {
             mode = EQUATORIAL;
         } else {
             mode = OBLIQUE;
@@ -125,15 +126,15 @@ public class LambertAzimuthalEqualArea extends MapProjection {
 
         final double sinphi;
         qp     = qsfn(1);
-        rq     = Math.sqrt(0.5 * qp);
+        rq     = sqrt(0.5 * qp);
         mmf    = 0.5 / (1 - excentricitySquared);
-        sinphi = Math.sin(latitudeOfOrigin);
+        sinphi = sin(latitudeOfOrigin);
         if (isSpherical) {
-            sinb1 = Math.sin(latitudeOfOrigin);
-            cosb1 = Math.cos(latitudeOfOrigin);
+            sinb1 = sin(latitudeOfOrigin);
+            cosb1 = cos(latitudeOfOrigin);
         } else {
             sinb1 = qsfn(sinphi) / qp;
-            cosb1 = Math.sqrt(1.0 - sinb1 * sinb1);
+            cosb1 = sqrt(1.0 - sinb1 * sinb1);
         }
         switch (mode) {
             case NORTH_POLE:  // Fall through
@@ -149,8 +150,8 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 break;
             }
             case OBLIQUE: {
-                dd  = Math.cos(latitudeOfOrigin) /
-                        (Math.sqrt(1.0 - excentricitySquared * sinphi * sinphi) * rq * cosb1);
+                dd  = cos(latitudeOfOrigin) /
+                        (sqrt(1.0 - excentricitySquared * sinphi * sinphi) * rq * cosb1);
                 xmf = rq * dd;
                 ymf = rq / dd;
                 break;
@@ -174,7 +175,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         set(expected, Provider.LATITUDE_OF_CENTRE,  values, latitudeOfOrigin);
         set(expected, Provider.LONGITUDE_OF_CENTRE, values, centralMeridian);
         return values;
@@ -188,35 +189,35 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     protected Point2D transformNormalized(final double lambda, final double phi, Point2D ptDst)
             throws ProjectionException
     {
-        final double coslam = Math.cos(lambda);
-        final double sinlam = Math.sin(lambda);
-        final double sinphi = Math.sin(phi);
+        final double coslam = cos(lambda);
+        final double sinlam = sin(lambda);
+        final double sinphi = sin(phi);
         double q = qsfn(sinphi);
         final double sinb, cosb, b, c, x, y;
         switch (mode) {
             case OBLIQUE: {
                 sinb = q / qp;
-                cosb = Math.sqrt(1.0 - sinb * sinb);
+                cosb = sqrt(1.0 - sinb * sinb);
                 c    = 1.0 + sinb1 * sinb + cosb1 * cosb * coslam;
-                b    = Math.sqrt(2.0 / c);
+                b    = sqrt(2.0 / c);
                 y    = ymf * b * (cosb1 * sinb - sinb1 * cosb * coslam);
                 x    = xmf * b * cosb * sinlam;
                 break;
             }
             case EQUATORIAL: {
                 sinb = q / qp;
-                cosb = Math.sqrt(1.0 - sinb * sinb);
+                cosb = sqrt(1.0 - sinb * sinb);
                 c    = 1.0 + cosb * coslam;
-                b    = Math.sqrt(2.0 / c);
+                b    = sqrt(2.0 / c);
                 y    = ymf * b * sinb;
                 x    = xmf * b * cosb * sinlam;
                 break;
             }
             case NORTH_POLE: {
-                c = (Math.PI / 2) + phi;
+                c = (PI / 2) + phi;
                 q = qp - q;
                 if (q >= 0.0) {
-                    b = Math.sqrt(q);
+                    b = sqrt(q);
                     x = b * sinlam;
                     y = coslam * -b;
                 } else {
@@ -225,10 +226,10 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 break;
             }
             case SOUTH_POLE: {
-                c = phi - (Math.PI / 2);
+                c = phi - (PI / 2);
                 q = qp + q;
                 if (q >= 0.0) {
-                    b = Math.sqrt(q);
+                    b = sqrt(q);
                     x = b * sinlam;
                     y = coslam * +b;
                 } else {
@@ -240,7 +241,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 throw new AssertionError(mode);
             }
         }
-        if (Math.abs(c) < EPSILON_LATITUDE) {
+        if (abs(c) < EPSILON_LATITUDE) {
             throw toleranceError();
         }
         if (ptDst != null) {
@@ -265,15 +266,15 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             case OBLIQUE: {
                 x /= dd;
                 y *= dd;
-                final double rho = Math.hypot(x, y);
+                final double rho = hypot(x, y);
                 if (rho < FINE_EPSILON) {
                     lambda = 0.0;
                     phi = latitudeOfOrigin;
                 } else {
                     double sCe, cCe, q, ab;
-                    sCe = 2.0 * Math.asin(0.5 * rho / rq);
-                    cCe = Math.cos(sCe);
-                    sCe = Math.sin(sCe);
+                    sCe = 2.0 * asin(0.5 * rho / rq);
+                    cCe = cos(sCe);
+                    sCe = sin(sCe);
                     x *= sCe;
                     if (mode == OBLIQUE) {
                         ab = cCe * sinb1 + y * sCe * cosb1 / rho;
@@ -284,8 +285,8 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                         q  = qp * ab;
                         y  = rho * cCe;
                     }
-                    lambda = Math.atan2(x, y);
-                    phi = authlat(Math.asin(ab));
+                    lambda = atan2(x, y);
+                    phi = authlat(asin(ab));
                 }
                 break;
             }
@@ -303,8 +304,8 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                     if (mode == SOUTH_POLE) {
                         ab = -ab;
                     }
-                    lambda = Math.atan2(x, y);
-                    phi = authlat(Math.asin(ab));
+                    lambda = atan2(x, y);
+                    phi = authlat(asin(ab));
                 }
                 break;
             }
@@ -352,9 +353,9 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(lambda, phi, ptDst)) != null;
 
-            final double sinphi = Math.sin(phi);
-            final double cosphi = Math.cos(phi);
-            final double coslam = Math.cos(lambda);
+            final double sinphi = sin(phi);
+            final double cosphi = cos(phi);
+            final double coslam = cos(lambda);
             double x,y;
             switch (mode) {
                 case EQUATORIAL: {
@@ -362,8 +363,8 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                     if (y <= FINE_EPSILON) {
                         throw toleranceError();
                     }
-                    y  = Math.sqrt(2.0 / y);
-                    x  = y * cosphi * Math.sin(lambda);
+                    y  = sqrt(2.0 / y);
+                    x  = y * cosphi * sin(lambda);
                     y *= sinphi;
                     break;
                 }
@@ -372,28 +373,28 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                     if (y <= FINE_EPSILON) {
                         throw toleranceError();
                     }
-                    y  = Math.sqrt(2.0 / y);
-                    x  = y * cosphi * Math.sin(lambda);
+                    y  = sqrt(2.0 / y);
+                    x  = y * cosphi * sin(lambda);
                     y *= cosb1 * sinphi - sinb1 * cosphi * coslam;
                     break;
                 }
                 case NORTH_POLE: {
-                    if (Math.abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
+                    if (abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
                         throw toleranceError();
                     }
-                    y = (Math.PI/4) - phi * 0.5;
-                    y = 2.0 * Math.sin(y);
-                    x = y * Math.sin(lambda);
+                    y = (PI/4) - phi * 0.5;
+                    y = 2.0 * sin(y);
+                    x = y * sin(lambda);
                     y *= -coslam;
                     break;
                 }
                 case SOUTH_POLE: {
-                    if (Math.abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
+                    if (abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
                         throw toleranceError();
                     }
-                    y = (Math.PI/4) - phi * 0.5;
-                    y = 2.0 * Math.cos(y);
-                    x = y * Math.sin(lambda);
+                    y = (PI/4) - phi * 0.5;
+                    y = 2.0 * cos(y);
+                    x = y * sin(lambda);
                     y *= +coslam;
                     break;
                 }
@@ -421,40 +422,40 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             double lambda, phi;
-            final double rh = Math.hypot(x, y);
+            final double rh = hypot(x, y);
             phi = rh * 0.5;
             if (phi > 1.0) {
                 throw toleranceError();
             }
-            phi = 2.0 * Math.asin(phi);
+            phi = 2.0 * asin(phi);
             switch (mode) {
                 case EQUATORIAL: {
-                    final double sinz = Math.sin(phi);
-                    final double cosz = Math.cos(phi);
-                    phi = Math.abs(rh) <= FINE_EPSILON ? 0.0 : Math.asin(y * sinz / rh);
+                    final double sinz = sin(phi);
+                    final double cosz = cos(phi);
+                    phi = abs(rh) <= FINE_EPSILON ? 0.0 : asin(y * sinz / rh);
                     x *= sinz;
                     y = cosz * rh;
-                    lambda = (y == 0) ? 0.0 : Math.atan2(x, y);
+                    lambda = (y == 0) ? 0.0 : atan2(x, y);
                     break;
                 }
                 case OBLIQUE: {
-                    final double sinz = Math.sin(phi);
-                    final double cosz = Math.cos(phi);
-                    phi = Math.abs(rh) <= FINE_EPSILON ? latitudeOfOrigin :
-                            Math.asin(cosz * sinb1 + y * sinz * cosb1 / rh);
+                    final double sinz = sin(phi);
+                    final double cosz = cos(phi);
+                    phi = abs(rh) <= FINE_EPSILON ? latitudeOfOrigin :
+                            asin(cosz * sinb1 + y * sinz * cosb1 / rh);
                     x *= sinz * cosb1;
-                    y = (cosz - Math.sin(phi) * sinb1) * rh;
-                    lambda = (y == 0) ? 0.0 : Math.atan2(x, y);
+                    y = (cosz - sin(phi) * sinb1) * rh;
+                    lambda = (y == 0) ? 0.0 : atan2(x, y);
                     break;
                 }
                 case NORTH_POLE: {
-                    phi = (Math.PI / 2) - phi;
-                    lambda = Math.atan2(x, -y);
+                    phi = (PI / 2) - phi;
+                    lambda = atan2(x, -y);
                     break;
                 }
                 case SOUTH_POLE: {
-                    phi -= (Math.PI / 2);
-                    lambda = Math.atan2(x, y);
+                    phi -= (PI / 2);
+                    lambda = atan2(x, y);
                     break;
                 }
                 default: {
@@ -480,7 +481,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
         if (excentricity >= EPSILON) {
             final double con = excentricity * sinphi;
             return ((1.0 - excentricitySquared) * (sinphi / (1.0 - con*con) -
-                    (0.5 / excentricity) * Math.log((1.0 - con) / (1.0 + con))));
+                    (0.5 / excentricity) * log((1.0 - con) / (1.0 + con))));
         } else {
             return sinphi + sinphi;
         }
@@ -491,7 +492,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
      */
     private double authlat(final double beta) {
         final double t = beta + beta;
-        return beta + APA0 * Math.sin(t) + APA1 * Math.sin(t+t) + APA2 * Math.sin(t+t+t);
+        return beta + APA0 * sin(t) + APA1 * sin(t+t) + APA2 * sin(t+t+t);
     }
 
     /**

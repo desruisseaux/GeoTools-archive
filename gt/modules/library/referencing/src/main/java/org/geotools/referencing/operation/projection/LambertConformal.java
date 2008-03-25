@@ -23,18 +23,16 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.util.Collection;
-
-// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -43,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * a limited area.  This projection is used for the charts of North America.
  * <p>
  *
- * This implementation provides transforms for three cases of the lambert conic 
+ * This implementation provides transforms for three cases of the lambert conic
  * conformal projection:
  * <ul>
  *   <li>{@code Lambert_Conformal_Conic_1SP} (EPSG code 9801)</li>
@@ -53,11 +51,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       that includes a scale_factor parameter</li>
  * </ul>
  *
- * For the 1SP case the latitude of origin is used as the standard parallel (SP). 
+ * For the 1SP case the latitude of origin is used as the standard parallel (SP).
  * To use 1SP with a latitude of origin different from the SP, use the 2SP
- * and set the SP1 to the single SP. The "standard_parallel_2" 
- * parameter is optional and will be given the same value as "standard_parallel_1" 
- * if not set (creating a 1 standard parallel projection). 
+ * and set the SP1 to the single SP. The "standard_parallel_2"
+ * parameter is optional and will be given the same value as "standard_parallel_1"
+ * if not set (creating a 1 standard parallel projection).
  * <p>
  *
  * <strong>References:</strong><ul>
@@ -84,8 +82,8 @@ public abstract class LambertConformal extends MapProjection {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
-    /** 
+
+    /**
      * Constant for the belgium 2SP case. This is 29.2985 seconds, given here in radians.
      */
     private static final double BELGE_A = 0.00014204313635987700;
@@ -94,22 +92,22 @@ public abstract class LambertConformal extends MapProjection {
      * Standards parallel 1 in radians, for {@link #getParameterValues} implementation.
      */
     private final double phi1;
-    
+
     /**
      * Standards parallel 2 in radians, for {@link #getParameterValues} implementation.
      */
     final private double phi2;
-    
+
     /**
      * Internal variables for computation.
      */
     private final double n,F,rho0;
-    
+
     /**
      * {@code true} for Belgium 2SP.
      */
     private final boolean belgium;
-    
+
     /**
      * Constructs a new map projection from the supplied parameters.
      *
@@ -121,7 +119,7 @@ public abstract class LambertConformal extends MapProjection {
     {
         this(parameters, false);
     }
-    
+
     /**
      * Constructs a new map projection from the supplied parameters.
      *
@@ -129,10 +127,10 @@ public abstract class LambertConformal extends MapProjection {
      * @param  belgium {@code true} for the Belgium 2SP case.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    LambertConformal(final ParameterValueGroup parameters, final boolean belgium) 
+    LambertConformal(final ParameterValueGroup parameters, final boolean belgium)
             throws ParameterNotFoundException
     {
-        //Fetch parameters 
+        //Fetch parameters
         super(parameters);
         final Collection expected = getParameterDescriptors().descriptors();
         final boolean sp2 = expected.contains(AbstractProvider.STANDARD_PARALLEL_2);
@@ -155,25 +153,24 @@ public abstract class LambertConformal extends MapProjection {
             phi1 = phi2 = latitudeOfOrigin;
         }
         // Compute constants
-        if (Math.abs(phi1 + phi2) < EPSILON) {
+        if (abs(phi1 + phi2) < EPSILON) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
-                                               new Latitude(Math.toDegrees(phi1)),
-                                               new Latitude(Math.toDegrees(phi2))));
+                                               new Latitude(toDegrees(phi1)),
+                                               new Latitude(toDegrees(phi2))));
         }
-        final double  cosphi1 = Math.cos(phi1);
-        final double  sinphi1 = Math.sin(phi1);
-        final boolean  secant = Math.abs(phi1-phi2) > EPSILON; // Should be 'true' for 2SP case.
+        final double  cosphi1 = cos(phi1);
+        final double  sinphi1 = sin(phi1);
+        final boolean  secant = abs(phi1-phi2) > EPSILON; // Should be 'true' for 2SP case.
         if (isSpherical) {
             if (secant) {
-                n = Math.log(cosphi1 / Math.cos(phi2)) /
-                    Math.log(Math.tan((Math.PI/4) + 0.5*phi2) /
-                             Math.tan((Math.PI/4) + 0.5*phi1));
+                n = log(cosphi1 / cos(phi2)) /
+                    log(tan(PI/4 + 0.5*phi2) / tan(PI/4 + 0.5*phi1));
             } else {
                 n = sinphi1;
             }
-            F = cosphi1 * Math.pow(Math.tan((Math.PI/4) + 0.5*phi1), n) / n;
-            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPSILON) {
-                rho0 = F * Math.pow(Math.tan((Math.PI/4) + 0.5*latitudeOfOrigin), -n);
+            F = cosphi1 * pow(tan(PI/4 + 0.5*phi1), n) / n;
+            if (abs(abs(latitudeOfOrigin) - PI/2) >= EPSILON) {
+                rho0 = F * pow(tan(PI/4 + 0.5*latitudeOfOrigin), -n);
             } else {
                 rho0 = 0.0;
             }
@@ -181,99 +178,100 @@ public abstract class LambertConformal extends MapProjection {
             final double m1 = msfn(sinphi1, cosphi1);
             final double t1 = tsfn(phi1, sinphi1);
             if (secant) {
-                final double sinphi2 = Math.sin(phi2);
-                final double m2 = msfn(sinphi2, Math.cos(phi2));
+                final double sinphi2 = sin(phi2);
+                final double m2 = msfn(sinphi2, cos(phi2));
                 final double t2 = tsfn(phi2, sinphi2);
-                n = Math.log(m1/m2) / Math.log(t1/t2);
+                n = log(m1/m2) / log(t1/t2);
             } else {
                 n = sinphi1;
             }
-            F = m1 * Math.pow(t1, -n) / n;
-            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPSILON) {
-                rho0 = F * Math.pow(tsfn(latitudeOfOrigin, Math.sin(latitudeOfOrigin)), n);
+            F = m1 * pow(t1, -n) / n;
+            if (abs(abs(latitudeOfOrigin) - PI/2) >= EPSILON) {
+                rho0 = F * pow(tsfn(latitudeOfOrigin, sin(latitudeOfOrigin)), n);
             } else {
                 rho0 = 0.0;
             }
-        } 
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         set(expected, AbstractProvider.STANDARD_PARALLEL_1, values, phi1);
         set(expected, AbstractProvider.STANDARD_PARALLEL_2, values, phi2);
         return values;
     }
-    
+
     /**
      * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         double rho;
         //Snyder p. 108
-        if (Math.abs(Math.abs(y) - (Math.PI/2)) < EPSILON) {
+        if (abs(abs(y) - PI/2) < EPSILON) {
             if (y*n <= 0) {
                 throw new ProjectionException(Errors.format(ErrorKeys.POLE_PROJECTION_$1,
-                                              new Latitude(Math.toDegrees(y))));
+                                              new Latitude(toDegrees(y))));
             } else {
                 rho = 0;
             }
         } else if (isSpherical) {
-            rho = F * Math.pow(Math.tan((Math.PI/4) + 0.5*y), -n);
+            rho = F * pow(tan(PI/4 + 0.5*y), -n);
         } else {
-            rho = F * Math.pow(tsfn(y, Math.sin(y)), n);
+            rho = F * pow(tsfn(y, sin(y)), n);
         }
-        
+
         x *= n;
         if (belgium) {
             x -= BELGE_A;
         }
-        y = rho0 - rho * Math.cos(x);
-        x =        rho * Math.sin(x);
-        
+        y = rho0 - rho * cos(x);
+        x =        rho * sin(x);
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
         return new Point2D.Double(x,y);
     }
-     
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         double theta;
         y = rho0 - y;
-        double rho = Math.sqrt(x*x + y*y);  // Zero when the latitude is 90 degrees.
+        double rho = hypot(x, y);  // Zero when the latitude is 90 degrees.
         if (rho > EPSILON) {
             if (n < 0) {
                 rho = -rho;
                 x = -x;
                 y = -y;
             }
-            theta = Math.atan2(x, y);
+            theta = atan2(x, y);
             if (belgium) {
                 theta += BELGE_A;
             }
             x = theta/n;
             if (isSpherical) {
-                y = 2.0 * Math.atan(Math.pow(F/rho, 1.0/n)) - (Math.PI/2);
+                y = 2.0 * atan(pow(F/rho, 1.0/n)) - PI/2;
             } else {
-                y = cphi2(Math.pow(rho/F, 1.0/n));
+                y = cphi2(pow(rho/F, 1.0/n));
             }
         } else {
             x = 0.0;
-            y = n < 0 ? -(Math.PI/2) : (Math.PI/2);
+            y = n < 0 ? -(PI/2) : (PI/2);
         }
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -281,10 +279,11 @@ public abstract class LambertConformal extends MapProjection {
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Returns a hash value for this projection.
      */
+    @Override
     public int hashCode() {
         /*
          * This code should be computed fast. Consequently, we do not use all fields
@@ -294,10 +293,11 @@ public abstract class LambertConformal extends MapProjection {
         final long code = Double.doubleToLongBits(F);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
     }
-    
+
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization

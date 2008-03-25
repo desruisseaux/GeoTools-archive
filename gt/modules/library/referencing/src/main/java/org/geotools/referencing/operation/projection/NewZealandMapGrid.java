@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,22 +16,19 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
 import java.util.Collection;
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.ReferenceIdentifier;
-
-// Geotools dependencies
 import org.geotools.math.Complex;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -136,7 +133,7 @@ public class NewZealandMapGrid extends MapProjection {
      * Constructs a new map projection with default parameter values.
      */
     protected NewZealandMapGrid() {
-        this((ParameterValueGroup) Provider.PARAMETERS.createValue());
+        this(Provider.PARAMETERS.createValue());
     }
 
     /**
@@ -163,6 +160,7 @@ public class NewZealandMapGrid extends MapProjection {
      * {@link ModifiedParameterDescriptor}. This hack was needed because the New Zeland map
      * projection uses particular default values for parameters like "False Easting", etc.
      */
+    @Override
     final boolean isExpectedParameter(final Collection expected, final ParameterDescriptor param) {
         return ModifiedParameterDescriptor.contains(expected, param);
     }
@@ -176,7 +174,7 @@ public class NewZealandMapGrid extends MapProjection {
                                                        final Point2D ptDst)
             throws ProjectionException
     {
-        final double dphi = (y - latitudeOfOrigin) * (180/Math.PI * 3600E-5);
+        final double dphi = (y - latitudeOfOrigin) * (180/PI * 3600E-5);
         double dphi_pow_i = dphi;
         double dpsi       = 0;
         for (int i=0; i<TPSI.length; i++) {
@@ -244,7 +242,7 @@ public class NewZealandMapGrid extends MapProjection {
             dphi += (TPHI[i] * dpsi_pow_i);
         }
 
-        dphi = dphi / (180/Math.PI * 3600E-5) + latitudeOfOrigin;
+        dphi = dphi / (180/PI * 3600E-5) + latitudeOfOrigin;
         if (ptDst != null) {
             ptDst.setLocation(theta.imag, dphi);
             return ptDst;
@@ -298,11 +296,11 @@ public class NewZealandMapGrid extends MapProjection {
                 });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
-        }    
+        }
 
         /**
          * Creates a transform from the specified group of parameter values. This method doesn't

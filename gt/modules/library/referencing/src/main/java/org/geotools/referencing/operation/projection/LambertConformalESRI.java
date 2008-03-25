@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,15 +16,12 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -33,7 +30,7 @@ import org.geotools.resources.i18n.Vocabulary;
 
 /**
  * Lambert Conical Conformal Projection using ESRI parameters.
- * ESRI includes a {@code scale_factor} parameter. 
+ * ESRI includes a {@code scale_factor} parameter.
  *
  * @since 2.2
  * @source $URL$
@@ -97,9 +94,9 @@ public class LambertConformalESRI extends LambertConformal {
                 SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
-         
+
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -108,7 +105,8 @@ public class LambertConformalESRI extends LambertConformal {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<ConicProjection> getOperationType() {
             return ConicProjection.class;
         }
 
@@ -119,7 +117,7 @@ public class LambertConformalESRI extends LambertConformal {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             return new LambertConformalESRI(parameters);

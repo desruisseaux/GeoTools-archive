@@ -4,7 +4,7 @@
  *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2005, Institut de Recherche pour le Développement
- *  
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,14 +17,9 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
 import java.util.Iterator;
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
-
-// Geotools dependencies
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.operation.MathTransformProvider;  // For javadoc
 
@@ -76,6 +71,7 @@ final class ModifiedParameterDescriptor extends DefaultParameterDescriptor {
     /**
      * Returns the default value for the parameter.
      */
+    @Override
     public Object getDefaultValue() {
         return defaultValue;
     }

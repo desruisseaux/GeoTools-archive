@@ -21,7 +21,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -29,8 +28,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -38,17 +35,19 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
+import static java.lang.Math.*;
+
 
 /**
  * Orthographic Projection. This is a perspective azimuthal (planar) projection
- * that is neither conformal nor equal-area. It resembles a globe and only 
- * one hemisphere can be seen at a time, since it is 
- * a perspectiove projection from infinite distance. While not useful for 
+ * that is neither conformal nor equal-area. It resembles a globe and only
+ * one hemisphere can be seen at a time, since it is
+ * a perspectiove projection from infinite distance. While not useful for
  * accurate measurements, this projection is useful for pictorial views of the
  * world. Only the spherical form is given here.
  * <p>
- * 
- * NOTE: formulae used below are from a port, to java, of the 
+ *
+ * NOTE: formulae used below are from a port, to java, of the
  *       'proj' package of the USGS survey. USGS work is acknowledged here.
  * <p>
  *
@@ -81,10 +80,10 @@ public abstract class Orthographic extends MapProjection {
      *
      * @since 2.4
      */
-    protected Orthographic(final ParameterValueGroup parameters) 
+    protected Orthographic(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters);
     }
 
@@ -98,6 +97,7 @@ public abstract class Orthographic extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -141,21 +141,22 @@ public abstract class Orthographic extends MapProjection {
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
-                SCALE_FACTOR,     
+                SCALE_FACTOR,
                 FALSE_EASTING,    FALSE_NORTHING
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
-        }    
+        }
 
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<PlanarProjection> getOperationType() {
             return PlanarProjection.class;
         }
 
@@ -166,14 +167,14 @@ public abstract class Orthographic extends MapProjection {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException, FactoryException
         {
             // Values here are in radians (the standard units for the map projection package)
-            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
+                if (abs(latitudeOfOrigin - PI/2) < EPSILON) {
                     return new PolarOrthographic(parameters);
                 }
                 // Equatorial case.
@@ -187,6 +188,6 @@ public abstract class Orthographic extends MapProjection {
             } else {
                 throw new FactoryException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
             }
-        }    
+        }
     }
 }

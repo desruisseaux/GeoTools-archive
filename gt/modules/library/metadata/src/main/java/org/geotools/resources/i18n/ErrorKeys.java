@@ -802,6 +802,11 @@ public final class ErrorKeys {
     public static final int OPERATION_NOT_FOUND_$1 = 112;
 
     /**
+     * Possible use of "{0}" projection outside its valid area.
+     */
+    public static final int OUT_OF_PROJECTION_VALID_AREA_$1 = 204;
+
+    /**
      * Name or alias for parameter "{0}" at index {1} conflict with name "{2}" at index {3}.
      */
     public static final int PARAMETER_NAME_CLASH_$4 = 113;

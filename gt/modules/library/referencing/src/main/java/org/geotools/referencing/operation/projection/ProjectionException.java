@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -35,20 +34,20 @@ public class ProjectionException extends TransformException {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 3031350727691500915L;
-    
+
     /**
      * Constructs a new exception with no detail message.
      */
     public ProjectionException() {
     }
-    
+
     /**
      * Constructs a new exception with the specified detail message.
      */
     public ProjectionException(final String message) {
         super(message);
     }
-    
+
     /**
      * Constructs a new exception with the specified detail message and cause.
      */

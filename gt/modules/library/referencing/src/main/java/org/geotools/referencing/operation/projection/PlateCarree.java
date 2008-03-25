@@ -16,10 +16,7 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -27,8 +24,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -62,6 +57,7 @@ public class PlateCarree extends EquidistantCylindrical {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
@@ -85,6 +81,7 @@ public class PlateCarree extends EquidistantCylindrical {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
+    @Override
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
@@ -132,7 +129,7 @@ public class PlateCarree extends EquidistantCylindrical {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -141,7 +138,8 @@ public class PlateCarree extends EquidistantCylindrical {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<CylindricalProjection> getOperationType() {
             return CylindricalProjection.class;
         }
 
@@ -152,7 +150,7 @@ public class PlateCarree extends EquidistantCylindrical {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException, FactoryException
         {
             if (isSpherical(parameters)) {

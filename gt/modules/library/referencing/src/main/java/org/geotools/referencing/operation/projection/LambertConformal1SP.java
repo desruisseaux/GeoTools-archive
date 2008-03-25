@@ -14,15 +14,12 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -83,7 +80,7 @@ public class LambertConformal1SP extends LambertConformal {
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
-    public static class Provider extends AbstractProvider {       
+    public static class Provider extends AbstractProvider {
         /**
          * The parameters group.
          */
@@ -100,18 +97,19 @@ public class LambertConformal1SP extends LambertConformal {
                 SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
             });
-         
+
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
-        }     
+        }
 
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<ConicProjection> getOperationType() {
             return ConicProjection.class;
         }
 
@@ -122,7 +120,7 @@ public class LambertConformal1SP extends LambertConformal {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             return new LambertConformal1SP(parameters);

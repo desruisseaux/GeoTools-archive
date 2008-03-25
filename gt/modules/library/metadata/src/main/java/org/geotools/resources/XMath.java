@@ -61,6 +61,7 @@ public final class XMath {
      *
      * @deprecated Replaced by {@link Math#hypot}.
      */
+    @Deprecated
     public static double hypot(final double x, final double y) {
         return Math.sqrt(x*x + y*y);
     }
@@ -71,6 +72,7 @@ public final class XMath {
      *
      * @deprecated Replaced by {@link Math#log10}.
      */
+    @Deprecated
     public static double log10(final double x) {
         return Math.log(x) / LN10;
     }
@@ -80,6 +82,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static double pow10(final double x) {
         return org.geotools.math.XMath.pow10(x);
     }
@@ -91,6 +94,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static strictfp double pow10(final int x) {
         return org.geotools.math.XMath.pow10(x);
     }
@@ -105,6 +109,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static int sgn(final double x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -119,6 +124,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static int sgn(final float x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -131,6 +137,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static int sgn(long x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -143,6 +150,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static int sgn(int x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -155,6 +163,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static short sgn(short x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -167,6 +176,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static byte sgn(byte x) {
         return org.geotools.math.XMath.sgn(x);
     }
@@ -182,6 +192,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static double round(final double value, int flu) {
         return org.geotools.math.XMath.roundIfAlmostInteger(value, flu);
     }
@@ -203,6 +214,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static double fixRoundingError(final double value, int n) {
         return org.geotools.math.XMath.trimDecimalFractionDigits(value, 4, n);
     }
@@ -215,6 +227,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static int countFractionDigits(final double value) {
         return org.geotools.math.XMath.countDecimalFractionDigits(value);
     }
@@ -385,6 +398,7 @@ public final class XMath {
      *
      * @deprecated Moved to {@link org.geotools.math.XMath}.
      */
+    @Deprecated
     public static float toNaN(int index) throws IndexOutOfBoundsException {
         return org.geotools.math.XMath.toNaN(index);
     }
@@ -395,7 +409,10 @@ public final class XMath {
      *
      * @param  type The type to test (may be {@code null}).
      * @return {@code true} if {@code type} is the class {@link Float} or {@link Double}.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
+    @Deprecated
     public static boolean isReal(final Class<?> type) {
         return type != null &&
                Double.class.equals(type) ||
@@ -409,7 +426,10 @@ public final class XMath {
      * @param  type The type to test (may be {@code null}).
      * @return {@code true} if {@code type} is the class {@link Long}, {@link Integer},
      *         {@link Short} or {@link Byte}.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
+    @Deprecated
     public static boolean isInteger(final Class<?> type) {
         return type != null &&
                Long.class.equals(type) ||
@@ -423,7 +443,10 @@ public final class XMath {
      *
      * @param  type The type (may be {@code null}).
      * @return The number of bits, or 0 if unknow.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
+    @Deprecated
     public static int getBitCount(final Class<?> type) {
         if (Double   .class.equals(type)) return Double   .SIZE;
         if (Float    .class.equals(type)) return Float    .SIZE;
@@ -442,7 +465,10 @@ public final class XMath {
      *
      * @param  type The primitive type (may be {@code null}).
      * @return The type as a wrapper.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
+    @Deprecated
     public static Class<?> primitiveToWrapper(final Class<?> type) {
         if (Character.TYPE.equals(type)) return Character.class;
         if (Boolean  .TYPE.equals(type)) return Boolean  .class;
@@ -468,7 +494,10 @@ public final class XMath {
      *         of the specified type.
      *
      * @since 2.4
+     *
+     * @deprecated Moved to {@link Classes}.
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T valueOf(final Class<T> type, final String value)
             throws IllegalArgumentException, NumberFormatException

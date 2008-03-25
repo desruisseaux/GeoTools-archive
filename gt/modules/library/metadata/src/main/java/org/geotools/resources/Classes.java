@@ -17,13 +17,17 @@
 package org.geotools.resources;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * A set of miscellaneous methods related to classes.
+ * A set of miscellaneous methods working on {@link Class} objects.
  *
  * @since 2.5
  * @source $URL$
@@ -32,9 +36,39 @@ import java.util.Set;
  */
 public final class Classes {
     /**
-     * Forbid object creation.
+     * Mapping between a primitive type and its wrapper, if any.
      */
-    private Classes() {
+    private static final Map<Class<?>,Classes> MAPPING = new HashMap<Class<?>,Classes>(16);
+    static {
+        new Classes(Double   .TYPE, Double   .class, true,  false, (byte) Double   .SIZE);
+        new Classes(Float    .TYPE, Float    .class, true,  false, (byte) Float    .SIZE);
+        new Classes(Long     .TYPE, Long     .class, false, true,  (byte) Long     .SIZE);
+        new Classes(Integer  .TYPE, Integer  .class, false, true,  (byte) Integer  .SIZE);
+        new Classes(Short    .TYPE, Short    .class, false, true,  (byte) Short    .SIZE);
+        new Classes(Byte     .TYPE, Byte     .class, false, true,  (byte) Byte     .SIZE);
+        new Classes(Character.TYPE, Character.class, false, false, (byte) Character.SIZE);
+        new Classes(Boolean  .TYPE, Boolean  .class, false, false, (byte) 1);
+        new Classes(Void     .TYPE, Void     .class, false, false, (byte) 0);
+    }
+
+    /** The primitive type.                     */ private final Class<?> primitive;
+    /** The wrapper for the primitive type.     */ private final Class<?> wrapper;
+    /** {@code true} for floating point number. */ private final boolean  isFloat;
+    /** {@code true} for integer number.        */ private final boolean  isInteger;
+    /** The size in bytes.                      */ private final byte     size;
+
+    /**
+     * Creates a mapping between a primitive type and its wrapper.
+     */
+    private Classes(Class<?> primitive, Class<?> wrapper, boolean isFloat, boolean isInteger, byte size) {
+        this.primitive = primitive;
+        this.wrapper   = wrapper;
+        this.isFloat   = isFloat;
+        this.isInteger = isInteger;
+        this.size      = size;
+        if (MAPPING.put(primitive, this) != null || MAPPING.put(wrapper, this) != null) {
+            throw new AssertionError(); // Should never happen.
+        }
     }
 
     /**
@@ -199,6 +233,82 @@ compare:for (int i=0; i<c1.length; i++) {
             }
         }
         return n == 0; // If n>0, at least one interface was not found in 'c1'.
+    }
+
+    /**
+     * Returns {@code true} if the given {@code type} is a floating point type.
+     *
+     * @param  type The type to test (may be {@code null}).
+     * @return {@code true} if {@code type} is the primitive or wrapper class of
+     *         {@link Float} or {@link Double}.
+     */
+    public static boolean isFloat(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) && mapping.isFloat;
+    }
+
+    /**
+     * Returns {@code true} if the given {@code type} is an integer type.
+     *
+     * @param  type The type to test (may be {@code null}).
+     * @return {@code true} if {@code type} is the primitive of wrapper class of
+     *         {@link Long}, {@link Integer}, {@link Short} or {@link Byte}.
+     */
+    public static boolean isInteger(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) && mapping.isInteger;
+    }
+
+    /**
+     * Returns the number of bits used by number of the specified type.
+     *
+     * @param  type The type (may be {@code null}).
+     * @return The number of bits, or 0 if unknow.
+     */
+    public static int getBitCount(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) ? mapping.size : 0;
+    }
+
+    /**
+     * Changes a primitive class to its wrapper (e.g. {@code double} to {@link Double}).
+     * If the specified class is not a primitive type, then it is returned unchanged.
+     *
+     * @param  type The primitive type (may be {@code null}).
+     * @return The type as a wrapper.
+     */
+    public static Class<?> primitiveToWrapper(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) ? mapping.wrapper : type;
+    }
+
+    /**
+     * Converts the specified string into a value object. The value object will be an instance
+     * of {@link Boolean}, {@link Integer}, {@link Double}, <cite>etc.</cite> according the
+     * specified type.
+     *
+     * @param  type The requested type.
+     * @param  value the value to parse.
+     * @return The value object, or {@code null} if {@code value} was null.
+     * @throws IllegalArgumentException if {@code type} is not a recognized type.
+     * @throws NumberFormatException if the string value is not parseable as a number
+     *         of the specified type.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T valueOf(final Class<T> type, final String value)
+            throws IllegalArgumentException, NumberFormatException
+    {
+        if (value == null) {
+            return null;
+        }
+        if (Double .class.equals(type)) return (T) Double .valueOf(value);
+        if (Float  .class.equals(type)) return (T) Float  .valueOf(value);
+        if (Long   .class.equals(type)) return (T) Long   .valueOf(value);
+        if (Integer.class.equals(type)) return (T) Integer.valueOf(value);
+        if (Short  .class.equals(type)) return (T) Short  .valueOf(value);
+        if (Byte   .class.equals(type)) return (T) Byte   .valueOf(value);
+        if (Boolean.class.equals(type)) return (T) Boolean.valueOf(value);
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 
     /**

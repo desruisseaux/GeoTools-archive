@@ -22,17 +22,12 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
 
@@ -57,17 +52,17 @@ public class HotineObliqueMercator extends ObliqueMercator {
      * @todo Current implementation assumes a "azimuth" case. We may try to detect
      *       automatically the "two points" case in a future version if needed. Note
      *       that this limitation doesn't apply to projection created from the
-     *       {@link Provider_TwoPoint}. 
+     *       {@link Provider_TwoPoint}.
      */
     protected HotineObliqueMercator(final ParameterValueGroup parameters)
-            throws ParameterNotFoundException 
+            throws ParameterNotFoundException
     {
         this(parameters, Provider.PARAMETERS.descriptors(), false);
     }
 
     /**
      * Constructs a new map projection from the supplied parameters.
-     * 
+     *
      * @param parameters The parameter values in standard units.
      * @param expected The expected parameter descriptors.
      * @param twoPoint {@code true} for the "two points" case, or {@code false} for the
@@ -76,15 +71,16 @@ public class HotineObliqueMercator extends ObliqueMercator {
      */
     HotineObliqueMercator(final ParameterValueGroup parameters, final Collection expected,
                           final boolean twoPoint)
-            throws ParameterNotFoundException 
+            throws ParameterNotFoundException
     {
-        // Fetch parameters 
+        // Fetch parameters
         super(parameters, expected, twoPoint, true);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return (twoPoint) ? Provider_TwoPoint.PARAMETERS : Provider.PARAMETERS;
     }
@@ -132,7 +128,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -145,6 +141,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
@@ -181,7 +178,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider_TwoPoint() {
             super(PARAMETERS);
@@ -194,6 +191,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {

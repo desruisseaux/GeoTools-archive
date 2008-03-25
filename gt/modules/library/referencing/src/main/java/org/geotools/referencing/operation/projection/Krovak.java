@@ -19,18 +19,19 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
 import javax.units.Unit;
-
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
-
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -150,30 +151,30 @@ public class Krovak extends MapProjection {
         ensureLongitudeInRange(Provider.LONGITUDE_OF_CENTER, centralMeridian,  false);
 
         // Calculates useful constants.
-        sinAzim = Math.sin(azimuth);
-        cosAzim = Math.cos(azimuth);
-        n       = Math.sin(pseudoStandardParallel);
-        tanS2   = Math.tan(pseudoStandardParallel / 2 + s45);
+        sinAzim = sin(azimuth);
+        cosAzim = cos(azimuth);
+        n       = sin(pseudoStandardParallel);
+        tanS2   = tan(pseudoStandardParallel / 2 + s45);
 
         final double sinLat, cosLat, cosL2, u0;
-        sinLat = Math.sin(latitudeOfOrigin);
-        cosLat = Math.cos(latitudeOfOrigin);
+        sinLat = sin(latitudeOfOrigin);
+        cosLat = cos(latitudeOfOrigin);
         cosL2  = cosLat * cosLat;
-        alfa   = Math.sqrt(1 + ((excentricitySquared * (cosL2*cosL2)) / (1 - excentricitySquared)));
+        alfa   = sqrt(1 + ((excentricitySquared * (cosL2*cosL2)) / (1 - excentricitySquared)));
         hae    = alfa * excentricity / 2;
-        u0     = Math.asin(sinLat / alfa);
+        u0     = asin(sinLat / alfa);
 
         final double g, esl;
         esl = excentricity * sinLat;
-        g   = Math.pow((1 - esl) / (1 + esl), (alfa * excentricity) / 2);
-        k1  = Math.pow(Math.tan(latitudeOfOrigin/2 + s45), alfa) * g / Math.tan(u0/2 + s45);
-        ka  = Math.pow(1 / k1, -1 / alfa);
+        g   = pow((1 - esl) / (1 + esl), (alfa * excentricity) / 2);
+        k1  = pow(tan(latitudeOfOrigin/2 + s45), alfa) * g / tan(u0/2 + s45);
+        ka  = pow(1 / k1, -1 / alfa);
 
         final double radius;
-        radius = Math.sqrt(1 - excentricitySquared) / (1 - (excentricitySquared * (sinLat * sinLat)));
+        radius = sqrt(1 - excentricitySquared) / (1 - (excentricitySquared * (sinLat * sinLat)));
 
-        ro0 = scaleFactor * radius / Math.tan(pseudoStandardParallel);
-        rop = ro0 * Math.pow(tanS2, n);
+        ro0 = scaleFactor * radius / tan(pseudoStandardParallel);
+        rop = ro0 * pow(tanS2, n);
     }
 
     /**
@@ -188,7 +189,7 @@ public class Krovak extends MapProjection {
      */
     @Override
     public ParameterValueGroup getParameterValues() {
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         final ParameterValueGroup values = super.getParameterValues();
         set(expected, Provider.LATITUDE_OF_CENTER,       values, latitudeOfOrigin      );
         set(expected, Provider.LONGITUDE_OF_CENTER,      values, centralMeridian       );
@@ -206,19 +207,19 @@ public class Krovak extends MapProjection {
     protected Point2D transformNormalized(final double lambda, final double phi, Point2D ptDst)
             throws ProjectionException
     {
-        final double esp = excentricity * Math.sin(phi);
-        final double gfi = Math.pow(((1. - esp) / (1. + esp)), hae);
-        final double u   = 2 * (Math.atan(Math.pow(Math.tan(phi/2 + s45), alfa) / k1 * gfi) - s45);
+        final double esp = excentricity * sin(phi);
+        final double gfi = pow(((1. - esp) / (1. + esp)), hae);
+        final double u   = 2 * (atan(pow(tan(phi/2 + s45), alfa) / k1 * gfi) - s45);
         final double deltav = -lambda * alfa;
-        final double cosU = Math.cos(u);
-        final double s = Math.asin((cosAzim * Math.sin(u)) + (sinAzim * cosU * Math.cos(deltav)));
-        final double d = Math.asin(cosU * Math.sin(deltav) / Math.cos(s));
+        final double cosU = cos(u);
+        final double s = asin((cosAzim * sin(u)) + (sinAzim * cosU * cos(deltav)));
+        final double d = asin(cosU * sin(deltav) / cos(s));
         final double eps = n * d;
-        final double ro = rop / Math.pow(Math.tan(s/2 + s45), n);
+        final double ro = rop / pow(tan(s/2 + s45), n);
 
         /* x and y are reverted  */
-        final double y = -(ro * Math.cos(eps));
-        final double x = -(ro * Math.sin(eps));
+        final double y = -(ro * cos(eps));
+        final double x = -(ro * sin(eps));
 
         if (ptDst != null) {
             ptDst.setLocation(x, y);
@@ -235,14 +236,14 @@ public class Krovak extends MapProjection {
             throws ProjectionException
     {
         // x -> southing, y -> westing
-        final double ro  = Math.hypot(x, y);
-        final double eps = Math.atan2(-x, -y);
+        final double ro  = hypot(x, y);
+        final double eps = atan2(-x, -y);
         final double d   = eps / n;
-        final double s   = 2 * (Math.atan(Math.pow(ro0/ro, 1/n) * tanS2) - s45);
-        final double cs  = Math.cos(s);
-        final double u   = Math.asin((cosAzim * Math.sin(s)) - (sinAzim * cs * Math.cos(d)));
-        final double kau = ka * Math.pow(Math.tan((u / 2.) + s45), 1 / alfa);
-        final double deltav = Math.asin((cs * Math.sin(d)) / Math.cos(u));
+        final double s   = 2 * (atan(pow(ro0/ro, 1/n) * tanS2) - s45);
+        final double cs  = cos(s);
+        final double u   = asin((cosAzim * sin(s)) - (sinAzim * cs * cos(d)));
+        final double kau = ka * pow(tan((u / 2.) + s45), 1 / alfa);
+        final double deltav = asin((cs * sin(d)) / cos(u));
         final double lambda = -deltav / alfa;
         double phi = 0;
         double fi1 = u;
@@ -250,9 +251,9 @@ public class Krovak extends MapProjection {
         // iteration calculation
         for (int i=MAXIMUM_ITERATIONS;;) {
             fi1 = phi;
-            final double esf = excentricity * Math.sin(fi1);
-            phi = 2. * (Math.atan(kau * Math.pow((1. + esf) / (1. - esf), excentricity/2.)) - s45);
-            if (Math.abs(fi1 - phi) <= ITERATION_TOLERANCE) {
+            final double esf = excentricity * sin(fi1);
+            phi = 2. * (atan(kau * pow((1. + esf) / (1. - esf), excentricity/2.)) - s45);
+            if (abs(fi1 - phi) <= ITERATION_TOLERANCE) {
                 break;
             }
             if (--i < 0) {
@@ -373,7 +374,7 @@ public class Krovak extends MapProjection {
          * Returns the operation type for this map projection.
          */
         @Override
-        public Class getOperationType() {
+        public Class<ConicProjection> getOperationType() {
             return ConicProjection.class;
         }
 

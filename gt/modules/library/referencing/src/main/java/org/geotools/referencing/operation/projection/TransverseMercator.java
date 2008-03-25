@@ -24,12 +24,8 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -37,8 +33,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.ReferenceIdentifier;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
@@ -47,6 +41,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -61,20 +57,20 @@ import org.geotools.resources.i18n.Errors;
  *
  * The elliptical equations used here are series approximations, and their accuracy
  * decreases as points move farther from the central meridian of the projection.
- * The forward equations here are accurate to a less than a mm &plusmn;10 degrees from 
- * the central meridian, a few mm &plusmn;15 degrees from the 
+ * The forward equations here are accurate to a less than a mm &plusmn;10 degrees from
+ * the central meridian, a few mm &plusmn;15 degrees from the
  * central meridian and a few cm &plusmn;20 degrees from the central meridian.
- * The spherical equations are not approximations and should always give the 
+ * The spherical equations are not approximations and should always give the
  * correct values.
  * <p>
  *
- * There are a number of versions of the transverse mercator projection 
- * including the Universal (UTM) and Modified (MTM) Transverses Mercator 
+ * There are a number of versions of the transverse mercator projection
+ * including the Universal (UTM) and Modified (MTM) Transverses Mercator
  * projections. In these cases the earth is divided into zones. For the UTM
- * the zones are 6 degrees wide, numbered from 1 to 60 proceeding east from 
- * 180 degrees longitude, and between lats 84 degrees North and 80 
+ * the zones are 6 degrees wide, numbered from 1 to 60 proceeding east from
+ * 180 degrees longitude, and between lats 84 degrees North and 80
  * degrees South. The central meridian is taken as the center of the zone
- * and the latitude of origin is the equator. A scale factor of 0.9996 and 
+ * and the latitude of origin is the equator. A scale factor of 0.9996 and
  * false easting of 500000m is used for all zones and a false northing of 10000000m
  * is used for zones in the southern hemisphere.
  * <p>
@@ -108,30 +104,30 @@ public class TransverseMercator extends MapProjection {
      * Maximum number of iterations for iterative computations.
      */
     private static final int MAXIMUM_ITERATIONS = 15;
-    
+
     /**
      * Relative iteration precision used in the {@code mlfn} method.
      * This overrides the value in the {@link MapProjection} class.
      */
     private static final double ITERATION_TOLERANCE = 1E-11;
-    
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * Maximum difference allowed when comparing latitudes.
      */
     private static final double EPSILON_LATITUDE = 1E-10;
-    
+
     /**
      * A derived quantity of excentricity, computed by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
      * where <var>a</var> is the semi-major axis length and <var>b</bar> is the semi-minor axis
      * length.
      */
     private final double esp;
-    
+
     /**
      * Meridian distance at the {@code latitudeOfOrigin}.
      * Used for calculations for the ellipsoid.
@@ -143,7 +139,7 @@ public class TransverseMercator extends MapProjection {
      * Setup at construction time.
      */
     private final double en0,en1,en2,en3,en4;
-    
+
     /**
      * Constants used to calculate {@link #en0}, {@link #en1},
      * {@link #en2}, {@link #en3}, {@link #en4}.
@@ -183,130 +179,131 @@ public class TransverseMercator extends MapProjection {
     protected TransverseMercator(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
-        //Fetch parameters 
+        //Fetch parameters
         super(parameters);
-        
+
         //  Compute constants
         esp = excentricitySquared / (1.0 - excentricitySquared);
-          
+
         double t;
-        en0 = C00 - excentricitySquared  *  (C02 + excentricitySquared  * 
+        en0 = C00 - excentricitySquared  *  (C02 + excentricitySquared  *
              (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
         en1 =       excentricitySquared  *  (C22 - excentricitySquared  *
              (C04 + excentricitySquared  *  (C06 + excentricitySquared  * C08)));
-        en2 =  (t = excentricitySquared  *         excentricitySquared) * 
+        en2 =  (t = excentricitySquared  *         excentricitySquared) *
              (C44 - excentricitySquared  *  (C46 + excentricitySquared  * C48));
         en3 = (t *= excentricitySquared) *  (C66 - excentricitySquared  * C68);
         en4 =   t * excentricitySquared  *  C88;
-        ml0 = mlfn(latitudeOfOrigin, Math.sin(latitudeOfOrigin), Math.cos(latitudeOfOrigin));
+        ml0 = mlfn(latitudeOfOrigin, sin(latitudeOfOrigin), cos(latitudeOfOrigin));
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
-    
+
     /**
      * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
-        double sinphi = Math.sin(y);
-        double cosphi = Math.cos(y);
-        
-        double t = (Math.abs(cosphi) > EPSILON) ? sinphi/cosphi : 0;
+        double sinphi = sin(y);
+        double cosphi = cos(y);
+
+        double t = (abs(cosphi) > EPSILON) ? sinphi/cosphi : 0;
         t *= t;
         double al = cosphi*x;
         double als = al*al;
-        al /= Math.sqrt(1.0 - excentricitySquared * sinphi*sinphi);
+        al /= sqrt(1.0 - excentricitySquared * sinphi*sinphi);
         double n = esp * cosphi*cosphi;
 
         /* NOTE: meridinal distance at latitudeOfOrigin is always 0 */
-        y = (mlfn(y, sinphi, cosphi) - ml0 + 
+        y = (mlfn(y, sinphi, cosphi) - ml0 +
             sinphi*al*x*
             FC2 * ( 1.0 +
             FC4 * als * (5.0 - t + n*(9.0 + 4.0*n) +
             FC6 * als * (61.0 + t * (t - 58.0) + n*(270.0 - 330.0*t) +
             FC8 * als * (1385.0 + t * ( t*(543.0 - t) - 3111.0))))));
-        
+
         x = al*(FC1 + FC3 * als*(1.0 - t + n +
             FC5 * als * (5.0 + t*(t - 18.0) + n*(14.0 - 58.0*t) +
             FC7 * als * (61.0+ t*(t*(179.0 - t) - 479.0 )))));
-               
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
-        return new Point2D.Double(x,y);          
+        return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         double phi = inv_mlfn(ml0 + y);
-        
-        if (Math.abs(phi) >= (Math.PI/2)) {
-            y = y<0.0 ? -(Math.PI/2) : (Math.PI/2);
+
+        if (abs(phi) >= PI/2) {
+            y = y<0.0 ? -(PI/2) : (PI/2);
             x = 0.0;
         } else {
-            double sinphi = Math.sin(phi);
-            double cosphi = Math.cos(phi);
-            double t = (Math.abs(cosphi) > EPSILON) ? sinphi/cosphi : 0.0;
+            double sinphi = sin(phi);
+            double cosphi = cos(phi);
+            double t = (abs(cosphi) > EPSILON) ? sinphi/cosphi : 0.0;
             double n = esp * cosphi*cosphi;
             double con = 1.0 - excentricitySquared * sinphi*sinphi;
-            double d = x*Math.sqrt(con);
+            double d = x * sqrt(con);
             con *= t;
             t *= t;
             double ds = d*d;
-            
+
             y = phi - (con*ds / (1.0 - excentricitySquared)) *
                 FC2 * (1.0 - ds *
                 FC4 * (5.0 + t*(3.0 - 9.0*n) + n*(1.0 - 4*n) - ds *
                 FC6 * (61.0 + t*(90.0 - 252.0*n + 45.0*t) + 46.0*n - ds *
                 FC8 * (1385.0 + t*(3633.0 + t*(4095.0 + 1574.0*t))))));
-            
+
             x = d*(FC1 - ds * FC3 * (1.0 + 2.0*t + n -
                 ds*FC5*(5.0 + t*(28.0 + 24* t + 8.0*n) + 6.0*n -
                 ds*FC7*(61.0 + t*(662.0 + t*(1320.0 + 720.0*t))))))/cosphi;
         }
-        
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
-        return new Point2D.Double(x,y);        
+        return new Point2D.Double(x,y);
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
-        if (Math.abs(longitude - centralMeridian) > 0.26) {   // 15 degrees
+        if (abs(longitude - centralMeridian) > 0.26) {   // 15 degrees
             // When far from the valid area, use a larger tolerance.
             return 2.5;
-        } else if (Math.abs(longitude - centralMeridian) > 0.22) {  // 12.5 degrees
+        } else if (abs(longitude - centralMeridian) > 0.22) {  // 12.5 degrees
             return 1.0;
-        } else if (Math.abs(longitude - centralMeridian) > 0.17) {  // 10 degrees
+        } else if (abs(longitude - centralMeridian) > 0.17) {  // 10 degrees
             return 0.5;
         }
         // a normal tolerance
         return 1E-6;
     }
-    
+
 
     /**
      * Provides the transform equations for the spherical case of the
      * TransverseMercator projection.
-     * 
+     *
      * @version $Id$
      * @author André Gosselin
      * @author Martin Desruisseaux
@@ -325,27 +322,28 @@ public class TransverseMercator extends MapProjection {
             super(parameters);
             ensureSpherical();
         }
-        
+
         /**
          * {@inheritDoc}
          */
+        @Override
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
-                throws ProjectionException 
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             final double normalizedLongitude = x;
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-                    
-            double cosphi = Math.cos(y);
-            double b = cosphi * Math.sin(x);
-            if (Math.abs(Math.abs(b) - 1.0) <= EPSILON) {
+
+            double cosphi = cos(y);
+            double b = cosphi * sin(x);
+            if (abs(abs(b) - 1.0) <= EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
-            
+
             //Using Snyder's equation for calculating y, instead of the one used in Proj4
-            //poential problems when y and x = 90 degrees, but behaves ok in tests   
-            y = Math.atan2(Math.tan(y),Math.cos(x)) - latitudeOfOrigin;   /* Snyder 8-3 */
-            x = 0.5 * Math.log((1.0+b)/(1.0-b));    /* Snyder 8-1 */
+            //poential problems when y and x = 90 degrees, but behaves ok in tests
+            y = atan2(tan(y), cos(x)) - latitudeOfOrigin;   /* Snyder 8-3 */
+            x = 0.5 * log((1.0+b) / (1.0-b));               /* Snyder 8-1 */
 
             assert checkTransform(x, y, ptDst, getToleranceForSphereAssertions(normalizedLongitude));
             if (ptDst != null) {
@@ -353,26 +351,25 @@ public class TransverseMercator extends MapProjection {
                 return ptDst;
             }
             return new Point2D.Double(x,y);
-        }        
-        
+        }
+
         /**
          * {@inheritDoc}
          */
-        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-                throws ProjectionException 
+        @Override
+        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-            
-            double t = Math.exp(x);
-            double sinhX = 0.5 * (t - 1.0/t);              // sinh(x)
-            double cosD = Math.cos(latitudeOfOrigin + y);
-            double phi = Math.asin(Math.sqrt((1.0 - cosD*cosD) / (1.0 + sinhX*sinhX)));
+
+            double sinhX = sinh(x);
+            double cosD = cos(latitudeOfOrigin + y);
+            double phi = asin(sqrt((1.0 - cosD*cosD) / (1.0 + sinhX*sinhX)));
             // correct for the fact that we made everything positive using sqrt(x*x)
-            y = ((y + latitudeOfOrigin)<0.0) ? -phi : phi;   
-            x = (Math.abs(sinhX) <= EPSILON  &&  Math.abs(cosD) <= EPSILON) ?
-                    0.0 : Math.atan2(sinhX,cosD);
-            
+            y = ((y + latitudeOfOrigin)<0.0) ? -phi : phi;
+            x = (abs(sinhX) <= EPSILON  &&  abs(cosD) <= EPSILON) ? 0.0 : atan2(sinhX,cosD);
+
             assert checkInverseTransform(x, y, ptDst, getToleranceForSphereAssertions(x));
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
@@ -380,7 +377,7 @@ public class TransverseMercator extends MapProjection {
             }
             return new Point2D.Double(x,y);
         }
-        
+
         /**
          * Maximal error tolerated for assertions in the spherical case. When assertions
          * are enabled, every projection using spherical formulas is followed by a projection
@@ -397,23 +394,23 @@ public class TransverseMercator extends MapProjection {
          * @return The tolerance level for assertions, in meters.
          */
         protected double getToleranceForSphereAssertions(final double longitude) {
-            if (Math.abs(Math.abs(longitude)- Math.PI/2.0) < EPSILON_LATITUDE) {  // 90 degrees
+            if (abs(abs(longitude)- PI/2) < EPSILON_LATITUDE) {  // 90 degrees
                 // elliptical equations are at their worst here
                 return 1E+18;
             }
-            if (Math.abs(longitude) > 0.26) {   // 15 degrees
-                // When far from the valid area, use a very larger tolerance.          
+            if (abs(longitude) > 0.26) {   // 15 degrees
+                // When far from the valid area, use a very larger tolerance.
                 return 1E+6;
             }
             // a normal tolerance
             return 1E-6;
         }
     }
-    
-    
+
+
     /**
-     * Calculates the meridian distance. This is the distance along the central 
-     * meridian from the equator to {@code phi}. Accurate to < 1e-5 meters 
+     * Calculates the meridian distance. This is the distance along the central
+     * meridian from the equator to {@code phi}. Accurate to < 1e-5 meters
      * when used in conjuction with typical major axis values.
      *
      * @param phi latitude to calculate meridian distance for.
@@ -421,7 +418,7 @@ public class TransverseMercator extends MapProjection {
      * @param cphi cos(phi).
      * @return meridian distance for the given latitude.
      */
-    private final double mlfn(final double phi, double sphi, double cphi) {        
+    private final double mlfn(final double phi, double sphi, double cphi) {
         cphi *= sphi;
         sphi *= sphi;
         return en0 * phi - cphi *
@@ -430,12 +427,12 @@ public class TransverseMercator extends MapProjection {
               (en3 + sphi *
               (en4))));
     }
-    
+
     /**
      * Calculates the latitude ({@code phi}) from a meridian distance.
      * Determines phi to {@link #ITERATION_TOLERANCE} radians, about
      * 1e-6 seconds.
-     * 
+     *
      * @param  arg meridian distance to calulate latitude for.
      * @return the latitude of the meridian distance.
      * @throws ProjectionException if the iteration does not converge.
@@ -448,16 +445,16 @@ public class TransverseMercator extends MapProjection {
             if (--i < 0) {
                 throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
-            s = Math.sin(phi);
+            s = sin(phi);
             t = 1.0 - excentricitySquared * s * s;
-            t = (mlfn(phi, s, Math.cos(phi)) - arg) * (t * Math.sqrt(t)) * k;
+            t = (mlfn(phi, s, cos(phi)) - arg) * (t * sqrt(t)) * k;
             phi -= t;
-            if (Math.abs(t) < ITERATION_TOLERANCE) {
+            if (abs(t) < ITERATION_TOLERANCE) {
                 return phi;
             }
         }
     }
-    
+
     /**
      * Convenience method computing the zone code from the central meridian.
      * Information about zones convention must be specified in argument. Two
@@ -483,15 +480,15 @@ public class TransverseMercator extends MapProjection {
      * @return The zone number. First zone is numbered 1.
      */
     private int getZone(final double centralLongitudeZone1, final double zoneWidth) {
-        final double zoneCount = Math.abs(360/zoneWidth);
+        final double zoneCount = abs(360 / zoneWidth);
         double t;
         t  = centralLongitudeZone1 - 0.5*zoneWidth; // Longitude at the beginning of the first zone.
-        t  = Math.toDegrees(centralMeridian) - t;   // Degrees of longitude between the central longitude and longitude 1.
-        t  = Math.floor(t/zoneWidth + EPSILON);     // Number of zones between the central longitude and longitude 1.
-        t -= zoneCount*Math.floor(t/zoneCount);     // If negative, bring back to the interval 0 to (zoneCount-1).
+        t  = toDegrees(centralMeridian) - t;        // Degrees of longitude between the central longitude and longitude 1.
+        t  = floor(t/zoneWidth + EPSILON);          // Number of zones between the central longitude and longitude 1.
+        t -= zoneCount*floor(t/zoneCount);          // If negative, bring back to the interval 0 to (zoneCount-1).
         return ((int) t)+1;
     }
-    
+
     /**
      * Convenience method returning the meridian in the middle of current zone. This meridian is
      * typically the central meridian. This method may be invoked to make sure that the central
@@ -509,15 +506,15 @@ public class TransverseMercator extends MapProjection {
     private double getCentralMedirian(final double centralLongitudeZone1, final double zoneWidth) {
         double t;
         t  = centralLongitudeZone1 + (getZone(centralLongitudeZone1, zoneWidth)-1)*zoneWidth;
-        t -= 360*Math.floor((t+180)/360); // Bring back into [-180..+180] range.
+        t -= 360 * floor((t+180) / 360); // Bring back into [-180..+180] range.
         return t;
     }
 
     /**
      * Convenience method computing the zone code from the central meridian.
      *
-     * @return The zone number, using the scalefactor and false easting 
-     *         to decide if this is a UTM or MTM case. Returns 0 if the 
+     * @return The zone number, using the scalefactor and false easting
+     *         to decide if this is a UTM or MTM case. Returns 0 if the
      *         case of the projection cannot be determined.
      */
     public int getZone() {
@@ -538,7 +535,7 @@ public class TransverseMercator extends MapProjection {
      * typically the central meridian. This method may be invoked to make sure that the central
      * meridian is correctly set.
      *
-     * @return The central meridian, using the scalefactor and false easting 
+     * @return The central meridian, using the scalefactor and false easting
      *         to decide if this is a UTM or MTM case. Returns {@link Double#NaN}
      *         if the case of the projection cannot be determined.
      */
@@ -558,7 +555,8 @@ public class TransverseMercator extends MapProjection {
     /**
      * Returns a hash value for this projection.
      */
-    public int hashCode() { 
+    @Override
+    public int hashCode() {
         final long code = Double.doubleToLongBits(ml0);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
     }
@@ -566,6 +564,7 @@ public class TransverseMercator extends MapProjection {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -574,10 +573,10 @@ public class TransverseMercator extends MapProjection {
         // Relevant parameters are already compared in MapProjection
         return super.equals(object);
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
@@ -643,7 +642,8 @@ public class TransverseMercator extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<CylindricalProjection> getOperationType() {
             return CylindricalProjection.class;
         }
 
@@ -722,6 +722,7 @@ public class TransverseMercator extends MapProjection {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {

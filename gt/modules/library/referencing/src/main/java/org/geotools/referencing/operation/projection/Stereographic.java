@@ -30,12 +30,13 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
-
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -279,11 +280,11 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             // Values here are in radians (the standard units for the map projection package)
-            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            final double latitudeOfOrigin = abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             final boolean     isSpherical = isSpherical(parameters);
             final ParameterDescriptorGroup descriptor = getParameters();
             // Polar case.
-            if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
+            if (abs(latitudeOfOrigin - PI/2) < EPSILON) {
                 if (isSpherical) {
                     return new PolarStereographic.Spherical(parameters, descriptor, null);
                 } else {

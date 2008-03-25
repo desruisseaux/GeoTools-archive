@@ -21,16 +21,13 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -60,13 +57,13 @@ public class PolarOrthographic extends Orthographic {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected PolarOrthographic(final ParameterValueGroup parameters) 
+    protected PolarOrthographic(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         super(parameters);
-        ensureLatitudeEquals(Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, Math.PI/2);
+        ensureLatitudeEquals(Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, PI/2);
         northPole = (latitudeOfOrigin > 0);
-        latitudeOfOrigin = (northPole) ? Math.PI/2.0 : -Math.PI/2.0;
+        latitudeOfOrigin = (northPole) ? PI/2 : -PI/2;
         ensureSpherical();
     }
 
@@ -78,16 +75,16 @@ public class PolarOrthographic extends Orthographic {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        if (Math.abs(y - latitudeOfOrigin) - EPSILON > Math.PI/2.0) {
+        if (abs(y - latitudeOfOrigin) - EPSILON > PI/2) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
-        double cosphi = Math.cos(y);
-        double coslam = Math.cos(x);
+        double cosphi = cos(y);
+        double coslam = cos(x);
         if (northPole) {
             coslam = -coslam;
         }
         y = cosphi * coslam;
-        x = cosphi * Math.sin(x);
+        x = cosphi * sin(x);
 
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -103,7 +100,7 @@ public class PolarOrthographic extends Orthographic {
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        final double rho = Math.sqrt(x*x + y*y);
+        final double rho = hypot(x, y);
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPSILON) {
@@ -118,11 +115,11 @@ public class PolarOrthographic extends Orthographic {
             double phi;
             if (northPole) {
                 y = -y;
-                phi = Math.acos(sinc);   // equivalent to asin(cos(c)) over the range [0:1]
+                phi = acos(sinc);   // equivalent to asin(cos(c)) over the range [0:1]
             } else {
-                phi = -Math.acos(sinc);
+                phi = -acos(sinc);
             }
-            x = Math.atan2(x, y);
+            x = atan2(x, y);
             y = phi;
         }
         if (ptDst != null) {

@@ -23,24 +23,22 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
-
-// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
+
+import static java.lang.Math.*;
 
 
 /**
@@ -135,7 +133,7 @@ public class PolarStereographic extends Stereographic {
             latitudeTrueScale = doubleValue(expected, trueScaleDescriptor, parameters);
         } else {
             // Polar A case
-            latitudeTrueScale = (latitudeOfOrigin < 0) ? -Math.PI/2 : Math.PI/2;
+            latitudeTrueScale = (latitudeOfOrigin < 0) ? -PI/2 : PI/2;
         }
         ensureLatitudeInRange(trueScaleDescriptor, latitudeTrueScale, true);
         /*
@@ -145,27 +143,27 @@ public class PolarStereographic extends Stereographic {
         poleForced = (forceSouthPole != null);
         if (poleForced) {
             southPole = forceSouthPole.booleanValue();
-            latitudeTrueScale = Math.abs(latitudeTrueScale);
+            latitudeTrueScale = abs(latitudeTrueScale);
             if (southPole) {
                 latitudeTrueScale = -latitudeTrueScale;
             }
         } else {
             southPole = (latitudeTrueScale < 0);
         }
-        this.latitudeOfOrigin = (southPole) ? -(Math.PI/2) : +(Math.PI/2);
+        this.latitudeOfOrigin = (southPole) ? -(PI/2) : +(PI/2);
         this.standardParallel = latitudeTrueScale; // May be anything in [-90 .. +90] range.
         /*
          * Computes coefficients.
          */
-        latitudeTrueScale = Math.abs(latitudeTrueScale);
-        if (Math.abs(latitudeTrueScale - Math.PI/2) >= EPSILON) {
-            final double t = Math.sin(latitudeTrueScale);
-            k0 = msfn(t, Math.cos(latitudeTrueScale)) /
+        latitudeTrueScale = abs(latitudeTrueScale);
+        if (abs(latitudeTrueScale - PI/2) >= EPSILON) {
+            final double t = sin(latitudeTrueScale);
+            k0 = msfn(t, cos(latitudeTrueScale)) /
                  tsfn(latitudeTrueScale, t); // Derives from (21-32 and 21-33)
         } else {
             // True scale at pole (part of (21-33))
-            k0 = 2.0 / Math.sqrt(Math.pow(1+excentricity, 1+excentricity)*
-                                 Math.pow(1-excentricity, 1-excentricity));
+            k0 = 2.0 / sqrt(pow(1+excentricity, 1+excentricity)*
+                            pow(1-excentricity, 1-excentricity));
         }
     }
 
@@ -174,12 +172,12 @@ public class PolarStereographic extends Stereographic {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
-        final double sinlat = Math.sin(y);
-        final double coslon = Math.cos(x);
-        final double sinlon = Math.sin(x);
+        final double sinlat = sin(y);
+        final double coslon = cos(x);
+        final double sinlon = sin(x);
         if (southPole) {
             final double rho = k0 * tsfn(-y, -sinlat);
             x = rho * sinlon;
@@ -201,10 +199,10 @@ public class PolarStereographic extends Stereographic {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates (units in radians)
      * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
-        final double rho = Math.sqrt(x*x + y*y);
+        final double rho = hypot(x, y);
         if (southPole) {
             y = -y;
         }
@@ -215,11 +213,10 @@ public class PolarStereographic extends Stereographic {
         final double halfe = excentricity/2.0;
         double phi0 = 0;
         for (int i=MAXIMUM_ITERATIONS;;) {
-            final double esinphi = excentricity * Math.sin(phi0);
-            final double phi = (Math.PI/2) - 
-                               2.0*Math.atan(t*Math.pow((1-esinphi)/(1+esinphi), halfe));
-            if (Math.abs(phi-phi0) < ITERATION_TOLERANCE) {
-                x = (Math.abs(rho) < EPSILON) ? 0.0 : Math.atan2(x, -y);
+            final double esinphi = excentricity * sin(phi0);
+            final double phi = (PI/2) - 2.0*atan(t*pow((1-esinphi)/(1+esinphi), halfe));
+            if (abs(phi-phi0) < ITERATION_TOLERANCE) {
+                x = (abs(rho) < EPSILON) ? 0.0 : atan2(x, -y);
                 y = (southPole) ? -phi : phi;
                 break;
             }
@@ -239,13 +236,14 @@ public class PolarStereographic extends Stereographic {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterDescriptor trueScaleDescriptor = poleForced ? (southPole ?
                 ProviderSouth.STANDARD_PARALLEL :  // forced = true,  south = true
                 ProviderNorth.STANDARD_PARALLEL):  // forced = true,  south = false
                 ProviderB    .STANDARD_PARALLEL ;  // forced = false
         final ParameterValueGroup values = super.getParameterValues();
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         set(expected, trueScaleDescriptor, values, standardParallel);
         return values;
     }
@@ -253,6 +251,7 @@ public class PolarStereographic extends Stereographic {
     /**
      * Returns a hash value for this map projection.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(k0);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
@@ -261,6 +260,7 @@ public class PolarStereographic extends Stereographic {
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -310,9 +310,9 @@ public class PolarStereographic extends Stereographic {
         {
             super(parameters, descriptor, forceSouthPole);
             ensureSpherical();
-            final double phi = Math.abs(standardParallel);
-            if (Math.abs(phi - Math.PI/2) >= EPSILON) {
-                k0 = 1 + Math.sin(phi);  // derived from (21-7) and (21-11)
+            final double phi = abs(standardParallel);
+            if (abs(phi - PI/2) >= EPSILON) {
+                k0 = 1 + sin(phi);  // derived from (21-7) and (21-11)
             } else {
                 k0 = 2;
             }
@@ -323,19 +323,20 @@ public class PolarStereographic extends Stereographic {
          * (units in radians) and stores the result in {@code ptDst} (linear distance
          * on a unit sphere).
          */
-        protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-                throws ProjectionException 
+        @Override
+        protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+                throws ProjectionException
         {
             //Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-            final double coslat = Math.cos(y);
-            final double sinlat = Math.sin(y);
-            final double coslon = Math.cos(x);
-            final double sinlon = Math.sin(x);
+            final double coslat = cos(y);
+            final double sinlat = sin(y);
+            final double coslon = cos(x);
+            final double sinlon = sin(x);
 
             if (southPole) {
-                if (Math.abs(1-sinlat) < EPSILON) {
+                if (abs(1 - sinlat) < EPSILON) {
                     throw new ProjectionException(Errors.format(
                         ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -344,7 +345,7 @@ public class PolarStereographic extends Stereographic {
                 x = f * sinlon; // (21-9)
                 y = f * coslon; // (21-10)
             } else {
-                if (Math.abs(1+sinlat) < EPSILON) {
+                if (abs(1 + sinlat) < EPSILON) {
                     throw new ProjectionException(Errors.format(
                         ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -366,25 +367,26 @@ public class PolarStereographic extends Stereographic {
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinates (units in radians)
          * and stores the result in {@code ptDst} (linear distance on a unit sphere).
          */
-        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-                throws ProjectionException 
+        @Override
+        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-            final double rho = Math.sqrt(x*x + y*y);
+            final double rho = hypot(x, y);
 
             if (!southPole) {
                 y = -y;
             }
             // (20-17) call atan2(x,y) to properly deal with y==0
-            x = (Math.abs(x)<EPSILON && Math.abs(y)<EPSILON) ? 0.0 : Math.atan2(x, y);
-            if (Math.abs(rho) < EPSILON) {
+            x = (abs(x)<EPSILON && abs(y)<EPSILON) ? 0.0 : atan2(x, y);
+            if (abs(rho) < EPSILON) {
                 y = latitudeOfOrigin;
             } else {
-                final double c = 2.0 * Math.atan(rho/k0);
-                final double cosc = Math.cos(c);
-                y = (southPole) ? Math.asin(-cosc) : Math.asin(cosc);
+                final double c = 2.0 * atan(rho/k0);
+                final double cosc = cos(c);
+                y = (southPole) ? asin(-cosc) : asin(cosc);
                 // (20-14) with phi1=90
             }
 
@@ -400,7 +402,7 @@ public class PolarStereographic extends Stereographic {
     /**
      * Overides {@link PolarStereographic} to use the a series for the
      * {@link #inverseTransformNormalized inverseTransformNormalized(...)}
-     * method. This is the equation specified by the EPSG. Allows for a 
+     * method. This is the equation specified by the EPSG. Allows for a
      * {@code "latitude_true_scale"} parameter to be used, but this
      * parameter is not listed by the EPSG and is not given as a parameter
      * by the provider.
@@ -459,12 +461,12 @@ public class PolarStereographic extends Stereographic {
             C *= 4.0;
             D *= 8.0;
 
-            final double latTrueScale = Math.abs(standardParallel);
-            if (Math.abs(latTrueScale - Math.PI/2) >= EPSILON) {
-                final double t = Math.sin(latTrueScale);
-                k0 = msfn(t, Math.cos(latTrueScale)) *
-                             Math.sqrt(Math.pow(1+excentricity, 1+excentricity)*
-                                       Math.pow(1-excentricity, 1-excentricity)) /
+            final double latTrueScale = abs(standardParallel);
+            if (abs(latTrueScale - PI/2) >= EPSILON) {
+                final double t = sin(latTrueScale);
+                k0 = msfn(t, cos(latTrueScale)) *
+                             sqrt(pow(1+excentricity, 1+excentricity)*
+                                  pow(1-excentricity, 1-excentricity)) /
                              (2.0*tsfn(latTrueScale, t));
             } else {
                 k0 = 1.0;
@@ -475,26 +477,27 @@ public class PolarStereographic extends Stereographic {
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
          * and stores the result in {@code ptDst}.
          */
-        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-                throws ProjectionException 
+        @Override
+        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+                throws ProjectionException
         {
             // Compute using iteration formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-            final double rho = Math.sqrt(x*x + y*y);
+            final double rho = hypot(x, y);
             if (southPole) {
                 y = -y;
             }
             // The series form
-            final double t = (rho/k0) * Math.sqrt(Math.pow(1+excentricity, 1+excentricity)*
-                             Math.pow(1-excentricity, 1-excentricity)) / 2;
-            final double chi = Math.PI/2 - 2*Math.atan(t);
+            final double t = (rho/k0) * sqrt(pow(1+excentricity, 1+excentricity)*
+                             pow(1-excentricity, 1-excentricity)) / 2;
+            final double chi = PI/2 - 2*atan(t);
 
-            x = (Math.abs(rho) < EPSILON) ? 0.0 : Math.atan2(x, -y);
+            x = (abs(rho) < EPSILON) ? 0.0 : atan2(x, -y);
 
             // See Snyde P. 19, "Computation of Series"
-            final double sin2chi = Math.sin(2.0*chi);
-            final double cos2chi = Math.cos(2.0*chi);
+            final double sin2chi = sin(2.0 * chi);
+            final double cos2chi = cos(2.0 * chi);
             y = chi + sin2chi*(A + cos2chi*(B + cos2chi*(C + D*cos2chi)));
             y = (southPole) ? -y : y;
 
@@ -547,7 +550,7 @@ public class PolarStereographic extends Stereographic {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public ProviderA() {
             super(PARAMETERS);
@@ -560,6 +563,7 @@ public class PolarStereographic extends Stereographic {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
@@ -606,7 +610,7 @@ public class PolarStereographic extends Stereographic {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public ProviderB() {
             super(PARAMETERS);
@@ -619,6 +623,7 @@ public class PolarStereographic extends Stereographic {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
@@ -668,7 +673,7 @@ public class PolarStereographic extends Stereographic {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public ProviderNorth() {
             super(PARAMETERS);
@@ -681,6 +686,7 @@ public class PolarStereographic extends Stereographic {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
@@ -689,7 +695,7 @@ public class PolarStereographic extends Stereographic {
             } else {
                 return new PolarStereographic(parameters, PARAMETERS, Boolean.FALSE);
             }
-        }     
+        }
     }
 
     /**
@@ -730,7 +736,7 @@ public class PolarStereographic extends Stereographic {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public ProviderSouth() {
             super(PARAMETERS);
@@ -743,6 +749,7 @@ public class PolarStereographic extends Stereographic {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
+        @Override
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
@@ -751,6 +758,6 @@ public class PolarStereographic extends Stereographic {
             } else {
                 return new PolarStereographic(parameters, PARAMETERS, Boolean.TRUE);
             }
-        }  
+        }
     }
 }
