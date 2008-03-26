@@ -20,15 +20,12 @@ import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * While in transition to the new FM, this class implements the deprecated
- * {@linkplain org.opengis.feature.Feature} in order to no have to touch all the
- * library.
+ * Temptative implementation of Feature.
  * <p>
- * NOTE all the methods from the old geotools Feature interface throws
- * UnsupportedOperationException
+ * NOTE this is work in progress and at this time not really being used throughout the library.
  * </p>
- * 
- * @author gabriel
+ * @author jdeolive
+ * @author jgarnett
  */
 public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 
@@ -119,6 +116,10 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 		return defaultGeometry;
 	}
 
+	//TODO: REVISIT
+	//this implementation seems really bad to me or I am missing something:
+	//1- getValue() shouldn't contain the passed in attribute, but the schema should contain its descriptor
+	//2- this.defaultGeometry = defaultGeometry means getValue() will  not contain the argument
 	public void setDefaultGeometryProperty(GeometryAttribute defaultGeometry) {
 	    if (!getValue().contains(defaultGeometry)) {
 	        throw new IllegalArgumentException("specified attribute is not one of: " + getValue());
