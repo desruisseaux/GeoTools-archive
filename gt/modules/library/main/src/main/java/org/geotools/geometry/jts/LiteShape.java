@@ -35,11 +35,17 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 
 /**
- * A thin wrapper that adapts a JTS geometry to the Shape interface so that the
- * geometry can be used by java2d without coordinate cloning
- *
+ * A thin wrapper that adapts a JTS geometry to the Shape interface so that the geometry can be used
+ * by java2d without coordinate cloning.
+ * <p>
+ * This implementation supports the use of addineTransform and has a hard coded decimation stratagy
+ * (so you can skip points within the same pixel producing a Shape that is "more simple" than the
+ * origional Geometry).
+ * </p>
+ * 
  * @author Andrea Aime
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/geometry/jts/LiteShape.java $
  * @version $Id$
  */
 public class LiteShape implements Shape, Cloneable {

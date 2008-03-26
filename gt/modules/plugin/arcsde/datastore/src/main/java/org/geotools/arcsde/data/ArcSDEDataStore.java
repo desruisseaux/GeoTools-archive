@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2006, GeoTools Project Management Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -590,27 +590,48 @@ public class ArcSDEDataStore implements DataStore {
         return this.connectionPool;
     }
 
+    /**
+     * Check inProcessFeatureTypeInfos and featureTypeInfos for the provided typeName,
+     * checking the ArcSDE server as a last resort.
+     * 
+     * @param typeName
+     * @return FeatureTypeInfo
+     * @throws java.io.IOException
+     */
     FeatureTypeInfo getFeatureTypeInfo(final String typeName) throws java.io.IOException {
         assert typeName != null;
 
+        // Check if we have a view
         FeatureTypeInfo typeInfo = inProcessFeatureTypeInfos.get(typeName);
         if (typeInfo != null) {
             return typeInfo;
         }
+        // Check if this is a known featureType
         typeInfo = featureTypeInfos.get(typeName);
-        if (typeInfo == null) {
-            // connection used to retrieve the user name if a non qualified type
-            // name was passed in
-            final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
-            try {
-                typeInfo = getFeatureTypeInfo(typeName, conn);
-            } finally {
-                conn.close();
-            }
+        if (typeInfo != null) {
+            return typeInfo;
         }
-        return typeInfo;
+        return getFeatureTypeInfo(typeName, getConnectionPool() );
     }
 
+    /**
+     * Obtain a connection used to retrieve the user name if a non qualified type name was passed in.
+     * <p>
+     * This method is responsible for leasing a connection from the provided pool
+     * and calling getFeatureTypeInfo( typeName, connection ) to populate inProcessFeatureTypeInfos.
+     * @param typeName
+     * @param pool
+     * @return Generated FeatureTypeInfo for typeName
+     */
+    protected synchronized FeatureTypeInfo getFeatureTypeInfo( String typeName, ArcSDEConnectionPool pool ) throws IOException {
+        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        try {
+            return getFeatureTypeInfo(typeName, conn);
+        } finally {
+            conn.close();
+        }
+    }
+    
     synchronized FeatureTypeInfo getFeatureTypeInfo(final String typeName,
             final ArcSDEPooledConnection connection) throws IOException {
 

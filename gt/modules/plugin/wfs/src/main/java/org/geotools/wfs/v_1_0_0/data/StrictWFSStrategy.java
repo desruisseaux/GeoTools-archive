@@ -32,7 +32,7 @@ import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
-import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxFilterVisitor;
+import org.geotools.filter.visitor.WFSBBoxFilterVisitor;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -84,7 +84,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
                 COMPLIANCE_LEVEL);
     }
 
-    protected CoordinateReferenceSystem syncQueryCRS( String typeName, Filter serverFilter) {
+    protected CoordinateReferenceSystem correctFilterForServer( String typeName, Filter serverFilter) {
         // TODO modify bbox requests here
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(store.capabilities,
                 typeName);

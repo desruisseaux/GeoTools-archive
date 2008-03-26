@@ -217,11 +217,19 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
         URL host = capabilities.getGetCapabilities().getGet();
         if (host == null) {
             host = capabilities.getGetCapabilities().getPost();
+        }        
+        if( host.toString().indexOf("mapserv")!=-1 ){
+            strategy=new MapServerWFSStrategy(this);
         }
-        if (host.toString().indexOf("mapserv") != -1)
-            strategy = new MapServerWFSStrategy(this);
-        else
-            strategy = new StrictWFSStrategy(this);
+        else if( host.toString().indexOf("geoserver")!=-1 ){
+            strategy=new NonStrictWFSStrategy(this);
+        }
+        else if( lenient ){
+            strategy=new NonStrictWFSStrategy(this);
+        }
+        else {
+            strategy=new StrictWFSStrategy(this);
+        }
     }
 
     /**

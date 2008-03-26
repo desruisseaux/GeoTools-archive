@@ -29,7 +29,7 @@ import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filters;
-import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxFilterVisitor;
+import org.geotools.filter.visitor.WFSBBoxFilterVisitor;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -72,7 +72,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
             postFilter = filters[1];
         }
 
-        CoordinateReferenceSystem dataCRS = syncQueryCRS( query.getTypeName(), serverFilter);
+        CoordinateReferenceSystem dataCRS = correctFilterForServer( query.getTypeName(), serverFilter);
 
         ((DefaultQuery) query).setFilter(serverFilter);
          FeatureReader<SimpleFeatureType, SimpleFeature> reader = createFeatureReader(transaction, query);
@@ -188,15 +188,14 @@ class NonStrictWFSStrategy implements WFSStrategy {
      * Using the provided query; obtain a FeatureSetDescriptor and modify the provided serverFilter
      * to be correct.
      * <p>
-     * This method should modify the provided filter to make sure it agrees with a CoordinateReferenceSystem
-     * understood by the server; if we are being strict the implementation may also clip the requested bounds
-     * to that advertised as valid by the server (or by the data CRS).
+     * If we are being strict the implementation may also clip any geometry or bbox 
+     * to the valid bounds advertised as valid by the server (or by the data CRS).
      * <p>
      * @param query
      * @param serverFilter
      * @return CoordinateReferenceSystem to use when making the request (usually the data CRS for a WFS 1.0 Datastore)
      */
-    protected CoordinateReferenceSystem syncQueryCRS( String typeName, Filter serverFilter) {
+    protected CoordinateReferenceSystem correctFilterForServer( String typeName, Filter serverFilter) {
         // TODO modify bbox requests here
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(store.capabilities,
                 typeName);

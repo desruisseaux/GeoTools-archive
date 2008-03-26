@@ -27,6 +27,7 @@ import org.geotools.arcsde.data.ViewRegisteringFactoryHelper;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEConnectionReference;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -239,10 +240,14 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         }
 
         String namespaceUri = config.getNamespaceUri();
-        if (namespaceUri == null) {
-            sdeDStore = new ArcSDEDataStore(connPool);
-        } else {
-            sdeDStore = new ArcSDEDataStore(connPool, namespaceUri);
+        if( connPool instanceof ArcSDEConnectionReference){
+            // notice we check the pool rather than the config? that is because
+            // another user may of been in ahead of us and create connection pool
+            //
+            sdeDStore = new ArcSDEDataStore(connPool, namespaceUri );
+        }
+        else {
+            sdeDStore = new ArcSDEDataStore(connPool, namespaceUri );
         }
 
         ViewRegisteringFactoryHelper.registerSqlViews(sdeDStore, params);

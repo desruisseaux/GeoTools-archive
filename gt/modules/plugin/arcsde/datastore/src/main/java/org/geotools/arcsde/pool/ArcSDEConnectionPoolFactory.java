@@ -85,7 +85,13 @@ public class ArcSDEConnectionPoolFactory {
         if (pool == null) {
             // the new pool will be populated with config.minConnections
             // connections
-            pool = new ArcSDEConnectionPool(config);
+            if( config.getMaxConnections() != null && config.getMaxConnections() == 1 ){
+                // engage experimental single connection mode!
+                pool = new ArcSDEConnectionReference(config);    
+            }
+            else {
+                pool = new ArcSDEConnectionPool(config);
+            }
             this.currentPools.put(config, pool);
         }
 

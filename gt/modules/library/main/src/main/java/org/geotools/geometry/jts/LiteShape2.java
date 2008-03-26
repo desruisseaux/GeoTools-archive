@@ -39,9 +39,18 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * A thin wrapper that adapts a JTS geometry to the Shape interface so that the
- * geometry can be used by java2d without coordinate cloning
- * 
- * @author Andrea Aime
+ * geometry can be used by java2d without coordinate cloning.
+ * <p>
+ * This implementation supports the use of MathTransform and can be constructed
+ * with a Decimation stratagy object (allowing you to fine tune the process by 
+ * which a Geometry is simplified into a Shape).
+ * </p>
+ * <p>
+ * This implementation is very careful about cloning; and has the ability to
+ * go faster when you are using a LiteCoordinateSequenceFactory behind your
+ * geometry classes.
+ * </p>
+ * @author Jesse Eichar
  * @source $URL$
  * @version $Id$
  */

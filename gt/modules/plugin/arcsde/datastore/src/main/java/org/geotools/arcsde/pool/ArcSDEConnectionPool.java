@@ -90,10 +90,10 @@ public class ArcSDEConnectionPool {
     private SeConnectionFactory seConnectionFactory;
 
     /** this connection pool connection's parameters */
-    private ArcSDEConnectionConfig config;
+    protected ArcSDEConnectionConfig config;
 
     /** Apache commons-pool used to pool arcsde connections */
-    private ObjectPool pool;
+    protected ObjectPool pool;
 
     /**
      * Creates a new SdeConnectionPool object with the connection parameters
@@ -115,7 +115,7 @@ public class ArcSDEConnectionPool {
         this.config = config;
         LOGGER.fine("populating ArcSDE connection pool");
 
-        this.seConnectionFactory = new SeConnectionFactory(this.config);
+        this.seConnectionFactory = createConnectionFactory();
 
         int minConnections = config.getMinConnections().intValue();
         int maxConnections = config.getMaxConnections().intValue();
@@ -150,6 +150,18 @@ public class ArcSDEConnectionPool {
             LOGGER.log(Level.WARNING, "can't connect to " + config, e);
             throw new DataSourceException(e);
         }
+    }
+
+    /**
+     * SeConnectionFactory used to create ArcSDEPooledConnection instances
+     * for the pool.
+     * <p>
+     * Subclass may overide to customize this behaviour.
+     * </p>
+     * @return SeConnectionFactory.
+     */
+    protected SeConnectionFactory createConnectionFactory() {
+        return new SeConnectionFactory(this.config);
     }
 
     /**
@@ -207,18 +219,16 @@ public class ArcSDEConnectionPool {
     }
 
     /**
-     * DOCUMENT ME!
+     * Grab a connection from the pool.
      * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     * @throws UnavailableArcSDEConnectionException
-     * @throws IllegalStateException
-     *             DOCUMENT ME!
+     * @return ArcSDEPooledConnection so that close() will return it to the pool
+     * @throws DataSourceException If we could not get a connection
+     * @throws UnavailableArcSDEConnectionException If we are out of connections
+     * @throws IllegalStateException If pool has been closed.
      */
     public ArcSDEPooledConnection getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
+        
         if (pool == null) {
             throw new IllegalStateException("The ConnectionPool has been closed.");
         }
@@ -321,7 +331,7 @@ public class ArcSDEConnectionPool {
      * @version $Id: ArcSDEConnectionPool.java 25767 2007-06-07 10:33:44Z
      *          groldan $
      */
-    class SeConnectionFactory extends BasePoolableObjectFactory {
+    protected class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
         private ArcSDEConnectionConfig config;
 

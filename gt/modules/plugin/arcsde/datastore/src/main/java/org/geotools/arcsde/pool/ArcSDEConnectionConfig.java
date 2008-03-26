@@ -108,24 +108,25 @@ public class ArcSDEConnectionConfig {
     /** database user password */
     String userPassword;
 
-    /** DOCUMENT ME! */
+    /** minimum number of connection held in reserve, often 0 */
     Integer minConnections = null;
 
-    /** DOCUMENT ME! */
+    /** maximum number of connections */
     Integer maxConnections = null;
 
-    /** DOCUMENT ME! */
+    /** time to hold onto an idle connection before cleaning it up */
     Integer connTimeOut = null;
 
     /**
-     * DOCUMENT ME!
+     * Configure arcsde connection information from supplied
+     * connection parameters.
      * 
-     * @param params
+     * @param params Connection parameters
      * 
      * @throws NullPointerException
-     *             if at least one mandatory parameter is
+     *             if at least one mandatory parameter is null
      * @throws IllegalArgumentException
-     *             if at least one mandatory parameter is present but has no a
+     *             if at least one mandatory parameter is present but does not have a
      *             "valid" value.
      */
     public ArcSDEConnectionConfig(Map params) throws NullPointerException, IllegalArgumentException {
@@ -133,22 +134,17 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * DOCUMENT ME!
+     * Define arcsde connection information.
      * 
      * @param dbType
-     * @param serverName
-     *            DOCUMENT ME!
-     * @param portNumber
-     *            DOCUMENT ME!
-     * @param databaseName
-     *            DOCUMENT ME!
-     * @param userName
-     *            DOCUMENT ME!
-     * @param userPassword
-     *            DOCUMENT ME!
+     * @param serverName host or ip address of server
+     * @param portNumber port number the server is listenting on
+     * @param databaseName database to connect to
+     * @param userName user name for arcsde
+     * @param userPassword user password for arcsde
      * 
-     * @throws NullPointerException
-     * @throws IllegalArgumentException
+     * @throws NullPointerException If any of the parameters are null
+     * @throws IllegalArgumentException If any of the paramters is not valid
      */
     public ArcSDEConnectionConfig(String dbType, String serverName, String portNumber,
             String databaseName, String userName, String userPassword) throws NullPointerException,
@@ -164,15 +160,12 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * DOCUMENT ME!
+     * Extra connection parameters from the provided map.
      * 
-     * @param params
-     *            DOCUMENT ME!
+     * @param params Connection parameters
      * 
-     * @throws NumberFormatException
-     *             DOCUMENT ME!
-     * @throws IllegalArgumentException
-     *             DOCUMENT ME!
+     * @throws NumberFormatException If port could not be parsed into a number
+     * @throws IllegalArgumentException If any of the parameters are invalid
      */
     private void init(Map params) throws NumberFormatException, IllegalArgumentException {
         String dbtype = (String) params.get(DBTYPE_PARAM);
@@ -191,16 +184,14 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * DOCUMENT ME!
+     * Handle optional parameters; most are focused on connection pool use.
      * 
-     * @param params
-     *            DOCUMENT ME!
+     * @param params Connection parameters
      * 
-     * @throws IllegalArgumentException
-     *             DOCUMENT ME!
+     * @throws IllegalArgumentException If any of the optional prameters are invlaid.
      */
     private void setUpOptionalParams(Map params) throws IllegalArgumentException {
-        String exceptionMsg = null;
+        String exceptionMsg = "";
         Object ns = params.get(NAMESPACE_PARAM);
 
         this.namespaceUri = ns == null ? null : String.valueOf(ns);
@@ -213,35 +204,33 @@ public class ArcSDEConnectionConfig {
                 ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME);
 
         if (this.minConnections.intValue() <= 0) {
-            exceptionMsg = MIN_CONNECTIONS_PARAM + " must be a positive integer";
+            exceptionMsg += MIN_CONNECTIONS_PARAM + " must be a positive integer. ";
         }
 
         if (this.maxConnections.intValue() <= 0) {
-            exceptionMsg = MAX_CONNECTIONS_PARAM + " must be a positive integer";
+            exceptionMsg += MAX_CONNECTIONS_PARAM + " must be a positive integer. ";
         }
 
         if (this.connTimeOut.intValue() <= 0) {
-            exceptionMsg = CONNECTION_TIMEOUT_PARAM + " must be a positive integer";
+            exceptionMsg += CONNECTION_TIMEOUT_PARAM + " must be a positive integer. ";
         }
 
         if (this.minConnections.intValue() > this.maxConnections.intValue()) {
-            exceptionMsg = MIN_CONNECTIONS_PARAM + " must be lower than " + MAX_CONNECTIONS_PARAM;
+            exceptionMsg += MIN_CONNECTIONS_PARAM + " must be lower than " + MAX_CONNECTIONS_PARAM+".";            
         }
 
-        if (exceptionMsg != null) {
+        if (exceptionMsg.length() != 0) {
             throw new IllegalArgumentException(exceptionMsg);
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * Convert value to an Integer, or use the default value
      * 
-     * @param value
-     *            DOCUMENT ME!
-     * @param defaultValue
-     *            DOCUMENT ME!
+     * @param value Object to convert to int
+     * @param defaultValue Default value if conversion fails
      * 
-     * @return DOCUMENT ME!
+     * @return value as an interger, or default value if that is not possible
      */
     private static final Integer getInt(Object value, int defaultValue) {
         if (value == null) {
@@ -402,8 +391,8 @@ public class ArcSDEConnectionConfig {
     }
 
     /**
-     * checks for equality over another <code>ArcSDEConnectionConfig</code>,
-     * taking in count the values of database name, user name, and port number.
+     * Checks for equality over another <code>ArcSDEConnectionConfig</code>,
+     * taking into account the values of database name, user name, and port number.
      * 
      * @param o
      *            DOCUMENT ME!
