@@ -20,6 +20,7 @@ import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;
@@ -230,7 +231,7 @@ public class OperationJAI extends Operation2D {
      * {@link ParameterBlockJAI}, except the sources.
      * <p>
      * <b>Note:</b> it would be possible to use {@link ImagingParameters#parameters}
-     * directly in some occasions. However, we peform an unconditional copy instead
+     * directly in some occasions. However, we perform an unconditional copy instead
      * because some operations (e.g. "GradientMagnitude") may change the values.
      *
      * @param parameters The {@link ParameterValueGroup} to be copied.
@@ -589,23 +590,23 @@ public class OperationJAI extends Operation2D {
          * Set the rendering hints image layout. Only the following properties will be set:
          *
          *     - Color model
-         *     - Tile width
-         *     - Tile height
          */
         RenderingHints hints = ImageUtilities.getRenderingHints(parameters.getSource());
         ImageLayout   layout = (hints!=null) ? (ImageLayout)hints.get(JAI.KEY_IMAGE_LAYOUT) : null;
         if (layout==null || !layout.isValid(ImageLayout.COLOR_MODEL_MASK)) {
             if (sampleDims!=null && sampleDims.length!=0) {
-                if (layout == null) {
-                    layout = new ImageLayout();
-                }
                 int visibleBand = CoverageUtilities.getVisibleBand(primarySource.getRenderedImage());
                 if (visibleBand >= sampleDims.length) {
                     visibleBand = 0;
                 }
                 final ColorModel colors;
                 colors = sampleDims[visibleBand].getColorModel(visibleBand, sampleDims.length);
-                layout = layout.setColorModel(colors);
+                if (colors!=null) {
+                	if (layout == null) {
+                		layout = new ImageLayout();
+                	}
+                	layout = layout.setColorModel(colors);
+                }
             }
         }
         if (layout != null) {
@@ -678,7 +679,7 @@ public class OperationJAI extends Operation2D {
     /**
      * Returns the index of the quantitative category, providing that there is
      * one and only one quantitative category. If {@code categories} contains 0,
-     * 2 or more quantative category, then this method returns {@code -1}.
+     * 2 or more quantitative category, then this method returns {@code -1}.
      *
      * @since 2.4
      */
@@ -721,7 +722,7 @@ public class OperationJAI extends Operation2D {
      * @param  bandLists The set of sample dimensions for each source {@link GridCoverage2D}s.
      * @param  parameters Parameters, rendering hints and coordinate reference system to use.
      * @return The sample dimensions for each band in the destination image, or {@code null}
-     *         if unknow.
+     *         if unknown.
      *
      * @see #deriveCategory
      * @see #deriveUnit
@@ -768,13 +769,22 @@ public class OperationJAI extends Operation2D {
                  */
                 final GridSampleDimension[] allBands = bandLists[i];
                 sampleDim           = allBands[allBands.length==1 ? 0 : numBands];
-                categoryArray       = (Category[]) sampleDim.getCategories().toArray();
+                final List<Category> categories = sampleDim.getCategories();
+                // GridSampleDimension may contain no categories
+                if (categories==null) {
+                	result[numBands]=sampleDim;
+                	continue;
+                }
+                categoryArray       = (Category[]) categories.toArray();
                 indexOfQuantitative = getQuantitative(categoryArray);
                 if (indexOfQuantitative < 0) {
                     return null;
                 }
                 unitXS    [i] = sampleDim.getUnits();
                 categoryXS[i] = categoryArray[indexOfQuantitative];
+            }
+            if (categoryArray==null) {
+            	continue;
             }
             final Category oldCategory = categoryArray[indexOfQuantitative];
             final Unit     oldUnit     = sampleDim.getUnits();
@@ -814,7 +824,7 @@ public class OperationJAI extends Operation2D {
      *         like {@code "GradientMagnitude"}, this array has a length of 1. For binary
      *         operations like {@code "add"} and {@code "multiply"}, this array has a length of 2.
      * @param  parameters Parameters, rendering hints and coordinate reference system to use.
-     * @return The quantative category to use in the destination image, or {@code null} if unknow.
+     * @return The quantitative category to use in the destination image, or {@code null} if unknown.
      */
     protected Category deriveCategory(final Category[] categories, final Parameters parameters) {
         final NumberRange[] ranges = new NumberRange[categories.length];
@@ -886,7 +896,7 @@ public class OperationJAI extends Operation2D {
      *
      * @param  sources The sources grid coverage.
      * @param  primarySourceIndex The index of what seems to be the primary source, or {@code -1}
-     *         if none of unknow.
+     *         if none of unknown.
      * @param  parameters Parameters, rendering hints and coordinate reference system to use.
      * @return A name for the target grid coverage.
      */
