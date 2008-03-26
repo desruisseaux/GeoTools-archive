@@ -65,6 +65,7 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.SQLEncoder;
@@ -1770,7 +1771,7 @@ public abstract class JDBC1DataStore implements DataStore {
         String[] typeNames = getTypeNames();
         List<Name> names = new ArrayList<Name>(typeNames.length);
         for (String typeName : typeNames) {
-            names.add(new org.geotools.feature.Name(typeName));
+            names.add(new NameImpl(typeName));
         }
         return names;
     }

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.ComplexTypeImpl;
@@ -56,7 +56,7 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ANIMATETYPE_TYPE = new ComplexTypeImpl(new Name(
+    public static final ComplexType ANIMATETYPE_TYPE = new ComplexTypeImpl(new NameImpl(
                 "http://www.w3.org/2001/SMIL20/Language", "animateType"), Collections.EMPTY_LIST,
             false, false, Collections.EMPTY_LIST, SMIL20Schema.ANIMATEPROTOTYPE_TYPE, null);
 
@@ -86,7 +86,7 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ANIMATEMOTIONTYPE_TYPE = new ComplexTypeImpl(new Name(
+    public static final ComplexType ANIMATEMOTIONTYPE_TYPE = new ComplexTypeImpl(new NameImpl(
                 "http://www.w3.org/2001/SMIL20/Language", "animateMotionType"),
             Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             SMIL20Schema.ANIMATEMOTIONPROTOTYPE_TYPE, null);
@@ -116,7 +116,7 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SETTYPE_TYPE = new ComplexTypeImpl(new Name(
+    public static final ComplexType SETTYPE_TYPE = new ComplexTypeImpl(new NameImpl(
                 "http://www.w3.org/2001/SMIL20/Language", "setType"), Collections.EMPTY_LIST,
             false, false, Collections.EMPTY_LIST, SMIL20Schema.SETPROTOTYPE_TYPE, null);
 
@@ -146,7 +146,7 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ANIMATECOLORTYPE_TYPE = new ComplexTypeImpl(new Name(
+    public static final ComplexType ANIMATECOLORTYPE_TYPE = new ComplexTypeImpl(new NameImpl(
                 "http://www.w3.org/2001/SMIL20/Language", "animateColorType"),
             Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             SMIL20Schema.ANIMATECOLORPROTOTYPE_TYPE, null);
@@ -154,11 +154,11 @@ public class SMIL20LANGSchema extends SchemaImpl {
     public SMIL20LANGSchema() {
         super("http://www.w3.org/2001/SMIL20/Language");
 
-        put(new Name("http://www.w3.org/2001/SMIL20/Language", "animateType"), ANIMATETYPE_TYPE);
-        put(new Name("http://www.w3.org/2001/SMIL20/Language", "animateMotionType"),
+        put(new NameImpl("http://www.w3.org/2001/SMIL20/Language", "animateType"), ANIMATETYPE_TYPE);
+        put(new NameImpl("http://www.w3.org/2001/SMIL20/Language", "animateMotionType"),
             ANIMATEMOTIONTYPE_TYPE);
-        put(new Name("http://www.w3.org/2001/SMIL20/Language", "setType"), SETTYPE_TYPE);
-        put(new Name("http://www.w3.org/2001/SMIL20/Language", "animateColorType"),
+        put(new NameImpl("http://www.w3.org/2001/SMIL20/Language", "setType"), SETTYPE_TYPE);
+        put(new NameImpl("http://www.w3.org/2001/SMIL20/Language", "animateColorType"),
             ANIMATECOLORTYPE_TYPE);
     }
 }

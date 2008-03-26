@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -83,7 +83,7 @@ public class GML2ParsingUtils {
 
         if (!decl.isAbstract()) {
             //first look in cache
-            fType = ftCache.get(new Name(decl.getTargetNamespace(), decl.getName()));
+            fType = ftCache.get(new NameImpl(decl.getTargetNamespace(), decl.getName()));
 
             if (fType == null) {
                 //build from element declaration
@@ -92,7 +92,7 @@ public class GML2ParsingUtils {
             }
         } else {
             // first look in cache
-            fType = ftCache.get(new Name(node.getComponent().getNamespace(),
+            fType = ftCache.get(new NameImpl(node.getComponent().getNamespace(),
                         node.getComponent().getName()));
 
             if (fType == null) {

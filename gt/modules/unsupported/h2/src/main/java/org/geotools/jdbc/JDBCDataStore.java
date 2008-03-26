@@ -49,7 +49,7 @@ import org.geotools.data.store.ContentState;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
@@ -587,7 +587,7 @@ public final class JDBCDataStore extends ContentDataStore
                         continue;
                     }
 
-                    typeNames.add(new Name(namespaceURI, tableName));
+                    typeNames.add(new NameImpl(namespaceURI, tableName));
                 }
             } finally {
                 closeSafe(tables);

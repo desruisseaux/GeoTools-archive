@@ -14,6 +14,7 @@ import java.util.Set;
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.IllegalFilterException;
@@ -904,7 +905,7 @@ public class SimpleFeatureTypeBuilder {
 		if (local == null)
 			return null;
 		
-		return new org.geotools.feature.Name(uri, local);
+		return new NameImpl(uri, local);
 	}
 
 	/**

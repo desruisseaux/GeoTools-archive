@@ -56,6 +56,7 @@ import org.geotools.data.ServiceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -501,7 +502,7 @@ public class ArcSDEDataStore implements DataStore {
         String[] typeNames = getTypeNames();
         List<Name> names = new ArrayList<Name>(typeNames.length);
         for (String typeName : typeNames) {
-            names.add(new org.geotools.feature.Name(typeName));
+            names.add(new NameImpl(typeName));
         }
         return names;
     }

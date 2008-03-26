@@ -4,7 +4,7 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.feature.type.SchemaImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -26,12 +26,12 @@ public class SimpleTypeBuilderTest extends TestCase {
 		
 		FeatureTypeFactoryImpl typeFactory = new FeatureTypeFactoryImpl();
 		AttributeType pointType = 
-			typeFactory.createGeometryType( new Name( "test", "pointType" ), Point.class, null, false, false, Collections.EMPTY_LIST, null, null);		
-		schema.put( new Name( "test", "pointType" ), pointType );
+			typeFactory.createGeometryType( new NameImpl( "test", "pointType" ), Point.class, null, false, false, Collections.EMPTY_LIST, null, null);		
+		schema.put( new NameImpl( "test", "pointType" ), pointType );
 		
 		AttributeType intType = 
-			typeFactory.createAttributeType( new Name( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_LIST, null, null);
-		schema.put( new Name( "test", "intType" ), intType );
+			typeFactory.createAttributeType( new NameImpl( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_LIST, null, null);
+		schema.put( new NameImpl( "test", "intType" ), intType );
 		
 		builder = new SimpleFeatureTypeBuilder( new FeatureTypeFactoryImpl() );
 		builder.setBindings(schema);

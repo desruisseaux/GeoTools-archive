@@ -99,7 +99,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @param featureType optional, may be null
      */
     public DefaultFeatureCollection(String id, SimpleFeatureType featureType) {
-    	super(id,featureType == null ? new SimpleFeatureTypeImpl(new Name(FeatureTypes.DEFAULT_NAMESPACE.toString(),"AbstractFeatureType"), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST,null,null ) : featureType );
+    	super(id,featureType == null ? new SimpleFeatureTypeImpl(new NameImpl(FeatureTypes.DEFAULT_NAMESPACE.toString(),"AbstractFeatureType"), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST,null,null ) : featureType );
     	        
     	
 //    	this.id = id;

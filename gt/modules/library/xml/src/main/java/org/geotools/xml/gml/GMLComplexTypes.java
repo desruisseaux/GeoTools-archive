@@ -33,7 +33,7 @@ import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -6749,7 +6749,7 @@ public class GMLComplexTypes {
                 }
             }
             Class[] choices=collectionChoices(l);
-            Name typeName = new Name(name);
+            NameImpl typeName = new NameImpl(name);
             if( Geometry.class.isAssignableFrom(type)) {
             	return new ChoiceGeometryTypeImpl(typeName,choices,type,nillable,1,1,null, null, Collections.EMPTY_LIST);
             }

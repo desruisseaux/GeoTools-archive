@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeature;
@@ -28,7 +28,7 @@ public class BaseFeatureCollectionType extends SimpleFeatureTypeImpl  {
     final SimpleFeatureType memberType;
     
 	public BaseFeatureCollectionType(SimpleFeatureType memberType) {
-	    super( new Name( FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType") ,
+	    super( new NameImpl( FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType") ,
             Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST, null, null
 	    );		           
 	    this.memberType = memberType;

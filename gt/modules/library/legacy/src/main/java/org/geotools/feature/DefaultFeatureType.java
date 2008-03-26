@@ -81,7 +81,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     public DefaultFeatureType(String typeName, URI namespace,
             Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
             throws NullPointerException {
-        this(  namespace != null ? new Name( namespace.toString(), typeName ) : new Name( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ),
+        this(  namespace != null ? new NameImpl( namespace.toString(), typeName ) : new NameImpl( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ),
                 types, superTypes, defaultGeom );
     }
     private static final <T> List<T> toList( Collection<T> collection ){

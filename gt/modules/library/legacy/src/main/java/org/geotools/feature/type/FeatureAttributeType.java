@@ -20,7 +20,7 @@ import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.opengis.filter.Filter;
 
 /**
@@ -47,7 +47,7 @@ public class FeatureAttributeType extends AttributeDescriptorImpl implements Att
 
 	// The field for 'Class type' should be added when GT has moved to java 1.5
     public FeatureAttributeType(String name,FeatureType featureType, boolean nillable, int min, int max) {
-    	super(DefaultAttributeType.createAttributeType(name, Feature.class, Filter.INCLUDE),new Name(name),min,max,nillable,null);
+    	super(DefaultAttributeType.createAttributeType(name, Feature.class, Filter.INCLUDE),new NameImpl(name),min,max,nillable,null);
     	
     	this.featureType = featureType;
     }

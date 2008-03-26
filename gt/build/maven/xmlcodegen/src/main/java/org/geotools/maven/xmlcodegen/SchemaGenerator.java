@@ -36,6 +36,7 @@ import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.feature.type.SchemaImpl;
 import org.geotools.graph.build.GraphGenerator;
@@ -487,7 +488,7 @@ public class SchemaGenerator extends AbstractGenerator {
 				
 				//TODO: default value
 				AttributeDescriptor ad = factory.createAttributeDescriptor(
-					gtType, new org.geotools.feature.Name(uri,name),minOccurs, maxOccurs, isNillable, null
+					gtType, new NameImpl(uri,name),minOccurs, maxOccurs, isNillable, null
 				);
 				properties.add(ad);
 			}
@@ -525,7 +526,7 @@ public class SchemaGenerator extends AbstractGenerator {
      * Convenience method for gettign the name of a type.
      */
     private Name name(XSDTypeDefinition type) {
-        return new org.geotools.feature.Name(type.getTargetNamespace(),
+        return new NameImpl(type.getTargetNamespace(),
             type.getName());
     }
    

@@ -11,7 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.GeometryType;
@@ -51,27 +51,27 @@ public class SimpleSchema extends SchemaImpl {
     //
     /** BOOLEAN to Boolean.class */        
     public static final AttributeType BOOLEAN = factory.createAttributeType(
-		new Name(NAMESPACE,"boolean"), Boolean.class, false, false,
+		new NameImpl(NAMESPACE,"boolean"), Boolean.class, false, false,
 		Collections.EMPTY_LIST, (AttributeType) null, null 
 	);
     /** STRING to String.class */ 
     public static final AttributeType STRING = factory.createAttributeType(
-        new Name(NAMESPACE,"string"), String.class, false,
+        new NameImpl(NAMESPACE,"string"), String.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     /** HEXBINRAY to byte[].class */
     public static final AttributeType HEXBINARY = factory.createAttributeType(
-        new Name(NAMESPACE,"string"), byte[].class, false,
+        new NameImpl(NAMESPACE,"string"), byte[].class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     /** QNAME to byte[].class */
     public static final AttributeType QNAME = factory.createAttributeType(
-        new Name(NAMESPACE,"QName"), QName.class, false,
+        new NameImpl(NAMESPACE,"QName"), QName.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     /** QNAME to byte[].class */
     public static final AttributeType URI = factory.createAttributeType(
-        new Name(NAMESPACE,"anyUri"), URI.class, false,
+        new NameImpl(NAMESPACE,"anyUri"), URI.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     //
@@ -86,41 +86,41 @@ public class SimpleSchema extends SchemaImpl {
      * INT to java Integer.class
      */    
     public static final AttributeType INT = factory.createAttributeType(
-        new Name(NAMESPACE,"int"), Integer.class, false,
+        new NameImpl(NAMESPACE,"int"), Integer.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /**
      * INTEGER to BigInteger
      */
     public static final AttributeType INTEGER = factory.createAttributeType(
-        new Name(NAMESPACE,"integer"), BigInteger.class, false,
+        new NameImpl(NAMESPACE,"integer"), BigInteger.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /**
      * FLOAT to java Float.class
      */      
     public static final AttributeType FLOAT = factory.createAttributeType(
-        new Name(NAMESPACE,"float"), Float.class, false,
+        new NameImpl(NAMESPACE,"float"), Float.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /** DOUBLE to Double.class */
     public static final AttributeType DOUBLE = factory.createAttributeType(
-        new Name(NAMESPACE,"double"), Double.class, false,
+        new NameImpl(NAMESPACE,"double"), Double.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /** LONG to Long.class */
     public static final AttributeType LONG = factory.createAttributeType(
-        new Name(NAMESPACE,"long"), Long.class, false,
+        new NameImpl(NAMESPACE,"long"), Long.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /** SHORT to Short.class */
     public static final AttributeType SHORT = factory.createAttributeType(
-        new Name(NAMESPACE,"short"), Short.class, false,
+        new NameImpl(NAMESPACE,"short"), Short.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
     /** BYTE to Byte.class */
     public static final AttributeType BYTE = factory.createAttributeType(
-        new Name(NAMESPACE,"byte"), Byte.class, false,
+        new NameImpl(NAMESPACE,"byte"), Byte.class, false,
         false,Collections.EMPTY_LIST,null, null
     );
 
@@ -129,12 +129,12 @@ public class SimpleSchema extends SchemaImpl {
     //
     /** DATE to java.sql.Date.class */
     public static final AttributeType DATE = factory.createAttributeType(
-        new Name(NAMESPACE,"date"), Date.class, false,
+        new NameImpl(NAMESPACE,"date"), Date.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     /** TIME to java.sq1.Time.class */
     public static final AttributeType TIME = factory.createAttributeType(
-        new Name(NAMESPACE,"time"), Time.class, false,
+        new NameImpl(NAMESPACE,"time"), Time.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     /**
@@ -143,7 +143,7 @@ public class SimpleSchema extends SchemaImpl {
      * Data and a Time like a timestamp.
      */    
     public static final AttributeType DATETIME = factory.createAttributeType(
-        new Name(NAMESPACE,"datetime"), Timestamp.class, false,
+        new NameImpl(NAMESPACE,"datetime"), Timestamp.class, false,
         false,Collections.EMPTY_LIST, (AttributeType) null, null
     );
     
@@ -152,17 +152,17 @@ public class SimpleSchema extends SchemaImpl {
     //
     /** Geometry to Geometry.class */
     public static final GeometryType GEOMETRY = factory.createGeometryType(
-        new Name(NAMESPACE,"GeometryPropertyType"), Geometry.class, null, false, false, 
+        new NameImpl(NAMESPACE,"GeometryPropertyType"), Geometry.class, null, false, false, 
         Collections.EMPTY_LIST, null, null
     );
     /** POINT (extends GEOMETRY) binds to Point.class */    
     public static final GeometryType POINT = factory.createGeometryType(
-        new Name(NAMESPACE,"PointPropertyType"), Point.class, null, false, false, 
+        new NameImpl(NAMESPACE,"PointPropertyType"), Point.class, null, false, false, 
         Collections.EMPTY_LIST, null, null
     );
     /** LINESTRING (extends GEOMETRY) binds to LineString.class */        
     public static final GeometryType LINESTRING = factory.createGeometryType(
-        new Name(NAMESPACE,"LineStringPropertyType"), LineString.class, null, false, 
+        new NameImpl(NAMESPACE,"LineStringPropertyType"), LineString.class, null, false, 
         false, Collections.EMPTY_LIST, null, null
     );
 //    /** LINEARRING (extends GEOMETRY) binds to LinearRing.class */            
@@ -172,30 +172,30 @@ public class SimpleSchema extends SchemaImpl {
 //    );
     /**  POLYGON (extends GEOMETRY) binds to Polygon.class */            
     public static final GeometryType POLYGON = factory.createGeometryType(
-        new Name(NAMESPACE,"PolygonPropertyType"), Polygon.class, null, false, 
+        new NameImpl(NAMESPACE,"PolygonPropertyType"), Polygon.class, null, false, 
         false, Collections.EMPTY_LIST, null, null
     );
     /**  MULTIGEOMETRY (extends GEOMETRY) binds to GeometryCollection.class */                
     public static final GeometryType MULTIGEOMETRY = factory.createGeometryType(
-        new Name(NAMESPACE,"MultiGeometryPropertyType"), GeometryCollection.class, null,
+        new NameImpl(NAMESPACE,"MultiGeometryPropertyType"), GeometryCollection.class, null,
         false, false, Collections.EMPTY_LIST, null, null
     );
     
     /**  MULTIPOINT (extends MULTIGEOMETRY) binds to MultiPoint.class */            
     public static final GeometryType MULTIPOINT = factory.createGeometryType(
-        new Name(NAMESPACE,"MultiPointPropertyType"), MultiPoint.class, null, false, false, 
+        new NameImpl(NAMESPACE,"MultiPointPropertyType"), MultiPoint.class, null, false, false, 
         Collections.EMPTY_LIST, null, null
     );
     
     /**  MULTILINESTRING (extends MULTIGEOMETRY) binds to MultiLineString.class */            
     public static final GeometryType MULTILINESTRING = factory.createGeometryType(
-        new Name(NAMESPACE,"MultiLineStringPropertyType"), MultiLineString.class, null, 
+        new NameImpl(NAMESPACE,"MultiLineStringPropertyType"), MultiLineString.class, null, 
         false, false, Collections.EMPTY_LIST, null, null
     );
     
     /** MULTIPOLYGON (extends MULTIGEOMETRY) binds to MultiPolygon.class */            
     public static final GeometryType MULTIPOLYGON = factory.createGeometryType(
-        new Name(NAMESPACE,"MultiPolytonPropertyType"), MultiPolygon.class, null, false, 
+        new NameImpl(NAMESPACE,"MultiPolytonPropertyType"), MultiPolygon.class, null, false, 
         false, Collections.EMPTY_LIST, MULTIGEOMETRY, null
     );
     

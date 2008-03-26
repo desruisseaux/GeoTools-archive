@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.data.Transaction;
-import org.opengis.feature.type.Name;
+import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -73,7 +73,7 @@ public final class CollectionSource {
     }
 
     public Name getName() {
-        return new org.geotools.feature.Name("localhost/memory");
+        return new NameImpl("localhost/memory");
     }
 
     public void setTransaction( Transaction t ) {

@@ -21,7 +21,7 @@ import java.util.List;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.opengis.filter.Filter;
 
 /**
@@ -50,7 +50,7 @@ public class ListAttributeType extends AttributeDescriptorImpl implements Attrib
     public ListAttributeType(String name, boolean nillable, int min, int max,
     		AttributeType[] children, Filter restriction) {
     	super(DefaultAttributeType.createAttributeType(name, List.class, restriction),
-    			new Name(name),min,max,nillable,null);
+    			new NameImpl(name),min,max,nillable,null);
     	this.children = children;
     }
 

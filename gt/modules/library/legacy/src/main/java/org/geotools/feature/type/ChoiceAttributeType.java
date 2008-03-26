@@ -21,7 +21,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -71,7 +71,7 @@ public class ChoiceAttributeType extends AttributeDescriptorImpl implements Attr
     public ChoiceAttributeType(String name, int min, int max,
         AttributeType[] children, Filter restriction) {
     	super(DefaultAttributeType.createAttributeType(name, Object.class, restriction),
-    			new Name(name),min,max,calculateNillableStatic(children),null);
+    			new NameImpl(name),min,max,calculateNillableStatic(children),null);
         
     	//ensure immutable.
         this.children = copyChildren(children);

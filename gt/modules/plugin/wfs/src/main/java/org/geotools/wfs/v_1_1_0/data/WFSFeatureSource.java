@@ -12,6 +12,7 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.ResourceInfo;
+import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -39,7 +40,7 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
 
     public Name getName(){
         QName name = protocolHandler.getFeatureTypeInfo(typeName).getName();
-        return new org.geotools.feature.Name(name.getNamespaceURI(), name.getLocalPart());
+        return new NameImpl(name.getNamespaceURI(), name.getLocalPart());
     }
     
     /**

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -393,7 +394,7 @@ public class Descriptors {
      * @return
      */
     static public AttributeType type(ComplexType schema, String name) {
-        return type(schema, new org.geotools.feature.Name(name));
+        return type(schema, new NameImpl(name));
     }
 
     /**

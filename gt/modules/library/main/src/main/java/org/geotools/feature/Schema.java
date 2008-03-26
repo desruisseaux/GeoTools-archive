@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
@@ -254,8 +255,8 @@ public class Schema {
         
         // WARNING cannot copy metadata!        
         return new AttributeDescriptorImpl(
-            new AttributeTypeImpl( new org.geotools.feature.Name( name ), javaType, false, false, restrictions, null, null ), 
-            new org.geotools.feature.Name( name ), min, max, isNilable, defaultValue
+            new AttributeTypeImpl( new NameImpl( name ), javaType, false, false, restrictions, null, null ), 
+            new NameImpl( name ), min, max, isNilable, defaultValue
         );
     }
     

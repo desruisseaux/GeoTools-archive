@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LengthFunction;
@@ -430,7 +431,7 @@ public class AttributeTypeBuilder {
 	    }
 	    
 		AttributeType type = factory.createAttributeType(
-			new org.geotools.feature.Name(namespaceURI,name), binding, isIdentifiable, isAbstract, 
+			new NameImpl(namespaceURI,name), binding, isIdentifiable, isAbstract, 
 			restrictions(), superType, description());
 		resetTypeState();
 		
@@ -449,7 +450,7 @@ public class AttributeTypeBuilder {
 	 */
 	public GeometryType buildGeometryType() {
 		GeometryType type = factory.createGeometryType(
-			new org.geotools.feature.Name(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
+			new NameImpl(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
 			restrictions(), superType, description());
 		
 		resetTypeState();
@@ -493,7 +494,7 @@ public class AttributeTypeBuilder {
 	 *
 	 */
 	public AttributeDescriptor buildDescriptor(String name, AttributeType type) {
-		return buildDescriptor(new org.geotools.feature.Name(name), type );
+		return buildDescriptor(new NameImpl(name), type );
 	}
 	   
     /**
@@ -506,7 +507,7 @@ public class AttributeTypeBuilder {
      *
      */
 	public GeometryDescriptor buildDescriptor(String name, GeometryType type) {
-	    return buildDescriptor( new org.geotools.feature.Name(name), type );
+	    return buildDescriptor( new NameImpl(name), type );
 	}
 	
 	public AttributeDescriptor buildDescriptor(Name name, AttributeType type ) {

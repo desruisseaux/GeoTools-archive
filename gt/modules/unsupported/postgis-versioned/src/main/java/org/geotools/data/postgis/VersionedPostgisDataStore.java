@@ -65,6 +65,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactoryFinder;
@@ -1578,7 +1579,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         String[] typeNames = getTypeNames();
         List<Name> names = new ArrayList<Name>(typeNames.length);
         for (String typeName : typeNames) {
-            names.add(new org.geotools.feature.Name(typeName));
+            names.add(new NameImpl(typeName));
         }
         return names;
     }

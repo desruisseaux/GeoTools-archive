@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.Descriptors;
 import org.geotools.feature.type.FeatureTypeImpl;
 import org.geotools.feature.type.Types;
@@ -106,7 +107,7 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	}
 	
 	public int indexOf(String name) {
-		return indexOf( new org.geotools.feature.Name(name));
+		return indexOf( new NameImpl(name));
 	}
 
 	public int getAttributeCount() {

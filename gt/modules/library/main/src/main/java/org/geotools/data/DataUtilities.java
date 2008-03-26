@@ -51,7 +51,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.Name;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -1759,11 +1759,11 @@ public class DataUtilities {
             
             Class clazz = type(type);
             if(Geometry.class.isAssignableFrom(clazz)) {
-            	GeometryType at = new GeometryTypeImpl(new Name( name ), clazz , crs, false, false, Collections.EMPTY_LIST, null, null );
-	            return new GeometryDescriptorImpl( at, new Name(name), 0,1, nillable, null );
+            	GeometryType at = new GeometryTypeImpl(new NameImpl( name ), clazz , crs, false, false, Collections.EMPTY_LIST, null, null );
+	            return new GeometryDescriptorImpl( at, new NameImpl(name), 0,1, nillable, null );
             } else {
-	            AttributeType at = new AttributeTypeImpl( new Name( name ), clazz , false, false, Collections.EMPTY_LIST, null, null );
-	            return new AttributeDescriptorImpl( at, new Name(name), 0,1, nillable, null );
+	            AttributeType at = new AttributeTypeImpl( new NameImpl( name ), clazz , false, false, Collections.EMPTY_LIST, null, null );
+	            return new AttributeDescriptorImpl( at, new NameImpl(name), 0,1, nillable, null );
             }
         } catch (ClassNotFoundException e) {
             throw new SchemaException("Could not type " + name + " as:" + type, e);

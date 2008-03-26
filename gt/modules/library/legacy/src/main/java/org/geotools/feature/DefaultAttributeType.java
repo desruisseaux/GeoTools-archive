@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.util.Converters;
@@ -70,7 +71,7 @@ public class DefaultAttributeType extends AttributeDescriptorImpl
     }
     
     protected DefaultAttributeType(org.opengis.feature.type.AttributeType type,String name,boolean nillable,int min,int max, Object defaultValue) {
-    	super(type,new Name((name == null) ? "" : name),min,max,nillable,defaultValue);
+    	super(type,new NameImpl((name == null) ? "" : name),min,max,nillable,defaultValue);
         
         if(defaultValue!=null && !type.getBinding().isAssignableFrom(defaultValue.getClass()))
             throw new IllegalArgumentException("Default value does not match type");
@@ -394,7 +395,7 @@ public class DefaultAttributeType extends AttributeDescriptorImpl
      */
     public static org.opengis.feature.type.AttributeType createAttributeType(String name,Class binding,Filter restriction) {
     	return new AttributeTypeImpl( 
-			new org.geotools.feature.Name(name),binding,false,false,
+			new NameImpl(name),binding,false,false,
 			restriction != null ? Collections.singletonList(restriction) : Collections.EMPTY_LIST, 
 			null,null);
     }

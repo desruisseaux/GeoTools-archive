@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.feature.FeatureImplUtils;
+import org.geotools.feature.NameImpl;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeType;
@@ -59,7 +60,7 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 	}
 	
 	public PropertyDescriptor getProperty(String name) {
-	    return getProperty(new org.geotools.feature.Name( name ) );
+	    return getProperty(new NameImpl( name ) );
 	}
 	
 	public boolean isInline() {

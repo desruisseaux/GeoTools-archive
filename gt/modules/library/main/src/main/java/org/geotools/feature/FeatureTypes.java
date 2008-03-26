@@ -95,15 +95,15 @@ public class FeatureTypes {
     }
 
 	/** default feature collection name */
-	final public static Name DEFAULT_TYPENAME =
-		new Name( "AbstractFeatureCollectionType", DEFAULT_NAMESPACE.toString() );
+	final public static NameImpl DEFAULT_TYPENAME =
+		new NameImpl( "AbstractFeatureCollectionType", DEFAULT_NAMESPACE.toString() );
 
 	/** represent an unbounded field length */
     final public static int ANY_LENGTH = -1;
 
     /** An feature type with no attributes */
     public static final SimpleFeatureType EMPTY = new SimpleFeatureTypeImpl(
-        new Name( "Empty" ), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST, null, null
+        new NameImpl( "Empty" ), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST, null, null
     );
 
     /**

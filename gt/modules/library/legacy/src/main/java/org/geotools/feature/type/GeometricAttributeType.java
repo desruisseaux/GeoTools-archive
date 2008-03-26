@@ -20,6 +20,7 @@ import java.util.Collections;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
@@ -136,7 +137,7 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
     
     public static GeometryType createAttributeType(String name,Class binding,CoordinateReferenceSystem crs,Filter restriction) {
     	return new GeometryTypeImpl( 
-			new org.geotools.feature.Name(name),binding,crs,false,false,
+			new NameImpl(name),binding,crs,false,false,
 			restriction != null ? Collections.singletonList(restriction) : Collections.EMPTY_LIST, 
 			null,null);
     }
