@@ -178,7 +178,7 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     }
 
     @Override
-    public BufferedImage getBufferImage() {
+    public BufferedImage getSnapShot() {
         return comp.getBuffer();
     }
 

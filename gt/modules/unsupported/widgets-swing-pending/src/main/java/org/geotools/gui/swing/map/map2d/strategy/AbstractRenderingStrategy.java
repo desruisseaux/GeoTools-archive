@@ -232,7 +232,7 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy, Ma
 
     public abstract BufferedImage createBufferImage(MapContext context);
 
-    public abstract BufferedImage getBufferImage();
+    public abstract BufferedImage getSnapShot();
 
     public abstract void refresh();
 

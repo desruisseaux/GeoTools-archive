@@ -179,7 +179,7 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
     }
 
     @Override
-    public BufferedImage getBufferImage() {
+    public BufferedImage getSnapShot() {
         return comp.getBuffer();
     }
 

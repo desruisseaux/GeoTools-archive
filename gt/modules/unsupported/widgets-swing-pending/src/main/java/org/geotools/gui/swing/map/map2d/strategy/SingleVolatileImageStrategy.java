@@ -176,7 +176,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
     }
 
     @Override
-    public BufferedImage getBufferImage() {
+    public BufferedImage getSnapShot() {
         return comp.getBuffer();
     }
 

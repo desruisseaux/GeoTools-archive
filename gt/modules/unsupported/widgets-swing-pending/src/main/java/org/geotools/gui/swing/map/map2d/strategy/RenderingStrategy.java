@@ -25,6 +25,7 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 
@@ -50,24 +51,12 @@ public interface RenderingStrategy {
      * @return Java2D Point
      */
     public Point toComponentCoord(Coordinate coord);
-    
-    /**
-     * create a BufferedImage of the layer, using the mapcontext CRS and MapArea
-     * @param layer : Maplayer to make the BufferedImage
-     * @return BufferedImage
-     */
-    public BufferedImage createBufferImage(MapLayer layer);    
-    /**
-     * create a BufferedImage of a MapContext, using the mapcontext CRS and MapArea
-     * @param context : MapContext to make the BufferedImage
-     * @return BufferedImage
-     */
-    public BufferedImage createBufferImage(MapContext context);    
+       
     /**
      * create a bufferedImage of what is actually visible on the map widget
      * @return BufferedImage
      */
-    public BufferedImage getBufferImage();
+    public BufferedImage getSnapShot();
 
     /**
      * set the MapContext
@@ -83,12 +72,20 @@ public interface RenderingStrategy {
     /**
      * set the maparea to look at
      * @param area : can not be null 
+     * @deprecated use AffineTransform not Envelope.
+     * <b>Envelope doesn't handle many interesting parameters and are
+     * uncorrect uses to obtain a good rendering</b>
      */
+    @Deprecated
     public void setMapArea(Envelope area);    
     /**
      * get the maparea to look at
      * @return Envelope or null if no MapArea
+     * @deprecated use AffineTransform not Envelope.
+     * <b>Envelope doesn't handle many interesting parameters and are
+     * uncorrect uses to obtain a good rendering</b>
      */
+    @Deprecated
     public Envelope getMapArea();
     
     /**
@@ -105,9 +102,9 @@ public interface RenderingStrategy {
         
     /**
      * get the visual component 
-     * @return JComponent
+     * @return Component
      */
-    public JComponent getComponent();
+    public Component getComponent();
     
     /**
      * add a StrategyListener
