@@ -46,16 +46,16 @@ import static java.lang.Math.*;
  * accurate measurements, this projection is useful for pictorial views of the
  * world. Only the spherical form is given here.
  * <p>
- *
- * NOTE: formulae used below are from a port, to java, of the
- *       'proj' package of the USGS survey. USGS work is acknowledged here.
+ * <b>NOTE:</b>
+ * formulae used below are from a port, to java, of the {@code proj}
+ * package of the USGS survey. USGS work is acknowledged here.
  * <p>
- *
- * <strong>References:</strong><ul>
- *   <li> Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
- *        Relevant files are: {@code PJ_ortho.c}, {@code pj_fwd.c} and {@code pj_inv.c}.</li>
- *   <li> John P. Snyder (Map Projections - A Working Manual,
- *        U.S. Geological Survey Professional Paper 1395, 1987)</li>
+ * <b>References:</b>
+ * <ul>
+ *   <li>Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
+ *       Relevant files are: {@code PJ_ortho.c}, {@code pj_fwd.c} and {@code pj_inv.c}.</li>
+ *   <li>John P. Snyder (Map Projections - A Working Manual,
+ *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
  * </ul>
  *
  * @see <A HREF="http://mathworld.wolfram.com/OrthographicProjection.html">Orthographic projection on mathworld.wolfram.com</A>
@@ -67,6 +67,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public abstract class Orthographic extends MapProjection {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = -6489939032996419868L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -129,6 +134,11 @@ public abstract class Orthographic extends MapProjection {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider extends AbstractProvider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 3180410512573499562L;
+
         /**
          * The parameters group.
          */

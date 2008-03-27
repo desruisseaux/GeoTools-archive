@@ -25,8 +25,6 @@ package org.geotools.referencing.operation.projection;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,12 +87,18 @@ public abstract class MapProjection extends AbstractMathTransform
         implements MathTransform2D, Serializable
 {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -406751619777246914L;
+
+    /**
      * The projection package logger
      */
     protected static final Logger LOGGER = Logging.getLogger(MapProjection.class);
 
     /**
      * Maximum difference allowed when comparing real numbers.
+     * This field is private because subclasses may use different threshold value.
      */
     private static final double EPSILON = 1E-6;
 
@@ -168,7 +172,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Central longitude in <u>radians</u>. Default value is 0, the Greenwich meridian.
      * This is called '<var>lambda0</var>' in Snyder.
-     *
+     * <p>
      * <strong>Consider this field as final</strong>. It is not final only
      * because some classes need to modify it at construction time.
      */
@@ -177,7 +181,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Latitude of origin in <u>radians</u>. Default value is 0, the equator.
      * This is called '<var>phi0</var>' in Snyder.
-     *
+     * <p>
      * <strong>Consider this field as final</strong>. It is not final only
      * because some classes need to modify it at construction time.
      */
@@ -185,7 +189,7 @@ public abstract class MapProjection extends AbstractMathTransform
 
     /**
      * The scale factor. Default value is 1. Named '<var>k</var>' in Snyder.
-     *
+     * <p>
      * <strong>Consider this field as final</strong>. It is not final only
      * because some classes need to modify it at construction time.
      */
@@ -204,7 +208,7 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Global scale factor. Default value {@code globalScale} is equal
      * to {@link #semiMajor}&times;{@link #scaleFactor}.
-     *
+     * <p>
      * <strong>Consider this field as final</strong>. It is not final only
      * because some classes need to modify it at construction time.
      */
@@ -216,22 +220,20 @@ public abstract class MapProjection extends AbstractMathTransform
     private transient MathTransform2D inverse;
 
     /**
-     * When {@code true}, coordinate ranges will be checked, and a {@code WARNING} log will be
-     * issued if they are out of their natural ranges (-180/180&deg; for longitude, -90/90&deg;
-     * for latitude).
-     * <p>
-     * To avoid excessive logging, this flag will be set to {@code false} after the first
-     * coordinate failing the checks is found.
+     * When different than {@link #globalRangeCheckSemaphore}, coordinate ranges will be
+     * checked and a {@code WARNING} log will be issued if they are out of their natural
+     * ranges (-180/180&deg; for longitude, -90/90&deg; for latitude).
+     *
+     * @see #verifyCoordinateRanges()
+     * @see #warningLogged()
      */
-    protected transient boolean verifyCoordinateRanges = true;
+    private transient int rangeCheckSemaphore;
 
     /**
-     * Invoked on deserialization for setting the transient field values.
+     * The value to be checked against {@link #rangeCheckSemaphore} in order to determine
+     * if coordinates ranges should be checked.
      */
-    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        verifyCoordinateRanges = true;
-    }
+    private static int globalRangeCheckSemaphore = 1;
 
     /**
      * Constructs a new map projection from the suplied parameters.
@@ -268,7 +270,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * is going to contains a lot of.. well... projections, and we will try
      * to reduce the amount of class declarations.
      */
-    MapProjection(final ParameterValueGroup values, Collection expected)
+    MapProjection(final ParameterValueGroup values, Collection<GeneralParameterDescriptor> expected)
             throws ParameterNotFoundException
     {
         if (expected == null) {
@@ -298,7 +300,9 @@ public abstract class MapProjection extends AbstractMathTransform
      * @see #doubleValue
      * @see #set
      */
-    boolean isExpectedParameter(final Collection expected, final ParameterDescriptor param) {
+    boolean isExpectedParameter(final Collection<GeneralParameterDescriptor> expected,
+                                final ParameterDescriptor param)
+    {
         return expected.contains(param);
     }
 
@@ -318,7 +322,7 @@ public abstract class MapProjection extends AbstractMathTransform
      *
      * @see MathTransformProvider#doubleValue
      */
-    final double doubleValue(final Collection       expected,
+    final double doubleValue(final Collection<GeneralParameterDescriptor> expected,
                              final ParameterDescriptor param,
                              final ParameterValueGroup group)
             throws ParameterNotFoundException
@@ -373,8 +377,8 @@ public abstract class MapProjection extends AbstractMathTransform
         if (!(abs(abs(y) - expected) < EPSILON)) {
             y = toDegrees(y);
             final String n = name.getName().getCode();
-            throw new InvalidParameterValueException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                     n, new Latitude(y)), n, y);
+            throw new InvalidParameterValueException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, n, new Latitude(y)), n, y);
         }
     }
 
@@ -572,8 +576,8 @@ public abstract class MapProjection extends AbstractMathTransform
         final double y2 = toRadians(target.getY());
         final double dx = toRadians(abs(target.getX() - source.getX()) % 360);
         double rho = sin(y1)*sin(y2) + cos(y1)*cos(y2)*cos(dx);
-        if (rho>+1) {assert rho <= +(1+EPSILON) : rho; rho=+1;}
-        if (rho<-1) {assert rho >= -(1+EPSILON) : rho; rho=-1;}
+        if (rho > +1) {assert rho <= +(1+EPSILON) : rho; rho = +1;}
+        if (rho < -1) {assert rho >= -(1+EPSILON) : rho; rho = -1;}
         return acos(rho) * semiMajor;
     }
 
@@ -633,14 +637,12 @@ public abstract class MapProjection extends AbstractMathTransform
                           distance,
                           new Longitude(longitude - toDegrees(centralMeridian )),
                           new Latitude (latitude  - toDegrees(latitudeOfOrigin)),
-                          getParameterDescriptors().getName().getCode()));
+                          getName()));
             }
         } catch (ProjectionException exception) {
             throw exception;
         } catch (TransformException exception) {
-            final ProjectionException error = new ProjectionException(exception.getLocalizedMessage());
-            error.initCause(exception);
-            throw error;
+            throw new ProjectionException(exception);
         }
         return true;
     }
@@ -723,7 +725,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * and latitude as <var>y</var> values in the range {@code [-PI/2..PI/2]}. It will be
      * checked by the caller, so this method doesn't need to performs this check.
      * <p>
-     *
      * Input coordinates are also guarenteed to have the {@link #falseEasting}
      * and {@link #falseNorthing} removed and be divided by {@link #globalScale}
      * before this method is invoked. After this method is invoked, the
@@ -731,7 +732,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * in {@code ptDst}. This means that projections that implement this method
      * are performed on an ellipse (or sphere) with a semiMajor axis of 1.0.
      * <p>
-     *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
      * standardization, described above, is handled by {@code pj_inv.c}.
      * Therefore when porting projections from PROJ.4, the inverse transform
@@ -750,10 +750,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * @return      the coordinate point after transforming {@code x}, {@code y}
      *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
-     *
-     * @todo The {@code ptDst} argument will be removed and the return type changed if
-     * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
-     * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
     protected abstract Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
@@ -763,7 +759,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * This method is guaranteed to be invoked with values of <var>x</var> in the range
      * {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
      * <p>
-     *
      * Coordinates are also guaranteed to have the {@link #centralMeridian}
      * removed from <var>x</var> before this method is invoked. After this method
      * is invoked, the results in {@code ptDst} are multiplied by {@link #globalScale},
@@ -771,7 +766,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * This means that projections that implement this method are performed on an
      * ellipse (or sphere) with a semiMajor axis of 1.0.
      * <p>
-     *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
      * standardization, described above, is handled by {@code pj_fwd.c}.
      * Therefore when porting projections from PROJ.4, the forward transform equations can
@@ -789,10 +783,6 @@ public abstract class MapProjection extends AbstractMathTransform
      * @return      the coordinate point after transforming {@code x}, {@code y}
      *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
-     *
-     * @todo The {@code ptDst} argument will be removed and the return type changed if
-     * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
-     * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
     protected abstract Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
@@ -800,7 +790,6 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      * <p>
-     *
      * This method standardizes the source {@code x} coordinate
      * by removing the {@link #centralMeridian}, before invoking
      * <code>{@link #transformNormalized transformNormalized}(x, y, ptDst)</code>.
@@ -820,9 +809,9 @@ public abstract class MapProjection extends AbstractMathTransform
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
-        if (verifyCoordinateRanges) {
+        if (verifyCoordinateRanges()) {
             if (verifyGeographicRanges(this, x, y)) {
-                verifyCoordinateRanges = false;
+                warningLogged();
             }
         }
         /*
@@ -835,8 +824,7 @@ public abstract class MapProjection extends AbstractMathTransform
          * wanted.
          */
         ptDst = transformNormalized(centralMeridian != 0 ?
-                                    rollLongitude(toRadians(x) - centralMeridian) :
-                                    toRadians(x), toRadians(y), ptDst);
+                rollLongitude(toRadians(x) - centralMeridian) : toRadians(x), toRadians(y), ptDst);
         ptDst.setLocation(globalScale*ptDst.getX() + falseEasting,
                           globalScale*ptDst.getY() + falseNorthing);
 
@@ -856,7 +844,7 @@ public abstract class MapProjection extends AbstractMathTransform
      */
     public final void transform(final double[] src,  int srcOffset,
                                 final double[] dest, int dstOffset, int numPts)
-        throws ProjectionException
+            throws ProjectionException
     {
         /*
          * Vérifie s'il faudra parcourir le tableau en sens inverse.
@@ -908,7 +896,7 @@ public abstract class MapProjection extends AbstractMathTransform
     @Override
     public final void transform(final float[] src,  int srcOffset,
                                 final float[] dest, int dstOffset, int numPts)
-        throws ProjectionException
+            throws ProjectionException
     {
         final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                  srcOffset+(2*numPts) > dstOffset);
@@ -917,7 +905,7 @@ public abstract class MapProjection extends AbstractMathTransform
             dstOffset += 2*numPts;
         }
         final Point2D.Double point = new Point2D.Double();
-        ProjectionException firstException=null;
+        ProjectionException firstException = null;
         while (--numPts>=0) {
             try {
                 point.x = src[srcOffset++];
@@ -1005,9 +993,9 @@ public abstract class MapProjection extends AbstractMathTransform
                              rollLongitude(ptDst.getX() + centralMeridian) : ptDst.getX());
             final double y = toDegrees(ptDst.getY());
             ptDst.setLocation(x,y);
-            if (verifyCoordinateRanges) {
+            if (verifyCoordinateRanges()) {
                 if (verifyGeographicRanges(this, x, y)) {
-                    verifyCoordinateRanges = false;
+                    warningLogged();
                 }
             }
             assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
@@ -1156,6 +1144,53 @@ public abstract class MapProjection extends AbstractMathTransform
         return (abs(longitude) > 179) || (abs(latitude) > 89) ? 1E-1 : 1E-5;
     }
 
+    /**
+     * When {@code true}, coordinate ranges will be checked, and a {@link Level#WARNING WARNING}
+     * log will be issued if they are out of their natural ranges (-180/180&deg; for longitude,
+     * -90/90&deg; for latitude).
+     * <p>
+     * To avoid excessive logging, this flag will be set to {@code false} after the first
+     * coordinate failing the checks is found.
+     */
+    final boolean verifyCoordinateRanges() {
+        /*
+         * Do not synchronize - doing so would be a major bottleneck since this method will be
+         * invoked thousands of time. The consequence is that a call to {@link #resetWarnings}
+         * may not be reflected immediately in other threads, but the later is defined only on
+         * a "best effort" basis.
+         */
+        return rangeCheckSemaphore != globalRangeCheckSemaphore;
+    }
+
+    /**
+     * To be invoked after a warning in order to disable subsequent warnings.
+     */
+    final void warningLogged() {
+        synchronized (MapProjection.class) {
+            rangeCheckSemaphore = globalRangeCheckSemaphore;
+        }
+    }
+
+    /**
+     * Resets the warning status of all projections in the current JVM. Every {@link MapProjection}
+     * instance may log a warning the first time they are given coordinates outside their area of
+     * validity. Subsequent coordinates outside the area of validity are silently projected in order
+     * to avoid flowing the log with warnings. In case of suspicion, this method may be invoked in
+     * order to force all projections to log again their first out-of-bounds coordinates.
+     * <p>
+     * <b>Multi-threading</b><br>
+     * Calls to this method have immediate effect in the invoker's thread. The effect in other
+     * threads may be delayed by some arbitrary amount of time. This method works only on a
+     * "best effort" basis.
+     *
+     * @see org.geotools.referencing.CRS#reset
+     *
+     * @since 2.5
+     */
+    public static synchronized void resetWarnings() {
+        globalRangeCheckSemaphore++;
+    }
+
 
 
 
@@ -1228,11 +1263,11 @@ public abstract class MapProjection extends AbstractMathTransform
                 return phi;
             }
         }
-        throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+        throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
     }
 
     /**
-     * Compute function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
+     * Computes function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
      * latitude (Snyder 14-15), where <var>s</var> and <var>c</var> are the sine and cosine of
      * the true scale latitude, and <var>e²</var> is the {@linkplain #excentricitySquared
      * eccentricity squared}.
@@ -1242,7 +1277,7 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
-     * Compute function (15-9) and (9-13) from Snyder.
+     * Computes function (15-9) and (9-13) from Snyder.
      * Equivalent to negative of function (7-7).
      */
     final double tsfn(final double phi, double sinphi) {
@@ -1250,8 +1285,7 @@ public abstract class MapProjection extends AbstractMathTransform
         /*
          * NOTE: change sign to get the equivalent of Snyder (7-7).
          */
-        return tan(0.5 * (PI/2 - phi)) /
-               pow((1-sinphi) / (1+sinphi), 0.5*excentricity);
+        return tan(0.5 * (PI/2 - phi)) / pow((1-sinphi) / (1+sinphi), 0.5*excentricity);
     }
 
 

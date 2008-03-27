@@ -45,7 +45,6 @@ import static java.lang.Math.*;
  * the center.  This projection is used to represent polar areas.  It can be adapted
  * for other areas having a circular form.
  * <p>
- *
  * This implementation, and its subclasses, provides transforms for six cases of the
  * stereographic projection:
  * <ul>
@@ -59,38 +58,33 @@ import static java.lang.Math.*;
  *   <li>{@code "Stereographic_North_Pole"} in ESRI software (uses iteration for the inverse)</li>
  *   <li>{@code "Stereographic_South_Pole"} in ESRI software (uses iteration for the inverse)</li>
  * </ul>
- *
+ * <p>
  * Both the {@code "Oblique_Stereographic"} and {@code "Stereographic"}
  * projections are "double" projections involving two parts: 1) a conformal
  * transformation of the geographic coordinates to a sphere and 2) a spherical
  * Stereographic projection. The EPSG considers both methods to be valid, but
  * considers them to be a different coordinate operation methods.
  * <p>
- *
  * The {@code "Stereographic"} case uses the USGS equations of Snyder.
  * This employs a simplified conversion to the conformal sphere that
  * computes the conformal latitude of each point on the sphere.
  * <p>
- *
  * The {@code "Oblique_Stereographic"} case uses equations from the EPSG.
  * This uses a more generalized form of the conversion to the conformal sphere; using only
  * a single conformal sphere at the origin point. Since this is a "double" projection,
  * it is sometimes called the "Double Stereographic". The {@code "Oblique_Stereographic"}
  * is used in New Brunswick (Canada) and the Netherlands.
  * <p>
- *
  * The {@code "Stereographic"} and {@code "Double_Stereographic"} names are
  * used in ESRI's ArcGIS 8.x product. The {@code "Oblique_Stereographic"}
  * name is the EPSG name for the later only.
  * <p>
- *
  * <strong>WARNING:</strong> Tests points calculated with ArcGIS's {@code "Double_Stereographic"}
  * are not always equal to points calculated with the {@code "Oblique_Stereographic"}.
  * However, where there are differences, two different implementations of these equations
  * (EPSG guidence note 7 and {@code libproj}) calculate the same values as we do. Until these
  * differences are resolved, please be careful when using this projection.
  * <p>
- *
  * If a {@link Stereographic.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} parameter is
  * supplied and is not consistent with the projection classification (for example a latitude
  * different from &plusmn;90° for the polar case), then the oblique or polar case will be
@@ -98,14 +92,12 @@ import static java.lang.Math.*;
  * precedence on the projection classification. If ommited, then the default value is 90°N
  * for {@code "Polar_Stereographic"} and 0° for {@code "Oblique_Stereographic"}.
  * <p>
- *
  * Polar projections that use the series equations for the inverse calculation will
  * be little bit faster, but may be a little bit less accurate. If a polar
  * {@link Stereographic.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} is used for
  * the {@code "Oblique_Stereographic"} or {@code "Stereographic"}, the iterative
  * equations will be used for inverse polar calculations.
  * <p>
- *
  * The {@code "Polar Stereographic (variant B)"}, {@code "Stereographic_North_Pole"},
  * and {@code "Stereographic_South_Pole"} cases include a
  * {@link StereographicPole.ProviderB#STANDARD_PARALLEL "standard_parallel_1"} parameter.
@@ -115,8 +107,8 @@ import static java.lang.Math.*;
  * {@link StereographicPole.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} value
  * (i.e. the value is forced to &plusmn;90°).
  * <p>
- *
- * <strong>References:</strong><ul>
+ * <b>References:</b>
+ * <ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
  *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
  *   <li>"Coordinate Conversions and Transformations including Formulas",<br>
@@ -145,6 +137,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public abstract class Stereographic extends MapProjection {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = -176731870235252852L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -224,6 +221,11 @@ public abstract class Stereographic extends MapProjection {
      */
     public static class Provider extends AbstractProvider {
         /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 1243300263948365065L;
+
+        /**
          * The localized name for stereographic projection.
          */
         static final InternationalString NAME =
@@ -296,7 +298,6 @@ public abstract class Stereographic extends MapProjection {
                 if (isSpherical) {
                     return new EquatorialStereographic.Spherical(parameters, descriptor);
                 } else {
-//                    return new EquatorialStereographic(parameters, descriptor);
                     return createMathTransform(parameters, descriptor);
                 }
             } else

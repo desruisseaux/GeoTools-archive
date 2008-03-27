@@ -17,9 +17,9 @@
  */
 package org.geotools.referencing.operation.projection;
 
-import java.util.Iterator;
 import java.util.Collection;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.operation.MathTransformProvider;  // For javadoc
 
@@ -83,12 +83,13 @@ final class ModifiedParameterDescriptor extends DefaultParameterDescriptor {
      * is that this method is slower than {@code set.contains(descriptor)}, so it should be invoked
      * only if the former fails.
      */
-    public static boolean contains(final Collection set, ParameterDescriptor descriptor) {
+    public static boolean contains(final Collection<GeneralParameterDescriptor> set,
+                                   ParameterDescriptor descriptor)
+    {
         if (descriptor instanceof ModifiedParameterDescriptor) {
             descriptor = ((ModifiedParameterDescriptor) descriptor).original;
         }
-        for (final Iterator it=set.iterator(); it.hasNext();) {
-            ParameterDescriptor candidate = (ParameterDescriptor) it.next();
+        for (GeneralParameterDescriptor candidate : set) {
             if (candidate instanceof ModifiedParameterDescriptor) {
                 candidate = ((ModifiedParameterDescriptor) candidate).original;
             }

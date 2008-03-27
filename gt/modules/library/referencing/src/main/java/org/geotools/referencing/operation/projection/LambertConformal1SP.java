@@ -39,6 +39,11 @@ import org.geotools.resources.i18n.Vocabulary;
  */
 public class LambertConformal1SP extends LambertConformal {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 149783452790829983L;
+
+    /**
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
@@ -81,6 +86,11 @@ public class LambertConformal1SP extends LambertConformal {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -4243116402872545772L;
+
         /**
          * The parameters group.
          */

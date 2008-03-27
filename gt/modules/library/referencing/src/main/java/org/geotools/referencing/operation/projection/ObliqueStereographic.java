@@ -31,7 +31,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
@@ -45,13 +44,12 @@ import static java.lang.Math.*;
  * "Oblique Stereographic Alternative" in the {@code libproj4} package
  * written by Gerald Evenden. His work is acknowledged here and greatly appreciated.
  * <p>
- *
  * The forward equations used in {@code libproj4} are the same as those given in the
  * UNB reports for the Double Stereographic. The inverse equations are similar,
  * but use different methods to iterate for the latitude.
  * <p>
- *
- * <strong>References:</strong><ul>
+ * <b>References:</b>
+ * <ul>
  *   <li>{@code libproj4} is available at
  *       <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/">libproj4 Miscellanea</A><br>
  *        Relevent files are: {@code PJ_sterea.c}, {@code pj_gauss.c},
@@ -74,6 +72,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public class ObliqueStereographic extends StereographicUSGS {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = -1454098847621943639L;
+
     /*
      * The tolerance used for the inverse iteration. This is smaller
      * than the tolerance in the {@code StereographicOblique} superclass.
@@ -136,8 +139,7 @@ public class ObliqueStereographic extends StereographicUSGS {
         cosc0  = cos(phic0);
         ratexp = 0.5 * C * excentricity;
         K      = tan(0.5 * phic0 + PI/4) /
-                    (pow(tan(0.5 * latitudeOfOrigin + PI/4), C) *
-                     srat(excentricity * sphi, ratexp));
+                (pow(tan(0.5 * latitudeOfOrigin + PI/4), C) * srat(excentricity * sphi, ratexp));
     }
 
     /**
@@ -179,7 +181,6 @@ public class ObliqueStereographic extends StereographicUSGS {
     {
         // Compute using USGS formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-
         final double rho = hypot(x, y);
         if (abs(rho) < EPSILON) {
             x = 0.0;
@@ -197,19 +198,17 @@ public class ObliqueStereographic extends StereographicUSGS {
                 y = asin(y);
             }
         }
-
         // Begin pj_inv_gauss(...) method inlined
         x /= C;
-        double num = pow(tan(0.5 * y + PI/4.0)/K, 1.0/C);
+        double num = pow(tan(0.5 * y + PI/4)/K, 1.0/C);
         for (int i=MAXIMUM_ITERATIONS;;) {
-            double phi = 2.0 * atan(num * srat(excentricity * sin(y),
-                        -0.5 * excentricity)) - PI/2.0;
+            double phi = 2.0 * atan(num * srat(excentricity * sin(y), -0.5 * excentricity)) - PI/2;
             if (abs(phi - y) < ITERATION_TOLERANCE) {
                 break;
             }
             y = phi;
             if (--i < 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
             }
         }
         // End pj_inv_gauss(...) method inlined
@@ -255,6 +254,11 @@ public class ObliqueStereographic extends StereographicUSGS {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider extends Stereographic.Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 6505988910141381354L;
+
         /**
          * The parameters group.
          */

@@ -34,15 +34,15 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 
 import static java.lang.Math.*;
 
 
 /**
  * Lambert Azimuthal Equal Area (EPSG code 9820).
- *
- * <strong>References:</strong><ul>
+ * <p>
+ * <b>References:</b>
+ * <ul>
  *   <li> A. Annoni, C. Luzet, E.Gubler and J. Ihde - Map Projections for Europe</li>
  *   <li> John P. Snyder (Map Projections - A Working Manual,
  *        U.S. Geological Survey Professional Paper 1395)</li>
@@ -59,6 +59,9 @@ import static java.lang.Math.*;
  * @author Martin Desruisseaux
  */
 public class LambertAzimuthalEqualArea extends MapProjection {
+    /** For cross-version compatibility. */
+    private static final long serialVersionUID = 1639914708790574760L;
+
     /** Maximum difference allowed when comparing real numbers. */
     private static final double EPSILON = 1E-7;
 
@@ -99,7 +102,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     {
         // Fetch parameters
         super(parameters);
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         latitudeOfOrigin = doubleValue(expected, Provider.LATITUDE_OF_CENTRE,  parameters);
         centralMeridian  = doubleValue(expected, Provider.LONGITUDE_OF_CENTRE, parameters);
         ensureLatitudeInRange (Provider.LATITUDE_OF_CENTRE,  latitudeOfOrigin, true);
@@ -242,7 +245,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             }
         }
         if (abs(c) < EPSILON_LATITUDE) {
-            throw toleranceError();
+            throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
         }
         if (ptDst != null) {
             ptDst.setLocation(x,y);
@@ -329,6 +332,11 @@ public class LambertAzimuthalEqualArea extends MapProjection {
      */
     private static final class Spherical extends LambertAzimuthalEqualArea {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 2091431369806844342L;
+
+        /**
          * Constructs a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
@@ -361,7 +369,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 case EQUATORIAL: {
                     y = 1.0 + cosphi * coslam;
                     if (y <= FINE_EPSILON) {
-                        throw toleranceError();
+                        throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
                     }
                     y  = sqrt(2.0 / y);
                     x  = y * cosphi * sin(lambda);
@@ -371,7 +379,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 case OBLIQUE: {
                     y = 1.0 + sinb1 * sinphi + cosb1 * cosphi * coslam;
                     if (y <= FINE_EPSILON) {
-                        throw toleranceError();
+                        throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
                     }
                     y  = sqrt(2.0 / y);
                     x  = y * cosphi * sin(lambda);
@@ -380,7 +388,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 }
                 case NORTH_POLE: {
                     if (abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
-                        throw toleranceError();
+                        throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
                     }
                     y = (PI/4) - phi * 0.5;
                     y = 2.0 * sin(y);
@@ -390,7 +398,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 }
                 case SOUTH_POLE: {
                     if (abs(phi + latitudeOfOrigin) < EPSILON_LATITUDE) {
-                        throw toleranceError();
+                        throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
                     }
                     y = (PI/4) - phi * 0.5;
                     y = 2.0 * cos(y);
@@ -425,7 +433,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             final double rh = hypot(x, y);
             phi = rh * 0.5;
             if (phi > 1.0) {
-                throw toleranceError();
+                throw new ProjectionException(ErrorKeys.TOLERANCE_ERROR);
             }
             phi = 2.0 * asin(phi);
             switch (mode) {
@@ -495,13 +503,6 @@ public class LambertAzimuthalEqualArea extends MapProjection {
         return beta + APA0 * sin(t) + APA1 * sin(t+t) + APA2 * sin(t+t+t);
     }
 
-    /**
-     * Returns an exception for a tolerance error (error code -20 in Proj4).
-     */
-    private static ProjectionException toleranceError() {
-        return new ProjectionException(Errors.format(ErrorKeys.TOLERANCE_ERROR));
-    }
-
 
 
 
@@ -525,6 +526,11 @@ public class LambertAzimuthalEqualArea extends MapProjection {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 3877793025552244132L;
+
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.

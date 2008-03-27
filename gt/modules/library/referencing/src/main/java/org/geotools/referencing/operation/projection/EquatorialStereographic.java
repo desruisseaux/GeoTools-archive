@@ -27,10 +27,10 @@ import java.awt.geom.Point2D;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import static java.lang.Math.*;
+
 
 /**
  * The USGS equatorial case of the {@linkplain Stereographic stereographic} projection.
@@ -45,6 +45,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public class EquatorialStereographic extends StereographicUSGS {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -5098015759558831875L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -121,6 +126,11 @@ public class EquatorialStereographic extends StereographicUSGS {
      */
     static final class Spherical extends EquatorialStereographic {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -4790138052004333003L;
+
+        /**
          * Constructs a spherical equatorial stereographic projection (USGS equations).
          *
          * @param  parameters The group of parameter values.
@@ -143,14 +153,13 @@ public class EquatorialStereographic extends StereographicUSGS {
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
-            //Compute using ellipsoidal formulas, for comparaison later.
+            // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
             final double coslat = cos(y);
             double f = 1.0 + coslat * cos(x);
             if (f < EPSILON) {
-                throw new ProjectionException(Errors.format(
-                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(ErrorKeys.VALUE_TEND_TOWARD_INFINITY);
             }
             f = k0 / f;              // (21-14)
             x = f * coslat * sin(x); // (21-2)
@@ -177,7 +186,7 @@ public class EquatorialStereographic extends StereographicUSGS {
 
             final double rho = hypot(x, y);
             if (abs(rho) < EPSILON) {
-                y = 0.0;                     // latitudeOfOrigin
+                y = 0.0; // latitudeOfOrigin
                 x = 0.0;
             } else {
                 final double c = 2.0 * atan(rho / k0);
@@ -188,7 +197,6 @@ public class EquatorialStereographic extends StereographicUSGS {
                 final double ct = rho*cosc;
                 x = (abs(t) < EPSILON && abs(ct) < EPSILON) ? 0.0 : atan2(t, ct);
             }
-
             assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);

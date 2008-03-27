@@ -23,6 +23,7 @@
 package org.geotools.referencing.operation.projection;
 
 import java.util.Collection;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -43,6 +44,11 @@ import org.geotools.metadata.iso.citation.Citations;
  * @author Rueben Schulz
  */
 public class HotineObliqueMercator extends ObliqueMercator {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 7376814731765422533L;
+
     /**
      * Constructs a new map projection from the supplied parameters.
      *
@@ -69,7 +75,8 @@ public class HotineObliqueMercator extends ObliqueMercator {
      *         "azimuth" case. The former is used by ESRI but not EPSG.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    HotineObliqueMercator(final ParameterValueGroup parameters, final Collection expected,
+    HotineObliqueMercator(final ParameterValueGroup parameters,
+                          final Collection<GeneralParameterDescriptor> expected,
                           final boolean twoPoint)
             throws ParameterNotFoundException
     {
@@ -109,6 +116,11 @@ public class HotineObliqueMercator extends ObliqueMercator {
      */
     public static final class Provider extends ObliqueMercator.Provider {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 5822488360988630419L;
+
+        /**
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
@@ -145,7 +157,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
+            final Collection<GeneralParameterDescriptor> descriptors = PARAMETERS.descriptors();
             return new HotineObliqueMercator(parameters, descriptors, false);
         }
     }
@@ -163,6 +175,11 @@ public class HotineObliqueMercator extends ObliqueMercator {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider_TwoPoint extends ObliqueMercator.Provider_TwoPoint {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -3104452416276842816L;
+
         /**
          * The parameters group.
          */
@@ -195,7 +212,7 @@ public class HotineObliqueMercator extends ObliqueMercator {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
+            final Collection<GeneralParameterDescriptor> descriptors = PARAMETERS.descriptors();
             return new HotineObliqueMercator(parameters, descriptors, true);
         }
     }

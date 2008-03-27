@@ -28,9 +28,6 @@ import java.awt.geom.Point2D;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.geotools.measure.Latitude;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
 
 import static java.lang.Math.*;
 
@@ -44,14 +41,13 @@ import static java.lang.Math.*;
  * <em>loxodrome</em> lines, i.e. a ship following this line would keep a constant azimuth on its
  * compass.
  * <p>
- *
  * This implementation handles both the 1 and 2 stardard parallel cases.
  * For {@code Mercator_1SP} (EPSG code 9804), the line of contact is the equator.
  * For {@code Mercator_2SP} (EPSG code 9805) lines of contact are symmetrical
  * about the equator.
  * <p>
- *
- * <strong>References:</strong><ul>
+ * <b>References:</b>
+ * <ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
  *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
  *   <li>"Coordinate Conversions and Transformations including Formulas",<br>
@@ -72,6 +68,11 @@ import static java.lang.Math.*;
  */
 public abstract class Mercator extends MapProjection {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 6146741819833248649L;
+
+    /**
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
@@ -88,25 +89,22 @@ public abstract class Mercator extends MapProjection {
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected Mercator(final ParameterValueGroup parameters)
-            throws ParameterNotFoundException
-    {
-        // Fetch parameters
+    protected Mercator(final ParameterValueGroup parameters) throws ParameterNotFoundException {
         super(parameters);
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         if (expected.contains(AbstractProvider.STANDARD_PARALLEL_1)) {
-            // scaleFactor is not a parameter in the Mercator_2SP case and is computed from
-            // the standard parallel.   The super-class constructor should have initialized
-            // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
-            // user implementation still provides a scale factor for its custom projections.
-            standardParallel = abs(doubleValue(expected,
-                    AbstractProvider.STANDARD_PARALLEL_1, parameters));
+            /*
+             * scaleFactor is not a parameter in the Mercator_2SP case and is computed from
+             * the standard parallel.   The super-class constructor should have initialized
+             * 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
+             * user implementation still provides a scale factor for its custom projections.
+             */
+            standardParallel = abs(doubleValue(expected, AbstractProvider.STANDARD_PARALLEL_1, parameters));
             ensureLatitudeInRange(AbstractProvider.STANDARD_PARALLEL_1, standardParallel, false);
             if (isSpherical) {
                 scaleFactor *= cos(standardParallel);
             }  else {
-                scaleFactor *= msfn(sin(standardParallel),
-                                    cos(standardParallel));
+                scaleFactor *= msfn(sin(standardParallel), cos(standardParallel));
             }
             globalScale = scaleFactor * semiMajor;
         } else {
@@ -146,10 +144,8 @@ public abstract class Mercator extends MapProjection {
             throws ProjectionException
     {
         if (abs(y) > (PI/2 - EPSILON)) {
-            throw new ProjectionException(Errors.format(
-                    ErrorKeys.POLE_PROJECTION_$1, new Latitude(toDegrees(y))));
+            throw new ProjectionException(y);
         }
-
         y = -log(tsfn(y, sin(y)));
 
         if (ptDst != null) {
@@ -186,14 +182,17 @@ public abstract class Mercator extends MapProjection {
      */
     static abstract class Spherical extends Mercator {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 2383414176395616561L;
+
+        /**
          * Constructs a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
          * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
-        protected Spherical(final ParameterValueGroup parameters)
-                throws ParameterNotFoundException
-        {
+        protected Spherical(final ParameterValueGroup parameters) throws ParameterNotFoundException {
             super(parameters);
             ensureSpherical();
         }
@@ -208,8 +207,7 @@ public abstract class Mercator extends MapProjection {
                 throws ProjectionException
         {
             if (abs(y) > (PI/2 - EPSILON)) {
-                throw new ProjectionException(Errors.format(
-                        ErrorKeys.POLE_PROJECTION_$1, new Latitude(toDegrees(y))));
+                throw new ProjectionException(y);
             }
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
@@ -232,7 +230,7 @@ public abstract class Mercator extends MapProjection {
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
-            // Compute using ellipsoidal formulas, for comparaison later.
+            // Computes using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             y = PI/2 - 2.0*atan(exp(-y));

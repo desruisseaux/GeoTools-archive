@@ -24,7 +24,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import static java.lang.Math.*;
@@ -40,6 +39,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public class PolarOrthographic extends Orthographic {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = 3281503361127178484L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -76,7 +80,7 @@ public class PolarOrthographic extends Orthographic {
             throws ProjectionException
     {
         if (abs(y - latitudeOfOrigin) - EPSILON > PI/2) {
-            throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(ErrorKeys.POINT_OUTSIDE_HEMISPHERE);
         }
         double cosphi = cos(y);
         double coslam = cos(x);
@@ -104,7 +108,7 @@ public class PolarOrthographic extends Orthographic {
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPSILON) {
-                throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(ErrorKeys.POINT_OUTSIDE_HEMISPHERE);
             }
             sinc = 1.0;
         }

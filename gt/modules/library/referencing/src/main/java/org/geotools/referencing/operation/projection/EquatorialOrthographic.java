@@ -24,7 +24,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import static java.lang.Math.*;
@@ -44,6 +43,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public class EquatorialOrthographic extends ObliqueOrthographic {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 1093901743907259987L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -75,14 +79,11 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-
         final double cosphi = cos(y);
         final double coslam = cos(x);
-
         if (cosphi * coslam < -EPSILON) {
-            throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
+            throw new ProjectionException(ErrorKeys.POINT_OUTSIDE_HEMISPHERE);
         }
-
         y = sin(y);
         x = cosphi * sin(x);
 
@@ -104,16 +105,14 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-
         final double rho = hypot(x, y);
         double sinc = rho;
         if (sinc > 1.0) {
             if ((sinc - 1.0) > EPSILON) {
-                throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
+                throw new ProjectionException(ErrorKeys.POINT_OUTSIDE_HEMISPHERE);
             }
             sinc = 1.0;
         }
-
         final double cosc = sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPSILON) {
             y = latitudeOfOrigin;
@@ -126,8 +125,7 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
             // begin sinchk
             if (abs(phi) >= 1.0) {
                 phi = (phi < 0.0) ? -PI/2.0 : PI/2.0;
-            }
-            else {
+            } else {
                 phi = asin(phi);
             }
             // end sinchk
@@ -143,7 +141,6 @@ public class EquatorialOrthographic extends ObliqueOrthographic {
             }
             y = phi;
         }
-
         assert checkInverseTransform(x, y, ptDst);
         if (ptDst != null) {
             ptDst.setLocation(x,y);

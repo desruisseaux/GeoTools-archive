@@ -79,8 +79,8 @@ import static java.lang.Math.*;
  *       from the {@code proj4} package of the USGS survey, which
  *       have been reproduced verbatim. USGS work is acknowledged here.
  * <p>
- *
- * <strong>References:</strong><ul>
+ * <b>References:</b>
+ * <ul>
  *   <li> Proj-4.4.6 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
  *        Relevent files are: {@code PJ_tmerc.c}, {@code pj_mlfn.c}, {@code pj_fwd.c} and {@code pj_inv.c}.</li>
  *   <li> John P. Snyder (Map Projections - A Working Manual,
@@ -337,7 +337,7 @@ public class TransverseMercator extends MapProjection {
             double cosphi = cos(y);
             double b = cosphi * sin(x);
             if (abs(abs(b) - 1.0) <= EPSILON) {
-                throw new ProjectionException(Errors.format(ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(ErrorKeys.VALUE_TEND_TOWARD_INFINITY);
             }
 
             //Using Snyder's equation for calculating y, instead of the one used in Proj4
@@ -443,7 +443,7 @@ public class TransverseMercator extends MapProjection {
         phi = arg;
         for (i=MAXIMUM_ITERATIONS; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
             }
             s = sin(phi);
             t = 1.0 - excentricitySquared * s * s;

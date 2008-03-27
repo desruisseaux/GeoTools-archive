@@ -158,7 +158,7 @@ public abstract class Operation2D extends AbstractOperation {
             GridCoverage2D source = (GridCoverage2D) candidate;
             if (computeOnGeophysicsValues) {
                 final GridCoverage2D old = source;
-                source = source.geophysics(true);
+                source = source.view(ViewType.GEOPHYSICS);
                 if (i == PRIMARY_SOURCE_INDEX) {
                     type = (old == source) ? ViewType.GEOPHYSICS : ViewType.PACKED;
                 }

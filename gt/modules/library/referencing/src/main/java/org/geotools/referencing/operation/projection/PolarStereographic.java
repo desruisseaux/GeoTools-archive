@@ -33,7 +33,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
@@ -54,6 +53,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public class PolarStereographic extends Stereographic {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = -6635298308431138524L;
+
     /**
      * Maximum number of iterations for iterative computations.
      */
@@ -126,7 +130,7 @@ public class PolarStereographic extends Stereographic {
          */
         final ParameterDescriptor trueScaleDescriptor = Boolean.TRUE.equals(forceSouthPole) ?
                 ProviderSouth.STANDARD_PARALLEL : ProviderNorth.STANDARD_PARALLEL;
-        final Collection expected = descriptor.descriptors();
+        final Collection<GeneralParameterDescriptor> expected = descriptor.descriptors();
         double latitudeTrueScale;
         if (isExpectedParameter(expected, trueScaleDescriptor)) {
             // Any cases except Polar A
@@ -187,7 +191,6 @@ public class PolarStereographic extends Stereographic {
             x =  rho * sinlon;
             y = -rho * coslon;
         }
-
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -222,10 +225,9 @@ public class PolarStereographic extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
             }
         }
-
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -286,6 +288,11 @@ public class PolarStereographic extends Stereographic {
      */
     static final class Spherical extends PolarStereographic {
         /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 1655096575897215547L;
+
+        /**
          * A constant used in the transformations. This constant hides the {@code k0}
          * constant from the ellipsoidal case. The spherical and ellipsoidal {@code k0}
          * are not computed in the same way, and we preserve the ellipsoidal {@code k0}
@@ -327,18 +334,15 @@ public class PolarStereographic extends Stereographic {
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
-            //Compute using ellipsoidal formulas, for comparaison later.
+            // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-
             final double coslat = cos(y);
             final double sinlat = sin(y);
             final double coslon = cos(x);
             final double sinlon = sin(x);
-
             if (southPole) {
                 if (abs(1 - sinlat) < EPSILON) {
-                    throw new ProjectionException(Errors.format(
-                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(ErrorKeys.VALUE_TEND_TOWARD_INFINITY);
                 }
                 // (21-12)
                 final double f = k0 * coslat / (1-sinlat); // == tan (pi/4 + phi/2)
@@ -346,15 +350,13 @@ public class PolarStereographic extends Stereographic {
                 y = f * coslon; // (21-10)
             } else {
                 if (abs(1 + sinlat) < EPSILON) {
-                    throw new ProjectionException(Errors.format(
-                        ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
+                    throw new ProjectionException(ErrorKeys.VALUE_TEND_TOWARD_INFINITY);
                 }
                 // (21-8)
                 final double f = k0 * coslat / (1+sinlat); // == tan (pi/4 - phi/2)
                 x =  f * sinlon; // (21-5)
                 y = -f * coslon; // (21-6)
             }
-
             assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
@@ -373,9 +375,7 @@ public class PolarStereographic extends Stereographic {
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-
             final double rho = hypot(x, y);
-
             if (!southPole) {
                 y = -y;
             }
@@ -389,7 +389,6 @@ public class PolarStereographic extends Stereographic {
                 y = (southPole) ? asin(-cosc) : asin(cosc);
                 // (20-14) with phi1=90
             }
-
             assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
@@ -416,6 +415,11 @@ public class PolarStereographic extends Stereographic {
      * @author Rueben Schulz
      */
     static final class Series extends PolarStereographic {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 2795404156883313290L;
+
         /**
          * Constants used for the inverse polar series
          */
@@ -460,7 +464,6 @@ public class PolarStereographic extends Stereographic {
             B = 2.0 * (7.0/48.0*e4 + 29.0/240.0*e6 + 811.0/11520.0*e8) - 4.0*D;
             C *= 4.0;
             D *= 8.0;
-
             final double latTrueScale = abs(standardParallel);
             if (abs(latTrueScale - PI/2) >= EPSILON) {
                 final double t = sin(latTrueScale);
@@ -483,7 +486,6 @@ public class PolarStereographic extends Stereographic {
         {
             // Compute using iteration formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-
             final double rho = hypot(x, y);
             if (southPole) {
                 y = -y;
@@ -533,6 +535,11 @@ public class PolarStereographic extends Stereographic {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class ProviderA extends Stereographic.Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 9124091259039220308L;
+
         /**
          * The parameters group.
          */
@@ -589,6 +596,11 @@ public class PolarStereographic extends Stereographic {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class ProviderB extends Stereographic.Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 5188231050523249971L;
+
         /**
          * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default
@@ -648,6 +660,11 @@ public class PolarStereographic extends Stereographic {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class ProviderNorth extends Stereographic.Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 657493908431273866L;
+
         /**
          * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default
@@ -711,6 +728,11 @@ public class PolarStereographic extends Stereographic {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class ProviderSouth extends Stereographic.Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 6537800238416448564L;
+
         /**
          * The operation parameter descriptor for the {@code standardParallel}
          * parameter value. Valid values range is from -90 to 90°. The default

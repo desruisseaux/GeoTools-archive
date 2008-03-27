@@ -45,6 +45,11 @@ import org.geotools.resources.i18n.Errors;
  */
 public class PlateCarree extends EquidistantCylindrical {
     /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = -6041146276958636165L;
+
+    /**
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
@@ -67,6 +72,7 @@ public class PlateCarree extends EquidistantCylindrical {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
+    @Override
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
@@ -115,6 +121,11 @@ public class PlateCarree extends EquidistantCylindrical {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 8535645757318203345L;
+
         /**
          * The parameters group.
          */

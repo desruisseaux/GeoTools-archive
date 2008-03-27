@@ -17,6 +17,9 @@
  */
 package org.geotools.referencing.operation.projection;
 
+import org.geotools.measure.Latitude;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -43,9 +46,45 @@ public class ProjectionException extends TransformException {
 
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param code One of the constants suitable for {@link Errors#format(int)}.
+     */
+    ProjectionException(final int code) {
+        this(Errors.format(code));
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param code One of the constants suitable for {@link Errors#format(int)}.
+     * @param value An argument value to be formatted.
+     */
+    ProjectionException(final int code, final Object value) {
+        this(Errors.format(code, value));
+    }
+
+    /**
+     * Constructs a new exception with a detail message
+     * formatted for a latitude too close from a pole.
+     */
+    ProjectionException(final double latitude) {
+        this(Errors.format(ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(latitude))));
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message.
      */
     public ProjectionException(final String message) {
         super(message);
+    }
+
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @since 2.5
+     */
+    public ProjectionException(final Throwable cause) {
+        super(cause.getLocalizedMessage(), cause);
     }
 
     /**

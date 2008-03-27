@@ -47,36 +47,31 @@ import static java.lang.Math.*;
 
 
 /**
- * Oblique Mercator Projection. A conformal, oblique, cylindrical projection
- * with the cylinder touching the ellipsoid (or sphere) along a great circle
- * path (the central line). The {@linkplain Mercator} and {@linkplain TransverseMercator
- * Transverse Mercator} projections can be thought of as special cases of the
- * oblique mercator, where the central line is along the equator or a meridian,
- * respectively. The Oblique Mercator projection has been used in Switzerland,
- * Hungary, Madagascar, Malaysia, Borneo and the panhandle of Alaska.
+ * Oblique Mercator Projection. A conformal, oblique, cylindrical projection with the cylinder
+ * touching the ellipsoid (or sphere) along a great circle path (the central line). The
+ * {@linkplain Mercator} and {@linkplain TransverseMercator Transverse Mercator} projections can
+ * be thought of as special cases of the oblique mercator, where the central line is along the
+ * equator or a meridian, respectively. The Oblique Mercator projection has been used in
+ * Switzerland, Hungary, Madagascar, Malaysia, Borneo and the panhandle of Alaska.
  * <p>
- *
- * The Oblique Mercator projection uses a (<var>U</var>,<var>V</var>) coordinate system,
- * with the <var>U</var> axis along the central line. During the forward projection,
- * coordinates from the ellipsoid are projected conformally to a sphere of constant total
- * curvature, called the "aposphere", before being projected onto the plane. The projection
- * coordinates are further convented to a (<var>X</var>,<var>Y</var>) coordinate system
- * by rotating the calculated (<var>u</var>,<var>v</var>) coordinates to give output
- * (<var>x</var>,<var>y</var>) coordinates. The rotation value is usually the same as
- * the projection azimuth (the angle, east of north, of the central line), but some cases
- * allow a separate rotation parameter.
+ * The Oblique Mercator projection uses a (<var>U</var>,<var>V</var>) coordinate system, with the
+ * <var>U</var> axis along the central line. During the forward projection, coordinates from the
+ * ellipsoid are projected conformally to a sphere of constant total curvature, called the
+ * "aposphere", before being projected onto the plane. The projection coordinates are further
+ * convented to a (<var>X</var>,<var>Y</var>) coordinate system by rotating the calculated
+ * (<var>u</var>,<var>v</var>) coordinates to give output (<var>x</var>,<var>y</var>) coordinates.
+ * The rotation value is usually the same as the projection azimuth (the angle, east of north, of
+ * the central line), but some cases allow a separate rotation parameter.
  * <p>
- *
- * There are two forms of the oblique mercator, differing in the origin of
- * their grid coordinates. The {@linkplain HotineObliqueMercator Hotine Oblique Mercator}
- * (EPSG code 9812) has grid coordinates start at the intersection of the central line
- * and the equator of the aposphere. The {@linkplain ObliqueMercator Oblique Mercator}
- * (EPSG code 9815) is the same, except the grid coordinates begin at the central point
- * (where the latitude of center and central line intersect). ESRI separates these two
- * case by appending {@code "Natural_Origin"} (for the {@code "Hotine_Oblique_Mercator"})
- * and {@code "Center"} (for the {@code "Oblique_Mercator"}) to the projection names.
+ * There are two forms of the oblique mercator, differing in the origin of their grid coordinates.
+ * The {@linkplain HotineObliqueMercator Hotine Oblique Mercator} (EPSG code 9812) has grid
+ * coordinates start at the intersection of the central line and the equator of the aposphere.
+ * The {@linkplain ObliqueMercator Oblique Mercator} (EPSG code 9815) is the same, except the
+ * grid coordinates begin at the central point (where the latitude of center and central line
+ * intersect). ESRI separates these two case by appending {@code "Natural_Origin"} (for the
+ * {@code "Hotine_Oblique_Mercator"}) and {@code "Center"} (for the {@code "Oblique_Mercator"})
+ * to the projection names.
  * <p>
- *
  * Two different methods are used to specify the central line for the oblique mercator:
  * 1) a central point and an azimuth, east of north, describing the central line and
  * 2) two points on the central line. The EPSG does not use the two point method,
@@ -87,7 +82,6 @@ import static java.lang.Math.*;
  * and is instead calculated as the intersection between the central line and the
  * equator of the aposphere.
  * <p>
- *
  * For the azimuth method, the central latitude cannot be &plusmn;90.0 degrees
  * and the central line cannot be at a maximum or minimum latitude at the central point.
  * In the two point method, the latitude of the first and second points cannot be
@@ -98,13 +92,11 @@ import static java.lang.Math.*;
  * of the central latitude being 0.0 has been removed, since the equations appear
  * to work correctly in this case.
  * <p>
- *
  * Azimuth values of 0.0 and &plusmn;90.0 degrees are allowed (and used in Hungary
  * and Switzerland), though these cases would usually use a Mercator or
  * Transverse Mercator projection instead. Azimuth values > 90 degrees cause
  * errors in the equations.
  * <p>
- *
  * The oblique mercator is also called the "Rectified Skew Orthomorphic" (RSO). It appears
  * is that the only difference from the oblique mercator is that the RSO allows the rotation
  * from the (<var>U</var>,<var>V</var>) to (<var>X</var>,<var>Y</var>) coordinate system to
@@ -114,33 +106,44 @@ import static java.lang.Math.*;
  * The rotation parameter is optional in all the non-two point projections and will be
  * set to the azimuth if not specified.
  * <p>
- *
  * Projection cases and aliases implemented by the {@link ObliqueMercator} are:
  * <ul>
- * <li>Oblique_Mercator (EPSG code 9815) - grid coordinates begin at the central point, has "rectified_grid_angle" parameter.</li>
- * <li>Hotine_Oblique_Mercator_Azimuth_Center (ESRI) - grid coordinates begin at the central point.</li>
- * <li>Rectified_Skew_Orthomorphic_Center (ESRI) - grid coordinates begin at the central point, has "rectified_grid_angle" parameter.</li>
+ *   <li>{@code Oblique_Mercator} (EPSG code 9815)<br>
+ *       grid coordinates begin at the central point,
+ *       has {@code "rectified_grid_angle"} parameter.</li>
+ *   <li>{@code Hotine_Oblique_Mercator_Azimuth_Center} (ESRI)<br>
+ *       grid coordinates begin at the central point.</li>
+ *   <li>{@code Rectified_Skew_Orthomorphic_Center} (ESRI)<br>
+ *       grid coordinates begin at the central point,
+ *       has {@code "rectified_grid_angle"} parameter.</li>
  *
- * <li>Hotine_Oblique_Mercator (EPSG code 9812) - grid coordinates begin at the interseciton of the central line and aposphere equator, has "rectified_grid_angle" parameter.</li>
- * <li>Hotine_Oblique_Mercator_Azimuth_Natural_Origin (ESRI) - grid coordinates begin at the interseciton of the central line and aposphere equator.</li>
- * <li>Rectified_Skew_Orthomorphic_Natural_Origin (ESRI) - grid coordinates begin at the interseciton of the central line and aposphere equator, has "rectified_grid_angle" parameter.</li>
+ *   <li>{@code Hotine_Oblique_Mercator} (EPSG code 9812)<br>
+ *       grid coordinates begin at the interseciton of the central line and aposphere equator,
+ *       has {@code "rectified_grid_angle"} parameter.</li>
+ *   <li>{@code Hotine_Oblique_Mercator_Azimuth_Natural_Origin} (ESRI)<br>
+ *       grid coordinates begin at the interseciton of the central line and aposphere equator.</li>
+ *   <li>{@code Rectified_Skew_Orthomorphic_Natural_Origin} (ESRI)<br>
+ *       grid coordinates begin at the interseciton of the central line and aposphere equator,
+ *       has {@code "rectified_grid_angle"} parameter.</li>
  *
- * <li>Hotine_Oblique_Mercator_Two_Point_Center (ESRI) - grid coordinates begin at the central point.</li>
- * <li>Hotine_Oblique_Mercator_Two_Point_Natural_Origin (ESRI) - grid coordinates begin at the interseciton of the central line and aposphere equator.</li>
+ *   <li>{@code Hotine_Oblique_Mercator_Two_Point_Center} (ESRI)<br>
+ *       grid coordinates begin at the central point.</li>
+ *   <li>{@code Hotine_Oblique_Mercator_Two_Point_Natural_Origin} (ESRI)<br>
+ *       grid coordinates begin at the interseciton of the central line and aposphere equator.</li>
  * </ul>
- *
- * <strong>References:</strong>
+ * <p>
+ * <b>References:</b>
  * <ul>
  *   <li>{@code libproj4} is available at
  *       <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/">libproj4 Miscellanea</A><br>
- *        Relevent files are: {@code PJ_omerc.c}, {@code pj_tsfn.c},
- *        {@code pj_fwd.c}, {@code pj_inv.c} and {@code lib_proj.h}</li>
- *   <li> John P. Snyder (Map Projections - A Working Manual,
- *        U.S. Geological Survey Professional Paper 1395, 1987)</li>
- *   <li> "Coordinate Conversions and Transformations including Formulas",
- *        EPSG Guidence Note Number 7 part 2, Version 24.</li>
+ *       Relevent files are: {@code PJ_omerc.c}, {@code pj_tsfn.c},
+ *       {@code pj_fwd.c}, {@code pj_inv.c} and {@code lib_proj.h}</li>
+ *   <li>John P. Snyder (Map Projections - A Working Manual,
+ *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
+ *   <li>"Coordinate Conversions and Transformations including Formulas",
+ *       EPSG Guidence Note Number 7 part 2, Version 24.</li>
  *   <li>Gerald Evenden, 2004, <a href="http://members.verizon.net/~vze2hc4d/proj4/omerc.pdf">
- *         Documentation of revised Oblique Mercator</a></li>
+ *       Documentation of revised Oblique Mercator</a></li>
  * </ul>
  *
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Oblique Mercator projection on MathWorld</A>
@@ -153,6 +156,11 @@ import static java.lang.Math.*;
  * @author  Rueben Schulz
  */
 public class ObliqueMercator extends MapProjection {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = 5382294977124711214L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -306,7 +314,8 @@ public class ObliqueMercator extends MapProjection {
      *         constructor.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    ObliqueMercator(final ParameterValueGroup parameters, final Collection expected,
+    ObliqueMercator(final ParameterValueGroup parameters,
+                    final Collection<GeneralParameterDescriptor> expected,
                     final boolean twoPoint, final boolean hotine)
             throws ParameterNotFoundException
     {
@@ -428,10 +437,8 @@ public class ObliqueMercator extends MapProjection {
             longitudeOf1stPoint = Double.NaN;
             latitudeOf2ndPoint  = Double.NaN;
             longitudeOf2ndPoint = Double.NaN;
-
             longitudeOfCentre = doubleValue(expected, Provider.LONGITUDE_OF_CENTRE, parameters);
             ensureLongitudeInRange(Provider.LONGITUDE_OF_CENTRE, longitudeOfCentre, true);
-
             azimuth = doubleValue(expected, Provider.AZIMUTH, parameters);
             // Already checked for +-360 deg. above.
             if ((azimuth > -1.5*PI && azimuth < -0.5*PI) ||
@@ -442,7 +449,6 @@ public class ObliqueMercator extends MapProjection {
                 throw new InvalidParameterValueException(Errors.format(
                         ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value), name, value);
             }
-
             temp = doubleValue(expected, Provider.RECTIFIED_GRID_ANGLE, parameters);
             if (Double.isNaN(temp)) {
                 temp = azimuth;
@@ -471,7 +477,6 @@ public class ObliqueMercator extends MapProjection {
         BrA       = B / A;
         v_pole_n  = ArB * log(tan(0.5 * (PI/2.0 - gamma0)));
         v_pole_s  = ArB * log(tan(0.5 * (PI/2.0 + gamma0)));
-
         if (hotine) {
             u_c = 0.0;
         } else {
@@ -508,7 +513,6 @@ public class ObliqueMercator extends MapProjection {
         set(expected, Provider.LONGITUDE_OF_CENTRE,        values, longitudeOfCentre);
         set(expected, Provider.AZIMUTH,                    values, azimuth);
         set(expected, Provider.RECTIFIED_GRID_ANGLE,       values, rectifiedGridAngle);
-
         set(expected, Provider_TwoPoint.LAT_OF_1ST_POINT,  values, latitudeOf1stPoint);
         set(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, values, longitudeOf1stPoint);
         set(expected, Provider_TwoPoint.LAT_OF_2ND_POINT,  values, latitudeOf2ndPoint);
@@ -530,7 +534,7 @@ public class ObliqueMercator extends MapProjection {
             double V = sin(B * x);
             double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
             if (abs(abs(U) - 1.0) < EPSILON) {
-                throw new ProjectionException(Errors.format(ErrorKeys.INFINITE_VALUE_$1, "v"));
+                throw new ProjectionException(ErrorKeys.INFINITE_VALUE_$1, "v");
             }
             v = 0.5 * ArB * log((1.0 - U) / (1.0 + U));
             temp = cos(B * x);
@@ -543,7 +547,6 @@ public class ObliqueMercator extends MapProjection {
             v = y > 0 ? v_pole_n : v_pole_s;
             u = ArB * y;
         }
-
         u -= u_c;
         x = v * cosrot + u * sinrot;
         y = u * cosrot - v * sinrot;
@@ -563,7 +566,6 @@ public class ObliqueMercator extends MapProjection {
     {
         double v = x * cosrot - y * sinrot;
         double u = y * cosrot + x * sinrot + u_c;
-
         double Qp = exp(-BrA * v);
         double temp = 1.0 / Qp;
         double Sp = 0.5 * (Qp - temp);
@@ -577,7 +579,6 @@ public class ObliqueMercator extends MapProjection {
             y = cphi2(y);
             x = -atan2((Sp * cosgamma0 - Vp * singamma0), cos(BrA * u)) / B;
         }
-
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -666,6 +667,11 @@ public class ObliqueMercator extends MapProjection {
      */
     public static class Provider extends AbstractProvider {
         /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 201776686002266891L;
+
+        /**
          * The operation parameter descriptor for the {@link #latitudeOfCentre latitudeOfCentre}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
@@ -679,11 +685,6 @@ public class ObliqueMercator extends MapProjection {
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
-         * @deprecated Renamed {@link #LATITUDE_OF_CENTRE}.
-         */
-        public static final ParameterDescriptor LAT_OF_CENTRE = LATITUDE_OF_CENTRE;
-
-        /**
          * The operation parameter descriptor for the {@link #longitudeOfCentre longitudeOfCentre}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
@@ -695,11 +696,6 @@ public class ObliqueMercator extends MapProjection {
                     new NamedIdentifier(Citations.GEOTIFF,  "CenterLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
-
-        /**
-         * @deprecated Renamed {@link #LONGITUDE_OF_CENTRE}.
-         */
-        public static final ParameterDescriptor LONG_OF_CENTRE = LONGITUDE_OF_CENTRE;
 
         /**
          * The operation parameter descriptor for the {@link #azimuth azimuth}
@@ -786,7 +782,7 @@ public class ObliqueMercator extends MapProjection {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
+            final Collection<GeneralParameterDescriptor> descriptors = PARAMETERS.descriptors();
             return new ObliqueMercator(parameters, descriptors, false, false);
         }
     }
@@ -804,6 +800,11 @@ public class ObliqueMercator extends MapProjection {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider_TwoPoint extends Provider {
+        /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = 7124258885016543889L;
+
         /**
          * The operation parameter descriptor for the {@code latitudeOf1stPoint}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
@@ -883,7 +884,7 @@ public class ObliqueMercator extends MapProjection {
         protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            final Collection descriptors = PARAMETERS.descriptors();
+            final Collection<GeneralParameterDescriptor> descriptors = PARAMETERS.descriptors();
             return new ObliqueMercator(parameters, descriptors, true, false);
         }
     }

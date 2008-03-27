@@ -90,13 +90,30 @@ public final class CrsTest extends TestCase {
         assertSame(DefaultGeographicCRS.WGS84, CRS.decode("WGS84(DD)"));
     }
 
+    /**
+     * Tests an ESRI code.
+     */
     public void XtestESRICode() throws Exception {
-        String wkt = "PROJCS[\"Albers_Conic_Equal_Area\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Equidistant_Conic\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-96.0],PARAMETER[\"Standard_Parallel_1\",33.0],PARAMETER[\"Standard_Parallel_2\",45.0],PARAMETER[\"Latitude_Of_Origin\",39.0],UNIT[\"Meter\",1.0]]";
+        String wkt = "PROJCS[\"Albers_Conic_Equal_Area\",\n"                  +
+                     "  GEOGCS[\"GCS_North_American_1983\",\n"                +
+                     "    DATUM[\"D_North_American_1983\",\n"                 +
+                     "    SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],\n" +
+                     "    PRIMEM[\"Greenwich\",0.0],\n"                       +
+                     "    UNIT[\"Degree\",0.0174532925199433]],\n"            +
+                     "  PROJECTION[\"Equidistant_Conic\"],\n"                 +
+                     "  PARAMETER[\"False_Easting\",0.0],\n"                  +
+                     "  PARAMETER[\"False_Northing\",0.0],\n"                 +
+                     "  PARAMETER[\"Central_Meridian\",-96.0],\n"             +
+                     "  PARAMETER[\"Standard_Parallel_1\",33.0],\n"           +
+                     "  PARAMETER[\"Standard_Parallel_2\",45.0],\n"           +
+                     "  PARAMETER[\"Latitude_Of_Origin\",39.0],\n"            +
+                     "  UNIT[\"Meter\",1.0]]";
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
         final MathTransform crsTransform = CRS.findMathTransform(WGS84, crs, true);
         assertFalse(crsTransform.isIdentity());
     }
+
     /**
      * Tests the transformations of an envelope.
      */

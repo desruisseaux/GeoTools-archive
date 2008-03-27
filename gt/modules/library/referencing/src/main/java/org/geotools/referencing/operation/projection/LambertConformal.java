@@ -36,13 +36,13 @@ import static java.lang.Math.*;
 
 
 /**
- * Lambert Conical Conformal Projection.  Areas and shapes are deformed
- * as one moves away from standard parallels.  The angles are true in
- * a limited area.  This projection is used for the charts of North America.
+ * Lambert Conical Conformal Projection.  Areas and shapes are deformed as one moves away from
+ * standard parallels.  The angles are true in a limited area.  This projection is used for the
+ * charts of North America.
  * <p>
- *
  * This implementation provides transforms for three cases of the lambert conic
  * conformal projection:
+ * <p>
  * <ul>
  *   <li>{@code Lambert_Conformal_Conic_1SP} (EPSG code 9801)</li>
  *   <li>{@code Lambert_Conformal_Conic_2SP} (EPSG code 9802)</li>
@@ -50,15 +50,14 @@ import static java.lang.Math.*;
  *   <li>{@code Lambert_Conformal_Conic} - An alias for the ESRI 2SP case
  *       that includes a scale_factor parameter</li>
  * </ul>
- *
- * For the 1SP case the latitude of origin is used as the standard parallel (SP).
- * To use 1SP with a latitude of origin different from the SP, use the 2SP
- * and set the SP1 to the single SP. The "standard_parallel_2"
- * parameter is optional and will be given the same value as "standard_parallel_1"
- * if not set (creating a 1 standard parallel projection).
  * <p>
- *
- * <strong>References:</strong><ul>
+ * For the 1SP case the latitude of origin is used as the standard parallel (SP). To use 1SP with
+ * a latitude of origin different from the SP, use the 2SP and set the SP1 to the single SP. The
+ * {@code standard_parallel_2"} parameter is optional and will be given the same value as
+ * {@code "standard_parallel_1"} if not set (creating a 1 standard parallel projection).
+ * <p>
+ * <b>References:</b>
+ * <ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
  *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
  *   <li>"Coordinate Conversions and Transformations including Formulas",<br>
@@ -78,6 +77,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 public abstract class LambertConformal extends MapProjection {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 1275881689637308614L;
+
     /**
      * Maximum difference allowed when comparing real numbers.
      */
@@ -130,9 +134,9 @@ public abstract class LambertConformal extends MapProjection {
     LambertConformal(final ParameterValueGroup parameters, final boolean belgium)
             throws ParameterNotFoundException
     {
-        //Fetch parameters
+        // Fetch parameters
         super(parameters);
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         final boolean sp2 = expected.contains(AbstractProvider.STANDARD_PARALLEL_2);
         this.belgium = belgium;
         if (sp2) {
@@ -215,11 +219,10 @@ public abstract class LambertConformal extends MapProjection {
             throws ProjectionException
     {
         double rho;
-        //Snyder p. 108
+        // Snyder p. 108
         if (abs(abs(y) - PI/2) < EPSILON) {
             if (y*n <= 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.POLE_PROJECTION_$1,
-                                              new Latitude(toDegrees(y))));
+                throw new ProjectionException(y);
             } else {
                 rho = 0;
             }
@@ -228,14 +231,12 @@ public abstract class LambertConformal extends MapProjection {
         } else {
             rho = F * pow(tsfn(y, sin(y)), n);
         }
-
         x *= n;
         if (belgium) {
             x -= BELGE_A;
         }
         y = rho0 - rho * cos(x);
         x =        rho * sin(x);
-
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;

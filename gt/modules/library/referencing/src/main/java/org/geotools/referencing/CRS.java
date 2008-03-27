@@ -18,9 +18,10 @@ package org.geotools.referencing;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
+import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -57,6 +58,7 @@ import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
+import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
@@ -1440,6 +1442,36 @@ public final class CRS {
      */
     static void unexpectedException(final String methodName, final Exception exception) {
         Logging.unexpectedException(CRS.class, methodName, exception);
+    }
+
+    /**
+     * Resets some aspects of the referencing system. The aspects to be reset are specified by
+     * a space or comma delimited string, which may include any of the following elements:
+     * <p>
+     * <ul>
+     *   <li>{@code "plugins"} for {@linkplain ReferencingFactoryFinder#scanForPlugins searching
+     *       the classpath for new plugins}.</li>
+     *   <li>{@code "warnings"} for {@linkplain MapProjection#resetWarnings re-enabling the
+     *       warnings to be issued when a coordinate is out of projection valid area}.</li>
+     * </ul>
+     *
+     * @param aspects The aspects to reset, or {@code "all"} for all of them.
+     *        Unknown aspects are silently ignored.
+     *
+     * @since 2.5
+     */
+    public static void reset(final String aspects) {
+        final StringTokenizer tokens = new StringTokenizer(aspects, ", \t\n\r\f");
+        while (tokens.hasMoreTokens()) {
+            final String aspect = tokens.nextToken().trim();
+            final boolean all = aspect.equalsIgnoreCase("all");
+            if (all || aspect.equalsIgnoreCase("plugins")) {
+                ReferencingFactoryFinder.scanForPlugins();
+            }
+            if (all || aspect.equalsIgnoreCase("warnings")) {
+                MapProjection.resetWarnings();
+            }
+        }
     }
 
     /**

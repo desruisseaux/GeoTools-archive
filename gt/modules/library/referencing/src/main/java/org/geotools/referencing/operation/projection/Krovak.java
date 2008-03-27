@@ -29,44 +29,39 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 
 import static java.lang.Math.*;
 
 
 /**
- * Krovak Oblique Conformal Conic projection (EPSG code 9819). This projection is
- * used in the Czech Republic and Slovakia under the name 'Krovak' projection. The
- * geographic coordinates on the ellipsoid are first reduced to conformal
- * coordinates on the conformal (Gaussian) sphere. These spherical coordinates
- * are then projected onto the oblique cone and converted to grid coordinates.
- * The pseudo standard parallel is defined on the conformal sphere after its
- * rotation, to obtain the oblique aspect of the projection. It is then the
- * parallel on this sphere at which the map projection is true to scale; on
- * the ellipsoid it maps as a complex curve.
- *
- * <p>The compulsory parameters are just the ellipsoid characteristics.
- * All other parameters are optional and have defaults to match the common
- * usage with Krovak projection.</p>
- *
- * <p>In general the axis of Krovak projection are defined as westing and
- * southing (not easting and northing) and they are also reverted, so if the
- * value of projected coordinates should (and in <var>y</var>, <var>x</var>
- * order in Krovak) be positive the 'Axis' parameter for projection should be
- * defined explicitly like this (in wkt):</p>
+ * Krovak Oblique Conformal Conic projection (EPSG code 9819). This projection is used in the
+ * Czech Republic and Slovakia under the name "Krovak" projection. The geographic coordinates
+ * on the ellipsoid are first reduced to conformal coordinates on the conformal (Gaussian) sphere.
+ * These spherical coordinates are then projected onto the oblique cone and converted to grid
+ * coordinates. The pseudo standard parallel is defined on the conformal sphere after its rotation,
+ * to obtain the oblique aspect of the projection. It is then the parallel on this sphere at which
+ * the map projection is true to scale; on the ellipsoid it maps as a complex curve.
+ * <p>
+ * The compulsory parameters are just the ellipsoid characteristics. All other parameters are
+ * optional and have defaults to match the common usage with Krovak projection.
+ * <p>
+ * In general the axis of Krovak projection are defined as westing and southing (not easting and
+ * northing) and they are also reverted, so if the value of projected coordinates should (and in
+ * <var>y</var>, <var>x</var> order in Krovak) be positive the 'Axis' parameter for projection
+ * should be defined explicitly like this (in wkt):
  *
  * <pre>PROJCS["S-JTSK (Ferro) / Krovak",
  *         .
  *         .
  *         .
- *
  *     PROJECTION["Krovak"]
  *     PARAMETER["semi_major", 6377397.155],
  *     PARAMETER["semi_minor", 6356078.963],
  *     UNIT["meter",1.0],
  *     AXIS["x", WEST],
  *     AXIS["y", SOUTH]]
- *     </pre>Axis in Krovak:
+ *     </pre>
+ * Axis in Krovak:
  * <pre>
  *   y<------------------+
  *                       |
@@ -74,23 +69,22 @@ import static java.lang.Math.*;
  *                       |
  *                       x
  * </pre>
- * <p>By default, the axis are 'easting, northing' so the values of projected coordinates
- * are negative (and in <var>y</var>, <var>x</var> order in Krovak - it is cold
- * Krovak GIS version).</p>
  *
- * <p><strong>References:</strong>
- *  <ul>
- *      <li>Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
- *      Relevant files is: {@code PJ_krovak.c}</li>
- *      <li>"Coordinate Conversions and Transformations including Formulas" available at, <A
- *      HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">http://www.remotesensing.org/geotiff/proj_list/guid7.html</A></li>
- *  </ul>
+ * By default, the axis are 'easting, northing' so the values of projected coordinates are negative
+ * (and in <var>y</var>, <var>x</var> order in Krovak - it is cold Krovak GIS version).
+ * <p>
+ * <b>References:</b>
+ * <ul>
+ *   <li>Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
+ *       Relevant files is: {@code PJ_krovak.c}</li>
+ *   <li>"Coordinate Conversions and Transformations including Formulas" available at,
+ *       <A HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">http://www.remotesensing.org/geotiff/proj_list/guid7.html</A></li>
+ * </ul>
  * </p>
  *
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/krovak.html">Krovak on
- *      RemoteSensing.org </A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/krovak.html">Krovak on RemoteSensing.org</A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">Krovak on "Coordinate
- *      Conversions and Transformations including Formulas"</A>
+ *       Conversions and Transformations including Formulas"</A>
  * @see <A HREF="http://www.posc.org/Epicentre.2_2/DataModel/ExamplesofUsage/eu_cs34e2.html">Krovak on POSC</A>
  *
  * @since 2.4
@@ -100,6 +94,11 @@ import static java.lang.Math.*;
  * @author Martin Desruisseaux
  */
 public class Krovak extends MapProjection {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8359105634355342212L;
+
     /**
      * Maximum number of iterations for iterative computations.
      */
@@ -140,7 +139,7 @@ public class Krovak extends MapProjection {
      */
     protected Krovak(final ParameterValueGroup parameters) throws ParameterNotFoundException {
         super(parameters);
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         // Fetch parameters from user input.
         latitudeOfOrigin       = doubleValue(expected, Provider.LATITUDE_OF_CENTER,       parameters);
         centralMeridian        = doubleValue(expected, Provider.LONGITUDE_OF_CENTER,      parameters);
@@ -217,7 +216,7 @@ public class Krovak extends MapProjection {
         final double eps = n * d;
         final double ro = rop / pow(tan(s/2 + s45), n);
 
-        /* x and y are reverted  */
+        // x and y are reverted.
         final double y = -(ro * cos(eps));
         final double x = -(ro * sin(eps));
 
@@ -257,10 +256,9 @@ public class Krovak extends MapProjection {
                 break;
             }
             if (--i < 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
             }
         }
-
         if (ptDst != null) {
             ptDst.setLocation(lambda, phi);
             return ptDst;
@@ -290,6 +288,11 @@ public class Krovak extends MapProjection {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -278392856661204734L;
+
         /**
          * The operation parameter descriptor for the {@linkplain #latitudeOfOrigin
          * latitude of origin} parameter value. Valid values range is from -90 to 90.

@@ -18,6 +18,7 @@ package org.geotools.referencing.operation.projection;
 
 import java.util.Collection;
 import java.awt.geom.Point2D;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,29 +38,16 @@ import static java.lang.Math.*;
  * This is an implementation of algorithm published by
  * <a href="http://www.govt.nz/record?recordid=28">Land Information New Zealand</a>.
  * The algorithm is documented <a href="http://www.linz.govt.nz/rcs/linz/6137/">here</a>.
+ * <p>
+ * <b>Implementation note</b><br>
+ * This class make extensive use of {@link Complex} type which may be costly unless the compiler
+ * can inline on the stack. We assume that Jave 6 and above can do this optimization.
  *
  * @since 2.2
  * @source $URL$
  * @version $Id$
  * @author Justin Deoliveira
  * @author Martin Desruisseaux
- *
- * @todo The algorithm uses complex numbers, which is not very well supported in Java. This
- *       implementation uses {@linkplain Complex} as a support class. Various instances of
- *       {@link Complex} are created once for ever at {@code NewZealandMapGrid} construction
- *       time, in order to avoid creating up to 6 objects for every point to be projected.
- *       The downside is that transformation methods must be synchronized. The cost should
- *       be small for simple applications, but may become important for multi-thread applications.
- *       Furthermore, those fields raise a slight serialization issue.
- *       <p>
- *       The most efficient fix in Java would be to expand inline all {@link Complex} operations
- *       like {@link Complex#add add} (easy), {@link Complex#multiply multiply} (more tedious),
- *       <cite>etc.</cite>, until we get a code using only {@code double} primitives on the stack
- *       and no {@link Complex} objects on the heap (except the {@code A} and {@code B} constants).
- *       But it would make the code significantly more difficult to read.
- *       <p>
- *       An elegant fix would have been "lightweight objects" allocated on the stack (something
- *       similar to {@code struct} in C#), if such thing existed in the Java language.
  */
 public class NewZealandMapGrid extends MapProjection {
     /**
@@ -108,28 +96,6 @@ public class NewZealandMapGrid extends MapProjection {
         };
 
     /**
-     * A temporary complex number used during transform calculation. Created once for
-     * ever in order to avoid new object creation for every point to be transformed.
-     */
-    private transient final Complex theta = new Complex();
-
-    /**
-     * An other temporary complex number created once for ever for the same reason than
-     * {@link #theta}. This number is usually equals to some other complex number raised
-     * to some power.
-     */
-    private transient final Complex power = new Complex();
-
-    /**
-     * An other temporary complex number created once for ever for the same reason than
-     * {@link #theta}.
-     *
-     * @todo Need to reassign those fields on deserialization.
-     */
-    private transient final Complex z=new Complex(), t=new Complex(),
-                                    num=new Complex(), denom=new Complex();
-
-    /**
      * Constructs a new map projection with default parameter values.
      */
     protected NewZealandMapGrid() {
@@ -161,7 +127,9 @@ public class NewZealandMapGrid extends MapProjection {
      * projection uses particular default values for parameters like "False Easting", etc.
      */
     @Override
-    final boolean isExpectedParameter(final Collection expected, final ParameterDescriptor param) {
+    final boolean isExpectedParameter(final Collection<GeneralParameterDescriptor> expected,
+                                      final ParameterDescriptor param)
+    {
         return ModifiedParameterDescriptor.contains(expected, param);
     }
 
@@ -170,8 +138,8 @@ public class NewZealandMapGrid extends MapProjection {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected synchronized Point2D transformNormalized(final double x, final double y,
-                                                       final Point2D ptDst)
+    protected Point2D transformNormalized(final double x, final double y,
+                                          final Point2D ptDst)
             throws ProjectionException
     {
         final double dphi = (y - latitudeOfOrigin) * (180/PI * 3600E-5);
@@ -181,8 +149,10 @@ public class NewZealandMapGrid extends MapProjection {
             dpsi += (TPSI[i] * dphi_pow_i);
             dphi_pow_i *= dphi;
         }
-        power.real = theta.real = dpsi;
-        power.imag = theta.imag = x;
+        // See implementation note in class javadoc.
+        final Complex theta = new Complex(dpsi, x);
+        final Complex power = new Complex(theta);
+        final Complex z     = new Complex();
         z.multiply(A[0], power);
         for (int i=1; i<A.length; i++) {
             power.multiply(power, theta);
@@ -199,19 +169,24 @@ public class NewZealandMapGrid extends MapProjection {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
-    protected synchronized Point2D inverseTransformNormalized(final double x, final double y,
-                                                              final Point2D ptDst)
+    protected Point2D inverseTransformNormalized(final double x, final double y,
+                                                 final Point2D ptDst)
             throws ProjectionException
     {
-        power.real = z.real = y;
-        power.imag = z.imag = x;
+        // See implementation note in class javadoc.
+        final Complex z = new Complex(y, x);
+        final Complex power = new Complex(z);
+        final Complex theta = new Complex();
         theta.multiply(B[0], z);
         for (int j=1; j<B.length; j++) {
             power.multiply(power, z);
             theta.addMultiply(theta, B[j], power);
         }
-        // increasing the number of iterations through this loop decreases
-        // the error in the calculation, but 3 iterations gives 10-3 accuracy
+        // Increasing the number of iterations through this loop decreases
+        // the error in the calculation, but 3 iterations gives 10-3 accuracy.
+        final Complex num   = new Complex();
+        final Complex denom = new Complex();
+        final Complex t     = new Complex();
         for (int j=0; j<3; j++) {
             power.power(theta, 2);
             num.addMultiply(z, A[1], power);
@@ -221,7 +196,6 @@ public class NewZealandMapGrid extends MapProjection {
                 t.multiply(t, k);
                 num.add(num, t);
             }
-
             power.real = 1;
             power.imag = 0;
             denom.copy(A[0]);
@@ -233,7 +207,6 @@ public class NewZealandMapGrid extends MapProjection {
             }
             theta.divide(num, denom);
         }
-
         final double dpsi = theta.real;
         double dpsi_pow_i = dpsi;
         double dphi = TPHI[0] * dpsi;
@@ -241,7 +214,6 @@ public class NewZealandMapGrid extends MapProjection {
             dpsi_pow_i *= dpsi;
             dphi += (TPHI[i] * dpsi_pow_i);
         }
-
         dphi = dphi / (180/PI * 3600E-5) + latitudeOfOrigin;
         if (ptDst != null) {
             ptDst.setLocation(theta.imag, dphi);

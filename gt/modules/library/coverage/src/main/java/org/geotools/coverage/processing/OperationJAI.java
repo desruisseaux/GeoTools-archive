@@ -331,7 +331,7 @@ public class OperationJAI extends Operation2D {
             final ViewType primarySourceType)
     {
         if (primarySourceType != null) {
-            coverage = coverage.geophysics(ViewType.GEOPHYSICS.equals(primarySourceType));
+            coverage = coverage.view(primarySourceType);
         }
         return coverage;
     }
@@ -601,11 +601,11 @@ public class OperationJAI extends Operation2D {
                 }
                 final ColorModel colors;
                 colors = sampleDims[visibleBand].getColorModel(visibleBand, sampleDims.length);
-                if (colors!=null) {
-                	if (layout == null) {
-                		layout = new ImageLayout();
-                	}
-                	layout = layout.setColorModel(colors);
+                if (colors != null) {
+                    if (layout == null) {
+                        layout = new ImageLayout();
+                    }
+                    layout = layout.setColorModel(colors);
                 }
             }
         }
@@ -768,12 +768,12 @@ public class OperationJAI extends Operation2D {
                  * loop.
                  */
                 final GridSampleDimension[] allBands = bandLists[i];
-                sampleDim           = allBands[allBands.length==1 ? 0 : numBands];
+                sampleDim = allBands[allBands.length == 1 ? 0 : numBands];
                 final List<Category> categories = sampleDim.getCategories();
                 // GridSampleDimension may contain no categories
-                if (categories==null) {
-                	result[numBands]=sampleDim;
-                	continue;
+                if (categories == null) {
+                    result[numBands] = sampleDim;
+                    continue;
                 }
                 categoryArray       = (Category[]) categories.toArray();
                 indexOfQuantitative = getQuantitative(categoryArray);
@@ -783,7 +783,7 @@ public class OperationJAI extends Operation2D {
                 unitXS    [i] = sampleDim.getUnits();
                 categoryXS[i] = categoryArray[indexOfQuantitative];
             }
-            if (categoryArray==null) {
+            if (categoryArray == null) {
             	continue;
             }
             final Category oldCategory = categoryArray[indexOfQuantitative];

@@ -28,7 +28,6 @@ import java.awt.geom.Point2D;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import static java.lang.Math.*;
@@ -51,6 +50,11 @@ import static java.lang.Math.*;
  * @author Rueben Schulz
  */
 class StereographicUSGS extends Stereographic {
+    /**
+     * For compatibility with different versions during deserialization.
+     */
+    private static final long serialVersionUID = 948619442800459871L;
+
     /**
      * Maximum number of iterations for iterative computations.
      */
@@ -104,7 +108,7 @@ class StereographicUSGS extends Stereographic {
             chi1    = 0.0;
             cosChi1 = 1.0;
             sinChi1 = 0.0;
-        } else {                                    // Oblique
+        } else {  // Oblique
             cosphi0 = cos(latitudeOfOrigin);
             sinphi0 = sin(latitudeOfOrigin);
             chi1    = 2.0 * atan(ssfn(latitudeOfOrigin, sinphi0)) - PI/2;
@@ -171,10 +175,9 @@ class StereographicUSGS extends Stereographic {
             }
             phi0 = phi;
             if (--i < 0) {
-                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+                throw new ProjectionException(ErrorKeys.NO_CONVERGENCE);
             }
         }
-
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -217,6 +220,11 @@ class StereographicUSGS extends Stereographic {
      */
     static final class Spherical extends StereographicUSGS {
         /**
+         * For compatibility with different versions during deserialization.
+         */
+        private static final long serialVersionUID = -8558594307755820783L;
+
+        /**
          * A constant used in the transformations. This constant hides the {@code k0}
          * constant from the ellipsoidal case. The spherical and ellipsoidal {@code k0}
          * are not computed in the same way, and we preserve the ellipsoidal {@code k0}
@@ -255,8 +263,7 @@ class StereographicUSGS extends Stereographic {
             final double coslon = cos(x);
             double f = 1.0 + sinphi0*sinlat + cosphi0*coslat*coslon; // (21-4)
             if (f < EPSILON) {
-                throw new ProjectionException(Errors.format(
-                          ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
+                throw new ProjectionException(ErrorKeys.VALUE_TEND_TOWARD_INFINITY);
             }
             f = k0 / f;
             x = f * coslat * sin(x);                                // (21-2)
@@ -294,7 +301,6 @@ class StereographicUSGS extends Stereographic {
                 y = asin(cosc*sinphi0 + y*sinc*cosphi0/rho);           // (20-14)
                 x = (abs(ct)<EPSILON && abs(t)<EPSILON) ? 0.0 : atan2(t, ct);
             }
-
             assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);

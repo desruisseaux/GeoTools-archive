@@ -41,6 +41,11 @@ import org.geotools.resources.i18n.Vocabulary;
  */
 public class Mercator2SP extends Mercator {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -5693375873386007245L;
+
+    /**
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
@@ -68,6 +73,11 @@ public class Mercator2SP extends Mercator {
      * @author Rueben Schulz
      */
     private static final class Spherical extends Mercator.Spherical {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 7693484746681095374L;
+
         /**
          * Constructs a new map projection from the suplied parameters.
          *
@@ -110,6 +120,11 @@ public class Mercator2SP extends Mercator {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 6356028352681135786L;
+
         /**
          * The parameters group.
          */

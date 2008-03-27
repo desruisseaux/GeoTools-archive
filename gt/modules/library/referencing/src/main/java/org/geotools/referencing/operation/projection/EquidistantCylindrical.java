@@ -19,7 +19,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
-
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -28,7 +27,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.FactoryException;
-
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -40,13 +38,13 @@ import static java.lang.Math.*;
 
 
 /**
- * Equidistant cylindrical projection (EPSG code 9823).  In the particular case where the
- * {@code standard_parallel_1} is 0°, this projection is also called
- * {@linkplain PlateCarree Plate Carree} or Equirectangular.
- *
- * This is used in, for example, <cite>WGS84 / Plate Carree</cite> (EPSG:32662).
- *
- * <strong>References:</strong><ul>
+ * Equidistant cylindrical projection (EPSG code 9823).  In the particular case
+ * where the {@code standard_parallel_1} is 0°, this projection is also called
+ * {@linkplain PlateCarree Plate Carree} or Equirectangular. This is used in,
+ * for example, <cite>WGS84 / Plate Carree</cite> (EPSG:32662).
+ * <p>
+ * <b>References:</b>
+ * <ul>
  *   <li>John P. Snyder (Map Projections - A Working Manual,<br>
  *       U.S. Geological Survey Professional Paper 1395, 1987)</li>
  *   <li>"Coordinate Conversions and Transformations including Formulas",<br>
@@ -63,6 +61,11 @@ import static java.lang.Math.*;
  * @author Martin Desruisseaux
  */
 public class EquidistantCylindrical extends MapProjection {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -848975059471102069L;
+
     /**
      * Cosinus of the {@code "standard_parallel_1"} parameter.
      */
@@ -85,10 +88,9 @@ public class EquidistantCylindrical extends MapProjection {
     {
         // Fetch parameters
         super(parameters);
-        final Collection expected = getParameterDescriptors().descriptors();
+        final Collection<GeneralParameterDescriptor> expected = getParameterDescriptors().descriptors();
         if (expected.contains(Provider.STANDARD_PARALLEL_1)) {
-            standardParallel = abs(doubleValue(expected,
-                                        Provider.STANDARD_PARALLEL_1, parameters));
+            standardParallel = abs(doubleValue(expected, Provider.STANDARD_PARALLEL_1, parameters));
             ensureLatitudeInRange(Provider.STANDARD_PARALLEL_1, standardParallel, false);
             cosStandardParallel = cos(standardParallel);
         } else {
@@ -198,6 +200,11 @@ public class EquidistantCylindrical extends MapProjection {
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -278288251842178001L;
+
         /**
          * The operation parameter descriptor for the {@linkplain #standardParallel standard parallel}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
