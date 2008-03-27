@@ -639,8 +639,13 @@ public class Encoder {
                     Iterator itr = (Iterator) child[1];
 
                     if (itr.hasNext()) {
+                        Object next = itr.next();
+                        if ( next == null ) {
+                            logger.warning( "Iterator returned null for " + element.getName() );
+                        }
+                        
                         //add the next object to be encoded to the stack
-                        encoded.push(new EncodingEntry(itr.next(), element));
+                        encoded.push(new EncodingEntry(next, element));
                     } else {
                         //this child is done, remove from child list
                         entry.children.remove(0);
@@ -694,6 +699,7 @@ public class Encoder {
                             }
 
                             if (binding.getType() == null) {
+                                logger.warning( "Binding: " + binding.getTarget() + " returns null type.");
                                 continue;
                             }
 
