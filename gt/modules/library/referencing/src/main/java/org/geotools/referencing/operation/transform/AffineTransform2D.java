@@ -17,8 +17,9 @@
  */
 package org.geotools.referencing.operation.transform;
 
-import java.awt.geom.AffineTransform;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.util.prefs.Preferences;
 
 import org.opengis.util.Cloneable;
@@ -135,6 +136,17 @@ public class AffineTransform2D extends XAffineTransform
         ptDst.setOrdinate(0, array[0]);
         ptDst.setOrdinate(1, array[1]);
         return ptDst;
+    }
+
+    /**
+     * Transforms the specified shape.
+     *
+     * @param  shape Shape to transform.
+     * @return Transformed shape, or {@code shape} if this transform is the identity transform.
+     */
+    @Override
+    public Shape createTransformedShape(final Shape shape) {
+        return transform(this, shape, false);
     }
 
     /**

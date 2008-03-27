@@ -16,7 +16,10 @@
  */
 package org.geotools.referencing.operation.matrix;
 
+import java.awt.Shape;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.RectangularShape;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -271,6 +274,64 @@ public class XAffineTransform extends AffineTransform {
     }
 
     /**
+     * Transforms the given shape. This method is similar to
+     * {@link #createTransformedShape createTransformedShape} except that:
+     * <p>
+     * <ul>
+     *   <li>It tries to preserve the shape kind when possible. For example if the given shape
+     *       is an instance of {@link RectangularShape} and the given transform do not involve
+     *       rotation, then the returned shape may be some instance of the same class.</li>
+     *   <li>It tries to recycle the given object if {@code overwrite} is {@code true}.</li>
+     * </ul>
+     *
+     * @param transform Affine transform to use.
+     * @param shape     The shape to transform.
+     * @param overwrite If {@code true}, this method is allowed to overwrite {@code shape} with the
+     *                  transform result. If {@code false}, then {@code shape} is never modified.
+     *
+     * @return The direct transform of the given shape. May or may not be the same instance than
+     *         the given shape.
+     *
+     * @see #createTransformedShape
+     *
+     * @since 2.5
+     */
+    public static Shape transform(final AffineTransform transform, Shape shape, boolean overwrite) {
+        final int type = transform.getType();
+        if (type == TYPE_IDENTITY) {
+            return shape;
+        }
+        if ((type & (TYPE_GENERAL_ROTATION | TYPE_GENERAL_TRANSFORM)) == 0) {
+            if (shape instanceof Rectangle2D) {
+                final Rectangle2D rect = (Rectangle2D) shape;
+                return transform(transform, rect, overwrite ? rect : null);
+            }
+            if ((type & (TYPE_FLIP & TYPE_MASK_ROTATION)) == 0) {
+                if (shape instanceof RectangularShape) {
+                    RectangularShape rect = (RectangularShape) shape;
+                    if (!overwrite) {
+                        rect = (RectangularShape) rect.clone();
+                    }
+                    final Rectangle2D frame = rect.getFrame();
+                    rect.setFrame(transform(transform, frame, frame));
+                    return rect;
+                }
+            }
+        }
+        if (shape instanceof GeneralPath) {
+            final GeneralPath path = (GeneralPath) shape;
+            if (overwrite) {
+                path.transform(transform);
+            } else {
+                shape = path.createTransformedShape(transform);
+            }
+        } else {
+            shape = transform.createTransformedShape(shape);
+        }
+        return shape;
+    }
+
+    /**
      * Returns a rectangle which entirely contains the direct
      * transform of {@code bounds}. This operation is equivalent to:
      *
@@ -280,9 +341,10 @@ public class XAffineTransform extends AffineTransform {
      * </code></blockquote>
      *
      * @param transform Affine transform to use.
-     * @param bounds    Rectangle to transform. This rectangle will not be modified.
-     * @param dest      Rectangle in which to place the result.  If null, a new
-     *                  rectangle will be created.
+     * @param bounds    Rectangle to transform. This rectangle will not be modified except
+     *                  if {@code dest} is the same reference.
+     * @param dest      Rectangle in which to place the result.
+     *                  If null, a new rectangle will be created.
      *
      * @return The direct transform of the {@code bounds} rectangle.
      *
@@ -299,8 +361,8 @@ public class XAffineTransform extends AffineTransform {
         double ymax = Double.NEGATIVE_INFINITY;
         final Point2D.Double point = new Point2D.Double();
         for (int i=0; i<4; i++) {
-            point.x = (i&1)==0 ? bounds.getMinX() : bounds.getMaxX();
-            point.y = (i&2)==0 ? bounds.getMinY() : bounds.getMaxY();
+            point.x = (i & 1) == 0 ? bounds.getMinX() : bounds.getMaxX();
+            point.y = (i & 2) == 0 ? bounds.getMinY() : bounds.getMaxY();
             transform.transform(point, point);
             if (point.x < xmin) xmin = point.x;
             if (point.x > xmax) xmax = point.x;
