@@ -47,6 +47,11 @@ public final class XDimension2D {
      */
     public static final class Float extends Dimension2D implements Serializable {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 4011566975974105082L;
+
+        /**
          * The width.
          */
         public float width;
@@ -116,6 +121,11 @@ public final class XDimension2D {
      * @author Martin Desruisseaux
      */
     public static final class Double extends Dimension2D implements Serializable {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 3603763914115376884L;
+
         /**
          * The width.
          */
