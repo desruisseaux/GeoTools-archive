@@ -68,7 +68,7 @@ public class XmlConverterFactory implements ConverterFactory {
                 Object converted = null;
 
                 try {
-                    converter.convert(source, target);
+                    converted = converter.convert(source, target);
                 } catch (Exception e) {
                     //ignore
                 }
