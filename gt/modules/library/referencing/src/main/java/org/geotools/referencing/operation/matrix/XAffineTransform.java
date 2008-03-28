@@ -17,6 +17,7 @@
 package org.geotools.referencing.operation.matrix;
 
 import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.RectangularShape;
@@ -318,12 +319,21 @@ public class XAffineTransform extends AffineTransform {
                 }
             }
         }
+        // TODO: Check for Path2D instance instead of GeneralPath
+        //       when we will be allowed to compile for Java 6.
         if (shape instanceof GeneralPath) {
             final GeneralPath path = (GeneralPath) shape;
             if (overwrite) {
                 path.transform(transform);
             } else {
                 shape = path.createTransformedShape(transform);
+            }
+        } else if (shape instanceof Area) {
+            final Area area = (Area) shape;
+            if (overwrite) {
+                area.transform(transform);
+            } else {
+                shape = area.createTransformedArea(transform);
             }
         } else {
             shape = transform.createTransformedShape(shape);
