@@ -3,10 +3,13 @@ package org.geotools.referencing.operation.builder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.WarpGridTransform2D;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -23,6 +26,7 @@ class GridParameters {
 	final private int xNumber;
 	final private int yNumber;
 	
+	
 	//final private AffineTransform2D trans;
 	private float[] warpPositions;
 
@@ -38,7 +42,7 @@ class GridParameters {
 		xStart = xstart;
 		yStart = ystart;
 		xNumber = xnumber; 
-		yNumber = ynumber; 		
+		yNumber = ynumber; 			
 		
 		
 		warpPositions = new float[2 * (xnumber + 1) * (ynumber + 1)];
@@ -64,27 +68,29 @@ class GridParameters {
 			throws TransformException {
 
 		if (isInteger) {
+			if (trans==null) { trans = getIdntityTransform();
+			}
 			GeneralEnvelope transEnv = CRS.transform(trans, env);
 
 			int iDx = (new Double(Math.round(dx * trans.getScaleX())))
 					.intValue();
 			int iDy = (new Double(Math.round(dy * trans.getScaleY())))
 					.intValue();
-			int xNum = (new Double(Math.ceil(transEnv.getLength(0) / iDx)))
+			int xNum = (new Double(Math.floor(transEnv.getLength(0) / iDx)))
 					.intValue();
-			int yNum = (new Double(Math.ceil(transEnv.getLength(0) / iDy)))
+			int yNum = (new Double(Math.floor(transEnv.getLength(1) / iDy)))
 					.intValue();
-			int xMin = (new Double(Math.round(transEnv.getMinimum(0)))
+			int xMin = (new Double(Math.floor(transEnv.getMinimum(0)))
 					.intValue());
-			int yMin = (new Double(Math.round(transEnv.getMinimum(0)))
+			int yMin = (new Double(Math.floor(transEnv.getMinimum(1)))
 					.intValue());
 
 			return new GridParameters(iDx, iDy, xMin, yMin, xNum, yNum);
 		} else {
 			
-			int xNum = (new Double(Math.ceil(env.getLength(0) / dx)))
+			int xNum = (new Double(Math.floor(env.getLength(0) / dx)))
 					.intValue();
-			int yNum = (new Double(Math.ceil(env.getLength(1) / dy)))
+			int yNum = (new Double(Math.floor(env.getLength(1) / dy)))
 					.intValue();
 
 			return new GridParameters(dx, dy, env.getMinimum(0), env
@@ -130,7 +136,10 @@ class GridParameters {
 	
 	public ParameterValueGroup getWarpGridParameters() {
 		ParameterValueGroup WarpGridParameters = new ParameterGroup(
-				WarpGridTransform2D.Provider.PARAMETERS);
+				new WarpGridTransform2D.Provider().getParameters());
+		/**
+		 * TODO - throw exception when the values are not integers
+		 */
 		WarpGridParameters.parameter("xStart").setValue(new Double(this.xStart).intValue());
 		WarpGridParameters.parameter("yStart").setValue(new Double(this.yStart).intValue());				
 		WarpGridParameters.parameter("xStep").setValue(new Double(this.xStep).intValue());				
@@ -143,4 +152,14 @@ class GridParameters {
 		return WarpGridParameters;
 	}
 
+	private static AffineTransform2D getIdntityTransform() {
+		GeneralMatrix M = new GeneralMatrix(3, 3);
+		double[] m0 = { 1, 0, 0 };
+		double[] m1 = { 0, 1, 0 };
+		double[] m2 = { 0, 0, 1 };
+		M.setRow(0, m0);
+		M.setRow(1, m1);
+		M.setRow(2, m2);
+		return (AffineTransform2D)ProjectiveTransform.create(M);
+	}
 }

@@ -300,11 +300,8 @@ public class WarpGridTransform2D extends WarpTransform2D {
      * Returns range of transformed data by searching max shift on each border of whole grid
      * @return GridRange of transformed data
      */
-    public GridRange getGridRange(){
+   /* public GridRange getGridRange(){
     	float top ;
-    	float buttom ;
-    	float left;
-    	float right;
     	
     	top = warpPositions[0];
     	
@@ -315,7 +312,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
         }
        return null;//new GridRange(null, null);
 
-    }
+    }*/
     /**
      *
      * The provider for the {@linkplain WarpGridTransform2D}. This provider constructs a JAI
@@ -360,13 +357,16 @@ public class WarpGridTransform2D extends WarpTransform2D {
         /**
          * The parameters group.
          */
-        public static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+        private static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                     new NamedIdentifier(Citations.GEOTOOLS, "Warp Grid")
                 },
                 new ParameterDescriptor[] {
                     X_START, X_STEP, X_NUMCELLS, Y_START, Y_STEP, Y_NUMCELLS, WARP_POSITIONS
                 });
 
+        public ParameterDescriptorGroup getParameters(){
+        	return PARAMETERS;
+        }
         /**
          * Create a provider for warp transforms.
          */
@@ -564,9 +564,9 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
                     while (xSt.hasMoreTokens() && longSt.hasMoreTokens()) {
                         warpPos[(2 * j) + (nc * i * 2)] = xStart + (j * xStep)
-                            + (float) Float.parseFloat(xSt.nextToken());
+                            + (float) -Float.parseFloat(xSt.nextToken())/3600;//decimal seconds
                         warpPos[(2 * j) + (nc * i * 2) + 1] = yStart + (i * yStep)
-                            + (float) Float.parseFloat(longSt.nextToken());
+                            + (float) Float.parseFloat(longSt.nextToken())/3600;//decimal seconds
                         ++j;
                     }
                 }
