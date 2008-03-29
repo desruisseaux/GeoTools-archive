@@ -39,6 +39,7 @@
 package org.geotools.styling;
 
 import java.util.Map;
+
 import org.opengis.filter.expression.Expression;
 
 
@@ -282,5 +283,5 @@ public interface TextSymbolizer extends Symbolizer {
      *
      * @return null - no options set
      */
-    Map getOptions();
+    Map<String,String> getOptions();
 }

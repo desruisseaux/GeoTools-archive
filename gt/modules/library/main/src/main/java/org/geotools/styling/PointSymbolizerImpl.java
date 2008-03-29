@@ -18,7 +18,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -31,8 +30,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class PointSymbolizerImpl extends AbstractGTComponent
-    implements PointSymbolizer, Cloneable {
+public class PointSymbolizerImpl implements PointSymbolizer, Cloneable {
     private String geometryPropertyName = null;
     private Graphic graphic = new GraphicImpl();
 
@@ -53,7 +51,6 @@ public class PointSymbolizerImpl extends AbstractGTComponent
      */
     public void setGeometryPropertyName(String name) {
         geometryPropertyName = name;
-        fireChanged();
     }
 
     /**
@@ -75,10 +72,7 @@ public class PointSymbolizerImpl extends AbstractGTComponent
         if (this.graphic == graphic) {
             return;
         }
-
-        Graphic old = this.graphic;
         this.graphic = graphic;
-        fireChildChanged("graphic", graphic, old);
     }
 
     /**

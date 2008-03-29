@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -58,7 +57,7 @@ import org.geotools.event.GTComponent;
  * @author iant
  * @source $URL$
  */
-public interface ContrastEnhancement extends GTComponent {
+public interface ContrastEnhancement {
     public void setType(Expression type);
 
     public Expression getType();

@@ -111,7 +111,6 @@ public class TextMarkImpl extends MarkImpl implements TextMark {
     public void setSymbol(Expression symbol) {
         Expression old = this.symbol;
         this.symbol = symbol;
-        fireChildChanged("symbol", symbol, old);
     }
 
     /**

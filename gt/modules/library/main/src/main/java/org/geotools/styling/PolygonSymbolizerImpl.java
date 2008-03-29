@@ -17,7 +17,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -30,8 +29,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class PolygonSymbolizerImpl extends AbstractGTComponent
-    implements PolygonSymbolizer, Cloneable {
+public class PolygonSymbolizerImpl implements PolygonSymbolizer, Cloneable {
     private Fill fill = new FillImpl();
     private Stroke stroke = new StrokeImpl();
     private String geometryPropertyName = null;
@@ -71,7 +69,6 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent
      */
     public void setGeometryPropertyName(String name) {
         geometryPropertyName = name;
-        fireChanged();
     }
 
     /**
@@ -94,10 +91,7 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent
         if (this.fill == fill) {
             return;
         }
-
-        Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged("fill", fill, old);
     }
 
     /**
@@ -120,10 +114,7 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent
         if (this.stroke == stroke) {
             return;
         }
-
-        Stroke old = this.stroke;
         this.stroke = stroke;
-        fireChildChanged("stroke", stroke, old);
     }
 
     /**

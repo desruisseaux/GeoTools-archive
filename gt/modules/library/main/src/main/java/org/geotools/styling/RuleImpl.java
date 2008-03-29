@@ -16,15 +16,13 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.event.GTList;
-import org.opengis.filter.Filter;
-import org.geotools.resources.Utilities;
-import org.opengis.util.Cloneable;
-
-// J2SE dependencies
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.geotools.resources.Utilities;
+import org.opengis.filter.Filter;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -34,9 +32,9 @@ import java.util.List;
  * @source $URL$
  * @version $Id$
  */
-public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
-    private List<Symbolizer> symbolizers = new GTList(this, "symbolizers");
-    private List graphics = new GTList(this, "graphics");
+public class RuleImpl implements Rule, Cloneable {
+    private List<Symbolizer> symbolizers = new ArrayList<Symbolizer>();
+    private List<Graphic> graphics = new ArrayList<Graphic>();
     private String name;
     private String title;
     private String abstractStr;
@@ -76,7 +74,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      *        the legend.
      */
     public void setLegendGraphic(Graphic[] graphics) {
-        List graphicList = Arrays.asList(graphics);
+        List<Graphic> graphicList = Arrays.asList(graphics);
     	
         this.graphics.clear();
         this.graphics.addAll(graphicList);
@@ -87,7 +85,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     }
 
     public void setSymbolizers(Symbolizer[] syms) {
-        List symbols = Arrays.asList(syms);
+        List<Symbolizer> symbols = Arrays.asList(syms);
         this.symbolizers.clear();
         this.symbolizers.addAll(symbols);
     }
@@ -113,7 +111,6 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      */
     public void setAbstract(java.lang.String abstractStr) {
         this.abstractStr = abstractStr;
-        fireChanged();
     }
 
     /**
@@ -131,8 +128,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      * @param name New value of property name.
      */
     public void setName(java.lang.String name) {
-        this.name = name;
-        fireChanged();
+        this.name = name;        
     }
 
     /**
@@ -150,8 +146,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      * @param title New value of property title.
      */
     public void setTitle(java.lang.String title) {
-        this.title = title;
-        fireChanged();
+        this.title = title;        
     }
 
     public Filter getFilter() {
@@ -159,9 +154,7 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     }
 
     public void setFilter(Filter filter) {
-        Filter old = this.filter;
         this.filter = filter;
-        fireChildChanged("filter", filter, old);
     }
 
     public boolean hasElseFilter() {
@@ -169,13 +162,11 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     }
 
     public void setIsElseFilter(boolean flag) {
-        hasElseFilter = flag;
-        fireChanged();
+        hasElseFilter = flag;        
     }
 
     public void setHasElseFilter() {
-        hasElseFilter = true;
-        fireChanged();
+        hasElseFilter = true;        
     }
 
     /**
@@ -194,7 +185,6 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      */
     public void setMaxScaleDenominator(double maxScaleDenominator) {
         this.maxScaleDenominator = maxScaleDenominator;
-        fireChanged();
     }
 
     /**
@@ -213,7 +203,6 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
      */
     public void setMinScaleDenominator(double minScaleDenominator) {
         this.minScaleDenominator = minScaleDenominator;
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {
@@ -228,8 +217,8 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
     public Object clone() {
         try {
             RuleImpl clone = (RuleImpl) super.clone();
-            clone.graphics = new GTList(clone, "graphics");
-            clone.symbolizers = new GTList(clone, "symbolizers");
+            clone.graphics = new ArrayList<Graphic>();
+            clone.symbolizers = new ArrayList<Symbolizer>();
             clone.filter = filter; // TODO: we must duplicate!
 
             Graphic[] legends = new Graphic[graphics.size()];

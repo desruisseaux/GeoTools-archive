@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
@@ -573,6 +574,41 @@ public final class JTS {
                 }), null);
     }
 
+    /**
+     * Create a ReferencedEnvelope from the provided geometry, we will
+     * do our best to guess the CoordinateReferenceSystem making use
+     * of getUserData() and getSRID() as needed.
+     * 
+     * @param geom Provided Geometry
+     * @return RefernecedEnveleope describing the bounds of the provided Geometry
+     */
+    public static ReferencedEnvelope toEnvelope( Geometry geom ){
+        if( geom == null ){
+            return null; //return new ReferencedEnvelope(); // very empty!
+        }
+        String srsName = null;
+        Object userData = geom.getUserData();
+        if( userData != null && userData instanceof String){
+            srsName = (String) userData;    
+        }
+        else if (geom.getSRID() > 0){
+            srsName = "EPSG:"+geom.getSRID();                                
+        }
+        CoordinateReferenceSystem crs = null;
+        if( userData != null && userData instanceof CoordinateReferenceSystem){
+            crs = (CoordinateReferenceSystem) userData;
+        }
+        else if( srsName != null ){
+            try {
+                crs = CRS.decode( srsName );
+            } catch (NoSuchAuthorityCodeException e) {
+                // e.printStackTrace();
+            } catch (FactoryException e) {
+                // e.printStackTrace();
+            }
+        }
+        return new ReferencedEnvelope( geom.getEnvelopeInternal(), crs );
+    }
     /**
      * Converts a {@link BoundingBox} to a polygon.
      * <p>

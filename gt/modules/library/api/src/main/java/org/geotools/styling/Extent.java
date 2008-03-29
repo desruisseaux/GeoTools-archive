@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -43,7 +42,7 @@ import org.geotools.event.GTComponent;
  * @author Justin Deoliveira, The Open Planning Project
  * @source $URL$
  */
-public interface Extent extends GTComponent {
+public interface Extent {
     /**
      * DOCUMENT ME!
      *

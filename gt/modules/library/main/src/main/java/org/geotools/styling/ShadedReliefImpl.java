@@ -17,20 +17,18 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
 /**
- * Application of relief shading
+ * Default implementation of ShadedRelief.
  *
  * @author iant
  * @source $URL$
  */
-public class ShadedReliefImpl extends AbstractGTComponent
-    implements ShadedRelief {
+public class ShadedReliefImpl implements ShadedRelief {
     private FilterFactory filterFactory;
     private Expression reliefFactor;
     private boolean brightness = false;
@@ -81,8 +79,6 @@ public class ShadedReliefImpl extends AbstractGTComponent
      * @param reliefFactor an expression which evaluates to a double.
      */
     public void setReliefFactor(Expression reliefFactor) {
-        Expression old = this.reliefFactor;
         this.reliefFactor = reliefFactor;
-        fireChildChanged("reliefFactor", reliefFactor, old);
     }
 }

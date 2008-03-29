@@ -18,12 +18,15 @@ package org.geotools.filter.spatial;
 import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilterImpl;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -146,13 +149,37 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 	private void updateMinMaxFields(Expression expression) {
 	    if(expression instanceof Literal) {
     	    Literal bbox = (Literal) expression;
-    	    Envelope env = (Envelope) bbox.evaluate(null, Envelope.class);
-    	    if(env == null)
-    	        return;
-    	    minx = env.getMinX();
-    	    maxx = env.getMaxX();
-    	    miny = env.getMinY();
-            maxy = env.getMaxY();
+    	    Object value = bbox.getValue();
+    	    if( value instanceof BoundingBox){
+    	        BoundingBox env = (BoundingBox) value;
+    	        minx = env.getMinX();
+                maxx = env.getMaxX();
+                miny = env.getMinY();
+                maxy = env.getMaxY();
+                srs = CRS.toSRS( env.getCoordinateReferenceSystem() );                
+    	    }
+    	    else {
+    	        Envelope env = null;
+    	        if( value instanceof Envelope){
+    	            env = (Envelope) value;
+    	        }
+    	        else if( value instanceof Geometry ){
+    	            Geometry geom = (Geometry) value;
+    	            env = geom.getEnvelopeInternal();
+    	            if( geom.getUserData() != null && geom.getUserData() instanceof String){
+    	                srs = (String) geom.getUserData();
+    	            }
+                }
+    	        else {
+    	            env = (Envelope) bbox.evaluate(null, Envelope.class);
+    	        }
+        	    if(env == null)
+        	        return;
+        	    minx = env.getMinX();
+        	    maxx = env.getMaxX();
+        	    miny = env.getMinY();
+                maxy = env.getMaxY();
+    	    }
 	    }
 	}
 

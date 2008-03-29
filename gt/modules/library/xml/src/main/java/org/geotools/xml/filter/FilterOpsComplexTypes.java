@@ -16,11 +16,17 @@
 package org.geotools.xml.filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -56,6 +62,10 @@ import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.ChoiceGT;
 import org.geotools.xml.schema.impl.SequenceGT;
 import org.geotools.xml.xsi.XSISimpleTypes;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -763,12 +773,36 @@ public class FilterOpsComplexTypes {
                 if( value.length==0 )
                     return Filter.EXCLUDE;
                 try{
-                    FilterFactory fac=FilterFactoryFinder.createFilterFactory();
-                    LogicFilter filter=fac.createLogicFilter(FilterType.LOGIC_OR);
+                    FilterFactory2 fac=CommonFactoryFinder.getFilterFactory2(null);
+                    //LogicFilter filter=fac.createLogicFilter(FilterType.LOGIC_OR);
+                    List<org.opengis.filter.Filter> filters = new ArrayList<org.opengis.filter.Filter>();
+                    Set ids = new HashSet();
+                    boolean isOnlyFids = true;
                     for (int i = 0; i < value.length; i++) {
-                        filter.addFilter((Filter) value[i].getValue());
+                        org.opengis.filter.Filter value2 = (org.opengis.filter.Filter) value[i].getValue();
+                        if( value2 == Filter.EXCLUDE) continue;
+                        if( value2 instanceof Id){
+                            Id idFilter = (Id) value2;
+                            ids.addAll( idFilter.getIdentifiers() );
+                        }
+                        else {
+                            isOnlyFids = false;
+                        }                        
+                        filters.add( value2 );
+                    }                    
+                    if( isOnlyFids && !ids.isEmpty()){
+                        return fac.id( ids );
                     }
-                    return filter;
+                    else if( filters.isEmpty() ){
+                        return Filter.EXCLUDE;
+                    }
+                    else if( filters.size() == 1 ){
+                        return filters.iterator().next();                        
+                    }
+                    else {
+                        return fac.or( filters );                        
+                    }
+                    //return filter;
                 }catch(IllegalFilterException e){
                     return value[0].getValue();
                 }
@@ -931,10 +965,13 @@ public class FilterOpsComplexTypes {
                                                            .toString(),
                         FeatureIdType.attrs[0].getName());
             }
-
-            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter(fid);
-
-            return r;
+            FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+            Set<FeatureId> fids = new HashSet<FeatureId>();
+            fids.add( ff.featureId(fid) );
+            
+            return ff.id( fids );
+            //FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter(fid);
+            //return r;
         }
 
         /**
@@ -948,7 +985,7 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return FidFilter.class;
+            return Id.class;
         }
 
         /**
@@ -958,7 +995,7 @@ public class FilterOpsComplexTypes {
         public boolean canEncode(Element element, Object value, Map hints) {
             return (element.getType() != null)
             && getName().equals(element.getType().getName())
-            && value instanceof FidFilter;
+            && value instanceof Id;
         }
 
         /**
@@ -976,12 +1013,15 @@ public class FilterOpsComplexTypes {
             String[] fids = ff.getFids();
             AttributesImpl att = new AttributesImpl();
             att.addAttribute(null, null, null, null, null);
+            
+            output.startElement(element.getNamespace(), "Filter", null);
 
             for (int i = 0; i < fids.length; i++) {
                 att.setAttribute(0, element.getNamespace().toString(),
                     attrs[0].getName(), null, "anyUri", fids[i]);
                 output.element(element.getNamespace(), element.getName(), att);
-            }
+            }            
+            output.endElement(element.getNamespace(), "Filter" );
         }
     }
 
@@ -2337,11 +2377,33 @@ public class FilterOpsComplexTypes {
         		throw new SAXException("Expected AND or OR logic filter" );
         	}
         	try {
-				LogicFilter filter = factory.createLogicFilter( type );
+        	    ArrayList<org.opengis.filter.Filter> children = new ArrayList<org.opengis.filter.Filter>( value.length );
+        	    Set<Identifier> ids = new HashSet<Identifier>( value.length );
+        	    boolean fidOnly = true;
+        	    
+				//LogicFilter filter = factory.createLogicFilter( type );
 				for( int i=0; i<value.length; i++){
-					filter.addFilter( (Filter) value[i].getValue() );
+				    Filter filter = (Filter) value[i];
+				    if( filter instanceof Id ){
+				        Id id = (Id) filter;
+				        ids.addAll( id.getIdentifiers() );
+				    }
+				    else {
+				        fidOnly = false;
+				    }
+				    children.add( filter );
 				}
-				return filter;
+			    if( type == FilterType.LOGIC_OR ){
+				    if( fidOnly ){
+				        return factory.id( ids ); 
+				    }
+				    else {
+				        return factory.or( children );
+				    }				    
+				}
+			    else {
+			        return factory.and( children );
+			    }				
 			}
         	catch( ClassCastException filterRequired ){
         		throw new SAXException("Illegal filter for "+element, filterRequired );

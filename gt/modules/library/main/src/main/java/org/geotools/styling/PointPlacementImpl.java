@@ -18,7 +18,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -34,8 +33,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class PointPlacementImpl extends AbstractGTComponent
-    implements PointPlacement, Cloneable {
+public class PointPlacementImpl implements PointPlacement, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
 
@@ -80,8 +78,6 @@ public class PointPlacementImpl extends AbstractGTComponent
         } else {
             this.anchorPoint = anchorPoint;
         }
-
-        fireChanged();
     }
 
     /**
@@ -105,8 +101,6 @@ public class PointPlacementImpl extends AbstractGTComponent
         } else {
             this.displacement = displacement;
         }
-
-        fireChanged();
     }
 
     /**
@@ -125,7 +119,6 @@ public class PointPlacementImpl extends AbstractGTComponent
      */
     public void setRotation(Expression rotation) {
         this.rotation = rotation;
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {

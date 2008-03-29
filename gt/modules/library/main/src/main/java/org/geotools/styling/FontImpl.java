@@ -20,8 +20,6 @@ package org.geotools.styling;
 // J2SE dependencies
 //import java.util.logging.Logger;
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.resources.Utilities;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -35,7 +33,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
+public class FontImpl implements Font, Cloneable {
     /** The logger for the default core module. */
 
     //private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
@@ -66,7 +64,6 @@ public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
      */
     public void setFontFamily(Expression fontFamily) {
         this.fontFamily = fontFamily;
-        fireChanged();
     }
 
     /**
@@ -85,7 +82,6 @@ public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
      */
     public void setFontSize(Expression fontSize) {
         this.fontSize = fontSize;
-        fireChanged();
     }
 
     /**
@@ -104,7 +100,6 @@ public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
      */
     public void setFontStyle(Expression fontStyle) {
         this.fontStyle = fontStyle;
-        fireChanged();
     }
 
     /**
@@ -123,7 +118,6 @@ public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
      */
     public void setFontWeight(Expression fontWeight) {
         this.fontWeight = fontWeight;
-        fireChanged();
     }
 
     /**

@@ -16,14 +16,12 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.resources.Utilities;
-import org.opengis.util.Cloneable;
-
-// J2SE dependencies
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
+import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -33,18 +31,16 @@ import java.util.Map;
  * @source $URL$
  * @version $Id$
  */
-public class ExternalGraphicImpl extends AbstractGTComponent
-    implements ExternalGraphic, Symbol, Cloneable {
+public class ExternalGraphicImpl implements ExternalGraphic, Symbol, Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
+    //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private URL location = null;
     private String format = null;
     private String uri = null;
-    private Map customProps = null;
+    private Map<String,Object> customProps = null;
 
     public void setURI(String uri) {
         this.uri = uri;
-        fireChanged();
     }
 
     /**
@@ -155,11 +151,11 @@ public class ExternalGraphicImpl extends AbstractGTComponent
         return false;
     }
 
-    public java.util.Map getCustomProperties() {
+    public java.util.Map<String,Object> getCustomProperties() {
         return customProps;
     }
 
-    public void setCustomProperties(java.util.Map list) {
+    public void setCustomProperties(java.util.Map<String,Object> list) {
         customProps = list;
     }
 }

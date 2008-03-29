@@ -22,7 +22,12 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.PropertyName;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -36,7 +41,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
-
+import org.opengis.filter.expression.Expression;
 
 /**
  * parsez short sections of gml for use in expressions and filters Hopefully we
@@ -50,7 +55,7 @@ public final class ExpressionDOMParser {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Factory for creating filters. */
-    private FilterFactory ff;
+    private FilterFactory2 ff;
 
     /** Factory for creating geometry objects */
     private static GeometryFactory gfac = new GeometryFactory();
@@ -74,15 +79,15 @@ public final class ExpressionDOMParser {
      * Creates a new instance of ExpressionXmlParser
      */
     private ExpressionDOMParser() {
-    	this( FilterFactoryFinder.createFilterFactory() );    	
+    	this( CommonFactoryFinder.getFilterFactory2( null ) );    	
+        LOGGER.finer("made new logic factory");
     }
     /** Constructor injection */
-    public ExpressionDOMParser( FilterFactory factory ){
-    	ff = factory;
-    	LOGGER.finer("made new logic factory");
+    public ExpressionDOMParser( FilterFactory2 factory ){
+    	ff = factory != null ? factory : CommonFactoryFinder.getFilterFactory2( null );
     }
     /** Setter injection */
-    public void setFilterFactory( FilterFactory factory ){
+    public void setFilterFactory( FilterFactory2 factory ){
     	ff = factory;
     }
     
@@ -164,7 +169,7 @@ public final class ExpressionDOMParser {
                                 "got a null geometry back from gml parser");
                         }
 
-                        return ff.createLiteralExpression(geom);
+                        return ff.literal(geom);
                     } catch (IllegalFilterException ife) {
                         LOGGER.warning("Problem building GML/JTS object: "
                             + ife);
@@ -203,10 +208,9 @@ public final class ExpressionDOMParser {
 
                 try {
                     //always store internal values as strings.  We might lose info otherwise.
-                    return ff.createLiteralExpression(nodeValue);
+                    return ff.literal(nodeValue);
                 } catch (IllegalFilterException ife) {
                     LOGGER.finer("Unable to build expression " + ife);
-
                     return null;
                 }
             }
@@ -218,7 +222,6 @@ public final class ExpressionDOMParser {
 
                 //Node left = null;
                 //Node right = null;
-                MathExpression math = ff.createMathExpression(DefaultExpression.MATH_ADD);
                 Node value = child.getFirstChild();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -226,7 +229,7 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add left value -> " + value + "<-");
-                math.addLeftValue(parseExpression(value));
+                Expression left = parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -234,12 +237,11 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add right value -> " + value + "<-");
-                math.addRightValue(parseExpression(value));
+                Expression right = parseExpression(value);
 
-                return math;
+                return ff.add( left, right );
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build expression " + ife);
-
                 return null;
             }
         }
@@ -247,17 +249,13 @@ public final class ExpressionDOMParser {
         if (childName.equalsIgnoreCase("sub")) {
             try {
                 //NodeList kids = child.getChildNodes();
-                MathExpression math;
-                math = ff.createMathExpression(DefaultExpression.MATH_SUBTRACT);
-
                 Node value = child.getFirstChild();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
                     value = value.getNextSibling();
                 }
-
                 LOGGER.finer("add left value -> " + value + "<-");
-                math.addLeftValue(parseExpression(value));
+                Expression left = parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -265,9 +263,9 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add right value -> " + value + "<-");
-                math.addRightValue(parseExpression(value));
+                Expression right = parseExpression(value);
 
-                return math;
+                return ff.subtract( left, right );
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build expression " + ife);
 
@@ -278,9 +276,6 @@ public final class ExpressionDOMParser {
         if (childName.equalsIgnoreCase("mul")) {
             try {
                 //NodeList kids = child.getChildNodes();
-                MathExpression math;
-                math = ff.createMathExpression(DefaultExpression.MATH_MULTIPLY);
-
                 Node value = child.getFirstChild();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -288,7 +283,7 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add left value -> " + value + "<-");
-                math.addLeftValue(parseExpression(value));
+                Expression left = parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -296,9 +291,9 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add right value -> " + value + "<-");
-                math.addRightValue(parseExpression(value));
+                Expression right = parseExpression(value);
 
-                return math;
+                return ff.multiply( left, right );
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build expression " + ife);
 
@@ -308,9 +303,6 @@ public final class ExpressionDOMParser {
 
         if (childName.equalsIgnoreCase("div")) {
             try {
-                MathExpression math;
-                math = ff.createMathExpression(DefaultExpression.MATH_DIVIDE);
-
                 Node value = child.getFirstChild();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -318,7 +310,7 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add left value -> " + value + "<-");
-                math.addLeftValue(parseExpression(value));
+                Expression left = parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -326,9 +318,9 @@ public final class ExpressionDOMParser {
                 }
 
                 LOGGER.finer("add right value -> " + value + "<-");
-                math.addRightValue(parseExpression(value));
+                Expression right = parseExpression(value);
 
-                return math;
+                return ff.divide( left, right );
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build expression " + ife);
 
@@ -341,8 +333,7 @@ public final class ExpressionDOMParser {
             	//JD: trim whitespace here
             	String value = child.getFirstChild().getNodeValue();
             	value = value != null ? value.trim() : value;
-                AttributeExpression attribute = ff
-                    .createAttributeExpression((SimpleFeatureType) null, value);
+                PropertyName attribute = ff.property( value );
 
                 //                attribute.setAttributePath(child.getFirstChild().getNodeValue());
                 return attribute;
@@ -354,7 +345,6 @@ public final class ExpressionDOMParser {
         }
 
         if (childName.equalsIgnoreCase("Function")) {
-            FunctionExpression func = null;
             Element param = (Element) child;
 
             NamedNodeMap map = param.getAttributes();
@@ -369,7 +359,7 @@ public final class ExpressionDOMParser {
                 }
                 if (name.indexOf(':') != -1)
                 {
-                	//the DOM parser wasnt properly set to handle namespaces...
+                	//the DOM parser was not properly set to handle namespaces...
                 	name = name.substring(name.indexOf(':')+1);
                 }
 
@@ -377,37 +367,28 @@ public final class ExpressionDOMParser {
 
                 if (name.equalsIgnoreCase("name")) {
                     funcName = res;
-                    func = ff.createFunctionExpression(res);
                 }
             }
 
-            if (func == null) {
-                if (funcName != null) {
-                    LOGGER.severe("failed to create instance of function "
-                        + funcName);
-                } else {
-                    LOGGER.severe("failed to find a function name in " + child);
-                }
-
+            if (funcName == null) {
+                LOGGER.severe("failed to find a function name in " + child);
                 return null;
             }
 
-            int argCount = func.getArgCount();
-            Expression[] args = new Expression[argCount];
+            ArrayList<Expression> args = new ArrayList<Expression>();
             Node value = child.getFirstChild();
 
-            for (int i = 0; i < argCount; i++) {
+            ARGS: while( value != null ){
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
                     value = value.getNextSibling();
+                    if( value == null )
+                        break ARGS;
                 }
-
-                args[i] = parseExpression(value);
+                args.add( parseExpression(value) );
                 value = value.getNextSibling();
             }
-
-            func.setArgs(args);
-
-            return func;
+            Expression[] array = args.toArray( new Expression[0]);
+            return ff.function( funcName, array );
         }
 
         if (child.getNodeType() == Node.TEXT_NODE) {
@@ -421,7 +402,7 @@ public final class ExpressionDOMParser {
                 try {
                     Integer intLiteral = new Integer(nodeValue);
 
-                    return ff.createLiteralExpression(intLiteral);
+                    return ff.literal(intLiteral);
                 } catch (NumberFormatException e) {
                     /* really empty */
                 }
@@ -429,12 +410,12 @@ public final class ExpressionDOMParser {
                 try {
                     Double doubleLit = new Double(nodeValue);
 
-                    return ff.createLiteralExpression(doubleLit);
+                    return ff.literal(doubleLit);
                 } catch (NumberFormatException e) {
                     /* really empty */
                 }
 
-                return ff.createLiteralExpression(nodeValue);
+                return ff.literal(nodeValue);
             } catch (IllegalFilterException ife) {
                 LOGGER.finer("Unable to build expression " + ife);
             }
@@ -483,13 +464,12 @@ public final class ExpressionDOMParser {
         if (childName.equalsIgnoreCase("gml:box")) {
             type = GML_BOX;
             coordList = parseCoords(child);
-
+            
             com.vividsolutions.jts.geom.Envelope env = new com.vividsolutions.jts.geom.Envelope();
 
             for (int i = 0; i < coordList.size(); i++) {
                 env.expandToInclude((Coordinate) coordList.get(i));
-            }
-
+            }            
             Coordinate[] coords = new Coordinate[NUM_BOX_COORDS];
             coords[0] = new Coordinate(env.getMinX(), env.getMinY());
             coords[1] = new Coordinate(env.getMinX(), env.getMaxY());
@@ -497,6 +477,7 @@ public final class ExpressionDOMParser {
             coords[3] = new Coordinate(env.getMaxX(), env.getMinY());
             coords[4] = new Coordinate(env.getMinX(), env.getMinY());
 
+            //return new ReferencedEnvelope( env, null );
             com.vividsolutions.jts.geom.LinearRing ring = null;
 
             try {
@@ -506,7 +487,6 @@ public final class ExpressionDOMParser {
 
                 return null;
             }
-
             return gfac.createPolygon(ring, null);
         }
 

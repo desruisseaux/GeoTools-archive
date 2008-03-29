@@ -18,7 +18,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -28,13 +27,13 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * DOCUMENT ME!
+ * Direct implementation of Halo.
  *
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$
  */
-public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
+public class HaloImpl implements Halo, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
@@ -80,9 +79,7 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
      * @param fill New value of property fill.
      */
     public void setFill(org.geotools.styling.Fill fill) {
-        Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged("fill", fill, old);
     }
 
     /**
@@ -100,9 +97,7 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
      * @param radius New value of property radius.
      */
     public void setRadius(Expression radius) {
-        Expression old = this.radius;
         this.radius = radius;
-        fireChildChanged("radius", radius, old);
     }
 
     public void accept(StyleVisitor visitor) {

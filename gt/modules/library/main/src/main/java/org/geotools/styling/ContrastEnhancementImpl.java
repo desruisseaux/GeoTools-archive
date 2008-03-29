@@ -18,7 +18,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
@@ -64,10 +63,7 @@ import org.opengis.filter.expression.Expression;
  * @author iant
  * @source $URL$
  */
-public class ContrastEnhancementImpl extends AbstractGTComponent
-    implements ContrastEnhancement {
-    
-    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
+public class ContrastEnhancementImpl implements ContrastEnhancement {
     private FilterFactory filterFactory;
     private Expression gamma;
     private Expression type;
@@ -94,21 +90,17 @@ public class ContrastEnhancementImpl extends AbstractGTComponent
 
     public void setGammaValue(Expression gamma) {
         this.gamma = gamma;
-        fireChanged();
     }
 
     public void setHistogram() {
         type = filterFactory.literal("HISTOGRAM");
-        fireChanged();
     }
 
     public void setNormalize() {
         type = filterFactory.literal("NORMALIZE");
-        fireChanged();
     }
 
     public void setType(Expression type) {
         this.type = type;
-        fireChanged();
     }
 }

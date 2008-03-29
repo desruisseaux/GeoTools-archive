@@ -16,7 +16,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -49,7 +48,7 @@ import org.geotools.event.GTComponent;
  * @version $Id$
  * @author James Macgill
  */
-public interface Style extends GTComponent {
+public interface Style {
     /** Style name (machine readable, don't show to users) */
     String getName();
 

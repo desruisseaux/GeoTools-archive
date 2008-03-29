@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -41,7 +40,7 @@ import org.geotools.event.GTComponent;
  * Defaults for quantity and label are system-dependent.
  * @source $URL$
  */
-public interface ColorMap extends GTComponent {
+public interface ColorMap {
     public static final int TYPE_RAMP = 1;
     public static final int TYPE_INTERVALS = 2;
     public static final int TYPE_VALUES = 3;

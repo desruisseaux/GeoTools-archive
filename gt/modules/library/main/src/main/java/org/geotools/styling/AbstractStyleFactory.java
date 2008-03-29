@@ -15,6 +15,7 @@
  */
 package org.geotools.styling;
 
+import java.awt.RenderingHints;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -237,7 +238,7 @@ public abstract class AbstractStyleFactory implements StyleFactory {
      *
      * @return DOCUMENT ME!
      */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
+    public Map<RenderingHints.Key,?> getImplementationHints() {
+        return Collections.emptyMap();
     }
 }

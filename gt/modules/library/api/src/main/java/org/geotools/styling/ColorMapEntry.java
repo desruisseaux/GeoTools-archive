@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -33,7 +32,7 @@ import org.geotools.event.GTComponent;
  *  </pre>
  * @source $URL$
  */
-public interface ColorMapEntry extends GTComponent {
+public interface ColorMapEntry {
     String getLabel();
 
     void setLabel(String label);

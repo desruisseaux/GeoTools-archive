@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -27,7 +26,7 @@ import org.geotools.event.GTComponent;
  * </p>
  * @source $URL$
  */
-public interface StyledLayer extends GTComponent {
+public interface StyledLayer {
     public String getName();
 
     public void setName(String name);

@@ -21,7 +21,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -30,7 +29,7 @@ import org.geotools.event.GTComponent;
  * @author iant
  * @source $URL$
  */
-public interface Symbol extends GTComponent {
+public interface Symbol {
     public static final Symbol[] SYMBOLS_EMPTY = new Symbol[0];
 
     void accept(StyleVisitor visitor);

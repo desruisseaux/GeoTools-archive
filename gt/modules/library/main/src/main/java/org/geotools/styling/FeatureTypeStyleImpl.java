@@ -16,15 +16,13 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.event.GTList;
-import org.geotools.resources.Utilities;
-import org.opengis.util.Cloneable;
-
-// OpenGIS dependencies
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -34,11 +32,10 @@ import java.util.logging.Logger;
  * @source $URL$
  * @version $Id$
  */
-public class FeatureTypeStyleImpl extends AbstractGTComponent
-    implements FeatureTypeStyle, Cloneable {
+public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
-    private java.util.List ruleList;
+    private java.util.List<Rule> ruleList;
     private String featureTypeName = "Feature";
     private String name = "name";
     private String title = "title";
@@ -54,8 +51,8 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
         this(Arrays.asList(rules));
     }
 
-    protected FeatureTypeStyleImpl(List rules) {
-        ruleList = new GTList(this, "rules");
+    protected FeatureTypeStyleImpl(List<Rule> rules) {
+        ruleList = new ArrayList<Rule>();
         ruleList.addAll(rules);
     }
 
@@ -63,7 +60,7 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
      * Creates a new instance of FeatureTypeStyleImpl
      */
     protected FeatureTypeStyleImpl() {
-        ruleList = new GTList(this, "rules");
+        ruleList = new ArrayList<Rule>();
     }
 
     public String getFeatureTypeName() {
@@ -74,7 +71,7 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
         return (Rule[]) ruleList.toArray(new Rule[0]);
     }
 
-    public List rules() {
+    public List<Rule> rules() {
         return ruleList;
     }
 
@@ -110,7 +107,6 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
         }
 
         featureTypeName = name;
-        fireChanged();
     }
 
     /**
@@ -129,7 +125,6 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
      */
     public void setAbstract(java.lang.String abstractStr) {
         this.abstractStr = abstractStr;
-        fireChanged();
     }
 
     /**
@@ -148,7 +143,6 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
      */
     public void setName(java.lang.String name) {
         this.name = name;
-        fireChanged();
     }
 
     /**
@@ -167,7 +161,6 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
      */
     public void setTitle(java.lang.String title) {
         this.title = title;
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {
@@ -263,9 +256,7 @@ public class FeatureTypeStyleImpl extends AbstractGTComponent
     }
     public String toString() {
     	StringBuffer buf = new StringBuffer();
-    	buf.append( "FeatureTypeStyleImpl<" );
-    	buf.append( notification );
-    	buf.append(">");
+    	buf.append( "FeatureTypeStyleImpl");
         buf.append( "[");
     	if( name != null ) {
     		buf.append(" name=");

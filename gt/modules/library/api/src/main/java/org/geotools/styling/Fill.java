@@ -20,10 +20,9 @@
 package org.geotools.styling;
 
 import java.awt.Color;
-import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTConstant;
+
 import org.geotools.filter.ConstantExpression;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -79,7 +78,7 @@ import org.geotools.filter.ConstantExpression;
  * @source $URL$
  * @version $Id$
  */
-public interface Fill extends GTComponent {
+public interface Fill {
     static final Fill DEFAULT = new ConstantFill() {
             final Expression COLOR = ConstantExpression.constant(new Color(128, 128, 128));
             final Expression BGCOLOR = ConstantExpression.constant(new Color(255, 255, 255, 0));
@@ -219,7 +218,7 @@ public interface Fill extends GTComponent {
 }
 
 
-abstract class ConstantFill extends GTConstant implements Fill {
+abstract class ConstantFill implements Fill {
     private void cannotModifyConstant() {
         throw new UnsupportedOperationException("Constant Fill may not be modified");
     }

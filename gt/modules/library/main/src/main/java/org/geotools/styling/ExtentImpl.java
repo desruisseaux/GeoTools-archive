@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -24,7 +23,7 @@ import org.opengis.util.Cloneable;
  *
  * @source $URL$
  */
-public class ExtentImpl extends AbstractGTComponent implements Extent,
+public class ExtentImpl implements Extent,
     Cloneable {
     private String name;
     private String value;
@@ -34,10 +33,7 @@ public class ExtentImpl extends AbstractGTComponent implements Extent,
     }
 
     public void setName(String name) {
-        String old = this.name;
         this.name = name;
-
-        fireChildChanged("name", this.name, old);
     }
 
     public String getValue() {
@@ -45,10 +41,7 @@ public class ExtentImpl extends AbstractGTComponent implements Extent,
     }
 
     public void setValue(String value) {
-        String old = this.value;
         this.value = value;
-
-        fireChildChanged("value", this.value, old);
     }
 
     public boolean equals(Object obj) {

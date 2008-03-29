@@ -18,7 +18,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -34,8 +33,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class DisplacementImpl extends AbstractGTComponent
-    implements Displacement, Cloneable {
+public class DisplacementImpl implements Displacement, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
@@ -66,8 +64,6 @@ public class DisplacementImpl extends AbstractGTComponent
         } catch (org.geotools.filter.IllegalFilterException ife) {
             LOGGER.severe("Failed to build defaultDisplacement: " + ife);
         }
-
-        fireChanged();
     }
 
     /**
@@ -77,7 +73,6 @@ public class DisplacementImpl extends AbstractGTComponent
      */
     public void setDisplacementX(Expression displacementX) {
         this.displacementX = displacementX;
-        fireChanged();
     }
 
     /**
@@ -87,7 +82,6 @@ public class DisplacementImpl extends AbstractGTComponent
      */
     public void setDisplacementY(Expression displacementY) {
         this.displacementY = displacementY;
-        fireChanged();
     }
 
     /**

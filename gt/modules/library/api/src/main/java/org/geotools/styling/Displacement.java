@@ -15,10 +15,8 @@
  */
 package org.geotools.styling;
 
-import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTConstant;
 import org.geotools.filter.ConstantExpression;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -30,7 +28,7 @@ import org.geotools.filter.ConstantExpression;
  * @version $Id$
  * @source $URL$
  */
-public interface Displacement extends GTComponent {
+public interface Displacement {
     /**
      * Default Displacment instance.
      */
@@ -98,7 +96,7 @@ public interface Displacement extends GTComponent {
 }
 
 
-abstract class ConstantDisplacement extends GTConstant implements Displacement {
+abstract class ConstantDisplacement implements Displacement {
     private void cannotModifyConstant() {
         throw new UnsupportedOperationException("Constant Displacement may not be modified");
     }

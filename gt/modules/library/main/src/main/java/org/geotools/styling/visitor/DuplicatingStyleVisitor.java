@@ -21,9 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.geotools.event.GTCloneUtil;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ChannelSelection;
@@ -91,7 +89,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     /**
      * This is our internal stack; used to maintain state as we copy sub elements.
      */
-    protected Stack pages=new Stack();  
+    protected Stack<Object> pages=new Stack<Object>();  
     
     public DuplicatingStyleVisitor() {
 		this( CommonFactoryFinder.getStyleFactory( null ) );
@@ -248,7 +246,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 
         if (rule.getFilter() != null) {
             Filter filter = rule.getFilter();
-            filterCopy = copy( rule.getFilter() );
+            filterCopy = copy( filter );
         }
 
         Graphic[] legendGraphic = rule.getLegendGraphic();
@@ -377,9 +375,9 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
      * @return copy of map
      */
     @SuppressWarnings("unchecked")
-    protected Map copy(Map customProperties) {
+    protected <K,V> Map<K,V> copy(Map<K,V> customProperties) {
         if( customProperties == null ) return null;
-        return new HashMap( customProperties );
+        return new HashMap<K,V>( customProperties );
     }
     
     /**
@@ -669,6 +667,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         Expression opacityCopy = copy( gr.getOpacity() );
         Expression rotationCopy = copy( gr.getRotation() );
         Expression sizeCopy = copy( gr.getSize() );        
+        
         // Looks like Symbols are a "view" of marks and external graphics?
         // Symbol[] symbolCopys = copy( gr.getSymbols() );
 
@@ -698,6 +697,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         }
         return copy;
     }
+    
     private Symbol[] copy(Symbol[] symbols) {
         if( symbols == null) return null;
         Symbol[] copy = new Symbol[symbols.length];
@@ -706,6 +706,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         }
         return copy;
     }
+    
     private ExternalGraphic[] copy(ExternalGraphic[] externalGraphics) {
         if( externalGraphics == null) return null;
         ExternalGraphic[] copy = new ExternalGraphic[externalGraphics.length];

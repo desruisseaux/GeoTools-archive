@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -28,7 +27,7 @@ import org.geotools.event.GTComponent;
  * @source $URL$
  * @version $Id$
  */
-public interface Font extends GTComponent {
+public interface Font {
     /** default font-size value **/
     static final int DEFAULT_FONTSIZE = 10;
 

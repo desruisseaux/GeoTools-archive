@@ -15,9 +15,8 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 
-public class RemoteOWSImpl extends AbstractGTComponent implements RemoteOWS {
+public class RemoteOWSImpl implements RemoteOWS {
 
 	private String service;
 	private String onlineResource;
@@ -27,10 +26,7 @@ public class RemoteOWSImpl extends AbstractGTComponent implements RemoteOWS {
 	}
 	
 	public void setService(String service) {
-		String old = this.service;
 		this.service = service;
-		
-		fireChildChanged("service",this.service,old);
 	}
 	
 	public String getOnlineResource() {
@@ -38,10 +34,7 @@ public class RemoteOWSImpl extends AbstractGTComponent implements RemoteOWS {
 	}
 	
 	public void setOnlineResource(String onlineResource) {
-		String old = this.onlineResource;
 		this.onlineResource = onlineResource;
-		
-		fireChildChanged("onlineResource",this.onlineResource,old);
 	}
 
 }

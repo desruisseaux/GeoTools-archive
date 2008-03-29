@@ -15,11 +15,9 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 
-public class ImageOutlineImpl extends AbstractGTComponent implements
-		ImageOutline {
+public class ImageOutlineImpl implements ImageOutline {
 
 	Symbolizer symbolizer;
 	
@@ -32,10 +30,7 @@ public class ImageOutlineImpl extends AbstractGTComponent implements
 			symbolizer instanceof LineSymbolizer ||
 			symbolizer instanceof PolygonSymbolizer
 		) {
-			Symbolizer old = this.symbolizer;
 			this.symbolizer = symbolizer;
-			
-			fireChildChanged("symbolizer",this.symbolizer,old);
 		}
 		else {
 			throw new IllegalArgumentException("Symbolizer must be Line or Polygon.");

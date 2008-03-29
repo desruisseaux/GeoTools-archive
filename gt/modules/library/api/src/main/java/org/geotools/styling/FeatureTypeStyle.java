@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import java.util.List;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -58,7 +57,7 @@ import org.geotools.event.GTComponent;
  * @version $Id$
  * @author James Macgill, CCG
  */
-public interface FeatureTypeStyle extends GTComponent {
+public interface FeatureTypeStyle {
     public String getName();
 
     void setName(String name);
@@ -156,7 +155,7 @@ public interface FeatureTypeStyle extends GTComponent {
      * </p>
      * @since GeoTools 2.2.M3, GeoAPI 2.0
      */
-    List rules();
+    List<Rule> rules();
 
     void accept(StyleVisitor visitor);
 }

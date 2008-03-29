@@ -20,9 +20,9 @@ package org.geotools.styling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.geotools.data.DataStore;
-import org.geotools.event.GTList;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -80,7 +80,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 	private SimpleFeatureType inlineFeatureType = null;
 	
 	RemoteOWS remoteOWS;
-    ArrayList styles = new GTList( this, "styles" );
+    List styles = new ArrayList<Style>();
     FeatureTypeConstraint[] constraints = new FeatureTypeConstraint[0];
     
     public RemoteOWS getRemoteOWS()
@@ -100,20 +100,15 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
 	public void setInlineFeatureDatastore(DataStore store)
     {
     	inlineFeatureDatastore = store;
-    	fireChanged();
     }
 	public void setInlineFeatureType(SimpleFeatureType ft)
 	{
 		inlineFeatureType = ft;
-		fireChanged();
 	}
 	
     public void setRemoteOWS(RemoteOWS service)
     {
-    	RemoteOWS old = this.remoteOWS;
     	this.remoteOWS = service;
-    	
-    	fireChildChanged("remoteOWS",this.remoteOWS,old);
     }
     
     public FeatureTypeConstraint[] getLayerFeatureConstraints(){
@@ -122,7 +117,6 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] constraints){
     	this.constraints = constraints;
-		fireChanged();
     }
     
     public Style[] getUserStyles(){
@@ -132,12 +126,10 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     public void setUserStyles(Style[] styles){ 
     	this.styles.clear();
     	this.styles.addAll(Arrays.asList(styles));
-		fireChanged();
     }    
 
     public void addUserStyle(Style style){
         styles.add(style);
-        fireChanged();
     }
     
     public void accept(StyleVisitor visitor) {

@@ -15,10 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -27,10 +23,9 @@ import org.opengis.filter.expression.Expression;
  * @author aaime
  * @source $URL$
  */
-public class ColorMapEntryImpl extends AbstractGTComponent
-    implements ColorMapEntry {
-    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
-    private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+public class ColorMapEntryImpl implements ColorMapEntry {
+    //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
+    //private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
     private Expression quantity;
     private Expression opacity;
     private Expression color;
@@ -48,7 +43,6 @@ public class ColorMapEntryImpl extends AbstractGTComponent
      */
     public void setLabel(String label) {
         this.label = label;
-        fireChanged();
     }
 
     /**

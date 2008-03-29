@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -48,7 +47,7 @@ import org.geotools.event.GTComponent;
  * @author iant
  * @source $URL$
  */
-public interface ShadedRelief extends GTComponent {
+public interface ShadedRelief {
     /**
      * turns brightnessOnly on or off depending on value of flag.
      *

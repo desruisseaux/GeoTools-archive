@@ -24,13 +24,13 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * DOCUMENT ME!
+ * Default implementation of named layer.
  *
  * @author jamesm
  * @source $URL$
  */
 public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
-    List styles = new ArrayList();
+    List<Style> styles = new ArrayList<Style>();
 
     FeatureTypeConstraint[] featureTypeConstraints = new FeatureTypeConstraint[0];
     
@@ -40,7 +40,6 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
 
     public void setLayerFeatureConstraints(FeatureTypeConstraint[] featureTypeConstraints) {
     	this.featureTypeConstraints = featureTypeConstraints;
-    	fireChanged();
     }
     
     public Style[] getStyles() {
@@ -54,7 +53,6 @@ public class NamedLayerImpl extends StyledLayerImpl implements NamedLayer {
      */
     public void addStyle(Style sl) {
         styles.add(sl);
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {

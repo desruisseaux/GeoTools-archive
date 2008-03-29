@@ -16,7 +16,10 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -24,28 +27,23 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
-// J2SE dependencies
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-
 
 /**
- * DOCUMENT ME!
+ * Direct implementation of Graphic.
  *
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$
  */
-public class GraphicImpl extends AbstractGTComponent implements Graphic,
+public class GraphicImpl implements Graphic,
     Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
+    //private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private String geometryPropertyName = "";
-    private java.util.List externalGraphics = new java.util.ArrayList();
-    private java.util.List marks = new java.util.ArrayList();
-    private java.util.List symbols = new java.util.ArrayList();
+    private java.util.List<ExternalGraphic> externalGraphics = new java.util.ArrayList<ExternalGraphic> ();
+    private java.util.List<Mark> marks = new java.util.ArrayList<Mark>();
+    private java.util.List<Symbol> symbols = new java.util.ArrayList<Symbol>();
     private Expression rotation = null;
     private Expression size = null;
     private Displacement displacement = null;
@@ -67,22 +65,6 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
     }
 
     /**
-     * Convenience method for logging a message with an exception.
-     *
-     * @param method the name of the calling method
-     * @param message the error message
-     * @param exception The exception thrown
-     */
-    private static void severe(final String method, final String message,
-        final Exception exception) {
-        final java.util.logging.LogRecord record = new java.util.logging.LogRecord(java.util.logging.Level.SEVERE,
-                message);
-        record.setSourceMethodName(method);
-        record.setThrown(exception);
-        LOGGER.log(record);
-    }
-
-    /**
      * Provides a list of external graphics which can be used to represent this
      * graphic. Each one should be an equivalent representation but in a
      * different format. If none are provided, or if none of the formats are
@@ -96,7 +78,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
         ExternalGraphic[] ret = null;
 
         if (externalGraphics.size() > 0) {
-            ret = (ExternalGraphic[]) externalGraphics.toArray(new ExternalGraphic[0]);
+            ret = externalGraphics.toArray(new ExternalGraphic[0]);
         }
 
         return ret;
@@ -120,8 +102,6 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
                 addExternalGraphic(externalGraphics[i]);
             }
         }
-
-        fireChanged();
     }
 
     public void addExternalGraphic(ExternalGraphic externalGraphic) {
@@ -142,7 +122,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
         Mark[] ret = new Mark[0];
 
         if (marks.size() > 0) {
-            ret = (Mark[]) marks.toArray(new Mark[0]);
+            ret = marks.toArray(new Mark[0]);
         }
 
         return ret;
@@ -164,8 +144,6 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
         for (int i = 0; i < marks.length; i++) {
             addMark(marks[i]);
         }
-
-        fireChanged();
     }
 
     public void addMark(Mark mark) {
@@ -200,7 +178,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
         Symbol[] ret = null;
 
         if (symbols.size() > 0) {
-            ret = (Symbol[]) symbols.toArray(new Symbol[symbols.size()]);
+            ret = symbols.toArray(new Symbol[symbols.size()]);
         } else {
             ret = new Symbol[] { new MarkImpl() };
         }
@@ -216,8 +194,6 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
                 addSymbol(symbols[i]);
             }
         }
-
-        fireChanged();
     }
 
     public void addSymbol(Symbol symbol) {
@@ -287,9 +263,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
     }
 
     public void setDisplacement(Displacement offset) {
-        Displacement old = this.displacement;
         this.displacement = offset;
-        fireChildChanged("offset", offset, old);
     }
 
     /**
@@ -298,9 +272,7 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
      * @param opacity New value of property opacity.
      */
     public void setOpacity(Expression opacity) {
-        Expression old = opacity;
         this.opacity = opacity;
-        fireChildChanged("opacity", opacity, old);
     }
 
     public void setOpacity(double opacity) {
@@ -313,16 +285,13 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
      * @param rotation New value of property rotation.
      */
     public void setRotation(Expression rotation) {
-        Expression old = this.rotation;
         this.rotation = rotation;
 
-        java.util.Iterator iter = marks.iterator();
+        java.util.Iterator<Mark> iter = marks.iterator();
 
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setRotation(rotation);
         }
-
-        fireChildChanged("rotation", rotation, old);
     }
 
     public void setRotation(double rotation) {
@@ -335,16 +304,13 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
      * @param size New value of property size.
      */
     public void setSize(Expression size) {
-        Expression old = this.size;
         this.size = size;
 
-        java.util.Iterator iter = marks.iterator();
+        java.util.Iterator<Mark> iter = marks.iterator();
 
         while (iter.hasNext()) {
             ((MarkImpl) iter.next()).setSize(size);
         }
-
-        fireChildChanged("size", size, old);
     }
 
     public void setSize(int size) {
@@ -353,7 +319,6 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
 
     public void setGeometryPropertyName(String name) {
         geometryPropertyName = name;
-        fireChanged();
     }
 
     /**
@@ -381,21 +346,21 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
 
         try {
             clone = (GraphicImpl) super.clone();
-            clone.marks = new ArrayList();
-            clone.externalGraphics = new ArrayList();
-            clone.symbols = new ArrayList();
+            clone.marks = new ArrayList<Mark>();
+            clone.externalGraphics = new ArrayList<ExternalGraphic>();
+            clone.symbols = new ArrayList<Symbol>();
 
             // Because ExternalGraphics and Marks are stored twice
             // and we only want to clone them once, we should use
             // the setter methods to place them in the proper lists
-            for (Iterator iter = externalGraphics.iterator(); iter.hasNext();) {
-                ExternalGraphic exGraphic = (ExternalGraphic) iter.next();
+            for (Iterator<ExternalGraphic> iter = externalGraphics.iterator(); iter.hasNext();) {
+                ExternalGraphic exGraphic = iter.next();
                 clone.addExternalGraphic((ExternalGraphic) ((Cloneable) exGraphic)
                     .clone());
             }
 
-            for (Iterator iter = marks.iterator(); iter.hasNext();) {
-                Mark mark = (Mark) iter.next();
+            for (Iterator<Mark> iter = marks.iterator(); iter.hasNext();) {
+                Mark mark = iter.next();
                 clone.addMark((Mark) ((Cloneable) mark).clone());
             }
         } catch (CloneNotSupportedException e) {

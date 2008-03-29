@@ -20,7 +20,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -71,7 +70,7 @@ import org.geotools.event.GTComponent;
  * @author Ian Turton, CCG
  * @source $URL$
  */
-public interface Halo extends GTComponent {
+public interface Halo {
     /**
      * Expression that represents the the distance the halo extends from the
      * text

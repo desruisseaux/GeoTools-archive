@@ -26,11 +26,11 @@ package org.geotools.renderer.lite;
 public class GlyphProperty {
     
     private String name;
-    private Class type;
+    private Class<?> type;
     private Object value;
     
     /** Creates a new instance of GlyphProperty */
-    public GlyphProperty(String s, Class c, Object o) {
+    public GlyphProperty(String s, Class<?> c, Object o) {
         name = s;
         type = c;
         value = o;
@@ -40,7 +40,7 @@ public class GlyphProperty {
         return name;
     }
     
-    public Class getType(){
+    public Class<?> getType(){
         return type;
     }
     

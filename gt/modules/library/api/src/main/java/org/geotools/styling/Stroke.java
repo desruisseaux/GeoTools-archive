@@ -17,11 +17,10 @@
 package org.geotools.styling;
 
 import java.awt.Color;
+
+import org.geotools.filter.ConstantExpression;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTConstant;
-import org.geotools.filter.ConstantExpression;
 
 
 /**
@@ -78,7 +77,7 @@ import org.geotools.filter.ConstantExpression;
  * @version $Id$
  * @author James Macgill
  */
-public interface Stroke extends GTComponent {
+public interface Stroke {
     /**
      * Default Stroke capturing the defaults indicated by the standard.
      * <p>
@@ -381,15 +380,10 @@ public interface Stroke extends GTComponent {
 
     void accept(StyleVisitor visitor);
 
-    /** Creates a clone of the Stroke.
-     *
-     * @return A clone of the stroke object.
-     */
-    Object clone();
 }
 
 
-abstract class ConstantStroke extends GTConstant implements Stroke {
+abstract class ConstantStroke implements Stroke {
     private void cannotModifyConstant() {
         throw new UnsupportedOperationException("Constant Stroke may not be modified");
     }

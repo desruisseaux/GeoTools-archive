@@ -17,7 +17,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.Filter;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -76,7 +75,7 @@ import org.geotools.event.GTComponent;
  * </p>
  * @source $URL$
  */
-public interface Rule extends GTComponent {
+public interface Rule {
     /**
      * Gets the name of the rule.
      *

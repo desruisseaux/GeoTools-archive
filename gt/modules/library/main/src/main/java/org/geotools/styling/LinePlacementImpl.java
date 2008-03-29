@@ -16,7 +16,8 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
+import java.util.logging.Logger;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -24,19 +25,15 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
-// J2SE dependencies
-import java.util.logging.Logger;
-
 
 /**
- * DOCUMENT ME!
+ * Default implementation of LinePlacement.
  *
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$
  */
-public class LinePlacementImpl extends AbstractGTComponent
-    implements LinePlacement, Cloneable {
+public class LinePlacementImpl implements LinePlacement, Cloneable {
     /** The logger for the default core module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
@@ -83,7 +80,6 @@ public class LinePlacementImpl extends AbstractGTComponent
      */
     public void setPerpendicularOffset(Expression perpendicularOffset) {
         this.perpendicularOffset = perpendicularOffset;
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {

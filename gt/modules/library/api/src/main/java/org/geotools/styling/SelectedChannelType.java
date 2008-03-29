@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -34,7 +33,7 @@ import org.geotools.event.GTComponent;
  * @author iant
  * @source $URL$
  */
-public interface SelectedChannelType extends GTComponent {
+public interface SelectedChannelType {
     public void setChannelName(String name);
 
     public String getChannelName();

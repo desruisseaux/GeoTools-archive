@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -27,7 +26,7 @@ import org.geotools.event.GTComponent;
  * @source $URL$
  * @version $Id$
  */
-public interface AnchorPoint extends GTComponent {
+public interface AnchorPoint {
     //TODO: add AnchorPoint to GeoAPI
     /**
      * get the x coordinate of the anchor point

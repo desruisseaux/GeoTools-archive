@@ -379,7 +379,7 @@ public class DuplicatorStyleVisitorTest extends TestCase {
         Stroke dashArray = sf.getDefaultStroke();
         dashArray.setDashArray(new float[] { 1.0f, 2.0f, 3.0f });
 
-        Stroke dashArray2 = (Stroke) dashArray.clone();
+        Stroke dashArray2 = (Stroke) ((Cloneable)dashArray).clone();
         assertEqualsContract(dashArray, dashArray2);
     }
 

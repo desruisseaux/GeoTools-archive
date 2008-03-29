@@ -20,6 +20,7 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
@@ -307,7 +308,10 @@ public class StyleObjectTest extends TestCase {
 
     public void testStroke() {
         Stroke stroke = styleFactory.getDefaultStroke();
-        Stroke clone = (Stroke) stroke.clone();
+        DuplicatingStyleVisitor duplicate = new DuplicatingStyleVisitor( styleFactory );
+        stroke.accept( duplicate );
+        Stroke clone = (Stroke) duplicate.getCopy();
+        
         assertClone(stroke, clone);
 
         Stroke notEq = styleFactory.createStroke(filterFactory.literal("#FF0000"), filterFactory
@@ -319,7 +323,8 @@ public class StyleObjectTest extends TestCase {
         Stroke dashArray = styleFactory.getDefaultStroke();
         dashArray.setDashArray(new float[] { 1.0f, 2.0f, 3.0f });
 
-        Stroke dashArray2 = (Stroke) dashArray.clone();
+        dashArray.accept( duplicate );
+        Stroke dashArray2 = (Stroke) duplicate.getCopy();
         assertEqualsContract(dashArray, dashArray2);
     }
 

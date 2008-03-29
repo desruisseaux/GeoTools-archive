@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -46,7 +45,7 @@ import org.geotools.event.GTComponent;
  *
  * @source $URL$
  */
-public interface LayerFeatureConstraints extends GTComponent {
+public interface LayerFeatureConstraints {
     /**
      * @return The feature type constraints.
      */

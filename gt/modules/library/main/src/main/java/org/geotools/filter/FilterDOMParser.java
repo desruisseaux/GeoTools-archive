@@ -24,6 +24,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A dom based parser to build filters as per OGC 01-067
@@ -81,9 +92,11 @@ public final class FilterDOMParser {
         spatial.put("Within", new Integer(AbstractFilter.GEOMETRY_WITHIN));
         spatial.put("Contains", new Integer(AbstractFilter.GEOMETRY_CONTAINS));
         spatial.put("Overlaps", new Integer(AbstractFilter.GEOMETRY_OVERLAPS));
-        spatial.put("Beyond", new Integer(AbstractFilter.GEOMETRY_BEYOND));
         spatial.put("BBOX", new Integer(AbstractFilter.GEOMETRY_BBOX));
 
+        // Beyond and DWithin not handled well
+        //spatial.put("Beyond", new Integer(AbstractFilter.GEOMETRY_BEYOND));
+        
         logical.put("And", new Integer(AbstractFilter.LOGIC_AND));
         logical.put("Or", new Integer(AbstractFilter.LOGIC_OR));
         logical.put("Not", new Integer(AbstractFilter.LOGIC_NOT));
@@ -104,7 +117,7 @@ public final class FilterDOMParser {
      *
      * @task TODO: split up this insanely long method.
      */
-    public static Filter parseFilter(Node root) {
+    public static org.opengis.filter.Filter parseFilter(Node root) {
         LOGGER.finer("parsingFilter " + root.getLocalName());
 
         //NodeList children = root.getChildNodes();
@@ -137,7 +150,7 @@ public final class FilterDOMParser {
             //boolean between = false;
             try {
                 short type = ((Integer) comparisions.get(childName)).shortValue();
-                CompareFilter filter = null;
+                //CompareFilter filter = null;
                 LOGGER.finer("type is " + type);
 
                 if (type == AbstractFilter.FID) {
@@ -172,7 +185,7 @@ public final class FilterDOMParser {
 
                     return fidFilter;
                 } else if (type == AbstractFilter.BETWEEN) {
-                    BetweenFilter bfilter = FILTER_FACT.createBetweenFilter();
+                    //BetweenFilter bfilter = FILTER_FACT.createBetweenFilter();
 
                     NodeList kids = child.getChildNodes();
 
@@ -193,8 +206,9 @@ public final class FilterDOMParser {
                     //while(value.getNodeType() != Node.ELEMENT_NODE ) 
                     //value = value.getNextSibling();
                     LOGGER.finer("add middle value -> " + value + "<-");
-                    bfilter.addMiddleValue(ExpressionDOMParser.parseExpression(
-                            value));
+                    Expression middle = ExpressionDOMParser.parseExpression(value);
+                    Expression lower = null;
+                    Expression upper = null;
 
                     for (int i = 0; i < kids.getLength(); i++) {
                         Node kid = kids.item(i);
@@ -213,8 +227,7 @@ public final class FilterDOMParser {
                             }
 
                             LOGGER.finer("add left value -> " + value + "<-");
-                            bfilter.addLeftValue(ExpressionDOMParser
-                                .parseExpression(value));
+                            lower = ExpressionDOMParser.parseExpression(value);
                         }
 
                         if (kidName.equalsIgnoreCase("UpperBoundary")) {
@@ -225,12 +238,11 @@ public final class FilterDOMParser {
                             }
 
                             LOGGER.finer("add right value -> " + value + "<-");
-                            bfilter.addRightValue(ExpressionDOMParser
-                                .parseExpression(value));
+                            upper = ExpressionDOMParser.parseExpression(value);
                         }
                     }
 
-                    return bfilter;
+                    return FILTER_FACT.between( middle, lower, upper );
                 } else if (type == AbstractFilter.LIKE) {
                     String wildcard = null;
                     String single = null;
@@ -292,14 +304,14 @@ public final class FilterDOMParser {
 
                     if (!((wildcard == null) || (single == null)
                             || (escape == null) || (pattern == null))) {
-                        LikeFilter lfilter = FILTER_FACT.createLikeFilter();
+                        //LikeFilter lfilter = FILTER_FACT.createLikeFilter();
                         LOGGER.finer("Building like filter " + value.toString()
                             + "\n" + pattern + " " + wildcard + " " + single
                             + " " + escape);
-                        lfilter.setValue(value);
-                        lfilter.setPattern(pattern, wildcard, single, escape);
+                        //lfilter.setValue(value);
+                        //lfilter.setPattern(pattern, wildcard, single, escape);
 
-                        return lfilter;
+                        return FILTER_FACT.like( value, pattern, wildcard, single, escape );
                     }
 
                     LOGGER.finer("Problem building like filter\n" + pattern
@@ -308,9 +320,6 @@ public final class FilterDOMParser {
                     return null;
                 } else if (type == AbstractFilter.NULL) {
                     return parseNullFilter(child);
-                } else {
-                	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-                    filter = factory.createCompareFilter(type);
                 }
 
                 // find and parse left and right values
@@ -321,7 +330,7 @@ public final class FilterDOMParser {
                 }
 
                 LOGGER.finest("add left value -> " + value + "<-");
-                filter.addLeftValue(ExpressionDOMParser.parseExpression(value));
+                Expression left = ExpressionDOMParser.parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -329,11 +338,33 @@ public final class FilterDOMParser {
                 }
 
                 LOGGER.finest("add right value -> " + value + "<-");
-                filter.addRightValue(ExpressionDOMParser.parseExpression(value));
-                return filter;
+                Expression right = ExpressionDOMParser.parseExpression(value);
+                
+                switch (type){
+                case FilterType.COMPARE_EQUALS:
+                    return FILTER_FACT.equals( left, right );
+                    
+                case FilterType.COMPARE_GREATER_THAN:
+                    return FILTER_FACT.greater( left, right );
+                    
+                case FilterType.COMPARE_GREATER_THAN_EQUAL:
+                    return FILTER_FACT.greaterOrEqual( left, right );
+                    
+                case FilterType.COMPARE_LESS_THAN:
+                    return FILTER_FACT.less( left, right );
+                    
+                case FilterType.COMPARE_LESS_THAN_EQUAL:
+                    return FILTER_FACT.lessOrEqual(left, right );
+
+                case FilterType.COMPARE_NOT_EQUALS:
+                    return FILTER_FACT.notEqual(left, right,false );
+
+                default:
+                    LOGGER.warning("Unable to build filter for " + childName);
+                    return null;
+                }
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build filter: " + ife);
-
                 return null;
             }
         } else if (spatial.containsKey(childName)) {
@@ -341,7 +372,7 @@ public final class FilterDOMParser {
 
             try {
                 short type = ((Integer) spatial.get(childName)).shortValue();
-                GeometryFilter filter = FILTER_FACT.createGeometryFilter(type);
+                //  GeometryFilter filter = FILTER_FACT.createGeometryFilter(type);
                 Node value = child.getFirstChild();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -349,8 +380,7 @@ public final class FilterDOMParser {
                 }
 
                 LOGGER.finest("add left value -> " + value + "<-");
-                filter.addLeftGeometry(ExpressionDOMParser.parseExpression(
-                        value));
+                Expression left = ExpressionDOMParser.parseExpression(value);
                 value = value.getNextSibling();
 
                 while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -362,7 +392,7 @@ public final class FilterDOMParser {
                 String valueName = (value.getLocalName()!=null)?value.getLocalName():value.getNodeName(); 
                 if (valueName.indexOf(':') != -1)
                 {
-                	//the DOM parser wasnt properly set to handle namespaces...
+                	//the DOM parser was not properly set to handle namespaces...
                 	valueName = valueName.substring(valueName.indexOf(':')+1);
                 }
                 
@@ -374,11 +404,57 @@ public final class FilterDOMParser {
                     LOGGER.finest("Built new literal " + literal);
                     value = literal;
                 }
-
-                filter.addRightGeometry(ExpressionDOMParser.parseExpression(
-                        value));
-
-                return filter;
+                Expression right = ExpressionDOMParser.parseExpression(value);
+                
+                switch ( type ){
+                case FilterType.GEOMETRY_EQUALS:
+                    return FILTER_FACT.equal( left, right );
+                    
+                case FilterType.GEOMETRY_DISJOINT:
+                    return FILTER_FACT.disjoint( left, right );
+                    
+                case FilterType.GEOMETRY_INTERSECTS:
+                    return FILTER_FACT.intersects( left, right );
+                    
+                case FilterType.GEOMETRY_TOUCHES:
+                    return FILTER_FACT.touches( left, right );
+                    
+                case FilterType.GEOMETRY_CROSSES:
+                    return FILTER_FACT.touches( left, right );
+                    
+                case FilterType.GEOMETRY_WITHIN:
+                    return FILTER_FACT.within( left, right );
+                    
+                case FilterType.GEOMETRY_CONTAINS:
+                    return FILTER_FACT.contains( left, right );
+                    
+                case FilterType.GEOMETRY_OVERLAPS:
+                    return FILTER_FACT.overlaps( left, right );
+                    
+                // case FilterType.GEOMETRY_BEYOND:
+                //    return FILTER_FACT.beyond( left, right, distance, units );
+                    
+                case FilterType.GEOMETRY_BBOX:
+                {
+                    Literal literal = (Literal) right;
+                    Object obj = literal.getValue();
+                    ReferencedEnvelope bbox = null;
+                    if( obj instanceof Geometry){
+                        bbox = JTS.toEnvelope( (Geometry) obj );
+                    }
+                    else if (obj instanceof ReferencedEnvelope){
+                        bbox = (ReferencedEnvelope) obj;
+                    }
+                    else if (obj instanceof Envelope){
+                        // no clue about CRS / srsName so we should guess
+                        bbox = new ReferencedEnvelope( (Envelope) obj, null );
+                    }
+                    return FILTER_FACT.bbox( left, bbox );                                                                                    
+                }
+                default:
+                    LOGGER.warning("Unable to build filter: " + childName);
+                    return null;
+                }
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build filter: " + ife);
 
@@ -428,11 +504,10 @@ public final class FilterDOMParser {
      *
      * @throws IllegalFilterException DOCUMENT ME!
      */
-    private static NullFilter parseNullFilter(Node nullNode)
+    private static PropertyIsNull parseNullFilter(Node nullNode)
         throws IllegalFilterException {
         LOGGER.finest("parsing null node: " + nullNode);
 
-        NullFilter nFilter = FILTER_FACT.createNullFilter();
         Node value = nullNode.getFirstChild();
 
         while (value.getNodeType() != Node.ELEMENT_NODE) {
@@ -440,9 +515,9 @@ public final class FilterDOMParser {
         }
 
         LOGGER.finest("add null value -> " + value + "<-");
-        nFilter.nullCheckValue(ExpressionDOMParser.parseExpression(value));
+        Expression expr = ExpressionDOMParser.parseExpression(value);
 
-        return nFilter;
+        return FILTER_FACT.isNull( expr );
     }
 
 }

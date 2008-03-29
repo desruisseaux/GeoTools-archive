@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -51,7 +50,7 @@ import org.geotools.event.GTComponent;
  * @author iant
  * @source $URL$
  */
-public interface ChannelSelection extends GTComponent {
+public interface ChannelSelection {
     /**
      * set the RGB channels to be used
      *

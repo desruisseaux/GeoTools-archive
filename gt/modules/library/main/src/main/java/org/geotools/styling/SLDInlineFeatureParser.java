@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionDOMParser;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,13 +39,13 @@ public class SLDInlineFeatureParser
 {
 	
 	/** hash table that takes a epsg# to its definition**/
-	private static Hashtable SRSLookup = new Hashtable();
+	private static Hashtable<Integer,CoordinateReferenceSystem> SRSLookup = new Hashtable<Integer,CoordinateReferenceSystem>();
 	
 
 	public SimpleFeatureType  featureType=null;
 	public MemoryDataStore dataStore = null;
 	Node  rootNode = null;
-	ArrayList features= new ArrayList();
+	ArrayList<Feature> features= new ArrayList<Feature>();
 	CoordinateReferenceSystem  SRS = null; // default EPSG#.
 	
 	private static int uniqueNumber = 0;
@@ -270,7 +271,8 @@ public class SLDInlineFeatureParser
 				parseSRS(srsName.getNodeValue());
 			}
 		}
-		return ExpressionDOMParser.parseGML(root);
+	    ExpressionDOMParser parser = new ExpressionDOMParser( CommonFactoryFinder.getFilterFactory2(null));
+	    return parser.gml( root );
 	}
 
 	/**
@@ -463,7 +465,7 @@ public class SLDInlineFeatureParser
 			{
 				childName = child.getNodeName();
 			}	
-			AttributeDescriptor attType = null;
+			//AttributeDescriptor attType = null;
 			//okay, have a tag, check to see if its a geometry
 			if (isGeometry(child))
 			{

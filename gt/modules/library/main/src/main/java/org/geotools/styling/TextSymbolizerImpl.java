@@ -16,20 +16,18 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.event.GTList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
-
-// OpenGIS dependencies
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -40,18 +38,17 @@ import java.util.Map;
  * @source $URL$
  * @version $Id$
  */
-public class TextSymbolizerImpl extends AbstractGTComponent
-    implements TextSymbolizer2, Cloneable {
+public class TextSymbolizerImpl implements TextSymbolizer2, Cloneable {
     private final FilterFactory filterFactory;
     private Fill fill;
-    private java.util.List fonts = new GTList(this, "fonts");
+    private java.util.List<Font> fonts = new ArrayList<Font>();
     private Halo halo;
     private LabelPlacement placement;
     private String geometryPropertyName = null;
     private Expression label = null;
     private Graphic graphic = null;
     private Expression priority = null;
-    private HashMap optionsMap = null; //null=nothing in it
+    private HashMap<String,String> optionsMap = null; //null=nothing in it
     private Expression abxtract = null;
     private Expression description = null;
     private OtherText otherText = null;
@@ -107,10 +104,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         if (this.fill == fill) {
             return;
         }
-
-        Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged("fill", fill, old);
     }
 
     /**
@@ -142,7 +136,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      * @param fonts The array of fonts to use in the symbolizer.
      */
     public void setFonts(Font[] fonts) {
-        List newFonts = Arrays.asList(fonts);
+        List<Font> newFonts = Arrays.asList(fonts);
         this.fonts.clear();
         this.fonts.addAll(newFonts);
     }
@@ -166,10 +160,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         if (this.halo == halo) {
             return;
         }
-
-        Halo old = this.halo;
         this.halo = halo;
-        fireChildChanged("halo", halo, old);
     }
 
     /**
@@ -187,9 +178,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      * @param label New value of property label.
      */
     public void setLabel(Expression label) {
-        Expression old = this.label;
         this.label = label;
-        fireChildChanged("label", label, old);
     }
 
     /**
@@ -211,10 +200,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         if (this.placement == labelPlacement) {
             return;
         }
-
-        LabelPlacement old = this.placement;
         this.placement = labelPlacement;
-        fireChildChanged("placement", labelPlacement, old);
     }
 
     /**
@@ -257,7 +243,6 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      */
     public void setGeometryPropertyName(java.lang.String geometryPropertyName) {
         this.geometryPropertyName = geometryPropertyName;
-        fireChanged();
     }
 
     /**
@@ -347,10 +332,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         if (this.priority == priority) {
             return;
         }
-
-        Expression old = this.priority;
         this.priority = priority;
-        fireChildChanged("priority", priority, old);
     }
 
     /* (non-Javadoc)
@@ -367,11 +349,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      */
     public void addToOptions(String key, String value) {
         if (optionsMap == null) {
-            optionsMap = new HashMap();
+            optionsMap = new HashMap<String,String>();
         }
-
         optionsMap.put(key, value.trim());
-        fireChanged(); // TODO: Handle Options Map?
     }
 
     /* (non-Javadoc)
@@ -388,7 +368,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
     /* (non-Javadoc)
      * @see org.geotools.styling.TextSymbolizer#getOptions()
      */
-    public Map getOptions() {
+    public Map<String,String> getOptions() {
         return optionsMap;
     }
 
@@ -400,10 +380,7 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         if (this.graphic == graphic) {
             return;
         }
-
-        Graphic old = this.graphic;
         this.graphic = graphic;
-        fireChildChanged("graphic", graphic, old);
     }
     public String toString() {
         StringBuffer buf = new StringBuffer();

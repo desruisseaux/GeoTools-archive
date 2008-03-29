@@ -15,18 +15,17 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
 /**
- * DOCUMENT ME!
+ * Default implementation of SelectedChannelType.
+ * 
  * @source $URL$
  */
-public class SelectedChannelTypeImpl extends AbstractGTComponent
-    implements SelectedChannelType {
+public class SelectedChannelTypeImpl implements SelectedChannelType {
     private FilterFactory filterFactory;
 
     //private Expression contrastEnhancement;
@@ -54,14 +53,10 @@ public class SelectedChannelTypeImpl extends AbstractGTComponent
 
     public void setChannelName(String name) {
         this.name = name;
-        fireChanged();
     }
 
     public void setContrastEnhancement(ContrastEnhancement enhancement) {
-        ContrastEnhancement old = this.contrastEnhancement;
         this.contrastEnhancement = enhancement;
-
-        fireChildChanged("contrastEnhancement", contrastEnhancement, old);
     }
 
     public void setContrastEnhancement(Expression gammaValue) {

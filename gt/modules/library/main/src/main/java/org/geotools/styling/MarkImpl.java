@@ -18,7 +18,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
@@ -27,13 +26,13 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * DOCUMENT ME!
+ * Default implementation of Mark.
  *
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$
  */
-public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
+public class MarkImpl implements Mark, Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
 
@@ -130,9 +129,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
      * @param fill New value of property fill.
      */
     public void setFill(org.geotools.styling.Fill fill) {
-        Fill old = this.fill;
         this.fill = fill;
-        fireChildChanged("fill", fill, old);
     }
 
     /**
@@ -141,15 +138,11 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
      * @param stroke New value of property stroke.
      */
     public void setStroke(Stroke stroke) {
-        Stroke old = this.stroke;
         this.stroke = stroke;
-        fireChildChanged("stroke", stroke, old);
     }
 
     public void setSize(Expression size) {
-        Expression old = this.size;
         this.size = size;
-        fireChildChanged("size", size, old);
     }
 
     public void setSize(int size) {
@@ -163,11 +156,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
      */
     public void setWellKnownName(Expression wellKnownName) {
         LOGGER.entering("DefaultMark", "setWellKnownName");
-
-        Expression old = this.wellKnownName;
         this.wellKnownName = wellKnownName;
-
-        fireChildChanged("wellKnownName", wellKnownName, old);
     }
 
     public void setWellKnownName(String name) {
@@ -175,9 +164,7 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     }
 
     public void setRotation(Expression rotation) {
-        Expression old = this.rotation;
         this.rotation = rotation;
-        fireChildChanged("rotation", rotation, old);
     }
 
     public void setRotation(double rotation) {
@@ -226,8 +213,8 @@ public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
             if (fill != null) {
             	clone.fill = (Fill) ((Cloneable) fill).clone();
             }
-            if (stroke != null) {
-            	clone.stroke = (Stroke) stroke.clone();
+            if (stroke != null && stroke instanceof Cloneable) {
+            	clone.stroke = (Stroke) ((Cloneable)stroke).clone();
             }
 
             return clone;

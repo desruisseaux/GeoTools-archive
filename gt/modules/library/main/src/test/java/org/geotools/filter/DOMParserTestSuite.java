@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opengis.filter.Filter;
 
 public class DOMParserTestSuite extends TestSuite {
     
@@ -190,7 +191,7 @@ public class DOMParserTestSuite extends TestSuite {
                     assertNotNull("Null filter returned", filter);
                     LOGGER.finer("filter: " + filter.getClass().toString());
                     LOGGER.fine("parsed: " + filter.toString());
-                    LOGGER.finer("result " + filter.contains(testFeature));
+                    LOGGER.finer("result " + filter.evaluate(testFeature));
                 }
             }
 

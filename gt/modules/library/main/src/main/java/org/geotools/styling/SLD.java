@@ -23,13 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTRoot;
+import org.geotools.filter.Filters;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
-import org.geotools.filter.Filters;
 
 
 /**
@@ -1598,25 +1595,6 @@ SYMBOLIZER:
         //no default, so just grab the first one
         return style[0];
     }
-
-	/**
-	 * Climbs the style hierarchy until null or an SLD is found.
-	 * 
-	 * @param gtComponent object
-	 * 
-	 * @return SLD
-	 */
-	public static StyledLayerDescriptor styledLayerDescriptor(Object gtComponent) {
-		if (!(gtComponent instanceof GTComponent)) return null;
-		GTComponent component = (GTComponent) gtComponent;
-		while (component.getNote().getParent() != GTRoot.NO_PARENT) {
-			component = component.getNote().getParent();
-			if (component instanceof StyledLayerDescriptor) {
-				return (StyledLayerDescriptor) component;
-			}
-		}
-		return null;
-	}
     
 	public static Filter[] filters(Rule[] rule) {
 		Filter[] filter = new Filter[rule.length];
@@ -1632,7 +1610,7 @@ SYMBOLIZER:
 	}
     
 	public static Rule[] rules(Style style) {
-		Set ruleSet = new HashSet();
+		Set<Rule> ruleSet = new HashSet<Rule>();
 		FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
 		for (int i = 0; i < fts.length; i++) {
 			Rule[] ftsRules = fts[i].getRules();

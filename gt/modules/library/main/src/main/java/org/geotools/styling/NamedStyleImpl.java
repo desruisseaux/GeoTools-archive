@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 
 
 /**
@@ -29,44 +28,43 @@ import org.geotools.event.AbstractGTComponent;
  * @author jamesm
  * @source $URL$
  */
-public class NamedStyleImpl extends AbstractGTComponent implements NamedStyle {
-    /** DOCUMENT ME! */
+public class NamedStyleImpl implements NamedStyle {
+    /** Style name */
     private String name;
 
     /**
-     * DOCUMENT ME!
+     * Style name
      *
-     * @return DOCUMENT ME!
+     * @return style name
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * DOCUMENT ME!
+     * Set name.
      *
-     * @param name DOCUMENT ME!
+     * @param name style name
      */
     public void setName(String name) {
         this.name = name;
-        fireChanged();
     }
 
     /**
-     * DOCUMENT ME!
+     * Human readable title.
      *
-     * @return DOCUMENT ME!
+     * @return Human readable title, or null
      */
     public String getTitle() {
         return null;
     }
 
     /**
-     * DOCUMENT ME!
+     * Human readable title.
      *
-     * @param title DOCUMENT ME!
+     * @param title Human readable title.
      *
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws UnsupportedOperationException Cannot be changed
      */
     public void setTitle(String title) {
         throw new UnsupportedOperationException();

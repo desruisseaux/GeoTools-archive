@@ -18,23 +18,22 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 
 /**
- * DOCUMENT ME!
+ * Direct implementation of AnchorPoint.
  *
  * @author Ian Turton, CCG
  * @source $URL$
  * @version $Id$
  */
-public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
+public class AnchorPointImpl implements AnchorPoint,
     Cloneable {
     /** The logger for the default core module. */
     private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
@@ -74,7 +73,14 @@ public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
      */
     public void setAnchorPointX(Expression anchorPointX) {
         this.anchorPointX = anchorPointX;
-        fireChanged();
+    }
+    /**
+     * Define the anchor point.
+     * 
+     * @param x Literal value of property anchorPointX
+     */
+    public void setAnchorPointX(double x){
+        this.anchorPointX = filterFactory.literal( x );
     }
 
     /**
@@ -93,9 +99,17 @@ public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
      */
     public void setAnchorPointY(Expression anchorPointY) {
         this.anchorPointY = anchorPointY;
-        fireChanged();
     }
 
+    /**
+     * Define the anchor point.
+     * 
+     * @param x Literal value of property anchorPointX
+     */
+    public void getAnchorPointY(double x){
+        this.anchorPointY = filterFactory.literal( x );
+    }
+    
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }

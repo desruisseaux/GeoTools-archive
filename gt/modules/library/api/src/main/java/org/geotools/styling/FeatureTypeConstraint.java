@@ -16,7 +16,6 @@
 package org.geotools.styling;
 
 import org.opengis.filter.Filter;
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -51,7 +50,7 @@ import org.geotools.event.GTComponent;
  * @author James Macgill
  * @source $URL$
  */
-public interface FeatureTypeConstraint extends GTComponent {
+public interface FeatureTypeConstraint {
     public String getFeatureTypeName();
 
     public void setFeatureTypeName(String name);

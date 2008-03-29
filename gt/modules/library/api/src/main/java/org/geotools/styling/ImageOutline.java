@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -42,7 +41,7 @@ import org.geotools.event.GTComponent;
  *
  * @source $URL$
  */
-public interface ImageOutline extends GTComponent {
+public interface ImageOutline {
     /**
      * Returns the symbolizer of the image outline.
      *

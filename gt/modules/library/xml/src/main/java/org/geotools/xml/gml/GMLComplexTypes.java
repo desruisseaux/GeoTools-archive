@@ -37,11 +37,13 @@ import org.geotools.feature.NameImpl;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.geotools.referencing.CRS;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer.StopException;
@@ -396,7 +398,12 @@ public class GMLComplexTypes {
                 // deprecated version
                 ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
             } else {
-            	throw new IOException("srsName required for MultiPoint "+e.getName());
+                if( e == null ){
+                    throw new IOException("srsName required for MultiPolygon" );
+                }
+                else {
+                    throw new IOException("srsName required for MultiPolygon "+e.getName());
+                }                
             }
         }
 
@@ -2758,7 +2765,7 @@ public class GMLComplexTypes {
             // might not be an element around for it, so we dont require that 
             // there be one and simply check that the value being encoded is a 
             // geometry
-            return value instanceof Geometry;
+            return value instanceof Geometry || value instanceof ReferencedEnvelope;
         }
 
         /**
@@ -2769,51 +2776,86 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (!canEncode(element, value, hints)) {
-                throw new OperationNotSupportedException("Cannot encode");
+                throw new OperationNotSupportedException("Cannot encode "+value);
             }
-
-            Geometry g = null;
-            	g=(Geometry) value;
-
-            AttributesImpl ai = new AttributesImpl();
-
-            // no GID
-            if (g.getUserData() != null) {
-                // TODO Fix this when parsing is better ... should be a coord reference system
-                ai.addAttribute("", "srsName", "", "anyURI",
-                    g.getUserData().toString());
-            } else {
-//                if (g.getSRID() != 0) {
-//                    // deprecated version
-//                    ai.addAttribute("", "srsName", "", "anyURI",
-//                        "" + g.getSRID());
-//                } else {
-                    ai = null;
-//                }
+            if( value instanceof ReferencedEnvelope){
+                ReferencedEnvelope bbox = (ReferencedEnvelope) value;
+                AttributesImpl ai = new AttributesImpl();
+    
+                // no GID
+                if( bbox != null && bbox.getCoordinateReferenceSystem() != null ){
+                    // TODO Fix this when parsing is better ... should be a coord reference system
+                    String srsName = CRS.toSRS( bbox.getCoordinateReferenceSystem() );
+                    ai.addAttribute("", "srsName", "", "anyURI", srsName ); 
+                } else {
+                        ai = null;
+                }
+    
+                if ( bbox == null || bbox.isNull() || bbox.isEmpty() ) {
+                    return;
+                }    
+                // we handle the case for a null element, see canEncode for details
+                if (element != null) {
+                    output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
+                }
+                else { 
+                    output.startElement(GMLSchema.NAMESPACE, "Box", ai);
+                }
+                
+                // Coordinate[] coords = g.getCoordinates();
+                Envelope e = bbox;
+                encodeCoords(elements[1], e, output);
+                
+                if (element != null) {
+                    output.endElement(GMLSchema.NAMESPACE, element.getName());
+                }
+                else { 
+                    output.endElement(GMLSchema.NAMESPACE, "Box");
+                }
             }
-
-            if ((g == null) || (g.getNumPoints() == 0)
-                    || (g.getCoordinates().length == 0)) {
-                return;
-            }
-
-            //we handle the case for a null element, see canEncode for details
-            if (element != null) {
-                output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
-            }
-            else { 
-                output.startElement(GMLSchema.NAMESPACE, "Box", ai);
-            }
-            
-//            Coordinate[] coords = g.getCoordinates();
-            Envelope e = g.getEnvelopeInternal();
-            encodeCoords(elements[1], e, output);
-            
-            if (element != null) {
-                output.endElement(GMLSchema.NAMESPACE, element.getName());
-            }
-            else { 
-                output.endElement(GMLSchema.NAMESPACE, "Box");
+            else {
+                Geometry g = (Geometry) value;
+    
+                AttributesImpl ai = new AttributesImpl();
+    
+                // no GID
+                if ( g != null && g.getUserData() != null) {
+                    // TODO Fix this when parsing is better ... should be a coord reference system
+                    ai.addAttribute("", "srsName", "", "anyURI",
+                        g.getUserData().toString());
+                } else {
+    //                if (g.getSRID() != 0) {
+    //                    // deprecated version
+    //                    ai.addAttribute("", "srsName", "", "anyURI",
+    //                        "" + g.getSRID());
+    //                } else {
+                        ai = null;
+    //                }
+                }
+    
+                if ((g == null) || (g.getNumPoints() == 0)
+                        || (g.getCoordinates().length == 0)) {
+                    return;
+                }
+    
+                //we handle the case for a null element, see canEncode for details
+                if (element != null) {
+                    output.startElement(GMLSchema.NAMESPACE, element.getName(), ai);
+                }
+                else { 
+                    output.startElement(GMLSchema.NAMESPACE, "Box", ai);
+                }
+                
+    //            Coordinate[] coords = g.getCoordinates();
+                Envelope e = g.getEnvelopeInternal();
+                encodeCoords(elements[1], e, output);
+                
+                if (element != null) {
+                    output.endElement(GMLSchema.NAMESPACE, element.getName());
+                }
+                else { 
+                    output.endElement(GMLSchema.NAMESPACE, "Box");
+                }
             }
         }
     }

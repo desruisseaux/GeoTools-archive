@@ -15,18 +15,15 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
+import java.util.Arrays;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.filter.ConstantExpression;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
-
-// J2SE depedencies
-import java.util.Arrays;
 
 
 /**
@@ -37,8 +34,7 @@ import java.util.Arrays;
  * @source $URL$
  * @version $Id$
  */
-public class StrokeImpl extends AbstractGTComponent implements Stroke,
-    Cloneable {
+public class StrokeImpl implements Stroke, Cloneable {
     private FilterFactory filterFactory;
     private Expression color;
     private float[] dashArray;
@@ -100,10 +96,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (this.color == color) {
             return;
         }
-
-        Expression old = this.color;
         this.color = color;
-        fireChildChanged("color", color, old);
     }
 
     /**
@@ -165,7 +158,6 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      */
     public void setDashArray(float[] dashPattern) {
         dashArray = dashPattern;
-        fireChanged();
     }
 
     /**
@@ -188,9 +180,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
             return;
         }
 
-        Expression old = this.dashOffset;
         this.dashOffset = dashOffset;
-        fireChildChanged("dashOffset", dashOffset, old);
     }
 
     /**
@@ -215,11 +205,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (this.fillGraphic == fillGraphic) {
             return;
         }
-
-        Graphic old = this.fillGraphic;
-
         this.fillGraphic = fillGraphic;
-        fireChildChanged("fillGraphic", fillGraphic, old);
     }
 
     /**
@@ -254,10 +240,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (this.strokeGraphic == strokeGraphic) {
             return;
         }
-
-        Graphic old = this.strokeGraphic;
         this.strokeGraphic = strokeGraphic;
-        fireChildChanged("strokeGraphic", strokeGraphic, old);
     }
 
     /**
@@ -284,10 +267,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (lineCap == null) {
             return;
         }
-
-        Expression old = this.lineCap;
         this.lineCap = lineCap;
-        fireChildChanged("lineCap", lineCap, old);
     }
 
     /**
@@ -314,10 +294,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (lineJoin == null) {
             return;
         }
-
-        Expression old = this.lineJoin;
         this.lineJoin = lineJoin;
-        fireChildChanged("lineJoin", lineJoin, old);
     }
 
     /**
@@ -353,10 +330,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         if (opacity == null) {
             return;
         }
-
-        Expression old = this.opacity;
         this.opacity = opacity;
-        fireChildChanged("opacity", opacity, old);
     }
 
     /**
@@ -383,9 +357,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *        but not negative.
      */
     public void setWidth(Expression width) {
-        Expression old = getWidth();
         this.width = width;
-        fireChildChanged("width", getWidth(), old);
     }
 
     public String toString() {
@@ -432,11 +404,11 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
                     dashArray.length);
             }
 
-            if (fillGraphic != null) {
+            if (fillGraphic != null && fillGraphic instanceof Cloneable) {
                 clone.fillGraphic = (Graphic) ((Cloneable) fillGraphic).clone();
             }
 
-            if (strokeGraphic != null) {
+            if (strokeGraphic != null && fillGraphic instanceof Cloneable ) {
                 clone.strokeGraphic = (Graphic) ((Cloneable) strokeGraphic)
                     .clone();
             }

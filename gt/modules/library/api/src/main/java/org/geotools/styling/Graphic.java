@@ -15,10 +15,8 @@
  */
 package org.geotools.styling;
 
-import org.opengis.filter.expression.Expression;
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTConstant;
 import org.geotools.filter.ConstantExpression;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -89,7 +87,7 @@ import org.geotools.filter.ConstantExpression;
  *       problem?
  * @source $URL$
  */
-public interface Graphic extends GTComponent {
+public interface Graphic {
     /**
      * A default Graphic instance.
      * <p>
@@ -301,7 +299,7 @@ public interface Graphic extends GTComponent {
 }
 
 
-abstract class ConstantGraphic extends GTConstant implements Graphic {
+abstract class ConstantGraphic implements Graphic {
     private void cannotModifyConstant() {
         throw new UnsupportedOperationException("Constant Graphic may not be modified");
     }

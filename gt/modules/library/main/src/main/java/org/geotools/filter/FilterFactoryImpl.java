@@ -252,6 +252,10 @@ public class FilterFactoryImpl implements FilterFactory {
         return bbox( name, minx, miny, maxx, maxy, srs );
     }
 
+    public BBOX bbox( Expression geometry, Expression bounds ) {
+        return new BBOXImpl(this, geometry, bounds );
+    }
+    
     public BBOX bbox( Expression geometry, BoundingBox bounds ) {
         return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(),
                 CRS.toSRS( bounds.getCoordinateReferenceSystem() ) );

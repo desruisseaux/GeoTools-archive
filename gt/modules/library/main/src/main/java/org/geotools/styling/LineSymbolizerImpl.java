@@ -17,7 +17,6 @@ package org.geotools.styling;
 
 
 // OpenGIS dependencies
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -30,8 +29,7 @@ import org.opengis.util.Cloneable;
  * @source $URL$
  * @version $Id$
  */
-public class LineSymbolizerImpl extends AbstractGTComponent
-    implements LineSymbolizer, Cloneable {
+public class LineSymbolizerImpl implements LineSymbolizer, Cloneable {
     private Stroke stroke = null;
     private String geometryName = null;
 
@@ -72,7 +70,6 @@ public class LineSymbolizerImpl extends AbstractGTComponent
      */
     public void setGeometryPropertyName(String name) {
         geometryName = name;
-        fireChanged();
     }
 
     /**
@@ -95,10 +92,7 @@ public class LineSymbolizerImpl extends AbstractGTComponent
         if (this.stroke == stroke) {
             return;
         }
-
-        Stroke old = this.stroke;
         this.stroke = stroke;
-        fireChildChanged( "stroke", stroke, old);
     }
 
     /**
@@ -123,8 +117,8 @@ public class LineSymbolizerImpl extends AbstractGTComponent
         try {
             clone = (LineSymbolizerImpl) super.clone();
 
-            if (stroke != null) {
-                clone.stroke = (Stroke) stroke.clone();
+            if (stroke != null && stroke instanceof Cloneable) {
+                clone.stroke = (Stroke) ((Cloneable)stroke).clone();
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e); // this should never happen.

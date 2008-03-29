@@ -15,7 +15,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -50,7 +49,7 @@ import org.geotools.event.GTComponent;
  * @author Ian Turton, CCG
  * @source $URL$
  */
-public interface LabelPlacement extends GTComponent {
+public interface LabelPlacement {
     //TODO: check GeoAPI renaming of LabelPlacement to TextPlacement
     //TODO: check GeoAPI use of accept(StyleVisitor, Object) instead of accept(StyleVisitor)
     void accept(StyleVisitor visitor);

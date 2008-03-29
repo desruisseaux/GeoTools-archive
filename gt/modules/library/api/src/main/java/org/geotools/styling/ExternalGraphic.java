@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Map;
 
 
+
 /**
  * Holds a reference to an external graphics file with a URL to its location
  * and its expected MIME type. Knowing the MIME type in advance allows stylers
@@ -118,7 +119,33 @@ public interface ExternalGraphic extends Symbol {
      */
     void setFormat(String format);
 
-    public void setCustomProperties(Map list);
-
-    public Map getCustomProperties();
+    /**
+     * Custom properties; renderer may consult these values when drawing graphic.
+     * <p>
+     * The default GeoTools renderer uses the following:
+     * <ul>
+     * <li>radius: 50
+     * <li>circle color: #000066
+     * <li>bar height:150
+     * <li>bar color:"#000000
+     * <li>bar uncertainty:50
+     * <li>bar uncertainty width:5
+     * <li>bar uncertainty color:"#999999
+     * <li>pointer length:100
+     * <li>pointer color: #FF0000
+     * <li>pointer direction: 21
+     * <li>wedge width: 25
+     * <li>wedge color: #9999FF"
+     * </ul>
+     * 
+     * @param properties
+     */
+    public void setCustomProperties(Map<String,Object> properties);
+    
+    /**
+     * Custom user supplied properties available when working with an external graphic.
+     * 
+     * @return properties
+     */
+    public Map<String,Object> getCustomProperties();
 }

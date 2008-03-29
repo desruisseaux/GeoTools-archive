@@ -20,12 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.event.AbstractGTRoot;
-import org.geotools.event.GTDelta;
-import org.geotools.event.GTDeltaImpl;
-import org.geotools.event.GTEvent;
-import org.geotools.event.GTEventImpl;
-import org.geotools.event.GTNoteImpl;
 import org.geotools.resources.Utilities;
 
 
@@ -72,8 +66,7 @@ import org.geotools.resources.Utilities;
  * </p>
  * @source $URL$
  */
-public class StyledLayerDescriptorImpl extends AbstractGTRoot
-    implements StyledLayerDescriptor {
+public class StyledLayerDescriptorImpl implements StyledLayerDescriptor {
     /** The logger for the default core module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
@@ -132,11 +125,9 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
 
         LOGGER.fine("StyleLayerDescriptorImpl added " + this.layers.size()
             + " styled layers");
-        fireChanged(); // TODO Handle StyledLayer List
     }
 
     public void addStyledLayer(StyledLayer layer) {
-        layer.getNote().setParent(this);
         layers.add(layer);
     }
 
@@ -156,7 +147,6 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
      */
     public void setName(String name) {
         this.name = name;
-        fireChanged();
     }
 
     /**
@@ -175,7 +165,6 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
      */
     public void setTitle(String title) {
         this.title = title;
-        fireChanged();
     }
 
     /**
@@ -194,37 +183,6 @@ public class StyledLayerDescriptorImpl extends AbstractGTRoot
      */
     public void setAbstract(java.lang.String abstractStr) {
         this.abstractStr = abstractStr;
-        fireChanged();
-    }
-
-    /**
-     * Issue a change event w/ PRE_DELETE
-     *
-     * @param childDelta Delta describing change
-     */
-    public void removed(GTDelta childDelta) {
-        if (!hasListeners()) {
-            return;
-        }
-
-        GTDelta delta = new GTDeltaImpl(new GTNoteImpl("", GTDelta.NO_INDEX),
-                GTDelta.Kind.NO_CHANGE, this, childDelta);
-        GTEventImpl event = new GTEventImpl(this, GTEvent.Type.PRE_DELETE, delta);
-        fire(event);
-    }
-
-    /**
-     * Used to pass on "We changed" notification from children.
-     *
-     * @param delta Describes change
-     */
-    public void changed(GTDelta delta) {
-        if (!hasListeners()) {
-            return;
-        }
-
-        fire(new GTDeltaImpl(new GTNoteImpl("", GTDelta.NO_INDEX),
-                GTDelta.Kind.NO_CHANGE, this, delta));
     }
 
     public void accept(StyleVisitor visitor) {

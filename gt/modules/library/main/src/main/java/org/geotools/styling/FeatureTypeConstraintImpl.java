@@ -16,17 +16,16 @@
 package org.geotools.styling;
 
 import java.util.Arrays;
-import org.geotools.event.AbstractGTComponent;
-import org.opengis.filter.Filter;
+
 import org.geotools.resources.Utilities;
+import org.opengis.filter.Filter;
 
 
 /**
  *
  * @source $URL$
  */
-public class FeatureTypeConstraintImpl extends AbstractGTComponent
-    implements FeatureTypeConstraint, Cloneable {
+public class FeatureTypeConstraintImpl implements FeatureTypeConstraint, Cloneable {
     /** the feature type name */
     String featureTypeName;
 
@@ -41,10 +40,7 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
     }
 
     public void setFeatureTypeName(String name) {
-        String old = this.featureTypeName;
         this.featureTypeName = name;
-
-        fireChildChanged("featureTypeName", this.featureTypeName, old);
     }
 
     public Filter getFilter() {
@@ -52,10 +48,7 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
     }
 
     public void setFilter(Filter filter) {
-        Filter old = this.filter;
         this.filter = filter;
-
-        fireChildChanged("filter", this.filter, old);
     }
 
     public Extent[] getExtents() {
@@ -63,10 +56,7 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
     }
 
     public void setExtents(Extent[] extents) {
-        Extent[] old = this.extents;
         this.extents = extents;
-
-        fireChildChanged("extents", this.extents, old);
     }
 
     public void accept(StyleVisitor visitor) {

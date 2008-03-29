@@ -19,7 +19,6 @@ package org.geotools.styling;
 // J2SE dependencies
 import java.util.logging.Logger;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Utilities;
@@ -33,7 +32,7 @@ import org.opengis.util.Cloneable;
  * @version $Id$
  * @author James Macgill, CCG
  */
-public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
+public class FillImpl implements Fill, Cloneable {
     /**
      * The logger for the default core module.
      */
@@ -89,9 +88,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setColor(Expression rgb) {
     	if( color == rgb ) return;
-    	Expression old = color;
     	color = rgb;
-    	fireChildChanged( "color", rgb, old );
     }
 
     public void setColor(String rgb) {
@@ -132,9 +129,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setBackgroundColor(Expression rgb) {
     	if( this.backgroundColor == rgb ) return;
-    	Expression old = backgroundColor;
     	backgroundColor = rgb;
-    	fireChildChanged( "backgroundColor", rgb, old );    
     }
 
     public void setBackgroundColor(String rgb) {
@@ -167,10 +162,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
     public void setOpacity(Expression opacity) {
     	if( this.opacity == opacity ) return;
     	
-    	Expression old = this.opacity;
     	this.opacity = opacity;
-    	
-    	fireChildChanged( "opacity", opacity, old );    
     }
 
     public void setOpacity(String opacity) {
@@ -196,9 +188,7 @@ public class FillImpl extends AbstractGTComponent implements Fill, Cloneable {
      */
     public void setGraphicFill(org.geotools.styling.Graphic graphicFill) {
     	if( this.graphicFill == graphicFill ) return;
-    	Graphic old = this.graphicFill;
     	this.graphicFill = graphicFill;    	
-    	fireChildChanged( "graphicFill", graphicFill, old );    
     }
     
     public void accept(StyleVisitor visitor) {

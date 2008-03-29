@@ -25,8 +25,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.geometry.jts.LiteShape2;
+import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -59,12 +61,35 @@ public class LiteShapeTest extends TestCase {
 		return suite;
 	}
 
-	public void testLineShape() throws TransformException, FactoryException {
+	   public void testLineShape() throws TransformException, FactoryException {
+	        GeometryFactory geomFac = new GeometryFactory();
+	        LineString lineString = makeSampleLineString(geomFac, 0, 0);
+	        AffineTransform affineTransform = new AffineTransform();
+            LiteShape lineShape = new LiteShape(lineString, affineTransform, false);
+
+	        assertFalse(lineShape.contains(0, 0));
+	        assertTrue(lineShape.contains(60, 60));
+	        assertFalse(lineShape.contains(50, 50, 10, 10));
+	        assertTrue(lineShape.contains(new java.awt.Point(60, 60)));
+	        assertFalse(lineShape.contains(new java.awt.geom.Rectangle2D.Float(50,
+	                50, 10, 10)));
+	        assertTrue(lineShape.getBounds2D().equals(
+	                new Rectangle2D.Double(50, 50, 80, 250)));
+	        assertTrue(lineShape.getBounds().equals(
+	                new java.awt.Rectangle(50, 50, 80, 250)));
+	        assertTrue(lineShape.intersects(0, 0, 100, 100));
+	        assertTrue(lineShape.intersects(new Rectangle2D.Double(0, 0, 100, 100)));
+	        assertFalse(lineShape.intersects(55, 55, 3, 100));
+	        assertFalse(lineShape
+	                .intersects(new Rectangle2D.Double(55, 55, 3, 100)));
+	    }
+	   
+	public void testLineShape2() throws TransformException, FactoryException {
 		GeometryFactory geomFac = new GeometryFactory();
 		LineString lineString = makeSampleLineString(geomFac, 0, 0);
-		LiteShape2 lineShape = new LiteShape2(lineString, ProjectiveTransform
-				.create(new AffineTransform()), new Decimator(
-				ProjectiveTransform.create(new AffineTransform())), false);
+		MathTransform transform = ProjectiveTransform.create(new AffineTransform());
+        Decimator decimator = new Decimator(transform);
+        LiteShape2 lineShape = new LiteShape2(lineString, transform, decimator, false);
 
 		assertFalse(lineShape.contains(0, 0));
 		assertTrue(lineShape.contains(60, 60));

@@ -16,8 +16,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
-import org.geotools.event.GTListener;
 
 
 /**
@@ -79,7 +77,7 @@ import org.geotools.event.GTListener;
  *
  * @since GeoTools 2.0
  */
-public interface StyledLayerDescriptor extends GTComponent {
+public interface StyledLayerDescriptor {
     public StyledLayer[] getStyledLayers();
 
     public void setStyledLayers(StyledLayer[] layers);
@@ -127,38 +125,6 @@ public interface StyledLayerDescriptor extends GTComponent {
      * @param abstractStr New value of property abstractStr.
      */
     public void setAbstract(java.lang.String abstractStr);
-
-    /**
-     * Listens to changes in the Style content.
-     *
-     * <p>
-     * Changes are provided:
-     *
-     * <ul>
-     * <li>
-     * Before: deletion
-     * </li>
-     * <li>
-     * After: modification
-     * </li>
-     * </ul>
-     * </p>
-     *
-     * <p>
-     * Since the Style data structure can be vast and complicated a trail of
-     * breadcrumbs (a delta) is provided to help find your way to the change.
-     * </p>
-     *
-     * @param listener
-     */
-    void addListener(GTListener listener);
-
-    /**
-     * Remove a style listener
-     *
-     * @param listener DOCUMENT ME!
-     */
-    void removeListener(GTListener listener);
 
     /**
      * Used to navigate a Style/SLD.

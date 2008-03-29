@@ -15,16 +15,15 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 
 
 /**
- * DOCUMENT ME!
+ * Default implementation of StyledLayer.
  *
  * @author jamesm
  * @source $URL$
  */
-public class StyledLayerImpl extends AbstractGTComponent implements StyledLayer {
+public class StyledLayerImpl implements StyledLayer {
     protected String name;
 
     public String getName() {
@@ -35,8 +34,6 @@ public class StyledLayerImpl extends AbstractGTComponent implements StyledLayer 
         if ((name == this.name) || ((name != null) && name.equals(this.name))) {
             return;
         }
-
         this.name = name;
-        fireChanged();
     }
 }

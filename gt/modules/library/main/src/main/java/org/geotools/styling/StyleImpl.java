@@ -16,17 +16,14 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
-import org.geotools.event.GTList;
-import org.geotools.resources.Utilities;
-import org.opengis.util.Cloneable;
-
-// J2SE dependencies
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -36,12 +33,12 @@ import java.util.logging.Logger;
  * @source $URL$
  * @version $Id$
  */
-public class StyleImpl extends AbstractGTComponent
-    implements org.geotools.styling.Style, Cloneable {
+public class StyleImpl implements org.geotools.styling.Style, Cloneable {
     /** The logger for the default core module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
-    private List featureTypeStyles = new GTList(this, "featureTypeStyles");
+    
+    private List<FeatureTypeStyle> featureTypeStyles = new ArrayList<FeatureTypeStyle>();
     private String abstractText = "";
     private String name = "Default Styler";
     private String title = "Default Styler";
@@ -74,7 +71,7 @@ public class StyleImpl extends AbstractGTComponent
     }
 
     public void setFeatureTypeStyles(FeatureTypeStyle[] styles) {
-        List newStyles = Arrays.asList(styles);
+        List<FeatureTypeStyle> newStyles = Arrays.asList(styles);
 
         this.featureTypeStyles.clear();
         this.featureTypeStyles.addAll(newStyles);
@@ -101,22 +98,18 @@ public class StyleImpl extends AbstractGTComponent
 
     public void setAbstract(String abstractStr) {
         abstractText = abstractStr;
-        fireChanged();
     }
 
     public void setDefault(boolean isDefault) {
         defaultB = isDefault;
-        fireChanged();
     }
 
     public void setName(String name) {
         this.name = name;
-        fireChanged();
     }
 
     public void setTitle(String title) {
         this.title = title;
-        fireChanged();
     }
 
     public void accept(StyleVisitor visitor) {
@@ -214,9 +207,7 @@ public class StyleImpl extends AbstractGTComponent
     }
     public String toString() {
     	StringBuffer buf = new StringBuffer();
-    	buf.append( "StyleImpl<" );
-    	buf.append( notification );
-    	buf.append(">");
+    	buf.append( "StyleImpl");
         buf.append( "[");
     	if( name != null ) {
     		buf.append(" name=");

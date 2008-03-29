@@ -16,10 +16,8 @@
 package org.geotools.styling;
 
 import java.util.Arrays;
-import org.geotools.event.AbstractGTComponent;
 
-public class LayerFeatureConstraintsImpl extends AbstractGTComponent
-	implements LayerFeatureConstraints {
+public class LayerFeatureConstraintsImpl implements LayerFeatureConstraints {
 
 	private FeatureTypeConstraint[] constraints;
 	
@@ -28,10 +26,7 @@ public class LayerFeatureConstraintsImpl extends AbstractGTComponent
 	}
 
 	public void setFeatureTypeConstraints(FeatureTypeConstraint[] constraints) {
-		FeatureTypeConstraint[] old = this.constraints;
 		this.constraints = constraints;
-		
-		fireChildChanged("featureTypeConstraints", this.constraints, old);
 	}
 	
 	public boolean equals(Object obj) {

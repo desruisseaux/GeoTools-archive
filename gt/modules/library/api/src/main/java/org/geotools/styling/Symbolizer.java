@@ -19,7 +19,6 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 
 
 /**
@@ -61,6 +60,6 @@ import org.geotools.event.GTComponent;
  * @source $URL$
  * @version $Id$
  */
-public interface Symbolizer extends GTComponent {
+public interface Symbolizer {
     void accept(StyleVisitor visitor);
 }

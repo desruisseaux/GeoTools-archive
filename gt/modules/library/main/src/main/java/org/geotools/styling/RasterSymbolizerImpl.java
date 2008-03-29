@@ -17,20 +17,18 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
 /**
- * DOCUMENT ME!
+ * Default implementation of RasterSymbolizer.
  *
  * @author iant
  * @source $URL$
  */
-public class RasterSymbolizerImpl extends AbstractGTComponent
-    implements RasterSymbolizer {
+public class RasterSymbolizerImpl implements RasterSymbolizer {
     // TODO: make container ready
     private FilterFactory filterFactory;
     private ChannelSelection channelSelection = new ChannelSelectionImpl();
@@ -228,10 +226,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.channelSelection == channel) {
             return;
         }
-
-        ChannelSelection old = this.channelSelection;
         this.channelSelection = channel;
-        fireChildChanged("channelSelection", channel, old);
     }
 
     /**
@@ -254,10 +249,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.colorMap == colorMap) {
             return;
         }
-
-        ColorMap old = colorMap;
         this.colorMap = colorMap;
-        fireChildChanged("colorMap", colorMap, old);
     }
 
     /**
@@ -282,10 +274,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.contrastEnhancement == contrastEnhancement) {
             return;
         }
-
-        ContrastEnhancement old = this.contrastEnhancement;
         this.contrastEnhancement = contrastEnhancement;
-        fireChildChanged("contrastEnhancement", contrastEnhancement, old);
     }
 
     /**
@@ -301,10 +290,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.geometryName == geometryName) {
             return;
         }
-
-        String old = this.geometryName;
         this.geometryName = geometryName;
-        fireChildChanged("geometryName", geometryName, old);
     }
 
     /**
@@ -342,10 +328,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
             if (this.symbolizer == symbolizer) {
                 return;
             }
-
-            Symbolizer old = this.symbolizer;
             this.symbolizer = symbolizer;
-            fireChildChanged("symbolizer", symbolizer, old);
         } else {
             throw new IllegalArgumentException(
                 "Only a line or polygon symbolizer may be used to outline a raster");
@@ -361,10 +344,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.opacity == opacity) {
             return;
         }
-
-        Expression old = this.opacity;
         this.opacity = opacity;
-        fireChildChanged("opacity", opacity, old);
     }
 
     /**
@@ -386,10 +366,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.overlap == overlap) {
             return;
         }
-
-        Expression old = this.overlap;
         this.overlap = overlap;
-        fireChildChanged("overlap", overlap, old);
     }
 
     /**
@@ -412,10 +389,7 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
         if (this.shadedRelief == shadedRelief) {
             return;
         }
-
-        ShadedRelief old = this.shadedRelief;
         this.shadedRelief = shadedRelief;
-        fireChildChanged("shadedRelief", shadedRelief, old);
     }
 
     public void accept(StyleVisitor visitor) {
