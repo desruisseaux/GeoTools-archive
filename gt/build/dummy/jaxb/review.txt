@@ -1,6 +1,6 @@
 MODULE DUMMY/JAXB
 ===========
-Module Developer: Cédric Briançon
+Module Developer: CÃ©dric BrianÃ§on
 
 javax.xml.bind
 --------------------
