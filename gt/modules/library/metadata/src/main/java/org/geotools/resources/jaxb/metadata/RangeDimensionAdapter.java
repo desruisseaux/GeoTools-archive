@@ -16,7 +16,7 @@
  */
 package org.geotools.resources.jaxb.metadata;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import org.geotools.metadata.iso.content.RangeDimensionImpl;
 import org.opengis.metadata.content.RangeDimension;
 
@@ -61,7 +61,7 @@ public final class RangeDimensionAdapter
      * Returns the {@link RangeDimensionImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "MD_RangeDimension")
+    @XmlElementRef
     public RangeDimensionImpl getRangeDimension() {
         return (metadata instanceof RangeDimensionImpl) ?
             (RangeDimensionImpl) metadata : new RangeDimensionImpl(metadata);

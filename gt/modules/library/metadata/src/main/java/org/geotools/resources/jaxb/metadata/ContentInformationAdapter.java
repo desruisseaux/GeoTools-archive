@@ -16,7 +16,7 @@
  */
 package org.geotools.resources.jaxb.metadata;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import org.geotools.metadata.iso.content.ContentInformationImpl;
 import org.opengis.metadata.content.ContentInformation;
 
@@ -60,7 +60,7 @@ public final class ContentInformationAdapter
      * Returns the {@link ContentInformationImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "MD_ContentInformation")
+    @XmlElementRef
     public ContentInformationImpl getContentInformation() {
         return (metadata instanceof ContentInformationImpl) ?
             (ContentInformationImpl) metadata : new ContentInformationImpl(metadata);

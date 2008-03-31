@@ -16,7 +16,7 @@
  */
 package org.geotools.resources.jaxb.metadata;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import org.geotools.metadata.iso.extent.GeographicExtentImpl;
 import org.opengis.metadata.extent.GeographicExtent;
 
@@ -59,7 +59,7 @@ public final class GeographicExtentAdapter extends MetadataAdapter<GeographicExt
      * Returns the {@link GeographicExtentImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "EX_GeographicExtent")
+    @XmlElementRef
     public GeographicExtentImpl getGeographicExtent() {
         return (metadata instanceof GeographicExtentImpl) ?
             (GeographicExtentImpl) metadata : new GeographicExtentImpl(metadata);

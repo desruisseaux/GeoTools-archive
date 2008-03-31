@@ -16,7 +16,7 @@
  */
 package org.geotools.resources.jaxb.metadata;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import org.geotools.metadata.iso.extent.TemporalExtentImpl;
 import org.opengis.metadata.extent.TemporalExtent;
 
@@ -59,7 +59,7 @@ public final class TemporalExtentAdapter extends MetadataAdapter<TemporalExtentA
      * Returns the {@link TemporalExtentImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "EX_TemporalExtent")
+    @XmlElementRef
     public TemporalExtentImpl getTemporalExtent() {
         return (metadata instanceof TemporalExtentImpl) ?
             (TemporalExtentImpl) metadata : new TemporalExtentImpl(metadata);
