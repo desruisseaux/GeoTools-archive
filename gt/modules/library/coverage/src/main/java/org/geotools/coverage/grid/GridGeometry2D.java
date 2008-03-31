@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.grid;
 
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -658,26 +657,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
                                    gridRange.getLower (gridDimensionY),
                                    gridRange.getLength(gridDimensionX),
                                    gridRange.getLength(gridDimensionY));
-        }
-        assert !isDefined(GRID_RANGE);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
-    }
-
-    /**
-     * Returns the two-dimensional part of the {@linkplain #getGridRange grid size}.
-     *
-     * @return The grid size (never {@code null}).
-     * @throws InvalidGridGeometryException if this grid geometry has no grid range (i.e.
-     *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_RANGE GRID_RANGE})</code>
-     *         returned {@code false}).
-     *
-     * @since 2.5
-     */
-    public Dimension getGridSize2D() throws InvalidGridGeometryException {
-        if (gridRange != null) {
-            assert isDefined(GRID_RANGE);
-            return new Dimension(gridRange.getLength(gridDimensionX),
-                                 gridRange.getLength(gridDimensionY));
         }
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
