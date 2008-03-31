@@ -43,7 +43,7 @@ import org.geotools.metadata.iso.MetadataEntity;
 @XmlType(propOrder={
     "linkage", "protocol", "applicationProfile", "name", "description", "function"
 })
-@XmlRootElement(name = "CI_OnLineResource")
+@XmlRootElement(name = "CI_OnlineResource")
 public class OnLineResourceImpl extends MetadataEntity implements OnLineResource {
     /**
      * Serial number for interoperability with different versions.

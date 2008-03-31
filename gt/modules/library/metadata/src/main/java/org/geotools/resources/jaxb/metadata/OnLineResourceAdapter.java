@@ -61,7 +61,7 @@ public final class OnLineResourceAdapter
      * Returns the {@link OnLineResourceImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "CI_OnLineResource")
+    @XmlElement(name = "CI_OnlineResource")
     public OnLineResourceImpl getOnLineResource() {
         return (metadata instanceof OnLineResourceImpl) ?
             (OnLineResourceImpl) metadata : new OnLineResourceImpl(metadata);
