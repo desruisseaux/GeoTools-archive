@@ -67,7 +67,7 @@ public class RecordTypeImpl implements RecordType {
      */
     private RecordTypeImpl() {
     }
-    
+
     /**
      * Creates a record with all attribute types specified.
      *
@@ -93,7 +93,7 @@ public class RecordTypeImpl implements RecordType {
      * @param parent   The schema that contains this record type.
      * @param typeName The name that identifies this record type.
      * @param attributeTypes
-     * 
+     *
      * @todo Should we really provide this method? There is no garantee that the user-provided
      *       values are consistent with {@link MemberName#getAttributeType}.
      */
@@ -167,7 +167,7 @@ public class RecordTypeImpl implements RecordType {
      *        Record#getAttributes() getAttributes()}.{@linkplain Map#keySet keySet()})</code></li>
      *    <li>Any other implementation-specific conditions.
      * </ul>
-     * 
+     *
      * @todo Replace {@code equals} by {@code containsAll}.
      */
     public boolean isInstance(final Record record) {
