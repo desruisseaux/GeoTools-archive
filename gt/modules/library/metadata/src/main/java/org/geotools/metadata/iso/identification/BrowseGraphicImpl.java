@@ -23,9 +23,11 @@ import java.net.URI;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.opengis.metadata.identification.BrowseGraphic;
 import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.jaxb.metadata.URINameAdapter;
 
 
 /**
@@ -108,6 +110,7 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */
+    @XmlJavaTypeAdapter(URINameAdapter.class)
     @XmlElement(name = "fileName", required = false)
     public URI getFileName() {
         return fileName;

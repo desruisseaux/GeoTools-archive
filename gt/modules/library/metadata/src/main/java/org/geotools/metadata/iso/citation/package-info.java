@@ -27,6 +27,7 @@ xmlns = {
     @XmlJavaTypeAdapter(OnLineFunctionAdapter.class),
     @XmlJavaTypeAdapter(DateAdapter.class),
     @XmlJavaTypeAdapter(StringAdapter.class),
+    @XmlJavaTypeAdapter(URIAdapter.class),
     // Primitive type handling
     @XmlJavaTypeAdapter(DoubleAdapter.class),
     @XmlJavaTypeAdapter(type=double.class, value=DoubleAdapter.class),
