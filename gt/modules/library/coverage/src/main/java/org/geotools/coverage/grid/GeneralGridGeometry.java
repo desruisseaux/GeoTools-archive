@@ -16,6 +16,7 @@
  */
 package org.geotools.coverage.grid;
 
+import java.awt.geom.RectangularShape;
 import java.awt.image.RenderedImage;   // For javadoc
 import java.io.Serializable;
 
@@ -159,7 +160,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * use by {@link GridCoverageFactory} only.
      */
     GeneralGridGeometry(final GeneralGridGeometry gm, final CoordinateReferenceSystem crs) {
-        gridRange = gm.gridRange;
+        gridRange = gm.gridRange;  // Do not clone; we assume it is safe to share.
         gridToCRS = gm.gridToCRS;
         envelope  = new GeneralEnvelope(gm.envelope);
         envelope.setCoordinateReferenceSystem(crs);
@@ -177,7 +178,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         if (other instanceof GeneralGridGeometry) {
             // Uses this path when possible in order to accept null values.
             final GeneralGridGeometry general = (GeneralGridGeometry) other;
-            gridRange = general.gridRange;
+            gridRange = general.gridRange;  // Do not clone; we assume it is safe to share.
             gridToCRS = general.gridToCRS;
             envelope  = general.envelope;
         } else {
@@ -216,7 +217,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                                final CoordinateReferenceSystem crs)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        this.gridRange = gridRange;
+        this.gridRange = clone(gridRange);
         this.gridToCRS = gridToCRS;
         if (gridRange!=null && gridToCRS!=null) {
             envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, crs);
@@ -347,7 +348,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                         final boolean   automatic)
             throws MismatchedDimensionException
     {
-        this.gridRange = gridRange;
+        this.gridRange = clone(gridRange);
         this.envelope  = new GeneralEnvelope(userRange);
         final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper(gridRange, userRange);
         if (!automatic) {
@@ -355,6 +356,19 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             mapper.setSwapXY(swapXY);
         }
         gridToCRS = mapper.createTransform();
+    }
+
+    /**
+     * Clones the given grid range if necessary. This is mostly a protection for {@link GridRange2D}
+     * which is mutable, at the opposite of {@link GeneralGridRange} which is immutable. We test for
+     * the {@link GridRange2D} super-class which defines a {@code clone()} method, instead of
+     * {@link GridRange2D} itself, for gaining some generality.
+     */
+    private static GridRange clone(GridRange gridRange) {
+        if (gridRange instanceof RectangularShape) {
+            gridRange = (GridRange) ((RectangularShape) gridRange).clone();
+        }
+        return gridRange;
     }
 
     /**
@@ -431,7 +445,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public GridRange getGridRange() throws InvalidGridGeometryException {
         if (gridRange != null) {
             assert isDefined(GRID_RANGE);
-            return gridRange;
+            return clone(gridRange);
         }
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
