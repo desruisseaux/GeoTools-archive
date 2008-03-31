@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.util.MemberName;
 import org.opengis.util.Record;
 import org.opengis.util.RecordSchema;
@@ -45,6 +45,7 @@ import org.opengis.util.TypeName;
  * @author Jody Garnet
  * @author Martin Desruisseaux
  */
+@XmlType(name = "RecordType")
 public class RecordTypeImpl implements RecordType {
     /**
      * The name that identifies this record type.
@@ -61,6 +62,12 @@ public class RecordTypeImpl implements RecordType {
      */
     private RecordSchema parent;
 
+    /**
+     * Empty constructor only used by JAXB.
+     */
+    private RecordTypeImpl() {
+    }
+    
     /**
      * Creates a record with all attribute types specified.
      *

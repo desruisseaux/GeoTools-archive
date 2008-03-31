@@ -252,7 +252,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      * Return on-line information that can be used to contact the individual or organization.
      * Returns {@code null} if none.
      */
-    @XmlElement(name = "onLineResource", required = false, namespace = "http://www.isotc211.org/2005/gmd")
+    @XmlElement(name = "onlineResource", required = false, namespace = "http://www.isotc211.org/2005/gmd")
     public OnLineResource getOnLineResource() {
         return onLineResource;
     }
