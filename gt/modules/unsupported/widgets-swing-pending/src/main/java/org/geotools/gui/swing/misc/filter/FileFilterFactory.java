@@ -62,6 +62,7 @@ public class FileFilterFactory {
         STYLE_LAYER_DESCRIPTOR("sld", "sld"),
         TIFF("tiff", "tif", "tiff"),
         VISUALDEM("vdem", "dem"),
+        WEBMAPCONTEXT("wmc", "wmc"),
         WORLD_IMAGE("world_image", "jpg", "jpeg", "bmp", "png");
         final InternationalString desc;
         final String[] ends;
