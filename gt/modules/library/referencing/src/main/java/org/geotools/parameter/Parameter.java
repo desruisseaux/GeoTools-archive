@@ -60,7 +60,7 @@ import org.geotools.measure.Units;
  * @see DefaultParameterDescriptor
  * @see ParameterGroup
  */
-public class Parameter extends AbstractParameter implements ParameterValue {
+public class Parameter<T> extends AbstractParameter implements ParameterValue<T> {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -69,7 +69,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * The value.
      */
-    private Object value;
+    private T value;
 
     /**
      * The unit of measure for the value, or {@code null} if it doesn't apply.
@@ -84,10 +84,13 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param name  The parameter name.
      * @param value The parameter value.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public Parameter(final String name, final int value) {
         this(new DefaultParameterDescriptor(name, 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        this.value = value;
+        this.value = (T) (Object) value;
     }
 
     /**
@@ -99,11 +102,14 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @param name  The parameter name.
      * @param value The parameter value.
      * @param unit  The unit for the parameter value.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public Parameter(final String name, final double value, final Unit unit) {
         this(new DefaultParameterDescriptor(name, Double.NaN, Double.NEGATIVE_INFINITY,
                                             Double.POSITIVE_INFINITY, normalize(unit)));
-        this.value = value;
+        this.value = (T) (Object) value;
         this.unit  = unit;
     }
 
@@ -115,10 +121,13 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param name  The parameter name.
      * @param value The parameter value.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public Parameter(final String name, final CodeList value) {
         this(new DefaultParameterDescriptor(name, value.getClass(), (CodeList)null));
-        this.value = value;
+        this.value = (T) (Object) value;
     }
 
     /**
@@ -127,7 +136,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param descriptor The abstract definition of this parameter.
      */
-    public Parameter(final ParameterDescriptor descriptor) {
+    public Parameter(final ParameterDescriptor<T> descriptor) {
         super(descriptor);
         value = descriptor.getDefaultValue();
         unit  = descriptor.getUnit();
@@ -142,7 +151,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *         for this parameter, or if the value is illegal for some other reason (for example
      *         the value is numeric and out of range).
      */
-    public Parameter(final ParameterDescriptor descriptor, final Object value)
+    public Parameter(final ParameterDescriptor<T> descriptor, final T value)
             throws InvalidParameterValueException
     {
         super(descriptor);
@@ -170,33 +179,41 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * {@linkplain ParameterDescriptor#getMaximumValue maximum} values and is one of the
      * {@linkplain ParameterDescriptor#getValidValues set of valid values}.
      * If the value fails any of those tests, then an exception is thrown.
+     * <p>
+     * This method is similar to <code>{@linkplain Parameters#isValid
+     * Parameters#isValid}(descriptor, value)</code> except that the exception contains an
+     * error message formatted with a description of the failure reason.
      *
      * @param  descriptor The parameter descriptor to check against.
      * @param  value The value to check, or {@code null}.
+     * @return The value casted to the descriptor parameterized type.
      * @throws InvalidParameterValueException if the parameter value is invalid.
      */
-    public static void ensureValidValue(final ParameterDescriptor descriptor, final Object value)
+    public static <T> T ensureValidValue(final ParameterDescriptor<T> descriptor, final Object value)
             throws InvalidParameterValueException
     {
         if (value == null) {
-            return;
+            return null;
         }
         final String error;
-        if (!descriptor.getValueClass().isAssignableFrom(value.getClass())) {
+        final Class<T> type = descriptor.getValueClass();
+        if (!type.isInstance(value)) {
             error = Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, Classes.getClass(value));
         } else {
-            final Comparable minimum = descriptor.getMinimumValue();
-            final Comparable maximum = descriptor.getMaximumValue();
-            if ((minimum!=null && minimum.compareTo(value)>0) ||
-                (maximum!=null && maximum.compareTo(value)<0))
+            @SuppressWarnings("unchecked") // Type checked in the above test case.
+            final Comparable<Object> minimum = (Comparable) descriptor.getMinimumValue();
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> maximum = (Comparable) descriptor.getMaximumValue();
+            if ((minimum != null && minimum.compareTo(value) > 0) ||
+                (maximum != null && maximum.compareTo(value) < 0))
             {
                 error = Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, value, minimum, maximum);
             } else {
-                final Set validValues = descriptor.getValidValues();
+                final Set<?> validValues = descriptor.getValidValues();
                 if (validValues!=null && !validValues.contains(value)) {
                     error = Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, getName(descriptor), value);
                 } else {
-                    return;
+                    return type.cast(value);
                 }
             }
         }
@@ -215,7 +232,8 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * Returns the abstract definition of this parameter.
      */
     @Override
-    public ParameterDescriptor getDescriptor() {
+    @SuppressWarnings("unchecked") // Type checked by the constructor.
+    public ParameterDescriptor<T> getDescriptor() {
         return (ParameterDescriptor) super.getDescriptor();
     }
 
@@ -497,12 +515,12 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @see #setValue(Object)
      */
-    public Object getValue() {
+    public T getValue() {
         return value;
     }
 
     /**
-     * Set the parameter value as a floating point and its associated unit.
+     * Sets the parameter value as a floating point and its associated unit.
      *
      * @param  value The parameter value.
      * @param  unit The unit for the specified value.
@@ -515,7 +533,9 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public void setValue(final double value, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
+        final Unit targetUnit = descriptor.getUnit();
         if (targetUnit == null) {
             throw unitlessParameter(descriptor);
         }
@@ -525,13 +545,15 @@ public class Parameter extends AbstractParameter implements ParameterValue {
                       descriptor.getName().getCode(), value);
         }
         final Double converted = unit.getConverterTo(targetUnit).convert(value);
-        ensureValidValue((ParameterDescriptor) descriptor, converted);
-        this.value = value;
+        ensureValidValue(descriptor, converted);
+        // Really store the original value, not the converted one,
+        // because we store the unit as well.
+        this.value = descriptor.getValueClass().cast(value);
         this.unit  = unit;
     }
 
     /**
-     * Set the parameter value as a floating point.
+     * Sets the parameter value as a floating point.
      * The unit, if any, stay unchanged.
      *
      * @param value The parameter value.
@@ -544,12 +566,13 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public void setValue(final double value) throws InvalidParameterValueException {
         final Double check = value;
-        ensureValidValue((ParameterDescriptor) descriptor, check);
-        this.value = check;
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
+        this.value = ensureValidValue(descriptor, check);
     }
 
     /**
-     * Set the parameter value as an integer.
+     * Sets the parameter value as an integer.
      *
      * @param  value The parameter value.
      * @throws InvalidParameterValueException if the integer type is inappropriate for this parameter,
@@ -558,19 +581,19 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @see #intValue
      */
     public void setValue(final int value) throws InvalidParameterValueException {
-        final ParameterDescriptor descriptor = (ParameterDescriptor) this.descriptor;
-        final Class type = descriptor.getValueClass();
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
+        final Class<T> type = descriptor.getValueClass();
         if (Double.class.equals(type) || Double.TYPE.equals(type)) {
             setValue((double) value);
             return;
         }
         final Integer check = value;
-        ensureValidValue(descriptor, check);
-        this.value = check;
+        this.value = ensureValidValue(descriptor, check);
     }
 
     /**
-     * Set the parameter value as a boolean.
+     * Sets the parameter value as a boolean.
      *
      * @param  value The parameter value.
      * @throws InvalidParameterValueException if the boolean type is inappropriate for this parameter.
@@ -578,9 +601,10 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @see #booleanValue
      */
     public void setValue(final boolean value) throws InvalidParameterValueException {
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
         final Boolean check = Boolean.valueOf(value);
-        ensureValidValue((ParameterDescriptor) descriptor, check);
-        this.value = check;
+        this.value = ensureValidValue(descriptor, check);
     }
 
     /**
@@ -596,8 +620,9 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @see #getValue
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        ensureValidValue((ParameterDescriptor) descriptor, value);
-        this.value = value;
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
+        this.value = ensureValidValue(descriptor, value);
     }
 
     /**
@@ -611,7 +636,9 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public void setValue(double[] values, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<T> descriptor = (ParameterDescriptor) this.descriptor;
+        final Unit targetUnit = descriptor.getUnit();
         if (targetUnit == null) {
             throw unitlessParameter(descriptor);
         }
@@ -624,8 +651,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         for (int i=0; i<converted.length; i++) {
             converted[i] = converter.convert(converted[i]);
         }
-        ensureValidValue((ParameterDescriptor) descriptor, converted);
-        this.value = values;
+        this.value = ensureValidValue(descriptor, converted);
         this.unit  = unit;
     }
 

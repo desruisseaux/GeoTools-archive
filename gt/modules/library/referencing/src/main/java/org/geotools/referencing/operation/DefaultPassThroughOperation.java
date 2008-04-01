@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,13 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.PassThroughOperation;
 import org.opengis.referencing.operation.Operation;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.util.UnsupportedImplementationException;
@@ -38,7 +34,7 @@ import org.geotools.util.UnsupportedImplementationException;
 /**
  * A pass-through operation specifies that a subset of a coordinate tuple is subject to a specific
  * coordinate operation.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -68,7 +64,7 @@ public class DefaultPassThroughOperation extends DefaultSingleOperation implemen
      * @param firstAffectedOrdinate Index of the first affected ordinate.
      * @param numTrailingOrdinates Number of trailing ordinates to pass through.
      */
-    public DefaultPassThroughOperation(final Map                      properties,
+    public DefaultPassThroughOperation(final Map<String,?>            properties,
                                        final CoordinateReferenceSystem sourceCRS,
                                        final CoordinateReferenceSystem targetCRS,
                                        final Operation                 operation,
@@ -95,7 +91,7 @@ public class DefaultPassThroughOperation extends DefaultSingleOperation implemen
      * @param  transform The {@linkplain MathTransformFactory#createPassThroughTransform
      *                   pass through transform}.
      */
-    public DefaultPassThroughOperation(final Map                      properties,
+    public DefaultPassThroughOperation(final Map<String,?>            properties,
                                        final CoordinateReferenceSystem sourceCRS,
                                        final CoordinateReferenceSystem targetCRS,
                                        final Operation                 operation,
@@ -141,10 +137,11 @@ public class DefaultPassThroughOperation extends DefaultSingleOperation implemen
         }
         return ((PassThroughTransform) transform).getModifiedCoordinates();
     }
-    
+
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final String name = super.formatWKT(formatter);
         try {

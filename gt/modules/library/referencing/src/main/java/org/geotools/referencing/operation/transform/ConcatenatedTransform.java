@@ -165,9 +165,10 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         }
         if (tr1.isIdentity()) return tr2;
         if (tr2.isIdentity()) return tr1;
-
-        // If both transforms use matrix, then we can create
-        // a single transform using the concatenated matrix.
+        /*
+         * If both transforms use matrix, then we can create
+         * a single transform using the concatenated matrix.
+         */
         final XMatrix matrix1 = getMatrix(tr1);
         if (matrix1 != null) {
             final XMatrix matrix2 = getMatrix(tr2);
@@ -194,18 +195,20 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 return ProjectiveTransform.create(matrix);
             }
         }
-
-        // If one transform is the inverse of the
-        // other, returns the identity transform.
+        /*
+         * If one transform is the inverse of the
+         * other, returns the identity transform.
+         */
         if (areInverse(tr1, tr2) || areInverse(tr2, tr1)) {
             assert tr1.getSourceDimensions() == tr2.getTargetDimensions();
             assert tr1.getTargetDimensions() == tr2.getSourceDimensions();
             return IdentityTransform.create(tr1.getSourceDimensions());
         }
-
-        // If one or both math transform are instance of ConcatenatedTransform,
-        // then maybe it is possible to efficiently concatenate tr1 or tr2 with
-        // one of step transforms. Try that...
+        /*
+         * If one or both math transform are instance of ConcatenatedTransform,
+         * then maybe it is possible to efficiently concatenate tr1 or tr2 with
+         * one of step transforms. Try that...
+         */
         if (tr1 instanceof ConcatenatedTransform) {
             final ConcatenatedTransform ctr = (ConcatenatedTransform) tr1;
             tr1 = ctr.transform1;
@@ -220,9 +223,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         // above may have returned an identity transform.
         if (tr1.isIdentity()) return tr2;
         if (tr2.isIdentity()) return tr1;
-
-        // Before to create a general ConcatenatedTransform object, give a
-        // chance to AbstractMathTransform to returns an optimized object.
+        /*
+         * Before to create a general ConcatenatedTransform object, give a
+         * chance to AbstractMathTransform to returns an optimized object.
+         * The main use case is Logarithmic vs Exponential transforms.
+         */
         if (tr1 instanceof AbstractMathTransform) {
             final MathTransform optimized = ((AbstractMathTransform) tr1).concatenate(tr2, false);
             if (optimized != null) {
@@ -249,9 +254,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     {
         final int dimSource = tr1.getSourceDimensions();
         final int dimTarget = tr2.getTargetDimensions();
-        //
-        // Check if the result need to be a MathTransform1D.
-        //
+        /*
+         * Checks if the result need to be a MathTransform1D.
+         */
         if (dimSource==1 && dimTarget==1) {
             if (tr1 instanceof MathTransform1D && tr2 instanceof MathTransform1D) {
                 return new ConcatenatedTransformDirect1D((MathTransform1D) tr1,
@@ -260,9 +265,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 return new ConcatenatedTransform1D(tr1, tr2);
             }
         } else
-        //
-        // Check if the result need to be a MathTransform2D.
-        //
+        /*
+         * Checks if the result need to be a MathTransform2D.
+         */
         if (dimSource==2 && dimTarget==2) {
             if (tr1 instanceof MathTransform2D && tr2 instanceof MathTransform2D) {
                 return new ConcatenatedTransformDirect2D((MathTransform2D) tr1,
@@ -271,9 +276,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 return new ConcatenatedTransform2D(tr1, tr2);
             }
         } else
-        //
-        // Check for the general case.
-        //
+        /*
+         * Checks for the general case.
+         */
         if (dimSource==tr1.getTargetDimensions() && tr2.getSourceDimensions()==dimTarget) {
             return new ConcatenatedTransformDirect(tr1, tr2);
         } else {
@@ -298,7 +303,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
 
     /**
-     * Check if transforms are compatibles. The default
+     * Checks if transforms are compatibles. The default
      * implementation check if transfert dimension match.
      */
     boolean isValid() {

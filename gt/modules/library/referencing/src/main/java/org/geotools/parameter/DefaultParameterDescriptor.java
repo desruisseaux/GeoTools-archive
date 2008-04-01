@@ -61,7 +61,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see DefaultParameterDescriptorGroup
  */
 public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
-        implements ParameterDescriptor
+        implements ParameterDescriptor<T>
 {
     /**
      * Serial number for interoperability with different versions.
@@ -106,14 +106,13 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @since 2.2
      */
-    public DefaultParameterDescriptor(final ParameterDescriptor/*<T>*/ descriptor) {
+    public DefaultParameterDescriptor(final ParameterDescriptor<T> descriptor) {
         super(descriptor);
-        // TODO: remove cast after we uncommented <T> above.
-        valueClass   = (Class<T>)      descriptor.getValueClass();
-        validValues  = (Set<T>)        descriptor.getValidValues();
-        defaultValue = (T)             descriptor.getDefaultValue();
-        minimum      = (Comparable<T>) descriptor.getMinimumValue();
-        maximum      = (Comparable<T>) descriptor.getMaximumValue();
+        valueClass   = descriptor.getValueClass();
+        validValues  = descriptor.getValidValues();
+        defaultValue = descriptor.getDefaultValue();
+        minimum      = descriptor.getMinimumValue();
+        maximum      = descriptor.getMaximumValue();
         unit         = descriptor.getUnit();
     }
 
@@ -127,6 +126,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Needs to move in a factory class.
      */
+    @Deprecated
     public DefaultParameterDescriptor(final String name,
                                       final int defaultValue,
                                       final int minimum,
@@ -147,6 +147,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public DefaultParameterDescriptor(final Map<String,?> properties,
                                       final int defaultValue,
                                       final int minimum,
@@ -169,6 +170,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public DefaultParameterDescriptor(final String name,
                                       final double defaultValue,
                                       final double minimum,
@@ -191,6 +193,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public DefaultParameterDescriptor(final Map<String,?> properties,
                                       final double  defaultValue,
                                       final double  minimum,
@@ -216,6 +219,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public DefaultParameterDescriptor(final String       name,
                                       final CharSequence remarks,
                                       final T            defaultValue,
@@ -253,6 +257,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     public DefaultParameterDescriptor(final String   name,
                                       final CodeList defaultValue)
     {
@@ -270,6 +275,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      *
      * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
+    @Deprecated
     DefaultParameterDescriptor(final String   name,
                                final Class<T> valueClass,
                                final CodeList defaultValue)
@@ -284,8 +290,7 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
     @SuppressWarnings("unchecked")
     private static <T extends CodeList> T[] getCodeLists(final Class<T> type) {
         try {
-            return (T[]) type.getMethod("values", (Class<?>[]) null)
-                                    .invoke(null, (Object[]) null);
+            return (T[]) type.getMethod("values", (Class<?>[]) null).invoke(null, (Object[]) null);
         } catch (Exception exception) {
             // No code list defined. Not a problem; we will just
             // not provide any set of code to check against.
@@ -451,11 +456,12 @@ public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
      * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
      * descriptor} for the created parameter value will be {@code this} object.
      */
-    public ParameterValue createValue() {
-        if (Double.class.equals(valueClass) && unit==null) {
-            return new FloatParameter(this);
+    @SuppressWarnings("unchecked")
+    public ParameterValue<T> createValue() {
+        if (Double.class.equals(valueClass) && unit == null) {
+            return (ParameterValue) new FloatParameter((ParameterDescriptor) this);
         }
-        return new Parameter(this);
+        return new Parameter<T>(this);
     }
 
     /**

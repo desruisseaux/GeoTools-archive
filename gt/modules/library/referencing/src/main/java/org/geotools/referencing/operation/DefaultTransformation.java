@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Transformation;
@@ -35,8 +33,8 @@ import org.opengis.referencing.operation.OperationMethod;
  * of a series of points in both coordinate reference systems. This computational process
  * is usually "over-determined", allowing derivation of error (or accuracy) estimates
  * for the transformation. Also, the stochastic nature of the parameters may result
- * in multiple (different) versions of the same coordinate transformation. 
- *  
+ * in multiple (different) versions of the same coordinate transformation.
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -61,7 +59,7 @@ public class DefaultTransformation extends DefaultOperation implements Transform
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
-    public DefaultTransformation(final Map                       properties,
+    public DefaultTransformation(final Map<String,?>            properties,
                                  final CoordinateReferenceSystem sourceCRS,
                                  final CoordinateReferenceSystem targetCRS,
                                  final MathTransform             transform,

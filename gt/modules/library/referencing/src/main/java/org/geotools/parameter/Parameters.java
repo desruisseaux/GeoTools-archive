@@ -18,7 +18,6 @@ package org.geotools.parameter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,6 +37,9 @@ import org.opengis.parameter.InvalidParameterTypeException;
 
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.util.logging.Logging;
+import org.geotools.resources.Classes;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -78,12 +80,6 @@ import org.geotools.util.logging.Logging;
  */
 public final class Parameters {
     /**
-     * Do not allows instantiation of this utility class.
-     */
-    private Parameters() {
-    }
-
-    /**
      * Small number for floating point comparaisons.
      */
     private static final double EPS = 1E-8;
@@ -96,10 +92,71 @@ public final class Parameters {
             new GeneralParameterDescriptor[0]);
 
     /**
+     * Do not allows instantiation of this utility class.
+     */
+    private Parameters() {
+    }
+
+    /**
+     * Casts the given parameter descriptor to the given type. An exception is thrown
+     * immediately if the parameter does not have the expected value class. This
+     * is a helper method for type safety when using Java 5 parameterized types.
+     *
+     * @param  descriptor The descriptor to cast.
+     * @param  type The expected value class.
+     * @return The descriptor casted to the given type.
+     * @throws ClassCastException if the given descriptor doesn't have the expected value class.
+     *
+     * @since 2.5
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> ParameterDescriptor<T> cast(ParameterDescriptor<?> descriptor, Class<T> type)
+            throws ClassCastException
+    {
+        if (descriptor != null) {
+            final Class<?> actual = descriptor.getValueClass();
+            // We require a strict equality - not type.isAssignableFrom(actual) - because in
+            // the later case we could have (to be strict) to return a <? extends T> type.
+            if (!type.equals(actual)) {
+                throw new ClassCastException(Errors.format(ErrorKeys.BAD_PARAMETER_TYPE_$2,
+                        descriptor.getName().getCode(), actual));
+            }
+        }
+        return (ParameterDescriptor) descriptor;
+    }
+
+    /**
+     * Casts the given parameter value to the given type. An exception is thrown
+     * immediately if the parameter does not have the expected value class. This
+     * is a helper method for type safety when using Java 5 parameterized types.
+     *
+     * @param  value The value to cast.
+     * @param  type The expected value class.
+     * @return The value casted to the given type.
+     * @throws ClassCastException if the given value doesn't have the expected value class.
+     *
+     * @since 2.5
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> ParameterValue<T> cast(final ParameterValue<?> value, final Class<T> type)
+            throws ClassCastException
+    {
+        if (value != null) {
+            final ParameterDescriptor descriptor = value.getDescriptor();
+            final Class<?> actual = descriptor.getValueClass();
+            if (!type.equals(actual)) { // Same comment than cast(ParameterDescriptor)...
+                throw new ClassCastException(Errors.format(ErrorKeys.BAD_PARAMETER_TYPE_$2,
+                        descriptor.getName().getCode(), actual));
+            }
+        }
+        return (ParameterValue) value;
+    }
+
+    /**
      * Checks a parameter value against its {@linkplain ParameterDescriptor parameter descriptor}.
      * This method takes care of handling checking arrays and collections against parameter
      * descriptor.
-     * <br><br>
+     * <p>
      * When the {@linkplain ParameterDescriptor#getValueClass value class} is an array (like
      * {@code double[].class}) or a {@linkplain Collection collection} (like {@code List.class}),
      * the descriptor
@@ -113,13 +170,17 @@ public final class Parameters {
      *
      * @see Parameter#ensureValidValue
      */
-    public static boolean isValid(final ParameterValue parameter) {
-        final ParameterDescriptor descriptor = parameter.getDescriptor();
+    public static boolean isValid(final ParameterValue<?> parameter) {
+        final ParameterDescriptor<?> descriptor = parameter.getDescriptor();
         final Object value = parameter.getValue();
-        final Class  type  = (value == null) ? Void.TYPE : value.getClass();
-        final Class  kind  = descriptor.getValueClass();
-
-        if (kind.isInstance(value)) {
+        if (value == null) {
+            // Accepts null values only if explicitly authorized.
+            final Set<?> validValues = descriptor.getValidValues();
+            return validValues != null && validValues.contains(value);
+        }
+        final Class<?> type = Classes.primitiveToWrapper(value.getClass());
+        final Class<?> expected = Classes.primitiveToWrapper(descriptor.getValueClass());
+        if (expected.isAssignableFrom(type)) {
             return false; // value not of the correct type
         }
         if (type.isArray()) {
@@ -132,21 +193,22 @@ public final class Parameters {
             }
         } else if (value instanceof Collection) {
             // handle checking elements in a collection
-            final Collection collection = (Collection) value;
-            for (final Iterator i=collection.iterator(); i.hasNext();) {
-                if (!isValidValue(i.next(), descriptor)) {
+            for (final Object element : (Collection) value) {
+                if (!isValidValue(element, descriptor)) {
                     return false;
                 }
             }
         } else {
-            isValidValue(value, descriptor);
+            if (!isValidValue(value, descriptor)) {
+                return false;
+            }
         }
         return true;
     }
 
     /**
-     * Called on a single {@linkplain ParameterValue parameter value}, or on elements of a
-     * parameter value. This method ensures that
+     * Called on a single {@linkplain ParameterValue parameter value},
+     * or on elements of a parameter value. This method ensures that
      * {@linkplain ParameterDescriptor#getMinimumValue minimum value},
      * {@linkplain ParameterDescriptor#getMaximumValue maximum value} and
      * {@linkplain ParameterDescriptor#getValidValues valid values}
@@ -158,18 +220,18 @@ public final class Parameters {
      *
      * @see Parameter#ensureValidValue
      */
-    private static boolean isValidValue(final Object value, final ParameterDescriptor descriptor) {
-        final Class  type = (value == null) ? Void.TYPE : value.getClass();
-        final Class  expected = descriptor.getValueClass();
-        final Set validValues = descriptor.getValidValues();
-        if (validValues!=null && !validValues.contains(value)) {
+    private static boolean isValidValue(final Object value, final ParameterDescriptor<?> descriptor) {
+        final Set<?> validValues = descriptor.getValidValues();
+        if (validValues != null && !validValues.contains(value)) {
             return false;
         }
-        final Comparable min = descriptor.getMinimumValue();
+        @SuppressWarnings("unchecked") // Type has been verified by the caller.
+        final Comparable<Object> min = (Comparable) descriptor.getMinimumValue();
         if (min!=null && min.compareTo(value) > 0) {
             return false;
         }
-        final Comparable max = descriptor.getMaximumValue();
+        @SuppressWarnings("unchecked")
+        final Comparable<Object> max = (Comparable) descriptor.getMaximumValue();
         if (max!=null && max.compareTo(value) < 0) {
             return false;
         }
@@ -177,8 +239,8 @@ public final class Parameters {
     }
 
     /**
-     * Searchs all parameters with the specified name. The given {@code name} is compared against
-     * parameter {@link GeneralParameterDescriptor#getName name} and
+     * Searchs all parameters with the specified name. The given {@code name} is
+     * compared against parameter {@link GeneralParameterDescriptor#getName name} and
      * {@link GeneralParameterDescriptor#getAlias alias}. This method search recursively
      * in subgroups up to the specified depth:
      * <p>
@@ -201,8 +263,8 @@ public final class Parameters {
      *               {@linkplain ParameterDescriptor descriptor}.
      * @return The set (possibly empty) of parameters with the given name.
      */
-    public static List search(final GeneralParameterValue param, final String name, int maxDepth) {
-        final List list = new ArrayList();
+    public static List<Object> search(final GeneralParameterValue param, final String name, int maxDepth) {
+        final List<Object> list = new ArrayList<Object>();
         search(param, name, maxDepth, list);
         return list;
     }
@@ -211,15 +273,15 @@ public final class Parameters {
      * Implementation of the search algorithm. The result is stored in the supplied set.
      */
     private static void search(final GeneralParameterValue param, final String name,
-                               final int maxDepth, final Collection list)
+                               final int maxDepth, final Collection<Object> list)
     {
         if (maxDepth >= 0) {
             if (AbstractIdentifiedObject.nameMatches(param.getDescriptor(), name)) {
                 list.add(param);
             }
-            if (maxDepth!=0 && param instanceof ParameterValueGroup) {
-                for (Iterator it=((ParameterValueGroup)param).values().iterator(); it.hasNext();) {
-                    search((GeneralParameterValue) it.next(), name, maxDepth-1, list);
+            if ((maxDepth != 0) && (param instanceof ParameterValueGroup)) {
+                for (final GeneralParameterValue value : ((ParameterValueGroup) param).values()) {
+                    search(value, name, maxDepth-1, list);
                 }
             }
         }
@@ -234,8 +296,7 @@ public final class Parameters {
      * @since 2.2
      */
     public static void copy(final ParameterValueGroup source, final ParameterValueGroup target) {
-        for (final Iterator it=source.values().iterator(); it.hasNext();) {
-            final GeneralParameterValue param = (GeneralParameterValue) it.next();
+        for (final GeneralParameterValue param : source.values()) {
             final String name = param.getDescriptor().getName().getCode();
             if (param instanceof ParameterValueGroup) {
                 copy((ParameterValueGroup) param, target.addGroup(name));
@@ -256,9 +317,11 @@ public final class Parameters {
      * @param  destination The destination map, or {@code null} for a default one.
      * @return {@code destination}, or a new map if {@code destination} was null.
      */
-    public static Map toNameValueMap(final GeneralParameterValue parameters, Map destination) {
+    public static Map<String,Object> toNameValueMap(final GeneralParameterValue parameters,
+                                                    Map<String,Object> destination)
+    {
         if (destination == null) {
-            destination = new LinkedHashMap();
+            destination = new LinkedHashMap<String,Object>();
         }
         if (parameters instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameters;
@@ -272,8 +335,8 @@ public final class Parameters {
         }
         if (parameters instanceof ParameterValueGroup) {
             final ParameterValueGroup group = (ParameterValueGroup) parameters;
-            for (final Iterator it=group.values().iterator(); it.hasNext();) {
-                destination = toNameValueMap((GeneralParameterValue) it.next(), destination);
+            for (final GeneralParameterValue value : group.values()) {
+                destination = toNameValueMap(value, destination);
             }
         }
         return destination;
@@ -332,7 +395,7 @@ public final class Parameters {
             return true;
         }
         /*
-         * A value were set, but is different from the expected value.
+         * A value was set, but is different from the expected value.
          */
         if (force) {
             parameter.setValue(value, unit);

@@ -65,7 +65,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Martin Desruisseaux
  */
 public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
-                                 implements OptionalFactory
+        implements OptionalFactory
 {
     /**
      * The priority level for this factory.
@@ -232,7 +232,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
             return null;
         }
         final boolean inverse;
-        Set operations;
+        Set<CoordinateOperation> operations;
         try {
             operations = authorityFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
             inverse = (operations == null || operations.isEmpty());
@@ -261,10 +261,12 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
             return null;
         }
         if (operations != null) {
-            for (final Iterator it=operations.iterator(); it.hasNext();) {
+            for (final Iterator<CoordinateOperation> it=operations.iterator(); it.hasNext();) {
                 CoordinateOperation candidate;
                 try {
-                    candidate = (CoordinateOperation) it.next();
+                    // The call to it.next() must be inside the try..catch block,
+                    // which is why we don't use the Java 5 for loop syntax here.
+                    candidate = it.next();
                     if (candidate == null) {
                         continue;
                     }

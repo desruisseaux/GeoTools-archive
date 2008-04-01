@@ -124,7 +124,7 @@ public final class ImagingParametersTest extends TestCase {
          * Tests clone. Requires J2SE 1.5 or above.
          */
         if (!TestData.isBaseJavaPlatform()) {
-            final ImagingParameters copy = (ImagingParameters) values.clone();
+            final ImagingParameters copy = values.clone();
             assertNotSame("clone", values, copy);
             assertNotSame("clone", values.parameters, copy.parameters);
             if (false) {
@@ -173,7 +173,7 @@ public final class ImagingParametersTest extends TestCase {
                 new ImagingParameterDescriptors(operation, replacingDescriptors);
 
         // Sets the parameter we want to override
-        final ParameterValueGroup rip = (ParameterValueGroup) ripd.createValue();
+        final ParameterValueGroup rip = ripd.createValue();
         assertSame(ripd, rip.getDescriptor());
         final ParameterValue p = rip.parameter("xPeriod");
         assertSame(SPATIAL_SUBSAMPLING_X, p.getDescriptor());

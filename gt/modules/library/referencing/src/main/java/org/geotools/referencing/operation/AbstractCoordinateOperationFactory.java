@@ -357,9 +357,8 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
             throws FactoryException
     {
         final Map<String,?> properties = getProperties(name);
-        final ReferencingFactoryContainer factories = getFactoryContainer();
-        final MathTransform transform = factories.createParameterizedTransform(parameters);
-        final OperationMethod  method = factories.getLastUsedMethod();
+        final MathTransform transform = mtFactory.createParameterizedTransform(parameters);
+        final OperationMethod  method = mtFactory.getLastMethodUsed();
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                                        method, Operation.class);
     }
@@ -462,9 +461,9 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * @return The concatenated operation.
      * @throws FactoryException if the object creation failed.
      */
-    public CoordinateOperation createConcatenatedOperation(Map properties,
-                                                           CoordinateOperation[] operations)
-            throws FactoryException
+    public CoordinateOperation createConcatenatedOperation(
+                        final Map<String,?> properties,
+                        final CoordinateOperation[] operations) throws FactoryException
     {
         CoordinateOperation operation;
         operation = new DefaultConcatenatedOperation(properties, operations, mtFactory);

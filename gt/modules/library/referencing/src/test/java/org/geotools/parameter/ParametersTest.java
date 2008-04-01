@@ -104,7 +104,7 @@ public final class ParametersTest extends TestCase {
      * inside and outside this range. Tests also the uses of values of the wrong type.
      */
     public void testRangeIntegers() {
-        Parameter param;
+        Parameter<Integer> param;
         param = new Parameter(new DefaultParameterDescriptor("Range", 15, -30, +40));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
@@ -140,7 +140,7 @@ public final class ParametersTest extends TestCase {
      * inside and outside this range. Tests also the uses of values of the wrong types.
      */
     public void testRangeDoubles() {
-        Parameter param;
+        Parameter<Double> param;
         param = new Parameter(new DefaultParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
@@ -177,8 +177,8 @@ public final class ParametersTest extends TestCase {
      * parameter.
      */
     public void testCodeList() {
-        Parameter param = new Parameter("Test", AxisDirection.DISPLAY_UP);
-        ParameterDescriptor op = (ParameterDescriptor) param.getDescriptor();
+        Parameter<AxisDirection> param = new Parameter("Test", AxisDirection.DISPLAY_UP);
+        ParameterDescriptor op = param.getDescriptor();
         assertEquals("Set<AxisDirection>",
                      new HashSet<AxisDirection>(Arrays.asList(AxisDirection.values())),
                      op.getValidValues());
@@ -208,11 +208,11 @@ public final class ParametersTest extends TestCase {
      * Test {@link DefaultParameterDescriptor} construction.
      */
     public void testParameterDescriptor() {
-        ParameterDescriptor descriptor;
-        ParameterValue      parameter;
+        ParameterDescriptor<Double> descriptor;
+        ParameterValue<Double>      parameter;
 
         descriptor = new DefaultParameterDescriptor("Test", 12, 4, 20, SI.METER);
-        parameter  = (ParameterValue) descriptor.createValue();
+        parameter  = descriptor.createValue();
         assertEquals("name",         "Test",       descriptor.getName().getCode());
         assertEquals("unit",         SI.METER,     descriptor.getUnit());
         assertEquals("class",        Double.class, descriptor.getValueClass());
@@ -266,12 +266,12 @@ public final class ParametersTest extends TestCase {
      * Test {@link Parameter} construction.
      */
     public void testParameterValue() throws IOException, ClassNotFoundException {
-        Parameter           parameter;
-        ParameterDescriptor descriptor;
-        Set                 validValues;
+        Parameter<?>           parameter;
+        ParameterDescriptor<?> descriptor;
+        Set<?>                 validValues;
 
         parameter  = new Parameter("Test", 14);
-        descriptor = (ParameterDescriptor)           parameter.getDescriptor();
+        descriptor = parameter.getDescriptor();
         assertNull  ("unit",                         parameter.getUnit());
         assertEquals("intValue",     14,             parameter.intValue());
         assertEquals("doubleValue",  14,             parameter.doubleValue(), 0);
@@ -344,14 +344,15 @@ public final class ParametersTest extends TestCase {
     /**
      * Test parameter values group.
      */
+    @SuppressWarnings("serial")
     public void testGroup() throws IOException {
         final ParameterWriter writer = new ParameterWriter(new StringWriter());
         final Integer ONE = 1;
-        final ParameterDescriptor p1, p2, p3, p4;
-        p1 = new DefaultParameterDescriptor(Collections.singletonMap("name", "1"), Integer.class, null, ONE, null, null, null, true);
-        p2 = new DefaultParameterDescriptor(Collections.singletonMap("name", "2"), Integer.class, null, ONE, null, null, null, true);
-        p3 = new DefaultParameterDescriptor(Collections.singletonMap("name", "3"), Integer.class, null, ONE, null, null, null, false);
-        p4 = new DefaultParameterDescriptor(Collections.singletonMap("name", "4"), Integer.class, null, ONE, null, null, null, false) {
+        final ParameterDescriptor<Integer> p1, p2, p3, p4;
+        p1 = new DefaultParameterDescriptor<Integer>(Collections.singletonMap("name", "1"), Integer.class, null, ONE, null, null, null, true);
+        p2 = new DefaultParameterDescriptor<Integer>(Collections.singletonMap("name", "2"), Integer.class, null, ONE, null, null, null, true);
+        p3 = new DefaultParameterDescriptor<Integer>(Collections.singletonMap("name", "3"), Integer.class, null, ONE, null, null, null, false);
+        p4 = new DefaultParameterDescriptor<Integer>(Collections.singletonMap("name", "4"), Integer.class, null, ONE, null, null, null, false) {
             /**
              * We are cheating here: <code>maximumOccurs</code> should always be 1 for
              * <code>ParameterValue</code>. However, the Geotools implementation should
@@ -364,19 +365,19 @@ public final class ParametersTest extends TestCase {
         };
 
         final Parameter v1, v2, v3, v4, v1b, v2b, v3b, v4b;
-        v1  = new Parameter(p1); v1 .setValue( 10);
-        v2  = new Parameter(p2); v2 .setValue( 20);
-        v3  = new Parameter(p3); v3 .setValue( 30);
-        v4  = new Parameter(p4); v4 .setValue( 40);
-        v1b = new Parameter(p1); v1b.setValue(-10);
-        v2b = new Parameter(p2); v2b.setValue(-20);
-        v3b = new Parameter(p3); v3b.setValue(-30);
-        v4b = new Parameter(p4); v4b.setValue(-40);
+        v1  = new Parameter<Integer>(p1); v1 .setValue( 10);
+        v2  = new Parameter<Integer>(p2); v2 .setValue( 20);
+        v3  = new Parameter<Integer>(p3); v3 .setValue( 30);
+        v4  = new Parameter<Integer>(p4); v4 .setValue( 40);
+        v1b = new Parameter<Integer>(p1); v1b.setValue(-10);
+        v2b = new Parameter<Integer>(p2); v2b.setValue(-20);
+        v3b = new Parameter<Integer>(p3); v3b.setValue(-30);
+        v4b = new Parameter<Integer>(p4); v4b.setValue(-40);
 
         ParameterDescriptorGroup descriptor;
         ParameterGroup           group;
         Collection               content;
-        Map                      properties;
+        Map<String,?>            properties;
         Parameter                automatic;
 
         /* --------------------------------------------- *
@@ -387,7 +388,7 @@ public final class ParametersTest extends TestCase {
          * --------------------------------------------- */
         properties = Collections.singletonMap("name", "group");
         group      = new ParameterGroup(properties, new Parameter[] {v1, v2, v3});
-        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        descriptor = group.getDescriptor();
         content    = descriptor.descriptors();
         writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
@@ -456,9 +457,9 @@ public final class ParametersTest extends TestCase {
          *    - v3   is optional and initially omitted
          * --------------------------------------------- */
         group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2});
-        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        descriptor = group.getDescriptor();
         content    = group.values();
-        automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        automatic  = (Parameter) v3.getDescriptor().createValue();
         writer.format(group); // Ensure there is no exception there.
         assertEquals   ("values.size()", 2, content.size());
         assertTrue     ("contains(v1)",     content.contains(v1 ));
@@ -522,9 +523,9 @@ public final class ParametersTest extends TestCase {
             assertNotNull(e.getMessage());
         }
         group      = new ParameterGroup(properties, new Parameter[] {v1, v4, v3, v4b});
-        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        descriptor = group.getDescriptor();
         content    = group.values();
-        automatic  = (Parameter) v3.getDescriptor().createValue(); // Remove cast with J2SE 1.5
+        automatic  = (Parameter) v3.getDescriptor().createValue();
         writer.format(group); // Ensure there is no exception there.
         assertEquals   ("values.size()", 4, content.size());
         assertTrue     ("contains(v1)",     content.contains(v1 ));
@@ -571,7 +572,7 @@ public final class ParametersTest extends TestCase {
          *    - v2   is mandatory
          * --------------------------------------------- */
         group      = new ParameterGroup(properties, new Parameter[] {v1, v2});
-        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        descriptor = group.getDescriptor();
         content    = descriptor.descriptors();
         writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
@@ -613,7 +614,7 @@ public final class ParametersTest extends TestCase {
          *    - v3   is optional
          * --------------------------------------------- */
         group      = new ParameterGroup(properties, new Parameter[] {v1, v3});
-        descriptor = (ParameterDescriptorGroup) group.getDescriptor();
+        descriptor = group.getDescriptor();
         content    = descriptor.descriptors();
         writer.format(group); // Ensure there is no exception there.
         assertEquals("name", "group", descriptor.getName().getCode());
@@ -718,7 +719,7 @@ public final class ParametersTest extends TestCase {
         for (int height=2; height<=size; height++) {
             for (int width=2; width<=size; width++) {
                 MatrixParameters parameters = (MatrixParameters) descriptor.createValue();
-                GeneralMatrix copy = (GeneralMatrix) matrix.clone();
+                GeneralMatrix copy = matrix.clone();
                 copy.setSize(height, width);
                 parameters.setMatrix(copy);
                 assertEquals("height", height, ((Parameter) parameters.parameter("num_row")).intValue());

@@ -24,7 +24,7 @@ import java.util.AbstractList;
  * An unmodifiable view of an array. Invoking
  *
  * <blockquote><code>
- * new UnmodifiableArrayList(array);
+ * UnmodifiableArrayList.wrap(array);
  * </code></blockquote>
  *
  * is equivalent to

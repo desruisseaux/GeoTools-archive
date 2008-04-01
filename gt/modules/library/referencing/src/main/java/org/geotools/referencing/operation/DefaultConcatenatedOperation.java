@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -41,10 +39,10 @@ import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -57,14 +55,14 @@ import org.geotools.resources.i18n.ErrorKeys;
  * (<var>n</var>). The source coordinate reference system of the first step and the target
  * coordinate reference system of the last step are the source and target coordinate reference
  * system associated with the concatenated operation.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
-                                       implements ConcatenatedOperation
+        implements ConcatenatedOperation
 {
     /**
      * Serial number for interoperability with different versions.
@@ -74,7 +72,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * The sequence of operations.
      */
-    private final List/*<SingleOperation>*/ operations;
+    private final List<SingleOperation> operations;
 
     /**
      * Constructs a concatenated operation from the specified name.
@@ -93,13 +91,14 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * The properties given in argument follow the same rules than for the
      * {@link AbstractCoordinateOperation} constructor.
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param operations The sequence of operations.
      */
-    public DefaultConcatenatedOperation(final Map properties,
+    public DefaultConcatenatedOperation(final Map<String,?> properties,
                                         final CoordinateOperation[] operations)
     {
-        this(properties, new ArrayList(operations!=null ? operations.length : 4), operations);
+        this(properties, new ArrayList<SingleOperation>(operations!=null ? operations.length : 4),
+             operations);
     }
 
     /**
@@ -108,17 +107,17 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * The properties given in argument follow the same rules than for the
      * {@link AbstractCoordinateOperation} constructor.
      *
-     * @param  properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param  properties Set of properties. Should contains at least {@code "name"}.
      * @param  operations The sequence of operations.
      * @param  factory    The math transform factory to use for math transforms concatenation.
      * @throws FactoryException if the factory can't concatenate the math transforms.
      */
-    public DefaultConcatenatedOperation(final Map properties,
+    public DefaultConcatenatedOperation(final Map<String,?> properties,
                                         final CoordinateOperation[] operations,
                                         final MathTransformFactory factory)
             throws FactoryException
     {
-        this(properties, new ArrayList(operations!=null ? operations.length : 4),
+        this(properties, new ArrayList<SingleOperation>(operations!=null ? operations.length : 4),
              operations, factory);
     }
 
@@ -126,8 +125,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultConcatenatedOperation(final Map  properties,
-                                         final ArrayList list,
+    private DefaultConcatenatedOperation(final Map<String,?> properties,
+                                         final ArrayList<SingleOperation> list,
                                          final CoordinateOperation[] operations)
     {
         this(properties, expand(operations, list), list);
@@ -137,8 +136,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultConcatenatedOperation(final Map  properties,
-                                         final ArrayList list,
+    private DefaultConcatenatedOperation(final Map<String,?> properties,
+                                         final ArrayList<SingleOperation> list,
                                          final CoordinateOperation[] operations,
                                          final MathTransformFactory factory)
             throws FactoryException
@@ -150,16 +149,16 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultConcatenatedOperation(final Map  properties,
+    private DefaultConcatenatedOperation(final Map<String,?> properties,
                                          final MathTransform transform,
-                                         final ArrayList/*<SingleOperation>*/ operations)
+                                         final List<SingleOperation> operations)
     {
         super(mergeAccuracy(properties, operations),
-              ((SingleOperation) operations.get(0)).getSourceCRS(),
-              ((SingleOperation) operations.get(operations.size()-1)).getTargetCRS(),
+              operations.get(0).getSourceCRS(),
+              operations.get(operations.size() - 1).getTargetCRS(),
               transform);
-        operations.trimToSize();
-        this.operations = Collections.unmodifiableList(operations); // No need to clone.
+        this.operations = UnmodifiableArrayList.wrap(
+                operations.toArray(new SingleOperation[operations.size()]));
     }
 
     /**
@@ -167,7 +166,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static MathTransform expand(final CoordinateOperation[] operations,
-                                        final List list)
+                                        final List<SingleOperation> list)
     {
         try {
             return expand(operations, list, null, true);
@@ -185,11 +184,12 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * @param  list The list in which to add {@code SingleOperation}.
      * @param  factory The math transform factory to use, or {@code null}
      * @param  wantTransform {@code true} if the concatenated math transform should be computed.
+     *         This is set to {@code false} only when this method invokes itself recursively.
      * @return The concatenated math transform.
      * @throws FactoryException if the factory can't concatenate the math transforms.
      */
     private static MathTransform expand(final CoordinateOperation[] operations,
-                                        final List list,
+                                        final List<SingleOperation> list,
                                         final MathTransformFactory factory,
                                         final boolean wantTransform)
             throws FactoryException
@@ -200,12 +200,11 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             ensureNonNull("operations", operations, i);
             final CoordinateOperation op = operations[i];
             if (op instanceof SingleOperation) {
-                list.add(op);
+                list.add((SingleOperation) op);
             } else if (op instanceof ConcatenatedOperation) {
                 final ConcatenatedOperation cop = (ConcatenatedOperation) op;
-                final List cops = cop.getOperations();
-                expand((CoordinateOperation[]) cops.toArray(new CoordinateOperation[cops.size()]),
-                       list, factory, false);
+                final List<SingleOperation> cops = cop.getOperations();
+                expand(cops.toArray(new CoordinateOperation[cops.size()]), list, factory, false);
             } else {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                         Classes.getClass(op), SingleOperation.class));
@@ -243,7 +242,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             final int size = list.size();
             if (size <= 1) {
                 throw new IllegalArgumentException(Errors.format(
-                            ErrorKeys.MISSING_PARAMETER_$1, "operations["+size+']'));
+                            ErrorKeys.MISSING_PARAMETER_$1, "operations[" + size + ']'));
             }
         }
         return transform;
@@ -270,26 +269,25 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      *
      * @todo We should use a Map and merge only one accuracy for each specification.
      */
-    private static Map mergeAccuracy(final Map properties,
-                                     final List/*<CoordinateOperation>*/ operations)
+    private static Map<String,?> mergeAccuracy(final Map<String,?> properties,
+            final List<? extends CoordinateOperation> operations)
     {
         if (!properties.containsKey(COORDINATE_OPERATION_ACCURACY_KEY)) {
-            Set accuracy = null;
-            for (final Iterator it=operations.iterator(); it.hasNext();) {
-                final CoordinateOperation op = (CoordinateOperation) it.next();
+            Set<PositionalAccuracy> accuracy = null;
+            for (final CoordinateOperation op : operations) {
                 if (op instanceof Transformation) {
                     // See javadoc for a rational why we take only transformations in account.
-                    final Collection/*<PositionalAccuracy>*/ candidates = op.getPositionalAccuracy();
+                    Collection<PositionalAccuracy> candidates = op.getCoordinateOperationAccuracy();
                     if (candidates!=null && !candidates.isEmpty()) {
                         if (accuracy == null) {
-                            accuracy = new LinkedHashSet();
+                            accuracy = new LinkedHashSet<PositionalAccuracy>();
                         }
                         accuracy.addAll(candidates);
                     }
                 }
             }
             if (accuracy != null) {
-                final Map merged = new HashMap(properties);
+                final Map<String,Object> merged = new HashMap<String,Object>(properties);
                 merged.put(COORDINATE_OPERATION_ACCURACY_KEY,
                            accuracy.toArray(new PositionalAccuracy[accuracy.size()]));
                 return merged;
@@ -301,7 +299,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * Returns the sequence of operations.
      */
-    public List/*<SingleOperation>*/ getOperations() {
+    public List<SingleOperation> getOperations() {
         return operations;
     }
 
@@ -315,6 +313,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -329,6 +328,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * Returns a hash code value for this concatenated operation.
      */
+    @Override
     public int hashCode() {
         return operations.hashCode() ^ (int)serialVersionUID;
     }
@@ -336,6 +336,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final String label = super.formatWKT(formatter);
         for (final Iterator it=operations.iterator(); it.hasNext();) {

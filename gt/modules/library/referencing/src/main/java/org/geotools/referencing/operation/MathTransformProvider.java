@@ -17,7 +17,6 @@
 package org.geotools.referencing.operation;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import javax.units.Unit;
 
@@ -41,6 +40,7 @@ import org.opengis.util.GenericName;
 
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.parameter.Parameters;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -319,8 +319,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                              final ParameterValueGroup copy)
             throws InvalidParameterNameException, InvalidParameterValueException
     {
-        for (final Iterator it=values.values().iterator(); it.hasNext();) {
-            final GeneralParameterValue value = (GeneralParameterValue) it.next();
+        for (final GeneralParameterValue value : values.values()) {
             final String name = value.getDescriptor().getName().getCode();
             if (value instanceof ParameterValueGroup) {
                 /*
@@ -341,8 +340,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
             /*
              * Single parameter - copy the value, with special care for value with units.
              */
-            final ParameterValue source = (ParameterValue) value;
-            final ParameterValue target;
+            final ParameterValue<?> source = (ParameterValue) value;
+            final ParameterValue<?> target;
             try {
                 target = copy.parameter(name);
             } catch (ParameterNotFoundException cause) {
@@ -377,8 +376,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
-    private static ParameterValue getParameter(final ParameterDescriptor param,
-                                               final ParameterValueGroup group)
+    private static <T> ParameterValue<T> getParameter(final ParameterDescriptor<T> param,
+                                                      final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
         /*
@@ -392,7 +391,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
             name = param.getName().getCode();
         }
         if (param.getMinimumOccurs() != 0) {
-            return group.parameter(name);
+            return Parameters.cast(group.parameter(name), param.getValueClass());
         }
         /*
          * The parameter is optional. We don't want to invokes 'parameter(name)', because we don't
@@ -405,10 +404,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         final GeneralParameterDescriptor search;
         search = group.getDescriptor().descriptor(name);
         if (search instanceof ParameterDescriptor) {
-            for (final Iterator it=group.values().iterator(); it.hasNext();) {
-                final GeneralParameterValue candidate = (GeneralParameterValue) it.next();
+            for (final GeneralParameterValue candidate : group.values()) {
                 if (search.equals(candidate.getDescriptor())) {
-                    return (ParameterValue) candidate;
+                    return Parameters.cast((ParameterValue) candidate, param.getValueClass());
                 }
             }
         }
@@ -429,12 +427,12 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
-    protected static Object value(final ParameterDescriptor param,
-                                  final ParameterValueGroup group)
+    protected static <T> T value(final ParameterDescriptor<T> param,
+                                 final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
-        final ParameterValue value = getParameter(param, group);
-        return (value!=null) ? value.getValue() : null;
+        final ParameterValue<T> value = getParameter(param, group);
+        return (value != null) ? value.getValue() : null;
     }
 
     /**
@@ -451,12 +449,12 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
-    protected static String stringValue(final ParameterDescriptor param,
-                                        final ParameterValueGroup group)
+    protected static String stringValue(final ParameterDescriptor<?> param,
+                                        final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
-        final ParameterValue value = getParameter(param, group);
-        return (value!=null) ? value.stringValue() : null;
+        final ParameterValue<?> value = getParameter(param, group);
+        return (value != null) ? value.stringValue() : null;
     }
 
     /**
@@ -473,12 +471,12 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
-    protected static int intValue(final ParameterDescriptor param,
-                                  final ParameterValueGroup group)
+    protected static int intValue(final ParameterDescriptor<?> param,
+                                  final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
-        final ParameterValue value = getParameter(param, group);
-        return (value!=null) ? value.intValue() : 0;
+        final ParameterValue<?> value = getParameter(param, group);
+        return (value != null) ? value.intValue() : 0;
     }
 
     /**
@@ -497,14 +495,14 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
-    protected static double doubleValue(final ParameterDescriptor param,
-                                        final ParameterValueGroup group)
+    protected static double doubleValue(final ParameterDescriptor<?> param,
+                                        final ParameterValueGroup    group)
             throws ParameterNotFoundException
     {
         final Unit unit = param.getUnit();
-        final ParameterValue value = getParameter(param, group);
-        return (value==null) ? Double.NaN :
-                (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
+        final ParameterValue<?> value = getParameter(param, group);
+        return (value == null) ? Double.NaN :
+                (unit != null) ? value.doubleValue(unit) : value.doubleValue();
     }
 
     /**
@@ -554,6 +552,11 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @since 2.2
      */
     protected static final class Delegate extends MathTransformProxy {
+        /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = -3942740060970730790L;
+
         /**
          * The provider for the {@linkplain #transform transform}.
          */

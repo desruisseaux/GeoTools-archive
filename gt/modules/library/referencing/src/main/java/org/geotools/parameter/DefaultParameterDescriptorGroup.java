@@ -54,7 +54,7 @@ import org.geotools.resources.i18n.Errors;
  * @see DefaultParameterDescriptor
  */
 public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
-                                          implements ParameterDescriptorGroup
+        implements ParameterDescriptorGroup
 {
     /**
      * Serial number for interoperability with different versions.

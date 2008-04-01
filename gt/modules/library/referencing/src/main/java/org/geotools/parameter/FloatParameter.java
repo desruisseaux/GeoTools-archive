@@ -48,7 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see DefaultParameterDescriptor
  * @see ParameterGroup
  */
-public class FloatParameter extends AbstractParameter implements ParameterValue {
+public class FloatParameter extends AbstractParameter implements ParameterValue<Double> {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -67,7 +67,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @param  descriptor The abstract definition of this parameter.
      * @throws IllegalArgumentException if the value class is not {@code Double.class}.
      */
-    public FloatParameter(final ParameterDescriptor descriptor) {
+    public FloatParameter(final ParameterDescriptor<Double> descriptor) {
         super(descriptor);
         final Class type = descriptor.getValueClass();
         final Class expected = Double.class;
@@ -88,7 +88,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @param  value The parameter value.
      * @throws IllegalArgumentException if the value class is not {@code Double.class}.
      */
-    public FloatParameter(final ParameterDescriptor descriptor, final double value) {
+    public FloatParameter(final ParameterDescriptor<Double> descriptor, final double value) {
         this(descriptor);
         setValue(value);
     }
@@ -97,7 +97,8 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Returns the abstract definition of this parameter.
      */
     @Override
-    public ParameterDescriptor getDescriptor() {
+    @SuppressWarnings("unchecked") // Type should has been checked by the constructor.
+    public ParameterDescriptor<Double> getDescriptor() {
         return (ParameterDescriptor) super.getDescriptor();
     }
 
@@ -149,7 +150,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @return The numeric value represented by this parameter after conversion to type {@code int}.
      */
     public int intValue() {
-        return (int)Math.round(value);
+        return (int) Math.round(value);
     }
 
     /**
@@ -207,8 +208,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @throws InvalidParameterTypeException The value is not a reference to a file or an URI.
      */
     public URI valueFile() throws InvalidParameterTypeException {
-        throw new InvalidParameterTypeException(getClassTypeError(),
-                  Parameter.getName(descriptor));
+        throw new InvalidParameterTypeException(getClassTypeError(), Parameter.getName(descriptor));
     }
 
     /**
@@ -223,7 +223,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *
      * @return The parameter value as an object.
      */
-    public Object getValue() {
+    public Double getValue() {
         return Double.valueOf(value);
     }
 
@@ -237,7 +237,9 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      */
     public void setValue(double value, final Unit unit) throws InvalidParameterValueException {
         ensureNonNull("unit", unit);
-        final Unit thisUnit = ((ParameterDescriptor) descriptor).getUnit();
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<Double> descriptor = (ParameterDescriptor) this.descriptor;
+        final Unit thisUnit = descriptor.getUnit();
         if (thisUnit == null) {
             throw unitlessParameter(descriptor);
         }
@@ -246,8 +248,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
             throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         value = unit.getConverterTo(thisUnit).convert(value);
-        Parameter.ensureValidValue((ParameterDescriptor) descriptor, Double.valueOf(value));
-        this.value = value;
+        this.value = Parameter.ensureValidValue(descriptor, Double.valueOf(value));
     }
 
     /**
@@ -258,8 +259,9 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *         (for example a value out of range).
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        Parameter.ensureValidValue((ParameterDescriptor) descriptor, Double.valueOf(value));
-        this.value = value;
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<Double> descriptor = (ParameterDescriptor) this.descriptor;
+        this.value = Parameter.ensureValidValue(descriptor, Double.valueOf(value));
     }
 
     /**
@@ -292,8 +294,9 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *         the value is numeric and out of range).
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        Parameter.ensureValidValue((ParameterDescriptor) descriptor, value);
-        this.value = ((Number) value).doubleValue();
+        @SuppressWarnings("unchecked") // Checked by constructor.
+        final ParameterDescriptor<Double> descriptor = (ParameterDescriptor) this.descriptor;
+        this.value = Parameter.ensureValidValue(descriptor, value);
     }
 
     /**

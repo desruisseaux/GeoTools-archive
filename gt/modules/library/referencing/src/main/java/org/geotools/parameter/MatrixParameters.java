@@ -63,19 +63,19 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     /**
      * The parameter values. Will be constructed only when first requested.
      */
-    private ParameterValue[][] matrixValues;
+    private ParameterValue<Double>[][] matrixValues;
 
     /**
      * The value for the {@link MatrixParameterDescriptors#numRow} parameter.
      * Consider this field as final. It is not only for {@link #clone} implementation.
      */
-    private ParameterValue numRow;
+    private ParameterValue<Integer> numRow;
 
     /**
      * The value for the {@link MatrixParameterDescriptors#numCol} parameter.
      * Consider this field as final. It is not only for {@link #clone} implementation.
      */
-    private ParameterValue numCol;
+    private ParameterValue<Integer> numCol;
 
     /**
      * Constructs default values for the specified
@@ -83,8 +83,8 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      */
     public MatrixParameters(final MatrixParameterDescriptors descriptor) {
         super(descriptor);
-        numRow = (ParameterValue) parameter(0);
-        numCol = (ParameterValue) parameter(1);
+        numRow = Parameters.cast((ParameterValue) parameter(0), Integer.class);
+        numCol = Parameters.cast((ParameterValue) parameter(1), Integer.class);
     }
 
     /**
@@ -177,17 +177,17 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
     @Override
-    public ParameterValue parameter(String name) throws ParameterNotFoundException {
+    public ParameterValue<?> parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
-        final MatrixParameterDescriptors descriptor = ((MatrixParameterDescriptors)this.descriptor);
+        final MatrixParameterDescriptors descriptor = ((MatrixParameterDescriptors) this.descriptor);
         final String prefix = descriptor.prefix;
         RuntimeException cause = null;
         if (name.regionMatches(true, 0, prefix, 0, prefix.length())) {
             final int split = name.indexOf(descriptor.separator, prefix.length());
             if (split >= 0) try {
                 final int row = Integer.parseInt(name.substring(prefix.length(), split));
-                final int col = Integer.parseInt(name.substring(split+1));
+                final int col = Integer.parseInt(name.substring(split + 1));
                 return parameter(row, col);
             } catch (NumberFormatException exception) {
                 cause = exception;
@@ -220,7 +220,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * @return The parameter value for the specified matrix element (never {@code null}).
      * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
-    public final ParameterValue parameter(final int row, final int column)
+    public final ParameterValue<Double> parameter(final int row, final int column)
             throws IndexOutOfBoundsException
     {
         return parameter(row, column, numRow.intValue(), numCol.intValue());
@@ -236,8 +236,9 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * @return The parameter value for the specified matrix element.
      * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
-    private ParameterValue parameter(final int row,    final int column,
-                                     final int numRow, final int numCol)
+    @SuppressWarnings("unchecked") // Because of array creation
+    private ParameterValue<Double> parameter(final int row,    final int column,
+                                             final int numRow, final int numCol)
             throws IndexOutOfBoundsException
     {
         MatrixParameterDescriptors.checkIndice("row",    row,    numRow);
@@ -248,14 +249,14 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
         if (row >= matrixValues.length) {
             matrixValues = XArray.resize(matrixValues, numRow);
         }
-        ParameterValue[] rowValues = matrixValues[row];
+        ParameterValue<Double>[] rowValues = matrixValues[row];
         if (rowValues == null) {
             matrixValues[row] = rowValues = new ParameterValue[numCol];
         }
         if (column >= rowValues.length) {
             matrixValues[row] = rowValues = XArray.resize(rowValues, numCol);
         }
-        ParameterValue param = rowValues[column];
+        ParameterValue<Double> param = rowValues[column];
         if (param == null) {
             rowValues[column] = param = new FloatParameter(
                 ((MatrixParameterDescriptors) descriptor).descriptor(row, column, numRow, numCol));
@@ -345,6 +346,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      *
      * @param matrix The matrix to copy in this group of parameters.
      */
+    @SuppressWarnings("unchecked") // Because of array creation
     public void setMatrix(final Matrix matrix) {
         final MatrixParameterDescriptors matrixDescriptor =
             ((MatrixParameterDescriptors) this.descriptor);
@@ -355,22 +357,17 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
         for (int row=0; row<numRow; row++) {
             for (int col=0; col<numCol; col++) {
                 final double element = matrix.getElement(row,col);
-                ParameterDescriptor descriptor = matrixDescriptor.descriptor(row, col);
-                final Object defaultValue = descriptor.getDefaultValue();
-                if (defaultValue instanceof Number) {
-                    double value = ((Number) defaultValue).doubleValue();
-                    if (Double.doubleToLongBits(element) ==
-                        Double.doubleToLongBits(value))
-                    {
-                        /*
-                         * Value matches the default value, so there is no need to keep it.
-                         * Remove entry to keep things sparse.
-                         */
-                        if (matrixValues != null  &&  matrixValues[row] != null) {
-                            matrixValues[row][col] = null;
-                        }
-                        continue;
+                ParameterDescriptor<Double> descriptor = matrixDescriptor.descriptor(row, col);
+                final double value = descriptor.getDefaultValue();
+                if (Double.doubleToLongBits(element) == Double.doubleToLongBits(value)) {
+                    /*
+                     * Value matches the default value, so there is no need to keep it.
+                     * Remove entry to keep things sparse.
+                     */
+                    if (matrixValues != null  &&  matrixValues[row] != null) {
+                        matrixValues[row][col] = null;
                     }
+                    continue;
                 }
                 if (matrixValues == null) {
                     matrixValues = new ParameterValue[numRow][];
@@ -413,6 +410,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Returns a clone of this parameter group.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public MatrixParameters clone() {
         final MatrixParameters copy = (MatrixParameters) super.clone();
         if (copy.matrixValues != null) {

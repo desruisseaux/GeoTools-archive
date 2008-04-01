@@ -19,13 +19,11 @@ package org.geotools.referencing.wkt;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Iterator;
 
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -36,6 +34,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.opengis.referencing.operation.Operation;
 
 
 /**
@@ -297,8 +296,7 @@ public class MathTransformParser extends AbstractParser {
              * check.
              */
             if (classification != null) {
-                for (final Iterator it=mtFactory.getAvailableMethods(CoordinateOperation.class).iterator(); it.hasNext();) {
-                    final OperationMethod method = (OperationMethod) it.next();
+                for (final OperationMethod method : mtFactory.getAvailableMethods(Operation.class)) {
                     if (AbstractIdentifiedObject.nameMatches(method, classification)) {
                         lastMethod = method;
                         break;

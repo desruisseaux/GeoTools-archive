@@ -1266,7 +1266,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
 
     /**
      * Implementation of transformation step on compound CRS.
-     *
+     * <p>
      * <strong>NOTE:</strong>
      * If there is a horizontal (geographic or projected) CRS together with a vertical CRS,
      * then we can't performs the transformation since the vertical value has an impact on
@@ -1368,7 +1368,7 @@ search: for (int j=0; j<targets.length; j++) {
         int lower, upper=0;
         for (int i=0; i<targets.length; i++) {
             CoordinateOperation step = steps[i];
-            final Map properties = AbstractIdentifiedObject.getProperties(step);
+            final Map<String,?> properties = AbstractIdentifiedObject.getProperties(step);
             final CoordinateReferenceSystem source = ordered[i];
             final CoordinateReferenceSystem target = targets[i];
             final CoordinateReferenceSystem targetStepCRS;
@@ -1454,14 +1454,14 @@ search: for (int j=0; j<targets.length; j++) {
             } else {
                 continue;
             }
-            if (!shift && sourceGeodetic==targetGeodetic) {
+            if (!shift && sourceGeodetic == targetGeodetic) {
                 shift = !equalsIgnoreMetadata(sourceDatum, targetDatum);
                 assert Classes.sameInterfaces(sourceDatum.getClass(),
                                               targetDatum.getClass(), Datum.class);
             }
         }
         return horizontal && vertical &&
-               (shift || targetCRS.getCoordinateSystem().getDimension()>=3);
+               (shift || targetCRS.getCoordinateSystem().getDimension() >= 3);
     }
 
 

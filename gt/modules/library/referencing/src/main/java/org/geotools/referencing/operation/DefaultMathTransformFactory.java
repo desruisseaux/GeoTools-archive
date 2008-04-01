@@ -188,7 +188,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * @see #getDefaultParameters
      * @see #createParameterizedTransform
      */
-    public Set<OperationMethod> getAvailableMethods(final Class type) {
+    public Set<OperationMethod> getAvailableMethods(final Class<? extends Operation> type) {
         return new LazySet<OperationMethod>(registry.getServiceProviders(MathTransformProvider.class,
                 (type!=null) ? new MethodFilter(type) : null, HINTS));
     }
@@ -311,8 +311,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     public ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
-        // Remove the cast when we will be allowed to compile for J2SE 1.5.
-        return (ParameterValueGroup) getProvider(method).getParameters().createValue();
+        return getProvider(method).getParameters().createValue();
     }
 
     /**

@@ -73,8 +73,7 @@ public class DefiningConversion extends DefaultConversion {
      */
     private static OperationMethod getOperationMethod(final ParameterValueGroup parameters) {
         ensureNonNull("parameters", parameters);
-        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        final ParameterDescriptorGroup descriptor = (ParameterDescriptorGroup) parameters.getDescriptor();
+        final ParameterDescriptorGroup descriptor = parameters.getDescriptor();
         return new DefaultOperationMethod(getProperties(descriptor, null), 2, 2, descriptor);
     }
 
@@ -92,7 +91,7 @@ public class DefiningConversion extends DefaultConversion {
     {
         super(properties, null, null, null, method);
         ensureNonNull("parameters", parameters);
-        this.parameters = (ParameterValueGroup) parameters.clone();
+        this.parameters = parameters.clone();
     }
 
     /**
@@ -100,7 +99,7 @@ public class DefiningConversion extends DefaultConversion {
      */
     @Override
     public ParameterValueGroup getParameterValues() {
-        return (ParameterValueGroup) parameters.clone();
+        return parameters.clone();
     }
 
     /**
