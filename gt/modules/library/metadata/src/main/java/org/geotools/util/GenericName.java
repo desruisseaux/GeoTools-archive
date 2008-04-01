@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.util.NameSpace;
 import org.opengis.util.LocalName;
 import org.opengis.util.ScopedName;  // For javadoc
@@ -48,6 +50,7 @@ import org.geotools.resources.Utilities;
  *
  * @see NameFactory
  */
+@XmlType(name = "GenericName")
 public abstract class GenericName implements org.opengis.util.GenericName, Serializable,
         Comparable<org.opengis.util.GenericName> // TODO: remove after we updated GeoAPI.jar
 {
@@ -96,6 +99,7 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
      *
      * @since 2.3
      */
+    @XmlElement(name = "depth", required = true)
     public abstract int depth();
 
     /**
@@ -103,6 +107,7 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
      * Each element in this list is like a directory name in a file path name.
      * The length of this sequence is the generic name depth.
      */
+    @XmlElement(name = "parsedName", required = true)
     public abstract List<LocalName> getParsedNames();
 
     /**

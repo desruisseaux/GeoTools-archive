@@ -37,12 +37,15 @@ import org.geotools.metadata.iso.distribution.DistributionImpl;
 import org.geotools.metadata.iso.distribution.DistributorImpl;
 import org.geotools.metadata.iso.identification.DataIdentificationImpl;
 import org.geotools.metadata.iso.identification.IdentificationImpl;
+import org.geotools.metadata.iso.spatial.DimensionImpl;
+import org.geotools.metadata.iso.spatial.GridSpatialRepresentationImpl;
 import org.geotools.util.Dummy;
 import org.geotools.util.GrowableInternationalString;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.spatial.DimensionNameType;
 
 
 /**
@@ -123,9 +126,9 @@ public class MetadataAnnotationsTest extends TestCase {
         if (ensuresCorrectJaxbVersion() == false) {
             return;
         }
-        final NamespacePrefixMapperImpl namespace =
+        final NamespacePrefixMapperImpl defaultNamespace =
                 new NamespacePrefixMapperImpl("http://www.isotc211.org/2005/gmd");
-        if (namespace instanceof Dummy) {
+        if (defaultNamespace instanceof Dummy) {
             return;
         }
         final JAXBContext context = JAXBContext.newInstance(MetaDataImpl.class);
@@ -133,7 +136,7 @@ public class MetadataAnnotationsTest extends TestCase {
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
-                new NamespacePrefixMapperImpl("http://www.isotc211.org/2005/gmd"));
+                defaultNamespace);
         final File tempXml = File.createTempFile("jaxb", ".tmp");
         tempXml.deleteOnExit();
         /*
@@ -160,6 +163,13 @@ public class MetadataAnnotationsTest extends TestCase {
         metadata.setIdentificationInfo(Arrays.asList(new Identification[] {
             dataIdent
         }));
+        final DimensionImpl dimension = new DimensionImpl();
+        dimension.setDimensionName(DimensionNameType.COLUMN);
+        dimension.setDimensionSize(830);
+        dimension.setResolution(new Double(70.5));
+        final GridSpatialRepresentationImpl gridSpatialRepres = new GridSpatialRepresentationImpl();
+        gridSpatialRepres.setAxisDimensionsProperties(Arrays.asList(dimension));
+        metadata.setSpatialRepresentationInfo(Arrays.asList(gridSpatialRepres));
         final DistributionImpl distrib = new DistributionImpl();
         distrib.setDistributors(Arrays.asList(new Distributor[] {
             new DistributorImpl(ResponsiblePartyImpl.GEOTOOLS)

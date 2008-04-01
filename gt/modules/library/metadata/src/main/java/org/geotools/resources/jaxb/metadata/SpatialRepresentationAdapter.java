@@ -16,7 +16,7 @@
  */
 package org.geotools.resources.jaxb.metadata;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import org.geotools.metadata.iso.spatial.SpatialRepresentationImpl;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 
@@ -62,7 +62,7 @@ public final class SpatialRepresentationAdapter
      * Returns the {@link SpatialRepresentationImpl} generated from the metadata value.
      * This method is systematically called at marshalling-time by JAXB.
      */
-    @XmlElement(name = "MD_SpatialRepresentation")
+    @XmlElementRef
     public SpatialRepresentationImpl getSpatialRepresentation() {
         return (metadata instanceof SpatialRepresentationImpl) ?
             (SpatialRepresentationImpl) metadata : new SpatialRepresentationImpl(metadata);

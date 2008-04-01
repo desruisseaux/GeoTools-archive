@@ -22,9 +22,11 @@ package org.geotools.metadata.iso.spatial;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.resources.jaxb.uom.MeasureInPixelAdapter;
 
 
 /**
@@ -120,6 +122,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
     /**
      * Degree of detail in the grid dataset.
      */
+    @XmlJavaTypeAdapter(MeasureInPixelAdapter.class)
     @XmlElement(name = "resolution", required = false)
     public Double getResolution() {
         return resolution;
