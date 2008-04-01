@@ -15,6 +15,8 @@
  */
 package org.geotools.filter.v1_0;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -23,6 +25,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -123,6 +126,23 @@ public class OGCUtils {
             }
 
             spatial = ff.literal(polygon);
+        }
+        else {
+            //look for an expression that is not a property name
+            for (Iterator c = node.getChildren().iterator(); c.hasNext(); ) {
+                Node child = (Node) c.next();
+                
+                //if property name, skip
+                if ( child.getValue() instanceof PropertyName ) {
+                    continue;
+                }
+                
+                //if expression, use it
+                if ( child.getValue() instanceof Expression ) {
+                    spatial = (Expression) child.getValue();
+                    break;
+                }
+            }
         }
 
         return new Expression[] { name, spatial };

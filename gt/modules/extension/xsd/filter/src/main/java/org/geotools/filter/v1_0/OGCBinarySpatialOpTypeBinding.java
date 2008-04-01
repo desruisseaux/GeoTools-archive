@@ -15,10 +15,14 @@
  */
 package org.geotools.filter.v1_0;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -174,4 +178,18 @@ public class OGCBinarySpatialOpTypeBinding extends AbstractComplexBinding {
 
         return OGCUtils.property(operator.getExpression1(), operator.getExpression2(), name);
     }
+    
+    public List getProperties(Object object) throws Exception {
+        //special hack for Functions, while not mandated by the spec we handle it 
+        // here
+        BinarySpatialOperator operator = (BinarySpatialOperator) object;
+        if ( operator.getExpression2() instanceof Function ) {
+            ArrayList props = new ArrayList();
+            props.add( new Object[]{ OGC.Function, operator.getExpression2() } ); 
+            return props;
+        }
+        
+        return super.getProperties(object);
+    }
+    
 }

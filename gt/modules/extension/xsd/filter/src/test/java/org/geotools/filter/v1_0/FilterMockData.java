@@ -332,6 +332,19 @@ public class FilterMockData {
         return f.within(f.property("the_geom"), f.literal(geometry()));
     }
 
+    static Within withinWithFunction() {
+        return f.within( f.property( "the_geom"), function() );
+    }
+    
+    static Element withinWithFunction(Document document, Node parent) {
+        Element within = element(document, parent, OGC.Within);
+
+        propertyName(document, within);
+        function(document, within);
+
+        return within;
+    }
+    
     static Element binarySpatialOperator(Document document, Node parent, QName name) {
         Element spatial = element(document, parent, name);
 

@@ -16,6 +16,7 @@
 package org.geotools.filter.v1_0;
 
 import org.w3c.dom.Document;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Contains;
@@ -268,5 +269,23 @@ public class BinarySpatialOpTypeBindingTest extends FilterTestSupport {
             dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PropertyName.getLocalPart()).getLength());
         assertEquals(1,
             dom.getElementsByTagNameNS(GML.NAMESPACE, GML.Point.getLocalPart()).getLength());
+    }
+    
+    public void testWithFunctionParse() throws Exception {
+    	FilterMockData.withinWithFunction(document, document);
+        
+        Within within = (Within) parse();
+        
+        assertNotNull(within.getExpression1());
+        assertNotNull(within.getExpression2());
+        
+        assertTrue( within.getExpression2() instanceof Function);
+    }
+    
+    public void testWithFunctionEncode() throws Exception {
+        Document dom = encode(FilterMockData.withinWithFunction(), OGC.Within);
+        
+        assertEquals(1,
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.Function.getLocalPart()).getLength());
     }
 }
