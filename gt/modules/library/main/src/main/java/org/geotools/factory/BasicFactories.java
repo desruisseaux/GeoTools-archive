@@ -19,7 +19,7 @@ package org.geotools.factory;
 import java.util.Map;
 
 // OpenGIS dependencies
-import org.opengis.feature.display.FeatureDisplayFactory;
+import org.opengis.display.FeatureDisplayFactory;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.go.CommonCapabilities;
