@@ -35,7 +35,6 @@ public class DefaultResourceInfo implements ResourceInfo {
     private URI schema;
     private String name;
     private Set<String> keywords;
-    private Icon icon;
     private String description;
     private CoordinateReferenceSystem crs;
     private ReferencedEnvelope bounds;
@@ -51,7 +50,6 @@ public class DefaultResourceInfo implements ResourceInfo {
         if( copy.getKeywords() != null ){
             this.keywords.addAll( copy.getKeywords() );
         }
-        this.icon = copy.getIcon();
         this.description = copy.getDescription();
         this.crs = copy.getCRS();
         this.bounds = copy.getBounds();                
@@ -82,13 +80,6 @@ public class DefaultResourceInfo implements ResourceInfo {
      */
     public Set<String> getKeywords() {
         return keywords;
-    }
-
-    /**
-     * @return the icon
-     */
-    public Icon getIcon() {
-        return icon;
     }
 
     /**
@@ -145,13 +136,6 @@ public class DefaultResourceInfo implements ResourceInfo {
      */
     public void setKeywords( Set<String> keywords ) {
         this.keywords = keywords;
-    }
-
-    /**
-     * @param icon the icon to set
-     */
-    public void setIcon( Icon icon ) {
-        this.icon = icon;
     }
 
     /**

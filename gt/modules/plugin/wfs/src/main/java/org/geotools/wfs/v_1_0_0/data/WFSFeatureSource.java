@@ -118,10 +118,6 @@ public class WFSFeatureSource extends AbstractFeatureSource implements
                 return featureSetDescription.getAbstract();
             }
 
-            public Icon getIcon() {
-                return null; // Talk to Eclisia!
-            }
-
             @SuppressWarnings("unchecked")
             public Set<String> getKeywords() {
                 return new HashSet<String>(featureSetDescription.getKeywords());

@@ -54,10 +54,6 @@ final class CapabilitiesResourceInfo implements ResourceInfo {
         return protocolHandler.getFeatureTypeCRS(typeName);
     }
 
-    public Icon getIcon() {
-        return null;
-    }
-
     public Set<String> getKeywords() {
         return protocolHandler.getKeywords(typeName);
     }

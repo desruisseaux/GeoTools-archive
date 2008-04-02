@@ -207,11 +207,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
             public String getDescription() {
                 return null;
             }
-    
-            public Icon getIcon() {
-                return null;
-            }
-    
+        
             public Set<String> getKeywords() {
                 return words;
             }

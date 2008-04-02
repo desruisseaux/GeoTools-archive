@@ -494,10 +494,6 @@ public class DefaultView implements FeatureSource<SimpleFeatureType, SimpleFeatu
                 return null;
             }
 
-            public Icon getIcon() {
-                return null;
-            }
-
             public Set<String> getKeywords() {
                 return words;
             }

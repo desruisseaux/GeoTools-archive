@@ -53,7 +53,6 @@ public class DefaultServiceInfo implements ServiceInfo, Serializable {
         this.publisher = copy.getPublisher();
         this.schema = copy.getSchema();
         this.title = copy.getTitle();
-        this.icon = copy.getIcon();
         this.source = copy.getSource();
     }
     /**
@@ -116,53 +115,7 @@ public class DefaultServiceInfo implements ServiceInfo, Serializable {
     public void setTitle( String title ) {
         this.title = title;
     }
-    public Icon getIcon() {
-        return getIcon( 16 );
-    }
-    /**
-     * Icon represent the service.
-     * <p>
-     * The returned icon is not always an ImageIcon; and may in fact
-     * pay attention to your component foreground and background color.
-     * </p>
-     * @param size Size of the icon (usually 16,32 and 48 are supported)
-     * @return A square icon of the requested size
-     */
-    public Icon getIcon( final int size) {
-        if (icon.getIconHeight() < size &&
-            icon.getIconWidth() < size ){
-            return icon;
-        }        
-        else {
-            return new Icon(){
-                public int getIconHeight() {
-                    return size;
-                }
 
-                public int getIconWidth() {
-                    return size;
-                }
-
-                public void paintIcon( Component c, Graphics g, int x, int y ) {
-                    BufferedImage img = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-                    icon.paintIcon( c, img.getGraphics(), 0, 0 );
-                    
-                    if( c != null ){
-                        g.drawImage( img, x, y, size, size, c.getBackground(), c );
-                    }
-                    else {
-                        g.drawImage( img, x, y, size, size, c );
-                    }                    
-                }                
-            };
-        }        
-    }
-    /**
-     * @param icon the icon to set
-     */
-    public void setIcon( Icon icon ) {
-        this.icon = icon;
-    }
     /**
      * @return the source
      */

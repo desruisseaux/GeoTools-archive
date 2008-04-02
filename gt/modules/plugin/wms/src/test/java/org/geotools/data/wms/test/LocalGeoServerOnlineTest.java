@@ -85,9 +85,6 @@ public class LocalGeoServerOnlineTest extends TestCase {
         ServiceInfo info = wms.getInfo();
         assertNotNull( info );
         
-        Icon icon = info.getIcon();
-        assertNotNull( icon );
-        
         assertEquals( serverURL, wms.getCapabilities().getRequest().getGetCapabilities().getGet() );
         assertEquals( "My GeoServer WMS", info.getTitle() );
         

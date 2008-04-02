@@ -93,14 +93,6 @@ public final class ArcSdeResourceInfo implements ResourceInfo {
     }
 
     /**
-     * @see org.geotools.data.ResourceInfo#getIcon()
-     * @return <code>null</code>
-     */
-    public Icon getIcon() {
-        return null;
-    }
-
-    /**
      * @see org.geotools.data.ResourceInfo#getKeywords()
      */
     public synchronized Set<String> getKeywords() {

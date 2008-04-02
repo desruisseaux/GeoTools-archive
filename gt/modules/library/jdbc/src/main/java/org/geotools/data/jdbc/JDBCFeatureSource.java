@@ -143,10 +143,6 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
                 return null;
             }
     
-            public Icon getIcon() {
-                return null;
-            }
-    
             public Set<String> getKeywords() {
                 return words;
             }

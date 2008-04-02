@@ -55,10 +55,6 @@ public class ShapefileFileResourceInfo implements ResourceInfo {
         return "Contents of file";
     }
 
-    public Icon getIcon() {
-        return null;
-    }
-
     public Set<String> getKeywords() {
         Set<String> words = new HashSet<String>();
         words.add( shapefile.getCurrentTypeName() );

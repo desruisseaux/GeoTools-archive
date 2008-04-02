@@ -132,10 +132,6 @@ public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatu
                 return null;
             }
 
-            public Icon getIcon() {
-                return null;
-            }
-
             public Set<String> getKeywords() {
                 return words;
             }
