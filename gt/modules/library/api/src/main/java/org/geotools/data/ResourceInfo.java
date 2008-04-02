@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Tookit
  *    http://geotools.org
- *    (C) 2005-2008, GeoTools Project Managment Committee (PMC)
+ *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
  *    (C) 2005, Refractions Research Inc.
  *
  *    This library is free software; you can redistribute it and/or
@@ -111,13 +111,6 @@ public interface ResourceInfo {
      * @return namespace, used with getName() to identify resource
      */
     URI getSchema();
-
-    /**
-     * Icon used to represent this resource.
-     * 
-     * @return Icon symbolizing this resource
-     */
-    Icon getIcon();
 
     /**
      * Bounding box of the resource (in the native CRS), envelope isNull otherwise.

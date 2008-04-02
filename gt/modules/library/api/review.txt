@@ -3,13 +3,14 @@ Module API
 Module Maintainer Jody Garnett
 IP Review Jody Garnett, July 8th, 2006
 IP Review Jody Garnett, July 20th, 2006
+IP Review Jody Garnett, April 1, 2008
 
 Header Used:
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Tookit
  *    http://geotools.org
- *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- *
+ *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -21,32 +22,21 @@ Header Used:
  *    Lesser General Public License for more details.
  */
 
-Changes
-2002-2005 changed to 2002-2006
-IMPORTANT NOTE - start of range is per file :-)
-Geotools2 changed to GeoTools
-
 Here is what I would like to check:
 - IP Check, do we have the correct header, is there any IP issues to consider
+- Update header to (C) 2008, Open Source Geospatial Foundation (OSGeo)
 
-org.geotools.catalog
---------------------
-Provides a catalog capable of managing resources and their associated connections.
-
-This code started out as part of the uDig project (LGPL) and has been ported for GeoTools
-2.2.x.
-
-IP:
-- Headers updated with (C) 2005-2006, GeoTools Project Managment Committee (PMC)
-- Headers updated with (C) 2005, Refractions Research Inc.
 
 org.geotools.data
 -----------------
 This code was revised for the GeoServer 1.2 release as part of GeoTools 2.0, design documentation and research for this effort
-is avaiable at http://vwfs.refractions.net/.
-
-IP:
+is available at http://vwfs.refractions.net/. Additional Java 5 generalization work
+introduced for GeoTools 2.5 in the form of DataAccess superclass.
+- Update header to (C) 2008, Open Source Geospatial Foundation (OSGeo)
 - Headers updated with (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+- DataAccess and related classes (added for GeoTools 2.5) had no headers
+- GmlObjectStore interfaces added in 2007 to support wfs 1.1 wor had no headers
+- ServiceInfo and ResourceInfo taken out of catalog package prior to move
 
 org.geotools.data.collection
 ----------------------------

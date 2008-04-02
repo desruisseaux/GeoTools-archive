@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    GeoTools - The Open Source Java GIS Tookit
  *    http://geotools.org
- *    (C) 2002-2008, GeoTools Project Managment Committee (PMC)
+ *    (C) 2008, Open Source Geospatial Foundation (OSGeo)
  *    (C) 2005, Refractions Research Inc.
  *
  *    This library is free software; you can redistribute it and/or
@@ -126,16 +126,4 @@ public interface ServiceInfo {
      */
     URI getSource();
 
-    /**
-     * Icon used to represent this service.
-     * <p>
-     * Icons can be requested at a specific size (the closest available size
-     * will be returned). You can use a size of -1 to request the largest size
-     * available (in case you want to do your own rescaling).
-     * <p>
-     * @param size Size of icon requested, -1 for default size
-     * @return Icon representing this service.
-     */
-    Icon getIcon();
-    //Icon getIcon( int size );
 }
