@@ -24,20 +24,19 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-jaxb</artifactId>
+  <artifactId>gt2-common</artifactId>
   <packaging>jar</packaging>
-  <name>JAXB placeholder</name>
+  <name>Common classes</name>
 
   <description>
-    Skeleton of JAXB API with "source" (as opposed to "runtime") retention policy.
-    JAXB annotation compiles against this module will be discarted by the compiler
-    in the final JAR.
+    Common package designed to store utility classes which are used for 
+    compilation, and adds no significant functionality.
   </description>
 
   <licenses>
     <license>
-      <name>General Public License (GPL) version 2 + CLASSPATH exception</name>
-      <url>http://openjdk.java.net/legal/gplv2+ce.html</url>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -58,23 +57,6 @@
       </roles>
     </developer>
   </developers>
-
-
-  <!-- =========================================================== -->
-  <!--     Dependency Management                                   -->
-  <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools.maven</groupId>
-      <artifactId>gt2-common</artifactId>
-      <version>2.5-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 
 
 </project>
