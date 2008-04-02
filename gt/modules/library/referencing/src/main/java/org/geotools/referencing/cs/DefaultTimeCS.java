@@ -25,10 +25,12 @@ import javax.units.Unit;
 
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.measure.Measure;
+import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
 
@@ -57,11 +59,41 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
     /**
      * A one-dimensional temporal CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
-     * axis in days.
+     * axis in {@linkplain javax.units.NonSI#DAY day} units.
      */
-    public static DefaultTimeCS DAYS = new DefaultTimeCS(
-                  name(VocabularyKeys.TEMPORAL),
-                  DefaultCoordinateSystemAxis.TIME);
+    public static final DefaultTimeCS DAYS;
+
+    /**
+     * A one-dimensional temporal CS with
+     * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
+     * axis in {@linkplain javax.units.SI#SECOND second} units.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTimeCS SECONDS;
+
+    /**
+     * A one-dimensional temporal CS with
+     * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
+     * axis in millisecond units.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTimeCS MILLISECONDS;
+
+    /**
+     * Creates the constants, reusing some intermediate constructs for efficienty.
+     */
+    static {
+        final Map<String,Object> properties = name(VocabularyKeys.TEMPORAL);
+        CoordinateSystemAxis axis = DefaultCoordinateSystemAxis.TIME;
+        DAYS = new DefaultTimeCS(properties, axis);
+        final InternationalString name = axis.getAlias().iterator().next().toInternationalString();
+        axis = new DefaultCoordinateSystemAxis(name, "t", AxisDirection.FUTURE, SI.SECOND);
+        SECONDS = new DefaultTimeCS(properties, axis);
+        axis = new DefaultCoordinateSystemAxis(name, "t", AxisDirection.FUTURE, SI.MILLI(SI.SECOND));
+        MILLISECONDS = new DefaultTimeCS(properties, axis);
+    }
 
     /**
      * Constructs a new coordinate system with the same values than the specified one.

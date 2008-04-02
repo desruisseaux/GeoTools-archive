@@ -44,9 +44,48 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
     private static final long serialVersionUID = 3357241732140076884L;
 
     /**
+     * Datum for time measured since January 1st, 4713 BC at 12:00 UTC.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalDatum JULIAN = new DefaultTemporalDatum(
+            "Julian", new Date(-2440588 * (24*60*60*1000L) + (12*60*60*1000L)));
+
+    /**
+     * Datum for time measured since November 17, 1858 at 00:00 UTC.
+     * A <cite>Modified Julian day</cite> (MJD) is defined relative to <cite>Julian day</cite>
+     * (JD) as {@code MJD = JD − 2400000.5}.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalDatum MODIFIED_JULIAN = new DefaultTemporalDatum(
+            "Modified Julian", new Date(-40587 * (24*60*60*1000L)));
+
+    /**
+     * Datum for time measured since May 24, 1968 at 00:00 UTC. This epoch was introduced by NASA
+     * for the space program. A <cite>Truncated Julian day</cite> (TJD) is defined relative to
+     * <cite>Julian day</cite> (JD) as {@code TJD = JD − 2440000.5}.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalDatum TRUNCATED_JULIAN = new DefaultTemporalDatum(
+            "Truncated Julian", new Date(-587 * (24*60*60*1000L)));
+
+    /**
+     * Datum for time measured since December 31, 1899 at 12:00 UTC.
+     * A <cite>Dublin Julian day</cite> (DJD) is defined relative to <cite>Julian day</cite> (JD)
+     * as {@code DJD = JD − 2415020}.
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalDatum DUBLIN_JULIAN = new DefaultTemporalDatum(
+            "Dublin Julian", new Date(-25568 * (24*60*60*1000L) + (12*60*60*1000L)));
+
+    /**
      * Default datum for time measured since January 1st, 1970 at 00:00 UTC.
      */
-    public static final DefaultTemporalDatum UNIX = new DefaultTemporalDatum("UNIX", new Date(0));
+    public static final DefaultTemporalDatum UNIX = new DefaultTemporalDatum(
+            "UNIX", new Date(0));
 
     /**
      * The date and time origin of this temporal datum.

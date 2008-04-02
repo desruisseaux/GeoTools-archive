@@ -403,8 +403,19 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         }
         assert !transform.equals(operation.getMathTransform()) : transform;
         final Class<? extends CoordinateOperation> type = AbstractCoordinateOperation.getType(operation);
-        final OperationMethod method = (operation instanceof Operation) ?
-                                       ((Operation) operation).getMethod() : null;
+        OperationMethod method = null;
+        if (operation instanceof Operation) {
+            method = ((Operation) operation).getMethod();
+            if (method != null) {
+                final int sourceDimensions = transform.getSourceDimensions();
+                final int targetDimensions = transform.getTargetDimensions();
+                if (sourceDimensions != method.getSourceDimensions() ||
+                    targetDimensions != method.getTargetDimensions())
+                {
+                    method = new DefaultOperationMethod(method, sourceDimensions, targetDimensions);
+                }
+            }
+        }
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform, method, type);
     }
 
