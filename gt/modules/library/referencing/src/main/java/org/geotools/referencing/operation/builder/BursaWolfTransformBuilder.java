@@ -478,7 +478,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
             q = xNew.getElement(6, 0);
 
             i++;
-        } while ((!dxMatrix.epsilonEquals((GMatrix) zero, tolerance) & (i < maxSteps)));
+        } while ((!dxMatrix.equals(zero, tolerance) & (i < maxSteps)));
 
         xNew.transpose();
 

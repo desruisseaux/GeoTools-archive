@@ -70,9 +70,9 @@ public final class LinearConversionTest {
             final GeneralMatrix check = new GeneralMatrix(m);
             m.invert();
             check.invert();
-            assertTrue(check.epsilonEquals(m, 1E-9));
+            assertTrue(check.equals(m, 1E-9));
             m.multiply(original);
-            assertTrue(identity.epsilonEquals(m, 1E-9));
+            assertTrue(identity.equals(m, 1E-9));
         }
     }
 

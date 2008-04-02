@@ -188,7 +188,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
                 ex = -value;
             }
         }
-        assert getAffineTransform().epsilonEquals(matrix, eps*RS);
+        assert getAffineTransform().equals(matrix, eps*RS);
     }
 
     /**

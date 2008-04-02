@@ -139,7 +139,7 @@ public class Matrix4 extends Matrix4d implements XMatrix {
     /**
      * {@inheritDoc}
      */
-    public boolean epsilonEquals(final Matrix matrix, final double tolerance) {
+    public boolean equals(final Matrix matrix, final double tolerance) {
         return GeneralMatrix.epsilonEquals(this, matrix, tolerance);
     }
 

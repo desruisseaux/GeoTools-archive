@@ -711,7 +711,7 @@ public final class ParametersTest {
                 parameters.setMatrix(copy);
                 assertEquals("height", height, ((Parameter) parameters.parameter("num_row")).intValue());
                 assertEquals("width",  width,  ((Parameter) parameters.parameter("num_col")).intValue());
-                assertTrue  ("equals", copy.epsilonEquals(parameters.getMatrix(), 0));
+                assertTrue  ("equals", copy.equals(parameters.getMatrix(), 0));
                 assertEquals("equals", parameters, parameters.clone());
             }
         }

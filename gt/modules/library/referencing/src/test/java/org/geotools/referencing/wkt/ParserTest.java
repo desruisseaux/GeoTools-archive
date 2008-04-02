@@ -31,7 +31,7 @@ import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransform;
 
 import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.TestScriptRunner;
+import org.geotools.referencing.ScriptRunner;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
@@ -314,7 +314,7 @@ public final class ParserTest {
     private void testParsing(final AbstractParser parser, final String filename)
             throws IOException, ParseException
     {
-        final BufferedReader reader = TestData.openReader(TestScriptRunner.class, filename);
+        final BufferedReader reader = TestData.openReader(ScriptRunner.class, filename);
         if (reader == null) {
             throw new FileNotFoundException(filename);
         }

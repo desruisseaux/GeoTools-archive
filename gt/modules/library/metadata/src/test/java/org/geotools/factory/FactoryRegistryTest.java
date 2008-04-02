@@ -43,7 +43,7 @@ public final class FactoryRegistryTest {
      * Creates the factory registry to test. The tests performed in this method are more
      * J2SE tests than Geotools implementation tests. We basically just ensure that we
      * have setup the service registry properly.
-     * <br><br>
+     * <p>
      * Factories are specified in arguments as {@link Factory} objects in order to avoid
      * the {@link DummyClass} to be initialized before {@link Hints}. This is not a problem
      * for normal execution, but Maven seems to mess with class loaders.

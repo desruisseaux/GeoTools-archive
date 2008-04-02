@@ -28,7 +28,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  * A console for running test scripts. Most of the work is already done by the subclass.
- * {@code TestScriptRunner} mostly add statistics about the test executed. This class is
+ * {@code ScriptRunner} mostly add statistics about the test executed. This class is
  * used by {@link ScriptTest}. It can also be run from the command line for executing all
  * files specified in argument.
  *
@@ -36,7 +36,7 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class TestScriptRunner extends Console {
+public final class ScriptRunner extends Console {
     /**
      * Number of tests run and passed. Used for displaying statistics.
      */
@@ -47,7 +47,7 @@ public final class TestScriptRunner extends Console {
      *
      * @param in The input stream.
      */
-    public TestScriptRunner(final LineNumberReader in) {
+    public ScriptRunner(final LineNumberReader in) {
         super(in);
         setPrompt(null);
     }
@@ -103,7 +103,7 @@ public final class TestScriptRunner extends Console {
             for (int i=0; i<args.length; i++) {
                 final String filename = args[i];
                 final LineNumberReader in = new LineNumberReader(new FileReader(filename));
-                final TestScriptRunner test = new TestScriptRunner(in);
+                final ScriptRunner test = new ScriptRunner(in);
                 test.out.write("Running \"");
                 test.out.write(filename);
                 test.out.write('"');

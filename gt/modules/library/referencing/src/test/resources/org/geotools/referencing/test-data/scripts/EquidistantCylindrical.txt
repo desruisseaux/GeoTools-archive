@@ -10,7 +10,7 @@
 // How to run this script:
 //
 //    chdir org/geotools/referencing/test-data/scripts
-//    java -ea org.geotools.referencing.TestScript Mercator.txt
+//    java -ea org.geotools.referencing.ScriptRunner Mercator.txt
 //
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
@@ -288,7 +288,8 @@ target pt=(-4123334.64257332, -7783644.86511911)
 
 set _PC1_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",0],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",0],UNIT["Meter",1]]
 set _PC2_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",9999.9],PARAMETER["False_Northing",159.51],PARAMETER["Central_Meridian",-20.588],UNIT["Meter",1]]
-set _PC3_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",0],PARAMETER["False_Northing",65464.5],PARAMETER["Central_Meridian",-125],UNIT["Meter",1]]set _PC4_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",0],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",88],UNIT["Meter",1]]
+set _PC3_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",0],PARAMETER["False_Northing",65464.5],PARAMETER["Central_Meridian",-125],UNIT["Meter",1]]
+set _PC4_ = PROJCS["Sphere_Plate_Carree",GEOGCS["Sphere", DATUM["Sphere", SPHEROID["Sphere", 6370997.0, 0 ]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]],PROJECTION["Plate_Carree"],PARAMETER["False_Easting",0],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",88],UNIT["Meter",1]]
 
 
 source crs = _sphere_2_

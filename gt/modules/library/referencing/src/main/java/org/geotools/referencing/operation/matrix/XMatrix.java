@@ -115,12 +115,15 @@ public interface XMatrix extends Matrix {
     void multiply(Matrix matrix);
 
     /**
-     * Compares the element values regardless the object class.
+     * Compares the element values regardless the object class. This is similar to a call to
+     * <code>{@linkplain javax.vecmath.GMatrix#epsilonEquals GMatrix.epsilonEquals}(matrix,
+     * tolerance)</code>. The method name is intentionally different in order to avoid
+     * ambiguities at compile-time.
      *
      * @param matrix    The matrix to compare.
      * @param tolerance The tolerance value.
      *
      * @since 2.5
      */
-    boolean epsilonEquals(Matrix matrix, double tolerance);
+    boolean equals(Matrix matrix, double tolerance);
 }

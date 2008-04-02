@@ -238,7 +238,7 @@ public class Matrix2 implements XMatrix, Serializable {
     /**
      * {@inheritDoc}
      */
-    public boolean epsilonEquals(final Matrix matrix, final double tolerance) {
+    public boolean equals(final Matrix matrix, final double tolerance) {
         return GeneralMatrix.epsilonEquals(this, matrix, tolerance);
     }
 

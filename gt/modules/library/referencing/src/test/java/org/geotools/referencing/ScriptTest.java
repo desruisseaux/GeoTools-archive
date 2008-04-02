@@ -45,7 +45,7 @@ public final class ScriptTest {
      */
     private void runScript(final String filename) throws Exception {
         final LineNumberReader in = TestData.openReader(this, filename);
-        final TestScriptRunner test = new TestScriptRunner(in);
+        final ScriptRunner test = new ScriptRunner(in);
         test.executeAll();
         in.close();
     }
