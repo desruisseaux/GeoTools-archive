@@ -197,7 +197,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     public synchronized void setDensities(final Collection<? extends Double> newValues) {
         densities = copyCollection(newValues, densities, Double.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

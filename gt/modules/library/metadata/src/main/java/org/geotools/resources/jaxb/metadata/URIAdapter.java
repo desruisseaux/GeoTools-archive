@@ -63,6 +63,11 @@ public class URIAdapter extends XmlAdapter<URIAdapter, URI> {
             return uri.toURL();
         } catch (MalformedURLException ex) {
             return null;
+        } catch (IllegalArgumentException ex) {
+            // If the value is empty or wrong, the marshalling process will throw this
+            // exception, when trying to create an URL. A null value will be returned
+            // and the matching tag will not be written.
+            return null;
         }
     }
 

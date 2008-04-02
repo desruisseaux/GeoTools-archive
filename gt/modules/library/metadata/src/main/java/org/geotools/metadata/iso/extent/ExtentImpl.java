@@ -226,7 +226,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
         }
         return candidate;
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

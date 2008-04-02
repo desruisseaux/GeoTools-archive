@@ -211,7 +211,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     public synchronized void setParameterCitation(final Collection<? extends Citation> newValues) {
         parameterCitation = copyCollection(newValues, parameterCitation, Citation.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

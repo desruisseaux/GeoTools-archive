@@ -165,7 +165,7 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
         distributorTransferOptions = copyCollection(newValues, distributorTransferOptions,
                                                     DigitalTransferOptions.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

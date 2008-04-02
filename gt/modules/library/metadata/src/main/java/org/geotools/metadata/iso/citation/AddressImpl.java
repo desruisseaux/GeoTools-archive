@@ -195,8 +195,8 @@ public class AddressImpl extends MetadataEntity implements Address {
         checkWritePermission();
         postalCode = newValue;
     }
-    
-        /**
+
+    /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.

@@ -154,8 +154,8 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
     public synchronized void setFacsimiles(final Collection<? extends String> newValues) {
         facsimiles = copyCollection(newValues, facsimiles, String.class);
     }
-    
-        /**
+
+    /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.

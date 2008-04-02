@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 
 /**
- * The ISO-19103 standard specifies that {@code Measures} require a {@code unit of measure}
+ * The ISO-19103 standard specifies that {@code Distance} require a {@code unit of measure}
  * defined, using the namespace {@code gco} linked to the following url
  * {@link http://www.isotc211.org/2005/gco}.
  *
@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @source $URL$
  * @author Cédric Briançon
  */
-public final class MeasureInPixelAdapter extends XmlAdapter<MeasureInPixelAdapter, Double> {
+public final class DistanceAdapter extends XmlAdapter<DistanceAdapter, Double> {
     /**
      * The unit of measure.
      */
@@ -44,21 +44,21 @@ public final class MeasureInPixelAdapter extends XmlAdapter<MeasureInPixelAdapte
     /**
      * Empty constructor used only by JAXB.
      */
-    private MeasureInPixelAdapter() {
+    private DistanceAdapter() {
     }
 
     /**
      * Constructs an adapter for this value.
      */
-    protected MeasureInPixelAdapter(final Double value) {
+    protected DistanceAdapter(final Double value) {
         this.value = value;
     }
 
     /**
-     * Returns a proxy representation of the {@code <gco:Measure>} tags.
+     * Returns a proxy representation of the {@code <gco:Distance>} tags.
      */
-    @XmlElement(name = "Measure", namespace = "http://www.isotc211.org/2005/gco")
-    public UOMProxy getMeasureProxy() {
+    @XmlElement(name = "Distance", namespace = "http://www.isotc211.org/2005/gco")
+    public UOMProxy getDistanceProxy() {
         return new UOMProxy(uom, value);
     }
 
@@ -76,7 +76,7 @@ public final class MeasureInPixelAdapter extends XmlAdapter<MeasureInPixelAdapte
      * @param value The value extract from the adapter.
      * @return A double object.
      */
-    public Double unmarshal(final MeasureInPixelAdapter value) {
+    public Double unmarshal(final DistanceAdapter value) {
         if (value == null) {
             return null;
         }
@@ -87,14 +87,14 @@ public final class MeasureInPixelAdapter extends XmlAdapter<MeasureInPixelAdapte
      * Allows JAXB to change the result of the marshalling process, according to the
      * ISO-19139 standard and its requirements about {@code measures}.
      *
-     * @param value The double value we want to integrate into a {@code <gco:Measure> tags}.
+     * @param value The double value we want to integrate into a {@code <gco:Distance> tags}.
      * @return An adaptation of the double value, that is to say a double value surrounded
-     *         by {@code <gco:Measure>} tags, with an {@code uom} attribute.
+     *         by {@code <gco:Distance>} tags, with an {@code uom} attribute.
      */
-    public MeasureInPixelAdapter marshal(final Double value) {
+    public DistanceAdapter marshal(final Double value) {
         if (value == null) {
             return null;
         }
-        return new MeasureInPixelAdapter(value);
+        return new DistanceAdapter(value);
     }
 }

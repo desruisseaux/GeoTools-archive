@@ -23,27 +23,27 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * Stores information about the unit of measure, in order to handle format defined
- * in ISO-19103 about the {@code <gco:Measure>} tags.
+ * in ISO-19103.
  *
  * @since 2.5
  * @source $URL$
  * @author Cédric Briançon
  */
-public class MeasureProxy {
+public class UOMProxy {
     /**
      * The value of the measure.
      */
-    private Double value;
+    protected Double value;
 
     /**
      * The unit of measure.
      */
-    private String uom;
+    protected String uom;
 
     /**
      * Default empty constructor for JAXB used.
      */
-    private MeasureProxy() {
+    private UOMProxy() {
     }
 
     /**
@@ -52,7 +52,7 @@ public class MeasureProxy {
      * @param uom The unit of measure to use.
      * @param value The value of the measure.
      */
-    protected MeasureProxy(final String uom, final Double value) {
+    protected UOMProxy(final String uom, final Double value) {
         this.value = value;
         this.uom = uom;
     }

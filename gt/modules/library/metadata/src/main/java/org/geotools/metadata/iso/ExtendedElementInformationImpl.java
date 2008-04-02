@@ -395,7 +395,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
         sources = copyCollection(newValues, sources, ResponsibleParty.class);
     }
     
-        /**
+    /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.

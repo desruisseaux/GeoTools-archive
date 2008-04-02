@@ -153,7 +153,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     public synchronized void setDimensions(final Collection<? extends RangeDimension> newValues) {
         dimensions = copyCollection(newValues, dimensions, RangeDimension.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

@@ -126,8 +126,8 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
     {
         transferOptions = copyCollection(newValues, transferOptions, DigitalTransferOptions.class);
     }
-    
-        /**
+
+    /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.

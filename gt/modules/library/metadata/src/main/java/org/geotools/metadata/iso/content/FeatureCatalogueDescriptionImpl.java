@@ -172,7 +172,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     {
         featureCatalogueCitations = copyCollection(newValues, featureCatalogueCitations, Citation.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

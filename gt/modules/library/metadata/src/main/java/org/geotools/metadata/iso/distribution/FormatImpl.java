@@ -204,7 +204,7 @@ public class FormatImpl extends MetadataEntity implements Format {
     {
         formatDistributors = copyCollection(newValues, formatDistributors, Distributor.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

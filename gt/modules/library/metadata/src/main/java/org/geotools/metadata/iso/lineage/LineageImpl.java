@@ -137,7 +137,7 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     public synchronized void setSources(final Collection<? extends Source> newValues) {
         sources = copyCollection(newValues, sources, Source.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

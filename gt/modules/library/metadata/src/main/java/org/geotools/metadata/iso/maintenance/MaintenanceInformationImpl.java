@@ -311,7 +311,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     public synchronized void setContacts(final Collection<? extends ResponsibleParty> newValues) {
         contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

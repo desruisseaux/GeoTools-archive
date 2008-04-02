@@ -341,12 +341,12 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Set any other descriptive information about the dataset.
      */
-   public synchronized void setSupplementalInformation(final InternationalString newValue)  {
+    public synchronized void setSupplementalInformation(final InternationalString newValue) {
         checkWritePermission();
         supplementalInformation = newValue;
     }
-   
-   /**
+
+    /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.
@@ -366,5 +366,5 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      */
 ///    private void afterMarshal(Marshaller marshaller) {
 ///        isMarshalling(false);
-///    }
+///   }
 }

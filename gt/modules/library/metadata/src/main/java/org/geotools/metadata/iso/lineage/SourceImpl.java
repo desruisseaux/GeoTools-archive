@@ -213,7 +213,7 @@ public class SourceImpl extends MetadataEntity implements Source {
     public synchronized void setSourceSteps(final Collection<? extends ProcessStep> newValues) {
         sourceSteps = copyCollection(newValues, sourceSteps, ProcessStep.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

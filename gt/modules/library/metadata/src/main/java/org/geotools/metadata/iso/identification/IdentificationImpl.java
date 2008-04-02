@@ -382,7 +382,7 @@ public class IdentificationImpl extends MetadataEntity implements Identification
     {
         aggregationInfo = copyCollection(newValues, aggregationInfo, AggregateInformation.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.

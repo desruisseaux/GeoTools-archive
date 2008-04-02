@@ -108,7 +108,7 @@ public class VectorSpatialRepresentationImpl extends SpatialRepresentationImpl
     {
         geometricObjects = copyCollection(newValues, geometricObjects, GeometricObjects.class);
     }
-    
+
     /**
      * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
