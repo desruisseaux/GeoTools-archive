@@ -16,9 +16,6 @@
  */
 package org.geotools.referencing.operation;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -34,11 +31,17 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.Transformation;
 
 import org.geotools.factory.Hints;
-import org.geotools.factory.GeoTools;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
+import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
+import static org.geotools.referencing.crs.DefaultEngineeringCRS.GENERIC_2D;
+import static org.geotools.referencing.crs.DefaultEngineeringCRS.GENERIC_3D;
+import static org.geotools.referencing.crs.DefaultEngineeringCRS.CARTESIAN_2D;
+import static org.geotools.referencing.crs.DefaultEngineeringCRS.CARTESIAN_3D;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -60,36 +63,13 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CoordinateOperationFactoryTest extends TestTransform {
-    /**
-     * Constructs a test case with the given name.
-     */
-    public CoordinateOperationFactoryTest(final String name) {
-        super(name);
-    }
-
-    /**
-     * Uses reflection to dynamically create a test suite containing all
-     * the <code>testXXX()</code> methods - from the JUnit FAQ.
-     */
-    public static Test suite() {
-        return new TestSuite(CoordinateOperationFactoryTest.class);
-    }
-
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
-
+public final class CoordinateOperationFactoryTest extends TransformTestBase {
     /**
      * Ensures that positional accuracy dependencies are properly loaded. This is not needed for
      * normal execution, but JUnit behavior with class loaders is sometime surprising.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void ensureClassLoaded() {
         assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED);
         assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED);
     }
@@ -98,36 +78,25 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
      * Make sure that <code>createOperation(sourceCRS, targetCRS)</code>
      * returns an identity transform when <code>sourceCRS</code> and <code>targetCRS</code>
      * are identical, and tests the generic CRS.
-     *
-     * @todo uses static imports when we will be allowed to compile with J2SE 1.5.
      */
+    @Test
     public void testGenericTransform() throws FactoryException {
-        assertTrue(opFactory.createOperation(DefaultGeographicCRS.WGS84,
-                   DefaultGeographicCRS.WGS84).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
-                   DefaultEngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_3D,
-                   DefaultEngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
-                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
-                   DefaultEngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
-                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultGeographicCRS.WGS84,
-                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
-                   DefaultGeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(WGS84,        WGS84       ).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(CARTESIAN_2D, CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(CARTESIAN_3D, CARTESIAN_3D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(GENERIC_2D,   GENERIC_2D  ).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(GENERIC_2D,   CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(CARTESIAN_2D, GENERIC_2D  ).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(WGS84,        GENERIC_2D  ).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(GENERIC_2D,   WGS84       ).getMathTransform().isIdentity());
         try {
-            opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
-                                      DefaultGeographicCRS.WGS84);
+            opFactory.createOperation(CARTESIAN_2D, WGS84);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
         try {
-            opFactory.createOperation(DefaultGeographicCRS.WGS84,
-                                      DefaultEngineeringCRS.CARTESIAN_2D);
+            opFactory.createOperation(WGS84, CARTESIAN_2D);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
@@ -137,6 +106,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     /**
      * Tests a transformation with unit conversion.
      */
+    @Test
     public void testUnitConversion() throws Exception {
         // NOTE: TOWGS84[0,0,0,0,0,0,0] is used here as a hack for
         //       avoiding datum shift. Shifts will be tested later.
@@ -195,6 +165,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
      * Tests a transformation that requires a datum shift with TOWGS84[0,0,0].
      * In addition, this method tests datum aliases.
      */
+    @Test
     public void testEllipsoidShift() throws Exception {
         final CoordinateReferenceSystem sourceCRS = crsFactory.createFromWKT(
                 "GEOGCS[\"NAD83\",\n"                                           +
@@ -236,6 +207,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     /**
      * Tests a transformation that requires a datum shift.
      */
+    @Test
     public void testDatumShift() throws Exception {
         final CoordinateReferenceSystem sourceCRS = crsFactory.createFromWKT(
                 "GEOGCS[\"NTF (Paris)\",\n"                                             +
@@ -323,6 +295,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     /**
      * Tests a transformation that requires a datum shift with 7 parameters.
      */
+    @Test
     public void testDatumShift7Param() throws Exception {
         final CoordinateReferenceSystem sourceCRS = DefaultGeographicCRS.WGS84;
         final CoordinateReferenceSystem targetCRS = crsFactory.createFromWKT(
@@ -384,6 +357,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     /**
      * Tests transformations involving compound CRS.
      */
+    @Test
     public void testCompoundCRS() throws Exception {
         final String WGS84 =
                 "GEOGCS[\"WGS 84\",\n"                                                  +
@@ -654,6 +628,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
      *
      * @see http://jira.codehaus.org/browse/GEOT-1618
      */
+    @Test
     public void testFactoryWithHints() {
         final Hints hints = new Hints();
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);

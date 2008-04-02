@@ -26,10 +26,6 @@ import javax.media.jai.OperationRegistry;
 import javax.media.jai.RegistryElementDescriptor;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.util.GenericName;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -37,6 +33,9 @@ import org.opengis.parameter.ParameterDescriptor;
 
 import org.geotools.TestData;
 import org.geotools.metadata.iso.citation.Citations;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -47,31 +46,11 @@ import org.geotools.metadata.iso.citation.Citations;
  * @author Martin Desruisseaux
  * @author Simone Giannecchini
  */
-public final class ImagingParametersTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ImagingParametersTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public ImagingParametersTest(String testName) {
-        super(testName);
-    }
-
+public final class ImagingParametersTest {
     /**
      * Tests {@link ImagingParameters}.
      */
+    @Test
     public void testDescriptors() {
         final String author = Citations.JAI.getTitle().toString();
         final String vendor = "com.sun.media.jai";
@@ -123,16 +102,14 @@ public final class ImagingParametersTest extends TestCase {
         /*
          * Tests clone. Requires J2SE 1.5 or above.
          */
-        if (!TestData.isBaseJavaPlatform()) {
-            final ImagingParameters copy = values.clone();
-            assertNotSame("clone", values, copy);
-            assertNotSame("clone", values.parameters, copy.parameters);
-            if (false) {
-                // NOTE: As of J2SE 1.5 and JAI 1.1, ParameterBlockJAI
-                //       doesn't implements the 'equals' method.
-                assertEquals("clone", values.parameters, copy.parameters);
-                assertEquals("clone", values, copy);
-            }
+        final ImagingParameters copy = values.clone();
+        assertNotSame("clone", values, copy);
+        assertNotSame("clone", values.parameters, copy.parameters);
+        if (false) {
+            // NOTE: As of J2SE 1.5 and JAI 1.1, ParameterBlockJAI
+            //       doesn't implements the 'equals' method.
+            assertEquals("clone", values.parameters, copy.parameters);
+            assertEquals("clone", values, copy);
         }
     }
 
@@ -147,6 +124,7 @@ public final class ImagingParametersTest extends TestCase {
     /**
      * Tests the wrapper with a parameter overriden.
      */
+    @Test
     public void testExtensions() {
         /*
          * The parameter descriptor for the subsampling.

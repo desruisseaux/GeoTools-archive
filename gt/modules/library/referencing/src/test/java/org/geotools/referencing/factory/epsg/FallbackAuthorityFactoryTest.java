@@ -15,14 +15,9 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// Java dependencies
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -31,6 +26,9 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ProjectedCRS;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,7 +39,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
  * @version $Id$
  * @author Andrea Aime (TOPP)
  */
-public class FallbackAuthorityFactoryTest extends TestCase {
+public final class FallbackAuthorityFactoryTest {
     /**
      * Set to {@code true} for printing debugging information.
      */
@@ -53,32 +51,9 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     private FactoryEPSGExtra extra;
 
     /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FallbackAuthorityFactoryTest.class);
-    }
-
-    /**
-     * Run the test from the command line.
-     *
-     * @param args the command line arguments.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Creates a test case with the specified name.
-     */
-    public FallbackAuthorityFactoryTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Adds the extra factory to the set of authority factories.
      */
-    @Override
+    @Before
     public void setUp() {
         assertNull(extra);
         extra = new FactoryEPSGExtra();
@@ -89,13 +64,8 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     /**
      * Removes the extra factory from the set of authority factories.
      */
-    @Override
+    @After
     public void tearDown() {
-        if (org.geotools.test.TestData.isBaseJavaPlatform()) {
-            // Disabled in J2SE 1.4 build because of a bug.
-            // TODO: Remove when we will be target J2SE 1.4 or 1.5.
-            return;
-        }
         assertNotNull(extra);
         ReferencingFactoryFinder.removeAuthorityFactory(extra);
         extra = null;
@@ -105,12 +75,8 @@ public class FallbackAuthorityFactoryTest extends TestCase {
      * Makes sure that the testing {@link FactoryEPSGExtra} has precedence over
      * {@link FactoryUsingWKT}.
      */
+    @Test
     public void testFactoryOrdering() {
-        if (org.geotools.test.TestData.isBaseJavaPlatform()) {
-            // Disabled in J2SE 1.4 build because of a bug.
-            // TODO: Remove when we will be target J2SE 1.4 or 1.5.
-            return;
-        }
         Set factories =  ReferencingFactoryFinder.getCRSAuthorityFactories(null);
         boolean foundWkt = false;
         boolean foundExtra = false;
@@ -135,6 +101,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
      * Tests the {@code 42101} code. The purpose of this test is mostly
      * to make sure that {@link FactoryUsingWKT} is in the chain.
      */
+    @Test
     public void test42101() throws FactoryException {
         assertTrue(CRS.decode("EPSG:42101") instanceof ProjectedCRS);
     }
@@ -142,12 +109,8 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     /**
      * Tests the {@code 00001} fake code.
      */
+    @Test
     public void test00001() throws FactoryException {
-        if (org.geotools.test.TestData.isBaseJavaPlatform()) {
-            // Disabled in J2SE 1.4 build because of a bug.
-            // TODO: Remove when we will be target J2SE 1.4 or 1.5.
-            return;
-        }
         try {
             CRS.decode("EPSG:00001");
             fail("This code should not be there");
@@ -157,43 +120,43 @@ public class FallbackAuthorityFactoryTest extends TestCase {
             // cool, that's what we expected
         }
     }
-    
+
     /**
      * GEOT-1702, make sure looking up for an existing code does not result in a
-     * StackOverflowException
-     * @throws FactoryException
+     * {@link StackOverflowException}.
      */
+    @Test
     public void testLookupSuccessfull() throws FactoryException {
         CoordinateReferenceSystem crs = CRS.decode("EPSG:42101");
         String code = CRS.lookupIdentifier(crs, true);
         assertEquals("EPSG:42101", code);
     }
-    
+
     /**
      * GEOT-1702, make sure looking up for a non existing code does not result in a
-     * StackOverflowException
-     * @throws FactoryException
+     * {@link StackOverflowException}.
      */
+    @Test
     public void testLookupFailing() throws FactoryException {
-        String wkt = "PROJCS[\"Google Mercator\", \r\n" + 
-                "  GEOGCS[\"WGS 84\", \r\n" + 
-                "    DATUM[\"World Geodetic System 1984\", \r\n" + 
-                "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]], \r\n" + 
-                "      AUTHORITY[\"EPSG\",\"6326\"]], \r\n" + 
-                "    PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], \r\n" + 
-                "    UNIT[\"degree\", 0.017453292519943295], \r\n" + 
-                "    AXIS[\"Geodetic latitude\", NORTH], \r\n" + 
-                "    AXIS[\"Geodetic longitude\", EAST], \r\n" + 
-                "    AUTHORITY[\"EPSG\",\"4326\"]], \r\n" + 
-                "  PROJECTION[\"Mercator_1SP\"], \r\n" + 
-                "  PARAMETER[\"latitude_of_origin\", 0.0], \r\n" + 
-                "  PARAMETER[\"central_meridian\", 0.0], \r\n" + 
-                "  PARAMETER[\"scale_factor\", 1.0], \r\n" + 
-                "  PARAMETER[\"false_easting\", 0.0], \r\n" + 
-                "  PARAMETER[\"false_northing\", 0.0], \r\n" + 
-                "  UNIT[\"m\", 1.0], \r\n" + 
-                "  AXIS[\"Easting\", EAST], \r\n" + 
-                "  AXIS[\"Northing\", NORTH], \r\n" + 
+        String wkt = "PROJCS[\"Google Mercator\", \r\n" +
+                "  GEOGCS[\"WGS 84\", \r\n" +
+                "    DATUM[\"World Geodetic System 1984\", \r\n" +
+                "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]], \r\n" +
+                "      AUTHORITY[\"EPSG\",\"6326\"]], \r\n" +
+                "    PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], \r\n" +
+                "    UNIT[\"degree\", 0.017453292519943295], \r\n" +
+                "    AXIS[\"Geodetic latitude\", NORTH], \r\n" +
+                "    AXIS[\"Geodetic longitude\", EAST], \r\n" +
+                "    AUTHORITY[\"EPSG\",\"4326\"]], \r\n" +
+                "  PROJECTION[\"Mercator_1SP\"], \r\n" +
+                "  PARAMETER[\"latitude_of_origin\", 0.0], \r\n" +
+                "  PARAMETER[\"central_meridian\", 0.0], \r\n" +
+                "  PARAMETER[\"scale_factor\", 1.0], \r\n" +
+                "  PARAMETER[\"false_easting\", 0.0], \r\n" +
+                "  PARAMETER[\"false_northing\", 0.0], \r\n" +
+                "  UNIT[\"m\", 1.0], \r\n" +
+                "  AXIS[\"Easting\", EAST], \r\n" +
+                "  AXIS[\"Northing\", NORTH], \r\n" +
                 "  AUTHORITY[\"EPSG\",\"900913\"]]";
         CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         assertNull(CRS.lookupIdentifier(crs, true));

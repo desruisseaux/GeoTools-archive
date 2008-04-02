@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,10 +16,7 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// Java3D dependencies
 import javax.vecmath.SingularMatrixException;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 
 
@@ -47,12 +44,12 @@ public interface XMatrix extends Matrix {
      * Returns the number of colmuns in this matrix.
      */
     int getNumCol();
-    
+
     /**
      * Returns the element at the specified index.
      */
     double getElement(int row, int col);
-    
+
     /**
      * Set the element at the specified index.
      */
@@ -116,4 +113,14 @@ public interface XMatrix extends Matrix {
      * transform.
      */
     void multiply(Matrix matrix);
+
+    /**
+     * Compares the element values regardless the object class.
+     *
+     * @param matrix    The matrix to compare.
+     * @param tolerance The tolerance value.
+     *
+     * @since 2.5
+     */
+    boolean epsilonEquals(Matrix matrix, double tolerance);
 }

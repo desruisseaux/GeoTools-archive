@@ -17,7 +17,6 @@
 package org.geotools.referencing.operation;
 
 import java.util.Random;
-import junit.framework.TestCase;
 
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.datum.DatumFactory;
@@ -33,6 +32,9 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Base class for transform test cases. This class is not a test in itself;
@@ -42,7 +44,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class TestTransform extends TestCase {
+public abstract class TransformTestBase {
     /**
      * Small values for comparaisons of floating point numbers after transformations.
      */
@@ -74,18 +76,10 @@ public abstract class TestTransform extends TestCase {
     protected static final Random random = new Random(-3531834320875149028L);
 
     /**
-     * Constructs a test case with the given name.
-     */
-    public TestTransform(final String name) {
-        super(name);
-    }
-
-    /**
      * Setup the factories using the hints provided by {@link #getHintsForTesting}.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public final void setUpFactories() {
         Hints hints  = getHintsForTesting();
         datumFactory = ReferencingFactoryFinder.getDatumFactory(hints);
         crsFactory   = ReferencingFactoryFinder.getCRSFactory(hints);
@@ -286,6 +280,7 @@ public abstract class TestTransform extends TestCase {
      * Quick self test, in part to give this test suite a test
      * and also to test the internal method.
      */
+    @Test
     public void testAssertPointsEqual(){
         String name = "self test";
         double a[]     = {10,   10  };

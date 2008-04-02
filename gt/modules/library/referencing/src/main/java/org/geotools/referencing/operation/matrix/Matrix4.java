@@ -137,6 +137,13 @@ public class Matrix4 extends Matrix4d implements XMatrix {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean epsilonEquals(final Matrix matrix, final double tolerance) {
+        return GeneralMatrix.epsilonEquals(this, matrix, tolerance);
+    }
+
+    /**
      * Returns a string representation of this matrix. The returned string is implementation
      * dependent. It is usually provided for debugging purposes only.
      */

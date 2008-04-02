@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,27 +16,20 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Collection;
-import java.util.logging.Level;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.Arguments;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -46,35 +39,11 @@ import org.geotools.resources.Arguments;
  * @source $URL$
  * @version $Id$
  */
-public final class AllAuthoritiesFactoryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final boolean log = arguments.getFlag("-log");
-        arguments.getRemainingArguments(0);
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(AllAuthoritiesFactoryTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public AllAuthoritiesFactoryTest(final String name) {
-        super(name);
-    }
-
+public final class AllAuthoritiesFactoryTest {
     /**
      * Tests the {@link AllAuthoritiesFactory#getAuthorityCodes} method.
      */
+    @Test
     public void testAuthorityCodes() throws FactoryException {
         final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
         final Collection codes = all.getAuthorityCodes(CoordinateReferenceSystem.class);
@@ -86,6 +55,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
     /**
      * Tests the {@link AllAuthoritiesFactory#createCoordinateReferenceSystem} method.
      */
+    @Test
     public void testCreateCRS() throws FactoryException {
         final CRSAuthorityFactory auto = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
         final CRSAuthorityFactory crs  = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS",  null);
@@ -129,6 +99,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
      * processing by {@link AllAuthoritiesFactory}, since the separator character is not the
      * usual {@code ':'}.
      */
+    @Test
     public void testHttp() throws FactoryException {
         final CRSAuthorityFactory crs = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
@@ -162,6 +133,7 @@ public final class AllAuthoritiesFactoryTest extends TestCase {
     /**
      * Tests the {@link IdentifiedObjectFinder#find} method.
      */
+    @Test
     public void testFind() throws FactoryException {
         final AbstractAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
         final IdentifiedObjectFinder finder = all.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);

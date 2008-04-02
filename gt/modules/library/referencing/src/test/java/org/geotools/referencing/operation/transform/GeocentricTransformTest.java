@@ -17,8 +17,6 @@
 package org.geotools.referencing.operation.transform;
 
 import javax.vecmath.Point3d;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -29,7 +27,10 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
-import org.geotools.referencing.operation.TestTransform;
+import org.geotools.referencing.operation.TransformTestBase;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -45,28 +46,7 @@ import org.geotools.referencing.operation.TestTransform;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class GeocentricTransformTest extends TestTransform {
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeocentricTransformTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GeocentricTransformTest(final String name) {
-        super(name);
-    }
-
+public final class GeocentricTransformTest extends TransformTestBase {
     /**
      * Tests the orthodromic distance computed by {@link DefaultEllipsoid}. There is actually two
      * algorithms used: one for the ellipsoidal model, and a simpler one for spherical model.
@@ -85,6 +65,7 @@ public final class GeocentricTransformTest extends TestTransform {
      *                                   Source: Office de la langue française, 1996
      *                                           http://www.granddictionnaire.com
      */
+    @Test
     public void testEllipsoid() throws FactoryException {
         final DefaultEllipsoid e = DefaultEllipsoid.WGS84;
         final double          hm = 0.5/60; // Half of a minute of angle, in degrees.
@@ -131,6 +112,7 @@ public final class GeocentricTransformTest extends TestTransform {
     /**
      * Tests the {@link GeocentricTransform} class.
      */
+    @Test
     public void testGeocentricTransform() throws FactoryException, TransformException {
         /*
          * Gets the math transform from WGS84 to a geocentric transform.

@@ -15,12 +15,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -28,10 +22,12 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,33 +37,11 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class SouthOrientedTest extends TestCase {
+public final class SouthOrientedTest {
     /**
      * Small number for matrix element comparaisons.
      */
     private static final double EPS = 1E-10;
-
-    /**
-     * Constructs a test with the given name.
-     */
-    public SouthOrientedTest(final String name) {
-        super(name);
-    }
-
-    /**
-     * Uses reflection to dynamically create a test suite containing all 
-     * the {@code testXXX()} methods - from the JUnit FAQ.
-     */
-    public static Test suite() {
-        return new TestSuite(SouthOrientedTest.class);
-    }
-
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(final String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
 
     /**
      * Parse a test CRS north or south oriented. If the CRS is fully south-oriented
@@ -107,6 +81,7 @@ public final class SouthOrientedTest extends TestCase {
     /**
      * Tests the Transverse Mercator South-Oriented case.
      */
+    @Test
     public void testTransverseMercator() throws FactoryException {
         /*
          * Tests "Transverse Mercator" (not south-oriented) with an axis oriented toward south.
@@ -162,6 +137,7 @@ public final class SouthOrientedTest extends TestCase {
     /**
      * Tests a Krovak projection with (SOUTH,WEST) axis.
      */
+    @Test
     public void testKrovak() throws FactoryException {
         final String geoWKT =
                 "GEOGCS[\"S-JTSK (Ferro)\", " +

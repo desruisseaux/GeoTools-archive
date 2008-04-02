@@ -19,9 +19,8 @@ import java.util.Arrays;
 import org.geotools.resources.XArray;
 import static org.geotools.math.XMath.*;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,31 +30,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class XMathTest extends TestCase {
-    /**
-     * Run the test from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(XMathTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public XMathTest(String name) {
-        super(name);
-    }
-
+public final class XMathTest {
     /**
      * Tests the {@link XMath#pow10} method.
      */
+    @Test
     public void testPow10() {
         for (int i=-304; i<=304; i++) {
             assertEquals(Double.parseDouble("1E"+i), pow10(i), 0);
@@ -65,6 +44,7 @@ public final class XMathTest extends TestCase {
     /**
      * Tests the {@link XMath#countFractionDigits} method.
      */
+    @Test
     public void testCountDecimalFractionDigits() {
         assertEquals(0,   countDecimalFractionDigits(-65.0));
         assertEquals(1,   countDecimalFractionDigits(-65.5));
@@ -80,6 +60,7 @@ public final class XMathTest extends TestCase {
     /**
      * Tests the {@link XMath#fixRoundingError} method.
      */
+    @Test
     public void testTrimDecimalFractionDigits() {
         assertEquals(-61.5,              trimDecimalFractionDigits(-61.50000000000001, 4, 12), 0);
         assertEquals(-61.5,              trimDecimalFractionDigits(-61.50000000000001, 4, 13), 0);
@@ -91,6 +72,7 @@ public final class XMathTest extends TestCase {
     /**
      * Tests the {@link XMath#primeNumber} method.
      */
+    @Test
     public void testPrimeNumber() {
         final int[] primes = {
             2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
@@ -104,6 +86,7 @@ public final class XMathTest extends TestCase {
     /**
      * Tests the {@link XMath#divisors} method.
      */
+    @Test
     public void testDivisors() {
         for (int i=0; i<10000; i++) {
             final int[] divisors = divisors(i);

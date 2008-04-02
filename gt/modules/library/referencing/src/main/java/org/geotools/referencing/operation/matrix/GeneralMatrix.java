@@ -63,15 +63,6 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     private static final long serialVersionUID = 8447482612423035360L;
 
     /**
-     * Defaul tolerance value for floating point comparisons.
-     *
-     * @since 2.4
-     *
-     * @deprecated Doesn't seem to be used...
-     */
-    public static final double EPS = 1E-6;
-
-    /**
      * Constructs a square identity matrix of size {@code size}&nbsp;&times;&nbsp;{@code size}.
      */
     public GeneralMatrix(final int size) {
@@ -456,6 +447,41 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             m = new GeneralMatrix(matrix);
         }
         mul(m);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean epsilonEquals(final Matrix matrix, final double tolerance) {
+        return epsilonEquals(this, matrix, tolerance);
+    }
+
+    /**
+     * Compares the element values.
+     */
+    static boolean epsilonEquals(final Matrix m1, final Matrix m2, final double tolerance) {
+        final int numRow = m1.getNumRow();
+        if (numRow != m2.getNumRow()) {
+            return false;
+        }
+        final int numCol = m1.getNumCol();
+        if (numCol != m2.getNumCol()) {
+            return false;
+        }
+        for (int j=0; j<numRow; j++) {
+            for (int i=0; i<numCol; i++) {
+                final double v1 = m1.getElement(j, i);
+                final double v2 = m2.getElement(j, i);
+                if (!(Math.abs(v1 - v2) <= tolerance)) {
+                    if (Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)) {
+                        // Special case for NaN and infinite values.
+                        continue;
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

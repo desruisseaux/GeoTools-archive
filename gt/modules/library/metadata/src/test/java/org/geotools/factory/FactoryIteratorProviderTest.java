@@ -16,9 +16,9 @@
 package org.geotools.factory;
 
 import java.util.Arrays;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -28,33 +28,18 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FactoryIteratorProviderTest extends TestCase {
+public final class FactoryIteratorProviderTest {
     /**
-     * Run the suite from the command line.
+     * The registry to use for testing purpose.
      */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FactoryIteratorProviderTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public FactoryIteratorProviderTest(final String testName) {
-        super(testName);
-    }
+    private FactoryRegistry registry;
 
     /**
      * Creates a new, initially empty, factory registry.
      */
-    private static FactoryRegistry createRegistry() {
-        return new FactoryRegistry(Arrays.asList(new Class<?>[] {
+    @Before
+    public void createRegistry() {
+        registry = new FactoryRegistry(Arrays.asList(new Class<?>[] {
             DummyFactory.class
         }));
     }
@@ -81,8 +66,8 @@ public class FactoryIteratorProviderTest extends TestCase {
      * Tests the registration of {@link DummyFactory} instances from
      * {@link DummyFactoryIteratorProvider}.
      */
+    @Test
     public void testRegistration() {
-        FactoryRegistry registry = createRegistry();
         /*
          * Tests the initially empty factory.
          */
@@ -140,7 +125,7 @@ public class FactoryIteratorProviderTest extends TestCase {
         /*
          * Tests with a new registry, which should be empty.
          */
-        registry = createRegistry();
+        createRegistry();
         try {
             assertNotNull(getFactory(registry, null));
             fail("The factory should be empty again.");

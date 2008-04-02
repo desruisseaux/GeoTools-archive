@@ -16,13 +16,11 @@
  */
 package org.geotools.referencing.cs;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
+import static org.geotools.referencing.cs.DefaultCoordinateSystemAxis.*;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,138 +29,77 @@ import org.opengis.referencing.cs.AxisDirection;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultCoordinateSystemAxisTest extends TestCase {
+public final class DefaultCoordinateSystemAxisTest {
     /**
      * For floating point number comparaisons.
      */
     private static final double EPS = 1E-10;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(DefaultCoordinateSystemAxisTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public DefaultCoordinateSystemAxisTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Tests the {@link DefaultCoordinateSystemAxis#nameMatches} method.
-     *
-     * @todo Use "static import" when we will be allowed to compile for J2SE 1.5.
      */
+    @Test
     public void testNameMatches() {
-        assertTrue (DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
-                    DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE.getName().getCode()));
-        assertFalse(DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
-                    DefaultCoordinateSystemAxis.GEODETIC_LATITUDE.getName().getCode()));
-        assertFalse(DefaultCoordinateSystemAxis.LONGITUDE.nameMatches(
-                    DefaultCoordinateSystemAxis.ALTITUDE.getName().getCode()));
-        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
-                    DefaultCoordinateSystemAxis.LONGITUDE.getName().getCode()));
-        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
-                    DefaultCoordinateSystemAxis.EASTING.getName().getCode()));
-        assertFalse(DefaultCoordinateSystemAxis.X.nameMatches(
-                    DefaultCoordinateSystemAxis.NORTHING.getName().getCode()));
+        assertTrue (LONGITUDE.nameMatches(GEODETIC_LONGITUDE.getName().getCode()));
+        assertFalse(LONGITUDE.nameMatches(GEODETIC_LATITUDE .getName().getCode()));
+        assertFalse(LONGITUDE.nameMatches(ALTITUDE          .getName().getCode()));
+        assertFalse(X        .nameMatches(LONGITUDE         .getName().getCode()));
+        assertFalse(X        .nameMatches(EASTING           .getName().getCode()));
+        assertFalse(X        .nameMatches(NORTHING          .getName().getCode()));
     }
 
     /**
      * Tests the {@link DefaultCoordinateSystemAxis#getPredefined(String)} method.
-     *
-     * @todo Use "static import" when we will be allowed to compile for J2SE 1.5.
      */
+    @Test
     public void testPredefined() {
-        assertNull(DefaultCoordinateSystemAxis.getPredefined("Dummy", null));
+        assertNull(getPredefined("Dummy", null));
 
         // Tests some abbreviations shared by more than one axis.
         // We should get the axis with the ISO 19111 name.
-        assertSame(DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("\u03C6", null));
-        assertSame(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("\u03BB", null));
-        assertSame(DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
-                   DefaultCoordinateSystemAxis.getPredefined("h", null));
+        assertSame(GEODETIC_LATITUDE,  getPredefined("\u03C6", null));
+        assertSame(GEODETIC_LONGITUDE, getPredefined("\u03BB", null));
+        assertSame(ELLIPSOIDAL_HEIGHT, getPredefined("h",      null));
 
         // The following abbreviation are used by WKT parsing
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_X,
-                   DefaultCoordinateSystemAxis.getPredefined("X", AxisDirection.OTHER));
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_Y,
-                   DefaultCoordinateSystemAxis.getPredefined("Y", AxisDirection.EAST));
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_Z,
-                   DefaultCoordinateSystemAxis.getPredefined("Z", AxisDirection.NORTH));
-        assertSame(DefaultCoordinateSystemAxis.LONGITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Lon", AxisDirection.EAST));
-        assertSame(DefaultCoordinateSystemAxis.LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Lat", AxisDirection.NORTH));
-        assertSame(DefaultCoordinateSystemAxis.X,
-                   DefaultCoordinateSystemAxis.getPredefined("X", AxisDirection.EAST));
-        assertSame(DefaultCoordinateSystemAxis.Y,
-                   DefaultCoordinateSystemAxis.getPredefined("Y", AxisDirection.NORTH));
-        assertSame(DefaultCoordinateSystemAxis.Z,
-                   DefaultCoordinateSystemAxis.getPredefined("Z", AxisDirection.UP));
+        assertSame(GEOCENTRIC_X, getPredefined("X",   AxisDirection.OTHER));
+        assertSame(GEOCENTRIC_Y, getPredefined("Y",   AxisDirection.EAST));
+        assertSame(GEOCENTRIC_Z, getPredefined("Z",   AxisDirection.NORTH));
+        assertSame(LONGITUDE,    getPredefined("Lon", AxisDirection.EAST));
+        assertSame(LATITUDE,     getPredefined("Lat", AxisDirection.NORTH));
+        assertSame(X,            getPredefined("X",   AxisDirection.EAST));
+        assertSame(Y,            getPredefined("Y",   AxisDirection.NORTH));
+        assertSame(Z,            getPredefined("Z",   AxisDirection.UP));
 
         // Tests from names
-        assertSame(DefaultCoordinateSystemAxis.LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Latitude", null));
-        assertSame(DefaultCoordinateSystemAxis.LONGITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Longitude", null));
-        assertSame(DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Geodetic latitude", null));
-        assertSame(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined("Geodetic longitude", null));
-        assertSame(DefaultCoordinateSystemAxis.NORTHING,
-                   DefaultCoordinateSystemAxis.getPredefined("Northing", null));
-        assertSame(DefaultCoordinateSystemAxis.NORTHING,
-                   DefaultCoordinateSystemAxis.getPredefined("N", null));
-        assertSame(DefaultCoordinateSystemAxis.EASTING,
-                   DefaultCoordinateSystemAxis.getPredefined("Easting", null));
-        assertSame(DefaultCoordinateSystemAxis.EASTING,
-                   DefaultCoordinateSystemAxis.getPredefined("E", null));
-        assertSame(DefaultCoordinateSystemAxis.SOUTHING,
-                   DefaultCoordinateSystemAxis.getPredefined("Southing", null));
-        assertSame(DefaultCoordinateSystemAxis.SOUTHING,
-                   DefaultCoordinateSystemAxis.getPredefined("S", null));
-        assertSame(DefaultCoordinateSystemAxis.WESTING,
-                   DefaultCoordinateSystemAxis.getPredefined("Westing", null));
-        assertSame(DefaultCoordinateSystemAxis.WESTING,
-                   DefaultCoordinateSystemAxis.getPredefined("W", null));
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_X,
-                   DefaultCoordinateSystemAxis.getPredefined("X", null));
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_Y,
-                   DefaultCoordinateSystemAxis.getPredefined("Y", null));
-        assertSame(DefaultCoordinateSystemAxis.GEOCENTRIC_Z,
-                   DefaultCoordinateSystemAxis.getPredefined("Z", null));
-        assertSame(DefaultCoordinateSystemAxis.X,
-                   DefaultCoordinateSystemAxis.getPredefined("x", null));
-        assertSame(DefaultCoordinateSystemAxis.Y,
-                   DefaultCoordinateSystemAxis.getPredefined("y", null));
-        assertSame(DefaultCoordinateSystemAxis.Z,
-                   DefaultCoordinateSystemAxis.getPredefined("z", null));
+        assertSame(LATITUDE,           getPredefined("Latitude",           null));
+        assertSame(LONGITUDE,          getPredefined("Longitude",          null));
+        assertSame(GEODETIC_LATITUDE,  getPredefined("Geodetic latitude",  null));
+        assertSame(GEODETIC_LONGITUDE, getPredefined("Geodetic longitude", null));
+        assertSame(NORTHING,           getPredefined("Northing",           null));
+        assertSame(NORTHING,           getPredefined("N",                  null));
+        assertSame(EASTING,            getPredefined("Easting",            null));
+        assertSame(EASTING,            getPredefined("E",                  null));
+        assertSame(SOUTHING,           getPredefined("Southing",           null));
+        assertSame(SOUTHING,           getPredefined("S",                  null));
+        assertSame(WESTING,            getPredefined("Westing",            null));
+        assertSame(WESTING,            getPredefined("W",                  null));
+        assertSame(GEOCENTRIC_X,       getPredefined("X",                  null));
+        assertSame(GEOCENTRIC_Y,       getPredefined("Y",                  null));
+        assertSame(GEOCENTRIC_Z,       getPredefined("Z",                  null));
+        assertSame(X,                  getPredefined("x",                  null));
+        assertSame(Y,                  getPredefined("y",                  null));
+        assertSame(Z,                  getPredefined("z",                  null));
     }
 
     /**
      * Tests the {@link DefaultCoordinateSystemAxis#getPredefined(CoordinateSystemAxis)} method.
      */
+    @Test
     public void testPredefinedAxis() {
         // A few hard-coded tests for debugging convenience.
-        assertSame(DefaultCoordinateSystemAxis.LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined(
-                   DefaultCoordinateSystemAxis.LATITUDE));
-        assertSame(DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
-                   DefaultCoordinateSystemAxis.getPredefined(
-                   DefaultCoordinateSystemAxis.GEODETIC_LATITUDE));
+        assertSame(LATITUDE,          getPredefined(LATITUDE));
+        assertSame(GEODETIC_LATITUDE, getPredefined(GEODETIC_LATITUDE));
 
         // Tests all constants.
         final DefaultCoordinateSystemAxis[] values = DefaultCoordinateSystemAxis.values();
@@ -170,13 +107,14 @@ public class DefaultCoordinateSystemAxisTest extends TestCase {
             final DefaultCoordinateSystemAxis axis = values[i];
             final String message = "values[" + i + ']';
             assertNotNull(message, axis);
-            assertSame(message, axis, DefaultCoordinateSystemAxis.getPredefined(axis));
+            assertSame(message, axis, getPredefined(axis));
         }
     }
 
     /**
      * Makes sure that the compass directions in {@link AxisDirection} are okay.
      */
+    @Test
     public void testCompass() {
         final AxisDirection[] compass = new AxisDirection[] {
             AxisDirection.NORTH,
@@ -196,7 +134,7 @@ public class DefaultCoordinateSystemAxisTest extends TestCase {
             AxisDirection.NORTH_WEST,
             AxisDirection.NORTH_NORTH_WEST
         };
-        assertEquals(compass.length, DefaultCoordinateSystemAxis.COMPASS_DIRECTION_COUNT);
+        assertEquals(compass.length, COMPASS_DIRECTION_COUNT);
         final int base = AxisDirection.NORTH.ordinal();
         final int h = compass.length / 2;
         for (int i=0; i<compass.length; i++) {
@@ -208,25 +146,27 @@ public class DefaultCoordinateSystemAxisTest extends TestCase {
             }
             assertEquals(index, base + i, c.ordinal());
             assertEquals(index, base + i + (i<h ? h : -h), c.opposite().ordinal());
-            assertEquals(index, 0, DefaultCoordinateSystemAxis.getAngle(c, c), EPS);
-            assertEquals(index, 180, Math.abs(DefaultCoordinateSystemAxis.getAngle(c, c.opposite())), EPS);
-            assertEquals(index, angle, DefaultCoordinateSystemAxis.getAngle(c, AxisDirection.NORTH), EPS);
+            assertEquals(index, 0, getAngle(c, c), EPS);
+            assertEquals(index, 180, Math.abs(getAngle(c, c.opposite())), EPS);
+            assertEquals(index, angle, getAngle(c, AxisDirection.NORTH), EPS);
         }
     }
 
     /**
      * Tests {@link DefaultCoordinateSystemAxis#getAngle}.
      */
+    @Test
     public void testAngle() {
-        assertEquals( 90.0, DefaultCoordinateSystemAxis.getAngle(AxisDirection.WEST, AxisDirection.SOUTH), EPS);
-        assertEquals(-90.0, DefaultCoordinateSystemAxis.getAngle(AxisDirection.SOUTH, AxisDirection.WEST), EPS);
-        assertEquals( 45.0, DefaultCoordinateSystemAxis.getAngle(AxisDirection.SOUTH, AxisDirection.SOUTH_EAST), EPS);
-        assertEquals(-22.5, DefaultCoordinateSystemAxis.getAngle(AxisDirection.NORTH_NORTH_WEST, AxisDirection.NORTH), EPS);
+        assertEquals( 90.0, getAngle(AxisDirection.WEST,             AxisDirection.SOUTH),      EPS);
+        assertEquals(-90.0, getAngle(AxisDirection.SOUTH,            AxisDirection.WEST),       EPS);
+        assertEquals( 45.0, getAngle(AxisDirection.SOUTH,            AxisDirection.SOUTH_EAST), EPS);
+        assertEquals(-22.5, getAngle(AxisDirection.NORTH_NORTH_WEST, AxisDirection.NORTH),      EPS);
     }
 
     /**
      * Tests {@link DefaultCoordinateSystemAxis#getAngle} using textual directions.
      */
+    @Test
     public void testAngle2() {
         compareAngle( 90.0, "West", "South");
         compareAngle(-90.0, "South", "West");
@@ -242,10 +182,10 @@ public class DefaultCoordinateSystemAxisTest extends TestCase {
      * Compare the angle between the specified directions.
      */
     private static void compareAngle(final double expected, final String source, final String target) {
-        final AxisDirection dir1 = DefaultCoordinateSystemAxis.getDirection(source);
-        final AxisDirection dir2 = DefaultCoordinateSystemAxis.getDirection(target);
+        final AxisDirection dir1 = getDirection(source);
+        final AxisDirection dir2 = getDirection(target);
         assertNotNull(dir1);
         assertNotNull(dir2);
-        assertEquals(expected, DefaultCoordinateSystemAxis.getAngle(dir1, dir2), EPS);
+        assertEquals(expected, getAngle(dir1, dir2), EPS);
     }
 }

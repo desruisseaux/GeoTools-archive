@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,28 +16,23 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.awt.geom.AffineTransform;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.OperationNotFoundException;
 
-// Geotools dependencies
-import org.geotools.referencing.operation.TestTransform;
+import org.geotools.referencing.operation.TransformTestBase;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
- * Test the following transforms:
+ * Tests the following transforms:
  *
  * <ul>
  *   <li>{@link MathTransformFactory#createPassthroughTransform}</li>
@@ -49,32 +44,12 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class PassthroughTransformTest extends TestTransform {
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(PassthroughTransformTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public PassthroughTransformTest(final String name) {
-        super(name);
-    }
-
+public final class PassthroughTransformTest extends TransformTestBase {
     /**
      * Test the pass through transform using an affine transform. The "passthrough" of
      * such transform are optimized in a special way.
      */
+    @Test
     public void testLinear() throws FactoryException, TransformException {
         runTest(mtFactory.createAffineTransform(
                 new GeneralMatrix(AffineTransform.getScaleInstance(4, 2))));
@@ -83,6 +58,7 @@ public final class PassthroughTransformTest extends TestTransform {
     /**
      * Test the general passthrough transform.
      */
+    @Test
     public void testPassthrough() throws FactoryException, TransformException {
         final ParameterValueGroup param = mtFactory.getDefaultParameters("Exponential");
         runTest(mtFactory.createParameterizedTransform(param));
@@ -164,7 +140,7 @@ public final class PassthroughTransformTest extends TestTransform {
         if (atDimension == mtDimension) {
             assertTrue("Test arrays are not correctly build.", Arrays.equals(atData, mtData));
         }
-        final double[] reference = (double[])mtData.clone();
+        final double[] reference = mtData.clone();
         submt.transform(atData, 0, atData, 0, pointCount);
         mt   .transform(mtData, 0, mtData, 0, pointCount);
         assertTrue("'subOffset' argument too high", subOffset + atDimension <= mtDimension);

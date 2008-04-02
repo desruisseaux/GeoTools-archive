@@ -21,9 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ListIterator;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -33,34 +32,14 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class KeySortedListTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(KeySortedListTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public KeySortedListTest(final String name) {
-        super(name);
-    }
-
+public final class KeySortedListTest {
     /**
      * Inserts random floating point numbers into the list. The key is the integer part of the
      * floating point number. This means that the number should be sorted in such a way that
      * their integer part are in increasing order, while the fractional part remains in random
      * order.
      */
+    @Test
     public void testAdd() {
         final Random random = new Random(6969483179756527012L);
         final KeySortedList<Integer,Double> list = new KeySortedList<Integer,Double>();

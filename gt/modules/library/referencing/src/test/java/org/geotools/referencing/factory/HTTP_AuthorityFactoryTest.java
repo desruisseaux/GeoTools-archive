@@ -16,23 +16,18 @@
  */
 package org.geotools.referencing.factory;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.geotools.factory.Hints;
-import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -42,31 +37,11 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class HTTP_AuthorityFactoryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(HTTP_AuthorityFactoryTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public HTTP_AuthorityFactoryTest(final String name) {
-        super(name);
-    }
-
+public final class HTTP_AuthorityFactoryTest {
     /**
      * Tests the {@link HTTP_AuthorityFactory#defaultAxisOrderHints} method.
      */
+    @Test
     public void testAxisOrderHints() {
         // The following are required for proper execution of the remaining of this test.
         assertNull(Hints.getSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
@@ -104,6 +79,7 @@ public final class HTTP_AuthorityFactoryTest extends TestCase {
     /**
      * Tests the CRS factory.
      */
+    @Test
     public void testCRS() throws FactoryException {
         CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("http://www.opengis.net", null);
         GeographicCRS crs;

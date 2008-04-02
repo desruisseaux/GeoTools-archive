@@ -16,16 +16,11 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.util.Random;
-
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -36,7 +31,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class LocalizationGridTest extends TestCase {
+public final class LocalizationGridTest {
     /**
      * Random number generator for this test.
      */
@@ -101,33 +96,11 @@ public final class LocalizationGridTest extends TestCase {
     private static final double FIT_TOLERANCE = 0.4;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(LocalizationGridTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public LocalizationGridTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Set up common objects used for all tests.
      * This implementation construct a default localization grid.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         final int width  = GRID_DATA[0].length/2;
         final int height = GRID_DATA.length;
         grid = new LocalizationGrid(width, height);
@@ -144,6 +117,7 @@ public final class LocalizationGridTest extends TestCase {
     /**
      * Test some grid properties.
      */
+    @Test
     public void testProperties() {
         assertTrue( grid.isMonotonic(false));
         assertTrue(!grid.isMonotonic(true));
@@ -200,12 +174,12 @@ public final class LocalizationGridTest extends TestCase {
      * Test direct transformation from grid coordinates to "real world"
      * coordinates using the localization grid.
      */
+    @Test
     public void testDirectTransform() throws TransformException {
         final double[] array = getGridCoordinates(false);
         grid.getMathTransform().transform(array, 0, array, 0, array.length/2);
         compare(array, true, EPS);
     }
-
 
     /**
      * Test affine tranformation for the whole grid by comparing the
@@ -213,6 +187,7 @@ public final class LocalizationGridTest extends TestCase {
      * the affine transform is fitted using least-squares method, the
      * transformation is approximative.
      */
+    @Test
     public void testAffineTransform() {
         final double[] array = getGridCoordinates(false);
         grid.getAffineTransform().transform(array, 0, array, 0, array.length/2);
@@ -223,6 +198,7 @@ public final class LocalizationGridTest extends TestCase {
      * Test inverse transformation from "real world" coordinates
      * to grid coordinates coordinate using the localization grid.
      */
+    @Test
     public void testInverseTransform () throws TransformException {
         final double[] array = getGridCoordinates(true);
         grid.getMathTransform().inverse().transform(array, 0, array, 0, array.length/2);
@@ -232,6 +208,7 @@ public final class LocalizationGridTest extends TestCase {
     /**
      * Test some mathematical identities used if {@link LocalizationGrid#fitPlane}.
      */
+    @Test
     public void testMathematicalIdentities() {
         int sum_x  = 0;
         int sum_y  = 0;

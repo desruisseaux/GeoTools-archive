@@ -16,13 +16,10 @@
  */
 package org.geotools.referencing.cs;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,36 +28,16 @@ import org.opengis.referencing.cs.AxisDirection;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DirectionAlongMeridianTest extends TestCase {
+public final class DirectionAlongMeridianTest {
     /**
      * For floating point comparaisons.
      */
     private static final double EPS = 1E-10;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(DirectionAlongMeridianTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public DirectionAlongMeridianTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Tests the {@link DirectionAlongMeridian#parse} method.
      */
+    @Test
     public void testParse() {
         DirectionAlongMeridian dir;
         String name;
@@ -97,6 +74,7 @@ public class DirectionAlongMeridianTest extends TestCase {
     /**
      * Tests the ordering, which also involve a test of angle measurement.
      */
+    @Test
     public void testOrdering() {
         assertOrdered("North along  90 deg East",   "North along   0 deg");
         assertOrdered("North along  75 deg West",   "North along 165 deg West");

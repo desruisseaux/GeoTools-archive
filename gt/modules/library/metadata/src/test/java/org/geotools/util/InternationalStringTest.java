@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.util.GenericName;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -37,31 +35,11 @@ import org.opengis.util.GenericName;
  * @source $URL$
  * @version $Id$
  */
-public final class InternationalStringTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(InternationalStringTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public InternationalStringTest(final String name) {
-        super(name);
-    }
-
+public final class InternationalStringTest {
     /**
      * Tests the {@link SimpleInternationalString} implementation.
      */
+    @Test
     public void testSimple() throws IOException, ClassNotFoundException {
         final String message = "This is an unlocalized message";
         final SimpleInternationalString toTest = new SimpleInternationalString(message);
@@ -72,6 +50,7 @@ public final class InternationalStringTest extends TestCase {
     /**
      * Tests the {@link SimpleInternationalString} implementation.
      */
+    @Test
     public void testGrowable() throws IOException, ClassNotFoundException {
         final String message     = "This is an unlocalized message";
         final String messageEn   = "This is a localized message";
@@ -107,6 +86,7 @@ public final class InternationalStringTest extends TestCase {
     /**
      * Tests the {@link GenericName} implementation.
      */
+    @Test
     public void testName() throws IOException, ClassNotFoundException {
         final GenericName name = NameFactory.create("codespace:subspace:name");
         basicTests(name);

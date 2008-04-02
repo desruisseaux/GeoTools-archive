@@ -15,7 +15,6 @@
  */
 package org.geotools.test;
 
-// J2SE dependencies
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -98,10 +97,10 @@ public class TestData implements Runnable {
     public static final String EXTENSIVE_TEST_KEY = "org.geotools.test.extensive";
 
     /**
-     * The {@linkplain System#getProperty(String) system property} key for interactive tests. 
+     * The {@linkplain System#getProperty(String) system property} key for interactive tests.
      * The value for this key is returned by the {@link #isInteractiveTest} method. Some
-     * test suites will show windows with maps and other artifacts related to testing 
-     * if this property is set to {@code true}. 
+     * test suites will show windows with maps and other artifacts related to testing
+     * if this property is set to {@code true}.
      * The value for this property is typically defined on the command line as a
      * <code>-D{@value}=true</code> option at Java or Maven starting time.
      */
@@ -111,7 +110,7 @@ public class TestData implements Runnable {
      * The files to delete at shutdown time. {@link File#deleteOnExit} alone doesn't seem
      * suffisient since it will preserve any overwritten files.
      */
-    private static final LinkedList toDelete = new LinkedList();
+    private static final LinkedList<Deletable> toDelete = new LinkedList<Deletable>();
 
     /**
      * {@code true} if JAI media lib is available.
@@ -157,17 +156,17 @@ public class TestData implements Runnable {
     }
 
     /**
-     * Returns {@code true} if the running Java virtual machine is 1.4. This is the lowest
+     * Returns {@code true} if the running Java virtual machine is 1.5. This is the lowest
      * Java version currently supported by Geotools. This version will increase in future
      * Geotools version.
      * <p>
-     * This method is used for some broken JUnit test that are know to run on JSE 1.4 but
+     * This method was used for some broken JUnit tests that were know to run on JSE 1.4 but
      * not on JSE 1.6 for example.
      */
     public static boolean isBaseJavaPlatform() {
-        return System.getProperty("java.version").startsWith("1.4");
+        return System.getProperty("java.version").startsWith("1.5");
     }
-    
+
     /**
      * Returns {@code true} if JAI MediaLib acceleration is available.
      * <p>
@@ -437,7 +436,7 @@ public class TestData implements Runnable {
      * when the virtual machine terminates. This method can optionnaly delete the file
      * only if it has been modified, thus giving a chance for test suites to copy their
      * resources only once.
-     * 
+     *
      * @param file The file to delete.
      * @param force If {@code true}, delete the file in all cases. If {@code false},
      *        delete the file if and only if it has been modified. The default value
@@ -502,6 +501,7 @@ public class TestData implements Runnable {
         /**
          * Returns the filepath.
          */
+        @Override
         public String toString() {
             return String.valueOf(file);
         }
@@ -525,8 +525,8 @@ public class TestData implements Runnable {
                  */
                 System.gc();
                 System.runFinalization();
-                for (final Iterator it=toDelete.iterator(); it.hasNext();) {
-                    final Deletable f = (Deletable) it.next();
+                for (final Iterator<Deletable> it=toDelete.iterator(); it.hasNext();) {
+                    final Deletable f = it.next();
                     try {
                         if (f.delete()) {
                             it.remove();

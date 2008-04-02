@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,22 +16,19 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.NumberFormat;
 
 import org.geotools.io.TableWriter;
-import org.geotools.referencing.Console;
-import org.geotools.referencing.ScriptTest;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.MismatchedDimensionException;
 
 
 /**
  * A console for running test scripts. Most of the work is already done by the subclass.
- * <code>TestScript</code> mostly add statistics about the test executed. This class is
+ * {@code TestScriptRunner} mostly add statistics about the test executed. This class is
  * used by {@link ScriptTest}. It can also be run from the command line for executing all
  * files specified in argument.
  *
@@ -39,7 +36,7 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class TestScript extends Console {
+public final class TestScriptRunner extends Console {
     /**
      * Number of tests run and passed. Used for displaying statistics.
      */
@@ -50,7 +47,7 @@ public final class TestScript extends Console {
      *
      * @param in The input stream.
      */
-    public TestScript(final LineNumberReader in) {
+    public TestScriptRunner(final LineNumberReader in) {
         super(in);
         setPrompt(null);
     }
@@ -58,6 +55,7 @@ public final class TestScript extends Console {
     /**
      * Invoked automatically when the <code>target pt</code> instruction were executed.
      */
+    @Override
     protected void test() throws TransformException, MismatchedDimensionException {
         testRun++;
         super.test();
@@ -105,7 +103,7 @@ public final class TestScript extends Console {
             for (int i=0; i<args.length; i++) {
                 final String filename = args[i];
                 final LineNumberReader in = new LineNumberReader(new FileReader(filename));
-                final TestScript test = new TestScript(in);
+                final TestScriptRunner test = new TestScriptRunner(in);
                 test.out.write("Running \"");
                 test.out.write(filename);
                 test.out.write('"');

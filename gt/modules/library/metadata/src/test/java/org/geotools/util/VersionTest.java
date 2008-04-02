@@ -15,9 +15,8 @@
  */
 package org.geotools.util;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -28,31 +27,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class VersionTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(VersionTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public VersionTest(final String name) {
-        super(name);
-    }
-
+public final class VersionTest {
     /**
      * Tests a numeric-only version.
      */
+    @Test
     public void testNumeric() {
         final Version version = new Version("6.11.2");
         assertEquals("6.11.2", version.toString());
@@ -71,6 +50,7 @@ public final class VersionTest extends TestCase {
     /**
      * Tests a alpha-numeric version.
      */
+    @Test
     public void testAlphaNumeric() {
         final Version version = new Version("1.6.b2");
         assertEquals("1.6.b2", version.toString());

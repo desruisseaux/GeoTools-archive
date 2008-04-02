@@ -17,10 +17,10 @@
 package org.geotools.referencing;
 
 import java.io.LineNumberReader;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.geotools.test.TestData;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -37,28 +37,7 @@ import org.geotools.test.TestData;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class ScriptTest extends TestCase {
-    /**
-     * Run all tests from the command line.
-     */
-    public static void main(final String[] args) throws Exception {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ScriptTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public ScriptTest(final String name) {
-        super(name);
-    }
-
+public final class ScriptTest {
     /**
      * Run the specified test script.
      *
@@ -66,7 +45,7 @@ public final class ScriptTest extends TestCase {
      */
     private void runScript(final String filename) throws Exception {
         final LineNumberReader in = TestData.openReader(this, filename);
-        final TestScript test = new TestScript(in);
+        final TestScriptRunner test = new TestScriptRunner(in);
         test.executeAll();
         in.close();
     }
@@ -76,6 +55,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testAbridgedMolodesky() throws Exception {
         runScript("scripts/AbridgedMolodensky.txt");
     }
@@ -87,6 +67,7 @@ public final class ScriptTest extends TestCase {
      * @throws FactoryException if a line can't be parsed.
      * @throws TransformException if the transformation can't be run.
      */
+    @Test
     public void testMolodesky() throws Exception {
         runScript("scripts/Molodensky.txt");
     }
@@ -96,6 +77,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testSimple() throws Exception {
         runScript("scripts/Simple.txt");
     }
@@ -105,6 +87,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testProjections() throws Exception {
         runScript("scripts/Projections.txt");
     }
@@ -114,6 +97,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testMercator() throws Exception {
         runScript("scripts/Mercator.txt");
     }
@@ -123,6 +107,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testObliqueMercator() throws Exception {
         runScript("scripts/ObliqueMercator.txt");
     }
@@ -132,6 +117,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testTransverseMercator() throws Exception {
         runScript("scripts/TransverseMercator.txt");
     }
@@ -141,6 +127,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testAlbersEqualArea() throws Exception {
         runScript("scripts/AlbersEqualArea.txt");
     }
@@ -150,6 +137,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testLambertAzimuthalEqualArea() throws Exception {
         runScript("scripts/LambertAzimuthalEqualArea.txt");
     }
@@ -159,6 +147,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testLambertConic() throws Exception {
         runScript("scripts/LambertConic.txt");
     }
@@ -168,6 +157,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testStereographic() throws Exception {
         runScript("scripts/Stereographic.txt");
     }
@@ -177,6 +167,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testOrthographic() throws Exception {
         runScript("scripts/Orthographic.txt");
     }
@@ -186,6 +177,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testNZMG() throws Exception {
     	runScript("scripts/NZMG.txt");
     }
@@ -195,6 +187,7 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
+    @Test
     public void testKrovak() throws Exception {
     	runScript("scripts/Krovak.txt");
     }
@@ -204,16 +197,20 @@ public final class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testOpenGIS() throws Exception {
-//        runScript("scripts/OpenGIS.txt");
-//    }
+    @Test
+    @Ignore
+    public void testOpenGIS() throws Exception {
+        runScript("scripts/OpenGIS.txt");
+    }
 
     /**
      * Run "NADCON.txt"
      *
      * @throws Exception If a test failed.
      */
-//    public void testNADCON() throws Exception {
-//        runScript("scripts/NADCON.txt");
-//    }
+    @Test
+    @Ignore
+    public void testNADCON() throws Exception {
+        runScript("scripts/NADCON.txt");
+    }
 }

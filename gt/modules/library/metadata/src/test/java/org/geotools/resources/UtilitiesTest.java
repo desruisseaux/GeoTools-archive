@@ -15,12 +15,8 @@
  */
 package org.geotools.resources;
 
-import java.io.File;
-import java.io.Serializable;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -30,31 +26,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class UtilitiesTest extends TestCase {
-    /**
-     * Run the test from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(UtilitiesTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public UtilitiesTest(String name) {
-        super(name);
-    }
-
+public final class UtilitiesTest {
     /**
      * Tests {@link Utilities#equals}.
      */
+    @Test
     public void testEquals() {
         assertTrue (Utilities.equals(null, null));
         assertFalse(Utilities.equals(null, ""  ));
@@ -66,6 +42,7 @@ public final class UtilitiesTest extends TestCase {
     /**
      * Tests {@link Utilities#spaces}.
      */
+    @Test
     public void testSpaces() {
         assertEquals("",         Utilities.spaces(0));
         assertEquals(" ",        Utilities.spaces(1));

@@ -16,9 +16,6 @@
 package org.geotools.referencing.factory.wms;
 
 import java.util.Collection;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
@@ -34,6 +31,9 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.CachedCRSAuthorityDecorator;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests {@link WebCRSFactory}.
@@ -42,45 +42,24 @@ import org.geotools.referencing.factory.IdentifiedObjectFinder;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CRSTest extends TestCase {
+public final class CRSTest {
     /**
      * The factory to test.
      */
     private WebCRSFactory factory;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CRSTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public CRSTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Initializes the factory to test.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         factory = new WebCRSFactory();
     }
 
     /**
      * Tests the registration in {@link ReferencingFactoryFinder}.
      */
+    @Test
     public void testFactoryFinder() {
         final Collection authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("CRS"));
@@ -91,6 +70,7 @@ public final class CRSTest extends TestCase {
     /**
      * Checks the authority names.
      */
+    @Test
     public void testAuthority() {
         final Citation authority = factory.getAuthority();
         assertTrue (Citations.identifierMatches(authority, "CRS"));
@@ -102,6 +82,7 @@ public final class CRSTest extends TestCase {
     /**
      * Tests the CRS:84 code.
      */
+    @Test
     public void testCRS84() throws FactoryException {
         GeographicCRS crs = factory.createGeographicCRS("CRS:84");
         assertSame(crs, factory.createGeographicCRS("84"));
@@ -116,6 +97,7 @@ public final class CRSTest extends TestCase {
     /**
      * Tests the CRS:83 code.
      */
+    @Test
     public void testCRS83() throws FactoryException {
         GeographicCRS crs = factory.createGeographicCRS("CRS:83");
         assertSame(crs, factory.createGeographicCRS("83"));
@@ -128,6 +110,7 @@ public final class CRSTest extends TestCase {
     /**
      * Tests the {@link IdentifiedObjectFinder#find} method.
      */
+    @Test
     public void testFind() throws FactoryException {
         final GeographicCRS CRS84 = factory.createGeographicCRS("CRS:84");
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
@@ -185,6 +168,7 @@ public final class CRSTest extends TestCase {
      * Tests the {@link IdentifiedObjectFinder#find} method through a buffered authority factory.
      * The objects found are expected to be cached.
      */
+    @Test
     public void testBufferedFind() throws FactoryException {
         final AbstractAuthorityFactory factory = new CachedCRSAuthorityDecorator(this.factory);
         final GeographicCRS CRS84 = factory.createGeographicCRS("CRS:84");
@@ -208,5 +192,4 @@ public final class CRSTest extends TestCase {
 
         assertEquals("CRS:84", finder.findIdentifier(DefaultGeographicCRS.WGS84));
     }
-
 }

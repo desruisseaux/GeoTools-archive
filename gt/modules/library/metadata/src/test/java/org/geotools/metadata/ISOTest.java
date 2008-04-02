@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -18,17 +18,14 @@ package org.geotools.metadata;
 import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.opengis.metadata.citation.CitationFactory;
-import org.opengis.metadata.content.CoverageContentType;
-import org.opengis.metadata.content.ImagingCondition;
 
 import org.opengis.util.CodeList;
 import org.opengis.metadata.MetaData;
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.metadata.citation.OnLineResource;
+import org.opengis.metadata.citation.CitationFactory;
+import org.opengis.metadata.content.ImagingCondition;
+import org.opengis.metadata.content.CoverageContentType;
 import org.opengis.metadata.maintenance.ScopeDescription;
 import org.opengis.metadata.identification.AggregateInformation;
 import org.opengis.metadata.identification.RepresentativeFraction;
@@ -36,6 +33,9 @@ import org.opengis.metadata.identification.RepresentativeFraction;
 import org.geotools.resources.Classes;
 import org.geotools.util.CheckedCollection;
 import org.geotools.metadata.iso.MetaDataImpl;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -48,7 +48,7 @@ import org.geotools.metadata.iso.MetaDataImpl;
  * @todo Current implementation relies on {@link MetaData} dependencies. This is probably
  *       not enough; we should provide an explicit list of metadata interface.
  */
-public class ISOTest extends TestCase {
+public final class ISOTest {
     /**
      * {@code true} for displaying debugging informations.
      */
@@ -179,29 +179,9 @@ public class ISOTest extends TestCase {
     };
 
     /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ISOTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public ISOTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Ensures that the {@link #TEST} array do not contains code list.
      */
+    @Test
     public void testNoCodeList() {
         for (int i=0; i<TEST.length; i++) {
             final Class type = TEST[i];
@@ -212,6 +192,7 @@ public class ISOTest extends TestCase {
     /**
      * Tests all dependencies starting from the {@link MetaDataImpl} class.
      */
+    @Test
     public void testDependencies() {
         assertNull(getImplementation(Number.class));
         assertSame(MetaDataImpl.class, getImplementation(MetaData.class));
@@ -276,14 +257,14 @@ public class ISOTest extends TestCase {
                  * is a collection, get an empty collection from the implementation.
                  * This is needed in order to get the element type in the collection.
                  */
-                Class type = accessor.type(i);
+                Class<?> type = accessor.type(i);
                 if (Collection.class.isAssignableFrom(type)) {
                     final Object example = accessor.get(i, dummyInstance);
                     if (example instanceof CheckedCollection) {
                         type = ((CheckedCollection) example).getElementType();
                     }
                 }
-                final Class impl = getImplementation(type);
+                final Class<?> impl = getImplementation(type);
                 if (impl != null) {
                     assertSetters(new PropertyAccessor(impl, type), done);
                 }
@@ -295,7 +276,7 @@ public class ISOTest extends TestCase {
      * Returns the implementation class for the specified interface class,
      * or {@code null} if none.
      */
-    private static Class getImplementation(final Class type) {
+    private static Class<?> getImplementation(final Class<?> type) {
         if (!CodeList.class.isAssignableFrom(type)) {
             String name = type.getName();
             if (name.startsWith(INTERFACE_PACKAGE)) {
@@ -321,7 +302,7 @@ public class ISOTest extends TestCase {
      * Returns {@code true} if the specified type is not in the list of
      * known unimplemented types.
      */
-    private static boolean isImplemented(final Class type) {
+    private static boolean isImplemented(final Class<?> type) {
         for (int i=0; i<UNIMPLEMENTED.length; i++) {
             if (type.equals(UNIMPLEMENTED[i])) {
                 return false;

@@ -19,9 +19,9 @@ import java.awt.RenderingHints;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -33,31 +33,11 @@ import junit.framework.TestSuite;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class GeoToolsTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeoToolsTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public GeoToolsTest(final String testName) {
-        super(testName);
-    }
-
+public final class GeoToolsTest {
     /**
      * Makes sures that J2SE 1.4 assertions are enabled.
      */
+    @Test
     public void testAssertionEnabled() {
         assertTrue("Assertions not enabled.", GeoToolsTest.class.desiredAssertionStatus());
     }
@@ -65,6 +45,7 @@ public class GeoToolsTest extends TestCase {
     /**
      * Tests the removal of keys from a hashmap. Required for {@link FactoryRegistry} working.
      */
+    @Test
     public void testHintsKey() {
         final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         assertFalse(hints.isEmpty());
@@ -82,6 +63,7 @@ public class GeoToolsTest extends TestCase {
     /**
      * Tests addition of custom hints.
      */
+    @Test
     public void testMyHints(){
         Hints hints = GeoTools.getDefaultHints();
         assertTrue(hints.isEmpty());
@@ -116,6 +98,7 @@ public class GeoToolsTest extends TestCase {
     /**
      * Tests the use of system properties.
      */
+    @Test
     public void testSystemHints() {
         Hints hints = GeoTools.getDefaultHints();
         assertNotNull(hints);
@@ -143,6 +126,7 @@ public class GeoToolsTest extends TestCase {
      * Tests {@link GeoTools#fixName} using simpliest name or no context.
      * We avoid the tests that would require a real initial context.
      */
+    @Test
     public void testFixName() {
         assertNull  (GeoTools.fixName(null));
         assertEquals("simpleName", GeoTools.fixName("simpleName"));

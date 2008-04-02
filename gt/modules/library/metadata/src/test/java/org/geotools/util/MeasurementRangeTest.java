@@ -17,9 +17,9 @@ package org.geotools.util;
 
 import javax.units.SI;
 import javax.units.Unit;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -30,31 +30,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MeasurementRangeTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(MeasurementRangeTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public MeasurementRangeTest(final String name) {
-        super(name);
-    }
-
+public final class MeasurementRangeTest {
     /**
      * Tests unit conversions.
      */
+    @Test
     public void testConversion() {
         final MeasurementRange range = new MeasurementRange(1000f, 2000f, SI.METER);
         assertSame(range, range.convertTo(SI.METER));
@@ -65,6 +45,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests the bounds values of a range of integers.
      */
+    @Test
     public void testIntegerBounds() {
         final NumberRange range = new NumberRange(10, 20);
         assertEquals(10, range.getMinimum(     ), 0);
@@ -78,6 +59,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests union and intersection without units and type change.
      */
+    @Test
     public void testIntegerIntersect() {
         NumberRange r1 = new NumberRange(10, 20);
         NumberRange r2 = new NumberRange(15, 30);
@@ -93,6 +75,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests union and intersection with type change.
      */
+    @Test
     public void testDoubleIntersect() {
         NumberRange r1 = new NumberRange(10.0, 20.0);
         NumberRange r2 = new NumberRange(15.0, 30.0);
@@ -105,6 +88,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests union and intersection with type change.
      */
+    @Test
     public void testIntegerDoubleIntersect() {
         NumberRange r1 = new NumberRange(10, 20);
         NumberRange r2 = new NumberRange(15.0, 30.0);
@@ -120,6 +104,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests union and intersection with type change.
      */
+    @Test
     public void testDoubleIntegerIntersect() {
         NumberRange r1 = new NumberRange(10.0, 20.0);
         NumberRange r2 = new NumberRange(15, 30);
@@ -135,6 +120,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests union and intersection involving a unit conversion.
      */
+    @Test
     public void testIntersectWithConversion() {
         final Unit KILOMETER = SI.KILO(SI.METER);
         NumberRange r1 = new MeasurementRange(1000f, 2000f, SI.METER);
@@ -150,6 +136,7 @@ public class MeasurementRangeTest extends TestCase {
     /**
      * Tests {@link MeasurementRange#toString()} method.
      */
+    @Test
     public void testToString() {
         final MeasurementRange range = new MeasurementRange(10, 20, SI.KILO(SI.METER));
         assertEquals("[10.0, 20.0] km", range.toString());

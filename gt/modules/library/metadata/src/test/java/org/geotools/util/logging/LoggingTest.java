@@ -17,9 +17,9 @@ package org.geotools.util.logging;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,31 +29,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class LoggingTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(LoggingTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public LoggingTest(final String name) {
-        super(name);
-    }
-
+public class LoggingTest {
     /**
      * Checks {@link Logging#GEOTOOLS}.
      */
+    @Test
     public void testGeotools() {
         assertEquals("",             Logging.ALL.name);
         assertEquals("org.geotools", Logging.GEOTOOLS.name);
@@ -72,6 +52,7 @@ public class LoggingTest extends TestCase {
     /**
      * Tests the redirection to Commons-logging.
      */
+    @Test
     public void testCommonsLogging() throws ClassNotFoundException {
         try {
             Logging.GEOTOOLS.setLoggerFactory("org.geotools.util.logging.CommonsLoggerFactory");
@@ -121,6 +102,7 @@ public class LoggingTest extends TestCase {
     /**
      * Tests the redirection to Log4J.
      */
+    @Test
     public void testLog4J() throws ClassNotFoundException {
         try {
             Logging.GEOTOOLS.setLoggerFactory("org.geotools.util.logging.Log4JLoggerFactory");

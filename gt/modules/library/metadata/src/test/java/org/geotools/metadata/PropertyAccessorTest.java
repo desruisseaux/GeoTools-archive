@@ -18,15 +18,16 @@ package org.geotools.metadata;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.geotools.util.SimpleInternationalString;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.util.InternationalString;
+
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.Citations;
-import org.opengis.util.InternationalString;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -36,28 +37,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PropertyAccessorTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(PropertyAccessorTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public PropertyAccessorTest(final String name) {
-        super(name);
-    }
-
+public final class PropertyAccessorTest {
     /**
      * Creates a property accessor for the given citation.
      */
@@ -71,6 +51,7 @@ public class PropertyAccessorTest extends TestCase {
     /**
      * Tests the constructor.
      */
+    @Test
     public void testConstructor() {
         final Citation citation = Citations.EPSG;
         PropertyAccessor accessor;
@@ -83,6 +64,7 @@ public class PropertyAccessorTest extends TestCase {
     /**
      * Tests the {@code indexOf} and {code name} methods.
      */
+    @Test
     public void testName() {
         final Citation citation = Citations.EPSG;
         final PropertyAccessor accessor = createPropertyAccessor(citation);
@@ -96,6 +78,7 @@ public class PropertyAccessorTest extends TestCase {
     /**
      * Tests the get method.
      */
+    @Test
     public void testGet() {
         Citation citation = Citations.EPSG;
         final PropertyAccessor accessor = createPropertyAccessor(citation);
@@ -124,6 +107,7 @@ public class PropertyAccessorTest extends TestCase {
     /**
      * Tests the shallow equals and copy methods.
      */
+    @Test
     public void testEquals() {
         Citation citation = Citations.EPSG;
         final PropertyAccessor accessor = createPropertyAccessor(citation);
@@ -162,6 +146,7 @@ public class PropertyAccessorTest extends TestCase {
     /**
      * Tests the hash code computation.
      */
+    @Test
     public void testHashCode() {
         final CitationImpl citation = new CitationImpl();
         final PropertyAccessor accessor = createPropertyAccessor(citation);

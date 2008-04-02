@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,12 +16,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.Ellipsoid;
@@ -29,11 +23,12 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Geotools dependencies
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.operation.TestTransform;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.geometry.GeneralDirectPosition;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -43,32 +38,12 @@ import org.geotools.geometry.GeneralDirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class GeocentricTranslationTest extends TestCase {
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeocentricTranslationTest.class);
-    }
-    
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GeocentricTranslationTest(final String name) {
-        super(name);
-    }
-
+public final class GeocentricTranslationTest {
     /**
      * Test case using example from EPSG Guidance Note number 7 part 2 (May 2005),
      * section 2.4.3.1.
      */
+    @Test
     public void testTranslation() throws FactoryException, TransformException {
         final String        classification = "Geocentric translations";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
@@ -93,6 +68,7 @@ public final class GeocentricTranslationTest extends TestCase {
      * Test case using example from EPSG Guidance Note number 7 part 2 (May 2005),
      * section 2.4.3.2.1.
      */
+    @Test
     public void testSevenParam() throws FactoryException, TransformException {
         final String        classification = "Position Vector 7-param. transformation";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
@@ -121,6 +97,7 @@ public final class GeocentricTranslationTest extends TestCase {
      * Test case using example from EPSG Guidance Note number 7 part 2 (May 2005),
      * section 2.4.3.2.2.
      */
+    @Test
     public void testFrameRotation() throws FactoryException, TransformException {
         final String        classification = "Coordinate Frame rotation";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
@@ -150,6 +127,7 @@ public final class GeocentricTranslationTest extends TestCase {
      * Note: the expected values here are approximatives since we didn't used
      * an external source of test points for this test.
      */
+    @Test
     public void testGeotoolsExtensions() throws FactoryException, TransformException {
         final String        classification = "Coordinate Frame rotation";
         final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);

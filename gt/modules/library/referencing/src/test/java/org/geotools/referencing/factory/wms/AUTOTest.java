@@ -16,20 +16,17 @@
 package org.geotools.referencing.factory.wms;
 
 import java.util.Collection;
-import java.util.logging.Level;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
-import org.geotools.resources.Arguments;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -40,49 +37,24 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public final class AUTOTest extends TestCase {
+public final class AUTOTest {
     /**
      * The factory to test.
      */
     private CRSAuthorityFactory factory;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final boolean log = arguments.getFlag("-log");
-        arguments.getRemainingArguments(0);
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(AUTOTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public AUTOTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Initializes the factory to test.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         factory = new AutoCRSFactory();
     }
 
     /**
      * Tests the registration in {@link ReferencingFactoryFinder}.
      */
+    @Test
     public void testFactoryFinder() {
         final Collection<String> authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("AUTO"));
@@ -95,6 +67,7 @@ public final class AUTOTest extends TestCase {
     /**
      * Checks the authority names.
      */
+    @Test
     public void testAuthority() {
         final Citation authority = factory.getAuthority();
         assertTrue (Citations.identifierMatches(authority, "AUTO"));
@@ -106,6 +79,7 @@ public final class AUTOTest extends TestCase {
     /**
      * UDIG requires this to work.
      */
+    @Test
     public void test42001() throws FactoryException {
         final ProjectedCRS utm = factory.createProjectedCRS("AUTO:42001,0.0,0.0");
         assertNotNull("auto-utm", utm);

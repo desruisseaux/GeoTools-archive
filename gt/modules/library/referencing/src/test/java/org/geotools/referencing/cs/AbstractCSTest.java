@@ -16,23 +16,17 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import javax.units.SI;
 import javax.units.Unit;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Matrix;
-
-// Geotools dependencies
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,31 +35,11 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractCSTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(AbstractCSTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public AbstractCSTest(final String name) {
-        super(name);
-    }
-
+public final class AbstractCSTest {
     /**
      * Tests the swapping of axis.
      */
+    @Test
     public void testAxisSwapping() {
         CoordinateSystem cs1, cs2;
         cs1 = new DefaultEllipsoidalCS("cs1",
@@ -131,6 +105,7 @@ public class AbstractCSTest extends TestCase {
     /**
      * Tests {@link AbstractCS#axisUsingUnit}.
      */
+    @Test
     public void testAxisUsingUnit() {
         assertNull("Should detect that no axis change is needed",
                    DefaultCartesianCS.PROJECTED.axisUsingUnit(SI.METER));
@@ -151,6 +126,7 @@ public class AbstractCSTest extends TestCase {
     /**
      * Tests {@link AbstractCS#standard}.
      */
+    @Test
     public void testStandards() {
         CoordinateSystem cs;
         cs = DefaultCartesianCS  .GRID;               assertSame(cs, AbstractCS.standard(cs));

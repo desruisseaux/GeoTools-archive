@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -18,21 +18,17 @@
  */
 package org.geotools.referencing.factory;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 
-// Geotools dependencies
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
 import org.geotools.referencing.ReferencingFactoryFinder;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -42,31 +38,11 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * @source $URL$
  * @version $Id$
  */
-public final class AuthorityFactoryProxyTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(AuthorityFactoryProxyTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public AuthorityFactoryProxyTest(final String name) {
-        super(name);
-    }
-
+public final class AuthorityFactoryProxyTest {
     /**
      * Tests {@link AuthorityFactoryProxy#getType(Class)}.
      */
+    @Test
     public void testType() {
         assertEquals(             ProjectedCRS.class, AuthorityFactoryProxy.getType(        ProjectedCRS.class));
         assertEquals(             ProjectedCRS.class, AuthorityFactoryProxy.getType( DefaultProjectedCRS.class));
@@ -80,6 +56,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
     /**
      * Tests {@link AuthorityFactoryProxy#create}. We uses the CRS factory for testing purpose.
      */
+    @Test
     public void testCreate() throws FactoryException {
         final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final CoordinateReferenceSystem expected = factory.createCoordinateReferenceSystem("83");
@@ -137,6 +114,7 @@ public final class AuthorityFactoryProxyTest extends TestCase {
      * Tests {@link IdentifiedObjectFinder#createFromCodes}.
      * We uses the CRS factory for testing purpose.
      */
+    @Test
     public void testCreateFromCodes() throws FactoryException {
         final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("CRS", null);
         final IdentifiedObjectFinder proxy = new IdentifiedObjectFinder(factory, GeographicCRS.class);

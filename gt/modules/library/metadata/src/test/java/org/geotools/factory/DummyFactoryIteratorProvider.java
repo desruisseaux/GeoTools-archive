@@ -17,6 +17,7 @@ package org.geotools.factory;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import static org.junit.Assert.*;
 
 
 /**
@@ -43,7 +44,9 @@ public final class DummyFactoryIteratorProvider implements FactoryIteratorProvid
     /**
      * Returns an iterator over all {@link DummyFactory}.
      */
-    public Iterator iterator(final Class category) {
+    @SuppressWarnings("unchecked")
+    public <T> Iterator<T> iterator(final Class<T> category) {
+        assertEquals(DummyFactory.class, category);
         final DummyFactory[] factories;
         if (firstHalf) {
             factories = new DummyFactory[] {
@@ -56,6 +59,6 @@ public final class DummyFactoryIteratorProvider implements FactoryIteratorProvid
                 new DummyFactory.Example4()
             };
         }
-        return Arrays.asList(factories).iterator();
+        return (Iterator) Arrays.asList(factories).iterator();
     }
 }

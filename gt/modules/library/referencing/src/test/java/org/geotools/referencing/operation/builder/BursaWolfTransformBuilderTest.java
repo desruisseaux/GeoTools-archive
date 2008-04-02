@@ -15,9 +15,10 @@
  */
 package org.geotools.referencing.operation.builder;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
@@ -25,35 +26,16 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// J2SE and extensions
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
-public class BursaWolfTransformBuilderTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     *   
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     * 
-     */
-    public static Test suite() {
-        return new TestSuite(BursaWolfTransformBuilderTest.class);
-    }
-
+public final class BursaWolfTransformBuilderTest {
     /**
      * Test {@link BursaWolfTransformBuilder}.
-     *
      */
-    public void testBursaWolfParamCalculaterXrotation()
-        throws FactoryException, TransformException {
+    @Test
+    public void testBursaWolfParamCalculaterXrotation() throws FactoryException, TransformException {
         Random random = new Random(773418718);
 
         double R = 6370000;
@@ -64,23 +46,23 @@ public class BursaWolfTransformBuilderTest extends TestCase {
         List <MappedPosition> vectors = new ArrayList<MappedPosition>();
 
         vectors.add(new MappedPosition(
-        		new GeneralDirectPosition(R, 0, 0),
-                new GeneralDirectPosition(R, 0, 0)));
+                    new GeneralDirectPosition(R, 0, 0),
+                    new GeneralDirectPosition(R, 0, 0)));
 
         vectors.add(new MappedPosition(
-                new GeneralDirectPosition(0, cos * R, -sin * R),
-                new GeneralDirectPosition(0, R, 0)));
+                    new GeneralDirectPosition(0, cos * R, -sin * R),
+                    new GeneralDirectPosition(0, R, 0)));
 
         vectors.add(new MappedPosition(
-                new GeneralDirectPosition(0, sin * R, cos * R),
-                new GeneralDirectPosition(0, 0, R)));
+                    new GeneralDirectPosition(0, sin * R, cos * R),
+                    new GeneralDirectPosition(0, 0, R)));
 
         double[] points = new double[vectors.size() * 3];
 
         for (int i = 0; i < vectors.size(); i++) {
-            points[i * 3] = ((MappedPosition)vectors.get(i)).getSource().getCoordinates()[0];
-            points[(i * 3) + 1] = ((MappedPosition)vectors.get(i)).getSource().getCoordinates()[1];
-            points[(i * 3) + 2] = ((MappedPosition)vectors.get(i)).getSource().getCoordinates()[2];
+            points[i * 3]       = vectors.get(i).getSource().getCoordinates()[0];
+            points[(i * 3) + 1] = vectors.get(i).getSource().getCoordinates()[1];
+            points[(i * 3) + 2] = vectors.get(i).getSource().getCoordinates()[2];
         }
 
         double[] dstPoints = new double[points.length];
@@ -90,11 +72,9 @@ public class BursaWolfTransformBuilderTest extends TestCase {
             .transform(points, 0, dstPoints, 0, (points.length / 3));
 
         for (int i = 0; i < vectors.size(); i++) {
-            assertEquals(dstPoints[i * 3], ((MappedPosition)vectors.get(i)).getTarget().getCoordinates()[0], 1E-2);
-            assertEquals(dstPoints[(i * 3) + 1], ((MappedPosition)vectors.get(i)).getTarget().getCoordinates()[1],
-                1E-2);
-            assertEquals(dstPoints[(i * 3) + 2], ((MappedPosition)vectors.get(i)).getTarget().getCoordinates()[2],
-                1E-2);
+            assertEquals(dstPoints[i * 3],       vectors.get(i).getTarget().getCoordinates()[0], 1E-2);
+            assertEquals(dstPoints[(i * 3) + 1], vectors.get(i).getTarget().getCoordinates()[1], 1E-2);
+            assertEquals(dstPoints[(i * 3) + 2], vectors.get(i).getTarget().getCoordinates()[2], 1E-2);
         }
     }
 
@@ -107,15 +87,16 @@ public class BursaWolfTransformBuilderTest extends TestCase {
      * @throws FactoryException DOCUMENT ME!
      * @throws TransformException
      */
+    @Test
     public void test2BursaWolfParamCalculater()
         throws FactoryException, TransformException {
         double R = 6370000;
         Random random = new Random(143477662);
-        
+
         DirectPosition ptSrc ;
         DirectPosition ptDst ;
         List <MappedPosition> vectors = new ArrayList<MappedPosition>();
-        
+
         BursaWolfParameters bwp = new BursaWolfParameters(null);
         bwp.dx = random.nextDouble() * 100;
         bwp.dy = random.nextDouble() * 100;

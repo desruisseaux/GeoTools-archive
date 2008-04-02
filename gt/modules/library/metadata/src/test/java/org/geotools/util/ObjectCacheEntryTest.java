@@ -1,23 +1,40 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2007, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.util;
 
-import junit.framework.TestCase;
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
- * Simple deadlock tests for ObjectCacheEntry.
- * 
+ * Simple deadlock tests for {@link ObjectCacheEntry}.
+ *
  * @author Cory Horner (Refractions Research)
  */
-public class ObjectCacheEntryTest extends TestCase {
+public final class ObjectCacheEntryTest {
 
     DefaultObjectCache.ObjectCacheEntry entry;
-    
+
     private class EntryReaderThread implements Runnable {
 
         Object[] values = null;
-        
+
         public EntryReaderThread() {
         }
-        
+
         public void run() {
             try {
                 values = new Object[] {entry.getValue()};
@@ -25,19 +42,19 @@ public class ObjectCacheEntryTest extends TestCase {
                 e.printStackTrace();
             }
         }
-        
+
         public Object[] getValue() {
             return values;
         }
     }
-    
+
     private class EntryWriterThread implements Runnable {
 
         Object[] values = null;
-        
+
         public EntryWriterThread() {
         }
-        
+
         public void run() {
             try {
                 entry.writeLock();
@@ -48,17 +65,18 @@ public class ObjectCacheEntryTest extends TestCase {
                 e.printStackTrace();
             }
         }
-        
+
         public Object[] getValue() {
             return values;
         }
     }
 
+    @Test
     public void testWriteReadDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
         entry = new DefaultObjectCache.ObjectCacheEntry();
         entry.writeLock();
-        
+
         //create another thread which starts reading
         Runnable thread1 = new EntryReaderThread();
         Thread t1 = new Thread(thread1);
@@ -67,11 +85,11 @@ public class ObjectCacheEntryTest extends TestCase {
 
         //write
         entry.setValue(1);
-        
+
         //check that the read thread was blocked
         Object[] values = ((EntryReaderThread) thread1).getValue();
-        assertEquals(null, values);
-        
+        assertArrayEquals(null, values);
+
         //unlock
         entry.writeUnLock();
 
@@ -82,6 +100,7 @@ public class ObjectCacheEntryTest extends TestCase {
         assertEquals(1, values[0]);
     }
 
+    @Test
     public void testWriteWriteDeadlock() throws InterruptedException {
         //lock the entry as if we were writing
         entry = new DefaultObjectCache.ObjectCacheEntry();
@@ -89,7 +108,7 @@ public class ObjectCacheEntryTest extends TestCase {
 
         //write the value 2
         entry.setValue(2);
-        
+
         //create another thread which starts writing
         Runnable thread1 = new EntryWriterThread();
         Thread t1 = new Thread(thread1);
@@ -100,7 +119,7 @@ public class ObjectCacheEntryTest extends TestCase {
         Object[] values = ((EntryWriterThread) thread1).getValue();
         assertNull(values);
         assertEquals(2, entry.getValue());
-        
+
         //unlock
         entry.writeUnLock();
 

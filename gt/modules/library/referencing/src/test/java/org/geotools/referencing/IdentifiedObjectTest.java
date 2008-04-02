@@ -20,14 +20,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.SimpleInternationalString;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -37,33 +36,13 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class IdentifiedObjectTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(IdentifiedObjectTest.class);
-    }
-
-    /**
-     * Construct a test case.
-     */
-    public IdentifiedObjectTest(String testName) {
-        super(testName);
-    }
-
+public final class IdentifiedObjectTest {
     /**
      * Tests {@link NamedIdentifier} attributes. Useful for making sure that the
      * hash code enumerated in the switch statement in the constructor have
      * the correct value.
      */
+    @Test
     public void testIdentifier() {
         final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("code",          "This is a code"));
@@ -108,6 +87,7 @@ public final class IdentifiedObjectTest extends TestCase {
     /**
      * Test {@link IdentifiedObject}.
      */
+    @Test
     public void testIdentifiedObject() {
         final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("name",             "This is a name"));
@@ -145,6 +125,7 @@ public final class IdentifiedObjectTest extends TestCase {
     /**
      * Test {@link AbstractReferenceSystem}.
      */
+    @Test
     public void testReferenceSystem() {
         final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("name",       "This is a name"));

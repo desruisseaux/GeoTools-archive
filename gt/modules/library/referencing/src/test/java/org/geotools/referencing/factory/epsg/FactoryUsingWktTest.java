@@ -18,10 +18,6 @@ package org.geotools.referencing.factory.epsg;
 import java.io.File;
 import java.util.Collection;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -33,6 +29,9 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests {@link FactoryUsingWKT}.
@@ -42,41 +41,17 @@ import org.geotools.referencing.NamedIdentifier;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class FactoryUsingWktTest extends TestCase {
+public final class FactoryUsingWktTest {
     /**
      * The factory to test.
      */
     private FactoryUsingWKT factory;
 
     /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FactoryUsingWktTest.class);
-    }
-
-    /**
-     * Run the test from the command line.
-     *
-     * @param args the command line arguments.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Creates a test case with the specified name.
-     */
-    public FactoryUsingWktTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Gets the authority factory for ESRI.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         factory = (FactoryUsingWKT) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
                 new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class));
     }
@@ -84,6 +59,7 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Tests the setting of "CRS authority extra directory" hint.
      */
+    @Test
     public void testCrsAuthorityExtraDirectoryHint() throws Exception {
         Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryUsingWKT.class);
         try {
@@ -102,6 +78,7 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Tests the authority code.
      */
+    @Test
     public void testAuthority(){
         final Citation authority = factory.getAuthority();
         assertNotNull(authority);
@@ -114,6 +91,7 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Tests the vendor.
      */
+    @Test
     public void testVendor(){
         final Citation vendor = factory.getVendor();
         assertNotNull(vendor);
@@ -123,6 +101,7 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Tests the {@code 18001} code.
      */
+    @Test
     public void test42101() throws FactoryException {
         CoordinateReferenceSystem actual, expected;
         expected = factory.createCoordinateReferenceSystem("42101");

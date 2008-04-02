@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -15,10 +15,8 @@
  */
 package org.geotools.referencing.wkt;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -28,31 +26,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SymbolsTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(SymbolsTest.class);
-    }
-    
-    /**
-     * Constructs a test case with the given name.
-     */
-    public SymbolsTest(final String name) {
-        super(name);
-    }
-
+public final class SymbolsTest {
     /**
      * Tests the {@link Symbols#containsAxis} method.
      */
+    @Test
     public void testContainsAxis() {
         final Symbols s = Symbols.DEFAULT;
         assertTrue("AXIS at the begining of a line.",

@@ -18,7 +18,7 @@ package org.geotools.factory;
 import java.util.Map;
 import java.util.Collections;
 import java.awt.RenderingHints;
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 
 /**
@@ -124,7 +124,7 @@ public interface DummyFactory extends InternalFactory {
         private Object value = Hints.VALUE_INTERPOLATION_BILINEAR;
 
         public Example5() {
-            Assert.fail("The constructor with Hints argument should have been used.");
+            fail("The constructor with Hints argument should have been used.");
         }
 
         public Example5(Hints hints) {

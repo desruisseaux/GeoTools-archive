@@ -19,9 +19,8 @@ package org.geotools.util;
 import java.util.HashSet;
 import java.util.Random;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,32 +30,12 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CanonicalSetTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CanonicalSetTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public CanonicalSetTest(final String name) {
-        super(name);
-    }
-
+public final class CanonicalSetTest {
     /**
      * Tests the {@link CanonicalSet} using strong references.
      * The tested {@link CanonicalSet} should behave like a standard {@link Set} object.
      */
+    @Test
     public void testStrongReferences() {
         final Random random = new Random();
         for (int pass=0; pass<20; pass++) {
@@ -96,6 +75,7 @@ public final class CanonicalSetTest extends TestCase {
      * In this test, we have to keep in mind than some elements
      * in <code>weakSet</code> may disaspear at any time!
      */
+    @Test
     public void testWeakReferences() throws InterruptedException {
         final Random random = new Random();
         for (int pass=0; pass<2; pass++) {

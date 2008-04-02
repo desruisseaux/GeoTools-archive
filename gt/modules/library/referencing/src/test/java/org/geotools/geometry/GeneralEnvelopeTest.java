@@ -15,10 +15,10 @@
  */
 package org.geotools.geometry;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.opengis.geometry.DirectPosition;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -28,31 +28,11 @@ import org.opengis.geometry.DirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeneralEnvelopeTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeneralEnvelopeTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GeneralEnvelopeTest(final String name) {
-        super(name);
-    }
-
+public final class GeneralEnvelopeTest {
     /**
      * Tests {@link GeneralEnvelope#equals} method.
      */
+    @Test
     public void testEquals() {
         /*
          * Initialize an empty envelope. The new envelope is empty

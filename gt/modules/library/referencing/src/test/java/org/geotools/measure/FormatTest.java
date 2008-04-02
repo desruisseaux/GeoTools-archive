@@ -22,11 +22,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
@@ -36,7 +31,9 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
-import org.geotools.resources.Arguments;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -46,34 +43,11 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class FormatTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        args = arguments.getRemainingArguments(0);
-        Locale.setDefault(arguments.locale);
-        TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FormatTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public FormatTest(final String name) {
-        super(name);
-    }
-
+public final class FormatTest {
     /**
      * Test {@link AngleFormat}.
      */
+    @Test
     public void testAngleFormat() throws ParseException {
         AngleFormat f = new AngleFormat("DD.ddd\u00B0", Locale.CANADA);
         assertFormat( "20.000\u00B0",  new Angle   ( 20.000), f);
@@ -112,6 +86,7 @@ public final class FormatTest extends TestCase {
     /**
      * Tests formatting of a 4-dimensional coordinates.
      */
+    @Test
     public void testCoordinateFormat() {
         final Date epoch = new Date(1041375600000L); // January 1st, 2003
         final DefaultTemporalDatum datum = new DefaultTemporalDatum("Time", epoch);

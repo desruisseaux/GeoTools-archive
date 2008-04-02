@@ -16,9 +16,9 @@
 package org.geotools.util.logging;
 
 import java.util.logging.Level;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,32 +29,12 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class LoggingAdapterTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(LoggingAdapterTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public LoggingAdapterTest(final String name) {
-        super(name);
-    }
-
+public final class LoggingAdapterTest {
     /**
      * Tests the {@link LoggerAdapter#log(Level,String)} method.
      * This is of special interest because of the switch cases used in implementation.
      */
+    @Test
     public void testLog() {
         final DummyLogger logger = new DummyLogger();
         final Object[] levels = new Object[] {

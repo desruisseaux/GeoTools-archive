@@ -15,13 +15,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// JUnit dependencies
-import junit.framework.AssertionFailedError;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -31,12 +24,13 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.resources.Arguments;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -51,61 +45,38 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Rueben Schulz
  */
-public final class DirectCreationTest extends TestCase {
+public final class DirectCreationTest {
     /**
      * Set to {@code true} for printing some informations to standard output while
      * performing tests. Consider this field as constants after the application launch.
      */
     private static boolean VERBOSE = false;
-    
+
     /** Tolerance for test when units are degrees. */
     private final static double[] TOL_DEG = {1E-6, 1E-6};
-    
+
     /** Tolerance for test when units are metres. */
     private final static double[] TOL_M = {1E-2, 1E-2};
-    
+
     /** factory to use to create projection transforms*/
     private MathTransformFactory mtFactory;
 
     /**
-     * Constructs a test with the given name.
-     */
-    public DirectCreationTest(final String name) {
-        super(name);
-    }
-    
-    /**
-     * Uses reflection to dynamically create a test suite containing all 
-     * the {@code testXXX()} methods - from the JUnit FAQ.
-     */
-    public static Test suite() {
-        return new TestSuite(DirectCreationTest.class);
-    }
-    
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(final String args[]) {
-        final Arguments arguments = new Arguments(args);
-        VERBOSE = arguments.getFlag("-verbose");
-        arguments.getRemainingArguments(0);
-        junit.textui.TestRunner.run(suite());
-    }
-    
-    /**
      * Set up common objects used by all tests.
      */
-    protected void setUp() {
+    @Before
+    public void setUp() {
         mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
     }
-    
+
     /**
      * Release common objects used by all tests.
      */
-    protected void tearDown() {
+    @After
+    public void tearDown() {
         mtFactory = null;
     }
-    
+
     /**
      * Check if two coordinate points are equals, in the limits of the specified
      * tolerance vector.
@@ -115,12 +86,10 @@ public final class DirectCreationTest extends TestCase {
      * @param tolerance The tolerance vector. If this vector length is smaller than the number
      *                  of dimension of <code>actual</code>, then the last tolerance value will
      *                  be reused for all extra dimensions.
-     * @throws AssertionFailedError If the actual point is not equals to the expected point.
      */
-    private static void assertEquals(final DirectPosition expected,
-                                     final DirectPosition actual,
-                                     final double[]       tolerance)
-            throws AssertionFailedError
+    private static void assertPositionEquals(final DirectPosition expected,
+                                             final DirectPosition actual,
+                                             final double[]       tolerance)
     {
         final int dimension = actual.getDimension();
         final int lastToleranceIndex = tolerance.length-1;
@@ -132,7 +101,7 @@ public final class DirectCreationTest extends TestCase {
                          tolerance[Math.min(i, lastToleranceIndex)]);
         }
     }
-    
+
     /**
      * Helper method to test transform from a source to a target point.
      * Coordinate points are (x,y) or (long, lat)
@@ -140,7 +109,7 @@ public final class DirectCreationTest extends TestCase {
     private static void doTransform(DirectPosition source,
                                     DirectPosition target,
                                     MathTransform transform)
-            throws TransformException 
+            throws TransformException
     {
         doTransform(source, target, transform, TOL_M);
     }
@@ -151,31 +120,32 @@ public final class DirectCreationTest extends TestCase {
      */
     private static void doTransform(DirectPosition source,   DirectPosition target,
                                     MathTransform transform, final double[] tolerance)
-            throws TransformException 
+            throws TransformException
     {
         DirectPosition calculated;
         calculated = transform.transform(source, null);
-        assertEquals(target, calculated, tolerance);
-        
-        //the inverse
+        assertPositionEquals(target, calculated, tolerance);
+
+        // The inverse
         target = source;
         source = calculated;
         calculated = transform.inverse().transform(source, null);
-        assertEquals(target, calculated, TOL_DEG);
+        assertPositionEquals(target, calculated, TOL_DEG);
     }
-    
+
     /**
      * Print parameters for the specified projection.
      * Used to see the if parameters for a transform are correct.
      */
     private void printParameters(final String proj) throws NoSuchIdentifierException {
         final ParameterValueGroup values = mtFactory.getDefaultParameters(proj);
-        ParameterWriter.print((ParameterDescriptorGroup) values.getDescriptor());
+        ParameterWriter.print(values.getDescriptor());
     }
 
     /**
      * Some tests for the Equidistant Cylindrical projection.
      */
+    @Test
     public void testEquidistantCylindrical() throws FactoryException, TransformException {
 
         ///////////////////////////////////////
@@ -206,8 +176,9 @@ public final class DirectCreationTest extends TestCase {
     /**
      * Some tests for the Mercator Projection.
      */
+    @Test
     public void testMercator() throws FactoryException, TransformException {
-        
+
         ///////////////////////////////////////
         // Mercator_1SP tests                //
         ///////////////////////////////////////
@@ -231,7 +202,7 @@ public final class DirectCreationTest extends TestCase {
         }
         doTransform(new DirectPosition2D(120.0, -3.0),
                     new DirectPosition2D(5009726.58, 569150.82), transform);
-        
+
         //spherical test (Snyder p. 266)
         params.parameter("semi_major")      .setValue(   1.0);
         params.parameter("semi_minor")      .setValue(   1.0);
@@ -245,7 +216,7 @@ public final class DirectCreationTest extends TestCase {
         }
         doTransform(new DirectPosition2D(-75.0, 35.0),
                     new DirectPosition2D(1.8325957, 0.6528366), transform);
-        
+
         //spherical test 2 (original units for target were feet)
         params.parameter("semi_major")      .setValue(6370997.0);
         params.parameter("semi_minor")      .setValue(6370997.0);
@@ -274,8 +245,8 @@ public final class DirectCreationTest extends TestCase {
         }
         doTransform(new DirectPosition2D(4.999999999999999,26.996561536844165),
                     new DirectPosition2D(173029.94823812644, 2448819.342941506), transform);
-        
-        
+
+
         ///////////////////////////////////////
         // Mercator_2SP tests                //
         ///////////////////////////////////////
@@ -296,7 +267,7 @@ public final class DirectCreationTest extends TestCase {
         }
         doTransform(new DirectPosition2D(53.0, 53.0),
                     new DirectPosition2D(165704.29, 5171848.07), transform);
-        
+
         //a spherical case (me)
         params = mtFactory.getDefaultParameters("Mercator_2SP");
         params.parameter("semi_major")         .setValue( 6370997.0);
@@ -311,12 +282,13 @@ public final class DirectCreationTest extends TestCase {
         }
         doTransform(new DirectPosition2D(-123.1, 49.2166666666),
                     new DirectPosition2D(2663494.1734, 2152319.9230), transform);
-        
+
     }
 
     /**
      * Some tests for the Oblique Mercator Projection.
      */
+    @Test
     public void testObliqueMercator() throws FactoryException, TransformException {
         if (VERBOSE) {
             printParameters("Oblique Mercator");
@@ -359,10 +331,11 @@ public final class DirectCreationTest extends TestCase {
         params.parameter("false_northing")      .setValue(200000.0);
         params.parameter("rectified_grid_angle").setValue(90.0);
     }
-    
+
     /**
      * Some tests for the Lambert Conic Conformal Projection.
      */
+    @Test
     public void testLambert() throws FactoryException, TransformException {
 
         ///////////////////////////////////////
@@ -386,10 +359,10 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
-        }    
+        }
         doTransform(new DirectPosition2D(-76.943683333, 17.932166666),
                     new DirectPosition2D(255966.58, 142493.51), transform);
-        
+
         //Spherical (me)
         params.parameter("semi_major")        .setValue(6370997.0);
         params.parameter("semi_minor")        .setValue(6370997.0);
@@ -401,17 +374,17 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform.toString());
-        }    
+        }
         doTransform(new DirectPosition2D(151.283333333, -33.916666666),
                     new DirectPosition2D(4232963.1816, 2287639.9866), transform);
-        
-        
+
+
         ///////////////////////////////////////
         // Lambert_Conformal_Conic_2SP tests //
         ///////////////////////////////////////
         if (VERBOSE) {
             printParameters("Lambert_Conformal_Conic_2SP");
-        }        
+        }
         //EPSG p. 17
         params = mtFactory.getDefaultParameters("Lambert_Conformal_Conic_2SP");
         params.parameter("semi_major")         .setValue(6378206.4);
@@ -425,10 +398,10 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
-        }    
+        }
         doTransform(new DirectPosition2D(-96.0, 28.5),
                     new DirectPosition2D(903277.7965, 77650.94219), transform);
-        
+
         //Spherical (me)
         params.parameter("semi_major")         .setValue(6370997.0);
         params.parameter("semi_minor")         .setValue(6370997.0);
@@ -441,10 +414,10 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
-        }    
+        }
         doTransform(new DirectPosition2D(139.733333333, 35.6833333333),
                     new DirectPosition2D(-6789805.6471, 7107623.6859), transform);
-        
+
         //1SP where SP != lat of origin (me)
         params.parameter("semi_major")         .setValue(6378137.0);
         params.parameter("semi_minor")         .setValue(6356752.31424518);
@@ -457,17 +430,17 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
-        }    
+        }
         doTransform(new DirectPosition2D(18.45, -33.9166666666),
                     new DirectPosition2D(1803288.3324, 1616657.7846), transform);
-        
-        
+
+
         ///////////////////////////////////////////////
         // Lambert_Conformal_Conic_2SP_Belgium test  //
         ///////////////////////////////////////////////
         if (VERBOSE) {
             printParameters("Lambert_Conformal_Conic_2SP_Belgium");
-        }    
+        }
         //epsg p. 19
         params = mtFactory.getDefaultParameters("Lambert_Conformal_Conic_2SP_Belgium");
         params.parameter("semi_major")         .setValue(6378388.0);
@@ -481,14 +454,15 @@ public final class DirectCreationTest extends TestCase {
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
-        }    
+        }
         doTransform(new DirectPosition2D(5.807370277, 50.6795725),
                     new DirectPosition2D(251763.20, 153034.13), transform);
     }
-    
+
     /**
      * Some tests for Krovak Projection.
      */
+    @Test
     public void testKrovak() throws FactoryException, TransformException {
 
         ///////////////////////////////////////
@@ -496,10 +470,10 @@ public final class DirectCreationTest extends TestCase {
         ///////////////////////////////////////
         if (VERBOSE) {
             printParameters("Krovak");
-        }        
+        }
         MathTransform transform;
         ParameterValueGroup params;
-        
+
         params = mtFactory.getDefaultParameters("Krovak");
         params.parameter("semi_major")                .setValue(6377397.155);
         params.parameter("semi_minor")                .setValue(6356078.963);
@@ -519,6 +493,7 @@ public final class DirectCreationTest extends TestCase {
     /**
      * Some tests for Stereographic projection.
      */
+    @Test
     public void testStereographic() throws FactoryException, TransformException {
 
         ///////////////////////////////////////
@@ -529,7 +504,7 @@ public final class DirectCreationTest extends TestCase {
         }
         MathTransform transform;
         ParameterValueGroup params;
-        
+
         //
         // http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html
         //

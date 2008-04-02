@@ -15,10 +15,8 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies and extensions
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,16 +25,9 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
@@ -55,7 +46,6 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 import org.opengis.util.ScopedName;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.DatumAliases;
 import org.geotools.referencing.factory.ReferencingObjectFactory;
@@ -66,7 +56,9 @@ import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.operation.projection.MapProjection;
-import org.geotools.resources.Arguments;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -76,32 +68,17 @@ import org.geotools.resources.Arguments;
  * @source $URL$
  * @version $Id$
  */
-public final class FactoriesTest extends TestCase {
+public final class FactoriesTest {
     /**
-     * The output stream. Will be overwriten by the {@link #main}
-     * if the test is run from the command line.
+     * The output stream. Can be redirected to the standard output stream for debugging.
      */
     private static PrintWriter out = new PrintWriter(new StringWriter());
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FactoriesTest.class);
-    }
-
-    /**
-     * Creates a new instance of <code>FactoriesTest</code>
-     */
-    public FactoriesTest(final String name) {
-        super(name);
-    }
 
     /**
      * Convenience method creating a map with only the "name" property.
      * This is the only mandatory property for object creation.
      */
-    private static Map name(final String name) {
+    private static Map<String,?> name(final String name) {
         return Collections.singletonMap("name", name);
     }
 
@@ -110,6 +87,7 @@ public final class FactoriesTest extends TestCase {
      *
      * @throws FactoryException if a coordinate reference system can't be created.
      */
+    @Test
     public void testCreation() throws FactoryException {
         out.println();
         out.println("Testing CRS creations");
@@ -203,6 +181,7 @@ public final class FactoriesTest extends TestCase {
     /**
      * Tests all map projection creation.
      */
+    @Test
     public void testMapProjections() throws FactoryException {
         out.println();
         out.println("Testing classification names");
@@ -256,6 +235,7 @@ public final class FactoriesTest extends TestCase {
      * Tests datum aliases. Note: ellipsoid and prime meridian are dummy values just
      * (not conform to the usage in real world) just for testing purpose.
      */
+    @Test
     public void testDatumAliases() throws FactoryException {
         final String           name0 = "Nouvelle Triangulation Francaise (Paris)";
         final String           name1 = "Nouvelle_Triangulation_Francaise_Paris";
@@ -309,25 +289,5 @@ public final class FactoriesTest extends TestCase {
         assertTrue (AbstractIdentifiedObject.nameMatches(datum, "WGS_1984"));
         assertTrue (AbstractIdentifiedObject.nameMatches(datum, "World Geodetic System 1984"));
         assertFalse(AbstractIdentifiedObject.nameMatches(datum, "WGS 72"));
-    }
-
-    /**
-     * Run the test from the command line.
-     * Options: {@code -verbose}.
-     *
-     * @param args the command line arguments.
-     */
-    public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        if (arguments.getFlag("-verbose")) try {
-            out = arguments.out;
-            final FactoriesTest test = new FactoriesTest(null);
-            test.testCreation();
-            test.testMapProjections();
-        } catch (FactoryException exception) {
-            exception.printStackTrace(arguments.err);
-        } else {
-            junit.textui.TestRunner.run(suite());
-        }
     }
 }

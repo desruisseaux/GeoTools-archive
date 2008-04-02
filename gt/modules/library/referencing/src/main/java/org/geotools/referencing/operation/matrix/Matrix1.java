@@ -175,6 +175,13 @@ public class Matrix1 implements XMatrix, Serializable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean epsilonEquals(final Matrix matrix, final double tolerance) {
+        return GeneralMatrix.epsilonEquals(this, matrix, tolerance);
+    }
+
+    /**
      * Returns {@code true} if the specified object is of type {@code Matrix1} and
      * all of the data members are equal to the corresponding data members in this matrix.
      */

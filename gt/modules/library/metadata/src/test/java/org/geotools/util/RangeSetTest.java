@@ -15,9 +15,8 @@
  */
 package org.geotools.util;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -27,31 +26,11 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Andrea Aime
  */
-public final class RangeSetTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(RangeSetTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public RangeSetTest(final String name) {
-        super(name);
-    }
-
+public final class RangeSetTest {
     /**
      * Tests {@link RangeSet#remove}.
      */
+    @Test
     public void testRangeRemoval() {
         RangeSet rs = new RangeSet(Double.class);
         rs.add(10.0, 22.0);

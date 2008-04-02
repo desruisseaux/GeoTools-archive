@@ -16,13 +16,13 @@
 package org.geotools.metadata;
 
 import java.util.Collection;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.opengis.metadata.quality.ConformanceResult;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -32,32 +32,12 @@ import org.opengis.metadata.quality.ConformanceResult;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CitationsTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CitationsTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public CitationsTest(final String name) {
-        super(name);
-    }
-
+public final class CitationsTest {
     /**
      * Tests the {@link AbstractMetadata#toString()} method first, since debugging
      * will relying a lot on this method for the remaining of the test suite.
      */
+    @Test
     public void testToString() {
         final String text = Citations.EPSG.toString();
         /*
@@ -72,6 +52,7 @@ public class CitationsTest extends TestCase {
     /**
      * Makes sure that {@link Citations} constants are immutables.
      */
+    @Test
     public void testCitation() {
         assertEquals ("Identity comparaison", Citations.EPSG, Citations.EPSG);
         assertNotSame(Citations.EPSG, Citations.OGC);
@@ -93,6 +74,7 @@ public class CitationsTest extends TestCase {
     /**
      * Tests {@link PositionalAccuracyImpl} constants.
      */
+    @Test
     public void testPositionalAccuracy() {
         assertEquals("Identity comparaison",
                      PositionalAccuracyImpl.DATUM_SHIFT_APPLIED,

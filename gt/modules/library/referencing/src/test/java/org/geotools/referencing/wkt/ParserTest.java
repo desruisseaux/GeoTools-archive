@@ -23,10 +23,6 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -34,13 +30,15 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransform;
 
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.TestScript;
+import org.geotools.referencing.TestScriptRunner;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.test.TestData;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -52,31 +50,11 @@ import org.geotools.test.TestData;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class ParserTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ParserTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public ParserTest(final String name) {
-        super(name);
-    }
-
+public final class ParserTest {
     /**
      * Test a hard coded version of a WKT. This is more convenient for debugging.
      */
+    @Test
     public void testHardCoded() throws ParseException {
         final Parser parser = new Parser();
         String              wkt1, wkt2;
@@ -247,6 +225,7 @@ public final class ParserTest extends TestCase {
     /**
      * Tests the Oracle variant of WKT.
      */
+    @Test
     public void testOracleWKT() throws ParseException {
         final String wkt =
                 "PROJCS[\"Datum 73 / Modified Portuguese Grid\"," +
@@ -282,6 +261,7 @@ public final class ParserTest extends TestCase {
      * Tests parsing with custom axis length. At the difference of the previous test,
      * the WKT formatting in this test should include the axis length as parameter values.
      */
+    @Test
     public void testCustomAxisLength() throws FactoryException, ParseException {
         DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
         ParameterValueGroup parameters = factory.getDefaultParameters("Lambert_Conformal_Conic_2SP");
@@ -313,6 +293,7 @@ public final class ParserTest extends TestCase {
     /**
      * Tests parsing of math transforms.
      */
+    @Test
     public void testMathTransform() throws IOException, ParseException {
         testParsing(new MathTransformParser(), "wkt/MathTransform.txt");
     }
@@ -320,6 +301,7 @@ public final class ParserTest extends TestCase {
     /**
      * Tests parsing of coordinate reference systems.
      */
+    @Test
     public void testCoordinateReferenceSystem() throws IOException, ParseException {
         testParsing(new Parser(), "wkt/CoordinateReferenceSystem.txt");
     }
@@ -332,7 +314,7 @@ public final class ParserTest extends TestCase {
     private void testParsing(final AbstractParser parser, final String filename)
             throws IOException, ParseException
     {
-        final BufferedReader reader = TestData.openReader(TestScript.class, filename);
+        final BufferedReader reader = TestData.openReader(TestScriptRunner.class, filename);
         if (reader == null) {
             throw new FileNotFoundException(filename);
         }

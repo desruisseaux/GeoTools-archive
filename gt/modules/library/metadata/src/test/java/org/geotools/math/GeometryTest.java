@@ -22,9 +22,8 @@ import java.awt.geom.Point2D;
 import java.util.Random;
 import javax.vecmath.Point3d;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -34,36 +33,16 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class GeometryTest extends TestCase {
+public final class GeometryTest {
     /**
      * Tolerance factor for comparaisons.
      */
     private static final double EPS = 1E-8;
 
     /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeometryTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GeometryTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Tests {@link Line#setLine}.
      */
+    @Test
     public void testLine() {
         final Line line = new Line();
         line.setLine(new Point2D.Double(-2, 2), new Point2D.Double(8, 22));
@@ -99,6 +78,7 @@ public final class GeometryTest extends TestCase {
     /**
      * Tests {@link Line#isoscelesTriangleBase}.
      */
+    @Test
     public void testIsoscelesTriangleBase() {
         final Line test = new Line();
         test.setLine(new Point2D.Double(20,30), new Point2D.Double(80,95));
@@ -120,6 +100,7 @@ public final class GeometryTest extends TestCase {
     /**
      * Tests {@link Plane#setPlane} methods.
      */
+    @Test
     public void testPlaneFit() {
         final Random  rd = new Random(457821698762354L);
         final Plane plan = new Plane();
@@ -139,7 +120,7 @@ public final class GeometryTest extends TestCase {
             y[i] = 40 + 100*rd.nextDouble();
             z[i] = plan.z(x[i], y[i]) + 10*rd.nextDouble()-5;
         }
-        final Plane copy = (Plane) plan.clone();
+        final Plane copy = plan.clone();
         final double eps = 1E-2; // We do expect some difference, but not much more than that.
         assertEquals("c",  copy.c,  plan.c,  eps);
         assertEquals("cx", copy.cx, plan.cx, eps);

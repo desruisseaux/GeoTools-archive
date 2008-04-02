@@ -18,11 +18,9 @@ package org.geotools.util.logging;
 
 import java.util.logging.Logger;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.geotools.resources.Arguments;
+import org.junit.*;
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 
 /**
@@ -32,48 +30,15 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class MonolineFormatterTest extends TestCase {
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(MonolineFormatterTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public MonolineFormatterTest(final String name) {
-        super(name);
-    }
-
-    /**
-     * Set to {@code true} if this is run has a JUnit test
-     * (i.e. not from the command line).
-     */
-    private static boolean runFromJUnit;
-
-    /**
-     * Set up common objects used for all tests. This initialization is performed by
-     * JUnit, but is <strong>not</strong> performed when the test is run from the
-     * command line. Instead, the initialization on command line is controled by
-     * the optional "-init" argument.
-     */
-    @Override
-    protected void setUp() throws Exception {
-        runFromJUnit = true;
-        super.setUp();
-        Logging.GEOTOOLS.forceMonolineConsoleOutput();
-    }
-
+public final class MonolineFormatterTest {
     /**
      * Run the test. This is only a visual test.
+     * This test is disabled by default in order to avoid polluting the output stream with logs
+     * during Maven builds.
      */
+    @Test
+    @Ignore
     public void testInitialization() {
-        if (runFromJUnit) {
-            // Avoid polluting the output stream during JUnit tests.
-            return;
-        }
         final String[] namespaces = {
             "org.geotools.core",
             "org.geotools.resources",
@@ -92,17 +57,5 @@ public final class MonolineFormatterTest extends TestCase {
             logger.fine   ("This is a detailed (but useless) message\nWe log this one on two lines!");
             logger.finer  ("This is a debug message");
         }
-    }
-
-    /**
-     * Run the test from the commande line.
-     */
-    public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        if (arguments.getFlag("-init")) {
-            Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        }
-        arguments.getRemainingArguments(0);
-        new MonolineFormatterTest(null).testInitialization();
     }
 }

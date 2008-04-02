@@ -16,20 +16,14 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import javax.units.SI;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
-
-// Geotools dependencies
 import org.geotools.referencing.CRS;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -38,31 +32,11 @@ import org.geotools.referencing.CRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultCartesianCSTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(DefaultCartesianCSTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public DefaultCartesianCSTest(final String name) {
-        super(name);
-    }
-
+public final class DefaultCartesianCSTest {
     /**
      * Tests the creation of a cartesian CS with legal and illegal axis.
      */
+    @Test
     public void testAxis() {
         DefaultCartesianCS cs;
         try {
@@ -115,6 +89,7 @@ public class DefaultCartesianCSTest extends TestCase {
      * Tests {@link AbstractCS#standard} with cartesian CS, especially
      * the ones that leads to the creation of right-handed CS.
      */
+    @Test
     public void testStandard() {
         // ----------- Axis to test ------ Expected axis --
         assertOrdered("East", "North",    "East", "North");

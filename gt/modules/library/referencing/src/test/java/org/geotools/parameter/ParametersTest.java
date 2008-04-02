@@ -34,10 +34,6 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
@@ -54,6 +50,9 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests the <code>org.geotools.parameter</code> package.
@@ -62,33 +61,13 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class ParametersTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ParametersTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public ParametersTest(String testName) {
-        super(testName);
-    }
-
+public final class ParametersTest {
     /**
      * Tests integer and floating point values in a wide range of values. Some on those
      * values are cached (e.g. 0, 90, 360) because frequently used. It should be transparent
      * to the user. Test also unit conversions (degrees to radians in this case).
      */
+    @Test
     public void testSequence() {
         for (int i=-1000; i<=1000; i++) {
             assertEquals("new (Integer, ...)", i, new Parameter("Integer", i          ).intValue());
@@ -103,6 +82,7 @@ public final class ParametersTest extends TestCase {
      * Creates a parameter bounded by some range of integer numbers, and tests values
      * inside and outside this range. Tests also the uses of values of the wrong type.
      */
+    @Test
     public void testRangeIntegers() {
         Parameter<Integer> param;
         param = new Parameter(new DefaultParameterDescriptor("Range", 15, -30, +40));
@@ -139,6 +119,7 @@ public final class ParametersTest extends TestCase {
      * Creates a parameter bounded by some range of floating point numbers, and tests values
      * inside and outside this range. Tests also the uses of values of the wrong types.
      */
+    @Test
     public void testRangeDoubles() {
         Parameter<Double> param;
         param = new Parameter(new DefaultParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
@@ -176,6 +157,7 @@ public final class ParametersTest extends TestCase {
      * new code list. This operation should fails if the new code list is created after the
      * parameter.
      */
+    @Test
     public void testCodeList() {
         Parameter<AxisDirection> param = new Parameter("Test", AxisDirection.DISPLAY_UP);
         ParameterDescriptor op = param.getDescriptor();
@@ -207,6 +189,7 @@ public final class ParametersTest extends TestCase {
     /**
      * Test {@link DefaultParameterDescriptor} construction.
      */
+    @Test
     public void testParameterDescriptor() {
         ParameterDescriptor<Double> descriptor;
         ParameterValue<Double>      parameter;
@@ -216,7 +199,7 @@ public final class ParametersTest extends TestCase {
         assertEquals("name",         "Test",       descriptor.getName().getCode());
         assertEquals("unit",         SI.METER,     descriptor.getUnit());
         assertEquals("class",        Double.class, descriptor.getValueClass());
-        assertEquals("defaultValue", 12.0,         descriptor.getDefaultValue());
+        assertEquals("defaultValue", 12.0,         descriptor.getDefaultValue().doubleValue(), 0.0);
         assertEquals("minimum",       4.0,         descriptor.getMinimumValue());
         assertEquals("maximum",      20.0,         descriptor.getMaximumValue());
         assertEquals("value",        12,           parameter.intValue());
@@ -265,6 +248,7 @@ public final class ParametersTest extends TestCase {
     /**
      * Test {@link Parameter} construction.
      */
+    @Test
     public void testParameterValue() throws IOException, ClassNotFoundException {
         Parameter<?>           parameter;
         ParameterDescriptor<?> descriptor;
@@ -344,6 +328,7 @@ public final class ParametersTest extends TestCase {
     /**
      * Test parameter values group.
      */
+    @Test
     @SuppressWarnings("serial")
     public void testGroup() throws IOException {
         final ParameterWriter writer = new ParameterWriter(new StringWriter());
@@ -675,6 +660,7 @@ public final class ParametersTest extends TestCase {
     /**
      * Test WKT formatting of transforms backed by matrix.
      */
+    @Test
     public void testMatrix() {
         final Formatter  formatter = new Formatter();
         final GeneralMatrix matrix = new GeneralMatrix(4);
@@ -705,7 +691,8 @@ public final class ParametersTest extends TestCase {
     /**
      * Tests the storage of matrix parameters.
      */
-    public void textMatrixEdit() {
+    @Test
+    public void testMatrixEdit() {
         final int size = 8;
         final Random random = new Random(47821365);
         final GeneralMatrix matrix = new GeneralMatrix(size);
@@ -724,7 +711,7 @@ public final class ParametersTest extends TestCase {
                 parameters.setMatrix(copy);
                 assertEquals("height", height, ((Parameter) parameters.parameter("num_row")).intValue());
                 assertEquals("width",  width,  ((Parameter) parameters.parameter("num_col")).intValue());
-                assertEquals("equals", copy,   parameters.getMatrix());
+                assertTrue  ("equals", copy.epsilonEquals(parameters.getMatrix(), 0));
                 assertEquals("equals", parameters, parameters.clone());
             }
         }

@@ -16,13 +16,10 @@
  */
 package org.geotools.referencing.factory;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -32,31 +29,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class URN_ParserTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(URN_ParserTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public URN_ParserTest(final String name) {
-        super(name);
-    }
-
+public final class URN_ParserTest {
     /**
      * Tests the main types.
      */
+    @Test
     public void testMainTypes() {
         assertEquals("crs",                 URN_Type.MAIN[0].name);
         assertEquals("datum",               URN_Type.MAIN[1].name);
@@ -67,6 +44,7 @@ public final class URN_ParserTest extends TestCase {
     /**
      * Parses a valid URN.
      */
+    @Test
     public void testParse() throws NoSuchAuthorityCodeException {
         final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:6.11.2:4326");
         assertEquals("crs",       parser.type.name);
@@ -79,6 +57,7 @@ public final class URN_ParserTest extends TestCase {
     /**
      * Parses a valid URN without version.
      */
+    @Test
     public void testParseWithoutVersion() throws NoSuchAuthorityCodeException {
         final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:4326");
         assertEquals("crs",       parser.type.name);
@@ -91,6 +70,7 @@ public final class URN_ParserTest extends TestCase {
     /**
      * Parses an invalid URN.
      */
+    @Test
     public void testInvalidParse() {
         final String urn = "urn:ogcx:def:CRS:EPSG:6.8:4326";
         try {
@@ -105,6 +85,7 @@ public final class URN_ParserTest extends TestCase {
     /**
      * Parses a URN with an unknow type.
      */
+    @Test
     public void testInvalidType() {
         final String urn = "urn:ogc:def:dummy:EPSG:6.8:4326";
         try {

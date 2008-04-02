@@ -26,12 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.units.SI;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.util.GenericName;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -43,6 +38,9 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests <cite>Well Know Text</cite> (WKT) formatting for some hard-coded, predefined objects.
@@ -51,31 +49,11 @@ import org.geotools.referencing.datum.DefaultVerticalDatum;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class PredefinedObjectsTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(PredefinedObjectsTest.class);
-    }
-
-    /**
-     * Construct a test case.
-     */
-    public PredefinedObjectsTest(String testName) {
-        super(testName);
-    }
-
+public final class PredefinedObjectsTest {
     /**
      * Tests {@link DefaultCoordinateSystemAxis} constants.
      */
+    @Test
     public void testAxis() {
         // Test Well Know Text
         assertEquals("x",         "AXIS[\"x\", EAST]",         DefaultCoordinateSystemAxis.X        .toWKT(0));
@@ -112,6 +90,7 @@ public final class PredefinedObjectsTest extends TestCase {
     /**
      * Tests {@link AbstractCS}.
      */
+    @Test
     public void testCoordinateSystems() {
         // Test dimensions
         assertEquals("Cartesian 2D",   2, DefaultCartesianCS  .PROJECTED  .getDimension());
@@ -125,6 +104,7 @@ public final class PredefinedObjectsTest extends TestCase {
     /**
      * Test {@link AbstractDatum} and well-know text formatting.
      */
+    @Test
     public void testDatum() {
         // WGS84 components and equalities
         assertEquals("Ellipsoid",     DefaultEllipsoid.WGS84,         DefaultGeodeticDatum.WGS84.getEllipsoid());
@@ -163,6 +143,7 @@ public final class PredefinedObjectsTest extends TestCase {
     /**
      * Tests {@link AbstractCRS}.
      */
+    @Test
     public void testCoordinateReferenceSystems() {
         // Test dimensions
         assertEquals("WGS84 2D", 2, DefaultGeographicCRS.WGS84   .getCoordinateSystem().getDimension());
@@ -182,6 +163,7 @@ public final class PredefinedObjectsTest extends TestCase {
     /**
      * Test serialization of various objects.
      */
+    @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         serialize(DefaultCoordinateSystemAxis.X);
         serialize(DefaultCoordinateSystemAxis.GEOCENTRIC_X);

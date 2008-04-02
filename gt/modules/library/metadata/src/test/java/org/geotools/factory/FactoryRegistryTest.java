@@ -16,10 +16,10 @@
 package org.geotools.factory;
 
 import java.util.*;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.geotools.resources.LazySet;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,34 +29,13 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class FactoryRegistryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FactoryRegistryTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public FactoryRegistryTest(final String testName) {
-        super(testName);
-    }
-
+public final class FactoryRegistryTest {
     /**
      * Ensures that class {@link Hints} is loaded before {@link DummyFactory}.
      * It is not needed for normal execution, but Maven seems to mess with class loaders.
      */
-    @Override
-    protected void setUp() {
+    @Before
+    public void ensureHintsLoaded() {
         assertNotNull(Hints.DATUM_FACTORY.toString());
     }
 
@@ -115,6 +94,7 @@ public final class FactoryRegistryTest extends TestCase {
      *
      * Additionnaly, factory #1 uses a KEY_INTERPOLATION hint.
      */
+    @Test
     public void testGetProvider() {
         final Hints.Key    key      = DummyFactory.DUMMY_FACTORY;
         final DummyFactory factory1 = new DummyFactory.Example1();
@@ -229,6 +209,7 @@ public final class FactoryRegistryTest extends TestCase {
      * {@link #testGetProvider}. But now, those cases are expected to creates automatically
      * new factory instances instead of throwing an exception.
      */
+    @Test
     public void testCreateProvider() {
         final Hints.Key    key      = DummyFactory.DUMMY_FACTORY;
         final DummyFactory factory1 = new DummyFactory.Example1();

@@ -20,9 +20,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -32,32 +31,12 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class DisjointSetTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(DisjointSetTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public DisjointSetTest(final String name) {
-        super(name);
-    }
-
+public final class DisjointSetTest {
      /**
-      * Test the set.
+      * Tests the set.
       */
-     public void testDisjointSet() {
+    @Test
+    public void testDisjointSet() {
         DisjointSet<String> t1 = new DisjointSet<String>(true);
         DisjointSet<String> t2 = new DisjointSet<String>(t1);
         DisjointSet<String> t3 = new DisjointSet<String>(t2);

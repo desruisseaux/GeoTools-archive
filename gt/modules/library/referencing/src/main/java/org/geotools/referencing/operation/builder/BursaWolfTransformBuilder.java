@@ -15,20 +15,18 @@
  */
 package org.geotools.referencing.operation.builder;
 
-import org.geotools.referencing.datum.BursaWolfParameters;
-import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.geometry.MismatchedReferenceSystemException;
 
-// J2SE and extensions
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.operation.transform.GeocentricTranslation;
+
 import java.util.List;
-import javax.vecmath.MismatchedSizeException;
+import javax.vecmath.GMatrix;
 
 
 /**
@@ -84,15 +82,12 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
     /** Bursa Wolf scaling. */
     private double q = 1;
 
-/**
+    /**
      * Creates a BursaWolfTransformBuilder.
-     * 
-     * @param vectors list of {@linkplain
-     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
+     *
+     * @param vectors list of {@linkplain MappedPosition mapped positions}.
      */
-    public BursaWolfTransformBuilder(List <MappedPosition> vectors)
-        throws MismatchedSizeException, MismatchedDimensionException,
-            MismatchedReferenceSystemException {
+    public BursaWolfTransformBuilder(final List<MappedPosition> vectors) {
         super.setMappedPositions(vectors);
 
         x = new GeneralMatrix(vectors.size(), 3);
@@ -120,6 +115,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      * @return dimension for {@linkplain #getSourceCRS source} and {@link
      *         #getTargetCRS target} CRS, which is 2.
      */
+    @Override
     public int getDimension() {
         return 3;
     }
@@ -130,6 +126,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      *
      * @return coordinate system type
      */
+    @Override
     public Class <? extends CartesianCS> getCoordinateSystemType() {
         return CartesianCS.class;
     }
@@ -252,7 +249,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      *         with respect to  beta.
      */
     protected GeneralMatrix getDRbeta() {
-        //GeneralMatrix dRbeta = new GeneralMatrix(3 * sourcePoints.size(), 1);  
+        //GeneralMatrix dRbeta = new GeneralMatrix(3 * sourcePoints.size(), 1);
         GeneralMatrix dRb = new GeneralMatrix(3, 3);
         double[] m0 = { -Math.sin(beta), 0, -Math.cos(beta) };
         double[] m1 = { 0, 0, 0 };
@@ -380,7 +377,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
         GeneralMatrix A = new GeneralMatrix(3 * size, 7);
         GeneralMatrix DT = new GeneralMatrix(3, 3);
 
-        // the partial derivative with respect to dx,dy,dz. 
+        // the partial derivative with respect to dx,dy,dz.
         double[] m0 = { 1, 0, 0 };
         double[] m1 = { 0, 1, 0 };
         double[] m2 = { 0, 0, 1 };
@@ -438,7 +435,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
         // Matrix of coefficients claculated in previous iteration
         GeneralMatrix xOld = new GeneralMatrix(7, 1);
 
-        // diference between each steps of old iteration    	
+        // diference between each steps of old iteration
         GeneralMatrix dxMatrix = new GeneralMatrix(7, 1);
 
         GeneralMatrix zero = new GeneralMatrix(7, 1);
@@ -454,13 +451,13 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
             GeneralMatrix A = getA();
             GeneralMatrix l = getl();
 
-            GeneralMatrix AT = (GeneralMatrix) A.clone();
+            GeneralMatrix AT = A.clone();
             AT.transpose();
 
             GeneralMatrix ATA = new GeneralMatrix(7, 7);
             GeneralMatrix ATl = new GeneralMatrix(7, 1);
 
-            // dx = A^T * A  * A^T * l    	
+            // dx = A^T * A  * A^T * l
             ATA.mul(AT, A);
             ATA.invert();
             ATl.mul(AT, l);
@@ -481,7 +478,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
             q = xNew.getElement(6, 0);
 
             i++;
-        } while ((!dxMatrix.epsilonEquals(zero, tolerance) & (i < maxSteps)));
+        } while ((!dxMatrix.epsilonEquals((GMatrix) zero, tolerance) & (i < maxSteps)));
 
         xNew.transpose();
 

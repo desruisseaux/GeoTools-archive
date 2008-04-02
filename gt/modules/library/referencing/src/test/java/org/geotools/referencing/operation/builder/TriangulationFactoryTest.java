@@ -15,9 +15,6 @@
  */
 package org.geotools.referencing.operation.builder;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.geometry.DirectPosition;
 import java.util.ArrayList;
@@ -25,26 +22,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.*;
+import static org.junit.Assert.*;
 
-public class TriangulationFactoryTest extends TestCase {
-    
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(TriangulationFactoryTest.class);
 
-        return suite;
-    }
+public final class TriangulationFactoryTest {
     /**
      * Test (@link TringulationFactory).
      */
+    @Test
     public void testTringulationFactory() {
         DirectPosition sp1 = new DirectPosition2D(10, 10);
         DirectPosition tp1 = new DirectPosition2D(10, 10);
@@ -78,22 +64,19 @@ public class TriangulationFactoryTest extends TestCase {
             System.out.println(e.getMessage());
         }
     }
+    
     /**
-     * Test (@link TringulationFactory). Triangles are tested with delaunay test.
+     * Test (@link TriangulationFactory). Triangles are tested with delaunay test.
      */
+    @Test
     public void testDelaunay() throws TriangulationException {
-        // coordinates of quadrilateral for triangulation 
-        DirectPosition2D leftDown = new DirectPosition2D(100, 100);
-
+        // coordinates of quadrilateral for triangulation
+        DirectPosition2D leftDown  = new DirectPosition2D(100, 100);
         DirectPosition2D rightDown = new DirectPosition2D(200, 100);
+        DirectPosition2D rightTop  = new DirectPosition2D(200, 250);
+        DirectPosition2D leftTop   = new DirectPosition2D(100, 250);
 
-        DirectPosition2D rightTop = new DirectPosition2D(200, 250);
-
-        DirectPosition2D leftTop = new DirectPosition2D(100, 250);
-
-        // ArrayList vertices = new ArrayList();
-
-        // generator for points within the quadrilateral:        
+        // generator for points within the quadrilateral:
         Random randomCoord = new Random(872066443);
 
         // number of points
@@ -101,30 +84,22 @@ public class TriangulationFactoryTest extends TestCase {
         DirectPosition[] vertices = new DirectPosition[number];
 
         for (int i = 0; i < number; i++) {
-            double x = leftDown.x
-                + (randomCoord.nextDouble() * (rightDown.x - leftDown.x));
-            double y = leftDown.y
-                + (randomCoord.nextDouble() * (leftTop.y - leftDown.y));
+            double x = leftDown.x + (randomCoord.nextDouble() * (rightDown.x - leftDown.x));
+            double y = leftDown.y + (randomCoord.nextDouble() * (leftTop  .y - leftDown.y));
             vertices[i] = new DirectPosition2D(x, y);
         }
 
-        Quadrilateral quad = new Quadrilateral(leftDown, rightDown, rightTop,
-                leftTop);
+        Quadrilateral quad = new Quadrilateral(leftDown, rightDown, rightTop, leftTop);
 
         List<TINTriangle> triangles = new ArrayList<TINTriangle>();
 
-        try {
-            TriangulationFactory trigfac = new TriangulationFactory(quad,
-                    vertices);
-            triangles = trigfac.getTriangulation();
-        } catch (TriangulationException e) {
-            System.out.println(e.getMessage());
-        }
+        TriangulationFactory trigfac = new TriangulationFactory(quad, vertices);
+        triangles = trigfac.getTriangulation();
 
         int j = 1;
 
         for (Iterator<TINTriangle> i = triangles.iterator(); i.hasNext();) {
-            TINTriangle triangle = (TINTriangle) i.next();            
+            TINTriangle triangle = i.next();
 
             for (j = 0; j < vertices.length; j++) {
                 // Delunay Test - there are no vetrices in the CircumCicle

@@ -19,10 +19,6 @@ package org.geotools.referencing;
 import java.util.Set;
 import java.awt.geom.Rectangle2D;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
@@ -34,6 +30,9 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests the {@link CRS} utilities methods.
@@ -42,31 +41,11 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CrsTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CrsTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public CrsTest(String testName) {
-        super(testName);
-    }
-
+public final class CrsTest {
     /**
      * Tests the {@link CRS#getSupportedAuthorities} method.
      */
+    @Test
     public void testSupportedAuthorities() {
         final Set<String> withoutAlias = CRS.getSupportedAuthorities(false);
         assertTrue (withoutAlias.contains("CRS"));
@@ -86,14 +65,19 @@ public final class CrsTest extends TestCase {
     /**
      * Tests simple decode.
      */
+    @Test
     public void testDecode() throws FactoryException {
         assertSame(DefaultGeographicCRS.WGS84, CRS.decode("WGS84(DD)"));
     }
 
     /**
      * Tests an ESRI code.
+     *
+     * @todo Not yet working.
      */
-    public void XtestESRICode() throws Exception {
+    @Test
+    @Ignore
+    public void testESRICode() throws Exception {
         String wkt = "PROJCS[\"Albers_Conic_Equal_Area\",\n"                  +
                      "  GEOGCS[\"GCS_North_American_1983\",\n"                +
                      "    DATUM[\"D_North_American_1983\",\n"                 +
@@ -117,6 +101,7 @@ public final class CrsTest extends TestCase {
     /**
      * Tests the transformations of an envelope.
      */
+    @Test
     public void testEnvelopeTransformation() throws FactoryException, TransformException {
         String wkt = "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                  +
                      "  GEOGCS[\"GCS_North_American_1983\",\n"              +
@@ -154,6 +139,7 @@ public final class CrsTest extends TestCase {
      * Tests the transformations of a rectangle using a coordinate operation.
      * With assertions enabled, this also test the transformation of an envelope.
      */
+    @Test
     public void testTransformationOverPole() throws FactoryException, TransformException {
         String wkt = "PROJCS[\"WGS 84 / Antarctic Polar Stereographic\",\n"     +
                      "  GEOGCS[\"WGS 84\",\n"                                   +

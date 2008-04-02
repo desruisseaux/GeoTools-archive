@@ -16,10 +16,6 @@
  */
 package org.geotools.referencing.factory;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.geotools.factory.Hints;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
@@ -33,6 +29,9 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.factory.FactoryNotFoundException;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests the {@link URN_AuthorityFactory} class backed by WMS or AUTO factories.
@@ -41,31 +40,11 @@ import org.geotools.factory.FactoryNotFoundException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class URN_AuthorityFactoryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(URN_AuthorityFactoryTest.class);
-    }
-
-    /**
-     * Creates a suite of the given name.
-     */
-    public URN_AuthorityFactoryTest(final String name) {
-        super(name);
-    }
-
+public final class URN_AuthorityFactoryTest {
     /**
      * Make sure that a singleton instance is registered.
      */
+    @Test
     public void testRegistration() {
         String authority = "URN:OGC:DEF";
         final AuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, null);
@@ -84,6 +63,7 @@ public final class URN_AuthorityFactoryTest extends TestCase {
     /**
      * Tests the CRS factory.
      */
+    @Test
     public void testCRS() throws FactoryException {
         CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("URN:OGC:DEF", null);
         GeographicCRS crs;
@@ -114,6 +94,7 @@ public final class URN_AuthorityFactoryTest extends TestCase {
     /**
      * Tests fetching the URN authority when the "longitude first axis order" hint is set.
      */
+    @Test
     public void testWhenForceXY() throws FactoryException {
         try {
             Hints.putSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING, "http");

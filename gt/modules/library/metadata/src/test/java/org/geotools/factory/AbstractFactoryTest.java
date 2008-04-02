@@ -16,9 +16,9 @@
 package org.geotools.factory;
 
 import java.awt.RenderingHints;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,28 +29,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class AbstractFactoryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(AbstractFactoryTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public AbstractFactoryTest(final String testName) {
-        super(testName);
-    }
-
+public final class AbstractFactoryTest {
     /**
      * A key for testing purpose.
      */
@@ -69,6 +48,7 @@ public final class AbstractFactoryTest extends TestCase {
     /**
      * Tests {@link AbstractFactory#equals}.
      */
+    @Test
     public void testEquals() {
         final Key key1              = new Key(1 );
         final Key key2              = new Key(2 );

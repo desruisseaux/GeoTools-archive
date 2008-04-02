@@ -20,12 +20,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
 import org.opengis.metadata.citation.Citation;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.Citations;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -35,31 +36,11 @@ import org.geotools.metadata.iso.citation.Citations;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MetadataStandardTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(MetadataStandardTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public MetadataStandardTest(final String name) {
-        super(name);
-    }
-
+public final class MetadataStandardTest {
     /**
      * Tests the shallow equals and copy methods.
      */
+    @Test
     public void testEquals() {
         final MetadataStandard std = MetadataStandard.ISO_19115;
         Citation citation = Citations.EPSG;
@@ -84,6 +65,7 @@ public class MetadataStandardTest extends TestCase {
     /**
      * Tests the {@link PropertyMap} implementation.
      */
+    @Test
     public void testMap() {
         final Citation citation = new CitationImpl(Citations.EPSG);
         final Map<String,Object> map = MetadataStandard.ISO_19115.asMap(citation);

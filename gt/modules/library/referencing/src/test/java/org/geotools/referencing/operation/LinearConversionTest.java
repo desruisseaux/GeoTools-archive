@@ -19,9 +19,6 @@ package org.geotools.referencing.operation;
 import java.util.Random;
 import javax.units.SI;
 import javax.units.Unit;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -40,6 +37,10 @@ import org.geotools.referencing.operation.matrix.Matrix3;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 import static org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
+import static org.opengis.referencing.cs.AxisDirection.*;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -49,31 +50,11 @@ import static org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class LinearConversionTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(LinearConversionTest.class);
-    }
-
-    /**
-     * Constructs a test case.
-     */
-    public LinearConversionTest(String testName) {
-        super(testName);
-    }
-
+public final class LinearConversionTest {
     /**
      * Tests matrix inversion and multiplication using {@link Matrix2}.
      */
+    @Test
     public void testMatrix2() {
         final Matrix2 m = new Matrix2();
         assertTrue(m.isAffine());
@@ -89,22 +70,23 @@ public final class LinearConversionTest extends TestCase {
             final GeneralMatrix check = new GeneralMatrix(m);
             m.invert();
             check.invert();
-            assertTrue(check.epsilonEquals(new GeneralMatrix(m), 1E-9));
+            assertTrue(check.epsilonEquals(m, 1E-9));
             m.multiply(original);
-            assertTrue(identity.epsilonEquals(new GeneralMatrix(m), 1E-9));
+            assertTrue(identity.epsilonEquals(m, 1E-9));
         }
     }
 
     /**
      * Tests axis swapping using {@link GeneralMatrix}.
      */
+    @Test
     public void testAxisSwapping() {
-        AxisDirection[] srcAxis = {AxisDirection.NORTH, AxisDirection.EAST, AxisDirection.UP};
-        AxisDirection[] dstAxis = {AxisDirection.NORTH, AxisDirection.EAST, AxisDirection.UP};
+        AxisDirection[] srcAxis = {NORTH, EAST, UP};
+        AxisDirection[] dstAxis = {NORTH, EAST, UP};
         GeneralMatrix   matrix  = new GeneralMatrix(srcAxis, dstAxis);
         assertTrue(matrix.isAffine  ());
         assertTrue(matrix.isIdentity());
-        dstAxis = new AxisDirection[] {AxisDirection.WEST, AxisDirection.UP, AxisDirection.SOUTH};
+        dstAxis = new AxisDirection[] {WEST, UP, SOUTH};
         matrix  = new GeneralMatrix(srcAxis, dstAxis);
         assertTrue (matrix.isAffine  ());
         assertFalse(matrix.isIdentity());
@@ -114,7 +96,7 @@ public final class LinearConversionTest extends TestCase {
             {-1, 0, 0, 0},
             { 0, 0, 0, 1}
         }), matrix);
-        dstAxis = new AxisDirection[] {AxisDirection.DOWN, AxisDirection.NORTH};
+        dstAxis = new AxisDirection[] {DOWN, NORTH};
         matrix  = new GeneralMatrix(srcAxis, dstAxis);
         assertFalse(matrix.isIdentity());
         assertEquals(new GeneralMatrix(new double[][] {
@@ -122,7 +104,7 @@ public final class LinearConversionTest extends TestCase {
             {1, 0, 0, 0},
             {0, 0, 0, 1}
         }), matrix);
-        dstAxis = new AxisDirection[] {AxisDirection.DOWN, AxisDirection.DOWN};
+        dstAxis = new AxisDirection[] {DOWN, DOWN};
         matrix  = new GeneralMatrix(srcAxis, dstAxis);
         assertFalse(matrix.isIdentity());
         assertEquals(new GeneralMatrix(new double[][] {
@@ -130,7 +112,7 @@ public final class LinearConversionTest extends TestCase {
             {0, 0,-1, 0},
             {0, 0, 0, 1}
         }), matrix);
-        dstAxis = new AxisDirection[] {AxisDirection.DOWN, AxisDirection.GEOCENTRIC_X};
+        dstAxis = new AxisDirection[] {DOWN, GEOCENTRIC_X};
         try {
             matrix = new GeneralMatrix(srcAxis, dstAxis);
             fail();
@@ -138,7 +120,7 @@ public final class LinearConversionTest extends TestCase {
             // This is the expected exception (axis not in source).
         }
         srcAxis = dstAxis;
-        dstAxis = new AxisDirection[] {AxisDirection.NORTH, AxisDirection.EAST, AxisDirection.UP, AxisDirection.WEST};
+        dstAxis = new AxisDirection[] {NORTH, EAST, UP, WEST};
         try {
             matrix = new GeneralMatrix(srcAxis, dstAxis);
             fail();
@@ -151,12 +133,13 @@ public final class LinearConversionTest extends TestCase {
      * Tests an example similar to the one provided in the
      * {@link AbstractCS#testScaleAndSwapAxis} javadoc.
      */
+    @Test
     public void testScaleAndSwapAxis() {
         final Unit cm = SI.CENTI(SI.METER);
         final Unit mm = SI.MILLI(SI.METER);
         final AbstractCS cs = new DefaultCartesianCS("Test",
-              new DefaultCoordinateSystemAxis("y", AxisDirection.SOUTH, cm),
-              new DefaultCoordinateSystemAxis("x", AxisDirection.EAST,  mm));
+              new DefaultCoordinateSystemAxis("y", SOUTH, cm),
+              new DefaultCoordinateSystemAxis("x", EAST,  mm));
         Matrix matrix;
         matrix = AbstractCS.swapAndScaleAxis(DefaultCartesianCS.GENERIC_2D, cs);
         assertEquals(new GeneralMatrix(new double[][] {
@@ -176,6 +159,7 @@ public final class LinearConversionTest extends TestCase {
      * Test the {@link DefaultProjectedCRS#createLinearConversion} method.
      * Note: this requires a working {@link MathTransformFactory}.
      */
+    @Test
     public void testCreateLinearConversion() throws FactoryException {
         final double                     EPS = 1E-12;
         final MathTransformFactory   factory = new DefaultMathTransformFactory();

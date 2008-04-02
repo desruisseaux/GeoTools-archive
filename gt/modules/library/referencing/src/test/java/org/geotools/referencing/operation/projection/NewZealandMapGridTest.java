@@ -15,13 +15,10 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,21 +28,7 @@ import org.opengis.referencing.operation.TransformException;
  * @version $Id$
  * @author Justin Deoliveira
  */
-public final class NewZealandMapGridTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(NewZealandMapGridTest.class);
-    }
-
+public final class NewZealandMapGridTest {
     /**
      * Sets of geographic coordinates to project.
      */
@@ -67,28 +50,31 @@ public final class NewZealandMapGridTest extends TestCase {
     /**
      * Computes the forward transform and compares against the expected result.
      */
-	public void testTransform() throws TransformException {
-		double[] dst = new double[6];
-		new NewZealandMapGrid().transform(GEOGRAPHIC, 0, dst, 0, 3);
-		for (int i=0; i<PROJECTED.length; i++) {
-			assertEquals(PROJECTED[i], dst[i], 0.1);   // 10 cm precision
-		}
-	}
+    @Test
+    public void testTransform() throws TransformException {
+        final double[] dst = new double[6];
+        new NewZealandMapGrid().transform(GEOGRAPHIC, 0, dst, 0, 3);
+        for (int i=0; i<PROJECTED.length; i++) {
+            assertEquals(PROJECTED[i], dst[i], 0.1);   // 10 cm precision
+        }
+    }
 
     /**
      * Computes the inverse transform and compares against the expected result.
      */
-	public void testInverseTransform() throws TransformException {
-		double[] dst = new double[6];
-		new NewZealandMapGrid().inverse().transform(PROJECTED, 0, dst, 0, 3);
-		for (int i=0; i<GEOGRAPHIC.length; i++) {
-			assertEquals(GEOGRAPHIC[i], dst[i], 0.0001); // About 10 m precision
-		}
-	}
+    @Test
+    public void testInverseTransform() throws TransformException {
+        final double[] dst = new double[6];
+        new NewZealandMapGrid().inverse().transform(PROJECTED, 0, dst, 0, 3);
+        for (int i=0; i<GEOGRAPHIC.length; i++) {
+            assertEquals(GEOGRAPHIC[i], dst[i], 0.0001); // About 10 m precision
+        }
+    }
 
     /**
      * Tests WKT formatting.
      */
+    @Test
     public void testWKT() {
         final String wkt = new NewZealandMapGrid().toWKT();
         assertTrue(wkt.indexOf("central_meridian") >= 0);

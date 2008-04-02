@@ -21,10 +21,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import javax.units.SI;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.TransformException;
@@ -37,6 +33,9 @@ import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests the geodetic calculator.
@@ -44,31 +43,11 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
  * @source $URL$
  * @version $Id$
  */
-public final class GeodeticCalculatorTest extends TestCase {
-    /**
-     * Run the test from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GeodeticCalculatorTest.class);
-    }
-
-    /**
-     * Construct a new test case.
-     */
-    public GeodeticCalculatorTest(final String name) {
-        super(name);
-    }
-
+public final class GeodeticCalculatorTest {
     /**
      * Tests some trivial azimuth directions.
      */
+    @Test
     public void testAzimuth() {
         final double EPS = 2E-1;
         final GeodeticCalculator calculator = new GeodeticCalculator();
@@ -85,6 +64,7 @@ public final class GeodeticCalculatorTest extends TestCase {
      * <A HREF="http://www.univ-lemans.fr/~hainry/articles/loxonavi.html">Orthodromie et
      * loxodromie</A> page.
      */
+    @Test
     @SuppressWarnings("fallthrough")
     public void testParallel45() {
         // Column 1: Longitude difference in degrees.
@@ -155,6 +135,7 @@ public final class GeodeticCalculatorTest extends TestCase {
      * Tests geodetic calculator involving a coordinate operation.
      * Our test uses a simple geographic CRS with only the axis order interchanged.
      */
+    @Test
     public void testUsingTransform() throws FactoryException, TransformException {
         final GeographicCRS crs = new DefaultGeographicCRS("Test", DefaultGeodeticDatum.WGS84,
                 new DefaultEllipsoidalCS("Test", DefaultCoordinateSystemAxis.LATITUDE,
@@ -181,6 +162,7 @@ public final class GeodeticCalculatorTest extends TestCase {
      * to get Java assertions to be run, which will compare the Geodetic Calculator results with
      * the Default Ellipsoid computations.
      */
+    @Test
     public void testEquator() {
         assertTrue(GeodeticCalculator.class.desiredAssertionStatus());
         final GeodeticCalculator calculator = new GeodeticCalculator();
@@ -203,12 +185,11 @@ public final class GeodeticCalculatorTest extends TestCase {
      * Tests the points reported in
      * <a href="http://jira.codehaus.org/browse/GEOT-1535">GEOT-1535</a>.
      *
-     * Disabled for now, because the error still presents.
+     * @todo Disabled for now, because the error still presents.
      */
+    @Test
+    @Ignore
     public void testGEOT1535() {
-        if (true) {
-            return;
-        }
         final GeodeticCalculator calculator = new GeodeticCalculator();
 
         calculator.setStartingGeographicPoint(10, 40);

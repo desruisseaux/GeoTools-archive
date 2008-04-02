@@ -27,9 +27,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.distribution.Distributor;
+import org.opengis.metadata.identification.CharacterSet;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.spatial.DimensionNameType;
+
 import org.geotools.metadata.iso.MetaDataImpl;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.ResponsiblePartyImpl;
@@ -41,51 +45,30 @@ import org.geotools.metadata.iso.spatial.DimensionImpl;
 import org.geotools.metadata.iso.spatial.GridSpatialRepresentationImpl;
 import org.geotools.test.Dummy;
 import org.geotools.util.GrowableInternationalString;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.distribution.Distributor;
-import org.opengis.metadata.identification.CharacterSet;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.spatial.DimensionNameType;
+
+import org.junit.*;
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 
 /**
- * <p>A test class for annotations written in the Metadata module.<p/>
- * <p>First, it marshalls all annotations in a XML temporary file, starting with the
+ * A test class for annotations written in the Metadata module.
+ * First, it marshalls all annotations in a XML temporary file, starting with the
  * {@link MetadataImpl} class as root element. Then, the temporary XML file is
  * unmarshalled, in order to get a {@linkplain MetadataImpl metadata} object.
- * Finally some fields of this object are compared with the original value.</p>
+ * Finally some fields of this object are compared with the original value.
  *
  * @since 2.5
  * @source $URL$
  * @author Cédric Briançon
  */
-public class MetadataAnnotationsTest extends TestCase {
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(MetadataAnnotationsTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public MetadataAnnotationsTest(final String name) {
-        super(name);
-    }
-
+public final class MetadataAnnotationsTest {
     /**
      * Ensure that the version of JAXB used is high enough to do all the process of the
      * marshalling. JAXB has to handle the {@link XmlSeeAlso} annotation. If it can't
      * then this annotation will not be present on class like {@link IdentificationImpl},
-     * for which we know that it contains this annotation.<br/>
+     * for which we know that it contains this annotation.
+     * <p>
      * Test the presence of JAXB in the endorsed folder as well. Since JAXB jars, which
      * can be downloaded on the JAXB website, have a different package structure than the
      * one present in the JDK6, we disable the use of the endorsed process for the test.
@@ -101,7 +84,8 @@ public class MetadataAnnotationsTest extends TestCase {
             Class c = Class.forName("com.sun.xml.bind.marshaller.NamespacePrefixMapper");
             return false;
         } catch (ClassNotFoundException e) {
-            /* Ensure that this class is not present in the classpath. If this class is
+            /*
+             * Ensure that this class is not present in the classpath. If this class is
              * present, it means that the user has put an other version of JAXB in the
              * endorsed folder of his jdk, and the test is then stopped since we can't
              * know whether the version is correct or not.
@@ -119,13 +103,12 @@ public class MetadataAnnotationsTest extends TestCase {
      *                       or during marshalling / unmarshalling processes.
      * @throws IOException If a writing error in the temporary file occurs.
      */
+    @Test
     public void testMetadataAnnotations() throws JAXBException, IOException {
         // First ensures that user's jdk contains a correct version of JAXB.
         // The {@code XmlSeeAlso} annotation appears in version 2.1 of JAXB,
         // that's why it is tested.
-        if (ensuresCorrectJaxbVersion() == false) {
-            return;
-        }
+        assumeTrue(ensuresCorrectJaxbVersion());
         final NamespacePrefixMapperImpl defaultNamespace =
                 new NamespacePrefixMapperImpl("http://www.isotc211.org/2005/gmd");
         if (defaultNamespace instanceof Dummy) {

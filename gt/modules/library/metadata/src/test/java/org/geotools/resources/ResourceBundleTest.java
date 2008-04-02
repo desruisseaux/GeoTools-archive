@@ -16,12 +16,11 @@
 package org.geotools.resources;
 
 import java.util.Locale;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,31 +30,11 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class ResourceBundleTest extends TestCase {
-    /**
-     * Run the test from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ResourceBundleTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public ResourceBundleTest(String name) {
-        super(name);
-    }
-
+public final class ResourceBundleTest {
     /**
      * Tests some simple vocabulary words.
      */
+    @Test
     public void testVocabulary() {
         Vocabulary resources;
 

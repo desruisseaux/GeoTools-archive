@@ -15,30 +15,23 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.util.Random;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// JAI dependencies
 import javax.media.jai.Warp;
 import javax.media.jai.WarpAffine;
 import javax.media.jai.WarpCubic;
 import javax.media.jai.WarpQuadratic;
 import javax.media.jai.WarpPolynomial;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.resources.Classes;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -48,32 +41,11 @@ import org.geotools.resources.Classes;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class WarpTransformTest extends TestCase {
+public final class WarpTransformTest {
     /**
      * Width and height of a pseudo-image source image.
      */
     private static final int WIDTH=1000, HEIGHT=2000;
-
-    /**
-     * Runs the tests with the textual test runner.
-     */
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(WarpTransformTest.class);
-    }
-    
-    /**
-     * Constructs a test case with the given name.
-     */
-    public WarpTransformTest(final String name) {
-        super(name);
-    }
 
     /**
      * Transforms in place a point. This is used for testing
@@ -166,6 +138,7 @@ public final class WarpTransformTest extends TestCase {
     /**
      * Tests an affine warp.
      */
+    @Test
     public void testAffine() throws TransformException {
         final int[] scalesX = {1,2,3,4,5,6,  2,7,3,1,8};
         final int[] scalesY = {1,2,3,4,5,6,  6,2,5,9,1};
@@ -189,6 +162,7 @@ public final class WarpTransformTest extends TestCase {
     /**
      * Tests a quadratic warp.
      */
+    @Test
     public void testQuadratic() throws TransformException {
         final int[] scalesX = {1,2,3,4,5,6,  2,7,3,1,8};
         final int[] scalesY = {1,2,3,4,5,6,  6,2,5,9,1};
@@ -212,6 +186,7 @@ public final class WarpTransformTest extends TestCase {
     /**
      * Tests the {@link WarpAdapter} class using an affine transform.
      */
+    @Test
     public void testAdapter() {
         final AffineTransform atr = AffineTransform.getScaleInstance(0.25, 0.5);
         atr.translate(4, 2);

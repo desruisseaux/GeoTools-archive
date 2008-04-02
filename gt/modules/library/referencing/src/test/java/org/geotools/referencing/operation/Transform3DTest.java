@@ -15,18 +15,11 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
 import javax.units.NonSI;
-
-// J2SE and JUnit dependencies
 import javax.units.SI;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
@@ -35,10 +28,12 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.parameter.ParameterValueGroup;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -51,28 +46,7 @@ import org.geotools.referencing.factory.ReferencingFactoryContainer;
  * @author Justin Couch
  * @author Martin Desruisseaux
  */
-public final class Transform3DTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(Transform3DTest.class);
-    }
-
-    /**
-     * Construct a test case.
-     */
-    public Transform3DTest(String testName) {
-        super(testName);
-    }
-
+public final class Transform3DTest {
     /**
      * Convenience method returning a set of properties for a CRS with the specified name.
      */
@@ -83,6 +57,7 @@ public final class Transform3DTest extends TestCase {
     /**
      * Tests a 3D projected to geocentric transform.
      */
+    @Test
     public void testProjectedToGeocentric() throws FactoryException, TransformException {
         // ----------------------------------------------------------
         // Gets factories to be used for all object creations

@@ -19,9 +19,8 @@ package org.geotools.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,38 +30,18 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class WeakValueHashMapTest extends TestCase {
+public final class WeakValueHashMapTest {
     /**
      * The size of the test sets to be created.
      */
     private static final int SAMPLE_SIZE = 500;
 
     /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-         return new TestSuite(WeakValueHashMapTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public WeakValueHashMapTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Tests the {@link WeakValueHashMap} using strong references.
      * The tested {@link WeakValueHashMap} should behave like a
      * standard {@link Map} object.
      */
+    @Test
     public void testStrongReferences() {
         final Random random = new Random();
         for (int pass=0; pass<4; pass++) {
@@ -99,6 +78,7 @@ public final class WeakValueHashMapTest extends TestCase {
      * In this test, we have to keep in mind than some elements
      * in {@code weakMap} may disaspear at any time.
      */
+    @Test
     public void testWeakReferences() throws InterruptedException {
         final Random random = new Random();
         for (int pass=0; pass<2; pass++) {

@@ -15,13 +15,12 @@
  */
 package org.geotools.geometry;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -31,32 +30,12 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DirectPositionTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(DirectPositionTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public DirectPositionTest(final String name) {
-        super(name);
-    }
-
+public final class DirectPositionTest {
     /**
      * Tests {@link GeneralDirectPosition#equals} method between different implementations. The
      * purpose of this test is also to run the assertion in the direct position implementations.
      */
+    @Test
     public void testEquals() {
         assertTrue(GeneralDirectPosition.class.desiredAssertionStatus());
         assertTrue(DirectPosition2D.class.desiredAssertionStatus());

@@ -16,11 +16,10 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE and JUnit dependencies
 import java.awt.geom.AffineTransform;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -30,36 +29,16 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class XAffineTransformTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(XAffineTransformTest.class);
-    }
-
+public final class XAffineTransformTest {
     /**
      * Tolerance value for comparaisons.
      */
     private static final double EPS = 1E-10;
 
     /**
-     * Constructs a test case.
-     */
-    public XAffineTransformTest(String testName) {
-        super(testName);
-    }
-
-    /**
      * Tests {@link XAffineTransform} in the unflipped case.
      */
+    @Test
     public void testUnflipped() {
         runTest(+1);
     }
@@ -67,6 +46,7 @@ public final class XAffineTransformTest extends TestCase {
     /**
      * Tests {@link XAffineTransform} in the flipped case.
      */
+    @Test
     public void testFlipped() {
         runTest(-1);
     }
