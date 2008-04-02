@@ -15,7 +15,7 @@
  */
 package com.sun.xml.internal.bind.marshaller;
 
-import org.geotools.util.Dummy;
+import org.geotools.test.Dummy;
 
 
 public abstract class NamespacePrefixMapper implements Dummy {

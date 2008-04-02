@@ -39,7 +39,7 @@ import org.geotools.metadata.iso.identification.DataIdentificationImpl;
 import org.geotools.metadata.iso.identification.IdentificationImpl;
 import org.geotools.metadata.iso.spatial.DimensionImpl;
 import org.geotools.metadata.iso.spatial.GridSpatialRepresentationImpl;
-import org.geotools.util.Dummy;
+import org.geotools.test.Dummy;
 import org.geotools.util.GrowableInternationalString;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.Distributor;
