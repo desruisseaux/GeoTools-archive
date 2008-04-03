@@ -21,7 +21,6 @@ package org.geotools.metadata.iso.citation;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Locale;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.OnLineFunction;
@@ -462,7 +461,8 @@ public final class Citations {
         InternationalString candidate = c2.getTitle();
         Iterator<? extends InternationalString> iterator = null;
         do {
-            final String asString = candidate.toString(Locale.US);
+            // The "null" locale argument is required for getting the unlocalized version.
+            final String asString = candidate.toString(null);
             if (titleMatches(c1, asString)) {
                 return true;
             }
@@ -500,7 +500,8 @@ public final class Citations {
         InternationalString candidate = citation.getTitle();
         Iterator<? extends InternationalString> iterator = null;
         do {
-            final String asString = candidate.toString(Locale.US);
+            // The "null" locale argument is required for getting the unlocalized version.
+            final String asString = candidate.toString(null);
             if (asString.trim().equalsIgnoreCase(title)) {
                 return true;
             }

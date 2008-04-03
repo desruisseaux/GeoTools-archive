@@ -24,7 +24,6 @@ import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Collection;
-import java.util.Locale;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -45,11 +44,11 @@ import org.opengis.util.CodeList;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
+import org.geotools.math.XMath;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.X364;
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -472,8 +471,7 @@ public class Formatter {
         }
         if (parameter instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameter;
-            // Remove cast when we will be allowed to compile for J2SE 1.5.
-            final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
+            final ParameterDescriptor descriptor = param.getDescriptor();
             final Unit valueUnit = descriptor.getUnit();
             Unit unit = valueUnit;
             if (unit!=null && !Unit.ONE.equals(unit)) {
@@ -506,7 +504,7 @@ public class Formatter {
                     value = Double.NaN;
                 }
                 if (!unit.equals(valueUnit)) {
-                    value = XMath.fixRoundingError(value, 9);
+                    value = XMath.trimDecimalFractionDigits(value, 4, 9);
                 }
                 format(value);
             } else {
@@ -699,9 +697,10 @@ public class Formatter {
         if (authority == citation) {
             return true;
         }
+        // The "null" locale argument is required for getting the unlocalized version.
         return (citation != null) &&
-               authority.getTitle().toString(Locale.US).equalsIgnoreCase(
-                citation.getTitle().toString(Locale.US));
+               authority.getTitle().toString(null).equalsIgnoreCase(
+                citation.getTitle().toString(null));
     }
 
     /**
@@ -732,7 +731,8 @@ public class Formatter {
                         }
                     }
                 }
-                final String title = authority.getTitle().toString(Locale.US);
+                // The "null" locale argument is required for getting the unlocalized version.
+                final String title = authority.getTitle().toString(null);
                 for (final GenericName alias : aliases) {
                     final GenericName scope = alias.getScope();
                     if (scope != null) {

@@ -139,7 +139,7 @@ public final class AbstractCSTest {
         cs = DefaultSphericalCS  .GEOCENTRIC;         assertSame(cs, AbstractCS.standard(cs));
         cs = DefaultTimeCS       .DAYS;               assertSame(cs, AbstractCS.standard(cs));
         cs = DefaultVerticalCS   .ELLIPSOIDAL_HEIGHT; assertSame(cs, AbstractCS.standard(cs));
-        cs = DefaultVerticalCS   .GRAVITY_RELATED;
+        cs = DefaultVerticalCS   .GRAVITY_RELATED_HEIGHT;
         assertSame("\"Standard\" vertical axis should be forced to ellipsoidal height.",
                    DefaultVerticalCS.ELLIPSOIDAL_HEIGHT, AbstractCS.standard(cs));
     }

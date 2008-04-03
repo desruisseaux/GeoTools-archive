@@ -30,7 +30,9 @@ import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.datum.TemporalDatum;
 
-import org.geotools.referencing.AbstractReferenceSystem;
+import org.geotools.referencing.cs.DefaultTimeCS;
+import org.geotools.referencing.AbstractReferenceSystem;  // For javadoc
+import org.geotools.referencing.datum.DefaultTemporalDatum;
 
 
 /**
@@ -54,7 +56,81 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
     private static final long serialVersionUID = 3000119849197222007L;
 
     /**
+     * Time measured in days since January 1st, 4713 BC at 12:00 UTC.
+     *
+     * @see DefaultTemporalDatum#JULIAN
+     * @see DefaultTimeCS#DAYS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS JULIAN = new DefaultTemporalCRS(
+            DefaultTemporalDatum.JULIAN, DefaultTimeCS.DAYS);
+
+    /**
+     * Time measured in days since November 17, 1858 at 00:00 UTC.
+     * A <cite>Modified Julian day</cite> (MJD) is defined relative to <cite>Julian day</cite>
+     * (JD) as {@code MJD = JD − 2400000.5}.
+     *
+     * @see DefaultTemporalDatum#MODIFIED_JULIAN
+     * @see DefaultTimeCS#DAYS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS MODIFIED_JULIAN = new DefaultTemporalCRS(
+            DefaultTemporalDatum.MODIFIED_JULIAN, DefaultTimeCS.DAYS);
+
+    /**
+     * Time measured in days since May 24, 1968 at 00:00 UTC. This epoch was introduced by NASA
+     * for the space program. A <cite>Truncated Julian day</cite> (TJD) is defined relative to
+     * <cite>Julian day</cite> (JD) as {@code TJD = JD − 2440000.5}.
+     *
+     * @see DefaultTemporalDatum#TRUNCATED_JULIAN
+     * @see DefaultTimeCS#DAYS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS TRUNCATED_JULIAN = new DefaultTemporalCRS(
+            DefaultTemporalDatum.TRUNCATED_JULIAN, DefaultTimeCS.DAYS);
+
+    /**
+     * Time measured in days since December 31, 1899 at 12:00 UTC.
+     * A <cite>Dublin Julian day</cite> (DJD) is defined relative to <cite>Julian day</cite> (JD)
+     * as {@code DJD = JD − 2415020}.
+     *
+     * @see DefaultTemporalDatum#DUBLIN_JULIAN
+     * @see DefaultTimeCS#DAYS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS DUBLIN_JULIAN = new DefaultTemporalCRS(
+            DefaultTemporalDatum.DUBLIN_JULIAN, DefaultTimeCS.DAYS);
+
+    /**
+     * Time measured in seconds since January 1st, 1970 at 00:00 UTC.
+     *
+     * @see DefaultTemporalDatum#UNIX
+     * @see DefaultTimeCS#SECONDS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS UNIX = new DefaultTemporalCRS(
+            DefaultTemporalDatum.UNIX, DefaultTimeCS.SECONDS);
+
+    /**
+     * Time measured in milliseconds since January 1st, 1970 at 00:00 UTC.
+     *
+     * @see DefaultTemporalDatum#UNIX
+     * @see DefaultTimeCS#MILLISECONDS
+     *
+     * @since 2.5
+     */
+    public static final DefaultTemporalCRS JAVA = new DefaultTemporalCRS(
+            DefaultTemporalDatum.UNIX, DefaultTimeCS.MILLISECONDS);
+
+    /**
      * Unit for milliseconds. Usefull for conversion from and to {@link Date} objects.
+     *
+     * @todo Should probably move elswhere. To be revisited after the move to JSR-275.
      */
     public static Unit MILLISECOND = SI.MILLI(SI.SECOND);
 
@@ -84,6 +160,19 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
      */
     public DefaultTemporalCRS(final TemporalCRS crs) {
         super(crs);
+    }
+
+    /**
+     * Constructs a temporal CRS with the same properties than the given datum.
+     * The inherited properties include the {@linkplain #getName name} and aliases.
+     *
+     * @param datum The datum.
+     * @param cs The coordinate system.
+     *
+     * @since 2.5
+     */
+    public DefaultTemporalCRS(final TemporalDatum datum, final TimeCS cs) {
+        this(getProperties(datum), datum, cs);
     }
 
     /**

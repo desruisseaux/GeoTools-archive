@@ -37,7 +37,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.measure.Measure;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.AbstractReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;  // For javadoc
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -109,6 +109,19 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      */
     public DefaultGeographicCRS(final GeographicCRS crs) {
         super(crs);
+    }
+
+    /**
+     * Constructs a geographic CRS with the same properties than the given datum.
+     * The inherited properties include the {@linkplain #getName name} and aliases.
+     *
+     * @param datum The datum.
+     * @param cs The coordinate system.
+     *
+     * @since 2.5
+     */
+    public DefaultGeographicCRS(final GeodeticDatum datum, final EllipsoidalCS cs) {
+        this(getProperties(datum), datum, cs);
     }
 
     /**

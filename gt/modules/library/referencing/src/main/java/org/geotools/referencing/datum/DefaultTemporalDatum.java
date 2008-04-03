@@ -26,6 +26,7 @@ import java.util.Map;
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -46,43 +47,54 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
     /**
      * Datum for time measured since January 1st, 4713 BC at 12:00 UTC.
      *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#JULIAN
+     *
      * @since 2.5
      */
     public static final DefaultTemporalDatum JULIAN = new DefaultTemporalDatum(
-            "Julian", new Date(-2440588 * (24*60*60*1000L) + (12*60*60*1000L)));
+            name(VocabularyKeys.JULIAN), new Date(-2440588 * (24*60*60*1000L) + (12*60*60*1000L)));
 
     /**
      * Datum for time measured since November 17, 1858 at 00:00 UTC.
      * A <cite>Modified Julian day</cite> (MJD) is defined relative to <cite>Julian day</cite>
      * (JD) as {@code MJD = JD − 2400000.5}.
      *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#MODIFIED_JULIAN
+     *
      * @since 2.5
      */
     public static final DefaultTemporalDatum MODIFIED_JULIAN = new DefaultTemporalDatum(
-            "Modified Julian", new Date(-40587 * (24*60*60*1000L)));
+            name(VocabularyKeys.MODIFIED_JULIAN), new Date(-40587 * (24*60*60*1000L)));
 
     /**
      * Datum for time measured since May 24, 1968 at 00:00 UTC. This epoch was introduced by NASA
      * for the space program. A <cite>Truncated Julian day</cite> (TJD) is defined relative to
      * <cite>Julian day</cite> (JD) as {@code TJD = JD − 2440000.5}.
      *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#TRUNCATED_JULIAN
+     *
      * @since 2.5
      */
     public static final DefaultTemporalDatum TRUNCATED_JULIAN = new DefaultTemporalDatum(
-            "Truncated Julian", new Date(-587 * (24*60*60*1000L)));
+            name(VocabularyKeys.TRUNCATED_JULIAN), new Date(-587 * (24*60*60*1000L)));
 
     /**
      * Datum for time measured since December 31, 1899 at 12:00 UTC.
      * A <cite>Dublin Julian day</cite> (DJD) is defined relative to <cite>Julian day</cite> (JD)
      * as {@code DJD = JD − 2415020}.
      *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#DUBLIN_JULIAN
+     *
      * @since 2.5
      */
     public static final DefaultTemporalDatum DUBLIN_JULIAN = new DefaultTemporalDatum(
-            "Dublin Julian", new Date(-25568 * (24*60*60*1000L) + (12*60*60*1000L)));
+            name(VocabularyKeys.DUBLIN_JULIAN), new Date(-25568 * (24*60*60*1000L) + (12*60*60*1000L)));
 
     /**
      * Default datum for time measured since January 1st, 1970 at 00:00 UTC.
+     *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#UNIX
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#JAVA
      */
     public static final DefaultTemporalDatum UNIX = new DefaultTemporalDatum(
             "UNIX", new Date(0));

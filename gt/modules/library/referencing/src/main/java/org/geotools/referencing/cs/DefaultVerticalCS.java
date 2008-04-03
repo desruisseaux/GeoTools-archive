@@ -27,7 +27,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.measure.Measure;
-import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -61,17 +60,23 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * ellipsoidal height}</var> axis in metres.
      */
     public static DefaultVerticalCS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCS(
-                    name(VocabularyKeys.ELLIPSOIDAL_HEIGHT),
                     DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
 
     /**
      * A one-dimensional vertical CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#GRAVITY_RELATED_HEIGHT
      * gravity-related height}</var> axis in metres.
+     *
+     * @since 2.5
      */
-    public static DefaultVerticalCS GRAVITY_RELATED = new DefaultVerticalCS(
-                    name(VocabularyKeys.GRAVITY_RELATED_HEIGHT),
+    public static DefaultVerticalCS GRAVITY_RELATED_HEIGHT = new DefaultVerticalCS(
                     DefaultCoordinateSystemAxis.GRAVITY_RELATED_HEIGHT);
+
+    /**
+     * @deprecated Renamed as {@link #GRAVITY_RELATED_HEIGHT}.
+     */
+    @Deprecated
+    public static DefaultVerticalCS GRAVITY_RELATED = GRAVITY_RELATED_HEIGHT;
 
     /**
      * A one-dimensional vertical CS with
@@ -79,7 +84,6 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * axis in metres.
      */
     public static DefaultVerticalCS DEPTH = new DefaultVerticalCS(
-                    name(VocabularyKeys.DEPTH),
                     DefaultCoordinateSystemAxis.DEPTH);
 
     /**
@@ -93,6 +97,18 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      */
     public DefaultVerticalCS(final VerticalCS cs) {
         super(cs);
+    }
+
+    /**
+     * Constructs a coordinate system with the same properties than the specified axis.
+     * The inherited properties include the {@linkplain #getName name} and aliases.
+     *
+     * @param axis The axis.
+     *
+     * @since 2.5
+     */
+    public DefaultVerticalCS(final CoordinateSystemAxis axis) {
+        super(getProperties(axis), new CoordinateSystemAxis[] {axis});
     }
 
     /**

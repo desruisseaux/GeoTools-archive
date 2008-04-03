@@ -28,9 +28,8 @@ import org.opengis.referencing.datum.VerticalDatum;
 
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.DefaultVerticalCS;
-import org.geotools.referencing.AbstractReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;  // For javadoc
 import org.geotools.referencing.datum.DefaultVerticalDatum;
-import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -62,10 +61,25 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      * Default vertical coordinate reference system using ellipsoidal datum.
      * Ellipsoidal heights are measured along the normal to the ellipsoid
      * used in the definition of horizontal datum.
+     *
+     * @see DefaultVerticalDatum#ELLIPSOIDAL
+     * @see DefaultVerticalCS#ELLIPSOIDAL_HEIGHT
      */
     public static final DefaultVerticalCRS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCRS(
-                        name(VocabularyKeys.ELLIPSOIDAL_HEIGHT),
-                        DefaultVerticalDatum.ELLIPSOIDAL, DefaultVerticalCS.ELLIPSOIDAL_HEIGHT);
+            getProperties(DefaultVerticalCS.ELLIPSOIDAL_HEIGHT),
+            DefaultVerticalDatum.ELLIPSOIDAL, DefaultVerticalCS.ELLIPSOIDAL_HEIGHT);
+
+    /**
+     * Default vertical coordinate reference system using geoidal datum.
+     *
+     * @see DefaultVerticalDatum#GEOIDAL
+     * @see DefaultVerticalCS#GRAVITY_RELATED_HEIGHT
+     *
+     * @since 2.5
+     */
+    public static final DefaultVerticalCRS GEOIDAL_HEIGHT = new DefaultVerticalCRS(
+            getProperties(DefaultVerticalCS.GRAVITY_RELATED_HEIGHT),
+            DefaultVerticalDatum.GEOIDAL, DefaultVerticalCS.GRAVITY_RELATED_HEIGHT);
 
     /**
      * Constructs a new vertical CRS with the same values than the specified one.
@@ -78,6 +92,19 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      */
     public DefaultVerticalCRS(final VerticalCRS crs) {
         super(crs);
+    }
+
+    /**
+     * Constructs a vertical CRS with the same properties than the given datum.
+     * The inherited properties include the {@linkplain #getName name} and aliases.
+     *
+     * @param datum The datum.
+     * @param cs The coordinate system.
+     *
+     * @since 2.5
+     */
+    public DefaultVerticalCRS(final VerticalDatum datum, final VerticalCS cs) {
+        this(getProperties(datum), datum, cs);
     }
 
     /**

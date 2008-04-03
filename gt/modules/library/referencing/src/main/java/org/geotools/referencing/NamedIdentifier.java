@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -187,7 +186,8 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      *                  {@linkplain GenericName generic name}.
      */
     public NamedIdentifier(final Citation authority, final InternationalString code) {
-        this(authority, code.toString(Locale.US));
+        // The "null" locale argument is required for getting the unlocalized version.
+        this(authority, code.toString(null));
         name = getName(authority, code);
     }
 
@@ -519,7 +519,8 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
                 }
             }
         }
-        final String title = getShortestTitle(authority).toString(Locale.US);
+        // The "null" locale argument is required for getting the unlocalized version.
+        final String title = getShortestTitle(authority).toString(null);
         if (isValidCodeSpace(title)) {
             return title;
         }

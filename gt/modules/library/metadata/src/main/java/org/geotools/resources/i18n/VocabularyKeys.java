@@ -291,6 +291,11 @@ public final class VocabularyKeys {
     public static final int DOWN = 33;
 
     /**
+     * Dublin Julian
+     */
+    public static final int DUBLIN_JULIAN = 243;
+
+    /**
      * Duplicated value
      */
     public static final int DUPLICATED_VALUE = 237;
@@ -471,6 +476,11 @@ public final class VocabularyKeys {
     public static final int GEOGRAPHIC_COORDINATES = 59;
 
     /**
+     * Geoidal
+     */
+    public static final int GEOIDAL = 247;
+
+    /**
      * Geoid model derived
      */
     public static final int GEOID_MODEL_DERIVED = 60;
@@ -606,6 +616,11 @@ public final class VocabularyKeys {
     public static final int JAVA_VERSION_$1 = 82;
 
     /**
+     * Julian
+     */
+    public static final int JULIAN = 244;
+
+    /**
      * Kernel
      */
     public static final int KERNEL = 83;
@@ -726,6 +741,11 @@ public final class VocabularyKeys {
      * Minimum
      */
     public static final int MINIMUM = 106;
+
+    /**
+     * Modified Julian
+     */
+    public static final int MODIFIED_JULIAN = 245;
 
     /**
      * Molodenski transform
@@ -1141,6 +1161,11 @@ public final class VocabularyKeys {
      * True
      */
     public static final int TRUE = 173;
+
+    /**
+     * Truncated Julian
+     */
+    public static final int TRUNCATED_JULIAN = 246;
 
     /**
      * Type

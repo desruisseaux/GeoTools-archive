@@ -790,7 +790,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
     private static Map<String,Object> toMap(final InternationalString name) {
         final Map<String,Object> properties = new HashMap<String,Object>(4);
         if (name != null) {
-            properties.put(NAME_KEY,  name.toString(Locale.US));
+            // The "null" locale argument is required for getting the unlocalized version.
+            properties.put(NAME_KEY,  name.toString(null));
             properties.put(ALIAS_KEY, NameFactory.create(new InternationalString[] {name}));
         }
         return properties;

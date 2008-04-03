@@ -22,14 +22,13 @@ package org.geotools.referencing.datum;
 import java.util.Collections;
 import java.util.Map;
 
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
 
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -37,8 +36,8 @@ import org.geotools.resources.Utilities;
  * surface used as a zero-height surface. The description includes its position with respect
  * to the Earth for any of the height types recognized by this standard. There are several
  * types of vertical datums, and each may place constraints on the
- * {@linkplain CoordinateSystemAxis coordinate system axis} with which it is combined to
- * create a {@linkplain VerticalCRS vertical CRS}.
+ * {@linkplain org.opengis.referencing.cs.CoordinateSystemAxis coordinate system axis} with which
+ * it is combined to create a {@linkplain org.opengis.referencing.crs.VerticalCRS vertical CRS}.
  *
  * @source $URL$
  * @version $Id$
@@ -72,7 +71,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
     }
 
     /**
-     * The type of this vertical datum. Default is geoidal.
+     * The type of this vertical datum. Default is "geoidal".
      */
     private final VerticalDatumType type;
 
@@ -80,7 +79,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * Default vertical datum for {@linkplain VerticalDatumType#GEOIDAL geoidal heights}.
      */
     public static final DefaultVerticalDatum GEOIDAL =
-                    new DefaultVerticalDatum("Geoidal", VerticalDatumType.GEOIDAL);
+            new DefaultVerticalDatum(name(VocabularyKeys.GEOIDAL), VerticalDatumType.GEOIDAL);
 
     /**
      * Default vertical datum for ellipsoidal heights. Ellipsoidal heights
@@ -88,7 +87,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * of horizontal datum.
      */
     public static final DefaultVerticalDatum ELLIPSOIDAL =
-                    new DefaultVerticalDatum("Ellipsoidal", VerticalDatumType.ELLIPSOIDAL);
+            new DefaultVerticalDatum(name(VocabularyKeys.ELLIPSOIDAL), VerticalDatumType.ELLIPSOIDAL);
 
     /**
      * Constructs a vertical datum from a name.

@@ -20,15 +20,12 @@
 package org.geotools.referencing.datum;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.opengis.referencing.datum.EngineeringDatum;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.LocalName;
 
 
 /**
@@ -55,13 +52,8 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      * @see org.geotools.referencing.crs.DefaultEngineeringCRS#CARTESIAN_2D
      * @see org.geotools.referencing.crs.DefaultEngineeringCRS#CARTESIAN_3D
      */
-    public static final DefaultEngineeringDatum UNKNOW;
-    static {
-        final Map<String,Object> properties = new HashMap<String,Object>(4);
-        properties.put( NAME_KEY, "Unknow");
-        properties.put(ALIAS_KEY, new LocalName(Vocabulary.formatInternational(VocabularyKeys.UNKNOW)));
-        UNKNOW = new DefaultEngineeringDatum(properties);
-    }
+    public static final DefaultEngineeringDatum UNKNOW =
+            new DefaultEngineeringDatum(name(VocabularyKeys.UNKNOW));
 
     /**
      * Constructs a new datum with the same values than the specified one.

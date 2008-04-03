@@ -30,7 +30,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.measure.Measure;
-import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
 
@@ -60,6 +59,11 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * A one-dimensional temporal CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
      * axis in {@linkplain javax.units.NonSI#DAY day} units.
+     *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#JULIAN
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#MODIFIED_JULIAN
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#TRUNCATED_JULIAN
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#DUBLIN_JULIAN
      */
     public static final DefaultTimeCS DAYS;
 
@@ -67,6 +71,8 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * A one-dimensional temporal CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
      * axis in {@linkplain javax.units.SI#SECOND second} units.
+     *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#UNIX
      *
      * @since 2.5
      */
@@ -76,6 +82,8 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * A one-dimensional temporal CS with
      * <var>{@linkplain DefaultCoordinateSystemAxis#TIME time}</var>,
      * axis in millisecond units.
+     *
+     * @see org.geotools.referencing.crs.DefaultTemporalCRS#JAVA
      *
      * @since 2.5
      */

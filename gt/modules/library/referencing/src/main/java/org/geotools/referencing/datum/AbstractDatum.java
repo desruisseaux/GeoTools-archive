@@ -21,6 +21,7 @@ package org.geotools.referencing.datum;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.opengis.metadata.extent.Extent;
@@ -31,6 +32,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
+import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -163,6 +165,19 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
         scope            = (InternationalString) subProperties.get(SCOPE_KEY             );
         this.realizationEpoch = (realizationEpoch != null) ?
                                  realizationEpoch.getTime() : Long.MIN_VALUE;
+    }
+
+    /**
+     * Same convenience method than {@link org.geotools.cs.AbstractCS#name} except that we get
+     * the unlocalized name (usually in English locale), because the name is part of the elements
+     * compared by the {@link #equals} method.
+     */
+    static Map<String,Object> name(final int key) {
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
+        final InternationalString name = Vocabulary.formatInternational(key);
+        properties.put(NAME_KEY,  name.toString(null)); // "null" required for unlocalized version.
+        properties.put(ALIAS_KEY, name);
+        return properties;
     }
 
     /**
