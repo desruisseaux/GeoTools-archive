@@ -1429,6 +1429,14 @@ public abstract class JDBC1DataStore implements DataStore {
 
 		return null;
 	}
+	
+	/**
+	 * Returns the database schema used by this JDBC datastore 
+	 * @return
+	 */
+	public String getDatabaseSchemaName() {
+	    return config.getDatabaseSchemaName();
+	}
 
 	/**
 	 * Retrieve a FeatureWriter over entire dataset.
