@@ -49,7 +49,6 @@ import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeTypeBuilder;
@@ -287,7 +286,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      */
     protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type,
         QueryData queryData) {
-        return new WKTAttributeIO();
+        return new DB2WKBAttributeIO();
     }
 
     /**
@@ -486,7 +485,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      *      org.geotools.data.jdbc.QueryData)
      */
     protected JDBCFeatureWriter createFeatureWriter(
-         FeatureReader<SimpleFeatureType, SimpleFeature> featureReader, QueryData queryData)
+         FeatureReader featureReader, QueryData queryData)
         throws IOException {
         String featureName = queryData.getFeatureType().getTypeName();
 
@@ -538,7 +537,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
 		}
 
 		if ((filter == Filter.INCLUDE) || filter.equals(Filter.INCLUDE)) {
-			return new EmptyFeatureReader<SimpleFeatureType, SimpleFeature>(requestType);
+			return new EmptyFeatureReader(requestType);
 		}
 
 		FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query, transaction);

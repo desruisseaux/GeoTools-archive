@@ -85,7 +85,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      * @param geomAttribute An AttributeType for a geometry attribute
      */
     public void sqlGeometryColumn(StringBuffer sql, AttributeDescriptor geomAttribute) {
-        sql.append( "DB2GSE.ST_AsText(" + sqlGeometryColumnName(geomAttribute) + ")");
+        sql.append( "DB2GSE.ST_AsBinary(" + sqlGeometryColumnName(geomAttribute) + ")");
     }
 
     /**

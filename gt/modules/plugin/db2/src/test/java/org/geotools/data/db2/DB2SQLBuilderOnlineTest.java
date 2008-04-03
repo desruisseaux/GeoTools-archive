@@ -92,7 +92,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 				this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
 		assertEquals(
 				"FID encoding failed",
-				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE (\"Id\" = 1)",
+				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsBinary(\"Geom\") FROM \"Test\".\"Places\" WHERE (\"Id\" = 1)",
 				fidQuery);
 		
 		FeatureId fid2 = ff2.featureId("2");
@@ -105,7 +105,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 				this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
 		assertEquals(
 				"FID encoding failed",
-				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE (\"Id\" = 2) OR (\"Id\" = 1)",
+				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsBinary(\"Geom\") FROM \"Test\".\"Places\" WHERE (\"Id\" = 2) OR (\"Id\" = 1)",
 				fidQuery);		
 	}
 
@@ -135,7 +135,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 				this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
 		assertEquals(
 				"compare encoding failed",
-				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" = 'Zena'",
+				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsBinary(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" = 'Zena'",
 				compareQuery);
 
 		sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Roads");
@@ -149,7 +149,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 				.getFIDMapper("Roads"), attrTypes, preFilter);
 		assertEquals(
 				"compare encoding failed",
-				"SELECT \"ID\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Roads\" WHERE \"Length\" = 2.5",
+				"SELECT \"ID\", \"Name\", DB2GSE.ST_AsBinary(\"Geom\") FROM \"Test\".\"Roads\" WHERE \"Length\" = 2.5",
 				compareQuery);
 	}
 
@@ -182,7 +182,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 				this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
 		assertEquals(
 				"LIKE encoding failed",
-				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" LIKE 's_met%s' ",
+				"SELECT \"Id\", \"Name\", DB2GSE.ST_AsBinary(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" LIKE 's_met%s' ",
 				likeQuery);
 	}
 
@@ -206,7 +206,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 
 		StringBuffer sb = new StringBuffer();
 		this.sqlBuilder.sqlGeometryColumn(sb, geomAttr);
-		assertEquals("Encoding didn't match", "DB2GSE.ST_AsText(\"Geom\")", sb
+		assertEquals("Encoding didn't match", "DB2GSE.ST_AsBinary(\"Geom\")", sb
 				.toString());
 	}
 }

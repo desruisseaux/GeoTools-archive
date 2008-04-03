@@ -40,7 +40,6 @@ public class DB2DataStoreOnlineTest extends AbstractDB2OnlineTestCase {
      * @throws Exception
      */
     protected void tearDown() throws Exception {
-        //		pool.close();
         super.tearDown();
     }
 

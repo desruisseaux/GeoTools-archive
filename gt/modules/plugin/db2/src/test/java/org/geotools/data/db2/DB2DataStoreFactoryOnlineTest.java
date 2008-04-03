@@ -48,9 +48,11 @@ public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
         try {
             @SuppressWarnings("unused")
 			DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(getParams());
+            dataStore.dispose();
         } catch (IOException e) {
             fail("createDataStore failed:" + e);
         }
+        
 
         // Should fail if dbtype is not "DB2"
         try {
@@ -69,6 +71,7 @@ public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
             params.put("tabschema", null);
 
             DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+            dataStore.dispose();
             String schema = dataStore.getTableSchema();
             assertEquals("DB2ADMIN", schema);
         } catch (IOException e) {
@@ -81,6 +84,7 @@ public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
         params.put("tabschema", "");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        dataStore.dispose();
         String schema = dataStore.getTableSchema();
         assertEquals("DB2ADMIN", schema);
     } catch (IOException e) {
@@ -92,6 +96,7 @@ public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
         params.put("tabschema", "sde");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        dataStore.dispose();
         String schema = dataStore.getTableSchema();
         assertEquals("SDE", schema);
     } catch (IOException e) {
@@ -103,6 +108,7 @@ public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
         params.put("tabschema", "\"Test\"");
 
         DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        dataStore.dispose();
         String schema = dataStore.getTableSchema();
         assertEquals("Test", schema);
     } catch (IOException e) {

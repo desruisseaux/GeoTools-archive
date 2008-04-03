@@ -139,6 +139,8 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         } else {
         	tabschema = tabschema.toUpperCase();
         }
+        // trim trailing blanks - just in case
+        tabschema = tabschema.trim();
         // Set the namespace and databaseSchemaName both to the table schema name
         // Set the timeout value to 100 seconds to force FeatureTypeHandler caching
         JDBCDataStoreConfig config = new JDBCDataStoreConfig(tabschema,

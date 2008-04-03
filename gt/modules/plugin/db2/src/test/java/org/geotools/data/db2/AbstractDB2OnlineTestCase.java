@@ -20,6 +20,11 @@ public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
     }
     public void setUp() throws Exception {
     	super.setUp();
+    	if (fixture == null) {
+    		System.out.println("DB2 fixture not found - make sure properties file copied from build tree resources directory");
+    		System.out.println("to Documents and Settings / userid / .geotools / db2");    		
+    		throw new IOException("DB2 fixture not found");
+    	}    	
     	if (ds == null) {
     		throw new IOException("DB2 Data Store not available");
     	}
@@ -107,6 +112,7 @@ public abstract class AbstractDB2OnlineTestCase extends OnlineTestCase {
         Statement st = getConnection().createStatement();
         dropTables(st);
         st.close();
+        ds.dispose();
         ds = null;
     }
 }
