@@ -333,7 +333,8 @@ public class GeocentricTranslation extends ProjectiveTransform {
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Transformation> getOperationType() {
             return Transformation.class;
         }
 

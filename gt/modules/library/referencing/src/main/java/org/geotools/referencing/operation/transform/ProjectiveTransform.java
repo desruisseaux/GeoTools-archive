@@ -293,7 +293,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         final int  inputDimension = numCol-1; // The last ordinate will be assumed equals to 1.
         final int outputDimension = numRow-1;
         final double[]     buffer = new double[numRow];
-        if (srcPts==dstPts) {
+        if (srcPts == dstPts) {
             // We are going to write in the source array. Checks if
             // source and destination sections are going to clash.
             final int upperSrc = srcOff + numPts*inputDimension;
@@ -308,8 +308,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 }
             }
         }
-        while (--numPts>=0) {
-            int mix=0;
+        while (--numPts >= 0) {
+            int mix = 0;
             for (int j=0; j<numRow; j++) {
                 double sum=elt[mix + inputDimension];
                 for (int i=0; i<inputDimension; i++) {
@@ -350,7 +350,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         final int  inputDimension = numCol-1; // The last ordinate will be assumed equals to 1.
         final int outputDimension = numRow-1;
         final double[]     buffer = new double[numRow];
-        if (srcPts==dstPts) {
+        if (srcPts == dstPts) {
             // We are going to write in the source array. Checks if
             // source and destination sections are going to clash.
             final int upperSrc = srcOff + numPts*inputDimension;
@@ -365,8 +365,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 }
             }
         }
-        while (--numPts>=0) {
-            int mix=0;
+        while (--numPts >= 0) {
+            int mix = 0;
             for (int j=0; j<numRow; j++) {
                 double sum=elt[mix + inputDimension];
                 for (int i=0; i<inputDimension; i++) {
@@ -512,7 +512,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
 
     /**
      * Creates an inverse transform using the specified matrix.
-     * To be overridden by {@link GeocentricAffineTransform}.
+     * To be overridden by {@link GeocentricTranslation}.
      */
     MathTransform createInverse(final Matrix matrix) {
         return new ProjectiveTransform(matrix);

@@ -462,7 +462,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
          */
         MathTransform candidate;
         if (dimensions.length == 2) {
-            System.arraycopy(dimensions, 0, axis, 0, 2); // (gridDimensionX, gridDimensionY)
+            axis[0] = dimensions[0]; // gridDimensionX
+            axis[1] = dimensions[1]; // gridDimensionY
             try {
                 candidate = filter.separate(transform);
                 if (candidate.getTargetDimensions() != 2) {
@@ -472,7 +473,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
                     candidate = filter.separate(transform);
                 }
                 dimensions = filter.getTargetDimensions();
-                System.arraycopy(dimensions, 0, axis, 2, 2); // (axisDimensionX, axisDimensionY)
+                axis[2] = dimensions[0]; // axisDimensionX
+                axis[3] = dimensions[1]; // axisDimensionY
                 try {
                     return (MathTransform2D) candidate;
                 } catch (ClassCastException exception) {

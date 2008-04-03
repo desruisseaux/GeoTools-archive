@@ -703,8 +703,8 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
         if (length==0 || dimensions[0]<0 || dimensions[length-1]>=crsDimension ||
             !XArray.isStrictlySorted(dimensions))
         {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1,
-                                               "dimension"));
+            throw new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "dimension"));
         }
         if (length == crsDimension) {
             return crs;

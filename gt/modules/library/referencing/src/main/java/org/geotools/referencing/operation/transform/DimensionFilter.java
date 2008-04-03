@@ -236,7 +236,7 @@ public class DimensionFilter {
     /**
      * Returns the output dimensions. This information is available only if one of the following
      * conditions is meet:
-     *
+     * <p>
      * <ul>
      *   <li>Target dimensions has been explicitly set using setter methods.</li>
      *   <li>No target dimensions were set but <code>{@linkplain #separate separate}(transform)</code>
@@ -259,7 +259,7 @@ public class DimensionFilter {
      * Separates the specified math transform. This method returns a math transform that uses
      * only the specified {@linkplain #getSourceDimensions source dimensions} and returns only
      * the specified {@linkplain #getTargetDimensions target dimensions}. Special case:
-     *
+     * <p>
      * <ul>
      *   <li><p>If {@linkplain #getSourceDimensions source dimensions} are unspecified, then the
      *       returned transform will expects all source dimensions as input but will produces only
@@ -478,7 +478,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
      * (<var>longitude</var>, <var>latitude</var>, <var>height</var>) outputs, then a sub-transform
      * may be used to keep only the (<var>longitude</var>, <var>latitude</var>) part. In most cases,
      * the created sub-transform is non-invertible since it loose informations.
-     * <br><br>
+     * <p>
      * This transform may be see as a non-square matrix transform with less rows
      * than columns, concatenated with {@code transform}. However, invoking
      * {@code createFilterTransfom(...)} allows the optimization of some common cases.
