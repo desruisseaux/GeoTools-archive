@@ -30,9 +30,9 @@
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-gdal/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-gdal/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/</url>
   </scm>
 
   <description>
@@ -73,19 +73,6 @@
       </roles>
     </developer>
   </developers>
-
-  <!--
-  <contributors>
-    <contributor>
-      <name></name>
-      <organization></organization>
-      <roles>
-        <role></role>
-      </roles>
-    </contributor>
-  </contributors>
-  -->
-
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
@@ -151,10 +138,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-
-  <!-- =========================================================== -->
-  <!--     Build configuration                                     -->
-  <!-- =========================================================== -->
-
 </project>

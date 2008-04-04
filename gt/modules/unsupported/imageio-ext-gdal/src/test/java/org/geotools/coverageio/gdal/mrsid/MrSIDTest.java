@@ -192,69 +192,11 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
         }
     }
     
-    public void testMetadata() throws Exception {
-    	 // get a reader
-        final BaseGDALGridCoverage2DReader reader = new MrSIDReader(TestData.file(this, fileName));
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // read once
-        //
-        // /////////////////////////////////////////////////////////////////////
-        GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-        assertNotNull(gc);
-    }
-    
-    protected static void displayImageIOMetadata(Node root) {
-		displayMetadata(root, 0);
-	}
-
-	static void indent(int level) {
-		for (int i = 0; i < level; i++) {
-			System.out.print("  ");
-		}
-	}
-
-	static void displayMetadata(Node node, int level) {
-		indent(level); // emit open tag
-		System.out.print("<" + node.getNodeName());
-		NamedNodeMap map = node.getAttributes();
-		if (map != null) { // print attribute values
-			int length = map.getLength();
-			for (int i = 0; i < length; i++) {
-				Node attr = map.item(i);
-				System.out.print(" " + attr.getNodeName() + "=\""
-						+ attr.getNodeValue() + "\"");
-			}
-		}
-		System.out.print(">"); // close current tag
-		String nodeValue = node.getNodeValue();
-		if (nodeValue != null)
-			System.out.println(" " + nodeValue);
-		else
-			System.out.println("");
-
-		Node child = node.getFirstChild();
-		if (child != null) {
-			while (child != null) { // emit child tags recursively
-				displayMetadata(child, level + 1);
-				child = child.getNextSibling();
-			}
-			indent(level); // emit close tag
-			System.out.println("</" + node.getNodeName() + ">");
-		} else {
-			// System.out.println("/>");
-		}
-	}
-    
     public static Test suite() {
 		TestSuite suite = new TestSuite();
 
 		// Test read exploiting common JAI operations (Crop-Translate-Rotate)
 		suite.addTest(new MrSIDTest("testVisualization"));
-
-		// Test reading of a simple image
-		suite.addTest(new MrSIDTest("testMetadata"));
 
 		return suite;
 	}
