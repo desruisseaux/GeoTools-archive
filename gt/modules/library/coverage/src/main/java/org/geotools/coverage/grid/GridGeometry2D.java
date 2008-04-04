@@ -38,6 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
+import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
@@ -193,7 +194,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         } else {
             final int[] dimensions;
             dimensions     = new int[4];
-            gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+            gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, null);
             gridFromCRS2D  = inverse(gridToCRS2D);
             gridDimensionX = dimensions[0];
             gridDimensionY = dimensions[1];
@@ -238,10 +239,28 @@ public class GridGeometry2D extends GeneralGridGeometry {
                           final CoordinateReferenceSystem crs)
             throws IllegalArgumentException, MismatchedDimensionException
     {
+        this(gridRange, gridToCRS, crs, null);
+    }
+
+    /**
+     * Constructs a new grid geometry from a math transform. This constructor is identical to
+     * <code>{@linkplain #GridGeometry2D(GridRange, MathTransform, CoordinateReferenceSystem)
+     * GridGeometry2D}(gridRange, gridToCRS, crs)</code> with the addition of an optional set
+     * of hints controlling the {@link MathTransform2D} creation. Those hints are used for
+     * fetching a {@link DimensionFilter} instance doing the work.
+     *
+     * @since 2.5
+     */
+    public GridGeometry2D(final GridRange           gridRange,
+                          final MathTransform       gridToCRS,
+                          final CoordinateReferenceSystem crs,
+                          final Hints hints)
+            throws IllegalArgumentException, MismatchedDimensionException
+    {
         super(gridRange, gridToCRS, crs);
         final int[] dimensions;
         dimensions     = new int[4];
-        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, hints);
         gridFromCRS2D  = inverse(gridToCRS2D);
         gridDimensionX = dimensions[0];
         gridDimensionY = dimensions[1];
@@ -273,7 +292,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         super(gridToCRS, envelope);
         final int[] dimensions;
         dimensions     = new int[4];
-        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, null);
         gridFromCRS2D  = inverse(gridToCRS2D);
         gridDimensionX = dimensions[0];
         gridDimensionY = dimensions[1];
@@ -348,7 +367,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         super(gridRange, userRange, reverse, swapXY, automatic);
         final int[] dimensions;
         dimensions     = new int[4];
-        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, null);
         gridFromCRS2D  = inverse(gridToCRS2D);
         gridDimensionX = dimensions[0];
         gridDimensionY = dimensions[1];
@@ -426,12 +445,13 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *         {@link #axisDimensionY} values. This argument is actually a workaround for a
      *         Java language limitation (no multiple return values). If we could, we would
      *         have returned directly the arrays computed in the body of this method.
+     * @param  hints An optional set of hints for {@link DimensionFilter} creation.
      * @return The {@link MathTransform2D} part of {@code transform}.
      * @throws IllegalArgumentException if the 2D part is not separable.
      */
     private static MathTransform2D getMathTransform2D(final MathTransform transform,
                                                       final GridRange     gridRange,
-                                                      final int[]              axis)
+                                                      final int[] axis, final Hints hints)
             throws IllegalArgumentException
     {
         if (transform==null || transform instanceof MathTransform2D) {
@@ -442,7 +462,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
          * Finds the axis for the two dimensional parts. We infer them from the grid range.
          * If no grid range were specified, then we assume that they are the 2 first dimensions.
          */
-        final DimensionFilter filter = new DimensionFilter();
+        final DimensionFilter filter = DimensionFilter.getInstance(hints);
         if (gridRange != null) {
             final int dimension = gridRange.getDimension();
             for (int i=0; i<dimension; i++) {

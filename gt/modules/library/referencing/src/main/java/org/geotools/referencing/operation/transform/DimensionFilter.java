@@ -70,6 +70,15 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class DimensionFilter {
     /**
+     * Hint key for specifying a particular instance of {@code DimensionFilter} to use.
+     *
+     * @see #getInstance
+     *
+     * @since 2.5
+     */
+    public static final Hints.Key INSTANCE = new Hints.Key(DimensionFilter.class);
+
+    /**
      * The input dimensions to keep, in strictly increasing order.
      * This sequence can contains any integers in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>
@@ -119,7 +128,29 @@ public class DimensionFilter {
     }
 
     /**
-     * Clear any {@linkplain #getSourceDimensions source} and
+     * Creates or returns an existing instance from the given set of hints. If the hints contain
+     * a value for the {@link #INSTANCE} key, this value is returned. Otherwise a new instance is
+     * {@linkplain #DimensionFilter(Hints) created} with the given hints.
+     *
+     * @param  hints The hints, or {@code null} if none.
+     * @return An existing or a new {@code DimensionFilter} instance (never {@code null}).
+     *
+     * @see #INSTANCE
+     *
+     * @since 2.5
+     */
+    public static DimensionFilter getInstance(final Hints hints) {
+        if (hints != null) {
+            final DimensionFilter candidate = (DimensionFilter) hints.get(INSTANCE);
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        return new DimensionFilter(hints);
+    }
+
+    /**
+     * Clears any {@linkplain #getSourceDimensions source} and
      * {@linkplain #getTargetDimensions target dimension} setting.
      */
     public void clear() {
