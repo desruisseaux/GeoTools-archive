@@ -57,19 +57,19 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-example</artifactId>
+  <artifactId>gt2-process</artifactId>
   <packaging>jar</packaging>
-  <name>Example</name>
-  <url>http://maven.geotools.fr/reports/example/</url>
+  <name>Process</name>
+  <url>http://maven.geotools.fr/reports/process/</url>
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/unsupported/example/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/unsupported/process/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/example/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/process/</url>
   </scm>
   
   <description>
-    Supply a quick description here.
+    This is an API for creating processes/operations.
   </description>
   
   <organization>
@@ -97,10 +97,10 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <id>YOURID</id>
-      <name>YOUR NAME</name>
-      <email>you@server.org</email>
-      <organization>University, Organization or Company</organization>
+      <id>gdavis</id>
+      <name>Graham Davis</name>
+      <email>gdavis@refractions.net</email>
+      <organization>Refractions Research</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
