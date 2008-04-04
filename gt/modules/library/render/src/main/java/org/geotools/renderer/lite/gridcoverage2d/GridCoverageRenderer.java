@@ -49,6 +49,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
@@ -477,43 +478,49 @@ public final class GridCoverageRenderer {
 			LOGGER.fine(new StringBuffer("Using interpolation ").append(
 					interpolation).toString());
 
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// CROPPING Coverage
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final GridCoverage2D croppedGridCoverage = getCroppedCoverage(
-				gridCoverage, croppedEnvelope, sourceCoverageCRS);
-		if (croppedGridCoverage == null) {
-			// nothing to render, the AOI does not overlap
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"Skipping current coverage because cropped to an empty area")
-								.toString());
-			return;
-		}
-		if (DEBUG) {
-			try {
-				ImageIO.write(croppedGridCoverage.geophysics(false)
-						.getRenderedImage(), "tiff", new File(debugDir,
-						"cropped.tiff"));
-			} catch (IOException e1) {
-				LOGGER.info(e1.getLocalizedMessage());
-			}
+		GridCoverage2D preResample = gridCoverage;
+		// Crop works fine only on non rotated coverages, so if the coverage has any rotation
+		// we have to give up cropping and deal with the full image instead
+		if(isScaleTranslate(gridCoverage.getGridGeometry().getGridToCRS())) {
+    		// /////////////////////////////////////////////////////////////////////
+    		//
+    		// CROPPING Coverage
+    		//
+    		// /////////////////////////////////////////////////////////////////////
+    		final GridCoverage2D croppedGridCoverage = getCroppedCoverage(
+    				gridCoverage, croppedEnvelope, sourceCoverageCRS);
+    		if (croppedGridCoverage == null) {
+    			// nothing to render, the AOI does not overlap
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER
+    						.fine(new StringBuffer(
+    								"Skipping current coverage because cropped to an empty area")
+    								.toString());
+    			return;
+    		}
+    		if (DEBUG) {
+    			try {
+    				ImageIO.write(croppedGridCoverage.geophysics(false)
+    						.getRenderedImage(), "tiff", new File(debugDir,
+    						"cropped.tiff"));
+    			} catch (IOException e1) {
+    				LOGGER.info(e1.getLocalizedMessage());
+    			}
+    		}
+    		preResample = croppedGridCoverage;
 		}
 
 		GridCoverage2D preSymbolizer;
 
 		if (doReprojection) {
-			preSymbolizer = resample(croppedGridCoverage, destinationCRS,
+			preSymbolizer = resample(preResample, destinationCRS,
 					interpolation == null ? new InterpolationNearest()
 							: interpolation, destinationEnvelope);
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine(new StringBuffer("Reprojecting to crs ").append(
 						destinationCRS.toWKT()).toString());
 		} else
-			preSymbolizer = croppedGridCoverage;
+			preSymbolizer = preResample;
 
 		if (DEBUG) {
 
@@ -658,5 +665,20 @@ public final class GridCoverageRenderer {
 		graphics.setRenderingHints(oldHints);
 
 	}
+	
+	/**
+     * Checks the transformation is a pure scale/translate instance (using a tolerance)
+     * @param transform
+     * @return
+     */
+    private boolean isScaleTranslate(MathTransform transform) {
+        if(!(transform instanceof AffineTransform))
+            return false;
+        final AffineTransform at = new AffineTransform((AffineTransform) transform);
+        XAffineTransform.round(at, EPS);
+        final double rotation= XAffineTransform.getRotation(at);
+        final boolean retVal =(Math.abs(rotation)==0);
+        return retVal;
+    }
 
 }
