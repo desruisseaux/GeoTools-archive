@@ -115,10 +115,13 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
+        lbl_color1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbl_color1.setText(bundle.getString("color")); // NOI18N
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel1.setText(bundle.getString("background")); // NOI18N
 
+        lbl2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbl2.setText(bundle.getString("opacity")); // NOI18N
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -142,6 +145,11 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
                         .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {guiAlpha, guiBackground, guiColor}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {jLabel1, lbl2, lbl_color1}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()

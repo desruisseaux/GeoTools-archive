@@ -124,10 +124,13 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleElementEdit
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
         jXTitledSeparator1.setTitle(bundle.getString("general")); // NOI18N
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel1.setText(bundle.getString("size")); // NOI18N
 
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText(bundle.getString("rotation")); // NOI18N
 
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText(bundle.getString("opacity")); // NOI18N
 
         guiDisplacement.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("displacement"))); // NOI18N
@@ -172,6 +175,11 @@ public class JGraphicPane extends javax.swing.JPanel implements StyleElementEdit
                 .add(guiExternal, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(82, Short.MAX_VALUE))
         );
+
+        layout.linkSize(new java.awt.Component[] {guiOpacity, guiRotation, guiSize}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        layout.linkSize(new java.awt.Component[] {jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
