@@ -17,16 +17,12 @@ package org.geotools.processfactory;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Set;
 
-import org.geotools.data.DataAccessFactory;
-import org.geotools.data.DataAccessFinder;
-import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.factory.Hints;
+import org.geotools.process.literal.IntersectsFactory;
 
 
 /**

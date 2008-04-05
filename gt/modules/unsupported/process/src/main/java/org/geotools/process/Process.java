@@ -22,7 +22,6 @@ package org.geotools.process;
 
 import java.util.Map;
 
-import org.geotools.processfactory.ProcessFactory;
 import org.opengis.util.ProgressListener;
 
 /**

@@ -22,42 +22,19 @@ package org.geotools.processfactory;
 
 import java.util.Map;
 
-import org.geotools.process.Process;
-import org.geotools.processparameter.ProcessParameter;
 import org.opengis.util.InternationalString;
 
 /**
- * Implementation of a ProcessFactory for Intersects process
+ * Used to describe the parameters needed for a Process, and for creating a Process to use.
  *
  * @author Graham Davis
  */
-public class IntersectsFactory implements ProcessFactory {
+public interface ProcessFactory {
 
-	public Process create(Map<String, Object> parameters)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public InternationalString getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ProcessParameter[] getParameterInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ProcessParameter[] getResultInfo(Map<String, Object> parameters)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public InternationalString getTitle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+		public InternationalString getTitle();
+		public InternationalString getDescription();
+		public ProcessParameter[] getParameterInfo();
+		
+		public Process create(Map<String, Object> parameters) throws IllegalArgumentException;
+		public ProcessParameter[] getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
 }
