@@ -33,8 +33,8 @@ public interface ProcessFactory {
 
 		public InternationalString getTitle();
 		public InternationalString getDescription();
-		public ProcessParameter[] getParameterInfo();
+		public Parameter[] getParameterInfo();
 		
 		public Process create(Map<String, Object> parameters) throws IllegalArgumentException;
-		public ProcessParameter[] getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
+		public Parameter[] getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
 }

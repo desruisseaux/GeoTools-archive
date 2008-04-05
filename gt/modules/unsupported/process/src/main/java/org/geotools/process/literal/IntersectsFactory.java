@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
-import org.geotools.process.ProcessParameter;
+import org.geotools.process.Parameter;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
@@ -40,13 +40,12 @@ public class IntersectsFactory implements ProcessFactory {
 		return new SimpleInternationalString("Intersection between two literal geometry");
 	}
 
-	public ProcessParameter[] getParameterInfo() {
+	public Parameter[] getParameterInfo() {
 	    return null;
 	}
 	
-	public ProcessParameter[] getResultInfo(Map<String, Object> parameters)
+	public Parameter[] getResultInfo(Map<String, Object> parameters)
 			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

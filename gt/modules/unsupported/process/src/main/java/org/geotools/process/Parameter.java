@@ -18,7 +18,7 @@
  *    OpenGIS consortium's work is fully acknowledged here.
  */
 
-package org.geotools.processparameter;
+package org.geotools.process;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Graham Davis
  */
-public class ProcessParameter {
+public class Parameter {
 	
     public final String key;
     public final InternationalString description;
@@ -41,11 +41,11 @@ public class ProcessParameter {
     public final Map<String, Object> metadata;
 
     /** Mandatory information */
-    public ProcessParameter(String key, Class type, InternationalString description ){
+    public Parameter(String key, Class type, InternationalString description ){
         this( key, type, description, false, null, null );
     }
     /** Addition of optional parameters */
-    public ProcessParameter(String key, Class type, InternationalString description,
+    public Parameter(String key, Class type, InternationalString description,
                      boolean required, Object sample, Map metadata){
         this.key = key;
         this.type = type;
