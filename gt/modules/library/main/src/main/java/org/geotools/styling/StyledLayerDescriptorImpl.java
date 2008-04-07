@@ -79,7 +79,8 @@ public class StyledLayerDescriptorImpl implements StyledLayerDescriptor {
 
     /** Holds value of property abstract. */
     private String abstractStr;
-    private List layers = new ArrayList();
+    
+    private List<StyledLayer> layers = new ArrayList<StyledLayer>();
 
     /**
      * Convenience method for grabbing the default style from the

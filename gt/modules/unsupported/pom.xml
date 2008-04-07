@@ -63,6 +63,7 @@
      <profile>
        <id>pending</id>
        <modules>
+         <module>process</module>
          <module>coveragetools</module>
          <module>sql-datastore</module>
          <module>geometryless</module>
