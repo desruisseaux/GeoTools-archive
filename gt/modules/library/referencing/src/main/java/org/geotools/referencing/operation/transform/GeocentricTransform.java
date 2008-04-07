@@ -439,9 +439,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Returns the inverse of this transform.
      */
     @Override
-    public MathTransform inverse() {
+    public synchronized MathTransform inverse() {
         if (inverse == null) {
-            // No need to synchronize; this is not a big deal if this object is created twice.
             inverse = new Inverse();
         }
         return inverse;

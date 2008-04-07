@@ -451,8 +451,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * "Digital Chart of the World"). If no alternative title is found or if the main title
      * is yet shorter, then it is used.
      */
-    private GenericName getName() {
-        // No need to synchronize; this is not a big deal if the name is created twice.
+    private synchronized GenericName getName() {
         if (name == null) {
             name = getName(authority, code);
         }

@@ -236,8 +236,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     /**
      * Returns the set of locales defined in this international string.
      */
-    public Set<Locale> getLocales() {
-        // No need to synchronize; this is not a big deal if this object is built twice.
+    public synchronized Set<Locale> getLocales() {
         if (localSet == null) {
             localSet = Collections.unmodifiableSet(localMap.keySet());
         }

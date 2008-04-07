@@ -360,12 +360,10 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * Creates the inverse transform of this object.
      */
     @Override
-    public MathTransform inverse() throws NoninvertibleTransformException {
-        // No need to synchronize. Not a big deal if two objects are created.
+    public synchronized MathTransform inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
-            inverse = new PassThroughTransform(firstAffectedOrdinate,
-                                               subTransform.inverse(),
-                                               numTrailingOrdinates);
+            inverse = new PassThroughTransform(
+                    firstAffectedOrdinate, subTransform.inverse(), numTrailingOrdinates);
             inverse.inverse = this;
         }
         return inverse;

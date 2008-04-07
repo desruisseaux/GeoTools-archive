@@ -150,10 +150,10 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      */
     protected CoordinateOperationAuthorityFactory getAuthorityFactory() {
         /*
-         * No need to synchronize. This is not a big deal if FactoryFinder is invoked twice.
-         * Actually, we should not synchronize at all. All methods from the super-class are
-         * thread-safe without synchronized statements, and we should preserve this advantage
-         * in order to reduce the risk of thread lock.
+         * No need to synchronize. This is not a big deal if ReferencingFactoryFinder is invoked
+         * twice since it is already synchronized. Actually, we should not synchronize at all.
+         * Every methods from the super-class are thread-safe without synchronized statements,
+         * and we should preserve this advantage in order to reduce the risk of contention.
          */
         if (authorityFactory == null) {
             /*

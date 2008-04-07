@@ -123,9 +123,8 @@ public class DefaultCompoundCS extends AbstractCS {
     /**
      * Returns all coordinate systems in this compound CS.
      */
-    public List<CoordinateSystem> getCoordinateSystems() {
+    public synchronized List<CoordinateSystem> getCoordinateSystems() {
         if (asList == null) {
-            // No need to synchronize; this is not a big deal if two lists are created.
             asList = Collections.unmodifiableList(Arrays.asList(cs));
         }
         return asList;

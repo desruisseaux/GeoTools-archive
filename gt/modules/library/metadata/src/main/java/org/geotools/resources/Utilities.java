@@ -327,10 +327,11 @@ public final class Utilities {
      * @return A string of length {@code length} filled with white spaces.
      */
     public static String spaces(int length) {
-        // No need to synchronize.  In the unlikely event of two threads
-        // calling this method at the same time and the two calls creating a
-        // new string, the String.intern() call will take care of
-        // canonicalizing the strings.
+        /*
+         * No need to synchronize.  In the unlikely event of two threads calling this method
+         * at the same time and the two calls creating a new string, the String.intern() call
+         * will take care of canonicalizing the strings.
+         */
         final int last = spacesFactory.length-1;
         if (length<0) length=0;
         if (length <= last) {

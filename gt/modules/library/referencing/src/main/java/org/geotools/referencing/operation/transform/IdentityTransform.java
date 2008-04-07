@@ -72,8 +72,7 @@ public class IdentityTransform extends AbstractMathTransform
     /**
      * Constructs an identity transform of the specified dimension.
      */
-    public static LinearTransform create(final int dimension) {
-        // No need to synchronize; not a big deal in a few objects are duplicated.
+    public static synchronized LinearTransform create(final int dimension) {
         LinearTransform candidate;
         if (dimension < POOL.length) {
             candidate = POOL[dimension];

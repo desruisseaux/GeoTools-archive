@@ -176,7 +176,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * @see #getAuthorities
      */
     @Override
-    public Citation getAuthority() {
+    public synchronized Citation getAuthority() {
         // No need to synchronize; this is not a big deal if we create this object twice.
         if (authority == null) {
             final Citation[] authorities = getAuthorities();

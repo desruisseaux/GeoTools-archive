@@ -54,9 +54,8 @@ public class Formattable {
 
     /**
      * The formatter for the {@link #toWKT()} method.
-     * Will be constructed only when first needed.
      */
-    private static Formatter FORMATTER;
+    private static final ThreadLocal<Formatter> FORMATTER = new ThreadLocal<Formatter>();
 
     /**
      * Default constructor.
@@ -154,35 +153,31 @@ public class Formattable {
             throw new IllegalArgumentException(Errors.format(
                       ErrorKeys.NULL_ARGUMENT_$1, "authority"));
         }
-        // No need to synchronize. This is not a big deal
-        // if two formatters co-exist for a short time.
-        Formatter formatter = FORMATTER;
+        Formatter formatter = FORMATTER.get();
         if (formatter             == null        ||
             formatter.indentation != indentation ||
             formatter.authority   != authority)
         {
             formatter = new Formatter(Symbols.DEFAULT, indentation);
             formatter.authority = authority;
-            FORMATTER = formatter;
+            FORMATTER.set(formatter);
         }
-        synchronized (formatter) {
-            try {
-                if (this instanceof GeneralParameterValue) {
-                    // Special processing for parameter values, which is formatted
-                    // directly in 'Formatter'. Note that in GeoAPI, this interface
-                    // doesn't share the same parent interface than other interfaces.
-                    formatter.append((GeneralParameterValue) this);
-                } else {
-                    formatter.append(this);
-                }
-                if (strict && formatter.isInvalidWKT()) {
-                    final Class unformattable = formatter.getUnformattableClass();
-                    throw new UnformattableObjectException(formatter.warning, unformattable);
-                }
-                return formatter.toString();
-            } finally {
-                formatter.clear();
+        try {
+            if (this instanceof GeneralParameterValue) {
+                // Special processing for parameter values, which is formatted
+                // directly in 'Formatter'. Note that in GeoAPI, this interface
+                // doesn't share the same parent interface than other interfaces.
+                formatter.append((GeneralParameterValue) this);
+            } else {
+                formatter.append(this);
             }
+            if (strict && formatter.isInvalidWKT()) {
+                final Class unformattable = formatter.getUnformattableClass();
+                throw new UnformattableObjectException(formatter.warning, unformattable);
+            }
+            return formatter.toString();
+        } finally {
+            formatter.clear();
         }
     }
 

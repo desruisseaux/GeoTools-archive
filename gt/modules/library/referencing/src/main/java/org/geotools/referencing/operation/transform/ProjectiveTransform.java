@@ -486,8 +486,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Creates the inverse transform of this object.
      */
     @Override
-    public MathTransform inverse() throws NoninvertibleTransformException {
-        // No need to synchronize. This is not a big deal if the same object is created twice.
+    public synchronized MathTransform inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
             if (isIdentity()) {
                 inverse = this;
