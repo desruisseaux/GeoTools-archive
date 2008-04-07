@@ -107,13 +107,23 @@ public class GridGeometry2D extends GeneralGridGeometry {
 
     /**
      * A math transform mapping only two dimensions of {@link #gridToCRS gridToCRS}.
+     * Is {@code null} if and only if {@link #gridToCRS} is null.
      */
     private final MathTransform2D gridToCRS2D;
 
     /**
      * The inverse of {@code gridToCRS2D}.
+     * Is {@code null} if and only if {@link #gridToCRS2D} is null.
      */
     private final MathTransform2D gridFromCRS2D;
+
+    /**
+     * {@link #gridToCRS2D} cached in the {@link PixelOrientation#UPPER_LEFT} case.
+     * This field is serialized because it may be user-provided, in which case it is
+     * likely to be more accurate than what we would compute. If {@code null}, will
+     * be computed when first needed.
+     */
+    private MathTransform2D cornerToCRS2D;
 
     /**
      * Tests the validity of this grid geometry.
@@ -122,6 +132,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (gridToCRS != null) {
             final int sourceDim = gridToCRS.getSourceDimensions();
             final int targetDim = gridToCRS.getTargetDimensions();
+            assert gridToCRS.equals(gridToCRS2D) == (sourceDim == 2 && targetDim == 2);
+            assert !gridToCRS2D.equals(cornerToCRS2D);
             assert gridRange == null || sourceDim == gridRange.getDimension() : gridRange;
             assert envelope  == null || targetDim ==  envelope.getDimension() : envelope;
             assert gridDimensionY < sourceDim : gridDimensionY;
@@ -146,6 +158,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         axisDimensionY = gm.axisDimensionY;
         gridFromCRS2D  = gm.gridFromCRS2D;
         gridToCRS2D    = gm.gridToCRS2D;
+        cornerToCRS2D  = gm.cornerToCRS2D;
         crs2D          = createCRS2D();
         assert isValid() : this;
     }
@@ -171,6 +184,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
             axisDimensionX = gg.axisDimensionX;
             axisDimensionY = gg.axisDimensionY;
             crs2D          = gg.crs2D;
+            cornerToCRS2D  = gg.cornerToCRS2D;
         } else {
             final int[] dimensions;
             dimensions     = new int[4];
@@ -272,6 +286,9 @@ public class GridGeometry2D extends GeneralGridGeometry {
         axisDimensionX = dimensions[2];
         axisDimensionY = dimensions[3];
         crs2D          = createCRS2D();
+        if (PixelInCell.CELL_CORNER.equals(anchor)) {
+            cornerToCRS2D = getMathTransform2D(gridToCRS, gridRange, dimensions, hints);
+        }
         assert isValid() : this;
     }
 
@@ -405,6 +422,9 @@ public class GridGeometry2D extends GeneralGridGeometry {
         axisDimensionX = dimensions[2];
         axisDimensionY = dimensions[3];
         crs2D          = createCRS2D();
+        if (PixelInCell.CELL_CORNER.equals(anchor)) {
+            cornerToCRS2D = getMathTransform2D(gridToCRS, gridRange, dimensions, hints);
+        }
         assert isValid() : this;
     }
 
@@ -547,15 +567,16 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * search for the grid dimensions in the given grid range having a length greater than 1.
      * The corresponding CRS dimensions are inferred from the transform itself.
      *
-     * @param  gridRange The grid range.
-     * @param  transform The transform.
+     * @param  gridRange The grid range, or {@code null} if unknown.
+     * @param  transform The transform, or {@code null} if none.
      * @param  axis An array of length 4 initialized to 0. This is the array where to store
      *         {@link #gridDimensionX}, {@link #gridDimensionY}, {@link #axisDimensionX} and
      *         {@link #axisDimensionY} values. This argument is actually a workaround for a
      *         Java language limitation (no multiple return values). If we could, we would
      *         have returned directly the arrays computed in the body of this method.
      * @param  hints An optional set of hints for {@link DimensionFilter} creation.
-     * @return The {@link MathTransform2D} part of {@code transform}.
+     * @return The {@link MathTransform2D} part of {@code transform}, or {@code null}
+     *         if and only if {@code gridToCRS} was null..
      * @throws IllegalArgumentException if the 2D part is not separable.
      */
     private static MathTransform2D getMathTransform2D(final MathTransform transform,
@@ -739,7 +760,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
             return crs2D;
         }
         assert !isDefined(CRS);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
+        throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_CRS);
     }
 
     /**
@@ -766,8 +787,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
             //       our privated 'envelope' field is not exposed to subclasses.
         }
         assert !isDefined(ENVELOPE);
-        throw new InvalidGridGeometryException(Errors.format(gridToCRS == null ?
-                    ErrorKeys.UNSPECIFIED_TRANSFORM : ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(gridToCRS == null ?
+                    ErrorKeys.UNSPECIFIED_TRANSFORM : ErrorKeys.UNSPECIFIED_IMAGE_SIZE);
     }
 
     /**
@@ -790,7 +811,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
                                    gridRange.getLength(gridDimensionY));
         }
         assert !isDefined(GRID_RANGE);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_IMAGE_SIZE);
     }
 
     /**
@@ -812,7 +833,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (gridToCRS2D != null) {
             return gridToCRS2D;
         }
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(ErrorKeys.NO_TRANSFORM2D_AVAILABLE);
     }
 
     /**
@@ -830,8 +851,37 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @since 2.3
      */
     public MathTransform2D getGridToCRS2D(final PixelOrientation orientation) {
+        if (gridToCRS2D == null) {
+            throw new InvalidGridGeometryException(ErrorKeys.NO_TRANSFORM2D_AVAILABLE);
+        }
+        if (!PixelOrientation.UPPER_LEFT.equals(orientation)) {
+            return computeGridToCRS2D(orientation);
+        }
+        synchronized (this) {
+            if (cornerToCRS2D == null) {
+                /*
+                 * If the gridToCRS transform is 2-dimensional, reuse the existing instance
+                 * (we will ensure in the assertion that it is suitable). Otherwise computes
+                 * and caches a new instance. We cache only the UPPER_LEFT case since it is
+                 * widely used; the other cases are rather unusual.
+                 */
+                if (gridToCRS.getSourceDimensions() == 2 && gridToCRS.getTargetDimensions() == 2) {
+                    cornerToCRS2D = (MathTransform2D) super.getGridToCRS(PixelInCell.CELL_CORNER);
+                } else {
+                    cornerToCRS2D = computeGridToCRS2D(orientation);
+                }
+            }
+        }
+        assert cornerToCRS2D.equals(computeGridToCRS2D(orientation));
+        return cornerToCRS2D;
+    }
+
+    /**
+     * Computes the value to be returned by {@link #getGridToCRS2D}.
+     */
+    private MathTransform2D computeGridToCRS2D(final PixelOrientation orientation) {
         final int xdim = (gridDimensionX < gridDimensionY) ? 0 : 1;
-        return (MathTransform2D) PixelTranslation.translate(getGridToCRS2D(),
+        return (MathTransform2D) PixelTranslation.translate(gridToCRS2D,
                 PixelOrientation.CENTER, orientation, xdim, xdim ^ 1);
     }
 
@@ -851,8 +901,11 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @since 2.3
      */
     public MathTransform getGridToCRS(final PixelOrientation orientation) {
-        return PixelTranslation.translate(getGridToCRS(),
-                PixelOrientation.CENTER, orientation, gridDimensionX, gridDimensionY);
+        if (gridToCRS == null) {
+            throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_TRANSFORM);
+        }
+        return PixelTranslation.translate(gridToCRS, PixelOrientation.CENTER, orientation,
+                gridDimensionX, gridDimensionY);
     }
 
     /**
@@ -901,7 +954,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
                           AbstractGridCoverage.toString(point, Locale.getDefault()), exception));
             }
         }
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
+        throw new InvalidGridGeometryException(ErrorKeys.NO_TRANSFORM2D_AVAILABLE);
     }
 
     /**
@@ -937,6 +990,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
                    this.gridDimensionY == that.gridDimensionY &&
                    this.axisDimensionX == that.axisDimensionX &&
                    this.axisDimensionY == that.axisDimensionY;
+            // Do not compare cornerToCRS2D since it may not be computed yet,
+            // and should be strictly derived from gridToCRS2D anyway.
         }
         return false;
     }

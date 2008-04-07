@@ -16,6 +16,8 @@
  */
 package org.geotools.coverage.grid;
 
+import org.geotools.resources.i18n.Errors;
+
 
 /**
  * Thrown by {@link GeneralGridGeometry} when a grid geometry is in an invalid state. For example
@@ -39,6 +41,14 @@ public class InvalidGridGeometryException extends IllegalStateException {
      * Constructs an exception with no detail message.
      */
     public InvalidGridGeometryException() {
+    }
+
+    /**
+     * Constructs an exception with a detail message from the specified error code.
+     * Should not be public because the GeoTools I18N framework is not a commited one.
+     */
+    InvalidGridGeometryException(final int code) {
+        super(Errors.format(code));
     }
 
     /**

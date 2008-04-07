@@ -426,7 +426,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         if (gridToCRS != null) {
             return gridToCRS.getSourceDimensions();
         }
-        return getGridRange().getDimension();
+        return gridRange.getDimension();
     }
 
     /**
@@ -452,7 +452,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             }
         }
         assert !isDefined(CRS);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
+        throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_CRS);
     }
 
     /**
@@ -473,8 +473,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             return envelope.clone();
         }
         assert !isDefined(ENVELOPE);
-        throw new InvalidGridGeometryException(Errors.format(gridToCRS == null ?
-                    ErrorKeys.UNSPECIFIED_TRANSFORM : ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(gridToCRS == null ?
+                    ErrorKeys.UNSPECIFIED_TRANSFORM : ErrorKeys.UNSPECIFIED_IMAGE_SIZE);
     }
 
     /**
@@ -496,7 +496,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             return clone(gridRange);
         }
         assert !isDefined(GRID_RANGE);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
+        throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_IMAGE_SIZE);
     }
 
     /**
@@ -524,7 +524,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             return gridToCRS;
         }
         assert !isDefined(GRID_TO_CRS);
-        throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_TRANSFORM));
+        throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_TRANSFORM);
     }
 
     /**
@@ -543,20 +543,22 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * @since 2.3
      */
     public MathTransform getGridToCRS(final PixelInCell anchor) throws InvalidGridGeometryException {
+        if (gridToCRS == null) {
+            throw new InvalidGridGeometryException(ErrorKeys.UNSPECIFIED_TRANSFORM);
+        }
         if (PixelInCell.CELL_CENTER.equals(anchor)) {
-            return getGridToCRS();
+            return gridToCRS;
         }
         if (PixelInCell.CELL_CORNER.equals(anchor)) {
             synchronized (this) {
                 if (cornerToCRS == null) {
-                    cornerToCRS = PixelTranslation.translate(getGridToCRS(),
-                            PixelInCell.CELL_CENTER, anchor);
+                    cornerToCRS = PixelTranslation.translate(gridToCRS, PixelInCell.CELL_CENTER, anchor);
                 }
             }
             assert !cornerToCRS.equals(gridToCRS) : cornerToCRS;
             return cornerToCRS;
         }
-        return PixelTranslation.translate(getGridToCRS(), PixelInCell.CELL_CENTER, anchor);
+        return PixelTranslation.translate(gridToCRS, PixelInCell.CELL_CENTER, anchor);
     }
 
     /**
@@ -578,7 +580,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.ILLEGAL_ARGUMENT_$2, "bitmask", bitmask));
         }
-        return ((bitmask & CRS)         == 0 || (envelope  != null && envelope.getCoordinateReferenceSystem()!=null))
+        return ((bitmask & CRS)         == 0 || (envelope  != null && envelope.getCoordinateReferenceSystem() != null))
             && ((bitmask & ENVELOPE)    == 0 || (envelope  != null && !envelope.isNull()))
             && ((bitmask & GRID_RANGE)  == 0 || (gridRange != null))
             && ((bitmask & GRID_TO_CRS) == 0 || (gridToCRS != null));
@@ -612,6 +614,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             return Utilities.equals(this.gridRange, that.gridRange) &&
                    Utilities.equals(this.gridToCRS, that.gridToCRS) &&
                    Utilities.equals(this.envelope , that.envelope );
+            // Do not compare cornerToCRS since it may not be computed yet,
+            // and should be strictly derived from gridToCRS anyway.
         }
         return false;
     }

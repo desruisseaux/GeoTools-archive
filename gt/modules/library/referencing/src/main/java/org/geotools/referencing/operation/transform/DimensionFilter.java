@@ -143,6 +143,7 @@ public class DimensionFilter {
         if (hints != null) {
             final DimensionFilter candidate = (DimensionFilter) hints.get(INSTANCE);
             if (candidate != null) {
+                candidate.clear();
                 return candidate;
             }
         }
