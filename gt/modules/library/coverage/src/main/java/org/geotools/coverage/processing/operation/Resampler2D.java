@@ -366,6 +366,7 @@ final class Resampler2D extends GridCoverage2D {
             sourceEnvelope = sourceCoverage.getEnvelope(); // Don't force this one to 2D.
             targetEnvelope = CRS.transform(operation, sourceEnvelope);
             targetEnvelope.setCoordinateReferenceSystem(targetCRS);
+            // 'targetCRS' may be different than the one set by CRS.transform(...).
             /*
              * If the target GridGeometry is incomplete, provides default
              * values for the missing fields. Three cases may occurs:
@@ -433,10 +434,10 @@ final class Resampler2D extends GridCoverage2D {
         if (layout != null) {
             layout = (ImageLayout) layout.clone();
         } else {
-            layout = new ImageLayout(sourceImage);
-            layout.unsetImageBounds();
-            layout.unsetTileLayout();
-            // At this point, only the color model and sample model are left valids.
+            layout = new ImageLayout();
+            // Do not inherit the color model and sample model from the 'sourceImage';
+            // Let the operation decide itself. This is necessary in case we change the
+            // source, as we do if we choose the "Mosaic" operation.
         }
         final Rectangle sourceBB = sourceGG.getGridRange2D();
         final Rectangle targetBB = targetGG.getGridRange2D();
@@ -454,9 +455,6 @@ final class Resampler2D extends GridCoverage2D {
             layout.setTileGridYOffset(layout.getMinY(sourceImage));
             layout.setTileWidth (size.width);
             layout.setTileHeight(size.height);
-            SampleModel model = layout.getSampleModel(sourceImage);
-            model = model.createCompatibleSampleModel(size.width, size.height);
-            layout.setSampleModel(model);
         }
         /*
          * Creates the border extender from the background values. We add it inconditionnaly as

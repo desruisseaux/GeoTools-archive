@@ -269,8 +269,7 @@ public class DefaultProcessor extends AbstractProcessor {
          */
         Interpolation[] interpolations = null;
         if (!operationName.equalsIgnoreCase("Interpolate")) {
-            for (final Iterator it=parameters.values().iterator(); it.hasNext();) {
-                final GeneralParameterValue param = (GeneralParameterValue) it.next();
+            for (final GeneralParameterValue param : parameters.values()) {
                 if (param instanceof ParameterValue) {
                     final Object value = ((ParameterValue) param).getValue();
                     if (value instanceof Interpolator2D) {
@@ -324,8 +323,9 @@ public class DefaultProcessor extends AbstractProcessor {
      * dynamically make new plug-ins available at runtime.
      */
     public synchronized void scanForPlugins() {
-        for (final Iterator it=registry.getServiceProviders(Operation.class, null, null); it.hasNext();) {
-            final Operation operation = (Operation) it.next();
+        final Iterator<Operation> it = registry.getServiceProviders(Operation.class, null, null);
+        while (it.hasNext()) {
+            final Operation operation = it.next();
             final String name = operation.getName().trim();
             if (!operations.containsKey(name)) {
                 addOperation0(operation);
