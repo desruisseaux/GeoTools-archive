@@ -58,19 +58,31 @@ public class Parameter<T> {
      */
     public final Object sample;
     
+    /** "featureType" FeatureType to validate a Feature value against */
+    public static final String FEATURE_TYPE = "featureType";
+    
+    /**
+     * "length" Integer used to limit the length of strings or literal geometries.
+     */
+    public static final String LENGTH = "length";
+    
+    /** "crs": CoordinateReferenceSystem used to restrict a Geometry literal */
+    public static final String CRS = "crs";
+    
+    /** "element": Class to use as the Element type for List<Element>. Please restrict
+     * your use of this facility to simple types; for most higher order data structures
+     * multiplicity is already accounted for - example MultiGeometry. */
+    public static final String ELEMENT = "element";
+    
     /**
      * Refinement of type; such as the FeatureType of a FeatureCollection, or component type of a List.
      * <p>
      * This information is supplied (along with type) to allow a process implementor communicate
      * additional restrictions on the allowed value beyond the strict type.
      * <p>
-     * The following keys are understood at this time:
-     * <ul>
-     * <li>"featureType": FeatureType to validate a Feature value against
-     * <li>"length": Integer used to limit the length of strings or literal geometries
-     * <li>...additional keys will be documented here over time
-     * <li>"crs": CoordinateReferenceSystem used to restrict a Geometry literal
-     * </ul>
+     * The following keys are understood at this time: LENGTH, FEATURE_TYPE, CRS, ELEMENT
+     * .. additional keys will be documented as static final fields over time.
+     * <p>
      * Any restrictions mentioned here should be mentioned as part of your
      * parameter description. This metadata is only used to help restrict what
      * the user enters; not all client application will understand and respect
@@ -91,7 +103,7 @@ public class Parameter<T> {
         this.description = description;
         this.required = required;
         this.sample = sample;
-        this.metadata = Collections.unmodifiableMap(metadata);
+        this.metadata = metadata == null ? null : Collections.unmodifiableMap(metadata);
     }
     
 }

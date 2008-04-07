@@ -25,11 +25,27 @@ import org.opengis.util.InternationalString;
  * @author Graham Davis
  */
 public interface ProcessFactory {
-
-		public InternationalString getTitle();
-		public InternationalString getDescription();
-		public Parameter[] getParameterInfo();
-		
-		public Process create(Map<String, Object> parameters) throws IllegalArgumentException;
-		public Parameter[] getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
+    /** Human readable title suitable for display.
+     * <p>
+     * Please note that this title is *not* stable across locale; if you want
+     * to remember a ProcessFactory between runs please use the classname
+     * (as we are not providing a name or uri)
+     */
+	public InternationalString getTitle();
+	
+	/**
+	 * Human readable description of this process.
+	 * @return
+	 */
+	public InternationalString getDescription();
+	
+	/**
+	 * Description of the Map parameter to use when executing.
+	 * @return
+	 */
+	public Map<String,Parameter<?>> getParameterInfo();
+	
+	public Process create(Map<String, Object> parameters) throws IllegalArgumentException;
+	
+	public Map<String,Parameter<?>> getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
 }

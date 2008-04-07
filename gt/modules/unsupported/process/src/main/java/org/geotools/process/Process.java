@@ -26,7 +26,11 @@ import org.opengis.util.ProgressListener;
  * @author Graham Davis
  */
 public interface Process {
-	
+	/**
+	 * 
+	 * @param monitor
+	 * @return Map of results (see factory getResultParameters for details), or null if canceled
+	 */
 	public Map<String,Object> process(ProgressListener monitor);
 	public ProcessFactory getFactory();
 }

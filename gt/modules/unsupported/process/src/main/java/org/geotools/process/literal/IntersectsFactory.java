@@ -15,45 +15,87 @@
  */
 package org.geotools.process.literal;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
 import org.geotools.process.Parameter;
+import org.geotools.process.impl.AbstractProcessFactory;
+import org.geotools.text.Text;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * A simple process showing how to interact with a couple of geometry literals.
+ * <p>
+ * This process is based on the SFSQL specification and implemented by the JTS Topology Suite;
+ * the interesting part is the process api used to make this concept avaialble to:
+ * <ul>
+ * <li>Java Programmer: via GEOM1, GEOM2 and RESULT
+ * <li>User Interface: via getParameterInfo
+ * </li>
  * 
  * @author Graham Davis
  */
-public class IntersectsFactory implements ProcessFactory {
+public class IntersectsFactory extends AbstractProcessFactory {
+    // making parameters available as static constants to help java programmers
+    /** First geometry for intersection */
+    static final Parameter<Geometry> GEOM1 =
+        new Parameter<Geometry>("geom1",Geometry.class, Text.text("Geometry 1") );
+    
+    /** Second geometry for intersection */
+    static final Parameter<Geometry> GEOM2 = 
+        new Parameter<Geometry>("geom1",Geometry.class, Text.text("Geometry 2") );
+    
+    /**
+     * Map used for getParameterInfo; used to describe operation requirements for user
+     * interface creation.
+     */
+    static final Map<String,Parameter<?>> prameterInfo = new TreeMap<String,Parameter<?>>();
+    static {
+        prameterInfo.put( GEOM1.key, GEOM1 );
+        prameterInfo.put( GEOM2.key, GEOM2 );
+    }
 
+    static final Parameter<Geometry> RESULT = 
+        new Parameter<Geometry>("result",Geometry.class, Text.text("Result of Geometry1.intersect( Geometry2 )") );
+        
+    /**
+     * Map used for getParameterInfo; used to describe operation requirements for user
+     * interface creation.
+     */
+    static final Map<String,Parameter<?>> resultInfo = new TreeMap<String,Parameter<?>>();
+    static {
+        resultInfo.put( RESULT.key, RESULT );
+    }
+    
 	public Process create(Map<String, Object> parameters)
 			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+		return new IntersectProcess( this, parameters );
 	}
 
 	public InternationalString getDescription() {
 		return new SimpleInternationalString("Intersection between two literal geometry");
 	}
 
-	public Parameter[] getParameterInfo() {
-	    return null;
+	public Map<String,Parameter<?>> getParameterInfo() {
+	    return Collections.unmodifiableMap( prameterInfo );
 	}
 	
-	public Parameter[] getResultInfo(Map<String, Object> parameters)
+	public Map<String,Parameter<?>> getResultInfo(Map<String, Object> parameters)
 			throws IllegalArgumentException {
-		return null;
+		return Collections.unmodifiableMap( resultInfo );
 	}
 
 	public InternationalString getTitle() {
 	    // please note that this is a title for display purposes only
 	    // finding an specific implementation by name is not possible
 	    //
-	    return new SimpleInternationalString("Intersection");
+	    return Text.text("Intersection");
 	}
 
 }
