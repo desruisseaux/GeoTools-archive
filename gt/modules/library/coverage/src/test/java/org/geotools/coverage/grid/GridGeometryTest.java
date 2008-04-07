@@ -16,24 +16,18 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.geometry.Envelope;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.metadata.spatial.PixelOrientation;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.transform.IdentityTransform;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -43,36 +37,15 @@ import org.geotools.referencing.operation.matrix.MatrixFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GridGeometryTest.class);
-    }
-    
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GridGeometryTest(final String name) {
-        super(name);
-    }
-
+public final class GridGeometryTest {
     /**
      * Tests the construction with an identity transform.
      */
+    @Test
     public void testIdentity() throws FactoryException {
-        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
         final int[] lower = new int[] {0,     0, 2};
         final int[] upper = new int[] {100, 200, 4};
-        final MathTransform identity = factory.createAffineTransform(MatrixFactory.create(4));
+        final MathTransform identity = IdentityTransform.create(3);
         GridGeometry2D gg;
         try {
             gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity, null);
@@ -88,11 +61,26 @@ public class GridGeometryTest extends TestCase {
         assertEquals(3, gg.getGridToCRS().getSourceDimensions());
         assertEquals(2, gg.getGridToCRS2D().getSourceDimensions());
         assertTrue(gg.getGridToCRS2D() instanceof AffineTransform);
+        /*
+         * Tests with a pixel orientation.
+         */
+        AffineTransform tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.CENTER);
+        assertTrue(tr.isIdentity());
+        tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.UPPER_LEFT);
+        assertFalse(tr.isIdentity());
+        assertEquals(AffineTransform.TYPE_TRANSLATION, tr.getType());
+        assertEquals(-0.5, tr.getTranslateX(), 0);
+        assertEquals(-0.5, tr.getTranslateY(), 0);
+        tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.valueOf("LOWER"));
+        assertEquals(AffineTransform.TYPE_TRANSLATION, tr.getType());
+        assertEquals(0.0, tr.getTranslateX(), 0);
+        assertEquals(0.5, tr.getTranslateY(), 0);
     }
 
     /**
      * Tests the construction from an envelope.
      */
+    @Test
     public void testEnvelope() {
         final int[]    lower   = new int[]    {   0,   0,  4};
         final int[]    upper   = new int[]    {  90,  45,  5};
@@ -100,7 +88,7 @@ public class GridGeometryTest extends TestCase {
         final double[] maximum = new double[] {+180, +90, 10};
         final GridGeometry2D gg;
         gg = new GridGeometry2D(new GeneralGridRange(lower,upper),
-                                new GeneralEnvelope(minimum, maximum), null, false);
+                                new GeneralEnvelope(minimum, maximum));
         final AffineTransform tr = (AffineTransform) gg.getGridToCRS2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |
                      AffineTransform.TYPE_TRANSLATION, tr.getType());
@@ -109,5 +97,31 @@ public class GridGeometryTest extends TestCase {
         assertEquals(4, tr.getScaleY(), 0);
         assertEquals(-178, tr.getTranslateX(), 0);
         assertEquals( -88, tr.getTranslateY(), 0);
+    }
+
+    /**
+     * Tests construction with 0.5 pixel translations.
+     */
+    @Test
+    public void testPixelInCell() {
+        final MathTransform identity = IdentityTransform.create(4);
+        final int[] lower = new int[] {100, 300, 3, 6};
+        final int[] upper = new int[] {200, 400, 4, 7};
+        final GeneralGridRange range = new GeneralGridRange(lower, upper);
+        GridGeometry2D gg = new GridGeometry2D(range, PixelInCell.CELL_CORNER, identity, null, null);
+
+        assertSame (identity, gg.getGridToCRS(PixelInCell.CELL_CORNER));
+        assertFalse(identity.equals(gg.getGridToCRS(PixelInCell.CELL_CENTER)));
+        assertFalse(identity.equals(gg.getGridToCRS(PixelOrientation.CENTER)));
+        assertSame (gg.getGridToCRS(PixelInCell.CELL_CENTER), gg.getGridToCRS(PixelOrientation.CENTER));
+
+        AffineTransform tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.CENTER);
+        assertFalse(tr.isIdentity());
+        assertEquals(AffineTransform.TYPE_TRANSLATION, tr.getType());
+        assertEquals(0.5, tr.getTranslateX(), 0);
+        assertEquals(0.5, tr.getTranslateY(), 0);
+
+        tr = (AffineTransform) gg.getGridToCRS2D(PixelOrientation.UPPER_LEFT);
+        assertTrue(tr.isIdentity());
     }
 }

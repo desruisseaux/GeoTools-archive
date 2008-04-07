@@ -35,9 +35,8 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -48,7 +47,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SampleTranscoderTest extends TestCase {
+public final class SampleTranscoderTest {
     /**
      * Small value for comparaisons. Remind: transformed values are stored in a new image
      * using the 'float' data type. So we can't expected as much precision than with a
@@ -67,32 +66,10 @@ public class SampleTranscoderTest extends TestCase {
     private GridSampleDimension band1;
 
     /**
-     * Runs the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(SampleTranscoderTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public SampleTranscoderTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Sets up common objects used for all tests.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         band1 = new GridSampleDimension("Temperature", new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
@@ -106,6 +83,7 @@ public class SampleTranscoderTest extends TestCase {
     /**
      * Tests the transformation using a random raster with only one band.
      */
+    @Test
     public void testOneBand() throws TransformException {
         assertTrue(testOneBand(1,  0) instanceof RenderedImageAdapter);
         assertTrue(testOneBand(.8, 2) instanceof RenderedOp);

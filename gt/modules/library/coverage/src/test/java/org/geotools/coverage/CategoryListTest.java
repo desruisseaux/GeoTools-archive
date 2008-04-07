@@ -20,12 +20,11 @@ import java.util.Arrays;
 import java.util.Random;
 import javax.media.jai.util.Range;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.resources.XArray;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -35,7 +34,7 @@ import org.geotools.resources.XArray;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CategoryListTest extends TestCase {
+public final class CategoryListTest {
     /**
      * Set to {@code true} in order to print diagnostic messages.
      */
@@ -52,28 +51,6 @@ public class CategoryListTest extends TestCase {
     private static final Random random = new Random(1471753385855374101L);
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CategoryListTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public CategoryListTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Returns the specified value as an hexadecimal string. Usefull
      * for comparing NaN values.
      */
@@ -82,8 +59,9 @@ public class CategoryListTest extends TestCase {
     }
 
     /**
-     * Test the {@link CategoryList#binarySearch} method.
+     * Tests the {@link CategoryList#binarySearch} method.
      */
+    @Test
     public void testBinarySearch() {
         for (int pass=0; pass<50; pass++) {
             final double[] array = new double[64];
@@ -119,8 +97,9 @@ public class CategoryListTest extends TestCase {
     }
 
     /**
-     * Test the {@link CategoryList} constructor.
+     * Tests the {@link CategoryList} constructor.
      */
+    @Test
     public void testArgumentChecks() {
         Category[] categories;
         categories = new Category[] {
@@ -161,6 +140,7 @@ public class CategoryListTest extends TestCase {
      * Tests the {@link CategoryList#getCategory} method and a
      * limited set of {@link CategoryList#transform} calls.
      */
+    @Test
     public void testGetCategory() throws TransformException {
         final Category[] categories = new Category[] {
             /*[0]*/ new Category("No data",     null, 0),

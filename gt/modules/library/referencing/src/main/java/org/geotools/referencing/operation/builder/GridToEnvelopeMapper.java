@@ -16,12 +16,10 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.awt.image.BufferedImage;    // For javadoc
 import java.awt.geom.AffineTransform;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -32,7 +30,6 @@ import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.Utilities;
@@ -179,7 +176,7 @@ public class GridToEnvelopeMapper {
         this.gridRange = gridRange;
         this.envelope  = userRange;
     }
-    
+
     /**
      * Makes sure that an argument is non-null.
      */
@@ -304,12 +301,8 @@ public class GridToEnvelopeMapper {
 
     /**
      * Applies heuristic rules in order to determine if the two first axis should be interchanged.
-     *
-     * @deprecated Avoid this method as much as possible. Experience shows that this method is
-     *             often used in a context where it should not, for example in order to select
-     *             the coefficients to read in an affine transform.
      */
-    public static boolean swapXY(final CoordinateSystem cs) {
+    private static boolean swapXY(final CoordinateSystem cs) {
         if (cs!=null && cs.getDimension() >= 2) {
             return AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
                    AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());

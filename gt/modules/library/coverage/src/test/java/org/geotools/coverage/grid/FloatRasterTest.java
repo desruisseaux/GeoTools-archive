@@ -29,9 +29,8 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -41,7 +40,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FloatRasterTest extends TestCase {
+public final class FloatRasterTest {
     /**
      * Tells if the test should show the image in a windows. Set to {@code true} only if this
      * test is executed from the command line (instead than from Maven or Netbeans for example).
@@ -49,30 +48,9 @@ public class FloatRasterTest extends TestCase {
     private static boolean display;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        display = true;
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(FloatRasterTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public FloatRasterTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Tests the creation of a floating point {@link WritableRaster}.
      */
+    @Test
     public void testRaster() {
         /*
          * Set the pixel values.  Because we use only one tile with one band, the code below
@@ -116,6 +94,7 @@ public class FloatRasterTest extends TestCase {
     /**
      * Tests the creation of a floating point matrix.
      */
+    @Test
     public void testMatrix() {
         final int width  = 500;
         final int height = 500;

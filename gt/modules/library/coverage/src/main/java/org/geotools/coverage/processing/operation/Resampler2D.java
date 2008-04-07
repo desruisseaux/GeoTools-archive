@@ -251,7 +251,7 @@ final class Resampler2D extends GridCoverage2D {
                         case 2:  gridToCRS = sourceGG.getGridToCRS2D(CORNER); break;
                         default: gridToCRS = sourceGG.getGridToCRS(CORNER);   break;
                     }
-                    targetGG = new GridGeometry2D(gridToCRS, envelope);
+                    targetGG = new GridGeometry2D(PixelInCell.CELL_CENTER, gridToCRS, envelope, null);
                     automaticGG = false;
                 } else {
                     targetGG = null;

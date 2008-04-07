@@ -17,12 +17,10 @@
 package org.geotools.coverage;
 
 import java.util.Random;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.opengis.referencing.operation.TransformException;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -32,48 +30,28 @@ import org.opengis.referencing.operation.TransformException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CategoryTest extends TestCase {
-    /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(CategoryTest.class);
-    }
-
+public final class CategoryTest {
     /**
      * Random number generator for this test.
      */
     private static final Random random = new Random(9119969932919929834L);
 
     /**
-     * Constructs a test case with the given name.
+     * Checks if a {@link Comparable} is a number identical to the supplied integer value.
      */
-    public CategoryTest(final String name) {
-        super(name);
-    }
-
-    /**
-     * Check if a {@link Comparable} is a number identical to the supplied integer value.
-     */
-    private static void assertEquals(String message, Comparable number, int expected) {
+    @SuppressWarnings("unchecked")
+    private static void assertValueEquals(String message, Comparable<?> number, int expected) {
         assertTrue("Integer.class", number instanceof Integer);
-        assertEquals(message, expected, ((Number)number).intValue());
+        assertEquals(message, expected, ((Number) number).intValue());
     }
 
     /**
-     * Check if a {@link Comparable} is a number identical to the supplied float value.
+     * Checks if a {@link Comparable} is a number identical to the supplied float value.
      */
-    private static void assertEquals(String message, Comparable number, double expected, double EPS) {
+    @SuppressWarnings("unchecked")
+    private static void assertValueEquals(String message, Comparable<?> number, double expected, double EPS) {
         assertTrue("Double.class", number instanceof Double);
-        final double actual = ((Number)number).doubleValue();
+        final double actual = ((Number) number).doubleValue();
         if (Double.isNaN(expected)) {
             assertEquals(message, toHexString(expected), toHexString(actual));
         } else {
@@ -92,6 +70,7 @@ public class CategoryTest extends TestCase {
     /**
      * Make sure that qualitative category produce the expected result.
      */
+    @Test
     public void testQualitativeCategory() throws TransformException {
         for (int pass=0; pass<100; pass++) {
             final int      sample    = random.nextInt(64);
@@ -102,8 +81,8 @@ public class CategoryTest extends TestCase {
                                                     category1.getSampleToGeophysics());
 
             assertEquals("<init>", category1, category2);
-            assertEquals("lower",  category1.geophysics(false).getRange().getMinValue(), sample);
-            assertEquals("upper",  category1.geophysics(false).getRange().getMaxValue(), sample);
+            assertValueEquals("lower",  category1.geophysics(false).getRange().getMinValue(), sample);
+            assertValueEquals("upper",  category1.geophysics(false).getRange().getMaxValue(), sample);
 
             assertNull("geophysics(false)", category1.geophysics(false).getSampleToGeophysics());
             assertNull("geophysics(true)",  category1.geophysics(true ).getSampleToGeophysics());
@@ -125,6 +104,7 @@ public class CategoryTest extends TestCase {
      * This test check also if the default {@link MathTransform1D}
      * for a linear relation is right.
      */
+    @Test
     public void testLinearCategory() throws TransformException {
         final double EPS = 1E-9;
         for (int pass=0; pass<100; pass++) {
@@ -134,10 +114,10 @@ public class CategoryTest extends TestCase {
             final double offset = 10*random.nextDouble() - 5.0;
             final Category category = new Category("Auto", null, lower, upper, scale, offset);
 
-            assertEquals("lower",  category.geophysics(false).getRange().getMinValue(), lower);
-            assertEquals("upper",  category.geophysics(false).getRange().getMaxValue(), upper);
-            assertEquals("minimum", category.geophysics(true).getRange().getMinValue(), lower*scale+offset, EPS);
-            assertEquals("maximum", category.geophysics(true).getRange().getMaxValue(), upper*scale+offset, EPS);
+            assertValueEquals("lower",  category.geophysics(false).getRange().getMinValue(), lower);
+            assertValueEquals("upper",  category.geophysics(false).getRange().getMaxValue(), upper);
+            assertValueEquals("minimum", category.geophysics(true).getRange().getMinValue(), lower*scale+offset, EPS);
+            assertValueEquals("maximum", category.geophysics(true).getRange().getMaxValue(), upper*scale+offset, EPS);
 
             for (int i=0; i<200; i++) {
                 final double x = 100*random.nextDouble();

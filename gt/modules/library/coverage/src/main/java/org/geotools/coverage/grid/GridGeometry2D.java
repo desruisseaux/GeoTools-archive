@@ -20,16 +20,14 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.metadata.spatial.PixelOrientation;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -40,11 +38,10 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -78,23 +75,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * Helpers methods for 2D CRS creation. Will be constructed only when first needed.
      */
     private static ReferencingFactoryContainer FACTORIES;
-
-    /**
-     * The offset for various pixel orientations. Keys must be upper-case names.
-     */
-    private static Map<PixelOrientation, Point2D.Double> ORIENTATIONS =
-            new HashMap<PixelOrientation, Point2D.Double>(12);
-    static {
-        ORIENTATIONS.put(PixelOrientation.CENTER,           new Point2D.Double( 0.0,  0.0));
-        ORIENTATIONS.put(PixelOrientation.UPPER_LEFT,       new Point2D.Double(-0.5, -0.5));
-        ORIENTATIONS.put(PixelOrientation.UPPER_RIGHT,      new Point2D.Double( 0.5, -0.5));
-        ORIENTATIONS.put(PixelOrientation.LOWER_LEFT,       new Point2D.Double(-0.5,  0.5));
-        ORIENTATIONS.put(PixelOrientation.LOWER_RIGHT,      new Point2D.Double( 0.5,  0.5));
-        ORIENTATIONS.put(PixelOrientation.valueOf("LEFT"),  new Point2D.Double(-0.5,  0.0));
-        ORIENTATIONS.put(PixelOrientation.valueOf("RIGHT"), new Point2D.Double( 0.5,  0.0));
-        ORIENTATIONS.put(PixelOrientation.valueOf("UPPER"), new Point2D.Double( 0.0, -0.5));
-        ORIENTATIONS.put(PixelOrientation.valueOf("LOWER"), new Point2D.Double( 0.0,  0.5));
-    }
 
     /**
      * The two-dimensional part of the coordinate reference system.
@@ -206,10 +186,10 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
-     * Constructs a new grid geometry from a math transform. The arguments are passed unchanged
-     * to the {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange, MathTransform,
-     * CoordinateReferenceSystem) super-class constructor}. However, they must obey to the
-     * following additional constraints:
+     * Constructs a new grid geometry from a grid range and a math transform. The arguments are
+     * passed unchanged to the {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange,
+     * MathTransform, CoordinateReferenceSystem) super-class constructor}. However, they must
+     * obey to the following additional constraints:
      * <p>
      * <ul>
      *   <li>Only two dimensions in the grid range can have a
@@ -226,7 +206,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @param  crs The coordinate reference system for the "real world" coordinates, or {@code null}
      *         if unknown. This CRS is given to the {@linkplain #getEnvelope envelope}.
      *
-     * @throws MismatchedDimensionException if the math transform and the CRS doesn't have
+     * @throws MismatchedDimensionException if the math transform and the CRS don't have
      *         consistent dimensions.
      * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
      *         a {@linkplain GridRange#getLength length} larger than 1, or if the math transform
@@ -239,28 +219,53 @@ public class GridGeometry2D extends GeneralGridGeometry {
                           final CoordinateReferenceSystem crs)
             throws IllegalArgumentException, MismatchedDimensionException
     {
-        this(gridRange, gridToCRS, crs, null);
+        this(gridRange, PixelInCell.CELL_CENTER, gridToCRS, crs, null);
     }
 
     /**
-     * Constructs a new grid geometry from a math transform. This constructor is identical to
+     * Constructs a new grid geometry from a math transform. This constructor is similar to
      * <code>{@linkplain #GridGeometry2D(GridRange, MathTransform, CoordinateReferenceSystem)
-     * GridGeometry2D}(gridRange, gridToCRS, crs)</code> with the addition of an optional set
-     * of hints controlling the {@link MathTransform2D} creation. Those hints are used for
-     * fetching a {@link DimensionFilter} instance doing the work.
+     * GridGeometry2D}(gridRange, gridToCRS, crs)</code> with the addition of an explicit anchor
+     * and an optional set of hints giving more control on the {@link MathTransform2D} to be
+     * inferred from the <var>n</var>-dimensional transform.
+     * <p>
+     * The {@code anchor} argument tells whatever the {@code gridToCRS} transform maps {@linkplain
+     * PixelInCell#CELL_CENTER cell center} (OGC convention) or {@linkplain PixelInCell#CELL_CORNER
+     * cell corner} (Java2D/JAI convention). At the opposite of the constructor expecting a {@link
+     * PixelOrientation} argument, the translation (if any) applies to every dimensions, not just
+     * the ones mapping the 2D part.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
+     * @param anchor    Whatever the {@code gridToCRS} transform maps
+     *                  {@linkplain PixelInCell#CELL_CENTER cell center} (OGC convention) or
+     *                  {@linkplain PixelInCell#CELL_CORNER cell corner} (Java2D/JAI convention).
+     * @param gridToCRS The math transform which allows for the transformations from grid
+     *                  coordinates to real world earth coordinates.
+     * @param crs       The coordinate reference system for the "real world" coordinates, or
+     *                  {@code null} if unknown. This CRS is given to the
+     *                  {@linkplain #getEnvelope envelope}.
+     * @param  hints    An optional set of hints controlling the {@link DimensionFilter} to be
+     *                  used for deriving the {@link MathTransform2D} instance from the given
+     *                  {@code gridToCRS} transform.
+     *
+     * @throws MismatchedDimensionException if the math transform and the CRS don't have
+     *         consistent dimensions.
+     * @throws IllegalArgumentException if the math transform can't transform coordinates
+     *         in the domain of the specified grid range.
      *
      * @since 2.5
      */
     public GridGeometry2D(final GridRange           gridRange,
+                          final PixelInCell         anchor,
                           final MathTransform       gridToCRS,
                           final CoordinateReferenceSystem crs,
                           final Hints hints)
-            throws IllegalArgumentException, MismatchedDimensionException
+            throws MismatchedDimensionException, IllegalArgumentException
     {
-        super(gridRange, gridToCRS, crs);
+        super(gridRange, anchor, gridToCRS, crs);
         final int[] dimensions;
         dimensions     = new int[4];
-        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, hints);
+        gridToCRS2D    = getMathTransform2D(super.gridToCRS, gridRange, dimensions, hints);
         gridFromCRS2D  = inverse(gridToCRS2D);
         gridDimensionX = dimensions[0];
         gridDimensionY = dimensions[1];
@@ -271,13 +276,111 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
-     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math transform}
-     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}.
+     * Constructs a new grid geometry from a math transform. This constructor is similar to
+     * <code>{@linkplain #GridGeometry2D(GridRange, MathTransform, CoordinateReferenceSystem)
+     * GridGeometry2D}(gridRange, gridToCRS, crs)</code> with the addition of an explicit anchor
+     * and an optional set of hints giving more control on the {@link MathTransform2D} to be
+     * inferred from the <var>n</var>-dimensional transform.
+     * <p>
+     * The {@code anchor} argument tells whatever the {@code gridToCRS} transform maps pixel
+     * center or some corner. Use {@link PixelOrientation#CENTER CENTER} for OGC conventions or
+     * {@link PixelOrientation#UPPER_LEFT UPPER_LEFT} for Java2D/JAI conventions. A translation
+     * (if needed) is applied only on the {@link #gridDimensionX} and {@link #gridDimensionY}
+     * parts of the transform - all other dimensions are assumed mapping pixel center.
      *
+     * @param  gridRange   The valid coordinate range of a grid coverage, or {@code null} if none.
+     * @param  anchor      Whatever the two-dimensional part of the {@code gridToCRS} transform
+     *                     maps pixel center or some corner.
+     * @param  gridToCRS   The math transform from grid coordinates to real world earth coordinates.
+     * @param  crs         The coordinate reference system for the "real world" coordinates, or
+     *                     {@code null} if unknown.
+     * @param  hints       An optional set of hints controlling the {@link DimensionFilter} to be
+     *                     used for deriving the {@link MathTransform2D} instance from the given
+     *                     {@code gridToCRS} transform.
+     *
+     * @throws MismatchedDimensionException if the math transform and the CRS don't have
+     *         consistent dimensions.
+     * @throws IllegalArgumentException if {@code gridRange} has more than 2 dimensions with
+     *         a {@linkplain GridRange#getLength length} larger than 1, or if the math transform
+     *         can't transform coordinates in the domain of the specified grid range.
+     *
+     * @since 2.5
+     */
+    public GridGeometry2D(final GridRange           gridRange,
+                          final PixelOrientation    anchor,
+                          final MathTransform       gridToCRS,
+                          final CoordinateReferenceSystem crs,
+                          final Hints hints)
+            throws IllegalArgumentException, MismatchedDimensionException
+    {
+        this(gridRange, anchor, gridToCRS, new int[4], crs, hints);
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors"). We could write this code in a less convolved way if only
+     * this requested was honored...
+     */
+    private GridGeometry2D(final GridRange        gridRange,
+                           final PixelOrientation anchor,
+                           final MathTransform    gridToCRS,
+                           final int[]            dimensions,  // Allocated by caller.
+                           final CoordinateReferenceSystem crs,
+                           final Hints hints)
+    {
+        this(gridRange, anchor, (gridToCRS != null) && (gridToCRS.getSourceDimensions() == 2) &&
+             (gridToCRS.getTargetDimensions() == 2) && PixelOrientation.UPPER_LEFT.equals(anchor) ?
+             PixelInCell.CELL_CORNER : PixelInCell.CELL_CENTER, gridToCRS,
+             getMathTransform2D(gridToCRS, gridRange, dimensions, hints), dimensions, crs);
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private GridGeometry2D(final GridRange        gridRange,
+                           final PixelOrientation anchor,
+                           final PixelInCell      anchorND,     // Computed by caller
+                           final MathTransform    gridToCRS,
+                           final MathTransform2D  gridToCRS2D,  // Computed by caller
+                           final int[]            dimensions,   // Computed by caller
+                           final CoordinateReferenceSystem crs)
+    {
+        super(gridRange, anchorND, PixelTranslation.translate(gridToCRS, anchor,
+              PixelTranslation.getPixelOrientation(anchorND), dimensions[0], dimensions[1]), crs);
+        gridDimensionX = dimensions[0];
+        gridDimensionY = dimensions[1];
+        axisDimensionX = dimensions[2];
+        axisDimensionY = dimensions[3];
+        if (gridToCRS == gridToCRS2D) {
+            // Recycles existing instance if we can (common case)
+            this.gridToCRS2D = (MathTransform2D) super.gridToCRS;
+        } else {
+            final int xdim = (gridDimensionX < gridDimensionY) ? 0 : 1;
+            this.gridToCRS2D = (MathTransform2D) PixelTranslation.translate(
+                    gridToCRS2D, anchor, PixelOrientation.CENTER, xdim, xdim ^ 1);
+        }
+        gridFromCRS2D = inverse(this.gridToCRS2D);
+        crs2D         = createCRS2D();
+        assert isValid() : this;
+    }
+
+    /**
+     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math
+     * transform}. According OGC specification, the math transform should map {@linkplain
+     * PixelInCell#CELL_CENTER pixel center}. But in Java2D/JAI conventions, the transform
+     * is rather expected to maps {@linkplain PixelInCell#CELL_CORNER pixel corner}. The
+     * convention to follow can be specified by the {@code anchor} argument.
+     *
+     * @param anchor    {@link PixelInCell#CELL_CENTER CELL_CENTER} for OGC conventions or
+     *                  {@link PixelInCell#CELL_CORNER CELL_CORNER} for Java2D/JAI conventions.
      * @param gridToCRS The math transform which allows for the transformations from grid
-     *                  coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *                  May be {@code null}, but this is not recommanded.
+     *                  coordinates to real world earth coordinates. May be {@code null},
+     *                  but this is not recommanded.
      * @param envelope  The envelope (including CRS) of a grid coverage, or {@code null} if none.
+     * @param hints     An optional set of hints controlling the {@link DimensionFilter} to be
+     *                  used for deriving the {@link MathTransform2D} instance from the given
+     *                  {@code gridToCRS} transform.
      *
      * @throws MismatchedDimensionException if the math transform and the envelope doesn't have
      *         consistent dimensions.
@@ -286,13 +389,16 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *
      * @since 2.5
      */
-    public GridGeometry2D(final MathTransform gridToCRS, final Envelope envelope)
+    public GridGeometry2D(final PixelInCell   anchor,
+                          final MathTransform gridToCRS,
+                          final Envelope      envelope,
+                          final Hints         hints)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        super(gridToCRS, envelope);
+        super(anchor, gridToCRS, envelope);
         final int[] dimensions;
         dimensions     = new int[4];
-        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions, null);
+        gridToCRS2D    = getMathTransform2D(this.gridToCRS, gridRange, dimensions, hints);
         gridFromCRS2D  = inverse(gridToCRS2D);
         gridDimensionX = dimensions[0];
         gridDimensionY = dimensions[1];
@@ -344,7 +450,10 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *         consistent dimensions.
      *
      * @since 2.2
+     *
+     * @deprecated Use {@link GridToEnvelopeMapper} instead, which provides more control.
      */
+    @Deprecated
     public GridGeometry2D(final GridRange gridRange,
                           final Envelope  userRange,
                           final boolean[] reverse,
@@ -722,11 +831,15 @@ public class GridGeometry2D extends GeneralGridGeometry {
      */
     public MathTransform2D getGridToCRS2D(final PixelOrientation orientation) {
         final int xdim = (gridDimensionX < gridDimensionY) ? 0 : 1;
-        return (MathTransform2D) translate(getGridToCRS2D(), orientation, xdim, xdim ^ 1);
+        return (MathTransform2D) PixelTranslation.translate(getGridToCRS2D(),
+                PixelOrientation.CENTER, orientation, xdim, xdim ^ 1);
     }
 
     /**
-     * Returns a math transform mapping the specified pixel part.
+     * Returns a math transform mapping the specified pixel part. A translation (if needed) is
+     * applied on the {@link #gridDimensionX} and {@link #gridDimensionY} parts of the transform;
+     * all other dimensions are assumed mapping pixel center. For applying a translation on all
+     * dimensions, use {@link #getGridToCRS(PixelInCell)} instead.
      *
      * @param  orientation The pixel part to map. The default value is
      *         {@link PixelOrientation#CENTER CENTER}.
@@ -738,40 +851,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @since 2.3
      */
     public MathTransform getGridToCRS(final PixelOrientation orientation) {
-        return translate(getGridToCRS(), orientation, gridDimensionX, gridDimensionY);
-    }
-
-    /**
-     * Translates the specified math transform according the specified pixel orientation.
-     * The {@code gridToCRS} math transform is assumed maps the pixel centers.
-     */
-    private static MathTransform translate(final MathTransform gridToCRS,
-                                           final PixelOrientation orientation,
-                                           final int gridDimensionX, final int gridDimensionY)
-    {
-        if (PixelOrientation.CENTER.equals(orientation)) {
-            return gridToCRS;
-        }
-        final Point2D.Double offset = getDirectPixelTranslation(orientation);
-        final int dimension = gridToCRS.getSourceDimensions();
-        final Matrix matrix = MatrixFactory.create(dimension + 1);
-        matrix.setElement(gridDimensionX, dimension, offset.x);
-        matrix.setElement(gridDimensionY, dimension, offset.y);
-        return ConcatenatedTransform.create(ProjectiveTransform.create(matrix), gridToCRS);
-    }
-
-    /**
-     * Like {@link #getPixelTranslation} but without cloning the returned value.
-     */
-    private static Point2D.Double getDirectPixelTranslation(final PixelOrientation orientation)
-            throws IllegalArgumentException
-    {
-        final Point2D.Double offset = ORIENTATIONS.get(orientation);
-        if (offset == null) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "orientation", orientation));
-        }
-        return offset;
+        return PixelTranslation.translate(getGridToCRS(),
+                PixelOrientation.CENTER, orientation, gridDimensionX, gridDimensionY);
     }
 
     /**
@@ -791,11 +872,15 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @return The position relative to the pixel center.
      * @throws IllegalArgumentException if the specified orientation is not known.
      * @since 2.4
+     *
+     * @deprecated Moved to {@link PixelTranslation#getPixelTranslation(PixelOrientation)}.
      */
+    @Deprecated
     public static Point2D getPixelTranslation(final PixelOrientation orientation)
             throws IllegalArgumentException
     {
-        return (Point2D) getDirectPixelTranslation(orientation).clone();
+        final PixelTranslation offset = PixelTranslation.getPixelTranslation(orientation);
+        return new Point2D.Double(offset.dx, offset.dy);
     }
 
     /**

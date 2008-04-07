@@ -45,6 +45,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 
 
 /**
@@ -218,10 +219,21 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     }
 
     /**
-     * Creates an envelope for a grid range transformed using the specified math transform.
+     * Creates an envelope for a grid range transformed to an envelope using the specified
+     * math transform. The <cite>grid to CRS</cite> transform should map either the
+     * {@linkplain PixelInCell#CELL_CENTER cell center} (as in OGC convention) or
+     * {@linkplain PixelInCell#CELL_CORNER cell corner} (as in Java2D/JAI convention)
+     * depending on the {@code anchor} value. This constructor creates an envelope
+     * containing entirely all pixels on a <cite>best effort</cite> basis - usually
+     * accurate for affine transforms.
+     * <p>
+     * <b>Note:</b> The convention is specified as a {@link PixelInCell} code instead than the
+     * more detailled {@link org.opengis.metadata.spatial.PixelOrientation}, because the later
+     * is restricted to the two-dimensional case while the former can be used for any number of
+     * dimensions.
      *
      * @param gridRange The grid range.
-     * @param gridType  Whatever grid range coordinates map to pixel center or pixel corner.
+     * @param anchor    Whatever grid range coordinates map to pixel center or pixel corner.
      * @param gridToCRS The transform (usually affine) from grid range to the envelope CRS.
      * @param crs       The envelope CRS, or {@code null} if unknow.
      *
@@ -234,9 +246,9 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @see org.geotools.coverage.grid.GeneralGridRange#GeneralGridRange(Envelope,PixelInCell)
      */
-    public GeneralEnvelope(final GridRange           gridRange,
-                           final PixelInCell         gridType,
-                           final MathTransform       gridToCRS,
+    public GeneralEnvelope(final GridRange     gridRange,
+                           final PixelInCell   anchor,
+                           final MathTransform gridToCRS,
                            final CoordinateReferenceSystem crs)
             throws IllegalArgumentException
     {
@@ -248,15 +260,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         ensureSameDimension(dimRange, dimSource);
         ensureSameDimension(dimRange, dimTarget);
         ordinates = new double[dimSource*2];
-        final double offset;
-        if (PixelInCell.CELL_CENTER.equals(gridType)) {
-            offset = 0.5;
-        } else if (PixelInCell.CELL_CORNER.equals(gridType)) {
-            offset = 0.0;
-        } else {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "gridType", gridType));
-        }
+        final double offset = PixelTranslation.getPixelTranslation(anchor) + 0.5;
         for (int i=0; i<dimSource; i++) {
             // According OpenGIS specification, GridGeometry maps pixel's center.
             // We want a bounding box for all pixels, not pixel's centers. Offset by

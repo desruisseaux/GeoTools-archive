@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.units.SI;
-import junit.framework.Assert;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.factory.Hints;
@@ -42,6 +41,8 @@ import org.geotools.test.TestData;
 import org.geotools.util.NumberRange;
 
 import com.sun.media.jai.codecimpl.util.RasterFactory;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -57,7 +58,7 @@ import com.sun.media.jai.codecimpl.util.RasterFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class GridCoverageExamples extends Assert {
+public final class GridCoverageExamples {
     /**
      * Small value for comparaison of sample values. Since most grid coverage implementation in
      * Geotools 2 store geophysics values as {@code float} numbers, this {@code EPS} value must
@@ -297,7 +298,6 @@ public final class GridCoverageExamples extends Assert {
                 return factory.create("My colored coverage", raster,
                         new Envelope2D(DefaultGeographicCRS.WGS84, 35, -41, 35+45, -41+46),
                                     null, null, null, new Color[][] {colors}, null);
-
             }
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(bounds);

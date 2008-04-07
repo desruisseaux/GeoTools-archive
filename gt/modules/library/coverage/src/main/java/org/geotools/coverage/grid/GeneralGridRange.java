@@ -25,14 +25,15 @@ import java.awt.image.RenderedImage;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoordinates;
 import org.opengis.referencing.datum.PixelInCell;
-import org.opengis.geometry.Envelope;
 
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 
 
 /**
@@ -253,18 +254,22 @@ public class GeneralGridRange implements GridRange, Serializable {
      * that grid coordinates (0,0) has an envelope starting at (-0.5, -0.5). In order to revert
      * back such envelope to a grid range, it is necessary to add 0.5 to every coordinates
      * (including the maximum value since it is exclusive in a grid range). This offset is applied
-     * only if {@code gridType} is {@link PixelInCell#CELL_CENTER}. Users who don't want such
-     * offset should specify {@link PixelInCell.CELL_CORNER}.
+     * only if {@code anchor} is {@link PixelInCell#CELL_CENTER}. Users who don't want such
+     * offset should specify {@link PixelInCell#CELL_CORNER}.
+     * <p>
+     * The convention is specified as a {@link PixelInCell} code instead than the more detailled
+     * {@link org.opengis.metadata.spatial.PixelOrientation} because the later is restricted to
+     * the two-dimensional case while the former can be used for any number of dimensions.
      *
      * @param envelope
      *          The envelope to use for initializing this grid range.
-     * @param gridType
+     * @param anchor
      *          Whatever envelope coordinates map to pixel center or pixel corner. Should be
      *          {@link PixelInCell#CELL_CENTER} if an offset of 0.5 should be added to every
-     *          envelope coordinate values, or {@link PixelInCell.CELL_CORNER} if no offset
+     *          envelope coordinate values, or {@link PixelInCell#CELL_CORNER} if no offset
      *          should be applied.
      * @throws IllegalArgumentException
-     *          If {@code gridType} is not valid.
+     *          If {@code anchor} is not valid.
      *
      * @since 2.5
      *
@@ -272,18 +277,10 @@ public class GeneralGridRange implements GridRange, Serializable {
      *      org.opengis.referencing.operation.MathTransform,
      *      org.opengis.referencing.crs.CoordinateReferenceSystem)
      */
-    public GeneralGridRange(final Envelope envelope, final PixelInCell gridType)
+    public GeneralGridRange(final Envelope envelope, final PixelInCell anchor)
             throws IllegalArgumentException
     {
-        final double offset;
-        if (PixelInCell.CELL_CENTER.equals(gridType)) {
-            offset = 0.5;
-        } else if (PixelInCell.CELL_CORNER.equals(gridType)) {
-            offset = 0.0;
-        } else {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "gridType", gridType));
-        }
+        final double offset = PixelTranslation.getPixelTranslation(anchor) + 0.5;
         final int dimension = envelope.getDimension();
         index = new int[dimension * 2];
         for (int i=0; i<dimension; i++) {
@@ -297,7 +294,7 @@ public class GeneralGridRange implements GridRange, Serializable {
      * Returns the number of dimensions.
      */
     public int getDimension() {
-        return index.length/2;
+        return index.length / 2;
     }
 
     /**
@@ -321,7 +318,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         if (dimension >= 0) {
             return index[dimension + index.length/2];
         }
-        else throw new ArrayIndexOutOfBoundsException(dimension);
+        throw new ArrayIndexOutOfBoundsException(dimension);
     }
 
     /**

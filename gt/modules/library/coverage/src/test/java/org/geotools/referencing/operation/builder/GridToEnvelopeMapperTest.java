@@ -16,21 +16,13 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-// OpenGIS dependencies
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -38,6 +30,9 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.geometry.GeneralEnvelope;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -49,36 +44,16 @@ import org.geotools.geometry.GeneralEnvelope;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridToEnvelopeMapperTest extends TestCase {
+public final class GridToEnvelopeMapperTest {
     /**
      * Tolerance factor for the comparaison of floating point numbers.
      */
     private static final double EPS = 1E-10;
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(GridToEnvelopeMapperTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public GridToEnvelopeMapperTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Various tests.
      */
+    @Test
     public void testMapper() throws NoninvertibleTransformException {
         ///////////////////////////////////////////////////////////////
         ///  Tests the initial state.

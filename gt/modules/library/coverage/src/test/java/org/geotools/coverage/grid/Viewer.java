@@ -49,6 +49,7 @@ import org.geotools.resources.Classes;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class Viewer extends JPanel {
     /**
      * The image to display.
@@ -140,9 +141,9 @@ public class Viewer extends JPanel {
             buffer.append(" - ");
         }
         buffer.append(coverage.getName().toString(JComponent.getDefaultLocale()));
-        if (coverage != coverage.geophysics(true)) {
+        if (coverage != coverage.view(ViewType.GEOPHYSICS)) {
             buffer.append(" (packed)");
-        } else if (coverage != coverage.geophysics(false)) {
+        } else if (coverage != coverage.view(ViewType.RENDERED)) {
             buffer.append(" (geophysics)");
         }
         return show(new Viewer(coverage), buffer.toString());

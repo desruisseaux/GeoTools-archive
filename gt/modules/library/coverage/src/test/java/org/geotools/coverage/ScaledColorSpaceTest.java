@@ -25,11 +25,10 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.geotools.coverage.grid.Viewer;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -40,7 +39,7 @@ import org.geotools.coverage.grid.Viewer;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ScaledColorSpaceTest extends TestCase {
+public final class ScaledColorSpaceTest {
     /**
      * Random number generator for this test.
      */
@@ -62,25 +61,10 @@ public class ScaledColorSpaceTest extends TestCase {
     private RenderedImage image;
 
     /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(ScaledColorSpaceTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public ScaledColorSpaceTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Sets up common objects used for all tests.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         minimum = random.nextDouble()*100;
         maximum = random.nextDouble()*200 + minimum + 10;
         colors  = new ScaledColorSpace(0, 1, minimum, maximum);
@@ -105,6 +89,7 @@ public class ScaledColorSpaceTest extends TestCase {
     /**
      * Tests the color space.
      */
+    @Test
     public void testColorSpace() {
         assertEquals(minimum, colors.getMinValue(0), 1E-4);
         assertEquals(maximum, colors.getMaxValue(0), 1E-4);
@@ -121,7 +106,7 @@ public class ScaledColorSpaceTest extends TestCase {
      * Runs the visual test.
      */
     public static void main(final String[] args) throws Exception {
-        final ScaledColorSpaceTest test = new ScaledColorSpaceTest(null);
+        final ScaledColorSpaceTest test = new ScaledColorSpaceTest();
         test.setUp();
         test.testColorSpace();
         Viewer.show(test.image);

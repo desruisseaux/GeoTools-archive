@@ -31,6 +31,7 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -255,7 +256,7 @@ public class Resample extends Operation2D {
             } else {
                 gridToCRS = GridGeometry2D.wrap(gridGeometry).getGridToCRS2D();
             }
-            gridGeometry = new GridGeometry2D(gridToCRS, target);
+            gridGeometry = new GridGeometry2D(PixelInCell.CELL_CENTER, gridToCRS, target, null);
         } else {
             /*
              * Different CRS. We need to infer an image size, which may be the same than the
@@ -281,7 +282,7 @@ public class Resample extends Operation2D {
                     gridToCRS = GridGeometry2D.wrap(gridGeometry).getGridToCRS2D();
                 }
                 transformed.intersect(reduced);
-                gridGeometry = new GridGeometry2D(gridToCRS, transformed);
+                gridGeometry = new GridGeometry2D(PixelInCell.CELL_CENTER, gridToCRS, transformed, null);
             } catch (FactoryException exception) {
                 recoverableException("resample", exception);
             } catch (TransformException exception) {

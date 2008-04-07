@@ -17,17 +17,14 @@
 package org.geotools.coverage;
 
 import java.awt.image.BufferedImage;
-import java.util.Random;
-
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RenderedOp;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -39,7 +36,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SampleDimensionTest extends TestCase {
+public final class SampleDimensionTest {
     /**
      * The categories making the sample dimension to test.
      */
@@ -86,39 +83,10 @@ public class SampleDimensionTest extends TestCase {
     private GridSampleDimension test;
 
     /**
-     * Random number generator for this test.
-     */
-    private static final Random random = new Random(5134392769888592001L);
-
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Returns the test suite.
-     */
-    public static Test suite() {
-        return new TestSuite(SampleDimensionTest.class);
-    }
-
-    /**
-     * Constructs a test case with the given name.
-     */
-    public SampleDimensionTest(final String name) {
-        super(name);
-    }
-
-    /**
      * Sets up common objects used for all tests.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() {
         assertEquals("setUp", CATEGORIES.length, NO_DATA.length);
         final Category[] categories = new Category[CATEGORIES.length+1];
         for (int i=0; i<CATEGORIES.length; i++) {
@@ -131,6 +99,7 @@ public class SampleDimensionTest extends TestCase {
     /**
      * Tests the consistency of the sample dimension.
      */
+    @Test
     public void testSampleDimension() {
         final double[] nodataValues = test.getNoDataValues();
         assertEquals("nodataValues.length", CATEGORIES.length, nodataValues.length);
@@ -157,6 +126,7 @@ public class SampleDimensionTest extends TestCase {
      * This allow to apply the operation in the same way than other JAI operations, without
      * any need for a direct access to package-private method.
      */
+    @Test
     public void testSampleTranscoderCreation() {
         final OperationRegistry registry = JAI.getDefaultInstance().getOperationRegistry();
         assertNotNull(registry.getDescriptor("rendered", SampleTranscoder.OPERATION_NAME));
@@ -189,6 +159,7 @@ public class SampleDimensionTest extends TestCase {
     /**
      * Tests the {@link GridSampleDimension#rescale} method.
      */
+    @Test
     public void testRescale() {
         GridSampleDimension scaled;
         scaled = test.geophysics(false).rescale(2, -6);

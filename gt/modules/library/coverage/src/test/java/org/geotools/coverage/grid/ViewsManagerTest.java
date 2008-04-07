@@ -18,7 +18,9 @@ package org.geotools.coverage.grid;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 import javax.units.SI;
-import junit.framework.TestCase;
+
+import org.junit.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -28,7 +30,7 @@ import junit.framework.TestCase;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ViewsManagerTest extends TestCase {
+public final class ViewsManagerTest {
     /**
      * The random number generator to use in this test suite.
      */
@@ -37,6 +39,7 @@ public class ViewsManagerTest extends TestCase {
     /**
      * Tests "Piecewise" operation using a simple transform.
      */
+    @Test
     public void testPiecewise() {
         // Initialize...
         final GridCoverageBuilder builder = new GridCoverageBuilder();
@@ -63,6 +66,7 @@ public class ViewsManagerTest extends TestCase {
     /**
      * Tests "Piecewise" operation using setting found in IFREMER's Coriolis data.
      */
+    @Test
     public void testCoriolis() {
         final double scale  = 0.001;
         final double offset = 20.0;

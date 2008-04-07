@@ -30,9 +30,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -112,12 +111,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public static final int GRID_TO_CRS = 8;
 
     /**
-     * A buffer of math transforms created by {@link #getHalfPixelTranslation}.
-     * Each element in this array will be created when first needed.
-     */
-    private static final MathTransform[] translations = new MathTransform[8];
-
-    /**
      * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest valid
      * grid coordinate is zero for {@link java.awt.image.BufferedImage}, but may be non-zero for
      * arbitrary {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0
@@ -154,15 +147,24 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     protected final MathTransform gridToCRS;
 
     /**
+     * Same as {@link #gridToCRS} but from {@linkplain PixelInCell#CELL_CORNER pixel corner}
+     * instead of center. Will be computed only when first needed. Serialized because it may
+     * be a value specified explicitly at construction time, in which case it can be more
+     * accurate than a computed value.
+     */
+    private MathTransform cornerToCRS;
+
+    /**
      * Constructs a new grid geometry identical to the specified one except for the CRS.
      * Note that this constructor just defines the CRS; it does <strong>not</strong> reproject
      * the envelope. For this reason, this constructor should not be public. It is for internal
      * use by {@link GridCoverageFactory} only.
      */
     GeneralGridGeometry(final GeneralGridGeometry gm, final CoordinateReferenceSystem crs) {
-        gridRange = gm.gridRange;  // Do not clone; we assume it is safe to share.
-        gridToCRS = gm.gridToCRS;
-        envelope  = new GeneralEnvelope(gm.envelope);
+        gridRange   = gm.gridRange;  // Do not clone; we assume it is safe to share.
+        gridToCRS   = gm.gridToCRS;
+        cornerToCRS = gm.cornerToCRS;
+        envelope    = new GeneralEnvelope(gm.envelope);
         envelope.setCoordinateReferenceSystem(crs);
     }
 
@@ -178,9 +180,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         if (other instanceof GeneralGridGeometry) {
             // Uses this path when possible in order to accept null values.
             final GeneralGridGeometry general = (GeneralGridGeometry) other;
-            gridRange = general.gridRange;  // Do not clone; we assume it is safe to share.
-            gridToCRS = general.gridToCRS;
-            envelope  = general.envelope;
+            gridRange   = general.gridRange;  // Do not clone; we assume it is safe to share.
+            gridToCRS   = general.gridToCRS;
+            cornerToCRS = general.cornerToCRS;
+            envelope    = general.envelope;
         } else {
             gridRange = other.getGridRange();
             gridToCRS = other.getGridToCRS();
@@ -194,8 +197,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
 
     /**
      * Constructs a new grid geometry from a grid range and a {@linkplain MathTransform math transform}
-     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}. This is the most general constructor,
-     * the one that gives the maximal control over the grid geometry to be created.
+     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
      * @param gridToCRS The math transform which allows for the transformations from grid
@@ -205,7 +207,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  {@code null} if unknown. This CRS is given to the
      *                  {@linkplain #getEnvelope envelope}.
      *
-     * @throws MismatchedDimensionException if the math transform and the CRS doesn't have
+     * @throws MismatchedDimensionException if the math transform and the CRS don't have
      *         consistent dimensions.
      * @throws IllegalArgumentException if the math transform can't transform coordinates
      *         in the domain of the specified grid range.
@@ -217,10 +219,45 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                                final CoordinateReferenceSystem crs)
             throws MismatchedDimensionException, IllegalArgumentException
     {
+        this(gridRange, PixelInCell.CELL_CENTER, gridToCRS, crs);
+    }
+
+    /**
+     * Constructs a new grid geometry from a grid range and a {@linkplain MathTransform math transform}
+     * mapping pixel {@linkplain PixelInCell#CELL_CENTER center} or {@linkplain PixelInCell#CELL_CORNER
+     * corner}. This is the most general constructor, the one that gives the maximal control over
+     * the grid geometry to be created.
+     *
+     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
+     * @param anchor    {@link PixelInCell#CELL_CENTER CELL_CENTER} for OGC conventions or
+     *                  {@link PixelInCell#CELL_CORNER CELL_CORNER} for Java2D/JAI conventions.
+     * @param gridToCRS The math transform which allows for the transformations from grid
+     *                  coordinates to real world earth coordinates. May be {@code null},
+     *                  but this is not recommanded.
+     * @param crs       The coordinate reference system for the "real world" coordinates, or
+     *                  {@code null} if unknown. This CRS is given to the
+     *                  {@linkplain #getEnvelope envelope}.
+     *
+     * @throws MismatchedDimensionException if the math transform and the CRS don't have
+     *         consistent dimensions.
+     * @throws IllegalArgumentException if the math transform can't transform coordinates
+     *         in the domain of the specified grid range.
+     *
+     * @since 2.5
+     */
+    public GeneralGridGeometry(final GridRange           gridRange,
+                               final PixelInCell         anchor,
+                               final MathTransform       gridToCRS,
+                               final CoordinateReferenceSystem crs)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
         this.gridRange = clone(gridRange);
-        this.gridToCRS = gridToCRS;
+        this.gridToCRS = PixelTranslation.translate(gridToCRS, anchor, PixelInCell.CELL_CENTER);
+        if (PixelInCell.CELL_CORNER.equals(anchor)) {
+            cornerToCRS = gridToCRS;
+        }
         if (gridRange!=null && gridToCRS!=null) {
-            envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, crs);
+            envelope = new GeneralEnvelope(gridRange, anchor, gridToCRS, crs);
         } else if (crs != null) {
             envelope = new GeneralEnvelope(crs);
             envelope.setToNull();
@@ -230,12 +267,17 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math transform}
-     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}.
+     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math
+     * transform}. According OGC specification, the math transform should map {@linkplain
+     * PixelInCell#CELL_CENTER pixel center}. But in Java2D/JAI conventions, the transform
+     * is rather expected to maps {@linkplain PixelInCell#CELL_CORNER pixel corner}. The
+     * convention to follow can be specified by the {@code anchor} argument.
      *
+     * @param anchor    {@link PixelInCell#CELL_CENTER CELL_CENTER} for OGC conventions or
+     *                  {@link PixelInCell#CELL_CORNER CELL_CORNER} for Java2D/JAI conventions.
      * @param gridToCRS The math transform which allows for the transformations from grid
-     *                  coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *                  May be {@code null}, but this is not recommanded.
+     *                  coordinates to real world earth coordinates. May be {@code null},
+     *                  but this is not recommanded.
      * @param envelope  The envelope (including CRS) of a grid coverage, or {@code null} if none.
      *
      * @throws MismatchedDimensionException if the math transform and the envelope doesn't have
@@ -245,10 +287,15 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *
      * @since 2.5
      */
-    public GeneralGridGeometry(final MathTransform gridToCRS, final Envelope envelope)
+    public GeneralGridGeometry(final PixelInCell   anchor,
+                               final MathTransform gridToCRS,
+                               final Envelope      envelope)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        this.gridToCRS = gridToCRS;
+        this.gridToCRS = PixelTranslation.translate(gridToCRS, anchor, PixelInCell.CELL_CENTER);
+        if (PixelInCell.CELL_CORNER.equals(anchor)) {
+            cornerToCRS = gridToCRS;
+        }
         if (envelope == null) {
             this.envelope  = null;
             this.gridRange = null;
@@ -266,9 +313,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                     Classes.getClass(gridToCRS)), exception);
         }
-        // According OpenGIS specification, GridGeometry maps pixel's center. We must
-        // be consistent with the GeneralEnvelope(GridRange, ...) constructor here.
-        gridRange = new GeneralGridRange(transformed, PixelInCell.CELL_CENTER);
+        gridRange = new GeneralGridRange(transformed, anchor);
     }
 
     /**
@@ -328,7 +373,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         consistent dimensions.
      *
      * @since 2.2
+     *
+     * @deprecated Use {@link GridToEnvelopeMapper} instead, which provides more control.
      */
+    @Deprecated
     public GeneralGridGeometry(final GridRange gridRange,
                                final Envelope  userRange,
                                final boolean[] reverse,
@@ -484,51 +532,31 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * This is similar to {@link #getGridToCRS()} except that the transform may maps
      * other parts than {@linkplain PixelInCell#CELL_CENTER pixel center}.
      *
-     * @param  halfPixel The pixel part to map.
+     * @param  anchor The pixel part to map.
      * @return The transform (never {@code null}).
      * @throws InvalidGridGeometryException if this grid geometry has no transform (i.e.
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_TO_CRS})</code>
      *         returned {@code false}).
      *
+     * @see GridGeometry2D#getGridToCRS(org.opengis.referencing.datum.PixelInCell)
+     *
      * @since 2.3
      */
-    public MathTransform getGridToCRS(final PixelInCell halfPixel)
-            throws InvalidGridGeometryException
-    {
-        final MathTransform gridToCRS = getGridToCRS();
-        if (PixelInCell.CELL_CENTER.equals(halfPixel)) {
-            return gridToCRS;
+    public MathTransform getGridToCRS(final PixelInCell anchor) throws InvalidGridGeometryException {
+        if (PixelInCell.CELL_CENTER.equals(anchor)) {
+            return getGridToCRS();
         }
-        if (!PixelInCell.CELL_CORNER.equals(halfPixel)) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "halfPixel", halfPixel));
-        }
-        return ConcatenatedTransform.create(
-                getHalfPixelTranslation(gridToCRS.getSourceDimensions()), gridToCRS);
-    }
-
-    /**
-     * Returns an affine transform holding a translation from the
-     * {@linkplain PixelInCell#CELL_CENTER pixel center} to the
-     * {@linkplain PixelInCell#CELL_CORNER pixel corner}. The
-     * translation terms are set to exactly -0.5.
-     *
-     * @param dimension The dimension.
-     */
-    private static MathTransform getHalfPixelTranslation(final int dimension) {
-        synchronized (translations) {
-            if (dimension < translations.length) {
-                final MathTransform candidate = translations[dimension];
-                if (candidate != null) {
-                    return candidate;
+        if (PixelInCell.CELL_CORNER.equals(anchor)) {
+            synchronized (this) {
+                if (cornerToCRS == null) {
+                    cornerToCRS = PixelTranslation.translate(getGridToCRS(),
+                            PixelInCell.CELL_CENTER, anchor);
                 }
             }
-            final MathTransform mt = ProjectiveTransform.createTranslation(dimension, -0.5);
-            if (dimension < translations.length) {
-                translations[dimension] = mt;
-            }
-            return mt;
+            assert !cornerToCRS.equals(gridToCRS) : cornerToCRS;
+            return cornerToCRS;
         }
+        return PixelTranslation.translate(getGridToCRS(), PixelInCell.CELL_CENTER, anchor);
     }
 
     /**
