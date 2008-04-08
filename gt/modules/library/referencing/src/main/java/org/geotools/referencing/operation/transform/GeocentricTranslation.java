@@ -207,7 +207,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * This is a Geotools-specific argument. If presents, an {@code "Ellipsoid_To_Geocentric"}
          * transform will be concatenated before the geocentric translation.
          */
-        public static final ParameterDescriptor SRC_DIM = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Integer> SRC_DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(Citations.GEOTOOLS, "src_dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
@@ -217,7 +217,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * This is a Geotools-specific argument. If presents, a {@code "Geocentric_To_Ellipsoid"}
          * transform will be concatenated after the geocentric translation.
          */
-        public static final ParameterDescriptor TGT_DIM = new DefaultParameterDescriptor(
+        public static final ParameterDescriptor<Integer> TGT_DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
                         new NamedIdentifier(Citations.GEOTOOLS, "tgt_dim")),
                     DEFAULT_DIMENSION, 2, 3, false);
@@ -228,7 +228,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * transform will be concatenated before the geocentric translation. Valid values range
          * from 0 to infinity.
          */
-        public static final ParameterDescriptor SRC_SEMI_MAJOR = createOptionalDescriptor(
+        public static final ParameterDescriptor<Double> SRC_SEMI_MAJOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC, "src_semi_major")
                 },
@@ -240,7 +240,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * transform will be concatenated before the geocentric translation. Valid values range
          * from 0 to infinity.
          */
-         public static final ParameterDescriptor SRC_SEMI_MINOR = createOptionalDescriptor(
+         public static final ParameterDescriptor<Double> SRC_SEMI_MINOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC, "src_semi_minor"),
                 },
@@ -252,7 +252,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * transform will be concatenated after the geocentric translation. Valid values range
          * from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MAJOR = createOptionalDescriptor(
+        public static final ParameterDescriptor<Double> TGT_SEMI_MAJOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC, "tgt_semi_major")
                 },
@@ -264,7 +264,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * transform will be concatenated after the geocentric translation. Valid values range
          * from 0 to infinity.
          */
-        public static final ParameterDescriptor TGT_SEMI_MINOR = createOptionalDescriptor(
+        public static final ParameterDescriptor<Double> TGT_SEMI_MINOR = createOptionalDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC, "tgt_semi_minor")
                 },
@@ -274,7 +274,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * The operation parameter descriptor for the <cite>X-axis translation</cite> ("dx")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DX = createDescriptor(
+        public static final ParameterDescriptor<Double> DX = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "dx"),
                     new NamedIdentifier(Citations.EPSG, "X-axis translation")
@@ -285,7 +285,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * The operation parameter descriptor for the <cite>Y-axis translation</cite> ("dy")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DY = createDescriptor(
+        public static final ParameterDescriptor<Double> DY = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "dy"),
                     new NamedIdentifier(Citations.EPSG, "Y-axis translation")
@@ -296,7 +296,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * The operation parameter descriptor for the <cite>Z-axis translation</cite> ("dz")
          * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DZ = createDescriptor(
+        public static final ParameterDescriptor<Double> DZ = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "dz"),
                     new NamedIdentifier(Citations.EPSG, "Z-axis translation")

@@ -39,7 +39,6 @@ import static org.opengis.referencing.IdentifiedObject.NAME_KEY;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.factory.ReferencingFactory;
@@ -53,6 +52,8 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.CanonicalSet;
+
+import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
 
 
 /**
@@ -698,24 +699,6 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     {
         final String name = getClassName(source) + " \u21E8 " + getClassName(target);
         return Collections.singletonMap(NAME_KEY, name);
-    }
-
-    /**
-     * Compares the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain AbstractIdentifiedObject},
-     * then this method will ignore the metadata during the comparaison.
-     *
-     * @param  object1 The first object to compare (may be null).
-     * @param  object2 The second object to compare (may be null).
-     * @return {@code true} if both objects are equals.
-     *
-     * @todo This method may be insuffisient, since it will returns {@code false} for
-     *       two different implementations, even if they encapsulate the same data values.
-     */
-    static boolean equalsIgnoreMetadata(final IdentifiedObject object1,
-                                        final IdentifiedObject object2)
-    {
-        return CRS.equalsIgnoreMetadata(object1, object2);
     }
 
     /**

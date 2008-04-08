@@ -19,11 +19,12 @@
  */
 package org.geotools.referencing.crs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -35,6 +36,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCompoundCS;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -63,6 +65,12 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     private final List<CoordinateReferenceSystem> crs;
 
     /**
+     * A decomposition of the CRS list into the single elements. Computed
+     * by {@link #computeSingleCRS} on construction or deserialization.
+     */
+    private transient List<SingleCRS> singles;
+
+    /**
      * Constructs a new compound CRS with the same values than the specified one.
      * This copy constructor provides a way to wrap an arbitrary implementation into a
      * Geotools one or a user-defined one (as a subclass), usually in order to leverage
@@ -74,6 +82,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     public DefaultCompoundCRS(final CompoundCRS crs) {
         super(crs);
         this.crs = crs.getCoordinateReferenceSystems();
+        computeSingleCRS();
     }
 
     /**
@@ -135,7 +144,8 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
             throw new IllegalArgumentException(Errors.format(
                         ErrorKeys.MISSING_PARAMETER_$1, "crs["+crs.length+']'));
         }
-        this.crs = Collections.unmodifiableList(Arrays.asList(crs));
+        this.crs = UnmodifiableArrayList.wrap(crs);
+        computeSingleCRS();
     }
 
     /**
@@ -169,11 +179,8 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * them are expanded in an array of {@code SingleCRS} objects.
      *
      * @return The single coordinate reference systems.
-     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a {@link CompoundCRS}.
      */
     public List<SingleCRS> getSingleCRS() {
-        final List<SingleCRS> singles = new ArrayList<SingleCRS>(crs.size());
-        getSingleCRS(crs, singles);
         return singles;
     }
 
@@ -196,8 +203,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
             singles = new ArrayList<SingleCRS>(elements.size());
             getSingleCRS(elements, singles);
         } else {
-            singles = new ArrayList<SingleCRS>(1);
-            singles.add((SingleCRS) crs);
+            singles = Collections.singletonList((SingleCRS) crs);
         }
         return singles;
     }
@@ -208,16 +214,41 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
      *         {@link CompoundCRS}.
      */
-    private static void getSingleCRS(final List<CoordinateReferenceSystem> crs,
-                                     final List<SingleCRS> singles)
+    private static boolean getSingleCRS(final List<CoordinateReferenceSystem> crs,
+                                        final List<SingleCRS> singles)
     {
+        boolean identical = true;
         for (final CoordinateReferenceSystem candidate : crs) {
             if (candidate instanceof CompoundCRS) {
                 getSingleCRS(((CompoundCRS) candidate).getCoordinateReferenceSystems(), singles);
+                identical = false;
             } else {
                 singles.add((SingleCRS) candidate);
             }
         }
+        return identical;
+    }
+
+    /**
+     * Computes the single CRS. Recycles a direct reference to the list
+     * (which must be immutable) if elements are already single CRS.
+     */
+    @SuppressWarnings("unchecked")
+    private void computeSingleCRS() {
+        singles = new ArrayList<SingleCRS>(crs.size());
+        if (getSingleCRS(crs, singles)) {
+            singles = (List) crs; // Shares the same list.
+        } else {
+            singles = UnmodifiableArrayList.wrap(singles.toArray(new SingleCRS[crs.size()]));
+        }
+    }
+
+    /**
+     * Computes the single CRS on deserialization.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        computeSingleCRS();
     }
 
     /**

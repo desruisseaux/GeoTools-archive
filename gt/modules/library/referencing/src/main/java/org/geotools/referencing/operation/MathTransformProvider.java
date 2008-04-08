@@ -180,8 +180,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
      */
-    protected static ParameterDescriptor createDescriptor(final ReferenceIdentifier[] identifiers,
-            final double defaultValue, final double minimum, final double maximum, final Unit unit)
+    protected static ParameterDescriptor<Double> createDescriptor(
+            final ReferenceIdentifier[] identifiers, final double defaultValue,
+            final double minimum, final double maximum, final Unit unit)
     {
         return new DefaultParameterDescriptor(toMap(identifiers), defaultValue,
                                               minimum, maximum, unit, true);
@@ -196,7 +197,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
      */
-    protected static ParameterDescriptor createOptionalDescriptor(
+    protected static ParameterDescriptor<Double> createOptionalDescriptor(
             final ReferenceIdentifier[] identifiers,
             final double minimum, final double maximum, final Unit unit)
     {

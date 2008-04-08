@@ -52,6 +52,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
 import static org.geotools.referencing.AbstractIdentifiedObject.nameMatches;
 import static org.geotools.referencing.operation.ProjectionAnalyzer.createLinearConversion;
 
@@ -199,6 +200,29 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
             final CoordinateOperation candidate = createFromDatabase(sourceCRS, targetCRS);
             if (candidate != null) {
                 return candidate;
+            }
+        }
+        /*
+         * Before to process, performs a special check for CompoundCRS where the target contains
+         * every elements included in the source.  CompoundCRS are usually verified last, but in
+         * the special case described above there is only axis switch or dimension to remove. If
+         * we wait last for processing them, what would have been a simple CoordinateOperation
+         * may become interleaved with more complex operation (e.g. projection followed by the
+         * inverse projection, before they get simplified by DefaultConcatenatedOperation, etc.).
+         */
+        if (sourceCRS instanceof CompoundCRS) {
+            final List<SingleCRS> sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
+            final List<SingleCRS> targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
+            if (containsIgnoreMetadata(sources, targets)) {
+                final CompoundCRS source = (CompoundCRS) sourceCRS;
+                if (targetCRS instanceof CompoundCRS) {
+                    final CompoundCRS target = (CompoundCRS) targetCRS;
+                    return createOperationStep(source, target);
+                }
+                if (targetCRS instanceof SingleCRS) {
+                    final SingleCRS target = (SingleCRS) targetCRS;
+                    return createOperationStep(source, target);
+                }
             }
         }
         /////////////////////////////////////////////////////////////////////
@@ -1495,6 +1519,24 @@ search: for (int j=0; j<targets.size(); j++) {
                    nameMatches(object2, object1.getName().getCode());
         }
         return false;
+    }
+
+    /**
+     * Returns {@code true} if {@code container} contains all CRS listed in {@code candidates},
+     * ignoring metadata.
+     */
+    private static boolean containsIgnoreMetadata(final List<SingleCRS> container,
+                                                  final List<SingleCRS> candidates)
+    {
+search: for (final SingleCRS crs : candidates) {
+            for (final SingleCRS c : container) {
+                if (equalsIgnoreMetadata(crs, c)) {
+                    continue search;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     /**

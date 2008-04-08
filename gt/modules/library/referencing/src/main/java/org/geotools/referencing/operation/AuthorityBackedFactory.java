@@ -40,6 +40,8 @@ import org.geotools.referencing.factory.BackingStoreException;
 import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
+import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
+
 
 /**
  * A {@linkplain CoordinateOperationFactory coordinate operation factory} extended with the extra

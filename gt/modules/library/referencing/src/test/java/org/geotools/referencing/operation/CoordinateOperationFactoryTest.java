@@ -616,5 +616,7 @@ public final class CoordinateOperationFactoryTest extends TransformTestBase {
         assertFalse(mt.isIdentity());
         assertTrue("The somewhat complex MathTransform chain should have been simplified " +
                    "to a single affine transform.", mt instanceof LinearTransform);
+        assertTrue("The operation should be a simple axis change, not a complex" +
+                   "chain of ConcatenatedOperations.", op instanceof Conversion);
     }
 }
