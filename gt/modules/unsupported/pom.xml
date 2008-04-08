@@ -63,7 +63,6 @@
      <profile>
        <id>pending</id>
        <modules>
-         <module>process</module>
          <module>coveragetools</module>
          <module>sql-datastore</module>
          <module>geometryless</module>
@@ -104,6 +103,7 @@
     <module>mysql</module>
     <module>oracle-spatial</module>
     <module>postgis-versioned</module>
+    <module>process</module>
     <module>repository</module>
     <module>tiger</module>
     <module>vpf</module>
