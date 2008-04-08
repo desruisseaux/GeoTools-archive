@@ -27,10 +27,16 @@ import org.opengis.util.ProgressListener;
  */
 public interface Process {
 	/**
-	 * 
+	 * Execute this process with the provided interfaces.
+	 * @param input Map of inputs (
 	 * @param monitor
-	 * @return Map of results (see factory getResultParameters for details), or null if canceled
+	 * @return Map of results (@see factory.getResultParameters for details), or null if canceled
 	 */
-	public Map<String,Object> process(ProgressListener monitor);
+	public Map<String,Object> process(Map<String,Object> input, ProgressListener monitor);
+	/**
+	 * ProcessFactory that created this process (useful if you want to check the process title etc..).
+	 * 
+	 * @return ProcessFactory that created this process.
+	 */
 	public ProcessFactory getFactory();
 }

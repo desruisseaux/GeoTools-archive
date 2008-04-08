@@ -13,7 +13,7 @@ public interface ParamWidget {
 	/**
 	 * Called to build the widget, initialize it (setting defaults or
 	 * whatever) and setup any listeners needed for validation of the widget value.
-	 * The returned JComponent will contain the widget with a label.
+	 * The returned JComponent will contain the widget for editing.
 	 * 
 	 * @return JComponent or null if error
 	 */	
@@ -28,13 +28,11 @@ public interface ParamWidget {
 	public boolean validate();
 	
 	/**
-	 * Sets the value of the widget.  Returns true if the value was sucessfully
-	 * set to the new value, returns false otherwise.
+	 * Sets the value of the widget.  
 	 * 
 	 * @param Object an object containing the value to set for the widget
-	 * @return boolean true if successfully set, false otherwise
 	 */	
-	public boolean setValue(Object value);
+	public void setValue(Object value);
 	
 	/**
 	 * Returns the current value of the widget.  

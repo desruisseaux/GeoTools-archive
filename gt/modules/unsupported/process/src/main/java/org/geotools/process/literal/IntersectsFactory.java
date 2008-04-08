@@ -73,9 +73,9 @@ public class IntersectsFactory extends AbstractProcessFactory {
         resultInfo.put( RESULT.key, RESULT );
     }
     
-	public Process create(Map<String, Object> parameters)
+	public Process create()
 			throws IllegalArgumentException {
-		return new IntersectProcess( this, parameters );
+		return new IntersectionProcess( this );
 	}
 
 	public InternationalString getDescription() {

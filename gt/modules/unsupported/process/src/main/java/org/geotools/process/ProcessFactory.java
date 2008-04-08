@@ -45,7 +45,11 @@ public interface ProcessFactory {
 	 */
 	public Map<String,Parameter<?>> getParameterInfo();
 	
-	public Process create(Map<String, Object> parameters) throws IllegalArgumentException;
+	/**
+	 * Create a process for execution.
+	 * @return Process implementation
+	 */
+	public Process create();
 	
 	public Map<String,Parameter<?>> getResultInfo(Map<String, Object> parameters) throws IllegalArgumentException;
 }

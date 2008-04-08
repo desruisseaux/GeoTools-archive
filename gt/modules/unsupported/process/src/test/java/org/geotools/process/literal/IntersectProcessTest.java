@@ -15,7 +15,9 @@
  */
 package org.geotools.process.literal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -43,9 +45,10 @@ public class IntersectProcessTest extends TestCase {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put( IntersectsFactory.GEOM1.key, geom1 );
         map.put( IntersectsFactory.GEOM2.key, geom2 );
-        IntersectProcess process = new IntersectProcess(null, map );
         
-        Map<String, Object> resultMap = process.process( null );
+        IntersectionProcess process = new IntersectionProcess( null );        
+        Map<String, Object> resultMap = process.process( map, null );
+        
         assertNotNull( resultMap );
         Object result = resultMap.get(IntersectsFactory.RESULT.key);
         assertNotNull( result );
@@ -53,4 +56,22 @@ public class IntersectProcessTest extends TestCase {
         Geometry intersection = geom1.intersection(geom2);
         assertTrue( intersection.equals( (Geometry) result ) );
     }
+    
+    public void testUnionProcess() throws Exception {
+        WKTReader reader = new WKTReader( new GeometryFactory() );
+        List<Geometry> list = new ArrayList<Geometry>();
+        list.add( reader.read("POLYGON((20 10, 30 0, 40 10, 30 20, 20 10))") );
+        list.add( reader.read("POLYGON((20 10, 30 0, 40 10, 20 10))") );
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put( UnionFactory.GEOM1.key, list );
+        
+        UnionProcess process = new UnionProcess( null );        
+        Map<String, Object> resultMap = process.process( map, null );
+        
+        assertNotNull( resultMap );
+        Object result = resultMap.get(IntersectsFactory.RESULT.key);
+        assertNotNull( result );
+        assertTrue( "expected geometry", result instanceof Geometry );        
+    }    
 }
