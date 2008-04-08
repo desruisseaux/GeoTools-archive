@@ -39,9 +39,9 @@ import org.opengis.metadata.spatial.GridSpatialRepresentation;
  *
  * @since 2.1
  */
-@XmlType(name = "MD_GridSpatialRepresentation", propOrder={
-    "numberOfDimensions", "axisDimensionsProperties", "cellGeometry", "transformationParameterAvailable"
-}, namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "MD_GridSpatialRepresentation", propOrder={"numberOfDimensions",
+    "axisDimensionsProperties", "cellGeometry", "transformationParameterAvailable"
+})
 @XmlSeeAlso({GeorectifiedImpl.class, GeoreferenceableImpl.class})
 @XmlRootElement(name = "MD_GridSpatialRepresentation")
 public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl

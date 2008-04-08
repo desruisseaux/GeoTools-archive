@@ -41,8 +41,7 @@ import org.opengis.util.RecordType;
  * @author Touraïvane
  */
 @XmlType(name = "MD_CoverageDescription", propOrder={
-    "attributeDescription", "contentType", "dimensions"
-}, namespace = "http://www.w3.org/2001/XMLSchema-instance")
+    "attributeDescription", "contentType", "dimensions"})
 @XmlSeeAlso({ImageDescriptionImpl.class})
 @XmlRootElement(name = "MD_CoverageDescription")
 public class CoverageDescriptionImpl extends ContentInformationImpl implements CoverageDescription {

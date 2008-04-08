@@ -40,7 +40,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "EX_TemporalExtent", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "EX_TemporalExtent")
 @XmlSeeAlso({SpatialTemporalExtentImpl.class})
 @XmlRootElement(name = "EX_TemporalExtent")
 public class TemporalExtentImpl extends MetadataEntity implements TemporalExtent {

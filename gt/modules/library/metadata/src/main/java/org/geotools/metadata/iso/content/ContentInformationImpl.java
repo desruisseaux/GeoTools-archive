@@ -36,7 +36,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "MD_ContentInformation", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "MD_ContentInformation")
 @XmlSeeAlso({CoverageDescriptionImpl.class, FeatureCatalogueDescriptionImpl.class})
 @XmlRootElement(name = "MD_ContentInformation")
 public class ContentInformationImpl extends MetadataEntity implements ContentInformation {

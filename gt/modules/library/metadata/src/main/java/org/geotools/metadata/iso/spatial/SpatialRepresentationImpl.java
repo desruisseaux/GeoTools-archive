@@ -35,7 +35,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "MD_SpatialRepresentation", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "MD_SpatialRepresentation")
 @XmlSeeAlso({GridSpatialRepresentationImpl.class, VectorSpatialRepresentationImpl.class})
 public class SpatialRepresentationImpl extends MetadataEntity implements SpatialRepresentation {
     /**

@@ -39,8 +39,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "MD_RangeDimension", propOrder={"descriptor"}, 
-         namespace="http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "MD_RangeDimension", propOrder={"descriptor"})
 @XmlSeeAlso({BandImpl.class})
 @XmlRootElement(name = "MD_RangeDimension")
 public class RangeDimensionImpl extends MetadataEntity implements RangeDimension {

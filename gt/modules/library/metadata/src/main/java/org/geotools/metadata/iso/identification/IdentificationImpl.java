@@ -51,9 +51,10 @@ import org.geotools.metadata.iso.MetadataEntity;
  * @since 2.1
  */
 @XmlType(name = "MD_Identification", propOrder={
-    "citation", "abstract", "purpose", "credits", "status", "pointOfContacts", "resourceMaintenance",
-    "graphicOverviews", "resourceFormat", "descriptiveKeywords", "resourceSpecificUsages", "resourceConstraints"
-}, namespace = "http://www.w3.org/2001/XMLSchema-instance")
+    "citation", "abstract", "purpose", "credits", "status", "pointOfContacts",
+    "resourceMaintenance", "graphicOverviews", "resourceFormat", "descriptiveKeywords",
+    "resourceSpecificUsages", "resourceConstraints"
+})
 @XmlSeeAlso({DataIdentificationImpl.class, ServiceIdentificationImpl.class})
 @XmlRootElement(name = "MD_Identification")
 public class IdentificationImpl extends MetadataEntity implements Identification {

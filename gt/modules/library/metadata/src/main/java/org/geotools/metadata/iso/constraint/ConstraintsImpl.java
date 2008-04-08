@@ -44,8 +44,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "MD_Constraints", propOrder = {"useLimitation"},
-         namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "MD_Constraints", propOrder = {"useLimitation"})
 @XmlSeeAlso({LegalConstraintsImpl.class, SecurityConstraintsImpl.class})
 @XmlRootElement(name = "MD_Constraints")
 public class ConstraintsImpl extends MetadataEntity implements Constraints {

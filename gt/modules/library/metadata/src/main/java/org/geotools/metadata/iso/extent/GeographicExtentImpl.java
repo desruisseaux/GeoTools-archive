@@ -37,7 +37,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  *
  * @since 2.1
  */
-@XmlType(name = "EX_GeographicExtent", propOrder = {"inclusion"}, namespace = "http://www.w3.org/2001/XMLSchema-instance")
+@XmlType(name = "EX_GeographicExtent")
 @XmlSeeAlso({GeographicBoundingBoxImpl.class, BoundingPolygonImpl.class, GeographicDescriptionImpl.class})
 @XmlRootElement(name = "EX_GeographicExtent", namespace = "http://www.w3.org/2001/XMLSchema-instance")
 public class GeographicExtentImpl extends MetadataEntity implements GeographicExtent {
