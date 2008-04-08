@@ -49,7 +49,7 @@ public class JProcessWizard extends JDialog {
     public static final int ERROR = 2;
     
     Controller controller = new Controller();
-    HashMap<String,JProcessPage> model;
+    HashMap<String,JProcessPage> model = new HashMap<String, JProcessPage>();
     JProcessPage current;
     
     private JPanel cardPanel;
@@ -61,14 +61,18 @@ public class JProcessWizard extends JDialog {
 
     private int returnCode;
 
-    public JProcessWizard( Dialog owner, String title, boolean modal, GraphicsConfiguration gc )
+    public JProcessWizard( String title ) throws HeadlessException {
+        super();
+        setTitle( title );
+        initComponents();
+    }
+    public JProcessWizard( Dialog owner, String title )
             throws HeadlessException {
-        super(owner, title, modal, gc);
+        super(owner, title, true, null  );
         initComponents();
     }
 
     private void initComponents() {
-
         // Code omitted
         JPanel buttonPanel = new JPanel();
         Box buttonBox = new Box(BoxLayout.X_AXIS);
@@ -98,7 +102,6 @@ public class JProcessWizard extends JDialog {
         buttonPanel.add(buttonBox, java.awt.BorderLayout.EAST);
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
         getContentPane().add(cardPanel, java.awt.BorderLayout.CENTER);
-
     }
     
     public Boolean isCancelEnabled(){
@@ -125,7 +128,7 @@ public class JProcessWizard extends JDialog {
         return backButton == null ? null : backButton.isEnabled();
     }    
     public void setBackEnabled(Boolean isEnabled) {
-        Boolean oldValue = nextButton.isEnabled();        
+        Boolean oldValue = backButton.isEnabled();        
         if (isEnabled != oldValue) {
             firePropertyChange("isBackEnabled", oldValue, isEnabled);
             backButton.setEnabled( isEnabled );
@@ -138,19 +141,6 @@ public class JProcessWizard extends JDialog {
      */
     public static void main( String args[] ) {
         // we need to open up the process wizard as an example...
-    }
-    
-    private PropertyChangeSupport propertyChangeSupport;
-    public void addPropertyChangeListener(PropertyChangeListener p) {
-        propertyChangeSupport.addPropertyChangeListener(p);
-    }
-    
-    public void removePropertyChangeListener(PropertyChangeListener p) {
-        propertyChangeSupport.removePropertyChangeListener(p);
-    }
-    
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
     
     /**
@@ -213,7 +203,10 @@ public class JProcessWizard extends JDialog {
     public void registerWizardPanel(JProcessPage page) {
         cardPanel.add(page.getPage(), page.getIdentifier());
         page.setJProcessWizard( this );
-        model.put( page.getIdentifier(), page );        
+        model.put( page.getIdentifier(), page );
+        if( page.getIdentifier() == JProcessPage.DEFAULT ){
+            setCurrentPanel( page.getIdentifier() );
+        }
     }  
     
     /** The controller listens to everything and updates the buttons */
@@ -234,8 +227,7 @@ public class JProcessWizard extends JDialog {
             //  get the ID that the current panel identifies as the next panel,
             //  and display it.
             
-            String nextId = current.getNextPageIdentifier();
-            
+            String nextId = current.getNextPageIdentifier();            
             if (nextId == JProcessPage.FINISH ) {
                 close( FINISH );
             } else {        

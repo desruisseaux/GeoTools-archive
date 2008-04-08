@@ -13,15 +13,15 @@ public abstract class JProcessPage {
     /**
      * Used to indicate which page we should start with.
      */
-    private static final String DEFAULT = "default";
+    public static final String DEFAULT = "default";
 
     /**
      * Used to indicate that we are done and the wizard should close
      */
     public static final String FINISH = "finish";
 
-    private JPanel page;
-    private String identifier;
+    protected final JPanel page;
+    protected final String identifier;
     /**
      * Wizard hosting this process page; we will access wizard.model directly to look up our friends
      * for next and previous.
@@ -31,10 +31,16 @@ public abstract class JProcessPage {
      * Create a default page.
      */
     public JProcessPage() {
-        identifier = DEFAULT;
-        page = new JPanel();
+        this( DEFAULT );
     }
 
+    /**
+     * Create a default page.
+     */
+    public JProcessPage(String id ) {
+        this( id, new JPanel() );
+    }
+    
     /**
      * Create a page.
      * 
@@ -50,16 +56,8 @@ public abstract class JProcessPage {
         return page;
     }
 
-    public final void setPage( JPanel page ) {
-        this.page = page;
-    }
-
     public final String getIdentifier() {
         return identifier;
-    }
-
-    public final void setIdentifier( String id ) {
-        identifier = id;
     }
 
     final void setJProcessWizard( JProcessWizard w ) {
