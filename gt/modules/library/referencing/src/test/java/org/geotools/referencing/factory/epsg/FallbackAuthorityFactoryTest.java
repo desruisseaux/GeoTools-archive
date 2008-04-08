@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.WKT;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -138,27 +139,7 @@ public final class FallbackAuthorityFactoryTest {
      */
     @Test
     public void testLookupFailing() throws FactoryException {
-        String wkt = "PROJCS[\"Google Mercator\", \r\n" +
-                "  GEOGCS[\"WGS 84\", \r\n" +
-                "    DATUM[\"World Geodetic System 1984\", \r\n" +
-                "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]], \r\n" +
-                "      AUTHORITY[\"EPSG\",\"6326\"]], \r\n" +
-                "    PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], \r\n" +
-                "    UNIT[\"degree\", 0.017453292519943295], \r\n" +
-                "    AXIS[\"Geodetic latitude\", NORTH], \r\n" +
-                "    AXIS[\"Geodetic longitude\", EAST], \r\n" +
-                "    AUTHORITY[\"EPSG\",\"4326\"]], \r\n" +
-                "  PROJECTION[\"Mercator_1SP\"], \r\n" +
-                "  PARAMETER[\"latitude_of_origin\", 0.0], \r\n" +
-                "  PARAMETER[\"central_meridian\", 0.0], \r\n" +
-                "  PARAMETER[\"scale_factor\", 1.0], \r\n" +
-                "  PARAMETER[\"false_easting\", 0.0], \r\n" +
-                "  PARAMETER[\"false_northing\", 0.0], \r\n" +
-                "  UNIT[\"m\", 1.0], \r\n" +
-                "  AXIS[\"Easting\", EAST], \r\n" +
-                "  AXIS[\"Northing\", NORTH], \r\n" +
-                "  AUTHORITY[\"EPSG\",\"900913\"]]";
-        CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        CoordinateReferenceSystem crs = CRS.parseWKT(WKT.MERCATOR_GOOGLE);
         assertNull(CRS.lookupIdentifier(crs, true));
     }
 

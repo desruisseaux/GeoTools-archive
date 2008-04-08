@@ -181,7 +181,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * also check against null value and make sure that all CRS dimension matches.
      *
      * @param  operations The array of operations to expand.
-     * @param  list The list in which to add {@code SingleOperation}.
+     * @param  target The destination list in which to add {@code SingleOperation}.
      * @param  factory The math transform factory to use, or {@code null}
      * @param  wantTransform {@code true} if the concatenated math transform should be computed.
      *         This is set to {@code false} only when this method invokes itself recursively.
@@ -189,7 +189,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * @throws FactoryException if the factory can't concatenate the math transforms.
      */
     private static MathTransform expand(final CoordinateOperation[] operations,
-                                        final List<SingleOperation> list,
+                                        final List<SingleOperation> target,
                                         final MathTransformFactory factory,
                                         final boolean wantTransform)
             throws FactoryException
@@ -200,11 +200,11 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             ensureNonNull("operations", operations, i);
             final CoordinateOperation op = operations[i];
             if (op instanceof SingleOperation) {
-                list.add((SingleOperation) op);
+                target.add((SingleOperation) op);
             } else if (op instanceof ConcatenatedOperation) {
                 final ConcatenatedOperation cop = (ConcatenatedOperation) op;
                 final List<SingleOperation> cops = cop.getOperations();
-                expand(cops.toArray(new CoordinateOperation[cops.size()]), list, factory, false);
+                expand(cops.toArray(new CoordinateOperation[cops.size()]), target, factory, false);
             } else {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                         Classes.getClass(op), SingleOperation.class));
@@ -239,7 +239,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             }
         }
         if (wantTransform) {
-            final int size = list.size();
+            final int size = target.size();
             if (size <= 1) {
                 throw new IllegalArgumentException(Errors.format(
                             ErrorKeys.MISSING_PARAMETER_$1, "operations[" + size + ']'));

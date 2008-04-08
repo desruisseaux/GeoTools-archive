@@ -872,7 +872,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
                 }
             }
         }
-        assert cornerToCRS2D.equals(computeGridToCRS2D(orientation));
         return cornerToCRS2D;
     }
 

@@ -163,6 +163,79 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                                     getName(tr1), getName(tr2)) + ' ' +
                       Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2, dim1, dim2));
         }
+        MathTransform mt = createOptimized(tr1, tr2);
+        if (mt != null) {
+            return mt;
+        }
+        /*
+         * If at least one math transform is an instance of ConcatenatedTransform and assuming
+         * that MathTransforms are associatives, tries the following arrangements and select
+         * one one with the fewest amount of steps:
+         *
+         *   Assuming :  tr1 = (A * B)
+         *               tr2 = (C * D)
+         *
+         *   Current  :  (A * B) * (C * D)     Will be the selected one if nothing better.
+         *   Try k=0  :  A * (B * (C * D))     Implies A * ((B * C) * D) through recursivity.
+         *   Try k=1  :  ((A * B) * C) * D     Implies (A * (B * C)) * D through recursivity.
+         *   Try k=2  :                        Tried only if try k=1 changed something.
+         *
+         * TODO: The same combinaison may be computed more than once (e.g. (B * C) above).
+         *       Should not be a big deal if there is not two many steps. In the even where
+         *       it would appears a performance issue, we could maintains a Map of combinaisons
+         *       already computed. The map would be local to a "create" method execution.
+         */
+        int stepCount = getStepCount(tr1) + getStepCount(tr2);
+        boolean tryAgain = true; // Really 'true' because we want at least 2 iterations.
+        for (int k=0; ; k++) {
+            MathTransform c1 = tr1;
+            MathTransform c2 = tr2;
+            final boolean first = (k & 1) == 0;
+            MathTransform candidate = first ? c1 : c2;
+            while (candidate instanceof ConcatenatedTransform) {
+                final ConcatenatedTransform ctr = (ConcatenatedTransform) candidate;
+                if (first) {
+                    c1 = candidate = ctr.transform1;
+                    c2 = create(ctr.transform2, c2);
+                } else {
+                    c1 = create(c1, ctr.transform1);
+                    c2 = candidate = ctr.transform2;
+                }
+                final int c = getStepCount(c1) + getStepCount(c2);
+                if (c < stepCount) {
+                    tr1 = c1;
+                    tr2 = c2;
+                    stepCount = c;
+                    tryAgain = true;
+                }
+            }
+            if (!tryAgain) break;
+            tryAgain = false;
+        }
+        /*
+         * Tries again the check for optimized cases (identity, etc.), because a
+         * transform may have been simplified to identity as a result of the above.
+         */
+        mt = createOptimized(tr1, tr2);
+        if (mt != null) {
+            return mt;
+        }
+        /*
+         * Can't avoid the creation of a ConcatenatedTransform object.
+         * Check for the type to create (1D, 2D, general case...)
+         */
+        return createConcatenatedTransform(tr1, tr2);
+    }
+
+    /**
+     * Tries to returns an optimized concatenation, for example by merging to affine transforms
+     * into a single one. If no optimized cases has been found, returns {@code null}. In the later
+     * case, the caller will need to create a more heavy {@link ConcatenatedTransform} instance.
+     */
+    private static MathTransform createOptimized(final MathTransform tr1, final MathTransform tr2) {
+        /*
+         * Trivial - but actually essential!! - check for the identity cases.
+         */
         if (tr1.isIdentity()) return tr2;
         if (tr2.isIdentity()) return tr1;
         /*
@@ -205,27 +278,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             return IdentityTransform.create(tr1.getSourceDimensions());
         }
         /*
-         * If one or both math transform are instance of ConcatenatedTransform,
-         * then maybe it is possible to efficiently concatenate tr1 or tr2 with
-         * one of step transforms. Try that...
-         */
-        if (tr1 instanceof ConcatenatedTransform) {
-            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr1;
-            tr1 = ctr.transform1;
-            tr2 = create(ctr.transform2, tr2);
-        }
-        if (tr2 instanceof ConcatenatedTransform) {
-            final ConcatenatedTransform ctr = (ConcatenatedTransform) tr2;
-            tr1 = create(tr1, ctr.transform1);
-            tr2 = ctr.transform2;
-        }
-        // Tests again, because one of the 'create' methods
-        // above may have returned an identity transform.
-        if (tr1.isIdentity()) return tr2;
-        if (tr2.isIdentity()) return tr1;
-        /*
-         * Before to create a general ConcatenatedTransform object, give a
-         * chance to AbstractMathTransform to returns an optimized object.
+         * Gives a chance to AbstractMathTransform to returns an optimized object.
          * The main use case is Logarithmic vs Exponential transforms.
          */
         if (tr1 instanceof AbstractMathTransform) {
@@ -240,9 +293,8 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 return optimized;
             }
         }
-        // Can't avoid the creation of a ConcatenatedTransform object.
-        // Check for the type to create (1D, 2D, general case...)
-        return createConcatenatedTransform(tr1, tr2);
+        // No optimized case found.
+        return null;
     }
 
     /**
@@ -257,7 +309,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         /*
          * Checks if the result need to be a MathTransform1D.
          */
-        if (dimSource==1 && dimTarget==1) {
+        if (dimSource == 1 && dimTarget == 1) {
             if (tr1 instanceof MathTransform1D && tr2 instanceof MathTransform1D) {
                 return new ConcatenatedTransformDirect1D((MathTransform1D) tr1,
                                                          (MathTransform1D) tr2);
@@ -268,7 +320,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         /*
          * Checks if the result need to be a MathTransform2D.
          */
-        if (dimSource==2 && dimTarget==2) {
+        if (dimSource == 2 && dimTarget == 2) {
             if (tr1 instanceof MathTransform2D && tr2 instanceof MathTransform2D) {
                 return new ConcatenatedTransformDirect2D((MathTransform2D) tr1,
                                                          (MathTransform2D) tr2);
@@ -279,7 +331,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         /*
          * Checks for the general case.
          */
-        if (dimSource==tr1.getTargetDimensions() && tr2.getSourceDimensions()==dimTarget) {
+        if (dimSource == tr1.getTargetDimensions() && tr2.getSourceDimensions() == dimTarget) {
             return new ConcatenatedTransformDirect(tr1, tr2);
         } else {
             return new ConcatenatedTransform(tr1, tr2);
@@ -322,6 +374,31 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      */
     public final int getTargetDimensions() {
         return transform2.getTargetDimensions();
+    }
+
+    /**
+     * Returns the number of {@linkplain MathTransform math transform} steps performed by this
+     * concatenated transform.
+     *
+     * @since 2.5
+     */
+    public final int getStepCount() {
+        return getStepCount(transform1) + getStepCount(transform2);
+    }
+
+    /**
+     * Returns the number of {@linkplain MathTransform math transform} steps performed by the
+     * given transform. As a special case, we returns 0 for the identity transform since it
+     * should be omitted from the final chain.
+     */
+    private static int getStepCount(final MathTransform transform) {
+        if (transform.isIdentity()) {
+            return 0;
+        }
+        if (!(transform instanceof ConcatenatedTransform)) {
+            return 1;
+        }
+        return ((ConcatenatedTransform) transform).getStepCount();
     }
 
     /**
@@ -508,12 +585,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
 
     /**
-     * Compares the specified object with
-     * this math transform for equality.
+     * Compares the specified object with this math transform for equality.
      */
     @Override
     public final boolean equals(final Object object) {
-        if (object==this) {
+        if (object == this) {
             // Slight optimization
             return true;
         }

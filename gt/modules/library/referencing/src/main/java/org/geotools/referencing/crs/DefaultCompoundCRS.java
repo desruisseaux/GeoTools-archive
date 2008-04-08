@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,22 +19,18 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.Datum;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCompoundCS;
@@ -64,7 +60,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     /**
      * The coordinate reference systems in this compound CRS.
      */
-    private final List/*<CoordinateReferenceSystem>*/ crs;
+    private final List<CoordinateReferenceSystem> crs;
 
     /**
      * Constructs a new compound CRS with the same values than the specified one.
@@ -128,10 +124,10 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.
      */
-    public DefaultCompoundCRS(final Map properties, CoordinateReferenceSystem[] crs) {
+    public DefaultCompoundCRS(final Map<String,?> properties, CoordinateReferenceSystem[] crs) {
         super(properties, createCoordinateSystem(crs));
         ensureNonNull("crs", crs);
-        crs = (CoordinateReferenceSystem[]) crs.clone();
+        crs = crs.clone();
         for (int i=0; i<crs.length; i++) {
             ensureNonNull("crs", crs, i);
         }
@@ -163,7 +159,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      *
      * @return The coordinate reference systems.
      */
-    public List/*<CoordinateReferenceSystem>*/ getCoordinateReferenceSystems() {
+    public List<CoordinateReferenceSystem> getCoordinateReferenceSystems() {
         return crs;
     }
 
@@ -175,10 +171,10 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @return The single coordinate reference systems.
      * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a {@link CompoundCRS}.
      */
-    public SingleCRS[] getSingleCRS() {
-        final List singles = new ArrayList(crs.size());
+    public List<SingleCRS> getSingleCRS() {
+        final List<SingleCRS> singles = new ArrayList<SingleCRS>(crs.size());
         getSingleCRS(crs, singles);
-        return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
+        return singles;
     }
 
     /**
@@ -190,18 +186,20 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @return The single coordinate reference systems.
      * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a {@link CompoundCRS}.
      */
-    public static SingleCRS[] getSingleCRS(final CoordinateReferenceSystem crs) {
+    public static List<SingleCRS> getSingleCRS(final CoordinateReferenceSystem crs) {
+        final List<SingleCRS> singles;
         if (crs instanceof DefaultCompoundCRS) {
-            return ((DefaultCompoundCRS) crs).getSingleCRS();
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ elements =
+            singles = ((DefaultCompoundCRS) crs).getSingleCRS();
+        } else if (crs instanceof CompoundCRS) {
+            final List<CoordinateReferenceSystem> elements =
                 ((CompoundCRS) crs).getCoordinateReferenceSystems();
-            final List singles = new ArrayList(elements.size());
+            singles = new ArrayList<SingleCRS>(elements.size());
             getSingleCRS(elements, singles);
-            return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
+        } else {
+            singles = new ArrayList<SingleCRS>(1);
+            singles.add((SingleCRS) crs);
         }
-        return new SingleCRS[] {(SingleCRS) crs};
+        return singles;
     }
 
     /**
@@ -210,11 +208,10 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
      *         {@link CompoundCRS}.
      */
-    private static void getSingleCRS(final List/*<CoordinateReferenceSystem>*/ crs,
-                                     final List/*<SingleCRS>*/ singles)
+    private static void getSingleCRS(final List<CoordinateReferenceSystem> crs,
+                                     final List<SingleCRS> singles)
     {
-        for (final Iterator it=crs.iterator(); it.hasNext();) {
-            final CoordinateReferenceSystem candidate = (CoordinateReferenceSystem) it.next();
+        for (final CoordinateReferenceSystem candidate : crs) {
             if (candidate instanceof CompoundCRS) {
                 getSingleCRS(((CompoundCRS) candidate).getCoordinateReferenceSystems(), singles);
             } else {
@@ -231,6 +228,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -241,18 +239,19 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this compound CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         // Don't call superclass method since 'coordinateSystem' and 'datum' may be null.
         return crs.hashCode() ^ (int)serialVersionUID;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -261,9 +260,10 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "COMPD_CS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
-        for (final Iterator it=crs.iterator(); it.hasNext();) {
-            formatter.append((CoordinateReferenceSystem) it.next());
+        for (final CoordinateReferenceSystem element : crs) {
+            formatter.append(element);
         }
         return "COMPD_CS";
     }

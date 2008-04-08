@@ -32,6 +32,7 @@ import org.opengis.geometry.DirectPosition;
 
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.WKT;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.LinearTransform;
@@ -83,22 +84,7 @@ public final class MathTransformTest {
      */
     @Test
     public void testDirectPositionTransform() throws FactoryException, TransformException {
-        CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(
-                "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                      +
-                "  GEOGCS[\"GCS_North_American_1983\",\n"                  +
-                "    DATUM[\"D_North_American_1983\",\n"                   +
-                "      TOWGS84[0,0,0,0,0,0,0]\n,"                          +
-                "      SPHEROID[\"GRS_1980\", 6378137, 298.257222101]],\n" +
-                "    PRIMEM[\"Greenwich\",0],\n"                           +
-                "    UNIT[\"Degree\", 0.017453292519943295]],\n"           +
-                "  PROJECTION[\"Transverse_Mercator\"],\n"                 +
-                "  PARAMETER[\"False_Easting\",500000],\n"                 +
-                "  PARAMETER[\"False_Northing\",0],\n"                     +
-                "  PARAMETER[\"Central_Meridian\",-123],\n"                +
-                "  PARAMETER[\"Scale_Factor\",0.9996],\n"                  +
-                "  PARAMETER[\"Latitude_Of_Origin\",0],\n"                 +
-                "  UNIT[\"Meter\",1]]");
-
+        CoordinateReferenceSystem crs = ReferencingFactoryFinder.getCRSFactory(null).createFromWKT(WKT.UTM_10N);
         MathTransform t = ReferencingFactoryFinder.getCoordinateOperationFactory(null).
                 createOperation(DefaultGeographicCRS.WGS84, crs).getMathTransform();
         DirectPosition position = new GeneralDirectPosition(-123, 55);

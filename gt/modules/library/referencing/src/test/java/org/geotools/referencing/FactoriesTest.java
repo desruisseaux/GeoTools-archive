@@ -243,7 +243,7 @@ public final class FactoriesTest {
         final Ellipsoid    ellipsoid = DefaultEllipsoid.WGS84;
         final PrimeMeridian meridian = DefaultPrimeMeridian.GREENWICH;
         DatumFactory         factory = new ReferencingObjectFactory();
-        final Map         properties = Collections.singletonMap("name", name1);
+        final Map<String,?> properties = Collections.singletonMap("name", name1);
         GeodeticDatum datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
         assertTrue(datum.getAlias().isEmpty());
 
@@ -256,7 +256,7 @@ public final class FactoriesTest {
             }
             final String pass = "Pass #"+i;
             datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
-            final GenericName[] aliases = (GenericName[]) datum.getAlias().toArray(new GenericName[0]);
+            final GenericName[] aliases = datum.getAlias().toArray(new GenericName[0]);
             assertEquals(pass, 3, aliases.length);
             assertEquals(pass, name0, aliases[0].asLocalName().toString());
             assertEquals(pass, name1, aliases[1].asLocalName().toString());
@@ -267,7 +267,7 @@ public final class FactoriesTest {
         }
 
         datum = factory.createGeodeticDatum(Collections.singletonMap("name", "Tokyo"), ellipsoid, meridian);
-        Collection/*<GenericName>*/ aliases = datum.getAlias();
+        Collection<GenericName> aliases = datum.getAlias();
         assertEquals(4, aliases.size());
 
         ((DatumAliases) factory).freeUnused();

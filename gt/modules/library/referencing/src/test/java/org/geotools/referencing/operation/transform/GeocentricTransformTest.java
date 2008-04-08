@@ -185,7 +185,7 @@ public final class GeocentricTransformTest extends TransformTestBase {
             final Point3d  pt1 = new Point3d(array1[base+0], array1[base+1], array1[base+2]);
             final Point3d  pt2 = new Point3d(array1[base+3], array1[base+4], array1[base+5]);
             final double cartesian = pt1.distance(pt2);
-            if (i<cartesianDistance.length) {
+            if (i < cartesianDistance.length) {
                 assertEquals("Cartesian distance["+i+']', cartesianDistance[i], cartesian, 0.1);
             }
             /*
@@ -202,7 +202,7 @@ public final class GeocentricTransformTest extends TransformTestBase {
                 double orthodromic = ellip.orthodromicDistance(array0[base+0], array0[base+1],
                                                                array0[base+3], array0[base+4]);
                 orthodromic = Math.hypot(orthodromic, array0[base+2] - array0[base+5]);
-                if (i<orthodromicDistance.length) {
+                if (i < orthodromicDistance.length) {
                     assertEquals("Orthodromic distance["+i+']', orthodromicDistance[i], orthodromic, 0.1);
                 }
                 assertTrue("Distance consistency["+i+']', cartesian <= orthodromic);

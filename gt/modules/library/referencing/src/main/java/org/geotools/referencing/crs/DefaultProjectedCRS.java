@@ -70,7 +70,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
     /**
      * Name of the {@value} projection parameter, which is handled specially during WKT formatting.
      */
-    private static final String SEMI_MAJOR="semi_major", SEMI_MINOR="semi_minor";
+    private static final String SEMI_MAJOR = "semi_major", SEMI_MINOR = "semi_minor";
 
     /**
      * Constructs a new projected CRS with the same values than the specified one.

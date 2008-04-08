@@ -150,14 +150,15 @@ public final class PredefinedObjectsTest {
         assertEquals("WGS84 3D", 3, DefaultGeographicCRS.WGS84_3D.getCoordinateSystem().getDimension());
 
         // Test WKT
-        assertEquals("WGS84", "GEOGCS[\"WGS84(DD)\", " +
-                                "DATUM[\"WGS84\", "+
-                                "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "+
-                                "PRIMEM[\"Greenwich\", 0.0], "+
-                                "UNIT[\"degree\", 0.017453292519943295], "+
-                                "AXIS[\"Geodetic longitude\", EAST], "+
-                                "AXIS[\"Geodetic latitude\", NORTH]]",
-                     DefaultGeographicCRS.WGS84.toWKT(0));
+        assertEquals("WGS84",
+                "GEOGCS[\"WGS84(DD)\", " +
+                "DATUM[\"WGS84\", "+
+                "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "+
+                "PRIMEM[\"Greenwich\", 0.0], "+
+                "UNIT[\"degree\", 0.017453292519943295], "+
+                "AXIS[\"Geodetic longitude\", EAST], "+
+                "AXIS[\"Geodetic latitude\", NORTH]]",
+                DefaultGeographicCRS.WGS84.toWKT(0));
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.Random;
 
 import javax.media.jai.Warp;
 import javax.media.jai.WarpAffine;
-import javax.media.jai.WarpCubic;
 import javax.media.jai.WarpQuadratic;
 import javax.media.jai.WarpPolynomial;
 

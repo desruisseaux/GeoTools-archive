@@ -474,7 +474,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     public MathTransform createAffineTransform(final Matrix matrix)
             throws FactoryException
     {
-        lastMethod.remove();
+        lastMethod.remove(); // To be strict, we should set ProjectiveTransform.Provider
         return pool.unique(ProjectiveTransform.create(matrix));
     }
 
@@ -497,7 +497,6 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                      final MathTransform transform2)
             throws FactoryException
     {
-        lastMethod.remove();
         MathTransform tr;
         try {
             tr = ConcatenatedTransform.create(transform1, transform2);
@@ -531,7 +530,6 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                     final int numTrailingOrdinates)
             throws FactoryException
     {
-        lastMethod.remove();
         MathTransform tr;
         try {
             tr = PassThroughTransform.create(firstAffectedOrdinate,

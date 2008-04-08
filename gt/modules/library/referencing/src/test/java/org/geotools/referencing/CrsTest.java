@@ -103,20 +103,7 @@ public final class CrsTest {
      */
     @Test
     public void testEnvelopeTransformation() throws FactoryException, TransformException {
-        String wkt = "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                  +
-                     "  GEOGCS[\"GCS_North_American_1983\",\n"              +
-                     "    DATUM[\"D_North_American_1983\",\n"               +
-                     "    SPHEROID[\"GRS_1980\",6378137,298.257222101]],\n" +
-                     "    PRIMEM[\"Greenwich\",0],\n"                       +
-                     "    UNIT[\"Degree\",0.017453292519943295]],\n"        +
-                     "  PROJECTION[\"Transverse_Mercator\"],\n"             +
-                     "  PARAMETER[\"False_Easting\",500000],\n"             +
-                     "  PARAMETER[\"False_Northing\",0],\n"                 +
-                     "  PARAMETER[\"Central_Meridian\",-123],\n"            +
-                     "  PARAMETER[\"Scale_Factor\",0.9996],\n"              +
-                     "  PARAMETER[\"Latitude_Of_Origin\",0],\n"             +
-                     "  UNIT[\"Meter\",1]]";
-        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(WKT.UTM_10N);
         final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
         final MathTransform crsTransform = CRS.findMathTransform(WGS84, mapCRS, true);
         assertFalse(crsTransform.isIdentity());
@@ -141,16 +128,7 @@ public final class CrsTest {
      */
     @Test
     public void testTransformationOverPole() throws FactoryException, TransformException {
-        String wkt = "PROJCS[\"WGS 84 / Antarctic Polar Stereographic\",\n"     +
-                     "  GEOGCS[\"WGS 84\",\n"                                   +
-                     "    DATUM[\"World Geodetic System 1984\",\n"              +
-                     "      SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n" +
-                     "    PRIMEM[\"Greenwich\", 0.0],\n"                        +
-                     "    UNIT[\"degree\", 0.017453292519943295]],\n"           +
-                     "  PROJECTION[\"Polar Stereographic (variant B)\"],\n"     +
-                     "  PARAMETER[\"standard_parallel_1\", -71.0],\n"           +
-                     "  UNIT[\"m\", 1.0]]";
-        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(wkt);
+        final CoordinateReferenceSystem mapCRS = CRS.parseWKT(WKT.POLAR_STEREOGRAPHIC);
         final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
         final CoordinateOperation operation =
                 CRS.getCoordinateOperationFactory(false).createOperation(mapCRS, WGS84);

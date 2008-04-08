@@ -20,6 +20,8 @@
 package org.geotools.referencing.operation;
 
 import java.util.Map;
+import java.util.List;
+import java.util.Collections;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -1164,13 +1166,13 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final SingleCRS   targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
-        if (sources.length == 1) {
-            return createOperation(sources[0], targetCRS);
+        final List<SingleCRS> sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
+        if (sources.size() == 1) {
+            return createOperation(sources.get(0), targetCRS);
         }
         if (!needsGeodetic3D(sources, targetCRS)) {
             // No need for a datum change (see 'needGeodetic3D' javadoc).
-            final SingleCRS[] targets = new SingleCRS[] {targetCRS};
+            final List<SingleCRS> targets = Collections.singletonList(targetCRS);
             return createOperationStep(sourceCRS, sources, targetCRS, targets);
         }
         /*
@@ -1202,9 +1204,9 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
-        if (targets.length == 1) {
-            return createOperation(sourceCRS, targets[0]);
+        final List<SingleCRS> targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
+        if (targets.size() == 1) {
+            return createOperation(sourceCRS, targets.get(0));
         }
         /*
          * This method has almost no chance to succeed (we can't invent ordinate values!) unless
@@ -1215,7 +1217,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         if (target3D != targetCRS) {
             return createOperation(sourceCRS, target3D);
         }
-        final SingleCRS[] sources = new SingleCRS[] {sourceCRS};
+        final List<SingleCRS> sources = Collections.singletonList(sourceCRS);
         return createOperationStep(sourceCRS, sources, targetCRS, targets);
     }
 
@@ -1231,13 +1233,13 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
-        final SingleCRS[] targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
-        if (targets.length == 1) {
-            return createOperation(sourceCRS, targets[0]);
+        final List<SingleCRS> sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
+        final List<SingleCRS> targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
+        if (targets.size() == 1) {
+            return createOperation(sourceCRS, targets.get(0));
         }
-        if (sources.length == 1) { // After 'targets' because more likely to fails to transform.
-            return createOperation(sources[0], targetCRS);
+        if (sources.size() == 1) { // After 'targets' because more likely to fails to transform.
+            return createOperation(sources.get(0), targetCRS);
         }
         /*
          * If the source CRS contains both a geodetic and a vertical CRS, then we can process
@@ -1245,8 +1247,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * CRS with a different datum, then the datum shift must be applied on the horizontal and
          * vertical components together.
          */
-        for (int i=0; i<targets.length; i++) {
-            if (needsGeodetic3D(sources, targets[i])) {
+        for (final SingleCRS target : targets) {
+            if (needsGeodetic3D(sources, target)) {
                 final ReferencingFactoryContainer factories = getFactoryContainer();
                 final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
                 final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
@@ -1283,9 +1285,9 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @throws FactoryException If the operation can't be constructed.
      */
     private CoordinateOperation createOperationStep(final CoordinateReferenceSystem sourceCRS,
-                                                    final SingleCRS[]               sources,
+                                                    final List<SingleCRS>           sources,
                                                     final CoordinateReferenceSystem targetCRS,
-                                                    final SingleCRS[]               targets)
+                                                    final List<SingleCRS>           targets)
             throws FactoryException
     {
         /*
@@ -1296,17 +1298,17 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * need reordering (for matching the order of target CRS) if any ordinates reordering and
          * source ordinates drops are required.
          */
-        final CoordinateReferenceSystem[] ordered = new CoordinateReferenceSystem[targets.length];
-        final CoordinateOperation[]       steps   = new CoordinateOperation      [targets.length];
-        final boolean[]                   done    = new boolean                  [sources.length];
+        final CoordinateReferenceSystem[] ordered = new CoordinateReferenceSystem[targets.size()];
+        final CoordinateOperation[]       steps   = new CoordinateOperation      [targets.size()];
+        final boolean[]                   done    = new boolean                  [sources.size()];
         final int[]                       indices = new int[getDimension(sourceCRS)];
         int count=0, dimensions=0;
-search: for (int j=0; j<targets.length; j++) {
+search: for (int j=0; j<targets.size(); j++) {
             int lower, upper=0;
-            final CoordinateReferenceSystem target = targets[j];
+            final CoordinateReferenceSystem target = targets.get(j);
             OperationNotFoundException cause = null;
-            for (int i=0; i<sources.length; i++) {
-                final CoordinateReferenceSystem source = sources[i];
+            for (int i=0; i<sources.size(); i++) {
+                final CoordinateReferenceSystem source = sources.get(i);
                 lower  = upper;
                 upper += getDimension(source);
                 if (done[i]) continue;
@@ -1339,7 +1341,7 @@ search: for (int j=0; j<targets.length; j++) {
          * affine transform. This transform also drop source dimensions not used
          * for any target coordinates.
          */
-        assert count == targets.length : count;
+        assert count == targets.size() : count;
         while (count!=0 && steps[--count].getMathTransform().isIdentity());
         final ReferencingFactoryContainer factories = getFactoryContainer();
         CoordinateOperation operation = null;
@@ -1366,11 +1368,11 @@ search: for (int j=0; j<targets.length; j++) {
          * pass through transform.
          */
         int lower, upper=0;
-        for (int i=0; i<targets.length; i++) {
+        for (int i=0; i<targets.size(); i++) {
             CoordinateOperation step = steps[i];
             final Map<String,?> properties = AbstractIdentifiedObject.getProperties(step);
             final CoordinateReferenceSystem source = ordered[i];
-            final CoordinateReferenceSystem target = targets[i];
+            final CoordinateReferenceSystem target = targets.get(i);
             final CoordinateReferenceSystem targetStepCRS;
             ordered[i] = target; // Used for the construction of targetStepCRS.
             MathTransform mt = step.getMathTransform();
@@ -1429,7 +1431,7 @@ search: for (int j=0; j<targets.length; j++) {
      *       and a vertical CRS, so we can't apply a 3D datum shift anyway.</li>
      * </ul>
      */
-    private static boolean needsGeodetic3D(final SingleCRS[] sourceCRS, final SingleCRS targetCRS) {
+    private static boolean needsGeodetic3D(final List<SingleCRS> sourceCRS, final SingleCRS targetCRS) {
         final boolean targetGeodetic;
         final Datum targetDatum = targetCRS.getDatum();
         if (targetDatum instanceof GeodeticDatum) {
@@ -1442,8 +1444,8 @@ search: for (int j=0; j<targets.length; j++) {
         boolean horizontal = false;
         boolean vertical   = false;
         boolean shift      = false;
-        for (int i=0; i<sourceCRS.length; i++) {
-            final Datum sourceDatum = sourceCRS[i].getDatum();
+        for (final SingleCRS crs : sourceCRS) {
+            final Datum sourceDatum = crs.getDatum();
             final boolean sourceGeodetic;
             if (sourceDatum instanceof GeodeticDatum) {
                 horizontal     = true;

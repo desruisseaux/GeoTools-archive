@@ -99,13 +99,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
     // and even with authority factories.
 
     /**
-     * The operation method for the last CRS created, or {@code null} if none. This field
-     * may be the operation name as a {@link String} rather than a {@link OperationMethod}
-     * if the math transform was not created by a Geotools implementation of factory.
-     */
-    private final ThreadLocal<Object> lastMethod = new ThreadLocal<Object>();
-
-    /**
      * Creates an instance from the specified hints. This constructor recognizes the
      * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
@@ -301,6 +294,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @deprecated Use {@link DefaultMathTransformFactory#getOperationMethod}. This method
      *             was inefficient for other implementations.
      */
+    @Deprecated
     public OperationMethod getOperationMethod(final String name)
             throws NoSuchIdentifierException
     {
@@ -310,9 +304,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
             return ((DefaultMathTransformFactory) mtFactory).getOperationMethod(name);
         }
         // Not a geotools implementation. Scan all methods.
-        final Set operations = mtFactory.getAvailableMethods(Operation.class);
-        for (final Iterator it=operations.iterator(); it.hasNext();) {
-            final OperationMethod method = (OperationMethod) it.next();
+        for (final OperationMethod method : mtFactory.getAvailableMethods(Operation.class)) {
             if (AbstractIdentifiedObject.nameMatches(method, name)) {
                 return method;
             }
@@ -337,28 +329,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *
      * @deprecated Moved to the {@link MathTransformFactory} interface.
      */
+    @Deprecated
     public OperationMethod getLastUsedMethod() {
-        final Object candidate = lastMethod.get();
-        if (candidate instanceof OperationMethod) {
-            return (OperationMethod) candidate;
-        }
-        if (candidate instanceof String) {
-            /*
-             * The last math transform was not created by a Geotools implementation
-             * of the factory. Scans all methods until a match is found.
-             */
-            final MathTransformFactory mtFactory = getMathTransformFactory();
-            final Set operations = mtFactory.getAvailableMethods(Operation.class);
-            final String classification = (String) candidate;
-            for (final Iterator it=operations.iterator(); it.hasNext();) {
-                final OperationMethod method = (OperationMethod) it.next();
-                if (AbstractIdentifiedObject.nameMatches(method.getParameters(), classification)) {
-                    lastMethod.set(method);
-                    return method;
-                }
-            }
-        }
-        return null;
+        return getMathTransformFactory().getLastMethodUsed();
     }
 
     /**
@@ -377,20 +350,11 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *
      * @deprecated Use the {@link MathTransformFactory} interface instead.
      */
+    @Deprecated
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
     {
-        lastMethod.remove();
-        final MathTransformFactory mtFactory = getMathTransformFactory();
-        final MathTransform transform = mtFactory.createParameterizedTransform(parameters);
-        if (mtFactory instanceof DefaultMathTransformFactory) {
-            // Special processing for Geotools implementation.
-            lastMethod.set(((DefaultMathTransformFactory) mtFactory).getLastMethodUsed());
-        } else {
-            // Not a geotools implementation. Will try to guess the method later.
-            lastMethod.set(parameters.getDescriptor().getName().getCode());
-        }
-        return transform;
+        return getMathTransformFactory().createParameterizedTransform(parameters);
     }
 
     /**
@@ -414,79 +378,13 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *
      * @deprecated Moved to the {@link MathTransformFactory} interface.
      */
+    @Deprecated
     public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
                                              final ParameterValueGroup       parameters,
                                              final CoordinateSystem          derivedCS)
             throws NoSuchIdentifierException, FactoryException
     {
-        /*
-         * If the user's parameter do not contains semi-major and semi-minor axis length, infers
-         * them from the ellipsoid. This is a convenience service since the user often omit those
-         * parameters (because they duplicate datum information).
-         */
-        final Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(baseCRS);
-        if (ellipsoid != null) {
-            final Unit axisUnit = ellipsoid.getAxisUnit();
-            Parameters.ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit, false);
-            Parameters.ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit, false);
-        }
-        /*
-         * Computes matrix for swapping axis and performing units conversion.
-         * There is one matrix to apply before projection on (longitude,latitude)
-         * coordinates, and one matrix to apply after projection on (easting,northing)
-         * coordinates.
-         */
-        final CoordinateSystem sourceCS = baseCRS.getCoordinateSystem();
-        final Matrix swap1, swap3;
-        try {
-            swap1 = AbstractCS.swapAndScaleAxis(sourceCS, AbstractCS.standard(sourceCS));
-            swap3 = AbstractCS.swapAndScaleAxis(AbstractCS.standard(derivedCS), derivedCS);
-        } catch (IllegalArgumentException cause) {
-            // User-specified axis don't match.
-            throw new FactoryException(cause);
-        } catch (ConversionException cause) {
-            // A Unit conversion is non-linear.
-            throw new FactoryException(cause);
-        }
-        /*
-         * Prepares the concatenation of the matrix computed above and the projection.
-         * Note that at this stage, the dimensions between each step may not be compatible.
-         * For example the projection (step2) is usually two-dimensional while the source
-         * coordinate system (step1) may be three-dimensional if it has a height.
-         */
-        MathTransformFactory  mtFactory = getMathTransformFactory();
-        MathTransform step1 = mtFactory.createAffineTransform(swap1);
-        MathTransform step3 = mtFactory.createAffineTransform(swap3);
-        MathTransform step2 = createParameterizedTransform(parameters);
-        // IMPORTANT: From this point, 'createParameterizedTransform' should not be invoked
-        //            anymore, directly or indirectly, in order to preserve the 'lastMethod'
-        //            value. It will be checked by the last assert before return.
-        /*
-         * If the target coordinate system has a height, instructs the projection to pass
-         * the height unchanged from the base CRS to the target CRS. After this block, the
-         * dimensions of 'step2' and 'step3' should match.
-         */
-        final int numTrailingOrdinates = step3.getSourceDimensions() - step2.getTargetDimensions();
-        if (numTrailingOrdinates > 0) {
-            step2 = mtFactory.createPassThroughTransform(0, step2, numTrailingOrdinates);
-        }
-        /*
-         * If the source CS has a height but the target CS doesn't, drops the extra coordinates.
-         * After this block, the dimensions of 'step1' and 'step2' should match.
-         */
-        final int sourceDim = step1.getTargetDimensions();
-        final int targetDim = step2.getSourceDimensions();
-        if (sourceDim > targetDim) {
-            final Matrix drop = MatrixFactory.create(targetDim+1, sourceDim+1);
-            drop.setElement(targetDim, sourceDim, 1);
-            step1 = mtFactory.createConcatenatedTransform(
-                    mtFactory.createAffineTransform(drop), step1);
-        }
-        final MathTransform transform =
-                mtFactory.createConcatenatedTransform(
-                mtFactory.createConcatenatedTransform(step1, step2), step3);
-        assert AbstractIdentifiedObject.nameMatches(parameters.getDescriptor(), getLastUsedMethod());
-        return transform;
+        return getMathTransformFactory().createBaseToDerived(baseCRS, parameters, derivedCS);
     }
 
     /**
@@ -500,34 +398,14 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *
      * @deprecated Moved to the {@link CRSFactory} interface.
      */
+    @Deprecated
     public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            final GeographicCRS baseCRS,
                                            final Conversion    conversionFromBase,
                                            final CartesianCS   derivedCS)
             throws FactoryException
     {
-        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
-        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS);
-        OperationMethod method = conversionFromBase.getMethod();
-        if (!(method instanceof MathTransformProvider)) {
-            /*
-             * Our Geotools implementation of DefaultProjectedCRS may not be able to detect
-             * the conversion type (PlanarProjection, CylindricalProjection, etc.)  because
-             * we rely on the Geotools-specific MathTransformProvider for that. We will try
-             * to help it with the optional "conversionType" hint,  providing that the user
-             * do not already provides this hint.
-             */
-            if (!properties.containsKey(DefaultProjectedCRS.CONVERSION_TYPE_KEY)) {
-                method = getLastUsedMethod();
-                if (method instanceof MathTransformProvider) {
-                    final Map<String,Object> copy = new HashMap<String,Object>(properties);
-                    copy.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
-                            ((MathTransformProvider) method).getOperationType());
-                    properties = copy;
-                }
-            }
-        }
-        return new DefaultProjectedCRS(properties, conversionFromBase, baseCRS, mt, derivedCS);
+        return getCRSFactory().createProjectedCRS(properties, baseCRS, conversionFromBase, derivedCS);
     }
 
     /**
@@ -546,6 +424,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @deprecated Use {@link CRSFactory#createDefiningConversion} followed by
      *             {@link CRSFactory#createProjectedCRS} instead.
      */
+    @Deprecated
     public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            GeographicCRS          baseCRS,
                                            OperationMethod         method,
@@ -574,12 +453,13 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @throws FactoryException if the object creation failed.
      */
     public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs) throws FactoryException {
-        final SingleCRS[] components = DefaultCompoundCRS.getSingleCRS(crs);
+        final List<SingleCRS> components = DefaultCompoundCRS.getSingleCRS(crs);
+        final int count = components.size();
         SingleCRS   horizontal = null;
         VerticalCRS vertical   = null;
         int hi=0, vi=0;
-        for (int i=0; i<components.length; i++) {
-            final SingleCRS candidate = components[i];
+        for (int i=0; i<count; i++) {
+            final SingleCRS candidate = components.get(i);
             if (candidate instanceof VerticalCRS) {
                 if (vertical == null) {
                     vertical = (VerticalCRS) candidate;
@@ -605,23 +485,22 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
                 return crs;
             }
         }
-        if (horizontal!=null && vertical!=null && Math.abs(vi-hi)==1) {
+        if (horizontal != null && vertical != null && Math.abs(vi-hi) == 1) {
             /*
              * Exactly one horizontal and one vertical CRS has been found, and those two CRS are
              * consecutives. Constructs the new 3D CS. If the two above-cited components are the
-             * only one, the result is returned directly. Otherwise, a new compound CRS is created.
+             * only ones, the result is returned directly. Otherwise, a new compound CRS is created.
              */
             final boolean classic = (hi < vi);
-            final SingleCRS single = toGeodetic3D(components.length == 2 ? crs : null,
-                                                  horizontal, vertical, classic);
-            if (components.length == 2) {
+            final SingleCRS single =
+                    toGeodetic3D(count == 2 ? crs : null, horizontal, vertical, classic);
+            if (count == 2) {
                 return single;
             }
-            final CoordinateReferenceSystem[] c=new CoordinateReferenceSystem[components.length-1];
             final int i = classic ? hi : vi;
-            System.arraycopy(components, 0, c, 0, i);
-            c[i] = single;
-            System.arraycopy(components, i+2, c, i+1, components.length-(i+2));
+            components.remove(i);
+            components.set(i, single);
+            final SingleCRS[] c = components.toArray(new SingleCRS[components.size()]);
             return crsFactory.createCompoundCRS(AbstractIdentifiedObject.getProperties(crs), c);
         }
         return crs;
