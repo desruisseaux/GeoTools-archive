@@ -15,6 +15,7 @@
  */
 package org.geotools.xml;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -114,35 +115,11 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
         throws Exception {
         //does this binding actually map to an eObject?
         if (EObject.class.isAssignableFrom(getType()) && (factory != null)) {
-            EObject eObject;
-
-            if ((value == null) || !(getType().isAssignableFrom(value.getClass()))) {
-                // yes, try and use the factory to dynamically create a new instance
-
-                // get the classname
-                String className = getType().getName();
-                int index = className.lastIndexOf('.');
-
-                if (index != -1) {
-                    className = className.substring(index + 1);
-                }
-
-                // find the proper create method
-                Method create = factory.getClass().getMethod("create" + className, null);
-
-                if (create == null) {
-                    // no dice
-                    return value;
-                }
-
-                // create the instance
-                eObject = (EObject) create.invoke(factory, null);
-            } else {
-                // value already provided (e.g., by a subtype binding with
-                // BEFORE execution mode)
-                eObject = (EObject) value;
+            EObject eObject = createEObject(value);
+            if ( eObject == null ) {
+                return value;
             }
-
+            
             setProperties( eObject, node, false );
             setProperties( eObject, node, true );
             
@@ -161,6 +138,38 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
         return value;
     }
 
+    /**
+     * Reflectively creates an instance of the target object.
+     */
+    protected EObject createEObject( Object value ) throws Exception {
+        if ((value == null) || !(getType().isAssignableFrom(value.getClass()))) {
+            // yes, try and use the factory to dynamically create a new instance
+
+            // get the classname
+            String className = getType().getName();
+            int index = className.lastIndexOf('.');
+
+            if (index != -1) {
+                className = className.substring(index + 1);
+            }
+
+            // find the proper create method
+            Method create = factory.getClass().getMethod("create" + className, null);
+
+            if (create == null) {
+                // no dice
+                return null;
+            }
+
+            // create the instance
+            return (EObject) create.invoke(factory, null);
+        } else {
+            // value already provided (e.g., by a subtype binding with
+            // BEFORE execution mode)
+            return (EObject) value;
+        }    
+    }
+    
     /**
      * Helper method for settings properties of an eobject.
      */
@@ -189,52 +198,59 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
      * </p>
      */
     protected final void setProperty(EObject eObject, String property, Object value, boolean lax) {
-        if (EMFUtils.has(eObject, property)) {
-            //dont do in lax mode since that means its a second pass
-            if ( lax && EMFUtils.isSet(eObject, property) ) {
-                return;
-            }
-    
-            try {
-                if (EMFUtils.isCollection(eObject, property)) {
-                        EMFUtils.add(eObject, property, value);    
-                } else {
+        try {
+            if (EMFUtils.has(eObject, property)) {
+                //dont do in lax mode since that means its a second pass
+                if ( lax && EMFUtils.isSet(eObject, property) ) {
+                    return;
+                }
+        
+                try {
+                    if (EMFUtils.isCollection(eObject, property)) {
+                            EMFUtils.add(eObject, property, value);    
+                    } else {
+                        EMFUtils.set(eObject, property, value);
+                    }
+                } catch (ClassCastException e) {
+                    //convert to the correct type
+                    EStructuralFeature feature = EMFUtils.feature(eObject, property);
+                    Class target = feature.getEType().getInstanceClass();
+
+                    if ((value != null) && !value.getClass().isAssignableFrom(target)) {
+                        //TODO: log this
+                        value = Converters.convert(value, target);
+                    }
+
+                    if (value == null) {
+                        //just throw the oringinal exception
+                        throw e;
+                    }
                     EMFUtils.set(eObject, property, value);
                 }
-            } catch (ClassCastException e) {
-                //convert to the correct type
-                EStructuralFeature feature = EMFUtils.feature(eObject, property);
-                Class target = feature.getEType().getInstanceClass();
+            } 
+            else {
+                //search by type, this is a bit of a hack so we only do it if the 
+                // lax flag is set
+                if (lax && value != null) {
+                    List features = EMFUtils.features(eObject, value.getClass());
 
-                if ((value != null) && !value.getClass().isAssignableFrom(target)) {
-                    //TODO: log this
-                    value = Converters.convert(value, target);
-                }
-
-                if (value == null) {
-                    //just throw the oringinal exception
-                    throw e;
-                }
-                EMFUtils.set(eObject, property, value);
-            }
-        } 
-        else {
-            //search by type, this is a bit of a hack so we only do it if the 
-            // lax flag is set
-            if (lax && value != null) {
-                List features = EMFUtils.features(eObject, value.getClass());
-
-                if (features.size() == 1) {
-                    EStructuralFeature feature = (EStructuralFeature) features.get(0);
-                    
-                    //only set if not previous set
-                    if ( !eObject.eIsSet( feature ) ) {
-                        eObject.eSet(feature, value);    
+                    if (features.size() == 1) {
+                        EStructuralFeature feature = (EStructuralFeature) features.get(0);
+                        
+                        //only set if not previous set
+                        if ( !eObject.eIsSet( feature ) ) {
+                            eObject.eSet(feature, value);    
+                        }    
+                        
                     }
-                    
                 }
             }
         }
+        catch( RuntimeException e ) {
+            String msg = "Unable to set property: " + property + " for eobject: " + getTarget();
+            throw new RuntimeException( msg, e );
+        }
+       
     }
 
     /**
