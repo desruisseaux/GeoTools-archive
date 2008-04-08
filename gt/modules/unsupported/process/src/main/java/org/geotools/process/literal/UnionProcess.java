@@ -16,6 +16,7 @@
 package org.geotools.process.literal;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.process.Process;
@@ -24,51 +25,52 @@ import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.opengis.util.ProgressListener;
 
+import com.sun.org.apache.bcel.internal.verifier.structurals.UninitializedObjectType;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
  * @author Jody
  */
-class IntersectProcess implements Process {
+class UnionProcess implements Process {
 
-    private IntersectsFactory factory;
-    private Map<String, Object> params;
+    private UnionFactory factory;
 
-    public IntersectProcess( IntersectsFactory intersectsFactory, Map<String, Object> parameters ) {
-        this.factory = intersectsFactory;
-        this.params = parameters;
+    public UnionProcess( UnionFactory unionFactory ) {
+        this.factory = unionFactory;
     }
 
     public ProcessFactory getFactory() {
         return factory;
     }
 
-    public Map<String, Object> process( ProgressListener monitor ) {
+    public Map<String, Object> process( Map<String, Object> input, ProgressListener monitor ) {
         if( monitor == null ) monitor = new NullProgressListener();
         try {
             monitor.started();
             monitor.setTask( Text.text("Grab arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) params.get( IntersectsFactory.GEOM1.key );
-            Geometry geom2 = (Geometry) params.get( IntersectsFactory.GEOM2.key );
+            List<Geometry> list = (List<Geometry>) input.get( UnionFactory.GEOM1.key );
             
-            monitor.setTask( Text.text("Grab arguments") );
-            monitor.progress( 10.0f );
-            
-            if( monitor.isCanceled() ){
-                return null; // user has canceled this operation
+            Geometry result = null;
+            for( Geometry geom : list ){
+                if( monitor.isCanceled() ) return null; // user has canceled this operation                
+                if( result == null ) {
+                    result = geom;
+                }
+                else {
+                    result = result.union( geom );
+                }                
             }
-            Geometry intersect = geom1.intersection( geom2 );
             
             monitor.setTask( Text.text("Encode result" ));
             monitor.progress( 90.0f );
             
-            Map<String, Object> result = new HashMap<String, Object>(1);
-            result.put( IntersectsFactory.RESULT.key, intersect );
+            Map<String, Object> resultMap = new HashMap<String, Object>(1);
+            resultMap.put( IntersectsFactory.RESULT.key, result );
             monitor.complete(); // same as 100.0f
             
-            return result;
+            return resultMap;
         }
         catch (Exception eek){
             monitor.exceptionOccurred(eek);

@@ -1,6 +1,8 @@
 package org.geotools.gui.swing.process;
 
 import javax.swing.JComponent;
+
+import org.geotools.process.Parameter;
 import org.geotools.text.Text;
 
 /**
@@ -10,9 +12,15 @@ import org.geotools.text.Text;
  * @author gdavis
  */
 public abstract class AbstractParamWidget implements ParamWidget {
-
-	protected static Text labelText;
-	protected static Object defaultValue;
-	protected static JComponent mainComponent;
+	protected final Parameter< ? > parameter;
 	
+	/**
+	 * Holds on to the parameter so implementations
+	 * can consult the type and metadata information.
+	 * 
+	 * @param parameter
+	 */
+	AbstractParamWidget( Parameter<?> parameter ){
+	    this.parameter = parameter; 
+	}
 }

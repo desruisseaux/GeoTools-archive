@@ -3,6 +3,7 @@ package org.geotools.gui.swing.process;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
+import org.geotools.process.Parameter;
 import org.geotools.text.Text;
 
 /**
@@ -10,20 +11,17 @@ import org.geotools.text.Text;
  * 
  * @author gdavis
  */
-public class DoubleWidgetImpl extends AbstractParamWidget {
+public class JDoubleField extends AbstractParamWidget {
 
     private JTextField blah;
     
-	public DoubleWidgetImpl(Text defaultVal) {
-		this.defaultValue = defaultVal;
+	public JDoubleField(Parameter<?> parameter) {
+		super( parameter );
 	}
 	
 	public JComponent doLayout() {
-		// TODO create the label and widget, layout them out and return the main
-		// JComponent holding them.
-	    JTextField blah = new JTextField(100); 
-	    
-		return blah;
+		blah = new JTextField(16); 
+	    return blah;
 	}
 
 	public Object getValue() {
