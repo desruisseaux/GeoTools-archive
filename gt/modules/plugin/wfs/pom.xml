@@ -92,9 +92,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.opengis</groupId>
+      <groupId>org.geotools.ogc</groupId>
       <artifactId>wfs</artifactId>
-      <version>1.1.0</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>xpp3</groupId>
