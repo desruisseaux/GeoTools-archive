@@ -69,15 +69,9 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>net.opengis</groupId>
+      <groupId>org.geotools.ogc</groupId>
       <artifactId>wfs</artifactId>
-      <version>1.1.0</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi</artifactId>
-        </exclusion>
-      </exclusions>	      
+      <version>2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

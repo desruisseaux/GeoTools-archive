@@ -20,9 +20,9 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.ows.KeywordsType;
-import net.opengis.ows.OwsFactory;
-import net.opengis.ows.WGS84BoundingBoxType;
+import net.opengis.ows10.KeywordsType;
+import net.opengis.ows10.Ows10Factory;
+import net.opengis.ows10.WGS84BoundingBoxType;
 import net.opengis.wfs.FeatureTypeListType;
 import net.opengis.wfs.FeatureTypeType;
 import net.opengis.wfs.OperationType;
@@ -68,7 +68,7 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
             ft.setName(new QName("http://www.openplans.org/topp", "Type1"));
             ft.setTitle("Title1");
             ft.setAbstract("Abstract1");
-            KeywordsType kwd = OwsFactory.eINSTANCE.createKeywordsType();
+            KeywordsType kwd = Ows10Factory.eINSTANCE.createKeywordsType();
             kwd.getKeyword().add("keword1");
             kwd.getKeyword().add("keword2");
             ft.getKeywords().add(kwd);
@@ -84,7 +84,7 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
             OutputFormatListType outputFormat = factory.createOutputFormatListType();
             outputFormat.setFormat("GML2");
             ft.setOutputFormats(outputFormat);
-            WGS84BoundingBoxType bbox = OwsFactory.eINSTANCE.createWGS84BoundingBoxType();
+            WGS84BoundingBoxType bbox = Ows10Factory.eINSTANCE.createWGS84BoundingBoxType();
             bbox.setCrs("urn:ogc:crs:EPSG:6.7:4326");
             ft.getWGS84BoundingBox().add(bbox);
             ftl.getFeatureType().add(ft);

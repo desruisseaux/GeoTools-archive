@@ -37,12 +37,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import junit.framework.TestCase;
-import net.opengis.ows.DCPType;
-import net.opengis.ows.KeywordsType;
-import net.opengis.ows.OperationType;
-import net.opengis.ows.OperationsMetadataType;
-import net.opengis.ows.RequestMethodType;
-import net.opengis.ows.ServiceIdentificationType;
+import net.opengis.ows10.DCPType;
+import net.opengis.ows10.KeywordsType;
+import net.opengis.ows10.OperationType;
+import net.opengis.ows10.OperationsMetadataType;
+import net.opengis.ows10.RequestMethodType;
+import net.opengis.ows10.ServiceIdentificationType;
 import net.opengis.wfs.FeatureCollectionType;
 import net.opengis.wfs.FeatureTypeListType;
 import net.opengis.wfs.FeatureTypeType;
