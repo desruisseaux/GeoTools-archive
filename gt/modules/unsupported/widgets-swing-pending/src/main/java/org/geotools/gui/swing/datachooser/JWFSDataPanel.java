@@ -46,7 +46,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 public class JWFSDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private static ResourceBundle BUNDLE = ResourceBundle.getBundle("org/geotools/gui/swing/datachooser/Bundle");
-    private DataStore store;
+    private WFSDataStore store;
     private final Map params = new HashMap<String, Object>();
 
     /** Creates new form DefaultShapeTypeChooser */
@@ -356,9 +356,6 @@ public class JWFSDataPanel extends javax.swing.JPanel implements DataPanel {
     }// </editor-fold>//GEN-END:initComponents
     private void but_refreshactionRefresh(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_refreshactionRefresh
 
-
-
-
         but_refresh.setEnabled(false);
         gui_progress.setString(BUNDLE.getString("connecting"));
         gui_progress.setIndeterminate(true);
@@ -436,26 +433,36 @@ public class JWFSDataPanel extends javax.swing.JPanel implements DataPanel {
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
         RandomStyleFactory rsf = new RandomStyleFactory();
 
+        WFSDataStoreFactory factory = new WFSDataStoreFactory();
+        try {
+            store = factory.createDataStore(params);
+            FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(store.getTypeNames()[0]);
+            Style style = rsf.createRandomVectorStyle(fs);
+            MapLayer layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("layer");
+            layers.add(layer);
 
-//        WFSDataStoreFactory factory = new WFSDataStoreFactory();
-//        store = factory.createDataStore(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (store != null) {
 
-            for (int i = 0; i < tab_table.getSelectedRows().length; i++) {
-                try {
-                    DBModel model = (DBModel) tab_table.getModel();
-                    String name = (String) model.getValueAt(tab_table.getSelectedRows()[i], 0);
-                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(name);
-                    Style style = rsf.createRandomVectorStyle(fs);
 
-                    MapLayer layer = new DefaultMapLayer(fs, style);
-                    layer.setTitle("oracle - " + name);
-                    layers.add(layer);
-                } catch (IOException ex) {
-                    System.out.println(ex);
-                }
-            }
+//            for (int i = 0; i < tab_table.getSelectedRows().length; i++) {
+//                try {
+//                    DBModel model = (DBModel) tab_table.getModel();
+//                    String name = (String) model.getValueAt(tab_table.getSelectedRows()[i], 0);
+//                    FeatureSource<SimpleFeatureType, SimpleFeature> fs = store.getFeatureSource(name);
+//                    Style style = rsf.createRandomVectorStyle(fs);
+//
+//                    MapLayer layer = new DefaultMapLayer(fs, style);
+//                    layer.setTitle("oracle - " + name);
+//                    layers.add(layer);
+//                } catch (IOException ex) {
+//                    System.out.println(ex);
+//                }
+//            }
 
         }
 
