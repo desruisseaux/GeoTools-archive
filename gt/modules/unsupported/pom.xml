@@ -109,6 +109,7 @@
     <module>vpf</module>
     <module>widgets-swing-pending</module>
     <module>xml-gpx</module>
+    <module>ogc</module>
   </modules>
 
 </project>
