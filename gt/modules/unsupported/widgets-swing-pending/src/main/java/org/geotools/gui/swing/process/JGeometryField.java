@@ -1,6 +1,10 @@
 package org.geotools.gui.swing.process;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -27,11 +31,18 @@ public class JGeometryField extends AbstractParamWidget {
 	
 	public JComponent doLayout() {
 		text = new JTextArea( 40, 3 );
+		text.addKeyListener( new KeyAdapter(){
+            public void keyReleased( KeyEvent e ) {
+                validate();
+            }            
+		});
 		text.setWrapStyleWord( true );
 		
-	    return new JScrollPane( text, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED ); 
+	    JScrollPane scroll = new JScrollPane( text,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER );
+	    scroll.setPreferredSize( new Dimension(400,80 ));
+	    return scroll;
 	}
-
+	
 	public Object getValue() {
 	    WKTReader reader = new WKTReader();
 	    String wkt = text.getText();
@@ -74,7 +85,7 @@ public class JGeometryField extends AbstractParamWidget {
 	public boolean validate() {
         WKTReader reader = new WKTReader();
         String wkt = text.getText();
-        if( wkt.length() != 0 ){
+        if( wkt.length() == 0 ){
             return true;
         }
        

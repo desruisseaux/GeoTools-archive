@@ -49,7 +49,7 @@ public class IntersectsFactory extends AbstractProcessFactory {
     
     /** Second geometry for intersection */
     static final Parameter<Geometry> GEOM2 = 
-        new Parameter<Geometry>("geom1",Geometry.class, Text.text("Geometry 2") );
+        new Parameter<Geometry>("geom2",Geometry.class, Text.text("Geometry 2") );
     
     /**
      * Map used for getParameterInfo; used to describe operation requirements for user

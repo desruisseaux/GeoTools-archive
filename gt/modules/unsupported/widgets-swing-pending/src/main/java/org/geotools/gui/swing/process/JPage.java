@@ -9,7 +9,7 @@ import javax.swing.JPanel;
  * 
  * @author Jody
  */
-public abstract class JProcessPage {
+public abstract class JPage {
     /**
      * Used to indicate which page we should start with.
      */
@@ -26,18 +26,18 @@ public abstract class JProcessPage {
      * Wizard hosting this process page; we will access wizard.model directly to look up our friends
      * for next and previous.
      */
-    private JProcessWizard wizard;
+    private JWizard wizard;
     /**
      * Create a default page.
      */
-    public JProcessPage() {
+    public JPage() {
         this( DEFAULT );
     }
 
     /**
      * Create a default page.
      */
-    public JProcessPage(String id ) {
+    public JPage(String id ) {
         this( id, new JPanel() );
     }
     
@@ -47,7 +47,7 @@ public abstract class JProcessPage {
      * @param id identifier
      * @param panel JPanel to use as wizard page
      */
-    public JProcessPage( String id, JPanel page ) {
+    public JPage( String id, JPanel page ) {
         identifier = id;
         this.page = page;
     }
@@ -60,14 +60,14 @@ public abstract class JProcessPage {
         return identifier;
     }
 
-    final void setJProcessWizard( JProcessWizard w ) {
+    final void setJProcessWizard( JWizard w ) {
         wizard = w;
     }
 
-    public final JProcessWizard getJProcessWizard() {
+    public final JWizard getJProcessWizard() {
         return wizard;
     }
-    public Map<String, JProcessPage> getModel() {
+    public Map<String, JPage> getModel() {
         return wizard.model;
     }
 

@@ -3,8 +3,8 @@ package org.geotools.demo.swing.process;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.geotools.gui.swing.process.JProcessPage;
-import org.geotools.gui.swing.process.JProcessWizard;
+import org.geotools.gui.swing.process.JPage;
+import org.geotools.gui.swing.process.JWizard;
 
 /**
  * This is a quick example to show how JProcessWizard works.
@@ -18,8 +18,8 @@ import org.geotools.gui.swing.process.JProcessWizard;
  */
 public class JProcessWizardExample {
     public static void main( String args[] ){
-        JProcessWizard wizard = new JProcessWizard("JProcessWizard Example");
-        wizard.registerWizardPanel( new JProcessPage(){
+        JWizard wizard = new JWizard("JProcessWizard Example");
+        wizard.registerWizardPanel( new JPage(){
             public String getBackPageIdentifier() {
                 return null; // first page cannot go back
             }
@@ -31,7 +31,7 @@ public class JProcessWizardExample {
                 page.add( new JLabel("Default Page"));
             }
         });
-        wizard.registerWizardPanel( new JProcessPage("page2"){
+        wizard.registerWizardPanel( new JPage("page2"){
             public String getBackPageIdentifier() {
                 return DEFAULT; // first page cannot go back
             }
@@ -48,9 +48,9 @@ public class JProcessWizardExample {
         int result = wizard.showModalDialog();
         System.out.print("Wizard completed with:");
         switch( result ){
-        case JProcessWizard.CANCEL: System.out.println( "CANEL" ); break;
-        case JProcessWizard.FINISH: System.out.println( "FINISH" ); break;
-        case JProcessWizard.ERROR: System.out.println( "ERROR" ); break;
+        case JWizard.CANCEL: System.out.println( "CANEL" ); break;
+        case JWizard.FINISH: System.out.println( "FINISH" ); break;
+        case JWizard.ERROR: System.out.println( "ERROR" ); break;
         default:
             System.out.println( "unexpected "+ result );
         }        
