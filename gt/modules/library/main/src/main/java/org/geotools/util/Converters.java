@@ -86,8 +86,8 @@ public final class Converters {
 	 *
 	 * @since 2.4
 	 */
-	public static Object convert( Object source, Class target ) {
-		return convert( source, target, null );
+	public static <T> T convert( Object source, Class<T> target ) {
+	    return target.cast( convert( source, target, null ) );
 	}
 
 	/**
@@ -106,15 +106,15 @@ public final class Converters {
 	 *
 	 * @since 2.4
 	 */
-	public static Object convert( Object source, Class target, Hints hints ) {
-		//cant convert null
+	public static <T> T convert( Object source, Class<T> target, Hints hints ) {
+		//can't convert null
         if ( source == null )
 			return null;
 
         //handle case of source being a direct instance of target
         // up front
         if ( source.getClass().equals( target ) ) {
-            return source;
+            return target.cast( source );
         }
 
 
@@ -123,7 +123,7 @@ public final class Converters {
 			Converter converter = factory.createConverter( source.getClass(), target, hints );
 			if ( converter != null ) {
 				try {
-					Object converted = converter.convert( source, target );
+					T converted = converter.convert( source, target );
 					if ( converted != null ) {
 						return converted;
 					}
@@ -136,7 +136,7 @@ public final class Converters {
 
 		//a couple of final tries
 		if ( String.class.equals( target ) ) {
-			return source.toString();
+			return (T) source.toString();
 		}
 		return null;
 	}

@@ -38,5 +38,5 @@ public interface Converter {
      *
      * @throws Exception If the conversion can not take place.
      */
-    Object convert(Object source, Class target) throws Exception;
+    <T> T convert(Object source, Class<T> target) throws Exception;
 }
