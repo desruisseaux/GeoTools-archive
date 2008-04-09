@@ -46,32 +46,32 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     /** Param, package visibiity for JUnit tests */
-    static final Param DBTYPE = new Param("dbtype", String.class, "must be 'mysql'", true, "mysql");
+    public static final Param DBTYPE = new Param("dbtype", String.class, "must be 'mysql'", true, "mysql");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param HOST = new Param("host", String.class, "mysql host machine", true,
+    public static final Param HOST = new Param("host", String.class, "mysql host machine", true,
             "localhost");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", Integer.class, "mysql connection port", false, "3306");
+    public static final Param PORT = new Param("port", Integer.class, "mysql connection port", false, "3306");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param DATABASE = new Param("database", String.class, "msyql database");
+    public static final Param DATABASE = new Param("database", String.class, "msyql database");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param USER = new Param("user", String.class, "user name to login as", false);
+    public static final Param USER = new Param("user", String.class, "user name to login as", false);
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PASSWD = new Param("passwd", String.class, "password used to login", false);
-    static final Param MAXCONN = new Param("max connections", Integer.class,
+    public static final Param PASSWD = new Param("passwd", String.class, "password used to login", false);
+    public static final Param MAXCONN = new Param("max connections", Integer.class,
             "maximum number of open connections", false, new Integer(10));
-    static final Param MINCONN = new Param("min connections", Integer.class,
+    public static final Param MINCONN = new Param("min connections", Integer.class,
             "minimum number of pooled connection", false, new Integer(4));
-    static final Param VALIDATECONN = new Param("validate connections", Boolean.class,
+    public static final Param VALIDATECONN = new Param("validate connections", Boolean.class,
             "check connection is alive before using it", false, Boolean.FALSE);
 
     /** Param, package visibiity for JUnit tests */
-    static final Param NAMESPACE = new Param("namespace", String.class, "namespace prefix used",
+    public static final Param NAMESPACE = new Param("namespace", String.class, "namespace prefix used",
             false);
     
     public static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
