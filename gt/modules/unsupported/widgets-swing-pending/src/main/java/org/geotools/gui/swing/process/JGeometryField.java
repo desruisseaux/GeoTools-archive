@@ -90,10 +90,17 @@ public class JGeometryField extends AbstractParamWidget {
         }
        
         try {
-            reader.read( wkt );
-            text.setToolTipText( null );
-            text.setForeground( Color.BLACK );            
-            return true;
+            Geometry geom = reader.read( wkt );
+            if( parameter.type.isInstance( geom )){
+                text.setToolTipText( null );
+                text.setForeground( Color.BLACK );            
+                return true;
+            }
+            else {
+                text.setToolTipText( "Could not use "+geom.getClass()+" as "+parameter.type );
+                text.setForeground( Color.RED );
+                return false;
+            }
         }
         catch (Throwable eek ){
             text.setToolTipText( eek.getLocalizedMessage() );

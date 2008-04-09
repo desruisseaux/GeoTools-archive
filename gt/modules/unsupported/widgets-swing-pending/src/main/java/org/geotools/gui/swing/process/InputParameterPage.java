@@ -12,6 +12,8 @@ import javax.swing.SpringLayout;
 import org.geotools.process.Parameter;
 import org.geotools.process.ProcessFactory;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * This page is responsible making a user interface based on the provided ProcessFactory.
  * 
@@ -50,10 +52,14 @@ public class InputParameterPage extends JPage {
             page.add(label);
 
             ParamWidget widget;
-            if (parameter.getClass().equals(Double.class)) {
+            if (Double.class.isAssignableFrom( parameter.type )) {
                 widget = new JDoubleField(parameter);
-            } else {
+            } else if (Geometry.class.isAssignableFrom( parameter.type)){
                 widget = new JGeometryField(parameter);
+            }
+            else {
+                // We got nothing special hope the converter api can deal
+                widget = new JField( parameter );
             }
             JComponent field = widget.doLayout();
             page.add(field);
