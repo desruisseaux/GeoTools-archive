@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.AddressType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.AddressType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -75,7 +75,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class AddressTypeBinding extends AbstractComplexEMFBinding {
-    public AddressTypeBinding(OwsFactory factory) {
+    public AddressTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

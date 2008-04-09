@@ -69,14 +69,9 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>net.opengis</groupId>
+      <groupId>org.geotools.ogc</groupId>
       <artifactId>ows</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.opengis</groupId>
-      <artifactId>ows11</artifactId>
-      <version>1.1.0</version>
+      <version>2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -92,16 +87,19 @@
         <artifactId>gt2-xmlcodegen</artifactId>
         <configuration>
           <schemaLocation>owsAll.xsd</schemaLocation>
-          <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/ows/</schemaSourceDirectory>
-          <destinationPackage>org.geotools.ows</destinationPackage>
+          <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/ows/v1_1</schemaSourceDirectory>
+          <destinationPackage>org.geotools.ows.v1_1</destinationPackage>
           <complexBindingBaseClass>org.geotools.xml.AbstractComplexEMFBinding</complexBindingBaseClass>
           <bindingConstructorArguments>
             <bindingConstructorArgument>
               <name>factory</name>
-              <type>net.opengis.ows.OwsFactory</type>
+              <type>net.opengis.ows.v1_1_0.Ows11Factory</type>
               <mode>parent</mode>
             </bindingConstructorArgument>
           </bindingConstructorArguments>
+          <includes>
+            <include>LanguageStringType</include>
+          </includes>
         </configuration>
       </plugin>
     </plugins>

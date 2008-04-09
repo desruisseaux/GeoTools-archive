@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.CapabilitiesBaseType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.CapabilitiesBaseType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -48,7 +48,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class CapabilitiesBaseTypeBinding extends AbstractComplexEMFBinding {
-    public CapabilitiesBaseTypeBinding(OwsFactory factory) {
+    public CapabilitiesBaseTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

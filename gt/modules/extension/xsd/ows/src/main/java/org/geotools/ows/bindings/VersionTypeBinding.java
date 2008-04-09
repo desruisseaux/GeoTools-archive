@@ -15,7 +15,7 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -41,7 +41,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class VersionTypeBinding extends AbstractSimpleBinding {
-    public VersionTypeBinding(OwsFactory factory) {
+    public VersionTypeBinding(Ows10Factory factory) {
     }
 
     /**

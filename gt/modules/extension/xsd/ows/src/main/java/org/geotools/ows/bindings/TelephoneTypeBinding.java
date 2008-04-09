@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
-import net.opengis.ows.TelephoneType;
+import net.opengis.ows10.Ows10Factory;
+import net.opengis.ows10.TelephoneType;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class TelephoneTypeBinding extends AbstractComplexEMFBinding {
-    public TelephoneTypeBinding(OwsFactory factory) {
+    public TelephoneTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

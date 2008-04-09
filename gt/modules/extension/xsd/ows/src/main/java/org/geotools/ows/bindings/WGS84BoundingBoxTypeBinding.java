@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
-import net.opengis.ows.WGS84BoundingBoxType;
+import net.opengis.ows10.Ows10Factory;
+import net.opengis.ows10.WGS84BoundingBoxType;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -70,7 +70,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class WGS84BoundingBoxTypeBinding extends AbstractComplexEMFBinding {
-    public WGS84BoundingBoxTypeBinding(OwsFactory factory) {
+    public WGS84BoundingBoxTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

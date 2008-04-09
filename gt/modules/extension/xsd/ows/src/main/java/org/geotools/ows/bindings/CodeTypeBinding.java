@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.CodeType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.CodeType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -47,7 +47,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class CodeTypeBinding extends AbstractComplexEMFBinding {
-    public CodeTypeBinding(OwsFactory factory) {
+    public CodeTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

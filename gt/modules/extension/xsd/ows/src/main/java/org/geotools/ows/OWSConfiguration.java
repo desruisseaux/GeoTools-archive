@@ -15,7 +15,7 @@
  */
 package org.geotools.ows;
 
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.Ows10Factory;
 import org.picocontainer.MutablePicoContainer;
 import org.geotools.filter.v1_1.OGCConfiguration;
 import org.geotools.ows.bindings.AcceptFormatsTypeBinding;
@@ -75,7 +75,7 @@ public class OWSConfiguration extends Configuration {
     }
 
     protected void configureContext(MutablePicoContainer container) {
-        container.registerComponentInstance(OwsFactory.eINSTANCE);
+        container.registerComponentInstance(Ows10Factory.eINSTANCE);
     }
 
     /**

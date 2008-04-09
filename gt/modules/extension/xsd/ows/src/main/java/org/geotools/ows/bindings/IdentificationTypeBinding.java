@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.IdentificationType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.IdentificationType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -72,7 +72,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class IdentificationTypeBinding extends AbstractComplexEMFBinding {
-    public IdentificationTypeBinding(OwsFactory factory) {
+    public IdentificationTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

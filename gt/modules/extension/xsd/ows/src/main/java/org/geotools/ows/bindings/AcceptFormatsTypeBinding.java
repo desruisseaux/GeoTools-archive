@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.AcceptFormatsType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.AcceptFormatsType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -44,7 +44,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class AcceptFormatsTypeBinding extends AbstractComplexEMFBinding {
-    public AcceptFormatsTypeBinding(OwsFactory factory) {
+    public AcceptFormatsTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

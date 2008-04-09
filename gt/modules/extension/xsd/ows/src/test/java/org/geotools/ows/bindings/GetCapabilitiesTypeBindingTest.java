@@ -15,7 +15,7 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.GetCapabilitiesType;
+import net.opengis.ows10.GetCapabilitiesType;
 import org.geotools.ows.OWS;
 import org.geotools.ows.OWSTestSupport;
 import org.geotools.xml.Binding;

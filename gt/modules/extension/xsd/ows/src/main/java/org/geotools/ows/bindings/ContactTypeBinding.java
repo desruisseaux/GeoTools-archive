@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.ContactType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.ContactType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -69,7 +69,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class ContactTypeBinding extends AbstractComplexEMFBinding {
-    public ContactTypeBinding(OwsFactory factory) {
+    public ContactTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

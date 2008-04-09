@@ -15,7 +15,7 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -41,7 +41,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class UpdateSequenceTypeBinding extends AbstractSimpleBinding {
-    public UpdateSequenceTypeBinding(OwsFactory factory) {
+    public UpdateSequenceTypeBinding(Ows10Factory factory) {
     }
 
     /**

@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.ExceptionReportType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.ExceptionReportType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class _ExceptionReportBinding extends AbstractComplexEMFBinding {
-    public _ExceptionReportBinding(OwsFactory factory) {
+    public _ExceptionReportBinding(Ows10Factory factory) {
         super(factory);
     }
 

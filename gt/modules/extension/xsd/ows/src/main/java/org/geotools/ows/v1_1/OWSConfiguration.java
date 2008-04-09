@@ -2,7 +2,7 @@ package org.geotools.ows.v1_1;
 
 import java.util.Map;
 
-import net.opengis.ows.v1_1_0.Ows11Factory;
+import net.opengis.ows11.Ows11Factory;
 
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.ComplexEMFBinding;

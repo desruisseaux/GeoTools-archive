@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
-import net.opengis.ows.ResponsiblePartyType;
+import net.opengis.ows10.Ows10Factory;
+import net.opengis.ows10.ResponsiblePartyType;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -48,7 +48,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class ResponsiblePartyTypeBinding extends AbstractComplexEMFBinding {
-    public ResponsiblePartyTypeBinding(OwsFactory factory) {
+    public ResponsiblePartyTypeBinding(Ows10Factory factory) {
         super(factory);
     }
 

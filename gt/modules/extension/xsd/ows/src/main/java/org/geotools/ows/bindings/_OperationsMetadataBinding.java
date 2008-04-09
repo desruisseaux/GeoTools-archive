@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OperationsMetadataType;
-import net.opengis.ows.OwsFactory;
+import net.opengis.ows10.OperationsMetadataType;
+import net.opengis.ows10.Ows10Factory;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -56,7 +56,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class _OperationsMetadataBinding extends AbstractComplexEMFBinding {
-    public _OperationsMetadataBinding(OwsFactory factory) {
+    public _OperationsMetadataBinding(Ows10Factory factory) {
         super(factory);
     }
 

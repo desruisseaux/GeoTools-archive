@@ -15,8 +15,8 @@
  */
 package org.geotools.ows.bindings;
 
-import net.opengis.ows.OwsFactory;
-import net.opengis.ows.ServiceProviderType;
+import net.opengis.ows10.Ows10Factory;
+import net.opengis.ows10.ServiceProviderType;
 import javax.xml.namespace.QName;
 import org.geotools.ows.OWS;
 import org.geotools.xml.*;
@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  * @generated
  */
 public class _ServiceProviderBinding extends AbstractComplexEMFBinding {
-    public _ServiceProviderBinding(OwsFactory factory) {
+    public _ServiceProviderBinding(Ows10Factory factory) {
         super(factory);
     }
 
