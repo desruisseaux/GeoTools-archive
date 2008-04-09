@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 import java.text.NumberFormat;
 import java.text.FieldPosition;
-import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeEvent;  // For javadoc
 import java.beans.PropertyChangeListener;
 
 import org.opengis.go.display.canvas.Canvas;
@@ -568,7 +568,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     public void setZOrderHint(final double zOrderHint) {
         if (Double.isNaN(zOrderHint)) {
             throw new IllegalArgumentException(Errors.getResources(getLocale()).getString(
-                      ErrorKeys.ILLEGAL_ARGUMENT_$2, "zOrderHint", new Double(zOrderHint)));
+                      ErrorKeys.ILLEGAL_ARGUMENT_$2, "zOrderHint", zOrderHint));
         }
         final double oldZOrder;
         synchronized (getTreeLock()) {
@@ -578,9 +578,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
             }
             this.zOrder = zOrderHint;
             refresh();
-            // TODO: Autoboxing with J2SE 1.5.
-            listeners.firePropertyChange(Z_ORDER_HINT_PROPERTY,
-                                         new Double(oldZOrder), new Double(zOrderHint));
+            listeners.firePropertyChange(Z_ORDER_HINT_PROPERTY, oldZOrder, zOrderHint);
         }
     }
 
@@ -643,10 +641,9 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     public final Graphic cloneGraphic() throws IllegalStateException {
         synchronized (getTreeLock()) {
             try {
-                return (Graphic) clone();
+                return clone();
             } catch (CloneNotSupportedException exception) {
-                throw new IllegalStateException(exception.getLocalizedMessage());
-                // TODO: bundle the cause when we will be allowed to compile for J2SE 1.5.
+                throw new IllegalStateException(exception.getLocalizedMessage(), exception);
             }
         }
     }
@@ -663,7 +660,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * @throws CloneNotSupportedException if this graphic is not cloneable.
      */
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    protected AbstractGraphic clone() throws CloneNotSupportedException {
         assert Thread.holdsLock(getTreeLock());
         final AbstractGraphic clone = (AbstractGraphic) super.clone();
         clone.canvas = null;
@@ -735,7 +732,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      */
     protected final Object getTreeLock() {
         final Canvas canvas = this.canvas;
-        return (canvas!=null) ? (Object)canvas : (Object)this;
+        return (canvas != null) ? (Object) canvas : (Object) this;
     }
 
     /**

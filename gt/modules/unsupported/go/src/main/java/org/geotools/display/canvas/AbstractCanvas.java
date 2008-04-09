@@ -29,10 +29,8 @@ import java.util.LinkedHashMap;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.GraphicsConfiguration;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.AffineTransform; // For javadoc
 
 import org.opengis.util.InternationalString;
 import org.opengis.go.display.DisplayFactory;
@@ -49,8 +47,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.IncompatibleOperationException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
 
 import org.geotools.factory.Hints;
 import org.geotools.resources.Classes;
@@ -119,10 +115,9 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * A comparator for sorting {@link Graphic} objects by increasing <var>z</var> order.
      */
-    private static final Comparator COMPARATOR = new Comparator() {
-        public int compare(final Object graphic1, final Object graphic2) {
-            return Double.compare(((Graphic)graphic1).getZOrderHint(),
-                                  ((Graphic)graphic2).getZOrderHint());
+    private static final Comparator<Graphic> COMPARATOR = new Comparator<Graphic>() {
+        public int compare(final Graphic graphic1, final Graphic graphic2) {
+            return Double.compare(graphic1.getZOrderHint(), graphic2.getZOrderHint());
         }
     };
 
@@ -178,7 +173,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * preserved no matter how {@link #sortedGraphics} reorder graphics. This is because we
      * want to preserve to {@link #add} contract even when z-value hints change.
      */
-    private final Map/*<Graphic,Graphic>*/ graphics = new LinkedHashMap();
+    private final Map<Graphic,Graphic> graphics = new LinkedHashMap<Graphic,Graphic>();
 
     /**
      * The set of {@link Graphic}s to display, sorted in increasing <var>z</var> value. If
@@ -187,7 +182,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      *
      * @see #getGraphics
      */
-    private transient List/*<Graphic>*/ sortedGraphics;
+    private transient List<Graphic> sortedGraphics;
 
     /**
      * A set of rendering hints.
@@ -327,7 +322,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      *       added to {@code canvas2} before the above-cited {@code add} method calls.
      */
     public synchronized Graphic add(Graphic graphic) throws IllegalArgumentException {
-        final List oldGraphics = sortedGraphics; // May be null.
+        final List<Graphic> oldGraphics = sortedGraphics; // May be null.
         if (graphic instanceof AbstractGraphic) {
             AbstractGraphic candidate = (AbstractGraphic) graphic;
             synchronized (candidate.getTreeLock()) {
@@ -338,11 +333,10 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
                 } else {
                     assert !graphics.containsKey(candidate) : candidate;
                     if (canvas != null) try {
-                        graphic = candidate = (AbstractGraphic) candidate.clone();
+                        graphic = candidate = candidate.clone();
                     } catch (CloneNotSupportedException e) {
                         throw new IllegalArgumentException(
-                                Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()));
-                        // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
+                                Errors.format(ErrorKeys.CANVAS_NOT_OWNER_$1, graphic.getName()), e);
                     }
                     candidate.setCanvas(this);
                     candidate.addPropertyChangeListener(PROPERTIES_LISTENER);
@@ -358,7 +352,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
          * method call, then the previous graphic instance will be kept (instead of the new
          * supplied one).
          */
-        final Graphic previous = (Graphic) graphics.put(graphic, graphic);
+        final Graphic previous = graphics.put(graphic, graphic);
         if (previous != null) {
             graphic = previous;
             graphics.put(graphic, graphic);
@@ -401,7 +395,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #getGraphics
      */
     public synchronized void remove(final Graphic graphic) throws IllegalArgumentException {
-        final List oldGraphics = sortedGraphics; // May be null.
+        final List<Graphic> oldGraphics = sortedGraphics; // May be null.
         if (graphic instanceof AbstractGraphic) {
             final AbstractGraphic candidate = (AbstractGraphic) graphic;
             final Canvas canvas = candidate.getCanvas();
@@ -444,9 +438,8 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see #getGraphics
      */
     public synchronized void removeAll() {
-        final List oldGraphics = sortedGraphics; // May be null.
-        for (final Iterator it=graphics.keySet().iterator(); it.hasNext();) {
-            final Graphic graphic = (Graphic) it.next();
+        final List<Graphic> oldGraphics = sortedGraphics; // May be null.
+        for (final Graphic graphic : graphics.keySet()) {
             if (graphic instanceof AbstractGraphic) {
                 final AbstractGraphic candidate = (AbstractGraphic) graphic;
                 assert Thread.holdsLock(candidate.getTreeLock());
@@ -471,12 +464,12 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * {@linkplain #add Adding} or {@linkplain #remove removing} graphics will
      * not affect the content of previous list returned by previous call to this method.
      */
-    public synchronized List/*<Graphic>*/ getGraphics() {
+    public synchronized List<Graphic> getGraphics() {
         if (sortedGraphics == null) {
-            final Set keys = graphics.keySet();
-            final Graphic[] list = (Graphic[]) keys.toArray(new Graphic[keys.size()]);
+            final Set<Graphic> keys = graphics.keySet();
+            final Graphic[] list = keys.toArray(new Graphic[keys.size()]);
             Arrays.sort(list, COMPARATOR);
-            sortedGraphics = new UnmodifiableArrayList(list);
+            sortedGraphics = UnmodifiableArrayList.wrap(list);
         }
         assert sortedGraphics.size() == graphics.size();
         assert graphics.keySet().containsAll(sortedGraphics);
@@ -618,8 +611,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
         try {
             setObjectiveCRS(crs);
         } catch (TransformException e) {
-            // TODO: Add the cause when we will be allowed to compile for J2SE 1.5.
-            throw new IllegalArgumentException(e.getLocalizedMessage());
+            throw new IllegalArgumentException(e.getLocalizedMessage(), e);
         }
     }
 
@@ -682,7 +674,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * for video monitor, but may also be a {@linkplain SphericalCS spherical} one for planetarium.
      * <p>
      * When rendering on a flat screen using <cite>Java2D</cite>, axis are oriented as in the
-     * {@linkplain Graphics2D Java2D space}: coordinates are in "dots" (about 1/72 of inch),
+     * {@linkplain java.awt.Graphics2D Java2D space}: coordinates are in "dots" (about 1/72 of inch),
      * <var>x</var> values increasing right and <var>y</var> values increasing <strong>down</strong>.
      * <p>
      * In the Geotools implementation, the display CRS must be
@@ -708,9 +700,10 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * device</cite> transform depends on the printer resolution. For example in the specific case
      * of <cite>Java2D</cite>, the {@linkplain #getDisplayCRS display CRS} is defined in such a way
      * that one display unit is approximatively equals to 1/72 of inch no matter what the printer
-     * resolution is. The display CRS is then what <cite>Java2D</cite> calls {@linkplain Graphics2D
-     * user space}, and the <cite>display to device</cite> transform is the {@linkplain
-     * GraphicsConfiguration#getDefaultTransform transform mapping display units do device units}.
+     * resolution is. The display CRS is then what <cite>Java2D</cite> calls
+     * {@linkplain java.awt.Graphics2D user space}, and the <cite>display to device</cite> transform
+     * is the {@linkplain java.awt.GraphicsConfiguration#getDefaultTransform transform mapping
+     * display units do device units}.
      * <p>
      * The default implementation returns the {@linkplain #getDisplayCRS display CRS}, i.e. assumes
      * that the <cite>display to device</cite> transform is the identity transform. Subclasses need
@@ -755,6 +748,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @param  key The hint key (e.g. {@link #FINEST_RESOLUTION}).
      * @return The hint value for the specified key, or {@code null} if none.
      */
+    @Override
     public synchronized Object getRenderingHint(final RenderingHints.Key key) {
         return hints.get(key);
     }
@@ -773,6 +767,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see RenderingHints#KEY_COLOR_RENDERING
      * @see RenderingHints#KEY_INTERPOLATION
      */
+    @Override
     public synchronized void setRenderingHint(final RenderingHints.Key key, final Object value) {
         if (value != null) {
             if (!value.equals(hints.put(key, value))) {
@@ -837,11 +832,12 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      *
      * @see #dispose
      */
+    @Override
     protected void clearCache() {
         assert Thread.holdsLock(this);
-        final List/*<Graphic>*/ graphics = getGraphics();
+        final List<Graphic> graphics = getGraphics();
         for (int i=graphics.size(); --i>=0;) {
-            final Graphic graphic = (Graphic) graphics.get(i);
+            final Graphic graphic = graphics.get(i);
             if (graphic instanceof DisplayObject) {
                 ((DisplayObject) graphic).clearCache();
             }
@@ -861,11 +857,12 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * @see AbstractGraphic#dispose
      * @see javax.media.jai.PlanarImage#dispose
      */
+    @Override
     public synchronized void dispose() {
-        final List/*<Graphic>*/ graphics = getGraphics();
+        final List<Graphic> graphics = getGraphics();
         removeAll();
         for (int i=graphics.size(); --i>=0;) {
-            final Graphic graphic = (Graphic) graphics.get(i);
+            final Graphic graphic = graphics.get(i);
             graphic.dispose();
         }
         super.dispose();
@@ -879,7 +876,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      */
     @Override
     public synchronized String toString() {
-        final List/*<Graphic>*/ graphics = getGraphics();
+        final List<Graphic> graphics = getGraphics();
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append("[\"").append(getTitle()).append("\", ")
@@ -887,7 +884,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
         int maxLength = 0;
         final String[] names = new String[graphics.size()];
         for (int i=0; i<names.length; i++) {
-            final Graphic graphic = (Graphic) graphics.get(i);
+            final Graphic graphic = graphics.get(i);
             final String name = names[i] = String.valueOf(graphic).trim();
             final int length = name.length();
             if (length > maxLength) {
@@ -895,7 +892,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
             }
         }
         for (int i=0; i<names.length; i++) {
-            final Graphic graphic = (Graphic) graphics.get(i);
+            final Graphic graphic = graphics.get(i);
             buffer.append("    ").append(names[i]);
             final String ext = toStringExt(graphic);
             if (ext != null) {

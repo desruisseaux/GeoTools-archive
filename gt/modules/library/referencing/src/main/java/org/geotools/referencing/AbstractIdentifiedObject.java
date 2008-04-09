@@ -330,9 +330,8 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
          * This algorithm is sub-optimal if the map contains a lot of entries of no interest to
          * this object. Hopefully, most users will fill a map only with usefull entries.
          */
-NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String    key   = ((String) entry.getKey()).trim().toLowerCase();
+NEXT_KEY: for (final Map.Entry<String,?> entry : properties.entrySet()) {
+            String    key   = entry.getKey().trim().toLowerCase();
             Object    value = entry.getValue();
             /*
              * Note: String.hashCode() is part of J2SE specification,
@@ -650,8 +649,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         if (info == null) {
             return null;
         }
-        for (final Iterator it=info.getIdentifiers().iterator(); it.hasNext();) {
-            final Identifier candidate = (Identifier) it.next();
+        for (final Identifier candidate : info.getIdentifiers()) {
             if (candidate instanceof ReferenceIdentifier) {
                 final ReferenceIdentifier identifier = (ReferenceIdentifier) candidate;
                 if (authority == null) {
@@ -740,8 +738,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             if (Citations.identifierMatches(authority, infoAuthority)) {
                 name = identifier.getCode();
             } else {
-                for (final Iterator it=info.getAlias().iterator(); it.hasNext();) {
-                    final GenericName alias = (GenericName) it.next();
+                for (final GenericName alias : info.getAlias()) {
                     if (alias instanceof Identifier) {
                         identifier = (Identifier) alias;
                         infoAuthority = identifier.getAuthority();
@@ -829,15 +826,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         matches the specified {@code name}.
      */
     private static boolean nameMatches(final IdentifiedObject object,
-                                       final Collection/*<GenericName>*/ alias, String name)
+                                       final Collection<GenericName> alias, String name)
     {
         name = name.trim();
         if (name.equalsIgnoreCase(object.getName().getCode().trim())) {
             return true;
         }
         if (alias != null) {
-            for (final Iterator it=alias.iterator(); it.hasNext();) {
-                final GenericName asName = (GenericName) it.next();
+            for (final GenericName asName : alias) {
                 final ScopedName asScoped = asName.asScopedName();
                 if (asScoped!=null && name.equalsIgnoreCase(asScoped.toString().trim())) {
                     return true;
@@ -916,7 +912,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                           final AbstractIdentifiedObject object2,
                           final boolean          compareMetadata)
     {
-        return (object1==object2) || (object1!=null && object1.equals(object2, compareMetadata));
+        return (object1 == object2) || (object1!=null && object1.equals(object2, compareMetadata));
     }
 
     /**
@@ -953,7 +949,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                                     final boolean   compareMetadata)
     {
         if (array1 != array2) {
-            if (array1==null || array2==null || array1.length!=array2.length) {
+            if ((array1 == null) || (array2 == null) || (array1.length != array2.length)) {
                 return false;
             }
             for (int i=array1.length; --i>=0;) {

@@ -555,12 +555,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * work for any axis instance); it is just a way to differentiate latitude and longitude.
      */
     private static final Map<String,CoordinateSystemAxis> ALIASES =
-            new HashMap<String,CoordinateSystemAxis>(8);
+            new HashMap<String,CoordinateSystemAxis>(12);
     static {
         ALIASES.put("lat",                GEODETIC_LATITUDE);
         ALIASES.put("latitude",           GEODETIC_LATITUDE);
         ALIASES.put("geodetic latitude",  GEODETIC_LATITUDE);
         ALIASES.put("lon",                GEODETIC_LONGITUDE);
+        ALIASES.put("long",               GEODETIC_LONGITUDE);
         ALIASES.put("longitude",          GEODETIC_LONGITUDE);
         ALIASES.put("geodetic longitude", GEODETIC_LONGITUDE);
         /*

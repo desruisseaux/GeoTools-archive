@@ -24,11 +24,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.awt.RenderingHints;
-import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeEvent;  // For javadoc
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
-import org.opengis.go.display.primitive.Graphic;
+import org.opengis.go.display.primitive.Graphic;  // For javadoc
 
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Loggings;

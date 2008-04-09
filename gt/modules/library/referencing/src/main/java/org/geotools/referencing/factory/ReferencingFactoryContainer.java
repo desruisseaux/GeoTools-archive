@@ -453,7 +453,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @throws FactoryException if the object creation failed.
      */
     public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs) throws FactoryException {
-        final List<SingleCRS> components = DefaultCompoundCRS.getSingleCRS(crs);
+        List<SingleCRS> components = DefaultCompoundCRS.getSingleCRS(crs);
         final int count = components.size();
         SingleCRS   horizontal = null;
         VerticalCRS vertical   = null;
@@ -472,9 +472,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
                 }
                 return crs;
             }
-            if (candidate instanceof GeographicCRS ||
-                candidate instanceof  ProjectedCRS)
-            {
+            if (candidate instanceof GeographicCRS || candidate instanceof  ProjectedCRS) {
                 if (horizontal == null) {
                     horizontal = candidate;
                     if (horizontal.getCoordinateSystem().getDimension() == 2) {
@@ -498,6 +496,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
                 return single;
             }
             final int i = classic ? hi : vi;
+            components = new ArrayList<SingleCRS>(components);
             components.remove(i);
             components.set(i, single);
             final SingleCRS[] c = components.toArray(new SingleCRS[components.size()]);

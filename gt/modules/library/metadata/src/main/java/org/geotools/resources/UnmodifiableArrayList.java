@@ -18,6 +18,7 @@ package org.geotools.resources;
 
 import java.io.Serializable;
 import java.util.AbstractList;
+import org.geotools.util.CheckedCollection;
 
 
 /**
@@ -42,7 +43,9 @@ import java.util.AbstractList;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class UnmodifiableArrayList<E> extends AbstractList<E> implements Serializable {
+public class UnmodifiableArrayList<E> extends AbstractList<E>
+        implements CheckedCollection<E>, Serializable
+{
     /**
      * For compatibility with different versions.
      */
@@ -54,23 +57,36 @@ public class UnmodifiableArrayList<E> extends AbstractList<E> implements Seriali
     private final E[] array;
 
     /**
-     * Create a new instance of an array list.
-     * The array given in argument is <strong>not</strong> cloned.
+     * Creates a new instance of an array list. A direct reference to the given array is retained
+     * (i.e. the array is <strong>not</strong> cloned). Consequently the given array should not
+     * be modified after construction if this list is intented to be immutable.
+     * <p>
+     * This constructor is for subclassing only. Users should invoke the {@link #wrap} static
+     * factory method, which provides more convenient handling of parameterized types.
      *
-     * @deprecated Use {@link #wrap} instead.
+     * @param array The array to wrap.
      */
-    public UnmodifiableArrayList(final E[] array) {
+    protected UnmodifiableArrayList(final E[] array) {
         this.array = array;
     }
 
     /**
-     * Create a new instance of an array list.
-     * The array given in argument is <strong>not</strong> cloned.
+     * Creates a new instance of an array list. A direct reference to the given array is retained
+     * (i.e. the array is <strong>not</strong> cloned). Consequently the given array should not
+     * be modified after construction if this list is intented to be immutable.
      *
      * @since 2.5
      */
     public static <E> UnmodifiableArrayList<E> wrap(final E[] array) {
         return new UnmodifiableArrayList<E>(array);
+    }
+
+    /**
+     * Returns the element type of the wrapped array.
+     */
+    @SuppressWarnings("unchecked") // Safe if this instance was created safely with wrap(E[]).
+    public Class<E> getElementType() {
+        return (Class) array.getClass().getComponentType();
     }
 
     /**
