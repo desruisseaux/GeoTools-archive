@@ -28,10 +28,12 @@
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>ecore</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
