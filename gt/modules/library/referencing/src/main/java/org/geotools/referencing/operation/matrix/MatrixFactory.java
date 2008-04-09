@@ -39,6 +39,9 @@ public final class MatrixFactory {
 
     /**
      * Creates a square identity matrix of size {@code size}&nbsp;&times;&nbsp;{@code size}.
+     *
+     * @param size For an affine transform, this is the number of source and target dimensions + 1.
+     * @return An identity matrix of the given size.
      */
     public static XMatrix create(final int size) {
         switch (size) {
@@ -53,6 +56,14 @@ public final class MatrixFactory {
     /**
      * Creates a matrix of size {@code numRow}&nbsp;&times;&nbsp;{@code numCol}.
      * Elements on the diagonal <var>j==i</var> are set to 1.
+     *
+     * @param numRow For an affine transform, this is the number of
+     *        {@linkplain org.opengis.referencing.operation.MathTransform#getTargetDimensions
+     *        target dimensions} + 1.
+     * @param numCol For an affine transform, this is the number of
+     *        {@linkplain org.opengis.referencing.operation.MathTransform#getSourceDimensions
+     *        source dimensions} + 1.
+     * @return An identity matrix of the given size.
      */
     public static XMatrix create(final int numRow, final int numCol) {
         if (numRow == numCol) {

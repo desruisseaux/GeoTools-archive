@@ -54,16 +54,18 @@ import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.AbstractCoverage;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.TransformedDirectPosition;
+import org.geotools.coverage.AbstractCoverage;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
@@ -106,6 +108,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * For compatibility during cross-version serialization.
      */
     private static final long serialVersionUID = 667472989475027853L;
+
+    /**
+     * Whatever default grid range computation should be performed on transform
+     * relative to pixel center or relative to pixel corner.  The former is OGC
+     * convention while the later is Java convention.
+     */
+    private static final PixelInCell PIXEL_IN_CELL = PixelInCell.CELL_CORNER;
 
     /**
      * The raster data.
@@ -185,6 +194,23 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
+     * @deprecated Use the constructor with a {@link Hints} argument instead.
+     *
+     * @since 2.2
+     */
+    @Deprecated
+    protected GridCoverage2D(final CharSequence             name,
+                             final PlanarImage             image,
+                                   GridGeometry2D   gridGeometry,
+                             final GridSampleDimension[]   bands,
+                             final GridCoverage[]        sources,
+                             final Map<?,?>           properties)
+            throws IllegalArgumentException
+    {
+        this(name, image, gridGeometry, bands, sources, properties, null);
+    }
+
+    /**
      * Constructs a grid coverage with the specified {@linkplain GridGeometry2D grid geometry} and
      * {@linkplain GridSampleDimension sample dimensions}. The {@linkplain Envelope envelope}
      * (including the {@linkplain CoordinateReferenceSystem coordinate reference system}) is
@@ -194,29 +220,36 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * ({@link javax.media.jai.util.CaselessStringKey} are accepted as well), while values may
      * be any {@link Object}.
      *
-     * @param name         The grid coverage name.
-     * @param image        The image.
-     * @param gridGeometry The grid geometry (must contains an {@linkplain GridGeometry2D#getEnvelope
-     *                     envelope} with its {@linkplain GridGeometry2D#getCoordinateReferenceSystem
-     *                     coordinate reference system} and a "{@linkplain
-     *                     GridGeometry2D#getGridToCoordinateSystem grid to CRS}" transform).
-     * @param bands        Sample dimensions for each image band, or {@code null} for default sample
-     *                     dimensions. If non-null, then this array's length must matches the number
-     *                     of bands in {@code image}.
-     * @param sources      The sources for this grid coverage, or {@code null} if none.
-     * @param properties   The set of properties for this coverage, or {@code null} none.
+     * @param name
+     *          The grid coverage name.
+     * @param image
+     *          The image.
+     * @param gridGeometry
+     *          The grid geometry (must contains an {@linkplain GridGeometry2D#getEnvelope envelope}
+     *          with its {@linkplain GridGeometry2D#getCoordinateReferenceSystem coordinate reference
+     *          system} and a "{@linkplain GridGeometry2D#getGridToCoordinateSystem grid to CRS}"
+     *          transform).
+     * @param bands
+     *          Sample dimensions for each image band, or {@code null} for default sample dimensions.
+     *          If non-null, then this array's length must matches the number of bands in {@code image}.
+     * @param sources
+     *          The sources for this grid coverage, or {@code null} if none.
+     * @param properties
+     *          The set of properties for this coverage, or {@code null} none.
+     * @param hints
+     *          An optional set of hints, or {@code null} if none.
+     * @throws IllegalArgumentException
+     *          If the number of bands differs from the number of sample dimensions.
      *
-     * @throws IllegalArgumentException if the number of bands differs from the number of sample
-     *         dimensions.
-     *
-     * @since 2.2
+     * @since 2.5
      */
     protected GridCoverage2D(final CharSequence             name,
                              final PlanarImage             image,
                                    GridGeometry2D   gridGeometry,
                              final GridSampleDimension[]   bands,
                              final GridCoverage[]        sources,
-                             final Map<?,?>           properties)
+                             final Map<?,?>           properties,
+                             final Hints                   hints)
             throws IllegalArgumentException
     {
         super(name, gridGeometry.getCoordinateReferenceSystem(), sources, image, properties);
@@ -240,7 +273,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (!gridGeometry.isDefined(GridGeometry2D.GRID_RANGE)) {
             final GridRange r = new GeneralGridRange(image, dimension);
             if (gridGeometry.isDefined(GridGeometry2D.GRID_TO_CRS)) {
-                gridGeometry = new GridGeometry2D(r, gridGeometry.getGridToCRS(), crs);
+                gridGeometry = new GridGeometry2D(r, PIXEL_IN_CELL,
+                        gridGeometry.getGridToCRS(PIXEL_IN_CELL), crs, hints);
             } else {
                 /*
                  * If the math transform was not explicitly specified by the user, then it will be
@@ -863,7 +897,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         // Do not synchronize past this point, because ViewsManager.get is already
         // synchronized. We need to rely on ViewsManager locking because the views
         // are shared among many GridCoverage2D instances.
-        return views.get(this, type);
+        final Hints hints = null; // We may revisit that later.
+        return views.get(this, type, hints);
     }
 
     /**

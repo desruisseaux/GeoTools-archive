@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.processing.operation;
 
-import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
@@ -28,6 +27,7 @@ import javax.media.jai.PlanarImage;
 
 import org.opengis.parameter.ParameterValueGroup;
 
+import org.geotools.factory.Hints;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.OperationJAI;
@@ -72,14 +72,15 @@ final class BandSelector2D extends GridCoverage2D {
     private BandSelector2D(final GridCoverage2D       source,
                            final PlanarImage          image,
                            final GridSampleDimension[] bands,
-                           final int[]           bandIndices)
+                           final int[]           bandIndices,
+                           final Hints                 hints)
     {
         super(source.getName(),                      // The grid source name
               image,                                 // The underlying data
               source.getGridGeometry(),              // The grid geometry (unchanged).
               bands,                                 // The sample dimensions
               new GridCoverage2D[] {source},         // The source grid coverages.
-              null);                                 // Properties
+              null, hints);                          // Properties
 
         this.bandIndices = bandIndices;
         assert bandIndices == null || bandIndices.length == bands.length;
@@ -92,7 +93,7 @@ final class BandSelector2D extends GridCoverage2D {
      * @param  A set of rendering hints, or {@code null} if none.
      * @return The result as a grid coverage.
      */
-    static GridCoverage2D create(final ParameterValueGroup parameters, RenderingHints hints) {
+    static GridCoverage2D create(final ParameterValueGroup parameters, Hints hints) {
         /*
          * Fetch all parameters, clone them if needed. The "VisibleSampleDimension" parameter is
          * Geotools-specific and optional. We get it as an Integer both for catching null value,
@@ -210,10 +211,10 @@ final class BandSelector2D extends GridCoverage2D {
             }
             layout.setColorModel(colors);
             if (hints != null) {
-                hints = (RenderingHints) hints.clone();
+                hints = hints.clone();
                 hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
             } else {
-                hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+                hints = new Hints(JAI.KEY_IMAGE_LAYOUT, layout);
             }
         }
         if (visibleBand == null) {
@@ -226,7 +227,7 @@ final class BandSelector2D extends GridCoverage2D {
         }
         final PlanarImage image = OperationJAI.getJAI(hints).createNS(operation, params, hints);
         image.setProperty("GC_VisibleBand", visibleBand);
-        return new BandSelector2D(source, image, targetBands, bandIndices);
+        return new BandSelector2D(source, image, targetBands, bandIndices, hints);
     }
 
     /**

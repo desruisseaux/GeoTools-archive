@@ -52,6 +52,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.coverage.CoverageUtilities;
@@ -181,7 +182,9 @@ scan:   for (int i=0; i<numBands; i++) {
      * <strong>NOTE:</strong> {@link GridCoverage2D#toString()} requires that this method is
      * synchronized on {@code this}.
      */
-    public synchronized GridCoverage2D get(final GridCoverage2D caller, final ViewType type) {
+    public synchronized GridCoverage2D get(final GridCoverage2D caller, final ViewType type,
+                                           final Hints userHints)
+    {
         GridCoverage2D coverage = views.get(type);
         if (coverage != null) {
             return coverage;
@@ -192,10 +195,10 @@ scan:   for (int i=0; i<numBands; i++) {
             throw new IllegalStateException("This coverage has been disposed.");
         }
         switch (type) {
-            case RENDERED:     coverage = rendered(caller);            break;
-            case PACKED:       coverage = geophysics(coverage, false); break;
-            case GEOPHYSICS:   coverage = geophysics(coverage, true);  break;
-            case PHOTOGRAPHIC: coverage = photographic(coverage);      break;
+            case RENDERED:     coverage = rendered(caller,            userHints); break;
+            case PACKED:       coverage = geophysics(coverage, false, userHints); break;
+            case GEOPHYSICS:   coverage = geophysics(coverage, true,  userHints); break;
+            case PHOTOGRAPHIC: coverage = photographic(coverage,      userHints); break;
             default: {
                 /*
                  * We don't want a case for:
@@ -223,7 +226,7 @@ scan:   for (int i=0; i<numBands; i++) {
      * by an RGB {@linkplain ColorSpace color space}, but not necessarly. It could be YMCB as well.
      */
     @SuppressWarnings("fallthrough")
-    private static GridCoverage2D photographic(final GridCoverage2D coverage) {
+    private static GridCoverage2D photographic(final GridCoverage2D coverage, final Hints userHints) {
         final RenderedImage image = coverage.getRenderedImage();
         final ColorModel cm = image.getColorModel();
         /*
@@ -307,7 +310,7 @@ scan:   for (int i=0; i<numBands; i++) {
             view = FormatDescriptor.create(image, dataType, hints);
         }
         assert view.getColorModel() instanceof ComponentColorModel;
-        return createView(coverage, view, null, 2);
+        return createView(coverage, view, null, 2, userHints);
     }
 
     /**
@@ -323,7 +326,9 @@ scan:   for (int i=0; i<numBands; i++) {
      *       bytecode. This bug is fixed in javac 1.4.2-beta. However, we still have an
      *       ArrayIndexOutOfBoundsException in JAI code...
      */
-    private static GridCoverage2D geophysics(final GridCoverage2D coverage, final boolean toGeo) {
+    private static GridCoverage2D geophysics(final GridCoverage2D coverage, final boolean toGeo,
+                                             final Hints userHints)
+    {
         /*
          * STEP 1 - Gets the source image and prepare the target bands (sample dimensions).
          *          As a slight optimisation, we skip the "Null" operation since such image
@@ -583,7 +588,7 @@ testLinear: for (int i=0; i<numBands; i++) {
             operation = "org.geotools.SampleTranscode";
         }
         final RenderedOp view = JAI.create(operation, param, hints);
-        return createView(coverage, view, targetBands, toGeo ? 1 : 0);
+        return createView(coverage, view, targetBands, toGeo ? 1 : 0, userHints);
     }
 
     /**
@@ -592,15 +597,15 @@ testLinear: for (int i=0; i<numBands; i++) {
      * @todo Not yet implemented. For now we use the packed view as a close match. Future version
      *       will needs to make sure that we returns the same instance than PACKED when suitable.
      */
-    private GridCoverage2D rendered(final GridCoverage2D coverage) {
-        return get(coverage, ViewType.PACKED);
+    private GridCoverage2D rendered(final GridCoverage2D coverage, final Hints userHints) {
+        return get(coverage, ViewType.PACKED, userHints);
     }
 
     /**
      * Creates the view and logs a record.
      */
     private static GridCoverage2D createView(final GridCoverage2D coverage, final RenderedOp view,
-            final GridSampleDimension[] targetBands, final int code)
+            final GridSampleDimension[] targetBands, final int code, final Hints userHints)
     {
         final InternationalString name = coverage.getName();
         if (GridCoverage2D.LOGGER.isLoggable(AbstractProcessor.OPERATION)) {
@@ -619,7 +624,7 @@ testLinear: for (int i=0; i<numBands; i++) {
             GridCoverage2D.LOGGER.log(record);
         }
         final GridCoverage[] sources = new GridCoverage[] {coverage};
-        return new GridCoverage2D(name, view, coverage.gridGeometry, targetBands, sources, null);
+        return new GridCoverage2D(name, view, coverage.gridGeometry, targetBands, sources, null, userHints);
     }
 
     /**

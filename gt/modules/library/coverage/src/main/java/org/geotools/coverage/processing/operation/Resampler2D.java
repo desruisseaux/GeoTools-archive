@@ -132,10 +132,11 @@ final class Resampler2D extends GridCoverage2D {
     private Resampler2D(final GridCoverage2D        source,
                         final PlanarImage           image,
                         final GridGeometry2D        geometry,
-                        final GridSampleDimension[] sampleDimensions)
+                        final GridSampleDimension[] sampleDimensions,
+                        final Hints                 hints)
     {
         super(source.getName(), image, geometry, sampleDimensions,
-              new GridCoverage2D[] {source}, null);
+              new GridCoverage2D[] {source}, null, hints);
     }
 
     /**
@@ -149,7 +150,8 @@ final class Resampler2D extends GridCoverage2D {
     private static GridCoverage2D create(final GridCoverage2D source,
                                          final PlanarImage    image,
                                          final GridGeometry2D geometry,
-                                         final ViewType       finalView)
+                                         final ViewType       finalView,
+                                         final Hints          hints)
     {
         final GridSampleDimension[] sampleDimensions;
         switch (finalView) {
@@ -166,7 +168,7 @@ final class Resampler2D extends GridCoverage2D {
          * The resampling may have been performed on the geophysics view.
          * Try to restore the original view.
          */
-        GridCoverage2D coverage = new Resampler2D(source, image, geometry, sampleDimensions);
+        GridCoverage2D coverage = new Resampler2D(source, image, geometry, sampleDimensions, hints);
         coverage = coverage.view(finalView);
         return coverage;
     }
@@ -523,7 +525,7 @@ final class Resampler2D extends GridCoverage2D {
                  */
                 sourceCoverage = sourceCoverage.view(finalView);
                 sourceImage = PlanarImage.wrapRenderedImage(sourceCoverage.getRenderedImage());
-                return create(sourceCoverage, sourceImage, targetGG, ViewType.SAME);
+                return create(sourceCoverage, sourceImage, targetGG, ViewType.SAME, hints);
             }
             if (sourceBB.contains(targetBB)) {
                 operation = "Crop";
@@ -567,7 +569,7 @@ final class Resampler2D extends GridCoverage2D {
                      * using heuristic rules. Only the constructor with a MathTransform argument
                      * is fully accurate.
                      */
-                    return create(sourceCoverage, sourceImage, targetGG, finalView);
+                    return create(sourceCoverage, sourceImage, targetGG, finalView, hints);
                 }
                 // More general approach: apply the affine transform.
                 operation = "Affine";
@@ -645,7 +647,7 @@ final class Resampler2D extends GridCoverage2D {
          *     is "Warp" with "Nearest" interpolation on geophysics pixels values. Background
          *     value is 255.
          */
-        targetCoverage = create(sourceCoverage, targetImage, targetGG, finalView);
+        targetCoverage = create(sourceCoverage, targetImage, targetGG, finalView, hints);
         assert CRS.equalsIgnoreMetadata(targetCoverage.getCoordinateReferenceSystem(), targetCRS) : targetGG;
         assert targetCoverage.getGridGeometry().getGridRange2D().equals(targetImage.getBounds())  : targetGG;
         if (AbstractProcessor.LOGGER.isLoggable(LOGGING_LEVEL)) {

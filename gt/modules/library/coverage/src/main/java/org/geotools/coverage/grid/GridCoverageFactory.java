@@ -93,6 +93,13 @@ import org.geotools.resources.Utilities;
  */
 public class GridCoverageFactory extends AbstractFactory {
     /**
+     * The hints to be given to coverage constructor.
+     *
+     * @todo Put there only the hints we need.
+     */
+    private final Hints userHints = null;
+
+    /**
      * Creates a default factory. Users should not need to creates instance of this class
      * directly. Invoke {@link org.geotools.coverage.FactoryFinder#getGridCoverageFactory}
      * instead.
@@ -562,7 +569,7 @@ public class GridCoverageFactory extends AbstractFactory {
                                        GridGeometry2D        gridGeometry,
                                  final GridSampleDimension[] bands,
                                  final GridCoverage[]        sources,
-                                 final Map                   properties)
+                                 final Map<?,?>              properties)
     {
         /*
          * Makes sure that the specified grid geometry has a CRS.
@@ -574,7 +581,7 @@ public class GridCoverageFactory extends AbstractFactory {
         }
         final GridCoverage2D coverage;
         coverage = new GridCoverage2D(name, PlanarImage.wrapRenderedImage(image),
-                                      gridGeometry, bands, sources, properties);
+                                      gridGeometry, bands, sources, properties, userHints);
         coverage.tileEncoding = (String) hints.get(Hints.TILE_ENCODING);
         return coverage;
     }

@@ -19,15 +19,12 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// JAI dependencies (for javadoc)
-import javax.media.jai.operator.BandSelectDescriptor;
+import javax.media.jai.operator.BandSelectDescriptor;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.metadata.iso.citation.Citations;
@@ -104,7 +101,7 @@ public class SelectSampleDimension extends Operation2D {
      * The parameter descriptor for the sample dimension indices.
      */
     public static final ParameterDescriptor SAMPLE_DIMENSIONS =
-            new DefaultParameterDescriptor(Citations.OGC, "SampleDimensions",
+            new DefaultParameterDescriptor<int[]>(Citations.OGC, "SampleDimensions",
                 int[].class,                        // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
@@ -118,7 +115,7 @@ public class SelectSampleDimension extends Operation2D {
      * This is a Geotools-specific parameter.
      */
     public static final ParameterDescriptor VISIBLE_SAMPLE_DIMENSION =
-            new DefaultParameterDescriptor(Citations.GEOTOOLS, "VisibleSampleDimension",
+            new DefaultParameterDescriptor<Integer>(Citations.GEOTOOLS, "VisibleSampleDimension",
                 Integer.class,                      // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
