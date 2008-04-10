@@ -69,6 +69,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
@@ -76,6 +77,7 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridRange;
@@ -86,7 +88,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -414,12 +416,11 @@ public abstract class BaseGDALGridCoverage2DReader extends
 			// ATTENTION: Gdal geotransform does not use the pixel is centre
 			// convention like world files.
 
-			// Grid2World Transformation
-			this.raster2Model = ProjectiveTransform.create(tempTransform);
+
 
 			try {
 				// Envelope setting
-				baseEnvelope = CRS.transform(raster2Model, new GeneralEnvelope(
+				baseEnvelope = CRS.transform(ProjectiveTransform.create(tempTransform), new GeneralEnvelope(
 						baseGridRange.toRectangle()));
 			} catch (IllegalStateException e) {
 				if (LOGGER.isLoggable(Level.WARNING)) {
@@ -430,6 +431,11 @@ public abstract class BaseGDALGridCoverage2DReader extends
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 				}
 			}
+			
+			// Grid2World Transformation
+			final double tr= PixelTranslation.getPixelTranslation(PixelInCell.CELL_CORNER);
+			tempTransform.translate(tr, tr);
+			this.raster2Model = ProjectiveTransform.create(tempTransform);
 		}
 	}
 
@@ -587,7 +593,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		GeneralEnvelope readEnvelope = null;
 		OverviewPolicy overviewPolicy = null;
 		Rectangle requestedDim = null;
-
+		MathTransform2D readGridToWorld=null;
 		// USE JAI ImageRead: -1==no, 0==unset 1==yes
 		int iUseJAI = 0;
 
@@ -619,6 +625,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 						continue;
 					}
 
+					readGridToWorld = gg.getGridToCRS2D();
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
@@ -723,7 +730,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 			}
 		}
 
-		return createCoverage(readEnvelope, requestedDim, iUseJAI,
+		return createCoverage(readEnvelope, requestedDim,readGridToWorld, iUseJAI,
 				useMultithreading, overviewPolicy);
 	}
 
@@ -735,6 +742,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 	 *            the requested envelope
 	 * @param requestedDim
 	 *            the requested dimension
+	 * @param readGridToWorld 
 	 * @param iUseJAI
 	 *            specify if the underlying read process should leverage on a
 	 *            JAI ImageRead operation or a simple direct call to the
@@ -748,9 +756,12 @@ public abstract class BaseGDALGridCoverage2DReader extends
 	 * 
 	 * @throws java.io.IOException
 	 */
-	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim, final int iUseJAI,
-			final boolean useMultithreading, OverviewPolicy overviewPolicy)
+	private GridCoverage createCoverage(
+			GeneralEnvelope requestedEnvelope,
+			Rectangle requestedDim, 
+			MathTransform2D readGridToWorld, final int iUseJAI,
+			final boolean useMultithreading, 
+			OverviewPolicy overviewPolicy)
 			throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
@@ -760,8 +771,8 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final Rectangle sourceRegion = new Rectangle();
-		final GeneralEnvelope adjustedRequestedEnvelope = evaluateRequestedEnvelope(
-				requestedEnvelope, sourceRegion);
+		final GeneralEnvelope adjustedRequestedEnvelope = evaluateRequestedParams(
+				requestedEnvelope, sourceRegion,requestedDim,readGridToWorld);
 
 		// Return null in case requested envelope does not intersect with the
 		// coverage
@@ -803,7 +814,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		}
 
 		try {
-			GeneralEnvelope req = (adjustedRequestedEnvelope.isEmpty()) ? requestedEnvelope
+			final GeneralEnvelope req = (adjustedRequestedEnvelope.isEmpty()) ? requestedEnvelope
 					: adjustedRequestedEnvelope;
 			setReadParameters(overviewPolicy, readP, req, requestedDim);
 		} catch (IOException e) {
@@ -823,11 +834,11 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		final PlanarImage coverage;
 		if ((sourceRegion != null) && !sourceRegion.isEmpty()) {
 			readP.setSourceRegion(sourceRegion);
-//			System.out.println("sourceRegion:"+sourceRegion);
+			System.out.println("sourceRegion:"+sourceRegion);
 
 		}
-//		System.out.println("sx:"+readP.getSourceXSubsampling());
-//		System.out.println("sy:"+readP.getSourceYSubsampling());
+		System.out.println("sx:"+readP.getSourceXSubsampling());
+		System.out.println("sy:"+readP.getSourceYSubsampling());
 		// //
 		//
 		// image and metadata
@@ -923,6 +934,8 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		}
 	}
 
+
+
 	/**
 	 * Evaluates the requested envelope and builds a new adjusted version of it
 	 * fitting this coverage envelope.
@@ -939,6 +952,8 @@ public abstract class BaseGDALGridCoverage2DReader extends
 	 *            represents the area to load in raster space. This parameter
 	 *            cannot be null since it gets filled with whatever the crop
 	 *            region is depending on the <code>requestedEnvelope</code>.
+	 * @param requestedDim 
+	 * @param readGridToWorld 
 	 * @return the adjusted requested envelope, empty if no requestedEnvelope
 	 *         has been specified, {@code null} in case the requested envelope
 	 *         does not intersect the coverage envelope.
@@ -946,8 +961,11 @@ public abstract class BaseGDALGridCoverage2DReader extends
 	 * @throws DataSourceException
 	 *             in case something bad occurs
 	 */
-	private GeneralEnvelope evaluateRequestedEnvelope(
-			GeneralEnvelope requestedEnvelope, Rectangle sourceRegion)
+	private GeneralEnvelope evaluateRequestedParams(
+			GeneralEnvelope requestedEnvelope, 
+			Rectangle sourceRegion, 
+			Rectangle requestedDim, 
+			MathTransform2D readGridToWorld)
 			throws DataSourceException {
 		GeneralEnvelope adjustedRequestedEnvelope = new GeneralEnvelope(2);
 
@@ -964,27 +982,31 @@ public abstract class BaseGDALGridCoverage2DReader extends
 
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// INTERSECT ENVELOPES
+				// INTERSECT ENVELOPES AND  CROP Destination REGION
 				//
 				// /////////////////////////////////////////////////////////////////////
-				adjustedRequestedEnvelope = getIntersection(requestedEnvelope2D);
+				adjustedRequestedEnvelope = getIntersection(requestedEnvelope2D,requestedDim,readGridToWorld);
 				if (adjustedRequestedEnvelope == null)
 					return null;
 
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// CROP
+				// CROP SOURCE REGION
 				//
 				// /////////////////////////////////////////////////////////////////////
 				sourceRegion.setRect(getCropRegion(adjustedRequestedEnvelope));
-
 				if (!sourceRegion.intersects(this.baseGridRange.toRectangle())
 						|| sourceRegion.isEmpty()) 
 					throw new DataSourceException("The crop region is invalid.");
-
 				sourceRegion.setRect(sourceRegion
 						.intersection(this.baseGridRange.toRectangle()));
 
+	
+				
+				
+				
+				
+				
 				if (LOGGER.isLoggable(Level.FINE)) {
 					LOGGER.log(Level.FINE, "Base Envelope = "
 							+ baseEnvelope.toString());
@@ -1054,31 +1076,66 @@ public abstract class BaseGDALGridCoverage2DReader extends
 	 * @param requestedEnvelope2D
 	 *            the requested 2D envelope to be intersected with the base
 	 *            envelope.
+	 * @param readGridToWorld 
+	 * @param requestedDim 
 	 * @return the resulting intersection of envelopes. In case of empty
 	 *         intersection, this method is allowed to return {@code null}
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
-	private GeneralEnvelope getIntersection(GeneralEnvelope requestedEnvelope2D)
+	private GeneralEnvelope getIntersection(
+			GeneralEnvelope requestedEnvelope2D,
+			Rectangle requestedDim, 
+			MathTransform2D readGridToWorld)
 			throws TransformException, FactoryException {
 
 		GeneralEnvelope adjustedRequestedEnvelope =  new GeneralEnvelope(2);
-		CoordinateReferenceSystem requestedEnvelopeCRS2D = requestedEnvelope2D
+		final CoordinateReferenceSystem requestedEnvelopeCRS2D = requestedEnvelope2D
 				.getCoordinateReferenceSystem();
 		boolean tryWithWGS84 = false;
 
 		try {
 			// convert the requested envelope 2D to this coverage native
-			// crs
+			// crs.
+			MathTransform transform=null;
 			if (!CRS.equalsIgnoreMetadata(requestedEnvelopeCRS2D,
-					this.spatialReferenceSystem2D)) {
-				adjustedRequestedEnvelope = CRS.transform(CRS
+					this.spatialReferenceSystem2D)) 
+				transform = CRS
 						.findMathTransform(requestedEnvelopeCRS2D,
-								this.spatialReferenceSystem2D, true),
+								this.spatialReferenceSystem2D, true);
+			//now transform the requested envelope to source crs
+			if(transform!=null&&!transform.isIdentity())
+				adjustedRequestedEnvelope = CRS.transform(transform,
 						requestedEnvelope2D);
-			} else {
+			 else {
 				adjustedRequestedEnvelope.setEnvelope(requestedEnvelope2D);
 			}
+			
+			// intersect the requested area with the bounds of this
+			// layer in native crs
+			if (!adjustedRequestedEnvelope.intersects(baseEnvelope2D, true))
+				return null;
+			adjustedRequestedEnvelope.intersect(this.baseEnvelope2D);
+			adjustedRequestedEnvelope
+					.setCoordinateReferenceSystem(this.spatialReferenceSystem2D);
+			
+			////
+			//
+			//transform the intersection envelope from the destination world space to the requested raster space
+			//
+			////
+			final Envelope requestedEnvelopeCropped= (transform!=null&&!transform.isIdentity())?CRS.transform(transform.inverse(),
+					adjustedRequestedEnvelope):adjustedRequestedEnvelope;
+			//TODO half pixel
+			final Rectangle2D ordinates = CRS.transform(
+					 readGridToWorld.inverse(),
+					 requestedEnvelopeCropped).toRectangle2D();
+			final GeneralGridRange finalRange = new GeneralGridRange(ordinates
+					.getBounds());
+			final Rectangle tempRect=finalRange.toRectangle();
+			//check that we stay inside the source rectangle
+			XRectangle2D.intersect(tempRect, requestedDim,tempRect);
+			requestedDim.setRect(tempRect);
 		} catch (TransformException te) {
 			// something bad happened while trying to transform this
 			// envelope. let's try with wgs84
@@ -1088,6 +1145,8 @@ public abstract class BaseGDALGridCoverage2DReader extends
 			// envelope. let's try with wgs84
 			tryWithWGS84 = true;
 		}
+		
+		//TODO IMPLEMENT ME
 
 		// //
 		//
@@ -1110,15 +1169,10 @@ public abstract class BaseGDALGridCoverage2DReader extends
 					requestedEnvelopeWGS84.getCoordinateReferenceSystem(),
 					this.spatialReferenceSystem2D, true),
 					adjustedRequestedEnvelope);
-		} else {
-			// intersect the requested area with the bounds of this
-			// layer in native crs
-			if (!adjustedRequestedEnvelope.intersects(baseEnvelope2D, true))
-				return null;
-			adjustedRequestedEnvelope.intersect(this.baseEnvelope2D);
-			adjustedRequestedEnvelope
-					.setCoordinateReferenceSystem(this.spatialReferenceSystem2D);
-		}
+			
+			
+			
+		} 
 		return adjustedRequestedEnvelope;
 	}
 
