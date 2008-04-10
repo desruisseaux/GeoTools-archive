@@ -67,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>net.opengis.ows</artifactId>
+      <artifactId>ows</artifactId>
       <version>${project.version}</version>
     </dependency>    
   </dependencies>
