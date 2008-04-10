@@ -863,8 +863,7 @@ public class WFS_1_0_0_DataStore extends AbstractDataStore implements WFSDataSto
      */
     public Filter processFilter(Filter filter) {
         FidFilterVisitor visitor = new FidFilterVisitor(fidMap);
-        Filters.accept(filter, visitor);
-        return visitor.getProcessedFilter();
+        return (Filter) filter.accept( visitor, null );
     }
 
     /**

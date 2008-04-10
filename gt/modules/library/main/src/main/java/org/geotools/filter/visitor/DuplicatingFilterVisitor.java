@@ -74,7 +74,7 @@ import org.opengis.filter.spatial.Within;
  * @author Jesse
  *
  */
-public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor{
+public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor {
 
 	protected final FilterFactory2 ff;
 

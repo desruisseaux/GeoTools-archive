@@ -15,39 +15,39 @@
  */
 package org.geotools.wfs.v_1_0_0.data;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.Filters;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LikeFilter;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.NullFilter;
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.filter.And;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
+ * FidFilterVisitor is used to fix up feature Ids that have
+ * been modifed (or actually assigned) after a transaction response.
+ * 
  * @author Jesse
- *
  */
 public class FidFilterVisitorTest extends TestCase {
 
 	private FidFilterVisitor visitor;
-	private FilterFactory ff=FilterFactoryFinder.createFilterFactory();
-	private Map state;
+	private FilterFactory2 ff=CommonFactoryFinder.getFilterFactory2(null);
+	private Map<String,String> state;
 	
 	protected void setUp() throws Exception {
-		state=new HashMap();
+		state=new HashMap<String,String>();
 		state.put("new1","final1");
 		state.put("new2","final2");
 		state.put("new3","final3");
@@ -55,157 +55,94 @@ public class FidFilterVisitorTest extends TestCase {
 		visitor=new FidFilterVisitor(state); 
 	}
 
+   /**
+    * This is really the only valid thing we have to take care of.
+    */
+    public void testVisitIdFilter() throws Exception {
+        Set<FeatureId> fidSet = new HashSet<FeatureId>();
+        fidSet.add( ff.featureId("new1"));
+        fidSet.add( ff.featureId("new2"));
+        Id before = ff.id( fidSet );
+        
+        Id after = (Id) before.accept( visitor, null );
+        assertSame( after, after );
+        assertTrue( after.getIDs().contains("final1") );
+        assertTrue( after.getIDs().contains("final2") );        
+    }
+    /** Check to make sure others ids are not harmed */
+    public void testVisitIdFilter2() throws Exception {
+        Set<FeatureId> fidSet = new HashSet<FeatureId>();
+        fidSet.add( ff.featureId("new1"));
+        fidSet.add( ff.featureId("other"));
+        Id before = ff.id( fidSet );
+        
+        Id after = (Id) before.accept( visitor, null );
+        assertSame( after, after );
+        assertTrue( after.getIDs().contains("final1") );
+        assertTrue( after.getIDs().contains("other") );        
+    }
+    /** Check to make sure others ids are not harmed */
+    public void testVisitIdFilter3() throws Exception {
+        Set<FeatureId> fidSet = new HashSet<FeatureId>();
+        fidSet.add( ff.featureId("new1"));
+        fidSet.add( ff.featureId("new2"));
+        fidSet.add( ff.featureId("new3"));        
+        fidSet.add( ff.featureId("other"));
+        Id before = ff.id( fidSet );
+        
+        Id after = (Id) before.accept( visitor, null );
+        assertSame( after, after );
+        assertTrue( after.getIDs().contains("final1") );
+        assertTrue( after.getIDs().contains("final2") );
+        assertTrue( after.getIDs().contains("final3") );
+        assertTrue( after.getIDs().contains("other") );        
+    }
+    
 	/**
 	 * Test method for {@link org.geotools.wfs.v_1_0_0.data.FidFilterVisitor#visit(org.geotools.filter.LogicFilter)}.
 	 */
 	public void testVisitLogicFilterOR() throws Exception {
-		LogicFilter f=ff.createLogicFilter(FilterType.LOGIC_OR);
-		f.addFilter(ff.createFidFilter("new1"));
-		f.addFilter(ff.createFidFilter("new2"));
-		visitor.visit(f);
-		
-		assertEquals(ff.createFidFilter("final1").or(ff.createFidFilter("final2")), visitor.getProcessedFilter());
-	}
-
-	/**
-	 * Test method for {@link org.geotools.wfs.v_1_0_0.data.FidFilterVisitor#visit(org.geotools.filter.LogicFilter)}.
-	 */
-	public void testVisitLogicFilterAND() throws Exception {
-		LogicFilter f=ff.createLogicFilter(FilterType.LOGIC_AND);
-		f.addFilter(ff.createFidFilter("new1"));
-		f.addFilter(ff.createFidFilter("new2"));
-		visitor.visit(f);
-		
-		assertEquals(ff.createFidFilter("final1").and(ff.createFidFilter("final2")), visitor.getProcessedFilter());
+	    Set<FeatureId> fidSet1 = Collections.singleton(ff.featureId("new1"));
+	    Set<FeatureId> fidSet2 = Collections.singleton(ff.featureId("new2"));
+        
+	    Or before = ff.or( ff.id( fidSet1 ), ff.id( fidSet2 ) );
+	    
+	    Or after = (Or) before.accept( visitor, null );
+		assertSame( after, after );
+	    assertTrue( ((Id)after.getChildren().get(0)).getIDs().contains("final1") );
+	    assertTrue( ((Id)after.getChildren().get(1)).getIDs().contains("final2") );
 	}
 	
 	/**
 	 * Test method for {@link org.geotools.wfs.v_1_0_0.data.FidFilterVisitor#visit(org.geotools.filter.FidFilter)}.
 	 */
 	public void testVisitLogicFilterNOT() {
-		FidFilter f = ff.createFidFilter("new1");
-		visitor.visit((LogicFilter)f.not());
-		assertEquals(ff.createFidFilter("final1").not(), visitor.getProcessedFilter());
-	}
-
+        Set<FeatureId> fidSet1 = Collections.singleton(ff.featureId("new1"));
+        Set<FeatureId> fidSet2 = Collections.singleton(ff.featureId("new2"));
+        
+        And before = ff.and( ff.id( fidSet1 ), ff.id( fidSet2 ) );
+        
+        And after = (And) before.accept( visitor, null );
+        assertSame( after, after );
+        assertTrue( ((Id)after.getChildren().get(0)).getIDs().contains("final1") );
+        assertTrue( ((Id)after.getChildren().get(1)).getIDs().contains("final2") );
+    }
 	/**
-	 * Test method for {@link org.geotools.wfs.v_1_0_0.data.FidFilterVisitor#visit(org.geotools.filter.FidFilter)}.
+	 * Lets ensure that others kinds of filters are not harmed 
+	 * @throws IllegalFilterException
 	 */
-	public void testVisitFidFilter() {
-		FidFilter f = ff.createFidFilter("new1");
-		visitor.visit(f);
-		assertEquals(ff.createFidFilter("final1"), visitor.getProcessedFilter());
-	}
-	public void testVisitFidFilter2() {
-		FidFilter f = ff.createFidFilter("other");
-		visitor.visit(f);
-		assertEquals(ff.createFidFilter("other"), visitor.getProcessedFilter());
-	}
-	public void testVisitFidFilter3() {
-		FidFilter f = ff.createFidFilter();
-		f.addFid("new1");
-		f.addFid("new2");
-		f.addFid("new3");
-		f.addFid("other");
-		visitor.visit(f);
-		
-		FidFilter expected = ff.createFidFilter();
-		expected.addFid("final1");
-		expected.addFid("final2");
-		expected.addFid("final3");
-		expected.addFid("other");
-		
-		assertEquals(expected, visitor.getProcessedFilter());
+	public void testVisitBetweenFilter() {
+	    Filter before = ff.between( ff.literal("1"), ff.literal("1"), ff.literal("1"));
+		Filter after = (Filter) before.accept(visitor, null );
+		assertEquals( before, after );
+		assertNotSame( before, after);
 	}
 
-	/**
-	 * Test method for {@link org.geotools.wfs.v_1_0_0.data.FidFilterVisitor#visit(org.geotools.filter.Filter)}.
-	 */
-	public void testVisitFilter() {
-		Filter f = ff.createFidFilter("new1");
-		visitor.visit(f);
-		assertEquals(ff.createFidFilter("final1"), visitor.getProcessedFilter());
-		
-		Filter filter=ff.createFidFilter("new2");
-		filter=filter.and(ff.createFidFilter("new3"));
-		visitor=new FidFilterVisitor(state);
-		visitor.visit(filter);
-		
-		assertEquals(ff.createFidFilter("final2").and(ff.createFidFilter("final3")), visitor.getProcessedFilter());
-	}
-	
-
-	public void testVisitBetweenFilter() throws IllegalFilterException {
-		BetweenFilter filter = ff.createBetweenFilter();
-		filter.addLeftValue(ff.createLiteralExpression("1"));
-		filter.addMiddleValue(ff.createLiteralExpression("1"));
-		filter.addRightValue(ff.createLiteralExpression("1"));
-		filter.accept(visitor);
-		assertSame(filter, visitor.getProcessedFilter());
+	public void testVisitCompareFilter() {
+        Filter before = ff.less(ff.literal("1"), ff.literal("1") );
+        Filter after = (Filter) before.accept(visitor, null );
+        assertEquals( before, after );
+        assertNotSame( before, after );
 	}
 
-	public void testVisitCompareFilter()  throws IllegalFilterException {
-		CompareFilter filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		filter.addLeftValue(ff.createLiteralExpression("1"));
-		filter.addRightValue(ff.createLiteralExpression("1"));
-		filter.accept(visitor);
-		assertSame(filter, visitor.getProcessedFilter());
-	}
-
-	public void testVisitGeometryFilter() throws IllegalFilterException  {
-		GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		filter.addLeftGeometry(ff.createBBoxExpression(new Envelope(0,10,0,10)));
-		filter.addLeftGeometry(ff.createBBoxExpression(new Envelope(0,10,0,10)));
-		filter.accept(visitor);
-		assertSame(filter, visitor.getProcessedFilter());
-	}
-
-	public void testVisitLikeFilter() throws IllegalFilterException  {
-		LikeFilter filter = ff.createLikeFilter();
-		filter.setPattern("patt", "", "", "");
-		filter.accept(visitor);
-		assertSame(filter, visitor.getProcessedFilter());
-	}
-
-	public void testVisitNullFilter() throws IllegalFilterException  {
-		NullFilter filter = ff.createNullFilter();
-		filter.accept(visitor);
-		assertSame(filter, visitor.getProcessedFilter());
-	}
-	
-	public void testFilterNONE() throws Exception {
-		Filters.accept( Filter.INCLUDE, visitor);
-		assertSame(Filter.INCLUDE, visitor.getProcessedFilter());
-	}
-	public void testFilterALL() throws Exception {
-        Filters.accept( Filter.EXCLUDE, visitor);
-		assertSame(Filter.EXCLUDE, visitor.getProcessedFilter());		
-	}
-
-	public void testFilterUnchanged() throws Exception {
-		CompareFilter c1=ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c1.addLeftValue(ff.createAttributeExpression("eventstatus"));
-		c1.addRightValue(ff.createLiteralExpression("deleted"));
-		
-		CompareFilter c2 = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c2.addLeftValue(ff.createAttributeExpression("eventtype"));
-		c2.addRightValue(ff.createLiteralExpression("road hazard"));
-		
-		CompareFilter c3 = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c3.addLeftValue(ff.createAttributeExpression("eventtype"));
-		c3.addRightValue(ff.createLiteralExpression("area warning"));
-
-		GeometryFilter g = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		g.addLeftGeometry(ff.createAttributeExpression("geom"));
-		g.addRightGeometry(ff.createBBoxExpression(new Envelope(0,180,0,90)));
-		
-		Filter f = c2.or(c3);
-		f=c1.not().and(f);
-		f=f.and(g);
-		
-		f.accept(visitor);
-		
-		assertEquals(f, visitor.getProcessedFilter());
-
-	}
 }
