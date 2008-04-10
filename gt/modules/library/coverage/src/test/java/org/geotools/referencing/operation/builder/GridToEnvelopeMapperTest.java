@@ -120,22 +120,27 @@ public final class GridToEnvelopeMapperTest {
         ///  Tests the creation when no CRS is available.
         ///
         assertFalse(mapper.getSwapXY());
-        assertNull (mapper.getReverseAxis());
+        boolean[] reverse = mapper.getReverseAxis();
+        assertNotNull(reverse);
+        assertEquals (2, reverse.length);
+        assertFalse  (reverse[0]);
+        assertTrue   (reverse[1]);
         final AffineTransform tr1 = mapper.createAffineTransform();
         assertEquals(AffineTransform.TYPE_GENERAL_SCALE |
-                     AffineTransform.TYPE_TRANSLATION, tr1.getType());
-        assertEquals(0.1,  tr1.getScaleX(),     EPS);
-        assertEquals(0.2,  tr1.getScaleY(),     EPS);
+                     AffineTransform.TYPE_TRANSLATION   |
+                     AffineTransform.TYPE_FLIP, tr1.getType());
+        assertEquals( 0.1, tr1.getScaleX(),     EPS);
+        assertEquals(-0.2, tr1.getScaleY(),     EPS);
         assertEquals(0.05, tr1.getTranslateX(), EPS);
-        assertEquals(0.10, tr1.getTranslateY(), EPS);
+        assertEquals(47.9, tr1.getTranslateY(), EPS);
         assertSame("Transform should be cached", tr1, mapper.createAffineTransform());
 
         // Tests a coordinate transformation.
         point.x = 10 - 0.5;
         point.y = 20 - 0.5;
         assertSame(point, tr1.transform(point, point));
-        assertEquals(1, point.x, EPS);
-        assertEquals(4, point.y, EPS);
+        assertEquals( 1, point.x, EPS);
+        assertEquals(44, point.y, EPS);
 
 
         ///////////////////////////////////////////////////////////////
@@ -218,6 +223,7 @@ public final class GridToEnvelopeMapperTest {
         assertFalse(mapper.getSwapXY());
         assertNotSame(tr3, mapper.createAffineTransform());
         mapper.setReverseAxis(null);
+        mapper.reverseAxis(1);
         assertFalse(mapper.isAutomatic(GridToEnvelopeMapper.SWAP_XY));
         assertFalse(mapper.isAutomatic(GridToEnvelopeMapper.REVERSE_AXIS));
         assertEquals(tr1, mapper.createAffineTransform());

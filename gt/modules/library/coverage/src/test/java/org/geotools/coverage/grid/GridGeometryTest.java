@@ -91,12 +91,13 @@ public final class GridGeometryTest {
                                 new GeneralEnvelope(minimum, maximum));
         final AffineTransform tr = (AffineTransform) gg.getGridToCRS2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |
-                     AffineTransform.TYPE_TRANSLATION, tr.getType());
+                     AffineTransform.TYPE_TRANSLATION   |
+                     AffineTransform.TYPE_FLIP, tr.getType());
 
-        assertEquals(4, tr.getScaleX(), 0);
-        assertEquals(4, tr.getScaleY(), 0);
+        assertEquals(   4, tr.getScaleX(),     0);
+        assertEquals(  -4, tr.getScaleY(),     0);
         assertEquals(-178, tr.getTranslateX(), 0);
-        assertEquals( -88, tr.getTranslateY(), 0);
+        assertEquals(  88, tr.getTranslateY(), 0);
     }
 
     /**
