@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>wfs</artifactId>
+  <artifactId>xsd-wfs</artifactId>
   <packaging>jar</packaging>
   <name>WFS XML Support</name>
   <description>
