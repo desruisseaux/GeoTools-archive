@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -10,7 +10,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-mrsid</artifactId>
+  <artifactId>mrsid</artifactId>
   <packaging>jar</packaging>
   <name>MrSID gridcoverage module</name>
 
@@ -67,17 +67,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
      <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -88,7 +88,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -105,4 +105,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>

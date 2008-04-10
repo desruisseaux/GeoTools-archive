@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-geotiff</artifactId>
+  <artifactId>geotiff</artifactId>
   <packaging>jar</packaging>
   <name>GeoTIFF grid coverage exchange module</name>
-  <url>http://maven.geotools.fr/reports/modules/plugin/geotiff/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geotiff/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geotiff/</url>
-  </scm>
-  
   <description>
     Datasource created to read GeoTIFF raster format.
   </description>
@@ -96,17 +87,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -119,13 +110,13 @@
     <dependency>
       <!-- We need this to make the referencing module useful. -->
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

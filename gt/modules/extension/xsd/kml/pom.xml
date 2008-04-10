@@ -14,27 +14,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-xml-xsd</artifactId>
+    <groupId>org.geotools.xsd</groupId>
+    <artifactId>xsd</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml-kml</artifactId>
+  <groupId>org.geotools.xsd</groupId>
+  <artifactId>kml</artifactId>
   <packaging>jar</packaging>
   <name>KML XML Support</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/xsd/kml/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/kml/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/kml/</url>
-  </scm>
-  
   <description>
     Filter XML support for Geotools.
   </description>
@@ -69,9 +60,9 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-core</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.version}</version>
     </dependency>    
   </dependencies>
 
@@ -79,7 +70,7 @@
     <plugins>
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-xmlcodegen</artifactId>
+        <artifactId>xmlcodegen</artifactId>
         <configuration>
           <schemaLocation>kml21.xsd</schemaLocation>
   	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/kml//</schemaSourceDirectory>
@@ -90,3 +81,4 @@
   </build>
 
 </project>
+

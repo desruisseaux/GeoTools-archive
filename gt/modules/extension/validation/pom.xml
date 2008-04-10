@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-extension</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-validation</artifactId>
+  <artifactId>validation</artifactId>
   <packaging>jar</packaging>
   <name>Validation Processor and Framework</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/validation/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/validation/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/validation/</url>
-  </scm>
-  
   <description>
     Validation module (and validator batch tool) for use with geotools2.
     This library has been ported to geotools2 as part of the VWFS project
@@ -93,30 +84,30 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-directory</artifactId>
+      <artifactId>directory</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-graph</artifactId>
+      <artifactId>graph</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>shapefile</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope> <!-- Should be "test", but this dependencies appears in the main directory! -->
     </dependency>

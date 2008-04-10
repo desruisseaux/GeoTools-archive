@@ -11,7 +11,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -56,19 +56,7 @@
   <artifactId>widgets-swing-pending</artifactId>
   <packaging>jar</packaging>
   <name>widgets-swing-pending</name>
-  <url>http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/</url>
-  <scm>
-    <connection>scm:http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/widgets-swing-pending/</url>
-  </scm>
-  
   <description>Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.</description>
-  
-  <organization>
-  </organization>
-  
-  <!-- for your project. -->
-  <inceptionYear>2007</inceptionYear>
 
   <!-- Pick your license. -->
   <!--
@@ -159,76 +147,76 @@
       <version>2.2-SNAPSHOT</version>
     </dependency>
 
-    <!-- gt2-api-2.5-SNAPSHOT.jar -->
+    <!-- api-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-coverage-2.5-SNAPSHOT.jar -->
+    <!-- coverage-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-<!-- gt2-epsg-hsql-2.5-SNAPSHOT.jar -->
+<!-- epsg-hsql-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version> 
     </dependency>
 
-    <!-- gt2-geotiff-2.5-SNAPSHOT.jar -->
+    <!-- geotiff-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-geotiff</artifactId>
+      <artifactId>geotiff</artifactId>
       <version>${project.version}</version> 
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-image</artifactId>
+      <artifactId>image</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-legacy</artifactId>
+      <artifactId>legacy</artifactId>
       <version>${project.version}</version>
     </dependency>
     
-    <!-- gt2-main-2.5-SNAPSHOT.jar -->
+    <!-- main-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-mappane-2.5-SNAPSHOT.jar -->
+    <!-- mappane-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-mappane</artifactId>
+      <artifactId>mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-metadata-2.5-SNAPSHOT.jar -->
+    <!-- metadata-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-metadata</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-cql</artifactId>
+      <artifactId>metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-oracle-spatial</artifactId>
+      <artifactId>cql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>oracle-spatial</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -236,76 +224,76 @@
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
 
 
-    <!-- gt2-referencing-2.5-SNAPSHOT.jar -->
+    <!-- referencing-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-render-2.5-SNAPSHOT.jar -->
+    <!-- render-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-render</artifactId>
+      <artifactId>render</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-shapefile-2.5-SNAPSHOT.jar -->
+    <!-- shapefile-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-shapefile-renderer-2.5-SNAPSHOT.jar -->
+    <!-- shapefile-renderer-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile-renderer</artifactId>
+      <artifactId>shapefile-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-xml-2.5-SNAPSHOT.jar -->
+    <!-- xml-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml</artifactId>
+      <artifactId>xml</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-xml-filter-2.5-SNAPSHOT.jar -->
+    <!-- xml-filter-2.5-SNAPSHOT.jar -->
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-filter</artifactId>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>filter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-xml-gml2-2.5-SNAPSHOT.jar -->
+    <!-- xml-gml2-2.5-SNAPSHOT.jar -->
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-gml2</artifactId>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gml2</artifactId>
       <version>${project.version}</version>
     </dependency>  
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-widgets-swing</artifactId>
+      <artifactId>widgets-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-xml-sld-2.5-SNAPSHOT.jar -->
+    <!-- xml-sld-2.5-SNAPSHOT.jar -->
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-sld</artifactId>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>sld</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -333,7 +321,7 @@
     <!-- jts-wrapper -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jts-wrapper</artifactId>
+      <artifactId>jts-wrapper</artifactId>
       <version>${project.version}</version>
     </dependency>
     
@@ -375,21 +363,21 @@
     <!-- WFS datastore -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-wfs</artifactId>
+      <artifactId>wfs</artifactId>
       <version>${project.version}</version>
     </dependency>
       
     <!-- WMS datastore -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-wms</artifactId>
+      <artifactId>wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <!-- process -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-process</artifactId>
+      <artifactId>process</artifactId>
       <version>${project.version}</version>
     </dependency>    
 

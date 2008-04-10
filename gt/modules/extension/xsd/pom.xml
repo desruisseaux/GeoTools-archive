@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-extension</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -23,19 +23,10 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml-xsd</artifactId>
+  <groupId>org.geotools.xsd</groupId>
+  <artifactId>xsd</artifactId>
   <packaging>pom</packaging>
   <name>XML Parsing</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/xsd/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/</url>
-  </scm>
-  
   <description>
   Parent module for xml modules.
   </description>
@@ -90,6 +81,13 @@
     </plugins>
   </build-->
 
+  <!-- =========================================================== -->
+  <!--     Build configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <finalName>gt-ext-xsd-${artifactId}-${version}</finalName>
+  </build>
+
   <modules>
     <module>core</module>
     <module>gml2</module>
@@ -102,3 +100,4 @@
   </modules>
 
 </project>
+

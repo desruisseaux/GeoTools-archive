@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-hsql</artifactId>
+  <artifactId>hsql</artifactId>
   <packaging>jar</packaging>
   <name>HSQL datasource module</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/hsql/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/hsql/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/hsql/</url>
-  </scm>
-  
   <description>
     HSQL is a lightweight (about 600k) JAVA database that
     is usefull for saving data locally. This module also uses
@@ -74,7 +65,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

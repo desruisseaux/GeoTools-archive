@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-vpf</artifactId>
+  <artifactId>vpf</artifactId>
   <packaging>jar</packaging>
   <name>VPF Plugin</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/vpf/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/vpf/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/vpf/</url>
-  </scm>
-  
   <description>
     (todo)
   </description>
@@ -99,18 +90,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -119,7 +110,7 @@
     <!-- because this is confusing to maven we need to give it a clue -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -15,20 +15,14 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-community-schemas</artifactId>
+    <artifactId>community-schemas</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
 
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-fm</artifactId>
-  <version>2.5-SNAPSHOT</version>
+  <artifactId>fm</artifactId>
   <name>ISO Feature Implementation module</name>
-  <url>http://maven.geotools.fr/reports/main/</url>
-  <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/unsupported/community-schemas/fm</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/module/unsupported/community-schemas/fm</url>
-  </scm>
   <description>
     The main module contains the key interfaces and default
     implementations that are used by other GeoTools modules.
@@ -54,8 +48,8 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-jxpath</groupId>
@@ -80,3 +74,4 @@
   <!-- ==================================================== -->
 
 </project>
+

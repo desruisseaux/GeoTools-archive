@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -23,19 +23,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-geometry</artifactId>
+  <artifactId>geometry</artifactId>
   <packaging>jar</packaging>
   <name>Geometries</name>
-  <version>2.5-SNAPSHOT</version> <!-- Remove this line when we will include this module in the full build. -->
-  <url>http://maven.geotools.fr/reports/modules/unsupported/geometry/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometry/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometry/</url>
-  </scm>
-  
   <description>
     Implementations of ISO 19107 (Spatial Schema).
   </description>
@@ -156,13 +146,13 @@
     
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>  
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>
     
@@ -173,7 +163,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>gt2-build</artifactId>
+    <artifactId>build</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-maven</artifactId>
+  <artifactId>maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven plugins for Geotools 2</name>
-  <url>http://maven.geotools.fr/reports/build/maven/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/</url>
-  </scm>
-  
   <description>
     Maven plugins specific to the the Geotools 2 project.
   </description>
@@ -69,7 +60,15 @@
       <version>1.2</version>
     </dependency>
   </dependencies>
+    
   
+  <!-- =========================================================== -->
+  <!--     Build configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <finalName>gt-mvn-${artifactId}-${version}</finalName>
+  </build>
+
   
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->

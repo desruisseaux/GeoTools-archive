@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>modules</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -56,18 +56,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-plugin</artifactId>
+  <artifactId>plugin</artifactId>
   <packaging>pom</packaging>
   <name>Geotools plugins</name>
-  <url>http://maven.geotools.fr/reports/modules/plugin/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/</url>
-  </scm>
-  
   <description>
     Geotools plugins.
   </description>
@@ -79,6 +70,15 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  
+  
+  <!-- =========================================================== -->
+  <!--     Build configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <finalName>gt-plg-${artifactId}-${version}</finalName>
+  </build>
+
 
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
@@ -106,3 +106,4 @@
   </modules>
 
 </project>
+

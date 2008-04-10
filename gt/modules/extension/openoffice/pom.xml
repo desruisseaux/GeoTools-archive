@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-extension</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-openoffice</artifactId>
+  <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
   <name>Bridges to OpenOffice suite</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/openoffice/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/</url>
-  </scm>
-  
   <description>
     Provides some Geotools's fonctionalities as OpenOffice plugins. For 
     example, the plugin provides coordinate operation services as formulas 
@@ -87,12 +78,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -137,7 +128,7 @@
       <!-- Copies the OpenOffice-generated .class files -->
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-javamaker</artifactId>
+        <artifactId>javamaker</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>
@@ -167,7 +158,7 @@
       <!-- Creates the oxt file -->
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-unopkg</artifactId>
+        <artifactId>unopkg</artifactId>
         <version>${project.version}</version>
         <configuration>
           <oxtName>geotools-${project.version}</oxtName>

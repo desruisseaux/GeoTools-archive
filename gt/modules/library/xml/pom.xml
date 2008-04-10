@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-library</artifactId>
+    <artifactId>library</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml</artifactId>
+  <artifactId>xml</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing Support</name>
-  <url>http://maven.geotools.fr/reports/modules/library/xml/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/xml/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/xml/</url>
-  </scm>
-  
   <description>
     XML Parser based on the XDO design.
   </description>
@@ -80,17 +71,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

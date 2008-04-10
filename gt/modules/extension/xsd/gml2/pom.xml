@@ -14,27 +14,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-xml-xsd</artifactId>
+    <groupId>org.geotools.xsd</groupId>
+    <artifactId>xsd</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml-gml2</artifactId>
+  <groupId>org.geotools.xsd</groupId>
+  <artifactId>gml2</artifactId>
   <packaging>jar</packaging>
   <name>GML2 XML Support</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/xsd/gml2/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml2/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml2/</url>
-  </scm>
-  
   <description>
     GML2 XML support for Geotools.
   </description>
@@ -70,33 +61,33 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>referencing</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>coverage</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-core</artifactId>
-      <version>2.5-SNAPSHOT</version>
-    </dependency>    
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <artifactId>epsg-hsql</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>    
   </dependencies>
@@ -121,7 +112,7 @@
       </plugin>
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-xmlcodegen</artifactId>
+        <artifactId>xmlcodegen</artifactId>
         <configuration>
           <schemaLocation>feature.xsd</schemaLocation>
           <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/gml2/</schemaSourceDirectory>
@@ -136,3 +127,4 @@
   
   
 </project>
+

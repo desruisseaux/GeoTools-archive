@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-db2</artifactId>
+  <artifactId>db2</artifactId>
   <packaging>jar</packaging>
   <name>DB2 Spatial Extender module</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/db2/</url>
-
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/</url>
-  </scm>
-
   <description>
     Provides a standard interface to the DB2 Spatial Extender.
     More information can be found at: http://www.software.ibm.com/data/spatial.
@@ -72,18 +63,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

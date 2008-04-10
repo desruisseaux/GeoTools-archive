@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -26,14 +26,9 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-jts-wrapper</artifactId>
+  <artifactId>jts-wrapper</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19107 implementation using JTS</name>
-  <url>http://maven.geotools.fr/reports/jtsGeometry/</url>
-  <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/jtsGeometry/</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/module/jtsGeometry/</url>
-  </scm>
   <description>
      This is a basic 2D ISO 19107 implementation which uses 
      JTS for the computational geometry.
@@ -75,7 +70,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

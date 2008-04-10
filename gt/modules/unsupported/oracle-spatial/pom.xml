@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-oracle-spatial</artifactId>
+  <artifactId>oracle-spatial</artifactId>
   <packaging>jar</packaging>
   <name>Oracle Spatial Module</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/oracle-spatial/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/oracle-spatial/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/oracle-spatial/</url>
-  </scm>
-  
   <description>
     Module offers GeoTools DataStore support for Oracle Spatial.
   </description>
@@ -147,18 +138,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

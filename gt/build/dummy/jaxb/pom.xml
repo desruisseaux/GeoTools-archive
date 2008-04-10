@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>gt2-dummy</artifactId>
+    <artifactId>dummy</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-jaxb</artifactId>
+  <artifactId>jaxb</artifactId>
   <packaging>jar</packaging>
   <name>JAXB placeholder</name>
 
@@ -71,7 +71,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.maven</groupId>
-      <artifactId>gt2-common</artifactId>
+      <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

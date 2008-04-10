@@ -12,21 +12,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-arcsde-plugin</artifactId>
+    <artifactId>arcsde-plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-arcsde</artifactId>
+  <artifactId>arcsde</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE DataStore plugin</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/arcsde/datastore/</url>
-  <scm>
-    <connection> scm:svn:http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/datastore/ </connection>
-    <url>http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/arcsde/datastore/</url>
-  </scm>
   <description> ArcSDE DataStore plugin. </description>
   <licenses>
     <license>
@@ -88,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!--
@@ -96,7 +91,7 @@
     is not being executed as it relies in non available data.
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jts-wrapper</artifactId>
+      <artifactId>jts-wrapper</artifactId>
       <version>${project.version}</version>
     </dependency>
      -->
@@ -106,30 +101,30 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-cql</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>cql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-render</artifactId>
+      <artifactId>epsg-wkt</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>render</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -151,7 +146,7 @@
       <dependencies>
         <dependency>
           <groupId>org.geotools</groupId>
-          <artifactId>gt2-sde-dummy</artifactId>
+          <artifactId>sde-dummy</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
         </dependency>

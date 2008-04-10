@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>modules</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-extension</artifactId>
+  <artifactId>extension</artifactId>
   <packaging>pom</packaging>
   <name>Geotools extensions</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/</url>
-  </scm>
-  
   <description>
     Extensions to Geotools.
   </description>
@@ -47,6 +38,14 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  
+  
+  <!-- =========================================================== -->
+  <!--     Build configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <finalName>gt-ext-${artifactId}-${version}</finalName>
+  </build>
   
   
   <!-- =========================================================== -->
@@ -64,3 +63,4 @@
 
 
 </project>
+

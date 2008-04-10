@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -57,16 +57,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-process</artifactId>
+  <artifactId>process</artifactId>
   <packaging>jar</packaging>
   <name>Process</name>
-  <url>http://maven.geotools.fr/reports/process/</url>
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/unsupported/process/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/process/</url>
-  </scm>
   
   <description>
     This is an API for creating processes/operations.
@@ -115,17 +108,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-coverageio-netcdf</artifactId>
+  <artifactId>coverageio-netcdf</artifactId>
   <packaging>jar</packaging>
   <name>Coverage I/O for NetCDF format</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio-netcdf/</url>
-
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/</url>
-  </scm>
-
   <description>
     Coverage I/O for NetCDF format.
   </description>
@@ -75,22 +66,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-metadata</artifactId>
+      <artifactId>metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverageio</artifactId>
+      <artifactId>coverageio</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

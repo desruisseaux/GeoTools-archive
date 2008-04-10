@@ -3,7 +3,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -12,26 +12,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-coveragetools</artifactId>
+  <artifactId>coveragetools</artifactId>
   <packaging>jar</packaging>
   <name>Coverage tools</name>
-  <!-- <version></version>
-  <url>http://maven.geotools.fr/reports/xml-gml2/</url>
-  <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml3/</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml3/</url>
-  </scm>
-   -->
   <description>
     Coverage tools (tools for building overviews, pyramids and the like)
   </description>
-
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>
@@ -72,27 +58,27 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-arcgrid</artifactId>
+      <artifactId>arcgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-geotiff</artifactId>
+      <artifactId>geotiff</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-image</artifactId>
+      <artifactId>image</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-imagemosaic</artifactId>
+      <artifactId>imagemosaic</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-imagepyramid</artifactId>
+      <artifactId>imagepyramid</artifactId>
       <version>${project.version}</version>
     </dependency>
 

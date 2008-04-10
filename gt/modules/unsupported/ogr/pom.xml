@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-ogr</artifactId>
+  <artifactId>ogr</artifactId>
   <packaging>jar</packaging>
   <name>OGR datastore module</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/ogr/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogr/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogr/</url>
-  </scm>
-  
   <description>
     A datastore levearing OGR for reading/writing a slew of data formats
   </description>
@@ -72,19 +63,19 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- we need mutable features and filter splitters -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- because main and sample-data depend on referencing we need a tie breaker 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     -->
@@ -92,19 +83,19 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

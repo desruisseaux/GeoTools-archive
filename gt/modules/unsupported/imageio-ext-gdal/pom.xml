@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -24,16 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-imageio-ext-gdal</artifactId>
+  <artifactId>imageio-ext-gdal</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module leveraging on the ImageI/O-Ext project</name>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/</url>
-  </scm>
 
   <description>
     Extension of the of Grid Coverage plugins, leveraging on the GDAL raster data access
@@ -80,7 +73,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -127,7 +120,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

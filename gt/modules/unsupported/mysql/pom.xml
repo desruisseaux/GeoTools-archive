@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-mysql</artifactId>
+  <artifactId>mysql</artifactId>
   <packaging>jar</packaging>
   <name>MySQL DataStore Implementation</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/mysql/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mysql/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mysql/</url>
-  </scm>
-  
   <description>
     The MySQL module contains an implementation of the DataStore interface
     (found in data), as well as the older DataSource interface (found in core),
@@ -93,7 +84,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -151,7 +151,7 @@
   <!--     Project Description                                     -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2</artifactId>
+  <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
   <version>2.5-SNAPSHOT</version>
   <name>Geotools</name>
@@ -821,6 +821,7 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
+    <finalName>gt-${artifactId}-${version}</finalName>
 
 
     <!-- ========================================================= -->
@@ -978,7 +979,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools.maven</groupId>
-            <artifactId>gt2-build-configs</artifactId>
+            <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -1062,7 +1063,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools.maven</groupId>
-            <artifactId>gt2-build-configs</artifactId>
+            <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -1161,7 +1162,7 @@
               <tagletClass>org.geotools.maven.taglet.Tutorial</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools.maven</groupId>
-                <artifactId>gt2-javadoc</artifactId>
+                <artifactId>javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>
@@ -1169,7 +1170,7 @@
               <tagletClass>org.geotools.maven.taglet.Source</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools.maven</groupId>
-                <artifactId>gt2-javadoc</artifactId>
+                <artifactId>javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>
@@ -1267,7 +1268,7 @@
             <group>
               <title>XML and derivatives (GML, SVG)</title>
               <packages>
-                org.geotools.xml*:org.geotools.gml*:org.geotools.svg*
+                org.geotools.xsd*:org.geotools.gml*:org.geotools.svg*
               </packages>
             </group>
             <group>
@@ -1458,3 +1459,4 @@
 
 
 </project>
+

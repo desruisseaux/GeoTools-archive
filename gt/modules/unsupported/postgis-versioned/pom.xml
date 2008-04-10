@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-postgis-versioned</artifactId>
+  <artifactId>postgis-versioned</artifactId>
   <packaging>jar</packaging>
   <name>Versioned PostGIS module</name>
-  <url>http://maven.geotools.fr/reports/postgis/</url>
-
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/postgis-versioned/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/postgis-versioned/</url>
-  </scm>
-
   <description>
     Used to extract and edit features from a PostGIS database along with
     feature versioning. PostGIS was developed by Refractions Research.
@@ -82,20 +73,20 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Depend on the test code as well -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

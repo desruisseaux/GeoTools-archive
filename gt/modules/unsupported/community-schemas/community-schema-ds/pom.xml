@@ -15,24 +15,14 @@
 
 	<parent>
 		<groupId>org.geotools</groupId>
-		<artifactId>gt2-community-schemas</artifactId>
+		<artifactId>community-schemas</artifactId>
 		<version>2.5-SNAPSHOT</version>
 	</parent>
 
 
 	<groupId>org.geotools</groupId>
-	<artifactId>gt2-community-schema-ds</artifactId>
-	<version>2.5-SNAPSHOT</version>
+	<artifactId>community-schema-ds</artifactId>
 	<name>Community Schemas DataStore</name>
-	<url>http://maven.geotools.fr/reports/main/</url>
-	<scm>
-		<connection>
-			scm:svn:http://svn.geotools.org/geotools/trunk/gt/module/unsupported/community-schemas/community-schema-ds
-		</connection>
-		<url>
-			http://svn.geotools.org/geotools/trunk/gt/module/unsupported/community-schemas/community-schema-ds
-		</url>
-	</scm>
 	<description>
 		The main module contains the key interfaces and default
 		implementations that are used by other GeoTools modules.
@@ -66,7 +56,7 @@
 		</dependency>
 		<dependency>
 			<!-- override transitive dependency from commons-digester 1.7
-				which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+				which depends on commons-collections 2.1, since xml (SchemaIndexImpl)
 				depends on commons-collections 3.1 -->
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
@@ -74,7 +64,7 @@
 		</dependency>
 		<dependency>
 			<!-- override transitive dependency from commons-digester 1.7
-				which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+				which depends on commons-collections 2.1, since xml (SchemaIndexImpl)
 				depends on commons-collections 3.1 -->
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -84,35 +74,35 @@
 
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt2-fm</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<artifactId>fm</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt2-data</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<artifactId>data</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt2-cql</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<artifactId>cql</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt2-xml-gml3</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<groupId>org.geotools.xsd</groupId>
+			<artifactId>gml3</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.geotools.demo</groupId>
-			<artifactId>gt2-demo-property</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<artifactId>property</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt2-sample-data</artifactId>
-			<version>2.5-SNAPSHOT</version>
+			<artifactId>sample-data</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -138,3 +128,4 @@
 		</testResources>
 	</build>
 </project>
+

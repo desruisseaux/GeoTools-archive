@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-tile</artifactId>
+  <artifactId>tile</artifactId>
   <packaging>jar</packaging>
   <name>Tile Client</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/tile/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/tile/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/tile/</url>
-  </scm>
-  
   <description>
     Tile module, supports the retrival of GridCoverage from external tile servers.
   </description>
@@ -72,23 +63,23 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-render</artifactId>
+      <artifactId>render</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-repository</artifactId>
+      <artifactId>repository</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-unsupported</artifactId>
+    <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
 
@@ -21,15 +21,8 @@
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>notifying-collections</artifactId>
-  <inceptionYear>2003</inceptionYear>
-  <version>2.5-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Notifying Collections</name>
-  <url>http://maven.geotools.fr/reports/jtsGeometry/</url>
-  <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/notifying-collections/</connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/notifying-collections/</url>
-  </scm>
   <description>
 	  Commons Events is a set of classes to enable 
 	  changes to objects to be observed.  It includes 
