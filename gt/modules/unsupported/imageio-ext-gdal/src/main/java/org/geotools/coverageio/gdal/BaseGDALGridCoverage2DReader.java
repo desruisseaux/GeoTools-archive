@@ -796,16 +796,11 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		//
 		// //
 		final ImageReadParam readP;
-
 		if (useMultithreading) {
 			readP = new DefaultCloneableImageReadParam();
 		} else {
 			readP = new ImageReadParam();
 		}
-
-		// TODO: setReadParameters has been refactored avoiding return
-		// imageChoice since GDAL automatically handle overviews.
-		final Integer imageChoice = Integer.valueOf(0);
 
 		try {
 			GeneralEnvelope req = (adjustedRequestedEnvelope.isEmpty()) ? requestedEnvelope
@@ -826,18 +821,19 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		}
 
 		final PlanarImage coverage;
-
 		if ((sourceRegion != null) && !sourceRegion.isEmpty()) {
 			readP.setSourceRegion(sourceRegion);
-		}
+//			System.out.println("sourceRegion:"+sourceRegion);
 
+		}
+//		System.out.println("sx:"+readP.getSourceXSubsampling());
+//		System.out.println("sy:"+readP.getSourceYSubsampling());
 		// //
 		//
 		// image and metadata
 		//
 		// //
 		boolean useJAI = (iUseJAI != 0) ? (iUseJAI > 0) : true;
-
 		if ((iUseJAI == 0) && (this.hints != null)) {
 			Object o = this.hints.get(Hints.USE_JAI_IMAGEREAD);
 
@@ -850,7 +846,7 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		if (useJAI) {
 			final ParameterBlock pbjImageRead = new ParameterBlock();
 			pbjImageRead.add(input);
-			pbjImageRead.add(imageChoice);
+			pbjImageRead.add(0);
 			pbjImageRead.add(Boolean.FALSE);
 			pbjImageRead.add(Boolean.FALSE);
 			pbjImageRead.add(Boolean.FALSE);
@@ -871,8 +867,9 @@ public abstract class BaseGDALGridCoverage2DReader extends
 		} else {
 			final ImageReader reader = readerSPI.createReaderInstance();
 			reader.setInput(input, true, true);
-			coverage = PlanarImage.wrapRenderedImage(reader.read(imageChoice,
+			coverage = PlanarImage.wrapRenderedImage(reader.read(0,
 					readP));
+			reader.dispose();
 
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.log(Level.FINE, "Using a direct read");
@@ -891,7 +888,6 @@ public abstract class BaseGDALGridCoverage2DReader extends
 			// adjustedRequestEnvelope
 			final int ssWidth = coverage.getWidth();
 			final int ssHeight = coverage.getHeight();
-
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth
 						+ " height = " + ssHeight);
@@ -915,7 +911,6 @@ public abstract class BaseGDALGridCoverage2DReader extends
 			final double scaleY = sourceRegion.height / (1.0 * ssHeight);
 			final double translateX = sourceRegion.x;
 			final double translateY = sourceRegion.y;
-
 			return createCoverageFromImage(coverage, ConcatenatedTransform
 					.create(ProjectiveTransform.create(new AffineTransform(
 							scaleX, 0, 0, scaleY, translateX, translateY)),
