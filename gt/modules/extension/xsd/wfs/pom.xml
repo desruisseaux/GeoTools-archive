@@ -61,7 +61,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>net.opengis.wfs</artifactId>
       <version>${project.version}</version>
       <!--version>1.1.0</version>
       <exclusions>      

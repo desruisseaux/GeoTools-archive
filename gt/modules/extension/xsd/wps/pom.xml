@@ -62,12 +62,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
-      <artifactId>wps</artifactId>
+      <artifactId>net.opengis.wps</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>net.opengis.ows</artifactId>
       <version>${project.version}</version>
     </dependency>    
   </dependencies>
