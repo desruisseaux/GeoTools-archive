@@ -123,9 +123,10 @@ public class GridToEnvelopeMapper {
     private Envelope envelope;
 
     /**
-     * The grid type. The default value is {@link PixelInCell#CELL_CENTER}.
+     * Whatever the {@code gridToCRS} transform will maps pixel center or corner.
+     * The default value is {@link PixelInCell#CELL_CENTER}.
      */
-    private PixelInCell gridType = PixelInCell.CELL_CENTER;
+    private PixelInCell anchor = PixelInCell.CELL_CENTER;
 
     /**
      * {@code true} if we should swap the two first axis, {@code false} if we should
@@ -230,19 +231,47 @@ public class GridToEnvelopeMapper {
     /**
      * Returns whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
      * or {@linkplain PixelInCell#CELL_CORNER pixel corner}.
+     *
+     * @deprecated Renamed {@link #getPixelAnchor}.
      */
+    @Deprecated
     public PixelInCell getGridType() {
-        return gridType;
+        return getPixelAnchor();
+    }
+
+    /**
+     * Returns whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
+     * or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC convention while
+     * the later is Java2D/JAI convention. The default is cell center (OGC convention).
+     *
+     * @since 2.5
+     */
+    public PixelInCell getPixelAnchor() {
+        return anchor;
     }
 
     /**
      * Set whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
      * or {@linkplain PixelInCell#CELL_CORNER pixel corner}.
+     *
+     * @deprecated Renamed {@link #setPixelAnchor}.
      */
-    public void setGridType(final PixelInCell gridType) {
-        ensureNonNull("gridType", gridType);
-        if (!Utilities.equals(this.gridType, gridType)) {
-            this.gridType = gridType;
+    @Deprecated
+    public void setGridType(final PixelInCell anchor) {
+        setPixelAnchor(anchor);
+    }
+
+    /**
+     * Sets whatever the grid range maps {@linkplain PixelInCell#CELL_CENTER pixel center}
+     * or {@linkplain PixelInCell#CELL_CORNER pixel corner}. The former is OGC convention
+     * while the later is Java2D/JAI convention.
+     *
+     * @since 2.5
+     */
+    public void setPixelAnchor(final PixelInCell anchor) {
+        ensureNonNull("anchor", anchor);
+        if (!Utilities.equals(this.anchor, anchor)) {
+            this.anchor = anchor;
             reset();
         }
     }
@@ -303,7 +332,7 @@ public class GridToEnvelopeMapper {
      * Applies heuristic rules in order to determine if the two first axis should be interchanged.
      */
     private static boolean swapXY(final CoordinateSystem cs) {
-        if (cs!=null && cs.getDimension() >= 2) {
+        if (cs != null && cs.getDimension() >= 2) {
             return AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
                    AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
         }
@@ -373,7 +402,6 @@ public class GridToEnvelopeMapper {
      * </ul>
      *
      * @return The reversal state of each axis, or {@code null} if unspecified.
-     *         For performance reason, this method do not clone the returned array.
      */
     public boolean[] getReverseAxis() {
         if (reverseAxis == null) {
@@ -392,6 +420,19 @@ public class GridToEnvelopeMapper {
                         reverseAxis[i] = !reverseAxis[i];
                     }
                 }
+            } else {
+                // No coordinate system. Reverse the second axis inconditionnaly
+                // (except if there is not enough dimensions).
+                int length = 0;
+                if (gridRange != null) {
+                    length = gridRange.getDimension();
+                } else if (envelope != null) {
+                    length = envelope.getDimension();
+                }
+                if (length >= 2) {
+                    reverseAxis = new boolean[length];
+                    reverseAxis[1] = true;
+                }
             }
         }
         return reverseAxis;
@@ -404,8 +445,7 @@ public class GridToEnvelopeMapper {
      * to {@code false}.
      *
      * @param reverse The reversal state of each axis. A {@code null} value means to
-     *        reverse no axis. For performance reason, this method do not clone the
-     *        supplied array.
+     *        reverse no axis.
      */
     public void setReverseAxis(final boolean[] reverse) {
         if (!Arrays.equals(reverseAxis, reverse)) {

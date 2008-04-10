@@ -67,7 +67,7 @@ public class MosaicBuilder {
     /**
      * The default tile size in pixels.
      */
-    private static final int DEFAULT_TILE_SIZE = 1024;
+    private static final int DEFAULT_TILE_SIZE = 512;
 
     /**
      * Minimum tile size when using {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA} without
@@ -948,9 +948,9 @@ public class MosaicBuilder {
     /**
      * Invoked automatically when a "<cite>grid to CRS</cite>" transform needs to be computed. The
      * default implementation returns a new {@link GridToEnvelopeMapper} instance in its default
-     * configuration, except for the {@linkplain GridToEnvelopeMapper#setGridType grid type} which
-     * is set to {@link PixelInCell#CELL_CORNER CELL_CORNER} (OGC specification maps pixel center,
-     * while Java I/O maps pixel upper-left corner).
+     * configuration, except for the {@linkplain GridToEnvelopeMapper#setPixelAnchor pixel anchor}
+     * which is set to {@link PixelInCell#CELL_CORNER CELL_CORNER} (OGC specification maps pixel
+     * center, while Java I/O maps pixel upper-left corner).
      * <p>
      * Subclasses may override this method in order to configure the mapper in an other way.
      *
@@ -961,7 +961,7 @@ public class MosaicBuilder {
      */
     protected GridToEnvelopeMapper createGridToEnvelopeMapper(final TileManager tiles) {
         final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
-        mapper.setGridType(PixelInCell.CELL_CORNER);
+        mapper.setPixelAnchor(PixelInCell.CELL_CORNER);
         return mapper;
     }
 
