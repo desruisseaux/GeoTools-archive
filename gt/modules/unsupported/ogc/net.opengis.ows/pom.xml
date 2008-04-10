@@ -9,17 +9,17 @@
   </parent>
 
   <groupId>org.geotools.ogc</groupId>
-  <artifactId>ows</artifactId>
+  <artifactId>net.opengis.ows</artifactId>
   <packaging>jar</packaging>
 
   <name>Open Web Services Model</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/ogc/ows</url>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/ogc/net.opengis.ows</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/ows
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.ows
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/ows</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.ows</url>
   </scm>
 
   <description>Open Web Services Schema EMF Model</description>
@@ -27,7 +27,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
-      <artifactId>xlink</artifactId>
+      <artifactId>org.w3.xlink</artifactId>
       <version>2.5-SNAPSHOT</version>
     </dependency>
   </dependencies>

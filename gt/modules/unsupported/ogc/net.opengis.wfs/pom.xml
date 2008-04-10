@@ -9,16 +9,25 @@
   </parent>
 
   <groupId>org.geotools.ogc</groupId>
-  <artifactId>wfs</artifactId>
+  <artifactId>net.opengis.wfs</artifactId>
   <packaging>jar</packaging>
 
   <name>Web Feature Service Model</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/ogc/net.opengis.wfs</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.wfs
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.wfs</url>
+  </scm>
+
   <description>Web Feature Service Schema EMF Model</description>
 
   <dependencies>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>net.opengis.ows</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

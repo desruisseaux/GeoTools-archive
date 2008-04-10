@@ -9,17 +9,17 @@
   </parent>
 
   <groupId>org.geotools.ogc</groupId>
-  <artifactId>wfsv</artifactId>
+  <artifactId>net.opengis.wfsv</artifactId>
   <packaging>jar</packaging>
 
   <name>Web Feature Service Versioning Model</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/ogc/wfsv</url>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/ogc/net.opengis.wfsv</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/wfsv
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.wfsv
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/wfsv</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ogc/net.opengis.wfsv</url>
   </scm>
 
   <description>Web Feature Service Versioning Schema EMF Model</description>
@@ -27,7 +27,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools.ogc</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>net.opengis.wfs</artifactId>
       <version>2.5-SNAPSHOT</version>
     </dependency>
   </dependencies>
