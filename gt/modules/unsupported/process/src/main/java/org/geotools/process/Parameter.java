@@ -18,7 +18,6 @@ package org.geotools.process;
 import java.util.Collections;
 import java.util.Map;
 
-import org.opengis.feature.type.FeatureType;
 import org.opengis.util.InternationalString;
 
 /**

@@ -16,8 +16,6 @@
 package org.geotools.process.impl;
 
 import org.geotools.process.ProcessFactory;
-import org.geotools.util.SimpleInternationalString;
-import org.opengis.util.InternationalString;
 
 /**
  * Super class that provides additional helper methods

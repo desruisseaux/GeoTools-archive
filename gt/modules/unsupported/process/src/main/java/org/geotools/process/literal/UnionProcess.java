@@ -25,7 +25,6 @@ import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.opengis.util.ProgressListener;
 
-import com.sun.org.apache.bcel.internal.verifier.structurals.UninitializedObjectType;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
