@@ -46,12 +46,12 @@
   </build>
 
   <modules>
-    <module>xlink</module>
-    <module>ows</module>
-    <module>wfs</module>
-    <module>wps</module>
-    <module>wcs</module>
-    <module>wfsv</module>
+    <module>org.w3.xlink</module>
+    <module>net.opengis.ows</module>
+    <module>net.opengis.wfs</module>
+    <module>net.opengis.wps</module>
+    <module>net.opengis.wcs</module>
+    <module>net.opengis.wfsv</module>
   </modules>
 
 </project>
