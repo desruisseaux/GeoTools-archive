@@ -19,7 +19,6 @@ package org.geotools.image.io.mosaic;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -47,8 +46,9 @@ public class MosaicBuilderTest extends TestBase {
         assertEquals(bounds, builder.getUntiledImageBounds());
 
         Dimension size = builder.getTileSize();
-        assertEquals(960, size.width);
-        assertEquals(900, size.height);
+        assertEquals(480, size.width);
+        assertEquals(480, size.height);
+        builder.setTileSize(new Dimension(960,900));
 
         Dimension[] subsamplings = builder.getSubsamplings();
         int[] width  = new int[] {1,2,3,3,5,6,9,10,10,15,18,18,30,45,90};
