@@ -211,12 +211,10 @@ public class MosaicImageWriter extends ImageWriter {
             tiles = Collections.emptyList();
             bytesPerPixel = 1;
         }
-        int maximumPixelCount = 0; // To be computed after a runtime.gc() when first needed.
         /*
          * Various other objects to be required in the loop...
          */
         final TreeNode       tree      = new GridNode(tiles.toArray(new Tile[tiles.size()]));
-        final Runtime        runtime   = Runtime.getRuntime();
         final ImageReadParam params    = reader.getDefaultReadParam();
         final Logger         logger    = Logging.getLogger(MosaicImageWriter.class);
         final boolean        logWrites = logger.isLoggable(level);
@@ -224,24 +222,14 @@ public class MosaicImageWriter extends ImageWriter {
         if (!logReads) {
             ((MosaicImageReader) reader).setLogLevel(level);
         }
+        final long maximumMemory = getMaximumMemoryAllocation();
+        int maximumPixelCount = (int) (maximumMemory / bytesPerPixel);
         BufferedImage image = null;
         while (!tiles.isEmpty()) {
             /*
-             * Before to attempt image loading, ask explicitly for a garbage collection cycle.
-             * In theory we should not do that, but experience suggests that it really prevent
-             * OutOfMemoryError when creating large images. If we still get OutOfMemoryError,
-             * we will try again with smaller value of 'maximumPixelCount'.
-             */
-            runtime.gc();
-            if (maximumPixelCount == 0) {
-                long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-                usedMemory = runtime.maxMemory() - 2*usedMemory;
-                maximumPixelCount = (int) Math.min(1024*1024*1024, usedMemory) / bytesPerPixel;
-            }
-            /*
-             * Loads the image for some initial tile from the list. We will write as many tiles as
-             * we can using this single image. The tiles successfully written will be removed from
-             * the list, so next iterations will process only the remaining tiles.
+             * Gets the source region for some initial tile from the list. We will write as many
+             * tiles as we can using a single image. The tiles successfully written will be removed
+             * from the list, so next iterations will process only the remaining tiles.
              */
             final Dimension imageSubsampling = new Dimension(); // Computed by next line.
             final Tile imageTile = getEnclosingTile(tiles, tree, imageSubsampling, maximumPixelCount);
@@ -249,19 +237,31 @@ public class MosaicImageWriter extends ImageWriter {
             if (image != null) {
                 final int width  = imageRegion.width  / imageSubsampling.width;
                 final int height = imageRegion.height / imageSubsampling.height;
-                if (width != image.getWidth() || height != image.getHeight()) {
-                    maximumPixelCount = 0; // Forces a new computation.
+                if (width == image.getWidth() && height == image.getHeight()) {
+                    ImageUtilities.fill(image, 0);
+                } else {
                     image = null;
-                    continue;
                 }
-                ImageUtilities.fill(image, 0);
+                /*
+                 * Next iteration may try to allocate bigger images. We do that inconditionnaly,
+                 * even if current image fit, because current image may be small due to memory
+                 * constaint during a previous iteration.
+                 */
+                maximumPixelCount = (int) (maximumMemory / bytesPerPixel);
             }
+            params.setDestination(image);
+            params.setSourceRegion(imageRegion);
+            params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
             if (logReads) {
                 logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
             }
-            params.setSourceRegion(imageRegion);
-            params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
-            params.setDestination(image);
+            /*
+             * Before to attempt image loading, ask explicitly for a garbage collection cycle.
+             * In theory we should not do that, but experience suggests that it really prevent
+             * OutOfMemoryError when creating large images. If we still get OutOfMemoryError,
+             * we will try again with smaller value of 'maximumPixelCount'.
+             */
+            System.gc();
             /*
              * Now process to the image loading. If we fails with an OutOfMemoryError (which
              * typically happen while creating the large BufferedImage), reduces the amount
@@ -475,6 +475,23 @@ public class MosaicImageWriter extends ImageWriter {
      */
     boolean isWriteEnabled() {
         return true;
+    }
+
+    /**
+     * Returns the maximal amount of memory that {@link #writeFromInput writeFromInput} is allowed
+     * to use. The default implementation computes a value from the amount of memory available in
+     * the current JVM. Subclasses can override this method for returning a different value.
+     * <p>
+     * The returned value will be considered on a <cite>best effort</cite> basis. There is no
+     * garantee that no more memory than the returned value will be used.
+     *
+     * @return An estimation of the maximum amount of memory allowed for allocation, in bytes.
+     */
+    public long getMaximumMemoryAllocation() {
+        final Runtime runtime = Runtime.getRuntime();
+        runtime.gc();
+        final long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        return Math.min(1024*1024*1024, runtime.maxMemory() - 2*usedMemory);
     }
 
     /**
