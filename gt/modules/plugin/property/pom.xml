@@ -15,52 +15,22 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>modules</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
-  <profiles>
-    <profile>
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <modules>
-        <module>epsg-access</module>      
-      </modules>
-    </profile>
-    <profile>
-      <id>Java 1.4 Specific Plugins</id>
-      <activation>
-        <jdk>1.4</jdk>
-      </activation>
-      <modules>
-         <module>arcgrid</module>
-      </modules>
-    </profile>
-    <!--profile>
-      <id>Java 5 Specific Plugins</id>
-      <activation>
-        <jdk>1.5</jdk>
-      </activation>
-      <modules>
-         <module>arcgrid</module>
-      </modules>
-    </profile-->
 
-  </profiles>
+  
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>plugin</artifactId>
-  <packaging>pom</packaging>
-  <name>Geotools plugins</name>
+  <artifactId>property</artifactId>
+  <packaging>jar</packaging>
+  <name>Property File DataStore</name>
   <description>
-    Geotools plugins.
+    DataStore based on standard Java properties files, origional created
+    as demo; now serves as a useful reference implementation.
   </description>
 
   <licenses>
@@ -70,41 +40,41 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>epsg-hsql</artifactId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
   
   
-  <!-- =========================================================== -->
-  <!--     Build configuration                                     -->
-  <!-- =========================================================== -->
-  <build>
-    <finalName>gt-plg-${artifactId}-${version}</finalName>
-  </build>
-
-
-  <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== --> 
-  <modules>
-    <module>arcgrid</module>
-    <module>arcsde</module>
-    <module>db2</module>
-    <module>epsg-access</module>
-    <module>epsg-extension</module>
-    <module>epsg-hsql</module>
-    <module>epsg-postgresql</module>
-    <module>epsg-wkt</module>
-    <module>geotiff</module>
-    <module>geometry</module>
-    <module>gtopo30</module>
-    <module>image</module>
-    <module>imagemosaic</module>
-    <module>imagepyramid</module>
-    <module>postgis</module>
-    <module>property</module>
-    <module>referencing3D</module>
-    <module>shapefile</module>
-    <module>wfs</module>
-    <module>wms</module>
-  </modules>
-
 </project>
-
