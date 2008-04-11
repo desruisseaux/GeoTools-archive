@@ -22,35 +22,36 @@ import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.BufferedImage;
-import java.io.Closeable;
 import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import javax.imageio.*;
-import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.*; // Lot of them in this class.
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
+import java.util.*; // Lot of them in this class.
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
+import java.lang.reflect.UndeclaredThrowableException;
 
 import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Loggings;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.IndexedResourceBundle;
 import org.geotools.util.logging.Logging;
 
 
@@ -72,6 +73,12 @@ public class MosaicImageWriter extends ImageWriter {
      * The logging level for tiling information during reads and writes.
      */
     private Level level = Level.FINE;
+
+    /**
+     * The executor to use for writting tiles in background thread.
+     * Will be created when first needed.
+     */
+    private ExecutorService executor;
 
     /**
      * Constructs an image writer with the default provider.
@@ -181,11 +188,13 @@ public class MosaicImageWriter extends ImageWriter {
      * @param  outputIndex The output image index, which is the index of the
      *         {@linkplain TileManager tile manager} to use in the array returned by
      *         {@link #getOutput}.
+     * @param  boolean {@code true} on success, or {@code false} if the process has been aborted.
      * @throws IOException If an error occured while reading or writing.
      */
-    public void writeFromInput(final Object input, final int inputIndex, final int outputIndex)
+    public boolean writeFromInput(final Object input, final int inputIndex, final int outputIndex)
             throws IOException
     {
+        clearAbortRequest();
         /*
          * Gets the reader first - especially before getOutput() - because the user may have
          * overriden filter(ImageReader) and set the output accordingly. TileBuilder do that.
@@ -214,11 +223,15 @@ public class MosaicImageWriter extends ImageWriter {
         /*
          * Various other objects to be required in the loop...
          */
-        final TreeNode       tree      = new GridNode(tiles.toArray(new Tile[tiles.size()]));
-        final ImageReadParam params    = reader.getDefaultReadParam();
-        final Logger         logger    = Logging.getLogger(MosaicImageWriter.class);
-        final boolean        logWrites = logger.isLoggable(level);
-        final boolean        logReads  = !(reader instanceof MosaicImageReader);
+        if (executor == null) {
+            executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        }
+        final List<Future<?>> tasks     = new ArrayList<Future<?>>();
+        final TreeNode        tree      = new GridNode(tiles.toArray(new Tile[tiles.size()]));
+        final ImageReadParam  params    = reader.getDefaultReadParam();
+        final Logger          logger    = Logging.getLogger(MosaicImageWriter.class);
+        final boolean         logWrites = logger.isLoggable(level);
+        final boolean         logReads  = !(reader instanceof MosaicImageReader);
         if (!logReads) {
             ((MosaicImageReader) reader).setLogLevel(level);
         }
@@ -226,14 +239,20 @@ public class MosaicImageWriter extends ImageWriter {
         int maximumPixelCount = (int) (maximumMemory / bytesPerPixel);
         BufferedImage image = null;
         while (!tiles.isEmpty()) {
+            if (abortRequested()) {
+                return false;
+            }
             /*
              * Gets the source region for some initial tile from the list. We will write as many
              * tiles as we can using a single image. The tiles successfully written will be removed
              * from the list, so next iterations will process only the remaining tiles.
              */
             final Dimension imageSubsampling = new Dimension(); // Computed by next line.
-            final Tile imageTile = getEnclosingTile(tiles, tree, imageSubsampling, maximumPixelCount);
+            final Tile imageTile = getEnclosingTile(tiles, tree, imageSubsampling,
+                    (image != null) ? new Dimension(image.getWidth(), image.getHeight()) : null,
+                    maximumPixelCount);
             final Rectangle imageRegion = imageTile.getAbsoluteRegion();
+            awaitTermination(tasks); // Must be invoked before we touch to the image.
             if (image != null) {
                 final int width  = imageRegion.width  / imageSubsampling.width;
                 final int height = imageRegion.height / imageSubsampling.height;
@@ -253,7 +272,7 @@ public class MosaicImageWriter extends ImageWriter {
             params.setSourceRegion(imageRegion);
             params.setSourceSubsampling(imageSubsampling.width, imageSubsampling.height, 0, 0);
             if (logReads) {
-                logger.log(getLogRecord(VocabularyKeys.LOADING_$1, imageTile));
+                logger.log(getLogRecord(false, VocabularyKeys.LOADING_$1, imageTile));
             }
             /*
              * Before to attempt image loading, ask explicitly for a garbage collection cycle.
@@ -274,6 +293,10 @@ public class MosaicImageWriter extends ImageWriter {
                 if (maximumPixelCount == 0) {
                     throw error;
                 }
+                if (logWrites) {
+                    logger.log(getLogRecord(true, LoggingKeys.RECOVERABLE_OUT_OF_MEMORY_$1,
+                                (imageRegion.width * imageRegion.height) / (1024 * 1024f)));
+                }
                 continue;
             }
             /*
@@ -293,9 +316,6 @@ public class MosaicImageWriter extends ImageWriter {
                 if (!imageRegion.contains(sourceRegion)) {
                     continue;
                 }
-                if (logWrites) {
-                    logger.log(getLogRecord(VocabularyKeys.SAVING_$1, tile));
-                }
                 final int xSubsampling = subsampling.width  / imageSubsampling.width;
                 final int ySubsampling = subsampling.height / imageSubsampling.height;
                 sourceRegion.translate(-imageRegion.x, -imageRegion.y);
@@ -308,9 +328,24 @@ public class MosaicImageWriter extends ImageWriter {
                 onTileWrite(tile, wp);
                 wp.setSourceRegion(sourceRegion);
                 wp.setSourceSubsampling(xSubsampling, ySubsampling, 0, 0);
-                writer.write(null, new IIOImage(image, null, null), wp);
-                close(writer.getOutput(), tile.getInput());
-                writer.dispose();
+                final IIOImage iioImage = new IIOImage(image, null, null);
+                final Object tileInput = tile.getInput();
+                tasks.add(executor.submit(new Callable<Object>() {
+                    public Object call() throws IOException {
+                        if (!abortRequested()) {
+                            if (logWrites) {
+                                logger.log(getLogRecord(false, VocabularyKeys.SAVING_$1, tile));
+                            }
+                            try {
+                                writer.write(null, iioImage, wp);
+                                close(writer.getOutput(), tileInput);
+                            } finally {
+                                writer.dispose();
+                            }
+                        }
+                        return null;
+                    }
+                }));
                 it.remove();
                 if (!tree.remove(tile)) {
                     throw new AssertionError(tile); // Should never happen.
@@ -320,6 +355,8 @@ public class MosaicImageWriter extends ImageWriter {
         }
         close(reader.getInput(), input);
         reader.dispose();
+        awaitTermination(tasks);
+        return !abortRequested();
     }
 
     /**
@@ -339,10 +376,55 @@ public class MosaicImageWriter extends ImageWriter {
     }
 
     /**
+     * Waits for every tasks to be completed. The tasks collection is emptied by this method.
+     *
+     * @throws IOException if at least one task threw a {@code IOException}.
+     */
+    private final void awaitTermination(final List<Future<?>> tasks) throws IOException {
+        Throwable exception = null;
+        for (int i=0; i<tasks.size(); i++) {
+            Future<?> task = tasks.get(i);
+            try {
+                task.get();
+                continue;
+            } catch (ExecutionException e) {
+                if (exception == null) {
+                    exception = e.getCause();
+                }
+                // Abort after the catch block.
+            } catch (InterruptedException e) {
+                // Abort after the catch block.
+            }
+            abort();
+            for (int j=tasks.size(); --j>i;) {
+                task = tasks.get(j);
+                if (task.cancel(false)) {
+                    tasks.remove(j);
+                }
+            }
+        }
+        tasks.clear();
+        if (exception != null) {
+            if (exception instanceof IOException) {
+                throw (IOException) exception;
+            }
+            if (exception instanceof RuntimeException) {
+                throw (RuntimeException) exception;
+            }
+            if (exception instanceof Error) {
+                throw (Error) exception;
+            }
+            throw new UndeclaredThrowableException(exception);
+        }
+    }
+
+    /**
      * Returns a log message for the given tile.
      */
-    private LogRecord getLogRecord(final int key, final Object arg) {
-        final LogRecord record = Vocabulary.getResources(locale).getLogRecord(level, key, arg);
+    private LogRecord getLogRecord(final boolean log, final int key, final Object arg) {
+        final IndexedResourceBundle bundle = log ?
+                Loggings.getResources(locale) : Vocabulary.getResources(locale);
+        final LogRecord record = bundle.getLogRecord(level, key, arg);
         record.setSourceClassName(MosaicImageWriter.class.getName());
         record.setSourceMethodName("writeFromInput");
         return record;
@@ -380,15 +462,23 @@ public class MosaicImageWriter extends ImageWriter {
      *        This is an output parameter only.
      */
     private static Tile getEnclosingTile(final List<Tile> tiles, final TreeNode tree,
-                                         final Dimension imageSubsampling,
-                                         final int maximumPixelCount)
+            final Dimension imageSubsampling, Dimension preferredSize, final int maximumPixelCount)
             throws IOException
     {
+        if (preferredSize != null) {
+            final int area = preferredSize.width * preferredSize.height;
+            if (area < maximumPixelCount / 2) {
+                // The image size was small, probably due to memory constraint in a previous
+                // iteration. Allow this method to try more aggresive memory usage.
+                preferredSize = null;
+            }
+        }
         final Set<Dimension> subsamplingDone = tiles.size() > 24 ? new HashSet<Dimension>() : null;
+        boolean selectedIsPreferredSize = false;
         Tile selectedTile = null;
         int subtileCount = 0;
         assert tree.containsAll(tiles);
-        for (final Tile tile : tiles) {
+search: for (final Tile tile : tiles) {
             /*
              * Gets the collection of tiles in the same area than the tile we are examinating.
              * We will retain the tile with the largest filtered collection. Filtering will be
@@ -414,47 +504,67 @@ public class MosaicImageWriter extends ImageWriter {
             }
             /*
              * Found a collection that may be larger than the most successful one so far. First,
-             * gets the smallest subsampling. In this process, we discart the subsampling that
-             * could not be used for reading the tile considered by the outer loop.
+             * gets the smallest subsampling. We will require tiles at the finest resolution to
+             * be written in the first pass before to go up in the pyramid. If they were written
+             * last, those small tiles would be read one-by-one, which defeat the purpose of this
+             * method (to read a bunch of tiles at once).
              */
-            final long area = (long) region.width * (long) region.height;
-            Dimension finerSubsampling = subsampling;
-            int bestSize = subsampling.width * subsampling.height;
-            for (final Iterator<Tile> it=enclosed.iterator(); it.hasNext();) {
-                final Tile subtile = it.next();
+            Dimension finestSubsampling = subsampling;
+            int smallestPixelArea = subsampling.width * subsampling.height;
+            for (final Tile subtile : enclosed) {
                 final Dimension s = subtile.getSubsampling();
-                final int size = s.width * s.height;
-                if (!isDivisor(subsampling, s) || (area / size) > maximumPixelCount) {
-                    it.remove();
-                    continue;
-                }
-                if (size < bestSize) {
-                    bestSize = size;
-                    finerSubsampling = s;
+                final int pixelArea = s.width * s.height;
+                if (pixelArea < smallestPixelArea) {
+                    smallestPixelArea = pixelArea;
+                    finestSubsampling = s;
                 }
             }
-            final int size = finerSubsampling.width * finerSubsampling.height;
+            long area = (long) region.width * (long) region.height;
+            if (area / smallestPixelArea > maximumPixelCount) {
+                continue;
+            }
             /*
              * Found a subsampling that may be finer than the tile subsampling. Now removes
              * every tiles which would consume too much memory if we try to read them using
-             * that subsampling.
+             * that subsampling. If the tiles to be removed are the finest ones, search for
+             * an other tile to write because we really want the finest resolution to be
+             * written first (see previous comment).
              */
             for (final Iterator<Tile> it=enclosed.iterator(); it.hasNext();) {
                 final Tile subtile = it.next();
-                final Rectangle subregion = subtile.getAbsoluteRegion();
-                final long pixelCount = ((long) subregion.width * (long) subregion.height) / size;
-                if (pixelCount > maximumPixelCount) {
+                final Dimension s = subtile.getSubsampling();
+                if (!isDivisor(subsampling, s)) {
                     it.remove();
+                    if (s.equals(finestSubsampling)) {
+                        continue search;
+                    }
+                    continue;
+                }
+                final Rectangle subregion = subtile.getAbsoluteRegion();
+                area = (long) subregion.width * (long) subregion.height;
+                if (area / smallestPixelArea > maximumPixelCount) {
+                    it.remove();
+                    if (s.equals(finestSubsampling)) {
+                        continue search;
+                    }
                 }
             }
             /*
              * Retains the tile with the largest filtered collection of sub-tiles.
+             * A special case is made for tile having the preferred size, in order
+             * to recycle the existing BufferedImage.
              */
             final int tileCount = enclosed.size();
-            if (selectedTile == null || tileCount > subtileCount) {
+            final boolean isPreferredSize = (preferredSize != null) &&
+                    region.width  / finestSubsampling.width  == preferredSize.width &&
+                    region.height / finestSubsampling.height == preferredSize.height;
+            if (selectedTile == null || tileCount > subtileCount ||
+                    (isPreferredSize && !selectedIsPreferredSize))
+            {
                 selectedTile = tile;
                 subtileCount = tileCount;
-                imageSubsampling.setSize(finerSubsampling);
+                selectedIsPreferredSize = isPreferredSize;
+                imageSubsampling.setSize(finestSubsampling);
             }
         }
         return selectedTile;
@@ -611,6 +721,9 @@ public class MosaicImageWriter extends ImageWriter {
      * If the output is different than the {@linkplain Tile#getInput tile input}, then it is
      * probably an {@linkplain ImageOutputStream image output stream} and closing it is caller's
      * responsability.
+     * <p>
+     * This method must returns a new instance. We are not allowed to cache and recycle writers,
+     * because more than one writer may be used simultaneously.
      *
      * @param  tile The tile to encode.
      * @param  image The image associated to the specified tile.
@@ -787,6 +900,22 @@ public class MosaicImageWriter extends ImageWriter {
     public IIOMetadata convertImageMetadata(IIOMetadata inData, ImageTypeSpecifier imageType, ImageWriteParam param) {
         return null;
     }
+
+    /**
+     * Disposes resources held by this writter. This method should be invoked when this
+     * writer is no longer in use, in order to release some threads created by the writer.
+     */
+    @Override
+    public void dispose() {
+        if (executor != null) {
+            executor.shutdown();
+            executor = null;
+        }
+        super.dispose();
+    }
+
+    // It is not strictly necessary to override finalize() since ThreadPoolExecutor
+    // already invokes shutdown() in its own finalize() method.
 
     /**
      * Service provider for {@link MosaicImageWriter}.

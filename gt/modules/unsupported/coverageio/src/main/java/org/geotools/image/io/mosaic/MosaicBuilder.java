@@ -873,6 +873,7 @@ public class MosaicBuilder {
      * @param input The image input, typically as a {@link File} or an other {@link TileManager}.
      * @param inputIndex Index of image to read, typically 0.
      * @param writeTiles If {@code true}, tiles are created and saved to disk.
+     * @return The tiles, or {@code null} if the process has been aborted while writing tiles.
      * @throws IOException if an error occured while reading the untiled image or (only if
      *         {@code writeTiles} is {@code true}) while writting the tiles to disk.
      */
@@ -903,7 +904,13 @@ public class MosaicBuilder {
         }
         final Writer writer = new Writer(inputIndex, writeTiles);
         writer.setLogLevel(getLogLevel());
-        writer.writeFromInput(input, inputIndex, 0);
+        try {
+            if (!writer.writeFromInput(input, inputIndex, 0)) {
+                return null;
+            }
+        } finally {
+            writer.dispose();
+        }
         TileManager tiles = writer.tiles;
         /*
          * Before to returns the tile manager, if no geometry has been inferred from the target

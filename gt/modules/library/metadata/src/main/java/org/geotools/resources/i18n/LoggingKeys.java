@@ -216,6 +216,11 @@ public final class LoggingKeys {
     public static final int POLYGON_CACHE_USE_$4 = 14;
 
     /**
+     * Failed to allocate {0} Mb of memory. Trying a smaller memory allocation.
+     */
+    public static final int RECOVERABLE_OUT_OF_MEMORY_$1 = 49;
+
+    /**
      * Log records are redirected to Apache commons logging.
      */
     public static final int REDIRECTED_TO_COMMONS_LOGGING = 39;
