@@ -15,13 +15,15 @@
  */
 package org.geotools.maven;
 
-// J2SE dependencies
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-// Maven and Plexus dependencies
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -33,7 +35,7 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * Copies <code>.jar</code> files in a single directory. Dependencies are copied as well,
  * except if already presents.
- * 
+ *
  * @goal collect
  * @phase package
  * @source $URL$
@@ -74,7 +76,7 @@ public class JarCollector extends AbstractMojo {
      * @parameter expression="${project.artifacts}"
      * @required
      */
-    private Set/*<Artifact>*/ dependencies;
+    private Set<Artifact> dependencies;
 
     /**
      * The Maven project running this plugin.
@@ -83,6 +85,8 @@ public class JarCollector extends AbstractMojo {
      * @required
      */
     private MavenProject project;
+
+    private final List<String> names = new ArrayList<String>();
 
     /**
      * Copies the {@code .jar} files to the collect directory.
@@ -150,29 +154,79 @@ public class JarCollector extends AbstractMojo {
         int count = 1;
         FileUtils.copyFileToDirectory(jarFile, collect);
         if (dependencies != null) {
-            for (final Iterator it=dependencies.iterator(); it.hasNext();) {
-                final Artifact artifact = (Artifact) it.next();
+            fillNamesFromResources();
+            for (final Artifact artifact : dependencies) {
                 final String scope = artifact.getScope();
                 if (scope != null &&  // Maven 2.0.6 bug?
                    (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
                     scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME)))
                 {
                     final File file = artifact.getFile();
-                    final File copy = new File(collect, file.getName());
-                    if (!copy.exists()) {
-                        /*
-                         * Copies the dependency only if it was not already copied. Note that
-                         * the module's JAR was copied inconditionnaly above (because it may
-                         * be the result of a new compilation). If a Geotools JAR from the
-                         * dependencies list changed, it will be copied inconditionnaly when
-                         * the module for this JAR will be processed by Maven.
-                         */
-                        FileUtils.copyFileToDirectory(file, collect);
-                        count++;
+                    if (artifact.getGroupId().startsWith("org.geotools")) {
+                        final String finalName = prefixedName(file);
+                        FileUtils.copyFile(file, new File(collect, finalName));
+                    } else {
+                        final File copy = new File(collect, file.getName());
+                        if (!copy.exists()) {
+                            /*
+                             * Copies the dependency only if it was not already copied. Note that
+                             * the module's JAR was copied inconditionnaly above (because it may
+                             * be the result of a new compilation). If a Geotools JAR from the
+                             * dependencies list changed, it will be copied inconditionnaly when
+                             * the module for this JAR will be processed by Maven.
+                             */
+                            FileUtils.copyFileToDirectory(file, collect);
+                            count++;
+                        }
                     }
                 }
             }
         }
         getLog().info("Copied "+count+" JAR to parent directory.");
+    }
+
+    /**
+     * Fill the list of jar names with the values found in the resource file.
+     *
+     * @throws IOException if the reading of the resource file fails.
+     */
+    private void fillNamesFromResources() throws IOException {
+        final InputStream input = getClass().getResourceAsStream("GtJars.txt");
+        final BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
+        String line;
+        while ((line = buffer.readLine()) != null) {
+            names.add(line.trim());
+        }
+        buffer.close();
+    }
+
+    /**
+     * Tests a file name with the ones present in the resource file, and returns the
+     * shortest matching name in the resource file.
+     *
+     * @param  file The file to test against the names in the resource file.
+     * @return The shortest name with a {@code gt-} prefix, or a generated name
+     *         if no matching name was found in the text file.
+     */
+    private String prefixedName(final File file) {
+        final String fileName = file.getName();
+        String match = null;
+        for (final String candidateName : names) {
+            if (candidateName.endsWith(fileName)) {
+                if (match == null) {
+                    match = candidateName;
+                } else {
+                    // There is already a name that has matched previously, we just keep
+                    // the name which is the shortest between them.
+                    if (candidateName.length() < match.length()) {
+                        match = candidateName;
+                    }
+                }
+            }
+        }
+        if (match == null) {
+            match = "gt-" + fileName;
+        }
+        return match;
     }
 }
