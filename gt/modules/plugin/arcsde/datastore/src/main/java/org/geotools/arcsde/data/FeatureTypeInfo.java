@@ -15,9 +15,13 @@
  */
 package org.geotools.arcsde.data;
 
+import java.util.logging.Logger;
+
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeQueryInfo;
 
@@ -32,6 +36,8 @@ import com.esri.sde.sdk.client.SeQueryInfo;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/FeatureTypeInfo.java $
  */
 final class FeatureTypeInfo {
+
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
     private final SimpleFeatureType featureType;
 
@@ -118,17 +124,21 @@ final class FeatureTypeInfo {
                 throw new IllegalArgumentException("In-process views can't be writable");
             }
         }
-        if (isView) {
-            throw new IllegalArgumentException("ArcSDE registered views can't be writable");
-        }
 
         this.featureType = featureType;
         this.fidStrategy = fidStrategy;
-        this.isWritable = isWritable;
         this.versioned = isMultiVersion;
         this.isView = isView;
         this.definitionQuery = definitionQuery;
         this.sdeDefinitionQuery = sdeDefinitionQuery;
+
+        if (isView && isWritable) {
+            LOGGER.info("Asked to create a writable view feature type, "
+                    + "which is not supported. Using it readonly");
+            this.isWritable = false;
+        } else {
+            this.isWritable = isWritable;
+        }
     }
 
     public String getFeatureTypeName() {
