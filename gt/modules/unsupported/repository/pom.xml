@@ -16,16 +16,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>repository</artifactId>
   <packaging>jar</packaging>
-  <version>2.5-SNAPSHOT</version>
   <name>Repository</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/repository</url>
-
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/repository
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/repository</url>
-  </scm>
 
   <description>
   A repository implementation used to manage GeoResources. The focus is on maintaining a single DataStore
@@ -59,43 +50,42 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>main</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>postgis</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>wms</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>wfs</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>   
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>render</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>shapefile</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>property</artifactId>
-      <version>2.5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

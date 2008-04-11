@@ -62,7 +62,7 @@
 			 <plugin>
 				<groupId>org.geotools.maven</groupId>
 				<artifactId>xmlcodegen</artifactId>
-				<version>2.5-SNAPSHOT</version>	
+				<version>${project.version}</version>	
 				<configuration>
 					<schemaLocation>po.xsd</schemaLocation>
 					<destinationPackage>org.geotools.po.bindings</destinationPackage>

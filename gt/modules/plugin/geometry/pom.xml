@@ -143,23 +143,20 @@
       <groupId>javax.units</groupId>
       <artifactId>jsr108</artifactId>
     </dependency>
-    
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>main</artifactId>
       <version>${project.version}</version>  
     </dependency>
-
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
