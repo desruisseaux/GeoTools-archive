@@ -194,12 +194,29 @@ public class MosaicImageWriter extends ImageWriter {
     public boolean writeFromInput(final Object input, final int inputIndex, final int outputIndex)
             throws IOException
     {
+        final boolean success;
+        final ImageReader reader = getImageReader(input);
+        try {
+            success = writeFromReader(reader, inputIndex, outputIndex);
+            close(reader.getInput(), input);
+        } finally {
+            reader.dispose();
+        }
+        return success;
+    }
+
+    /**
+     * Reads the image from the given reader and writes it as a set of tiles.
+     */
+    private boolean writeFromReader(final ImageReader reader, final int inputIndex, final int outputIndex)
+            throws IOException
+    {
         clearAbortRequest();
+        processImageStarted(outputIndex);
         /*
          * Gets the reader first - especially before getOutput() - because the user may have
          * overriden filter(ImageReader) and set the output accordingly. TileBuilder do that.
          */
-        final ImageReader reader = getImageReader(input);
         final TileManager[] managers = getOutput();
         if (managers == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_OUTPUT));
@@ -220,6 +237,7 @@ public class MosaicImageWriter extends ImageWriter {
             tiles = Collections.emptyList();
             bytesPerPixel = 1;
         }
+        final int initialTileCount = tiles.size();
         /*
          * Various other objects to be required in the loop...
          */
@@ -240,8 +258,10 @@ public class MosaicImageWriter extends ImageWriter {
         BufferedImage image = null;
         while (!tiles.isEmpty()) {
             if (abortRequested()) {
+                processWriteAborted();
                 return false;
             }
+            processImageProgress((initialTileCount - tiles.size()) * 100f / initialTileCount);
             /*
              * Gets the source region for some initial tile from the list. We will write as many
              * tiles as we can using a single image. The tiles successfully written will be removed
@@ -353,10 +373,14 @@ public class MosaicImageWriter extends ImageWriter {
             }
             assert !tiles.contains(imageTile) : imageTile;
         }
-        close(reader.getInput(), input);
-        reader.dispose();
         awaitTermination(tasks);
-        return !abortRequested();
+        if (abortRequested()) {
+            processWriteAborted();
+            return false;
+        } else {
+            processImageComplete();
+            return true;
+        }
     }
 
     /**

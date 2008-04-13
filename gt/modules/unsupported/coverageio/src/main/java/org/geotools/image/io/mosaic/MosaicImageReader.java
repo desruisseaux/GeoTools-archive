@@ -958,6 +958,7 @@ public class MosaicImageReader extends ImageReader {
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
+        processImageStarted(imageIndex);
         final Dimension subsampling = new Dimension(1,1);
         boolean subsamplingChangeAllowed = false;
         MosaicImageReadParam mosaicParam = null;
@@ -979,7 +980,7 @@ public class MosaicImageReader extends ImageReader {
         /*
          * If the subsampling changed as a result of TileManager.getTiles(...) call,
          * stores the new subsampling values in the parameters. Note that the source
-         * region will need to be computed again, which will do later.
+         * region will need to be computed again, which we will do later.
          */
         final int xSubsampling = subsampling.width;
         final int ySubsampling = subsampling.height;
@@ -1098,6 +1099,7 @@ public class MosaicImageReader extends ImageReader {
         do {
             for (final Tile tile : tiles) {
                 if (abortRequested()) {
+                    processReadAborted();
                     break;
                 }
                 final Rectangle tileRegion = tile.getAbsoluteRegion();
@@ -1263,6 +1265,7 @@ public class MosaicImageReader extends ImageReader {
             logger.log(record);
             table = null;
         } while (true);
+        processImageComplete();
         return image;
     }
 

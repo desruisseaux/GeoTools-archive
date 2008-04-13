@@ -86,6 +86,9 @@ public class JarCollector extends AbstractMojo {
      */
     private MavenProject project;
 
+    /**
+     * The list of JAR names read from {@code "GtJars.txt"} file.
+     */
     private final List<String> names = new ArrayList<String>();
 
     /**
