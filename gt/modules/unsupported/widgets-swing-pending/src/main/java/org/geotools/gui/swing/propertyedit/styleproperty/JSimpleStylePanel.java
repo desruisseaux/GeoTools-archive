@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import javax.swing.JScrollPane;
 import org.geotools.gui.swing.style.JTextSymbolizerPane;
 import org.geotools.styling.TextSymbolizer;
 
@@ -113,12 +114,12 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
                     detail = new JRasterSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
-                    add(BorderLayout.CENTER, detail.getComponent() );
+                    add(BorderLayout.CENTER, new JScrollPane(detail.getComponent()) );
                 } else if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {
                     detail = new JPolygonSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
-                   add(BorderLayout.CENTER, detail.getComponent() );
+                   add(BorderLayout.CENTER, new JScrollPane(detail.getComponent()) );
                 } else if (val.equals(MultiLineString.class) || val.equals(LineString.class)) {
                     detail = new JLineSymbolizerPane();
                     detail.setLayer(layer);
@@ -128,12 +129,12 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPan
                     detail = new JPointSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
-                    add(BorderLayout.CENTER, detail.getComponent() );
+                    add(BorderLayout.CENTER, new JScrollPane(detail.getComponent()) );
                 } else if (val.equals(TextSymbolizer.class) ) {
                     detail = new JTextSymbolizerPane();
                     detail.setLayer(layer);
                     detail.setStyle(layer.getStyle());     
-                    add(BorderLayout.CENTER, detail.getComponent() );
+                    add(BorderLayout.CENTER, new JScrollPane(detail.getComponent()) );
                 }else {        
                     detail = null;
                     add(BorderLayout.CENTER,new JLabel("<b>" + BUNDLE.getString("unknown_simplestyle") + "</b>"));
