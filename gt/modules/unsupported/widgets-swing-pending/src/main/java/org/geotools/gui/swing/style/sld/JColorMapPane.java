@@ -13,62 +13,69 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JDialog;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
-import org.geotools.styling.LinePlacement;
+import org.geotools.styling.ChannelSelection;
+import org.geotools.styling.ColorMap;
+import org.geotools.styling.ColorMapImpl;
+import org.geotools.styling.Fill;
 import org.geotools.styling.StyleBuilder;
 
 /**
- * @author johann sorel
+ * @author  johann sorel
  */
-public class JLinePlacementPane extends javax.swing.JPanel implements StyleElementEditor<LinePlacement>{
-    
+public class JColorMapPane extends javax.swing.JPanel implements StyleElementEditor<ColorMap>{
+
     private MapLayer layer = null;
-    private LinePlacement placement = null;
-    
-    public JLinePlacementPane() {
+    private ColorMap colorMap = null;
+
+    /** 
+     * Creates new form JFillPanel 
+     */
+    public JColorMapPane() {
         initComponents();
     }
-    
+
     public void setLayer(MapLayer layer) {
         this.layer = layer;
-        guiOffset.setLayer(layer);
+        guiEntrys.setLayer(layer);
     }
 
-    public MapLayer getLayer() {
+    public MapLayer getLayer(){
         return layer;
     }
-
-    public void setEdited(LinePlacement target) {
-        placement = target;
-        
-        if(placement != null){
-            guiOffset.setExpression(placement.getPerpendicularOffset());
+    
+    public void setEdited(ColorMap map) {
+        this.colorMap = map;
+        if (map != null) {
+            guiType.setValue(map.getType());            
+            guiEntrys.setEdited(map.getColorMapEntries());
         }
-        
     }
 
-    public LinePlacement getEdited() {
-        
-        if(placement == null){
-            placement = new StyleBuilder().createLinePlacement(1);
+    public ColorMap getEdited() {
+
+        if (colorMap == null) {
+            colorMap = new ColorMapImpl();
         }
-        
+
         apply();
-        return placement;
+        return colorMap;
     }
 
     public void apply() {
-        if(placement != null){
-            placement.setPerpendicularOffset(guiOffset.getExpression());
+        if (colorMap != null) {
+            colorMap.setType((Integer)guiType.getValue());
         }
     }
 
-    public Component getComponent() {
+    public Component getComponent(){
         return this;
     }
     
@@ -80,11 +87,14 @@ public class JLinePlacementPane extends javax.swing.JPanel implements StyleEleme
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        guiOffset = new org.geotools.gui.swing.style.sld.JExpressionPane();
         jLabel1 = new javax.swing.JLabel();
+        guiType = new javax.swing.JSpinner();
+        guiEntrys = new org.geotools.gui.swing.style.sld.JColorMapEntryTable();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("offset2")); // NOI18N
+        jLabel1.setText(bundle.getString("type")); // NOI18N
+
+        guiType.setModel(new javax.swing.SpinnerNumberModel());
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -93,19 +103,25 @@ public class JLinePlacementPane extends javax.swing.JPanel implements StyleEleme
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiOffset, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(guiType, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
+            .add(guiEntrys, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-            .add(guiOffset, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(guiType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(guiEntrys, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPane guiOffset;
+    private org.geotools.gui.swing.style.sld.JColorMapEntryTable guiEntrys;
+    private javax.swing.JSpinner guiType;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
-    
 }

@@ -142,7 +142,7 @@ public class JLinejoinPane extends javax.swing.JPanel {
         jButton1.setIcon(ICON_EXP);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
-        jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
+        jButton1.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1actionDialogLineCap(evt);
@@ -162,12 +162,15 @@ public class JLinejoinPane extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1))
         );
+
+        layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round, jButton1}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
             .add(but_round)
             .add(but_bevel)
             .add(but_mitre)
-            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round, jButton1}, org.jdesktop.layout.GroupLayout.VERTICAL);

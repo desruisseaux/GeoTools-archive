@@ -69,7 +69,7 @@ public class JGeomPane extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(lbl)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE))
+                .add(guiBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

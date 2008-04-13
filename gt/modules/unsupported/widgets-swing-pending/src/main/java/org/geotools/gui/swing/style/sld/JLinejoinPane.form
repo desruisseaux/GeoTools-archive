@@ -20,13 +20,13 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="but_round" min="-2" max="-2" attributes="0"/>
+              <Component id="but_round" linkSize="3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="but_bevel" min="-2" max="-2" attributes="0"/>
+              <Component id="but_bevel" linkSize="3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="but_mitre" min="-2" max="-2" attributes="0"/>
+              <Component id="but_mitre" linkSize="3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+              <Component id="jButton1" linkSize="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -35,7 +35,7 @@
           <Component id="but_round" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
           <Component id="but_bevel" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
           <Component id="but_mitre" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-          <Component id="jButton1" linkSize="2" alignment="3" pref="24" max="32767" attributes="1"/>
+          <Component id="jButton1" linkSize="2" alignment="3" max="32767" attributes="1"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -105,7 +105,7 @@
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[0, 3, 0, 3]"/>
+          <Insets value="[2, 2, 2, 2]"/>
         </Property>
       </Properties>
       <Events>

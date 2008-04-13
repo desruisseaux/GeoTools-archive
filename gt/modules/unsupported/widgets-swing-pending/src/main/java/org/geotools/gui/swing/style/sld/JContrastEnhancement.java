@@ -13,71 +13,73 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JDialog;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
-import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ChannelSelection;
+import org.geotools.styling.ColorMap;
+import org.geotools.styling.ContrastEnhancement;
+import org.geotools.styling.ContrastEnhancementImpl;
+import org.geotools.styling.Fill;
 import org.geotools.styling.StyleBuilder;
 
 /**
- *
- * @author johann sorel
+ * @author  johann sorel
  */
-public class JAnchorPointPane extends javax.swing.JPanel implements StyleElementEditor<AnchorPoint>{
-    
+public class JContrastEnhancement extends javax.swing.JPanel implements StyleElementEditor<ContrastEnhancement>{
+
     private MapLayer layer = null;
-    private AnchorPoint anchor = null;
-    
-    /** Creates new form JDisplacementPanel */
-    public JAnchorPointPane() {
+    private ContrastEnhancement enhancement = null;
+
+    /** 
+     * Creates new form JFillPanel 
+     */
+    public JContrastEnhancement() {
         initComponents();
-        init();
     }
-    
-    private void init(){
-        guiX.setType(JExpressionPane.EXP_TYPE.NUMBER);
-        guiY.setType(JExpressionPane.EXP_TYPE.NUMBER);
-    }
-    
-    public void setLayer(MapLayer layer){
-        guiX.setLayer(layer);
-        guiY.setLayer(layer);
+
+    public void setLayer(MapLayer layer) {
         this.layer = layer;
+        guiGamma.setLayer(layer);
+        guiType.setLayer(layer);
     }
-    
+
     public MapLayer getLayer(){
         return layer;
     }
-        
-    public void setEdited(AnchorPoint disp) {
-        this.anchor = disp;
-        
-        if(anchor != null){
-            guiX.setExpression(anchor.getAnchorPointX());
-            guiY.setExpression(anchor.getAnchorPointY());            
+    
+    public void setEdited(ContrastEnhancement enhancement) {
+        this.enhancement = enhancement;
+        if (enhancement != null) {
+            guiType.setExpression(enhancement.getType());
+            guiGamma.setExpression(enhancement.getGammaValue());
         }
     }
 
-    
-    public AnchorPoint getEdited(){
-        
-        if(anchor == null){
-            StyleBuilder sb = new StyleBuilder();
-            anchor = sb.createAnchorPoint(0,0);
+    public ContrastEnhancement getEdited() {
+
+        if (enhancement == null) {
+            enhancement = new ContrastEnhancementImpl();
         }
-        
+
         apply();
-        return anchor;
+        return enhancement;
     }
-            
-    public void apply(){
-        if(anchor != null){
-            anchor.setAnchorPointX(guiX.getExpression());
-            anchor.setAnchorPointY(guiY.getExpression());
+
+    public void apply() {
+        if (enhancement != null) {
+            enhancement.setGammaValue(guiGamma.getExpression());
+            enhancement.setType(guiType.getExpression());
         }
+    }
+
+    public Component getComponent(){
+        return this;
     }
     
     /** This method is called from within the constructor to
@@ -88,17 +90,17 @@ public class JAnchorPointPane extends javax.swing.JPanel implements StyleElement
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        guiType = new org.geotools.gui.swing.style.sld.JExpressionPane();
+        guiGamma = new org.geotools.gui.swing.style.sld.JExpressionPane();
         jLabel1 = new javax.swing.JLabel();
-        guiX = new org.geotools.gui.swing.style.sld.JExpressionPane();
         jLabel2 = new javax.swing.JLabel();
-        guiY = new org.geotools.gui.swing.style.sld.JExpressionPane();
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("x")); // NOI18N
+        jLabel1.setText(bundle.getString("type")); // NOI18N
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText(bundle.getString("y")); // NOI18N
+        jLabel2.setText(bundle.getString("gamma")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -107,42 +109,35 @@ public class JAnchorPointPane extends javax.swing.JPanel implements StyleElement
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiX, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(guiType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(layout.createSequentialGroup()
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiY, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(guiGamma, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        layout.linkSize(new java.awt.Component[] {guiX, guiY}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.linkSize(new java.awt.Component[] {jLabel1, jLabel2}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        layout.linkSize(new java.awt.Component[] {guiGamma, guiType}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(guiX, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(guiType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(guiY, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, guiGamma, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JExpressionPane guiX;
-    private org.geotools.gui.swing.style.sld.JExpressionPane guiY;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiGamma;
+    private org.geotools.gui.swing.style.sld.JExpressionPane guiType;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
-
-    public Component getComponent() {
-        return this;
-    }
-
-    
-    
 }
