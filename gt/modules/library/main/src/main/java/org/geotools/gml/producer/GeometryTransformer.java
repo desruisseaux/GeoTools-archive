@@ -27,14 +27,22 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 
 
 /**
- * DOCUMENT ME!
+ * Used to walk through GeometryObjects issuing SAX events
+ * as needed.
+ * <p>
+ * Please note that this GeometryTransformer issues GML2 events,
+ * the Coordinate 
  *
  * @author Ian Schneider
  * @source $URL$
@@ -95,7 +103,6 @@ public class GeometryTransformer extends TransformerBase {
             coordWriter.setPrefix( prefix );
             coordWriter.setNamespaceUri( nsUri );
         }
-        
         /**
          * Constructor for GeometryTranslator allowing the specification of the number of
          * valid dimension represented in the Coordinates.
@@ -105,15 +112,14 @@ public class GeometryTransformer extends TransformerBase {
          * @param numDecimals
          * @param isDummyZEnabled
          * @param dimension If this value is 3; the coordinate.z will be used rather than dummyZ
-         * @since 2.4.1
+         * since 2.4.1
          */
         public GeometryTranslator(ContentHandler handler, String prefix, String nsUri, int numDecimals, boolean isDummyZEnabled, int dimension) {
             this(handler,prefix,nsUri);
             coordWriter = new CoordinateWriter(numDecimals, isDummyZEnabled, dimension );
             coordWriter.setPrefix( prefix );
             coordWriter.setNamespaceUri( nsUri );
-        } 
-        
+        }        
         public boolean isDummyZEnabled(){
             return coordWriter.isDummyZEnabled();
         }
@@ -164,12 +170,13 @@ public class GeometryTransformer extends TransformerBase {
             }
             
             try {
-                Coordinate[] coords = new Coordinate[2];
-                coords[0] = new Coordinate(bounds.getMinX(), bounds.getMinY());
-                //coords[1] = new Coordinate(bounds.getMinX(), bounds.getMaxY());
-                coords[1] = new Coordinate(bounds.getMaxX(), bounds.getMaxY());
-                //coords[3] = new Coordinate(bounds.getMaxX(), bounds.getMinY());
-                coordWriter.writeCoordinates(coords, contentHandler);
+                double[] coords = new double[4];
+                coords[0] = bounds.getMinX();
+                coords[1] = bounds.getMinY();
+                coords[2] = bounds.getMaxX();
+                coords[3] = bounds.getMaxY();
+                CoordinateSequence coordSeq = new PackedCoordinateSequence.Double(coords, 2);
+                coordWriter.writeCoordinates(coordSeq, contentHandler);
             } catch (SAXException se) {
                 throw new RuntimeException(se);
             }
@@ -201,11 +208,29 @@ public class GeometryTransformer extends TransformerBase {
         	return "Box";
         }
         
+        /**
+         * Encodes the given geometry with no srsName attribute and forcing 2D
+         */
         public void encode(Geometry geometry) {
             encode(geometry, null);
         }
         
+        /**
+         * Encodes the geometry in plain 2D using the given srsName attribute value
+         * @see #encode(Geometry, String, int)
+         */
         public void encode(Geometry geometry, String srsName) {
+            encode(geometry, srsName, 2);
+        }
+        
+        /**
+         * Encodes the given geometry with the provided srsName attribute and for the specified dimensions
+         * @param geometry non null geometry to encode
+         * @param srsName srsName attribute for the geometry, or <code>null</code>
+         * @param dimensions shall laid between 1, 2, or 3. Number of coordinate dimensions to force.
+         * TODO: dimensions is not being taken into account currently. Jody?
+         */
+        public void encode(Geometry geometry, String srsName, final int dimensions) {
             String geomName = GMLUtils.getGeometryName(geometry);
             
             if ((srsName == null) || srsName.equals("")) {
@@ -218,17 +243,24 @@ public class GeometryTransformer extends TransformerBase {
             
             int geometryType = GMLUtils.getGeometryType(geometry);
             
+            CoordinateSequence coordSeq;
             switch (geometryType) {
                 case GMLUtils.POINT:
-                case GMLUtils.LINESTRING:
-                    
+                    coordSeq = ((Point) geometry).getCoordinateSequence();
                     try {
-                        coordWriter.writeCoordinates(geometry.getCoordinates(),
-                                contentHandler);
+                        coordWriter.writeCoordinates(coordSeq, contentHandler);
+                    } catch (SAXException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case GMLUtils.LINESTRING:
+                    coordSeq = ((LineString) geometry).getCoordinateSequence();
+                    try {
+                        coordWriter.writeCoordinates(coordSeq, contentHandler);
                     } catch (SAXException s) {
                         throw new RuntimeException(s);
                     }
-                    
+    
                     break;
                     
                 case GMLUtils.POLYGON:
@@ -248,7 +280,6 @@ public class GeometryTransformer extends TransformerBase {
             
             end(geomName);
         }
-        
         private void writePolygon(Polygon geometry) {
             String outBound = "outerBoundaryIs";
             String lineRing = "LinearRing";
@@ -256,10 +287,10 @@ public class GeometryTransformer extends TransformerBase {
             start(outBound);
             start(lineRing);
             
+            CoordinateSequence coordSeq;
             try {
-                coordWriter.writeCoordinates(geometry.getExteriorRing()
-                .getCoordinates(),
-                        contentHandler);
+                coordSeq = geometry.getExteriorRing().getCoordinateSequence();
+                coordWriter.writeCoordinates(coordSeq, contentHandler);
             } catch (SAXException s) {
                 throw new RuntimeException(s);
             }
@@ -272,9 +303,8 @@ public class GeometryTransformer extends TransformerBase {
                 start(lineRing);
                 
                 try {
-                    coordWriter.writeCoordinates(geometry.getInteriorRingN(i)
-                    .getCoordinates(),
-                            contentHandler);
+                    coordSeq = geometry.getInteriorRingN(i).getCoordinateSequence();
+                    coordWriter.writeCoordinates(coordSeq, contentHandler);
                 } catch (SAXException s) {
                     throw new RuntimeException(s);
                 }

@@ -1,6 +1,6 @@
 package org.geotools.gml.producer;
 
-import javax.sound.midi.Receiver;
+import junit.framework.TestCase;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -8,8 +8,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
-
-import junit.framework.TestCase;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * We need to ensure that the CoordianteWriter can output Z ordinates
@@ -21,7 +21,25 @@ import junit.framework.TestCase;
  *
  */
 public class CoordinateWriterTest extends TestCase {
-	/**
+    
+    /**
+     * Test normal 2D output 
+     * @throws Exception
+     */
+    public void test2DCoordSeq() throws Exception {
+        CoordinateSequence coords = new CoordinateArraySequence(coords2D( new int[]{1,1, 4,4, 0,4, 1,1 }));
+
+        CoordinateWriter writer = new CoordinateWriter(4);
+        CoordinateHandler output = new CoordinateHandler();
+
+        output.startDocument();
+        writer.writeCoordinates( coords, output);
+        output.endDocument();
+
+        assertEquals("<coordinates>1,1 4,4 0,4 1,1</coordinates>", output.received );
+    }
+    
+    /**
 	 * Test normal 2D output 
 	 * @throws Exception
 	 */
@@ -46,18 +64,35 @@ public class CoordinateWriterTest extends TestCase {
 		assertNotNull( coords );
 		assertEquals( 4, coords.length );
 
-		CoordinateWriter writer = new CoordinateWriter(4," ", ",", true, 0.0 );
+		final boolean useDummyZ = true;
+		final double zValue = 0.0;
+		CoordinateWriter writer = new CoordinateWriter(4," ", ",", useDummyZ, zValue);
 		CoordinateHandler output = new CoordinateHandler();
 
 		output.startDocument();
 		writer.writeCoordinates( coords, output);
 		output.endDocument();
 
+        System.out.println( output.received );
 		assertEquals("<coordinates>1,1,0 4,4,0 0,4,0 1,1,0</coordinates>", output.received );
-		System.out.println( output.received );
 	}
 
-	public void test3D() throws Exception {
+    public void test2DWithDummyZCoordSeq() throws Exception {
+        CoordinateSequence coords = new CoordinateArraySequence(coords2D( new int[]{1,1, 4,4, 0,4, 1,1 }));
+
+        final boolean useDummyZ = true;
+        final double zValue = 0.0;
+        CoordinateWriter writer = new CoordinateWriter(4," ", ",", useDummyZ, zValue);
+        CoordinateHandler output = new CoordinateHandler();
+
+        output.startDocument();
+        writer.writeCoordinates( coords, output);
+        output.endDocument();
+
+        assertEquals("<coordinates>1,1,0 4,4,0 0,4,0 1,1,0</coordinates>", output.received );
+    }
+
+    public void test3D() throws Exception {
 		Coordinate[] coords = coords3D( new int[]{1,1,3, 4,4,2, 0,4,2, 1,1,3 });
 		assertNotNull( coords );
 		assertEquals( 4, coords.length );
@@ -73,7 +108,21 @@ public class CoordinateWriterTest extends TestCase {
 		System.out.println( output.received );
 	}
 	
-	class CoordinateHandler implements ContentHandler {
+    public void test3DCoordSeq() throws Exception {
+        CoordinateSequence coords = new CoordinateArraySequence(coords3D( new int[]{1,1,3, 4,4,2, 0,4,2, 1,1,3 }));
+
+        CoordinateWriter writer = new CoordinateWriter(4," ", ",", true, 0.0, 3 );
+        CoordinateHandler output = new CoordinateHandler();
+
+        output.startDocument();
+        writer.writeCoordinates( coords, output);
+        output.endDocument();
+
+        System.out.println( output.received );
+        assertEquals("<coordinates>1,1,3 4,4,2 0,4,2 1,1,3</coordinates>", output.received );
+    }
+
+    class CoordinateHandler implements ContentHandler {
 		StringBuffer buffer;
 		String received;
 		public void characters(char[] ch, int start, int length)

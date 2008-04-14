@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 
 //import org.geotools.feature.*;
@@ -98,12 +100,12 @@ public class CoordinateWriter {
         this(numDecimals, tupleDelim, coordDelim, useDummyZ, 0);
     }
     public CoordinateWriter(int numDecimals, String tupleDelim, String coordDelim, boolean useDummyZ, double zValue) {
-        this(numDecimals, tupleDelim, coordDelim, useDummyZ, 0, 2);
+    	this(numDecimals, tupleDelim, coordDelim, useDummyZ, 0, 2);
     }
     public CoordinateWriter(int numDecimals, boolean useDummyZ,
-            int dimension) {
-        this(numDecimals, " ", ",", useDummyZ, 0, dimension );
-    }
+			int dimension) {
+    	this(numDecimals, " ", ",", useDummyZ, 0, dimension );
+	}
 
     /**
      * Create a CoordinateWriter for outputting GML coordinates.
@@ -151,7 +153,7 @@ public class CoordinateWriter {
         this.dummyZ = z;
     }
 
-    public int getNumDecimals(){
+	public int getNumDecimals(){
         return coordFormatter.getMaximumFractionDigits();
     }
     
@@ -171,6 +173,29 @@ public class CoordinateWriter {
     public void setNamespaceUri(String namespaceUri) {
         this.namespaceUri = namespaceUri;
     }
+
+    /**
+     * Write the provided list of coordinates out.
+     * <p>
+     * There are a range of constants that control exactly what
+     * is written:
+     * <ul>
+     * <li>useDummyZ: if true dummyZ will be added to each coordiante
+     * <li>namespaceAware: is true the prefix and namespaceUri will be used
+     * <li>
+     * </ul>
+     * 
+     * @param c
+     * @param output
+     * @throws SAXException
+     * @deprecated use #writeCoordinates(CoordinateSequence, ContentHandler) instead
+     */
+    public void writeCoordinates(Coordinate[] c, ContentHandler output)
+        throws SAXException {
+        writeCoordinates(new CoordinateArraySequence(c), output);
+    }
+    
+    
     /**
      * Write the provided list of coordinates out.
      * <p>
@@ -186,8 +211,8 @@ public class CoordinateWriter {
      * @param output
      * @throws SAXException
      */
-    public void writeCoordinates(Coordinate[] c, ContentHandler output)
-        throws SAXException {
+    public void writeCoordinates(CoordinateSequence c, ContentHandler output)
+    	throws SAXException {
         
         String prefix = this.prefix + ":";
         String namespaceUri = this.namespaceUri;
@@ -200,34 +225,31 @@ public class CoordinateWriter {
         output.startElement(namespaceUri, "coordinates", prefix + "coordinates",
                     atts);    
                 
-        for (int i = 0, n = c.length; i < n; i++) {
+        final int coordCount = c.size();
+        //used to check whether the coordseq handles a third dimension or not
+        final int coordSeqDimension = c.getDimension();
+        double x, y, z;
+        //write down a coordinate at a time
+        for (int i = 0, n = coordCount; i < n; i++) {
+            x = c.getOrdinate(i, 0);
+            y = c.getOrdinate(i, 1);
+            
             // clear the buffer
-            coordBuff.delete(0, coordBuff.length());
+            coordBuff.setLength(0);
             
             // format x into buffer and append delimiter
-            coordFormatter.format(c[i].x,coordBuff,zero).append(coordinateDelimiter);
-            
+            coordFormatter.format(x,coordBuff,zero).append(coordinateDelimiter);
             // format y into buffer
-            if(D == 3 || useDummyZ){
-                coordFormatter.format(c[i].y,coordBuff,zero).append(coordinateDelimiter);
-            } else{
-                coordFormatter.format(c[i].y,coordBuff,zero);
-            }
+            coordFormatter.format(y,coordBuff,zero);
             
-            // format dummy z into buffer if required
-            if( D == 3 ){
-                coordFormatter.format( c[i].z, coordBuff, zero);
-            }
-            else if(useDummyZ){
-                // 2D data being forced into 3D
-                coordFormatter.format(dummyZ, coordBuff, zero);
-            }
-            else {
-                // 2D data; no z required
+            if (D == 3 || useDummyZ) {
+                z = (D == 3 && coordSeqDimension > 2)? c.getOrdinate(i, 2) : dummyZ;
+                coordBuff.append(coordinateDelimiter);
+                coordFormatter.format(z, coordBuff, zero);
             }
             
             // if there is another coordinate, tack on a tuple delimiter
-            if (i + 1 < c.length){
+            if (i + 1 < coordCount){
                 coordBuff.append(tupleDelimiter);
             }
             
