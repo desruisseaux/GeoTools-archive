@@ -32,6 +32,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -45,12 +46,16 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class GML3EncodingUtils {
     static DirectPosition[] positions(LineString line) {
-        Coordinate[] coordinates = line.getCoordinates();
-        DirectPosition[] dps = new DirectPosition[coordinates.length];
+        CoordinateSequence coordinates = line.getCoordinateSequence();
+        DirectPosition[] dps = new DirectPosition[coordinates.size()];
+
+        double x;
+        double y;
 
         for (int i = 0; i < dps.length; i++) {
-            Coordinate coordinate = coordinates[i];
-            dps[i] = new DirectPosition2D(coordinate.x, coordinate.y);
+            x = coordinates.getOrdinate(i, 0);
+            y = coordinates.getOrdinate(i, 1);
+            dps[i] = new DirectPosition2D(x, y);
         }
 
         return dps;
