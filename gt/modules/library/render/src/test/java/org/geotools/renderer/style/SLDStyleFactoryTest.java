@@ -7,17 +7,28 @@
 
 package org.geotools.renderer.style;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Transparency;
+import java.net.URL;
 
-import org.geotools.filter.FilterFactoryFinder;
+import junit.framework.TestCase;
+
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
 import org.geotools.styling.Mark;
+import org.geotools.styling.NamedStyle;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.util.NumberRange;
+import org.opengis.filter.FilterFactory2;
 
 /**
  *
@@ -26,253 +37,106 @@ import org.geotools.util.NumberRange;
  */
 public class SLDStyleFactoryTest extends TestCase {
     
+    private StyleFactory styleFactory;
+    private SLDStyleFactory sldFactory;
+    private FilterFactory2 ff;
+    
     public SLDStyleFactoryTest(String testName) {
         super(testName);
     }
     
     protected void setUp() throws Exception {
+        styleFactory = CommonFactoryFinder.getStyleFactory( null );
+        ff = CommonFactoryFinder.getFilterFactory2( null );
+        sldFactory = new SLDStyleFactory();        
     }
     
     protected void tearDown() throws Exception {
-    }
-    
-    public static class SymbolizerKeyTest extends TestCase {
-        
-        public SymbolizerKeyTest(java.lang.String testName) {
-            
-            super(testName);
-        }
-        
-        protected void setUp() throws Exception {
-        }
-        
-        protected void tearDown() throws Exception {
-        }
-        
-        public static Test suite() {
-            TestSuite suite = new TestSuite(SymbolizerKeyTest.class);
-            
-            return suite;
-        }
-        
-        /**
-         * Test of equals method, of class org.geotools.renderer.style.SLDStyleFactory.SymbolizerKey.
-         */
-        public void testEquals() {
-            
-            // TODO add your test code below by replacing the default call to fail.
-        }
-        
-        /**
-         * Test of hashCode method, of class org.geotools.renderer.style.SLDStyleFactory.SymbolizerKey.
-         */
-        public void testHashCode() {
-            
-            // TODO add your test code below by replacing the default call to fail.
-        }
-    }
-    
-    
-    public static Test suite() {
-        TestSuite suite = new TestSuite(SLDStyleFactoryTest.class);
-        
-        return suite;
-    }
-    
-    /**
-     * Test of getHitRatio method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetHitRatio() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of getHits method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetHits() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of getRequests method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetRequests() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of createStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of createDynamicStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateDynamicStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
     }
     
     /**
      * Test of createPolygonStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
      */
     public void testCreateIncompletePolygonStyle() {
-        SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-
-        
-        PolygonSymbolizer symb;
+        PolygonSymbolizer symbolizer;
     
         //full symbolizer
-        symb = StyleFactoryFinder.createStyleFactory().createPolygonSymbolizer();
+        symbolizer = styleFactory.createPolygonSymbolizer();
         //symb.setFill(fac.createFill(FilterFactoryFinder.createFilterFactory().createLiteralExpression("#ffff00")));
         
-        sFac.createPolygonStyle(null, symb,range);
+        Style2D style = sldFactory.createPolygonStyle(null, symbolizer,range);
+        assertNotNull( style );
     }
-    
-    /**
-     * Test of createDynamicPolygonStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateDynamicPolygonStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of createLineStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateLineStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of createDynamicLineStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateDynamicLineStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
+            
     /**
      * Test of createPointStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
      */
     public void testCreateCompletePointStyle() {
-        SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
         
         PointSymbolizer symb;
         Mark myMark;
         //full symbolizer
-        symb = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
-        myMark = fac.createMark();
-        myMark.setFill(fac.createFill(FilterFactoryFinder.createFilterFactory().createLiteralExpression("#ffff00")));
-        symb.getGraphic().setSize(FilterFactoryFinder.createFilterFactory().createLiteralExpression(10));
+        symb = styleFactory.createPointSymbolizer();       
+        myMark = styleFactory.createMark();
+        myMark.setFill(styleFactory.createFill(ff.literal("#ffff00")));        
+        symb.getGraphic().setSize(ff.literal(10));
         symb.getGraphic().addMark(myMark);
-        symb.getGraphic().setOpacity(FilterFactoryFinder.createFilterFactory().createLiteralExpression(1));
-        symb.getGraphic().setRotation(FilterFactoryFinder.createFilterFactory().createLiteralExpression(0));
-        sFac.createPointStyle(null, symb,range);
-        
+        symb.getGraphic().setOpacity(ff.literal(1));
+        symb.getGraphic().setRotation(ff.literal(0));
+
+        MarkStyle2D style = (MarkStyle2D)  sldFactory.createPointStyle(null, symb,range);
+        assertEquals( Color.BLACK, style.getContour() ); // default is black
+        assertNotNull( style );
+        assertEquals( new Color( 255,255,00), style.getFill() );        
     }
     
     public void testCreateIncompletePointStyle() {
-        SLDStyleFactory sFac = new SLDStyleFactory();
         NumberRange range = new NumberRange(1,1);
-        StyleFactory fac = StyleFactoryFinder.createStyleFactory();
         
         PointSymbolizer symb;
         Mark myMark;
         //full symbolizer
-        symb = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
-        myMark = fac.createMark();
+        symb = styleFactory.createPointSymbolizer();
+        myMark = styleFactory.createMark();        
+        symb.getGraphic().addMark(myMark);        
         
-        symb.getGraphic().addMark(myMark);
-        
-        sFac.createPointStyle(null, symb,range);
-        
-    }
-    
-  
-    
- 
-    
-    /**
-     * Test of createTextStyle method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testCreateTextStyle() {
-        
-        // TODO add your test code below by replacing the default call to fail.
+        sldFactory.createPointStyle(null, symb,range);
     }
     
     /**
-     * Test of setScaleRange method, of class org.geotools.renderer.style.SLDStyleFactory.
+     * For GeoTools 2.5.x we have had a couple email reports
+     * of styling not working when working from a parsed SLD
+     * document.
      */
-    public void testSetScaleRange() {
+    public void testPointSymbolizerParsed() throws Exception {
+        URL sld = SLDStyleFactoryTest.class.getResource("test-data/star.sld");
+        SLDParser parser = new SLDParser( styleFactory );
+        parser.setInput(sld);
+        Style namedStyle = parser.readXML()[0];
+        FeatureTypeStyle featureTypeStyle = namedStyle.getFeatureTypeStyles()[0];
+        Rule rule = featureTypeStyle.getRules()[0];
+        PointSymbolizer symbolizer = (PointSymbolizer) rule.getSymbolizers()[0];
+
+        MarkStyle2D markStyle = (MarkStyle2D) sldFactory.createPointStyle(null, symbolizer, new NumberRange(1,1) );
+        Color paint = (Color) markStyle.getFill();
+        assertEquals( Color.RED.getRed(), paint.getRed() );
         
-        // TODO add your test code below by replacing the default call to fail.
+        AlphaComposite composite = (AlphaComposite) markStyle.getFillComposite();        
+        assertEquals( 0.3f, composite.getAlpha() );
     }
-    
-    /**
-     * Test of getPaint method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetPaint() {
-        
-        // TODO add your test code below by replacing the default call to fail.
+    public void testPointSymbolizerCoded() throws Exception {
+        Fill fill = styleFactory.createFill( ff.literal(Color.RED), ff.literal(0.3));
+        PointSymbolizer symbolizer = styleFactory.getDefaultPointSymbolizer();
+        Mark mark = styleFactory.createMark( ff.literal("start"), null, fill, ff.literal(5), ff.literal(0));
+        symbolizer.getGraphic().addMark( mark );
+
+        MarkStyle2D markStyle = (MarkStyle2D) sldFactory.createPointStyle(null, symbolizer, new NumberRange(1,1) );
+        Color paint = (Color) markStyle.getFill();
+        assertEquals( Color.RED.getRed(), paint.getRed() );
+
+        AlphaComposite composite = (AlphaComposite) markStyle.getFillComposite();        
+        assertEquals( 0.3f, composite.getAlpha() );
     }
-    
-    /**
-     * Test of getComposite method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetComposite() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of getTexturePaint method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetTexturePaint() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of lookUpJoin method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testLookUpJoin() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of lookUpCap method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testLookUpCap() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of getMapScaleDenominator method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testGetMapScaleDenominator() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
-    /**
-     * Test of setMapScaleDenominator method, of class org.geotools.renderer.style.SLDStyleFactory.
-     */
-    public void testSetMapScaleDenominator() {
-        
-        // TODO add your test code below by replacing the default call to fail.
-    }
-    
 }

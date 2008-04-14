@@ -365,7 +365,7 @@ public class SLDStyleFactory {
         return style;
     }
 
-    Style2D createPolygonStyle(Object feature, PolygonSymbolizer symbolizer, Range scaleRange) {
+    PolygonStyle2D createPolygonStyle(Object feature, PolygonSymbolizer symbolizer, Range scaleRange) {
         PolygonStyle2D style = new PolygonStyle2D();
 
         setScaleRange(style, scaleRange);
@@ -408,7 +408,19 @@ public class SLDStyleFactory {
         //setStroke(style, symbolizer.getStroke(), feature);
         return style;
     }
-
+    /**
+     * Style used to render the provided feature as a point.
+     * <p>
+     * Depending on the symbolizers used:
+     * <ul>
+     * <li>MarkStyle2D
+     * <li>GraphicStyle2D - used to render a glymph
+     * </ul>
+     * @param feature
+     * @param symbolizer
+     * @param scaleRange
+     * @return
+     */
     Style2D createPointStyle(Object feature, PointSymbolizer symbolizer, Range scaleRange) {
         Style2D retval = null;
 
@@ -1015,13 +1027,12 @@ public class SLDStyleFactory {
         if (fill == null) {
             return null;
         }
-
+        
         // get fill color
         Paint fillPaint = null;
-
         if (fill.getColor() != null) {
-            fillPaint = Color.decode((String) fill.getColor().evaluate(feature));
-
+            Color color = fill.getColor().evaluate( feature,Color.class );
+            fillPaint = color;
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("Setting fill: " + fillPaint.toString());
             }
@@ -1418,9 +1429,6 @@ public class SLDStyleFactory {
         if(exp == null){
             return fallback;
         }
-        Object o = exp.evaluate(f);
-        if(o instanceof Number)
-            return ((Number) o).floatValue();
         Float fo = (Float) exp.evaluate( f, Float.class );
         if( fo != null ){
             return fo.floatValue();
@@ -1429,7 +1437,6 @@ public class SLDStyleFactory {
     }
 
     private double evalToDouble(Expression exp, Object f, double fallback){
-        
         if(exp == null){
             return fallback;
         }
