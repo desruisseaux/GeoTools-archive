@@ -15,8 +15,6 @@
  */
 package org.geotools.data.ows;
 
-import org.geotools.data.wms.WMSOperationType;
-
 
 /**
  * Available WMS Operations are listed in a Request element.

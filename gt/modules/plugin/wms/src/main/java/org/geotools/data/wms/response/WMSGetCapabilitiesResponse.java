@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.GetCapabilitiesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
 import org.geotools.xml.DocumentFactory;
@@ -55,9 +55,8 @@ public class WMSGetCapabilitiesResponse extends GetCapabilitiesResponse {
 	        if (object instanceof ServiceException) {
 	        	throw (ServiceException) object;
 	        }
-	
-	        Capabilities capabilities = (Capabilities) object;
-	        this.capabilities = capabilities;
+	        
+	        this.capabilities = (Capabilities)object;
 		} finally {
 			inputStream.close();
 		}
