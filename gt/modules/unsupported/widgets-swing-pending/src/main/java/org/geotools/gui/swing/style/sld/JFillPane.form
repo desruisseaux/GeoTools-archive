@@ -21,11 +21,6 @@
               <Component id="guiColor" linkSize="2" min="-2" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jLabel1" linkSize="1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="guiBackground" linkSize="2" min="-2" max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
               <Component id="lbl2" linkSize="1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="guiAlpha" linkSize="2" min="-2" max="-2" attributes="0"/>
@@ -43,11 +38,6 @@
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="lbl_color1" max="32767" attributes="1"/>
                   <Component id="guiColor" alignment="1" min="-2" max="-2" attributes="1"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="jLabel1" max="32767" attributes="1"/>
-                  <Component id="guiBackground" alignment="0" min="-2" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -95,16 +85,6 @@
           <ResourceString bundle="org/geotools/gui/swing/style/sld/Bundle.properties" key="opacity" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
-      <Properties>
-        <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/geotools/gui/swing/style/sld/Bundle.properties" key="background" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiBackground">
     </Component>
     <Component class="org.geotools.gui.swing.style.sld.JExpressionPane" name="guiColor">
     </Component>

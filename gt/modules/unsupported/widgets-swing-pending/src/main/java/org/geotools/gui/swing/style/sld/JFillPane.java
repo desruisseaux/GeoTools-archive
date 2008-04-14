@@ -37,7 +37,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
         initComponents();
         
         guiColor.setType(JExpressionPane.EXP_TYPE.COLOR);
-        guiBackground.setType(JExpressionPane.EXP_TYPE.COLOR);
         guiAlpha.setType(JExpressionPane.EXP_TYPE.OPACITY);
     }
 
@@ -54,7 +53,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
     public void setEdited(Fill fill) {
         this.fill = fill;
         if (fill != null) {
-            guiBackground.setExpression(fill.getBackgroundColor());
             guiColor.setExpression(fill.getColor());
             guiAlpha.setExpression(fill.getOpacity());
             //handle by a button
@@ -74,7 +72,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
 
     public void apply() {
         if (fill != null) {
-            fill.setBackgroundColor(guiBackground.getExpression());
             fill.setColor(guiColor.getExpression());
             fill.setOpacity(guiAlpha.getExpression());
         }
@@ -96,8 +93,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
         jLabel3 = new javax.swing.JLabel();
         guiAlpha = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl2 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        guiBackground = new org.geotools.gui.swing.style.sld.JExpressionPane();
         guiColor = new org.geotools.gui.swing.style.sld.JExpressionPane();
         lbl_color1 = new javax.swing.JLabel();
 
@@ -117,9 +112,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
         lbl2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbl2.setText(bundle.getString("opacity")); // NOI18N
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setText(bundle.getString("background")); // NOI18N
-
         lbl_color1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbl_color1.setText(bundle.getString("color")); // NOI18N
 
@@ -132,10 +124,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(layout.createSequentialGroup()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiBackground, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(layout.createSequentialGroup()
                 .add(lbl2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(guiAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -145,9 +133,9 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
                 .add(butFill, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        layout.linkSize(new java.awt.Component[] {guiAlpha, guiBackground, guiColor}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {jLabel3, lbl2, lbl_color1}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
-        layout.linkSize(new java.awt.Component[] {jLabel1, jLabel3, lbl2, lbl_color1}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {guiAlpha, guiColor}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -155,10 +143,6 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                     .add(lbl_color1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(guiColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(guiBackground, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(lbl2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -194,9 +178,7 @@ public class JFillPane extends javax.swing.JPanel implements StyleElementEditor<
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton butFill;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiAlpha;
-    private org.geotools.gui.swing.style.sld.JExpressionPane guiBackground;
     private org.geotools.gui.swing.style.sld.JExpressionPane guiColor;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel lbl2;
     private javax.swing.JLabel lbl_color1;
