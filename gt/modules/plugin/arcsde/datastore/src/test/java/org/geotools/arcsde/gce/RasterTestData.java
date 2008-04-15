@@ -33,7 +33,7 @@ import org.geotools.arcsde.data.TestData;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBitPerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBytePerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterProducer;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.util.logging.Logging;
@@ -127,7 +127,7 @@ public class RasterTestData {
      */
     public void load1bitRaster() throws Exception {
         // we're definitely piggybacking on the testData class here
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         final String tableName = get1bitRasterTableName();
 
         // clean out the table if it's currently in-place
@@ -153,7 +153,7 @@ public class RasterTestData {
      */
     public void loadRGBRaster() throws Exception {
         // we're definitely piggybacking on the testData class here
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         final String tableName = getRGBRasterTableName();
 
         // clean out the table if it's currently in-place
@@ -173,7 +173,7 @@ public class RasterTestData {
 
     public void loadRGBColorMappedRaster() throws Exception {
         // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         final String tableName = getRGBColorMappedRasterTableName();
 
         // clean out the table if it's currently in-place
@@ -193,7 +193,7 @@ public class RasterTestData {
 
     public void loadOneByteGrayScaleRaster() throws Exception {
         // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         final String tableName = getGrayScaleOneByteRasterTableName();
 
         // clean out the table if it's currently in-place
@@ -223,7 +223,7 @@ public class RasterTestData {
         return crs;
     }
 
-    public void createRasterBusinessTempTable(String tableName, ArcSDEPooledConnection conn)
+    public void createRasterBusinessTempTable(String tableName, Session conn)
             throws Exception {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
@@ -264,7 +264,7 @@ public class RasterTestData {
             SeExtent extent,
             ArcSDERasterProducer prod,
             IndexColorModel colorModel) throws Exception {
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         try {
 
             // much of this code is from
@@ -382,7 +382,7 @@ public class RasterTestData {
             int level,
             int[] bands) throws DataSourceException, UnavailableArcSDEConnectionException {
 
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
 
         try {
             SeQuery query = conn.createSeQuery(new String[] { conn.getRasterColumn(rasterName)

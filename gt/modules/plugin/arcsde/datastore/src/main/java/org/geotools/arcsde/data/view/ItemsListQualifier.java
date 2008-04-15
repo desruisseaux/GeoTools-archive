@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -45,7 +45,7 @@ class ItemsListQualifier implements ItemsListVisitor {
     ItemsList _qualifiedList;
 
     /** DOCUMENT ME! */
-    private ArcSDEPooledConnection conn;
+    private Session conn;
 
     private Map tableAliases;
 
@@ -55,7 +55,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      * @param conn
      *            DOCUMENT ME!
      */
-    public ItemsListQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
+    public ItemsListQualifier(Session conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -70,7 +70,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static ItemsList qualify(ArcSDEPooledConnection conn, Map tableAliases, ItemsList items) {
+    public static ItemsList qualify(Session conn, Map tableAliases, ItemsList items) {
         if (items == null) {
             return null;
         }

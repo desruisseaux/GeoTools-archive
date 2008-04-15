@@ -40,7 +40,7 @@ import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
@@ -258,7 +258,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             Rectangle requestedDim,
             Integer forcedLevel) throws IOException {
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
 
             if (LOGGER.isLoggable(Level.INFO))
@@ -549,7 +549,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             throw new DataSourceException("Raster Attributes are null, can't calculated CRS info.");
         }
 
-        ArcSDEPooledConnection con = null;
+        Session con = null;
         try {
             con = connectionPool.getConnection();
             SeRasterColumn rCol = con.createSeRasterColumn(rasterAttributes.getRasterColumnId());
@@ -659,7 +659,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         connectionPool = ArcSDEConnectionPoolFactory.getInstance().createPool(sdeConfig);
 
         try {
-            ArcSDEPooledConnection scon = connectionPool.getConnection();
+            Session scon = connectionPool.getConnection();
 
             SeTable sTable = scon.getTable(rasterTable);
             SeQuery q = null;

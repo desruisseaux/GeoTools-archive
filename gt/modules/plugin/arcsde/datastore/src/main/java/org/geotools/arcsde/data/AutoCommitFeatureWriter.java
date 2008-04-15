@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
@@ -41,7 +41,7 @@ class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
     public AutoCommitFeatureWriter(final FIDReader fidReader,
                                    final SimpleFeatureType featureType,
                                    final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                                   final ArcSDEPooledConnection connection,
+                                   final Session connection,
                                    final FeatureListenerManager listenerManager,
                                    final ArcSdeVersionHandler versionHandler) throws NoSuchElementException,
                                                                              IOException {

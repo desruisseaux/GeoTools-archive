@@ -18,7 +18,7 @@ package org.geotools.arcsde.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -47,8 +47,8 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @param featureType
      * @param filteredContent
      * @param listenerManager
-     * @param transactionalConnection the {@link ArcSDEPooledConnection} to work over, with a
-     *            {@link ArcSDEPooledConnection#isTransactionActive() transaction active}
+     * @param transactionalConnection the {@link Session} to work over, with a
+     *            {@link Session#isTransactionActive() transaction active}
      * @param transaction a transaction <b>already configured</b> with the
      *            {@link ArcTransactionState} needed for this writer to work.
      * @throws NoSuchElementException

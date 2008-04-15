@@ -17,7 +17,7 @@
 package org.geotools.arcsde.data.view;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -48,7 +48,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 class FromItemQualifier implements FromItemVisitor {
     /** DOCUMENT ME! */
-    private ArcSDEPooledConnection conn;
+    private Session conn;
 
     /** DOCUMENT ME! */
     private FromItem qualifiedFromItem;
@@ -62,7 +62,7 @@ class FromItemQualifier implements FromItemVisitor {
      * @throws IllegalStateException
      *             DOCUMENT ME!
      */
-    private FromItemQualifier(ArcSDEPooledConnection conn) throws IllegalStateException {
+    private FromItemQualifier(Session conn) throws IllegalStateException {
         this.conn = conn;
     }
 
@@ -76,7 +76,7 @@ class FromItemQualifier implements FromItemVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static FromItem qualify(ArcSDEPooledConnection conn, FromItem fromItem) {
+    public static FromItem qualify(Session conn, FromItem fromItem) {
         if (fromItem == null) {
             return null;
         }

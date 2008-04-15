@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -239,7 +239,7 @@ public class ArcSDEAdapter {
      */
     public static FeatureTypeInfo fetchSchema(final String typeName,
             final String namespace,
-            final ArcSDEPooledConnection connection) throws IOException {
+            final Session connection) throws IOException {
 
         final SeLayer layer = connection.getLayer(typeName);
         final SeTable table = connection.getTable(typeName);
@@ -307,7 +307,7 @@ public class ArcSDEAdapter {
     /**
      * Creates a schema for the "SQL SELECT" like view definition
      */
-    public static FeatureTypeInfo createInprocessViewSchema(final ArcSDEPooledConnection conn,
+    public static FeatureTypeInfo createInprocessViewSchema(final Session conn,
             final String typeName,
             final String namespace,
             final PlainSelect qualifiedSelect,
@@ -870,7 +870,7 @@ public class ArcSDEAdapter {
      */
     public static void createSchema(final SimpleFeatureType featureType,
             final Map hints,
-            final ArcSDEPooledConnection connection) throws IOException, IllegalArgumentException {
+            final Session connection) throws IOException, IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
         }
@@ -1003,7 +1003,7 @@ public class ArcSDEAdapter {
         }
     }
 
-    private static SeTable createSeTable(ArcSDEPooledConnection connection,
+    private static SeTable createSeTable(Session connection,
             String qualifiedName,
             String hackColName,
             String configKeyword) throws SeException {

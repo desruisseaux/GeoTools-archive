@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
@@ -110,7 +110,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     public final ReferencedEnvelope getBounds(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
-        final ArcSDEPooledConnection connection = getConnection();
+        final Session connection = getConnection();
         ReferencedEnvelope ev;
         try {
             ev = getBounds(namedQuery, connection);
@@ -131,7 +131,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      * @throws IOException
      */
     protected ReferencedEnvelope getBounds(final Query namedQuery,
-            final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
+            final Session connection) throws DataSourceException, IOException {
         Envelope ev;
         ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery, versionHandler);
 
@@ -159,7 +159,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     public final int getCount(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
-        final ArcSDEPooledConnection connection = getConnection();
+        final Session connection = getConnection();
         final int count;
         try {
             count = getCount(namedQuery, connection);
@@ -174,7 +174,7 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     /**
      * @see FeatureSource#getCount(Query)
      */
-    protected int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
+    protected int getCount(final Query namedQuery, final Session connection)
             throws IOException {
         final int count;
         count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery, versionHandler);
@@ -192,9 +192,9 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      * @return
      * @throws IOException
      */
-    protected ArcSDEPooledConnection getConnection() throws IOException {
+    protected Session getConnection() throws IOException {
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
-        final ArcSDEPooledConnection connection = connectionPool.getConnection();
+        final Session connection = connectionPool.getConnection();
         return connection;
     }
 

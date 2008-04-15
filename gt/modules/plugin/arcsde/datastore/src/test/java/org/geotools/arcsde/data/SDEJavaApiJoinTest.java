@@ -31,7 +31,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -182,7 +182,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         testData = new TestData();
         testData.setUp();
 
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         try {
             InProcessViewSupportTestData.setUp(conn, testData);
         } finally {
@@ -475,7 +475,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiOrderBy() throws Exception {
-        ArcSDEPooledConnection conn = store.getConnectionPool().getConnection();
+        Session conn = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER, InProcessViewSupportTestData.CHILD };
@@ -549,7 +549,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiAlias() throws Exception {
-        ArcSDEPooledConnection conn = store.getConnectionPool().getConnection();
+        Session conn = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER + " AS MASTER",
@@ -604,7 +604,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiGroupBy() throws Exception {
-        ArcSDEPooledConnection conn = store.getConnectionPool().getConnection();
+        Session conn = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER, InProcessViewSupportTestData.CHILD };
@@ -682,7 +682,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiPlainSql() throws Exception {
-        ArcSDEPooledConnection conn = store.getConnectionPool().getConnection();
+        Session conn = store.getConnectionPool().getConnection();
 
         final SeQuery query = conn.createSeQuery();
         final String plainQuery = "SELECT " + InProcessViewSupportTestData.MASTER + ".ID, "

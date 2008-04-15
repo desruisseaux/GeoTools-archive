@@ -33,7 +33,7 @@ import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -100,7 +100,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDEConnectionConfig connectionConfig = new ArcSDEConnectionConfig(conProps);
         pool = ArcSDEConnectionPoolFactory.getInstance().createPool(connectionConfig);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
@@ -185,7 +185,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
 
@@ -253,7 +253,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
 
@@ -340,7 +340,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(threeBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
 
@@ -410,7 +410,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(threeBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();
@@ -496,7 +496,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(threeBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();
@@ -546,7 +546,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             scon = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();

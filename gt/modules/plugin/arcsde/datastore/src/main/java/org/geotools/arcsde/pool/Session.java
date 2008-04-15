@@ -56,7 +56,7 @@ import com.esri.sde.sdk.client.SeVersion;
  * @since 2.3.x
  * 
  */
-public class ArcSDEPooledConnection  {
+public class Session  {
     
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
 
@@ -92,14 +92,14 @@ public class ArcSDEPooledConnection  {
 	 * @param config Used to set up a SeConnection
 	 * @throws SeException If we cannot connect
 	 */
-	public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {	    
+	public Session(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {	    
 		this.connection = new SeConnection( config.getServerName(), config.getPortNumber().intValue(), config.getDatabaseName(), config.getUserName(), config.getUserPassword());
 	    this.config = config;
 		this.pool = pool;
 		this.lock = new ReentrantLock(false);
 		this.connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
 		
-		synchronized (ArcSDEPooledConnection.class) {
+		synchronized (Session.class) {
 			connectionCounter++;
 			connectionId = connectionCounter;
 		}

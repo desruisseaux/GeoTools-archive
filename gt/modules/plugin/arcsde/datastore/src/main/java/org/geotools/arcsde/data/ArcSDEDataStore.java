@@ -34,7 +34,7 @@ import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
 import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.ArcSDERunnable;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
@@ -109,7 +109,7 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool pool of {@link ArcSDEPooledConnection} this datastore works upon.
+     * @param connPool pool of {@link Session} this datastore works upon.
      */
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool) {
         this(connPool, null);
@@ -118,7 +118,7 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Creates a new ArcSDE DataStore working over the given connection pool
      * 
-     * @param connPool pool of {@link ArcSDEPooledConnection} this datastore works upon.
+     * @param connPool pool of {@link Session} this datastore works upon.
      * @param namespaceUri namespace URI for the {@link SimpleFeatureType}s, {@link AttributeType}s,
      *            and {@link AttributeDescriptor}s created by this datastore. May be
      *            <code>null</code>.
@@ -203,7 +203,7 @@ public class ArcSDEDataStore implements DataStore {
         assert query.getFilter() != null;
         assert transaction != null;
 
-        ArcSDEPooledConnection connection;
+        Session connection;
         ArcSdeVersionHandler versionHandler = ArcSdeVersionHandler.NONVERSIONED_HANDLER;
         {
             final FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(typeName);
@@ -239,7 +239,7 @@ public class ArcSDEDataStore implements DataStore {
      * @param query the Query containing the request criteria
      * @param connection the connection to use to retrieve content. It'll be closed by the returned
      *            FeatureReader<SimpleFeatureType, SimpleFeature> only if the connection does not
-     *            has a {@link ArcSDEPooledConnection#isTransactionActive() transaction in progress}.
+     *            has a {@link Session#isTransactionActive() transaction in progress}.
      * @param readerClosesConnection flag indicating whether the reader should auto-close the
      *            connection when exhausted/closed. <code>false</code> indicates never close it as
      *            its being used as the streamed content of a feature writer.
@@ -247,7 +247,7 @@ public class ArcSDEDataStore implements DataStore {
      * @throws IOException
      */
     FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
-            final ArcSDEPooledConnection connection,
+            final Session connection,
             final boolean readerClosesConnection,
             final ArcSdeVersionHandler versionHandler) throws IOException {
         final String typeName = query.getTypeName();
@@ -392,7 +392,7 @@ public class ArcSDEDataStore implements DataStore {
      * @param transaction
      */
     void getConnection( ArcSDERunnable runnable, String typeName, Transaction transaction ) throws IOException {
-        final ArcSDEPooledConnection connection;
+        final Session connection;
         final ArcTransactionState state;
         
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
@@ -417,7 +417,7 @@ public class ArcSDEDataStore implements DataStore {
             final Transaction transaction) throws IOException {
         // get the connection the streamed writer content has to work over
         // so the reader and writer share it
-        final ArcSDEPooledConnection connection;
+        final Session connection;
         final ArcTransactionState state;
         final boolean versioned;
         final ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, transaction);
@@ -577,7 +577,7 @@ public class ArcSDEDataStore implements DataStore {
      */
     private org.opengis.filter.Filter getUnsupportedFilter(final FeatureTypeInfo typeInfo,
             final Filter filter,
-            final ArcSDEPooledConnection conn) {
+            final Session conn) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
@@ -663,7 +663,7 @@ public class ArcSDEDataStore implements DataStore {
      * @return Generated FeatureTypeInfo for typeName
      */
     protected synchronized FeatureTypeInfo getFeatureTypeInfo( String typeName, ArcSDEConnectionPool pool ) throws IOException {
-        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        final Session conn = getConnectionPool().getConnection();
         try {
             return getFeatureTypeInfo(typeName, conn);
         } finally {
@@ -672,7 +672,7 @@ public class ArcSDEDataStore implements DataStore {
     }
     
     synchronized FeatureTypeInfo getFeatureTypeInfo(final String typeName,
-            final ArcSDEPooledConnection connection) throws IOException {
+            final Session connection) throws IOException {
 
         FeatureTypeInfo ftInfo = inProcessFeatureTypeInfos.get(typeName);
 
@@ -714,7 +714,7 @@ public class ArcSDEDataStore implements DataStore {
      */
     public void createSchema(final SimpleFeatureType featureType, final Map<String, String> hints)
             throws IOException, IllegalArgumentException {
-        final ArcSDEPooledConnection connection = connectionPool.getConnection();
+        final Session connection = connectionPool.getConnection();
         try {
             ArcSDEAdapter.createSchema(featureType, hints, connection);
         } finally {
@@ -746,7 +746,7 @@ public class ArcSDEDataStore implements DataStore {
 
         verifyQueryIsSupported(select);
 
-        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+        final Session conn = connectionPool.getConnection();
 
         try {
             final PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);

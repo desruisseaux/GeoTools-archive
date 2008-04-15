@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
@@ -57,7 +57,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     private List /* <SelectExpressionItem> */qualifiedItems = Collections.EMPTY_LIST;
 
     /** DOCUMENT ME! */
-    private ArcSDEPooledConnection conn;
+    private Session conn;
 
     private Map tableAliases;
 
@@ -67,7 +67,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
      * @param conn
      *            DOCUMENT ME!
      */
-    private SelectItemQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
+    private SelectItemQualifier(Session conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -82,7 +82,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
      * 
      * @return DOCUMENT ME!
      */
-    public static List qualify(ArcSDEPooledConnection conn, Map tableAliases, SelectItem item) {
+    public static List qualify(Session conn, Map tableAliases, SelectItem item) {
         if (item == null) {
             return null;
         }

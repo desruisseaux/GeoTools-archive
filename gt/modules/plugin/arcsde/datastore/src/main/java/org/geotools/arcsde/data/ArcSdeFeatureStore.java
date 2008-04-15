@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
@@ -119,7 +119,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
         // System.err.println(">>addFeatures called at " +
         // Thread.currentThread().getName());
         final String typeName = typeInfo.getFeatureTypeName();
-        final ArcSDEPooledConnection connection = getConnection();
+        final Session connection = getConnection();
         connection.getLock().lock();
         try {
             final FeatureWriter<SimpleFeatureType, SimpleFeature> writer = dataStore
@@ -154,7 +154,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
 
     @Override
     protected final ReferencedEnvelope getBounds(final Query namedQuery,
-            final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
+            final Session connection) throws DataSourceException, IOException {
         connection.getLock().lock();
         try {
             return super.getBounds(namedQuery, connection);
@@ -164,7 +164,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     }
 
     @Override
-    protected int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
+    protected int getCount(final Query namedQuery, final Session connection)
             throws IOException {
         connection.getLock().lock();
         try {
@@ -181,7 +181,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
     public void modifyFeatures(final AttributeDescriptor[] attributes,
             final Object[] values,
             final Filter filter) throws IOException {
-        final ArcSDEPooledConnection connection = getConnection();
+        final Session connection = getConnection();
         connection.getLock().lock();
         try {
             final String typeName = typeInfo.getFeatureTypeName();
@@ -225,7 +225,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
      * @see FeatureStore#removeFeatures(Filter)
      */
     public void removeFeatures(final Filter filter) throws IOException {
-        final ArcSDEPooledConnection connection;
+        final Session connection;
         final Transaction currTransaction = getTransaction();
         if (Transaction.AUTO_COMMIT == currTransaction) {
             connection = null;
@@ -274,7 +274,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
         }
 
         final String typeName = typeInfo.getFeatureTypeName();
-        final ArcSDEPooledConnection connection = getConnection();
+        final Session connection = getConnection();
         connection.getLock().lock();
         try {
             // truncate using this connection to apply or not depending on
@@ -310,7 +310,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
      * @param connection
      * @throws DataSourceException
      */
-    private void truncate(final String typeName, final ArcSDEPooledConnection connection)
+    private void truncate(final String typeName, final Session connection)
             throws IOException {
         final boolean transactionInProgress = connection.isTransactionActive();
         final SeTable table = connection.getTable(typeName);
@@ -341,11 +341,11 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements
      * connection pool as key. Otherwise asks the pool for a new connection.
      */
     @Override
-    protected ArcSDEPooledConnection getConnection() throws IOException,
+    protected Session getConnection() throws IOException,
             UnavailableArcSDEConnectionException {
         final Transaction currTransaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
-        ArcSDEPooledConnection connection;
+        Session connection;
         if (Transaction.AUTO_COMMIT.equals(currTransaction)) {
             connection = connectionPool.getConnection();
         } else {

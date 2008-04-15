@@ -32,7 +32,7 @@ import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -78,7 +78,7 @@ class ArcSDEQuery {
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
      */
-    final ArcSDEPooledConnection connection;
+    final Session connection;
 
     /**
      * The exact feature type this query is about to request from the arcsde server. It could have
@@ -120,7 +120,7 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      * @see prepareQuery
      */
-    private ArcSDEQuery(final ArcSDEPooledConnection connection,
+    private ArcSDEQuery(final Session connection,
                         final SimpleFeatureType schema,
                         final FilterSet filterSet,
                         final FIDReader fidReader,
@@ -145,7 +145,7 @@ class ArcSDEQuery {
      * @return
      * @throws IOException
      */
-    public static ArcSDEQuery createQuery(final ArcSDEPooledConnection conn,
+    public static ArcSDEQuery createQuery(final Session conn,
             final SimpleFeatureType fullSchema,
             final Query query,
             final FIDReader fidReader,
@@ -175,7 +175,7 @@ class ArcSDEQuery {
      * @throws IOException see <i>throws DataSourceException</i> bellow.
      * @see ArcSDEDataStore#registerView(String, PlainSelect)
      */
-    public static ArcSDEQuery createInprocessViewQuery(final ArcSDEPooledConnection conn,
+    public static ArcSDEQuery createInprocessViewQuery(final Session conn,
             final SimpleFeatureType fullSchema,
             final Query query,
             final SeQueryInfo definitionQuery,
@@ -331,7 +331,7 @@ class ArcSDEQuery {
      * created with this method can be used to execute and fetch results. They cannot be used for
      * other operations, such as calculating layer extents, or result count.
      * <p>
-     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is tha this
+     * Difference with {@link #createSeQueryForFetch(Session, String[])} is tha this
      * function tells <code>SeQuery.setSpatialConstraints</code> to NOT return geometry based
      * bitmasks, which are needed for calculating the query extent and result count, but not for
      * fetching SeRows.
@@ -426,7 +426,7 @@ class ArcSDEQuery {
      * created with this method are to be used for calculating layer extents and result counts.
      * These queries cannot be executed or used to fetch results.
      * <p>
-     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])} is that this
+     * Difference with {@link #createSeQueryForFetch(Session, String[])} is that this
      * function tells <code>SeQuery.setSpatialConstraints</code> to return geometry based
      * bitmasks, which are needed for calculating the query extent and result count, but not for
      * fetching SeRows.
@@ -488,7 +488,7 @@ class ArcSDEQuery {
     /**
      * Convenient method to just calculate the result count of a given query.
      */
-    public static int calculateResultCount(final ArcSDEPooledConnection connection,
+    public static int calculateResultCount(final Session connection,
             final FeatureTypeInfo typeInfo,
             final Query query,
             final ArcSdeVersionHandler versioningHandler) throws IOException {
@@ -519,7 +519,7 @@ class ArcSDEQuery {
     /**
      * Convenient method to just calculate the resulting bound box of a given query.
      */
-    public static Envelope calculateQueryExtent(final ArcSDEPooledConnection connection,
+    public static Envelope calculateQueryExtent(final Session connection,
             final FeatureTypeInfo typeInfo,
             final Query query,
             final ArcSdeVersionHandler versioningHandler) throws IOException {
@@ -720,7 +720,7 @@ class ArcSDEQuery {
     /**
      * Closes the query.
      * <p>
-     * The {@link ArcSDEPooledConnection connection} used by the query is not closed by this
+     * The {@link Session connection} used by the query is not closed by this
      * operation as it was provided by the calling code and thus it is its responsibility to handle
      * the connection life cycle.
      * </p>

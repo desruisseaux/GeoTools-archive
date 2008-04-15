@@ -762,6 +762,7 @@ public abstract class ArcSDEGeometryBuilder {
         @Override
         protected Geometry newGeometry(double[][][] coords) throws DataSourceException {
             // /////
+            /*
             for (int i = 0; i < coords.length; i++) {
                 for (int j = 0; j < coords[i].length; j++) {
                     double[] ds = coords[i][j];
@@ -769,7 +770,7 @@ public abstract class ArcSDEGeometryBuilder {
                 }
             }
             //System.out.println("-----");
-
+            */
             // ///////
 
             double[] shell = coords[0][0];

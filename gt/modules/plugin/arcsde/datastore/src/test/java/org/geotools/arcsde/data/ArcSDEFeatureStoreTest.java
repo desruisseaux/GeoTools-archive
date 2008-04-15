@@ -33,7 +33,7 @@ import junit.framework.TestSuite;
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -200,7 +200,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
 
         ArcSDEConnectionPool connectionPool = testData.getConnectionPool();
-        ArcSDEPooledConnection connection = connectionPool.getConnection();
+        Session connection = connectionPool.getConnection();
         SeQuery seQuery;
         try {
             int objectId = (int) ArcSDEAdapter.getNumericFid(fid);
@@ -291,7 +291,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final String typeName;
         {
             ArcSDEConnectionPool connectionPool = testData.getConnectionPool();
-            ArcSDEPooledConnection connection = connectionPool.getConnection();
+            Session connection = connectionPool.getConnection();
             final String user;
             user = connection.getUser();
             connection.close();
@@ -1300,7 +1300,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+                Session conn = testData.getConnectionPool().getConnection();
                 try {
                     SeTable versionedTable = testData.createVersionedTable(conn);
                     tableName = versionedTable.getQualifiedName();
@@ -1398,7 +1398,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+                Session conn = testData.getConnectionPool().getConnection();
                 try {
                     SeTable versionedTable = testData.createVersionedTable(conn);
                     tableName = versionedTable.getQualifiedName();

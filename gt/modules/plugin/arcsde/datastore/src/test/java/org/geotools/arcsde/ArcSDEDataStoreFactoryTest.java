@@ -27,7 +27,7 @@ import org.geotools.arcsde.data.ArcSDEDataStore;
 import org.geotools.arcsde.data.InProcessViewSupportTestData;
 import org.geotools.arcsde.data.TestData;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -174,7 +174,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
      * @throws SeException
      */
     public void testCreateDataStoreWithInProcessViews() throws IOException, SeException {
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
         try {
             InProcessViewSupportTestData.setUp(conn, testData);
         } finally {

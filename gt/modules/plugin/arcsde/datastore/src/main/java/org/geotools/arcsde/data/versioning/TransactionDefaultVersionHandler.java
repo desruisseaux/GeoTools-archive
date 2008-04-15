@@ -18,7 +18,7 @@ package org.geotools.arcsde.data.versioning;
 import java.io.IOException;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -38,7 +38,7 @@ import com.esri.sde.sdk.client.SeVersion;
  */
 public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
 
-    private final ArcSDEPooledConnection connection;
+    private final Session connection;
 
     private final SeVersion defaultVersion;
 
@@ -48,7 +48,7 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
 
     private SeState transactionState;
 
-    public TransactionDefaultVersionHandler(final ArcSDEPooledConnection connection) throws IOException {
+    public TransactionDefaultVersionHandler(final Session connection) throws IOException {
         this.connection = connection;
         try {
             defaultVersion = connection.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
@@ -64,7 +64,7 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
      * 
      * @see ArcSdeVersionHandler#
      */
-    public void setUpStream(final ArcSDEPooledConnection connection, SeStreamOp streamOperation)
+    public void setUpStream(final Session connection, SeStreamOp streamOperation)
             throws IOException {
         if (transactionState == null) {
             try {

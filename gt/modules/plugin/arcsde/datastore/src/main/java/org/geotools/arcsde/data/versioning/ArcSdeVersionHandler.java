@@ -17,7 +17,7 @@ package org.geotools.arcsde.data.versioning;
 
 import java.io.IOException;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeStreamOp;
@@ -36,7 +36,7 @@ public interface ArcSdeVersionHandler {
      * @param streamOperation
      * @throws IOException
      */
-    void setUpStream(ArcSDEPooledConnection connection, SeStreamOp streamOperation) throws IOException;
+    void setUpStream(Session connection, SeStreamOp streamOperation) throws IOException;
 
     /**
      * Called when a single edit operation that was settled up with {@link #setUpStream(SeStreamOp)}
@@ -90,7 +90,7 @@ public interface ArcSdeVersionHandler {
             // do nothing, not a versioned table
         }
 
-        public void setUpStream(ArcSDEPooledConnection connection, SeStreamOp streamOperation)
+        public void setUpStream(Session connection, SeStreamOp streamOperation)
                 throws IOException {
             // do nothing, not a versioned table
         }

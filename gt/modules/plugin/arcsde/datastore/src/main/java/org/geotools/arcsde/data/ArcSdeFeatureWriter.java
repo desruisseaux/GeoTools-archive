@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -80,7 +80,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     /**
      * Connection to hold while this feature writer is alive.
      */
-    protected ArcSDEPooledConnection connection;
+    protected Session connection;
 
     /**
      * Reader for streamed access to filtered content this writer acts upon.
@@ -94,7 +94,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
 
     /**
      * Map of {row index/mutable column names} in the SeTable structure. Not to be accessed
-     * directly, but through {@link #getMutableColumnNames(ArcSDEPooledConnection)}
+     * directly, but through {@link #getMutableColumnNames(Session)}
      */
     private LinkedHashMap<Integer, String> mutableColumnNames;
 
@@ -131,7 +131,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     public ArcSdeFeatureWriter(final FIDReader fidReader,
                                final SimpleFeatureType featureType,
                                final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                               final ArcSDEPooledConnection connection,
+                               final Session connection,
                                final FeatureListenerManager listenerManager,
                                final ArcSdeVersionHandler versionHandler) throws IOException {
 

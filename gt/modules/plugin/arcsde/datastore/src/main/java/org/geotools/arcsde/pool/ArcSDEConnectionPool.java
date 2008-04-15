@@ -127,11 +127,11 @@ public class ArcSDEConnectionPool {
                 maxWait, true, true);
         LOGGER.info("Created ArcSDE connection pool for " + config);
 
-        ArcSDEPooledConnection[] preload = new ArcSDEPooledConnection[minConnections];
+        Session[] preload = new Session[minConnections];
 
         try {
             for (int i = 0; i < minConnections; i++) {
-                preload[i] = (ArcSDEPooledConnection) this.pool.borrowObject();
+                preload[i] = (Session) this.pool.borrowObject();
                 if (i == 0) {
                     SeRelease seRelease = preload[i].getRelease();
                     String sdeDesc = seRelease.getDesc();
@@ -226,7 +226,7 @@ public class ArcSDEConnectionPool {
      * @throws UnavailableArcSDEConnectionException If we are out of connections
      * @throws IllegalStateException If pool has been closed.
      */
-    public ArcSDEPooledConnection getConnection() throws DataSourceException,
+    public Session getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
         
         if (pool == null) {
@@ -242,7 +242,7 @@ public class ArcSDEConnectionPool {
             // stackTrace[3].getMethodName();
             // }
 
-            ArcSDEPooledConnection connection = (ArcSDEPooledConnection) this.pool.borrowObject();
+            Session connection = (Session) this.pool.borrowObject();
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 // System.err.println("-> " + caller + " got " + connection);
@@ -276,7 +276,7 @@ public class ArcSDEConnectionPool {
      * 
      * @param conn
      */
-    public synchronized void markConnectionAsFailed(ArcSDEPooledConnection conn) {
+    public synchronized void markConnectionAsFailed(Session conn) {
         LOGGER.warning("ArcSDE connection '" + conn
                 + "' has been marked as failed.  Current pool state is " + getAvailableCount()
                 + " avail/" + this.getPoolSize() + " total");
@@ -293,7 +293,7 @@ public class ArcSDEConnectionPool {
      */
     @SuppressWarnings("unchecked")
     public List<String> getAvailableLayerNames() throws DataSourceException {
-        ArcSDEPooledConnection conn = null;
+        Session conn = null;
 
         List<String> layerNames = new LinkedList<String>();
         try {
@@ -365,7 +365,7 @@ public class ArcSDEConnectionPool {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
                 try {
-                    ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(
+                    Session seConn = new Session(
                             ArcSDEConnectionPool.this.pool, config);
                     return seConn;
                 } catch (NegativeArraySizeException nase) {
@@ -388,7 +388,7 @@ public class ArcSDEConnectionPool {
          */
         @Override
         public void activateObject(Object obj) {
-            final ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            final Session conn = (Session) obj;
             conn.markActive();
             LOGGER.finest("activating connection " + obj);
         }
@@ -396,7 +396,7 @@ public class ArcSDEConnectionPool {
         @Override
         public void passivateObject(Object obj) {
             LOGGER.finest("passivating connection " + obj);
-            final ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            final Session conn = (Session) obj;
             conn.markInactive();
         }
 
@@ -406,7 +406,7 @@ public class ArcSDEConnectionPool {
          * invoked on an "activated" instance.
          * 
          * @param an
-         *            instance of {@link ArcSDEPooledConnection} maintained by
+         *            instance of {@link Session} maintained by
          *            this pool.
          * 
          * @return <code>true</code> if the connection is still alive and
@@ -415,7 +415,7 @@ public class ArcSDEConnectionPool {
          */
         @Override
         public boolean validateObject(Object obj) {
-            ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            Session conn = (Session) obj;
             boolean valid = !conn.isClosed();
             // MAKE PROPER VALIDITY CHECK HERE as for GEOT-1273
             if (valid) {
@@ -440,12 +440,12 @@ public class ArcSDEConnectionPool {
          * specific to the pool implementation.)
          * 
          * @param obj
-         *            an instance of {@link ArcSDEPooledConnection} maintained
+         *            an instance of {@link Session} maintained
          *            by this pool.
          */
         @Override
         public void destroyObject(Object obj) {
-            ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            Session conn = (Session) obj;
             conn.destroy();
         }
     }

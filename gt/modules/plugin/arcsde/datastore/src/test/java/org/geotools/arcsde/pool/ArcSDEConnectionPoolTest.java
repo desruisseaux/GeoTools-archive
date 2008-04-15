@@ -259,7 +259,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         createPool(params);
 
-        ArcSDEPooledConnection[] conns = new ArcSDEPooledConnection[MAX_CONNECTIONS];
+        Session[] conns = new Session[MAX_CONNECTIONS];
         // try to get the maximun number of connections specified, and do not
         // release anyone
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
@@ -278,10 +278,10 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         // now, free one and check the same conection is returned on the
         // next call to getConnection()
-        ArcSDEPooledConnection expected = conns[0];
+        Session expected = conns[0];
         expected.close();
 
-        ArcSDEPooledConnection conn = this.pool.getConnection();
+        Session conn = this.pool.getConnection();
         assertEquals(expected, conn);
     }
 

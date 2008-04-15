@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -71,7 +71,7 @@ public class InProcessViewSupportTestData {
 
     public static final String typeName = "MasterChildTest";
 
-    public static void setUp(ArcSDEPooledConnection conn, TestData td) throws SeException, DataSourceException,
+    public static void setUp(Session conn, TestData td) throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
 
         testCrs = DefaultGeographicCRS.WGS84;
@@ -95,7 +95,7 @@ public class InProcessViewSupportTestData {
         registerViewParams.put("sqlView.1.sqlQuery", masterChildSql);
     }
 
-    private static void createMasterTable(ArcSDEPooledConnection conn, TestData td) throws SeException,
+    private static void createMasterTable(Session conn, TestData td) throws SeException,
             DataSourceException, UnavailableArcSDEConnectionException {
         SeTable table = conn.createSeTable( MASTER);
         SeLayer layer = null;
@@ -129,7 +129,7 @@ public class InProcessViewSupportTestData {
         LOGGER.info("successfully created master table " + layer.getQualifiedName());
     }
 
-    private static void createChildTable(ArcSDEPooledConnection conn, TestData td) throws DataSourceException,
+    private static void createChildTable(Session conn, TestData td) throws DataSourceException,
             UnavailableArcSDEConnectionException, SeException {
         SeTable table = conn.createSeTable(CHILD);
         try {
@@ -181,7 +181,7 @@ public class InProcessViewSupportTestData {
      * @throws SeException
      * @throws Exception
      */
-    private static void insertMasterData(ArcSDEPooledConnection conn, SeLayer layer)
+    private static void insertMasterData(Session conn, SeLayer layer)
             throws SeException {
         SeInsert insert = null;
 
@@ -238,7 +238,7 @@ public class InProcessViewSupportTestData {
      * @throws SeException
      * @throws Exception
      */
-    private static void insertChildData(ArcSDEPooledConnection conn, SeTable table)
+    private static void insertChildData(Session conn, SeTable table)
             throws SeException {
         final String[] columns = { "ID", "MASTER_ID", "NAME", "DESCRIPTION" };
 

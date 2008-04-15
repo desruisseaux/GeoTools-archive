@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -134,7 +134,7 @@ public abstract class FIDReader {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public static FIDReader getFidReader(ArcSDEPooledConnection conn, SeTable table, SeLayer layer,
+    public static FIDReader getFidReader(Session conn, SeTable table, SeLayer layer,
             SeRegistration reg) throws IOException {
         FIDReader fidReader = null;
         final String tableName = reg.getTableName();

@@ -33,7 +33,7 @@ import junit.framework.TestSuite;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterImageReadParam;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReader;
 import org.geotools.arcsde.gce.imageio.ArcSDERasterReaderSpi;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -97,7 +97,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 		rasterTestData.load1bitRaster();
 		rasterTestData.loadRGBRaster();
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		SeQuery q = null;
 		ArcSDEPyramid pyramid;
 		SeRow r;
@@ -182,7 +182,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -234,7 +234,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(threeBandReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -283,7 +283,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageTileAligned() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -332,7 +332,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageByteAligned() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -381,7 +381,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageDataOffset1() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -430,7 +430,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageDataOffset2() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -480,7 +480,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageTargetImageOffset1() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 
@@ -530,7 +530,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 	public void testRead1bitImageTargetImageBeyondBoundaries1() throws Exception {
 		ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi().createReaderInstance(oneBitReaderProps);
 
-		ArcSDEPooledConnection scon = null;
+		Session scon = null;
 		try {
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 

@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;
@@ -103,7 +103,7 @@ public class ArcSDEPyramidTest extends TestCase {
      */
     public void donttestArcSDEPyramidThreeBand() throws Exception {
 
-        ArcSDEPooledConnection scon = pool.getConnection();
+        Session scon = pool.getConnection();
         SeRasterAttr rAttr;
         try {
             SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
@@ -151,7 +151,7 @@ public class ArcSDEPyramidTest extends TestCase {
      */
     public void testArcSDEPyramidFourBand() throws Exception {
 
-        ArcSDEPooledConnection scon = pool.getConnection();
+        Session scon = pool.getConnection();
         SeRasterAttr rAttr;
         try {
             SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps

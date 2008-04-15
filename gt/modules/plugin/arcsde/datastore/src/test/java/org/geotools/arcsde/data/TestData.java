@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureCollection;
@@ -201,7 +201,7 @@ public class TestData {
 
     public String getTemp_table() throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
-        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
+        Session conn = getConnectionPool().getConnection();
         String tempTableName;
         try {
             tempTableName = getTemp_table(conn.unWrap());
@@ -259,7 +259,7 @@ public class TestData {
 
     private static void deleteTable(final ArcSDEConnectionPool connPool, final String tableName)
             throws DataSourceException, UnavailableArcSDEConnectionException {
-        ArcSDEPooledConnection conn = connPool.getConnection();
+        Session conn = connPool.getConnection();
         try {
             try {
                 SeLayer layer = conn.createSeLayer(tableName, "SHAPE");
@@ -290,7 +290,7 @@ public class TestData {
 
         deleteTempTable(connPool);
 
-        ArcSDEPooledConnection conn = connPool.getConnection();
+        Session conn = connPool.getConnection();
 
         try {
             /*
@@ -324,7 +324,7 @@ public class TestData {
      */
     public void insertTestData() throws Exception {
         ArcSDEConnectionPool connPool = getConnectionPool();
-        ArcSDEPooledConnection conn = connPool.getConnection();
+        Session conn = connPool.getConnection();
         try {
             tempTable.truncate();
             insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
@@ -782,7 +782,7 @@ public class TestData {
 
     private void createSimpleTestTables() throws IOException, SeException {
         final ArcSDEConnectionPool connectionPool = getConnectionPool();
-        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+        final Session conn = connectionPool.getConnection();
 
         String tableName;
         String rowIdColName;
@@ -836,7 +836,7 @@ public class TestData {
         }
     }
 
-    private void createSimpleTestTable(final ArcSDEPooledConnection conn,
+    private void createSimpleTestTable(final Session conn,
             final String tableName,
             final String rowIdColName,
             final int rowIdColumnType,
@@ -937,7 +937,7 @@ public class TestData {
      * @return the versioned table created
      * @throws Exception any exception thrown by sde
      */
-    public SeTable createVersionedTable(final ArcSDEPooledConnection connection) throws Exception {
+    public SeTable createVersionedTable(final Session connection) throws Exception {
         SeConnection conn = connection.unWrap();
         SeLayer layer = new SeLayer(conn);
         SeTable table;
@@ -991,7 +991,7 @@ public class TestData {
         return table;
     }
 
-    public void insertIntoVersionedTable(ArcSDEPooledConnection conn,
+    public void insertIntoVersionedTable(Session conn,
             SeState state,
             String tableName,
             String nameField) throws SeException {

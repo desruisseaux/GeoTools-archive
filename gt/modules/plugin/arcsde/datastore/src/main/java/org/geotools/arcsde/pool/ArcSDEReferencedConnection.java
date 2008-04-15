@@ -11,7 +11,7 @@ import com.esri.sde.sdk.client.SeException;
  * 
  * @author Jody Garnett
  */
-public class ArcSDEReferencedConnection extends ArcSDEPooledConnection {
+public class ArcSDEReferencedConnection extends Session {
 
     public ArcSDEReferencedConnection( ObjectPool pool, ArcSDEConnectionConfig config )
             throws SeException {

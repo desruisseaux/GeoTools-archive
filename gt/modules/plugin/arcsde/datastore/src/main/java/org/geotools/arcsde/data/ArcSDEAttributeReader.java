@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -95,7 +95,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      */
     private final Class<? extends Geometry> schemaGeometryClass;
 
-    private ArcSDEPooledConnection connection;
+    private Session connection;
 
     /**
      * Flag indicating whether to close or not the connection.
@@ -123,7 +123,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      * @throws IOException
      */
     public ArcSDEAttributeReader(final ArcSDEQuery query,
-                                 final ArcSDEPooledConnection connection,
+                                 final Session connection,
                                  final boolean handleConnectionClosing) throws IOException {
         this.query = query;
         this.connection = connection;

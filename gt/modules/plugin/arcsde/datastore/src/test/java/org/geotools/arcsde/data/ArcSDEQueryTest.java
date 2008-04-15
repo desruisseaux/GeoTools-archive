@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.data.versioning.AutoCommitDefaultVersionHandler;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -178,14 +178,14 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
-        ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
+        Session connection = dstore.getConnectionPool().getConnection();
         this._queryAll = ArcSDEQuery.createQuery(connection, ftype, Query.ALL,
                 FIDReader.NULL_READER, ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return this._queryAll;
     }
 
     private ArcSDEQuery getQueryFiltered() throws IOException {
-        ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
+        Session connection = dstore.getConnectionPool().getConnection();
         FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, connection);
         this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery, fti
                 .getFidStrategy(), new AutoCommitDefaultVersionHandler());
@@ -205,7 +205,7 @@ public class ArcSDEQueryTest extends TestCase {
 
         // should nevel do this, just to assert it is
         // not closed by returned to the pool
-        ArcSDEPooledConnection conn = queryAll.connection;
+        Session conn = queryAll.connection;
 
         queryAll.close();
 

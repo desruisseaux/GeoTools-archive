@@ -26,7 +26,7 @@ import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.versioning.ArcSdeVersionHandler;
 import org.geotools.arcsde.data.versioning.TransactionDefaultVersionHandler;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
@@ -55,7 +55,7 @@ final class ArcTransactionState implements Transaction.State {
      * Transactional connection this state works upon, held until commit(), rollback() or close() is
      * called.
      */
-    private ArcSDEPooledConnection connection;
+    private Session connection;
 
     private Transaction transaction;
 
@@ -81,7 +81,7 @@ final class ArcTransactionState implements Transaction.State {
      * @param pool connection pool where to grab a connection and hold it while there's a
      *            transaction open (signaled by any use of {@link #getConnection()}
      */
-    private ArcTransactionState(ArcSDEPooledConnection connection,
+    private ArcTransactionState(Session connection,
                                 final FeatureListenerManager listenerManager) {
         this.connection = connection;
         this.listenerManager = listenerManager;
@@ -129,7 +129,7 @@ final class ArcTransactionState implements Transaction.State {
      */
     public void commit() throws IOException {
         failIfClosed();
-        final ArcSDEPooledConnection connection = this.connection;
+        final Session connection = this.connection;
         connection.getLock().lock();
         try {
             if (this.currentVersionState != null) {
@@ -169,7 +169,7 @@ final class ArcTransactionState implements Transaction.State {
      */
     public void rollback() throws IOException {
         failIfClosed();
-        final ArcSDEPooledConnection connection = this.connection;
+        final Session connection = this.connection;
         connection.getLock().lock();
         try {
             versionHandler.rollbackEditState();
@@ -298,7 +298,7 @@ final class ArcTransactionState implements Transaction.State {
      * @throws DataSourceException
      * @throws SeException
      */
-    ArcSDEPooledConnection getConnection() throws DataSourceException,
+    Session getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
         failIfClosed();
         return connection;
@@ -331,7 +331,7 @@ final class ArcTransactionState implements Transaction.State {
 
             if (state == null) {
                 // start a transaction
-                final ArcSDEPooledConnection connection = connectionPool.getConnection();
+                final Session connection = connectionPool.getConnection();
                 try {
                     // TRY_LOCK: one thread at a time can use the connection
                     connection.setConcurrency(SeConnection.SE_TRYLOCK_POLICY);

@@ -50,7 +50,7 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
      * Code that just blindly asks for a connection will be stuck
      * in read-only mode (that said they will not block!).
      */
-    public ArcSDEPooledConnection getConnection() throws DataSourceException,
+    public Session getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
         return getConnection( Transaction.AUTO_COMMIT );
     }
@@ -63,7 +63,7 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
      * @throws UnavailableArcSDEConnectionException If we are out of connections
      * @throws IllegalStateException If pool has been closed.
      */
-    public ArcSDEPooledConnection getConnection( Transaction transaction ) throws DataSourceException,
+    public Session getConnection( Transaction transaction ) throws DataSourceException,
             UnavailableArcSDEConnectionException {
         
         if (pool == null) {
@@ -79,7 +79,7 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
             // stackTrace[3].getMethodName();
             // }
 
-            ArcSDEPooledConnection connection = (ArcSDEPooledConnection) this.pool.borrowObject();
+            Session connection = (Session) this.pool.borrowObject();
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 // System.err.println("-> " + caller + " got " + connection);
@@ -147,7 +147,7 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
                 try {
-                    ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(
+                    Session seConn = new Session(
                             ArcSDEConnectionReference.this.pool, config);
                     return seConn;
                 } catch (NegativeArraySizeException nase) {

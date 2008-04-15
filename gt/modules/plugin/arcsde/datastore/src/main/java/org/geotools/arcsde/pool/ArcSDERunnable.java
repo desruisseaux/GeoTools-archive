@@ -18,5 +18,5 @@ public abstract class ArcSDERunnable {
      * @param connection connection used to interact with ArcSDE
      * @param context Non null if working on a transaction
      */
-    public abstract void run( ArcSDEPooledConnection connection );
+    public abstract void run( Session connection );
 }

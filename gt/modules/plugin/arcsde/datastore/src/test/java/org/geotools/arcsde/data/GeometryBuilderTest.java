@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;
@@ -167,7 +167,7 @@ public class GeometryBuilderTest extends TestCase {
     public void testInsertGeometries(Geometry[] original, TestData testData) throws Exception {
         testData.truncateTempTable();
         SeLayer layer = testData.getTempLayer();
-        ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
+        Session conn = testData.getConnectionPool().getConnection();
 
         Geometry[] fetched = new Geometry[original.length];
         try {

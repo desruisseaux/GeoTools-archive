@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.util.logging.Logging;
 
 import com.esri.sde.sdk.client.SeException;
@@ -101,7 +101,7 @@ public class BandCopierTest extends TestCase {
     public void donttestLiveOneBitAlignedRasterTile() throws Exception {
         final String tableName = rasterTestData.get1bitRasterTableName();
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
@@ -152,7 +152,7 @@ public class BandCopierTest extends TestCase {
     public void donttestLiveOneBitUnalignedRasterTile() throws Exception {
         final String tableName = rasterTestData.get1bitRasterTableName();
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
@@ -207,7 +207,7 @@ public class BandCopierTest extends TestCase {
     public void donttestLiveRGBRasterTile() throws Exception {
         final String tableName = rasterTestData.getRGBRasterTableName();
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
@@ -256,7 +256,7 @@ public class BandCopierTest extends TestCase {
     public void testLiveGrayScaleRasterTile() throws Exception {
         final String tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
 
-        ArcSDEPooledConnection scon = null;
+        Session scon = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 

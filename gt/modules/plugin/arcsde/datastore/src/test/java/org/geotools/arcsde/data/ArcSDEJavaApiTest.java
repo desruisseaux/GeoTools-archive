@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 
@@ -75,7 +75,7 @@ public class ArcSDEJavaApiTest extends TestCase {
     /** utility to load test parameters and build a datastore with them */
     private static TestData testData;
 
-    private ArcSDEPooledConnection conn;
+    private Session conn;
 
     private ArcSDEConnectionPool pool;
 
@@ -266,7 +266,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      * @return the sde calculated counts for the given filter
      * @throws Exception
      */
-    private static int getTempTableCount(final ArcSDEPooledConnection conn,
+    private static int getTempTableCount(final Session conn,
             final String tableName,
             final String whereClause,
             final SeFilter[] spatFilters,
@@ -997,7 +997,7 @@ public class ArcSDEJavaApiTest extends TestCase {
      */
     public void testTransactionStateRead() throws Exception {
         // connection with a transaction in progress
-        final ArcSDEPooledConnection transConn;
+        final Session transConn;
 
         final SeTable tempTable = testData.getTempTable();
         // final SeLayer tempLayer = testData.getTempLayer();

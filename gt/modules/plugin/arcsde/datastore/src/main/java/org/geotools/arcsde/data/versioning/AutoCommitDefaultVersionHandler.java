@@ -18,7 +18,7 @@ package org.geotools.arcsde.data.versioning;
 import java.io.IOException;
 
 import org.geotools.arcsde.ArcSdeException;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -44,7 +44,7 @@ public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
         //
     }
 
-    public void setUpStream(final ArcSDEPooledConnection connection, SeStreamOp streamOperation)
+    public void setUpStream(final Session connection, SeStreamOp streamOperation)
             throws IOException {
 
         try {

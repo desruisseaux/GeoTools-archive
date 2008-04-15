@@ -40,7 +40,7 @@ import javax.imageio.metadata.IIOMetadata;
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.Session;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeException;
@@ -192,7 +192,7 @@ public class ArcSDERasterReader extends ImageReader {
                     + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
 
         // Now we do the actual reading from SDE.
-        ArcSDEPooledConnection scon = sdeirp.getConnection();
+        Session scon = sdeirp.getConnection();
         SeQuery query = null;
         BufferedImage destination;
 
