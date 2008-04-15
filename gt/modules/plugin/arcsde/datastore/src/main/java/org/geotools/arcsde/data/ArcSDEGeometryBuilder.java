@@ -765,10 +765,10 @@ public abstract class ArcSDEGeometryBuilder {
             for (int i = 0; i < coords.length; i++) {
                 for (int j = 0; j < coords[i].length; j++) {
                     double[] ds = coords[i][j];
-                    System.out.println("coords[" + i + "][" + j + "]=" + Arrays.toString(ds));
+                    //System.out.println("coords[" + i + "][" + j + "]=" + Arrays.toString(ds));
                 }
             }
-            System.out.println("-----");
+            //System.out.println("-----");
 
             // ///////
 
