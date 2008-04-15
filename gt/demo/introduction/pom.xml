@@ -102,7 +102,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.demo</groupId>
-      <artifactId>mappane</artifactId>
+      <artifactId>mappane-use</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
