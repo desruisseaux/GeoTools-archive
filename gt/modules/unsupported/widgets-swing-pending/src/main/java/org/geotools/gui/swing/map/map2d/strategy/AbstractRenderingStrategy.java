@@ -211,13 +211,12 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy, Ma
         double yval = bounds.height/height;
         
         double minX = coord.x - mapArea.getMinX();
-        double minY = coord.y - mapArea.getMinY();
+        double minY = mapArea.getMaxY() - coord.y;
         
         int x = (int)(minX*xval);
         int y = (int)(minY*yval);
         
-        return new Point(x,y);
-        
+        return new Point(x,y);        
     }
 
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {

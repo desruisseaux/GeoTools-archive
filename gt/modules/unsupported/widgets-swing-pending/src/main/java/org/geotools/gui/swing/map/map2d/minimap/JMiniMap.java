@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2006-2008, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -379,7 +379,7 @@ public class JMiniMap extends JComponent {
                 g.drawLine(x, 0, x, getHeight() - (maxPoint.y - minPoint.y) - minPoint.y);
                 g.drawLine(x, getHeight() - minPoint.y, x, getHeight());
 
-                y = getHeight() + (-maxPoint.y - minPoint.y) / 2;
+//                y = getHeight() + (-maxPoint.y - minPoint.y) / 2;
 
                 g.drawLine(0, y, minPoint.x, y);
                 g.drawLine(maxPoint.x, y, getWidth(), y);
