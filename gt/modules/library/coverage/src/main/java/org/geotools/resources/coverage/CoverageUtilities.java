@@ -512,7 +512,7 @@ public final class CoverageUtilities {
      * @param gridToCRS
      *            The grid to world transformation.
      */
-    public final static double[] getResolution(final AffineTransform gridToCRS) {
+    public static double[] getResolution(final AffineTransform gridToCRS) {
         double[] requestedRes = null;
         if (gridToCRS != null) {
             requestedRes = new double[2];
