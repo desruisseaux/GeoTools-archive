@@ -691,7 +691,6 @@ public class SLD {
 
     /**
      * Grabs the point opacity from the first PointSymbolizer.
-     * 
      * <p>
      * If you are using something fun like rules you  will need to do your own
      * thing.
@@ -726,10 +725,11 @@ public class SLD {
             if (fill == null) {
                 continue;
             }
-
-            Expression opacityExp = fill.getOpacity();
-
-            return Double.parseDouble(opacityExp.toString());
+            Expression expr = fill.getOpacity();
+            if( expr == null ){
+                continue;
+            }
+            return SLD.opacity( expr );
         }
 
         return Double.NaN;
@@ -968,15 +968,22 @@ public class SLD {
 
         return opacity(fill);
     }
-
+    /**
+     * Retrieve the opacity from the provided fill; or return the default.
+     * @param fill
+     * @return opacity from the above fill; or return the Fill.DEFAULT value
+     */
     public static double opacity(Fill fill) {
         if (fill == null) {
-            return Double.NaN;
+            fill = Fill.DEFAULT;
         }
 
         Expression opacityExp = fill.getOpacity();
-        double opacity = Double.parseDouble(opacityExp.toString());
-
+        if( opacityExp == null ){
+            opacityExp = Fill.DEFAULT.getOpacity();
+        }
+        double opacity = Filters.asDouble(opacityExp);
+        
         return opacity;
     }
 
@@ -1187,10 +1194,15 @@ public class SLD {
             return Double.NaN;
         }
 
-        Expression opacityExp = fill.getOpacity();
-        double opacity = Double.parseDouble(opacityExp.toString());
-
-        return opacity;
+        Expression expr = fill.getOpacity();
+        if( expr == null ){
+            return Double.NaN;
+        }
+        Double numeric = (Double) expr.evaluate( null, Double.class);
+        if( numeric == null ){
+            return Double.NaN;
+        }
+        return numeric.doubleValue();
     }
 
     /**
