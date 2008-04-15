@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.pool.ObjectPool;
-import org.geotools.arcsde.data.view.ColumnReferenceQualifier;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -42,7 +41,6 @@ import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRelease;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeState;
-import com.esri.sde.sdk.client.SeStreamOp;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeUpdate;
 import com.esri.sde.sdk.client.SeVersion;
@@ -314,6 +312,7 @@ public class ArcSDEPooledConnection  {
 	//
 	// Helper method that delgates to internal connection
 	//
+    @SuppressWarnings("unchecked")
     public List<SeLayer> getLayers() throws SeException {
         return connection.getLayers();
     }
@@ -333,7 +332,7 @@ public class ArcSDEPooledConnection  {
         connection.setConcurrency( policy );
     }
 
-    public void setTransactionAutoCommit( int auto ) {
+    public void setTransactionAutoCommit( int auto ) throws SeException {
        connection.setTransactionAutoCommit( auto );
     }
     //
@@ -349,7 +348,7 @@ public class ArcSDEPooledConnection  {
     public SeQuery createSeQuery() throws SeException {
         return new SeQuery(connection);
     }
-    public SeQuery createSeQuery( String[] propertyNames, SeSqlConstruct sql ) {
+    public SeQuery createSeQuery( String[] propertyNames, SeSqlConstruct sql ) throws SeException {
         return new SeQuery(connection, propertyNames, sql );
     }
     
@@ -361,19 +360,19 @@ public class ArcSDEPooledConnection  {
         return new SeTable(connection, qualifiedName);
     }
 
-    public SeInsert createSeInsert() {
+    public SeInsert createSeInsert() throws SeException {
         return new SeInsert(connection);
     }
 
-    public SeUpdate createSeUpdate() {
+    public SeUpdate createSeUpdate() throws SeException {
         return new SeUpdate(connection);
     }
 
-    public SeDelete createSeDelete() {
+    public SeDelete createSeDelete() throws SeException {
         return new SeDelete(connection);
     }
 
-    public SeVersion createSeVersion( String versionName ) {
+    public SeVersion createSeVersion( String versionName ) throws SeException {
         return new SeVersion( connection, versionName );
     }
     /**
@@ -392,10 +391,10 @@ public class ArcSDEPooledConnection  {
         return new SeState( connection );
     }
 
-    public SeRasterColumn createSeRasterColumn() {
+    public SeRasterColumn createSeRasterColumn() throws SeException {
         return new SeRasterColumn( connection );
     }
-    public SeRasterColumn createSeRasterColumn( SeObjectId rasterColumnId ) {
+    public SeRasterColumn createSeRasterColumn( SeObjectId rasterColumnId ) throws SeException {
         return new SeRasterColumn( connection, rasterColumnId );
     }
     
