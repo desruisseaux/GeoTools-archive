@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
@@ -30,7 +32,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import com.esri.sde.sdk.client.SeConnection;
 
 /**
- * DOCUMENT ME!
+ * Seems to visit a list and update the entries and fill in the blanks qualifying them.
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
@@ -43,7 +45,7 @@ class ItemsListQualifier implements ItemsListVisitor {
     ItemsList _qualifiedList;
 
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     private Map tableAliases;
 
@@ -53,7 +55,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      * @param conn
      *            DOCUMENT ME!
      */
-    public ItemsListQualifier(SeConnection conn, Map tableAliases) {
+    public ItemsListQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -68,7 +70,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static ItemsList qualify(SeConnection conn, Map tableAliases, ItemsList items) {
+    public static ItemsList qualify(ArcSDEPooledConnection conn, Map tableAliases, ItemsList items) {
         if (items == null) {
             return null;
         }

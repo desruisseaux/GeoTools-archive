@@ -16,6 +16,8 @@
  */
 package org.geotools.arcsde.data.view;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.schema.Table;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -47,7 +49,7 @@ class TableQualifier {
      *             if an SDE error is catched up while asking <code>conn</code>
      *             for the database and user name.
      */
-    public static Table qualify(SeConnection conn, Table table) throws IllegalStateException {
+    public static Table qualify(ArcSDEPooledConnection conn, Table table) throws IllegalStateException {
         if (table == null) {
             return null;
         }

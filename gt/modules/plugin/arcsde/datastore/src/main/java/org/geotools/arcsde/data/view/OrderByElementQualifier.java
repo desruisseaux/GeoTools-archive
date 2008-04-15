@@ -18,6 +18,8 @@ package org.geotools.arcsde.data.view;
 
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.statement.select.ColumnReference;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByVisitor;
@@ -39,7 +41,7 @@ public class OrderByElementQualifier implements OrderByVisitor {
     private OrderByElement _qualifiedOrderBy;
 
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     private Map tableAliases;
 
@@ -49,7 +51,7 @@ public class OrderByElementQualifier implements OrderByVisitor {
      * @param conn
      *            DOCUMENT ME!
      */
-    private OrderByElementQualifier(SeConnection conn, Map tableAliases) {
+    private OrderByElementQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -64,7 +66,7 @@ public class OrderByElementQualifier implements OrderByVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static OrderByElement qualify(SeConnection conn, Map tableAliases, OrderByElement orderBy) {
+    public static OrderByElement qualify(ArcSDEPooledConnection conn, Map tableAliases, OrderByElement orderBy) {
         if (orderBy == null) {
             return null;
         }

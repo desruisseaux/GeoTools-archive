@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.FromItem;
@@ -66,7 +68,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 public class SelectQualifier implements net.sf.jsqlparser.statement.select.SelectVisitor {
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     /** DOCUMENT ME! */
     private PlainSelect qualifiedSelect;
@@ -77,11 +79,11 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
      * @param conn
      *            DOCUMENT ME!
      */
-    public SelectQualifier(SeConnection conn) {
+    public SelectQualifier(ArcSDEPooledConnection conn) {
         this.conn = conn;
     }
 
-    public static PlainSelect qualify(SeConnection conn, PlainSelect select) {
+    public static PlainSelect qualify(ArcSDEPooledConnection conn, PlainSelect select) {
         SelectQualifier q = new SelectQualifier(conn);
         select.accept(q);
         return q.qualifiedSelect;

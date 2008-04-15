@@ -35,6 +35,7 @@ import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.ArcSDERunnable;
 import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -371,6 +372,43 @@ public class ArcSDEDataStore implements DataStore {
         return versionHandler;
     }
 
+    /**
+     * Execute code that requires an ArcSDEConnection for a read-only activity.
+     * <p>
+     * This method should be used when performing a read-only task such as fetching metadata about a
+     * table. Because this is a read-only activity it does not matter what Transaction is used for
+     * this work.
+     * <p>
+     * 
+     * @param runnable Code to be executed with an ArcSDEConnection
+     */
+    void getConnection( ArcSDERunnable runnable ){
+        
+    }
+    
+    /**
+     * Execute code that requires an ArcSDEConnection for a read/write activity.
+     * @param runnable
+     * @param transaction
+     */
+    void getConnection( ArcSDERunnable runnable, String typeName, Transaction transaction ) throws IOException {
+        final ArcSDEPooledConnection connection;
+        final ArcTransactionState state;
+        
+        if (Transaction.AUTO_COMMIT.equals(transaction)) {
+            connection = connectionPool.getConnection();
+            state = null;
+        } else {
+            state = ArcTransactionState.getState(transaction, connectionPool, listenerManager, false );
+            connection = state.getConnection();
+        }
+        try {
+            runnable.run( connection );
+        }
+        finally {
+            connection.close(); // return to pool
+        }
+    }
     /**
      * @see DataStore#getFeatureWriter(String, Filter, Transaction)
      */

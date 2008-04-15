@@ -106,7 +106,7 @@ public class BandCopierTest extends TestCase {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
             scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            SeQuery q = scon.createSeQuery( new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -157,7 +157,7 @@ public class BandCopierTest extends TestCase {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
             scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            SeQuery q = scon.createSeQuery( new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -212,7 +212,7 @@ public class BandCopierTest extends TestCase {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
             scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            SeQuery q = scon.createSeQuery( new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -261,7 +261,7 @@ public class BandCopierTest extends TestCase {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
             scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            SeQuery q = scon.createSeQuery( new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();

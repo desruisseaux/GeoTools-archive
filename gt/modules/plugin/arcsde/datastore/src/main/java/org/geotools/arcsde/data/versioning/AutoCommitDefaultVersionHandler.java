@@ -18,6 +18,7 @@ package org.geotools.arcsde.data.versioning;
 import java.io.IOException;
 
 import org.geotools.arcsde.ArcSdeException;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -43,17 +44,16 @@ public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
         //
     }
 
-    public void setUpStream(final SeConnection connection, SeStreamOp streamOperation)
+    public void setUpStream(final ArcSDEPooledConnection connection, SeStreamOp streamOperation)
             throws IOException {
 
         try {
             if (defaultVersion == null) {
-                defaultVersion = new SeVersion(connection,
-                        SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+                defaultVersion = connection.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
                 defaultVersion.getInfo();
-                SeState currentState = new SeState(connection, defaultVersion.getStateId());
+                SeState currentState = connection.createSeState(defaultVersion.getStateId());
                 if (!currentState.isOpen()) {
-                    SeState newState = new SeState(connection);
+                    SeState newState = connection.createSeState(null);
                     newState.create(currentState.getId());
                     defaultVersion.changeState(newState.getId());
                 }

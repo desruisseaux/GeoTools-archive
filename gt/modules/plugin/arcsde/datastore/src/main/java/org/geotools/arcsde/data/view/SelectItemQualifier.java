@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -55,7 +57,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     private List /* <SelectExpressionItem> */qualifiedItems = Collections.EMPTY_LIST;
 
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     private Map tableAliases;
 
@@ -65,7 +67,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
      * @param conn
      *            DOCUMENT ME!
      */
-    private SelectItemQualifier(SeConnection conn, Map tableAliases) {
+    private SelectItemQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -80,7 +82,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
      * 
      * @return DOCUMENT ME!
      */
-    public static List qualify(SeConnection conn, Map tableAliases, SelectItem item) {
+    public static List qualify(ArcSDEPooledConnection conn, Map tableAliases, SelectItem item) {
         if (item == null) {
             return null;
         }
@@ -129,7 +131,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
         SeTable table;
         SeColumnDefinition[] cols;
         try {
-            table = new SeTable(conn, tableName);
+            table = conn.createSeTable(tableName);
             cols = table.describe();
         } catch (SeException e) {
             throw new RuntimeException(e.getMessage());

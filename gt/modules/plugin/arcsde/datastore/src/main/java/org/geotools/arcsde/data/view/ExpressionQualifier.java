@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.DateValue;
@@ -77,7 +79,7 @@ class ExpressionQualifier implements ExpressionVisitor {
     private Expression _qualifiedExpression;
 
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     private Map tableAliases;
 
@@ -87,7 +89,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      * @param conn
      *            DOCUMENT ME!
      */
-    private ExpressionQualifier(SeConnection conn, Map tableAliases) {
+    private ExpressionQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -102,7 +104,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static Expression qualify(SeConnection conn, Map tableAliases, Expression exp) {
+    public static Expression qualify(ArcSDEPooledConnection conn, Map tableAliases, Expression exp) {
         if (exp == null) {
             return null;
         }

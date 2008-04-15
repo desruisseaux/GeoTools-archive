@@ -316,7 +316,7 @@ final class ArcTransactionState implements Transaction.State {
      * 
      * @param transaction non autocommit transaction
      * @param listenerManager
-     * @param versioned
+     * @param versioned True will update database wide version once per operation, false once per commit
      * @return the ArcTransactionState stored in the transaction with <code>connectionPool</code>
      *         as key.
      */

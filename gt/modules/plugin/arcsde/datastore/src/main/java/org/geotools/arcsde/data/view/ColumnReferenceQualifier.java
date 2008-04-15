@@ -18,6 +18,8 @@ package org.geotools.arcsde.data.view;
 
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.ColumnIndex;
 import net.sf.jsqlparser.statement.select.ColumnReference;
@@ -41,7 +43,7 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
     private ColumnReference qualifiedReference;
 
     /** DOCUMENT ME! */
-    private SeConnection conn;
+    private ArcSDEPooledConnection conn;
 
     private Map tableAliases;
 
@@ -51,7 +53,7 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
      * @param conn
      *            DOCUMENT ME!
      */
-    private ColumnReferenceQualifier(SeConnection conn, Map tableAliases) {
+    private ColumnReferenceQualifier(ArcSDEPooledConnection conn, Map tableAliases) {
         this.conn = conn;
         this.tableAliases = tableAliases;
     }
@@ -66,7 +68,7 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
      * 
      * @return DOCUMENT ME!
      */
-    public static ColumnReference qualify(SeConnection conn, Map tableAliases,
+    public static ColumnReference qualify(ArcSDEPooledConnection conn, Map tableAliases,
             ColumnReference colRef) {
         if (colRef == null) {
             return null;

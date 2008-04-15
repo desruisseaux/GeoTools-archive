@@ -97,7 +97,7 @@ public class InProcessViewSupportTestData {
 
     private static void createMasterTable(ArcSDEPooledConnection conn, TestData td) throws SeException,
             DataSourceException, UnavailableArcSDEConnectionException {
-        SeTable table = new SeTable(conn, MASTER);
+        SeTable table = conn.createSeTable( MASTER);
         SeLayer layer = null;
         try {
             table.delete();
@@ -107,7 +107,7 @@ public class InProcessViewSupportTestData {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
 
-        layer = new SeLayer(conn);
+        layer = conn.createSeLayer();
         layer.setTableName(MASTER);
 
         colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
@@ -131,7 +131,7 @@ public class InProcessViewSupportTestData {
 
     private static void createChildTable(ArcSDEPooledConnection conn, TestData td) throws DataSourceException,
             UnavailableArcSDEConnectionException, SeException {
-        SeTable table = new SeTable(conn, CHILD);
+        SeTable table = conn.createSeTable(CHILD);
         try {
             table.delete();
         } catch (SeException e) {
@@ -189,7 +189,7 @@ public class InProcessViewSupportTestData {
         final String[] columns = { "ID", "NAME", "SHAPE" };
 
         for (int i = 1; i < 4; i++) {
-            insert = new SeInsert(conn);
+            insert = conn.createSeInsert();
             insert.intoTable(layer.getName(), columns);
             insert.setWriteMode(true);
 
@@ -248,7 +248,7 @@ public class InProcessViewSupportTestData {
             for (int child = 0; child < master; child++) {
                 childId++;
 
-                SeInsert insert = new SeInsert(conn);
+                SeInsert insert = conn.createSeInsert();
                 insert.intoTable(table.getName(), columns);
                 insert.setWriteMode(true);
 
@@ -263,7 +263,7 @@ public class InProcessViewSupportTestData {
             }
         }
         // add the 7th row to test group by
-        SeInsert insert = new SeInsert(conn);
+        SeInsert insert = conn.createSeInsert();
         insert.intoTable(table.getName(), columns);
         insert.setWriteMode(true);
         SeRow row = insert.getRowToSet();

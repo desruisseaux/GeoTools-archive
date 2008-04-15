@@ -17,6 +17,7 @@
 package org.geotools.arcsde.pool;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
@@ -26,28 +27,52 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.pool.ObjectPool;
+import org.geotools.arcsde.data.view.ColumnReferenceQualifier;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeConnection;
+import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
+import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRasterColumn;
+import com.esri.sde.sdk.client.SeRegistration;
+import com.esri.sde.sdk.client.SeRelease;
+import com.esri.sde.sdk.client.SeSqlConstruct;
+import com.esri.sde.sdk.client.SeState;
+import com.esri.sde.sdk.client.SeStreamOp;
 import com.esri.sde.sdk.client.SeTable;
+import com.esri.sde.sdk.client.SeUpdate;
+import com.esri.sde.sdk.client.SeVersion;
 
 /**
- * An SeConnection that returns itself to the connection pool instead of closing on each call to close().
- * 
+ * Provides thread safe access to an SeConnection.
+ * <p>
+ * This class has become more and more magic over time! It no longer represents a Connection but provides
+ * "safe" access to a connection.
+ * <p>
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.3.x
  * 
  */
-public class ArcSDEPooledConnection extends SeConnection {
+public class ArcSDEPooledConnection  {
+    
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
 
-	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
-
+    /**
+     * Lock used to protect the connection
+     */
 	private Lock lock;
-
+	
+	/** Actual SeConnection being protected */
+	SeConnection connection;
+    
+	/**
+	 * ObjectPool used to manage open connections (shared).
+	 */
 	private ObjectPool pool;
 
 	private ArcSDEConnectionConfig config;
@@ -63,12 +88,19 @@ public class ArcSDEPooledConnection extends SeConnection {
 	private Map<String, SeLayer> cachedLayers = new HashMap<String, SeLayer>();
 	private Map<String, SeRasterColumn> cachedRasters = new HashMap<String, SeRasterColumn>();
 
-	public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {
-		super(config.getServerName(), config.getPortNumber().intValue(), config.getDatabaseName(), config.getUserName(), config.getUserPassword());
-		this.config = config;
+	/**
+	 * Provides safe access to an SeConnection.
+	 * @param pool ObjectPool used to manage SeConnection
+	 * @param config Used to set up a SeConnection
+	 * @throws SeException If we cannot connect
+	 */
+	public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {	    
+		this.connection = new SeConnection( config.getServerName(), config.getPortNumber().intValue(), config.getDatabaseName(), config.getUserName(), config.getUserPassword());
+	    this.config = config;
 		this.pool = pool;
 		this.lock = new ReentrantLock(false);
-		this.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+		this.connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+		
 		synchronized (ArcSDEPooledConnection.class) {
 			connectionCounter++;
 			connectionId = connectionCounter;
@@ -79,9 +111,8 @@ public class ArcSDEPooledConnection extends SeConnection {
 		return lock;
 	}
 
-	@Override
 	public final boolean isClosed() {
-		return super.isClosed();
+		return this.connection.isClosed();
 	}
 
 	/**
@@ -168,7 +199,7 @@ public class ArcSDEPooledConnection extends SeConnection {
 	public synchronized SeTable getTable(final String tableName) throws DataSourceException {
 		checkActive();
 		try {
-			return new SeTable(this, tableName);
+			return new SeTable(this.connection, tableName);
 		} catch (SeException e) {
 			throw new DataSourceException("Can't access table " + tableName, e);
 		}
@@ -176,7 +207,7 @@ public class ArcSDEPooledConnection extends SeConnection {
 
 	@SuppressWarnings("unchecked")
 	private void cacheLayers() throws SeException {
-		Vector<SeLayer> layers = this.getLayers();
+		Vector<SeLayer> layers = this.connection.getLayers();
 		cachedLayers.clear();
 		for (SeLayer layer : layers) {
 			cachedLayers.put(layer.getQualifiedName(), layer);
@@ -185,24 +216,22 @@ public class ArcSDEPooledConnection extends SeConnection {
 
 	@SuppressWarnings("unchecked")
 	private void cacheRasters() throws SeException {
-		Vector<SeRasterColumn> rasters = this.getRasterColumns();
+		Vector<SeRasterColumn> rasters = this.connection.getRasterColumns();
 		cachedRasters.clear();
 		for (SeRasterColumn raster : rasters) {
 			cachedRasters.put(raster.getQualifiedTableName(), raster);
 		}
 	}
 
-	@Override
 	public void startTransaction() throws SeException {
 		checkActive();
-		super.startTransaction();
+		this.connection.startTransaction();
 		transactionInProgress = true;
 	}
 
-	@Override
 	public void commitTransaction() throws SeException {
 		checkActive();
-		super.commitTransaction();
+		this.connection.commitTransaction();
 		transactionInProgress = false;
 	}
 
@@ -219,21 +248,19 @@ public class ArcSDEPooledConnection extends SeConnection {
 		return transactionInProgress;
 	}
 
-	@Override
 	public void rollbackTransaction() throws SeException {
 		checkActive();
-		super.rollbackTransaction();
+	    this.connection.rollbackTransaction();
 		transactionInProgress = false;
 	}
 
 	/**
-	 * Doesn't close the connection, but returns itself to the connection pool.
+	 * Return to the pool (may not close the internal connection, depends on pool settings).
 	 * 
 	 * @throws IllegalStateException
 	 *             if close() is called while a transaction is in progress
 	 * @see #destroy()
 	 */
-	@Override
 	public void close() throws IllegalStateException {
 		checkActive();
 		if (transactionInProgress) {
@@ -248,7 +275,6 @@ public class ArcSDEPooledConnection extends SeConnection {
 				// stackTrace[3].getMethodName();
 				// System.err.println("<- " + caller + " returning " +
 				// toString() + " to pool");
-
 				LOGGER.finer("<- returning " + toString() + " to pool");
 			}
 			this.pool.returnObject(this);
@@ -267,7 +293,7 @@ public class ArcSDEPooledConnection extends SeConnection {
 	 */
 	void destroy() {
 		try {
-			super.close();
+			this.connection.close();
 		} catch (SeException e) {
 			LOGGER.info("closing connection: " + e.getMessage());
 		}
@@ -285,5 +311,99 @@ public class ArcSDEPooledConnection extends SeConnection {
 	public int hashCode() {
 		return 17 ^ this.config.hashCode();
 	}
+	//
+	// Helper method that delgates to internal connection
+	//
+    public List<SeLayer> getLayers() throws SeException {
+        return connection.getLayers();
+    }
+    
+    public String getUser() throws SeException {
+        return connection.getUser();
+    }
 
+    public SeRelease getRelease() {
+        return connection.getRelease();
+    }
+    public String getDatabaseName() throws SeException {
+        return connection.getDatabaseName();
+    }
+    
+    public void setConcurrency( int policy ) throws SeException {
+        connection.setConcurrency( policy );
+    }
+
+    public void setTransactionAutoCommit( int auto ) {
+       connection.setTransactionAutoCommit( auto );
+    }
+    //
+    // Factory methods that make use of internal connection
+    // Q: How "long" are these objects good for? until the connection closes - or longer...
+    //
+    public SeLayer createSeLayer() throws SeException {
+        return new SeLayer(connection);
+    }
+    public SeLayer createSeLayer( String tableName, String shape) throws SeException {
+        return new SeLayer(connection, tableName, shape );
+    }
+    public SeQuery createSeQuery() throws SeException {
+        return new SeQuery(connection);
+    }
+    public SeQuery createSeQuery( String[] propertyNames, SeSqlConstruct sql ) {
+        return new SeQuery(connection, propertyNames, sql );
+    }
+    
+    public SeRegistration createSeRegistration( String typeName ) throws SeException {
+        return new SeRegistration(connection, typeName);
+    }
+
+    public SeTable createSeTable( String qualifiedName ) throws SeException {
+        return new SeTable(connection, qualifiedName);
+    }
+
+    public SeInsert createSeInsert() {
+        return new SeInsert(connection);
+    }
+
+    public SeUpdate createSeUpdate() {
+        return new SeUpdate(connection);
+    }
+
+    public SeDelete createSeDelete() {
+        return new SeDelete(connection);
+    }
+
+    public SeVersion createSeVersion( String versionName ) {
+        return new SeVersion( connection, versionName );
+    }
+    /**
+     * Create an SeState for the provided id.
+     * @param stateId stateId to use, or null
+     * @return SeState
+     * @throws SeException
+     */
+    public SeState createSeState( SeObjectId stateId ) throws SeException {
+        if( stateId == null ){
+            return createSeState();
+        }
+        return new SeState(connection, stateId );
+    }
+    public SeState createSeState() throws SeException {
+        return new SeState( connection );
+    }
+
+    public SeRasterColumn createSeRasterColumn() {
+        return new SeRasterColumn( connection );
+    }
+    public SeRasterColumn createSeRasterColumn( SeObjectId rasterColumnId ) {
+        return new SeRasterColumn( connection, rasterColumnId );
+    }
+    
+    /**
+     * @deprecated used for test cases only
+     * @return
+     */
+    public SeConnection unWrap(){
+        return connection;
+    }
 }

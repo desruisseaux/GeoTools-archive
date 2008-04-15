@@ -107,14 +107,14 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 			// Set up a pyramid and readerprops for the sample three-band imagery
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 			tableName = rasterTestData.getRGBRasterTableName();
-			q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+			q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
 			q.prepareQuery();
 			q.execute();
 			r = q.fetch();
 			rattrThreeBand = r.getRaster(0);
 			q.close();
 
-			SeRasterColumn rcol = new SeRasterColumn(scon, rattrThreeBand.getRasterColumnId());
+			SeRasterColumn rcol = scon.createSeRasterColumn(rattrThreeBand.getRasterColumnId());
 
 			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSysDescription());
 			pyramid = new ArcSDEPyramid(rattrThreeBand, crs);
@@ -139,14 +139,14 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 			// Set up a pyramid and readerprops for the sample 1-bit imagery
 			scon = rasterTestData.getTestData().getConnectionPool().getConnection();
 			tableName = rasterTestData.get1bitRasterTableName();
-			q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+			q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
 			q.prepareQuery();
 			q.execute();
 			r = q.fetch();
 			rattrOneBit = r.getRaster(0);
 			q.close();
 
-			SeRasterColumn rcol = new SeRasterColumn(scon, rattrOneBit.getRasterColumnId());
+			SeRasterColumn rcol = scon.createSeRasterColumn(rattrOneBit.getRasterColumnId());
 
 			CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSysDescription());
 			pyramid = new ArcSDEPyramid(rattrOneBit, crs);

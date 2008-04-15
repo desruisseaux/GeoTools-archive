@@ -18,6 +18,8 @@ package org.geotools.arcsde.data.view;
 
 import java.util.Map;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
@@ -44,7 +46,7 @@ class ColumnQualifier {
      * 
      * @return DOCUMENT ME!
      */
-    public static Column qualify(SeConnection conn, Map tableAliases, Column column) {
+    public static Column qualify(ArcSDEPooledConnection conn, Map tableAliases, Column column) {
         Table table = column.getTable();
 
         String columnName = column.getColumnName();

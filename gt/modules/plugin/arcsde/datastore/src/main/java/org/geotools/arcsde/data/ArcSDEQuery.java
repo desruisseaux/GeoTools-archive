@@ -351,7 +351,7 @@ class ArcSDEQuery {
                     + "'");
         }
 
-        SeQuery seQuery = new SeQuery(connection);
+        SeQuery seQuery = connection.createSeQuery();
         setQueryVersionState(seQuery);
 
         SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
@@ -368,7 +368,7 @@ class ArcSDEQuery {
             // SHAPE.fid as a last resort to get a fid
             if (-51 == e.getSeError().getSdeError()) {
                 seQuery.close();
-                seQuery = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
+                seQuery = connection.createSeQuery(propertyNames, filters.getSeSqlConstruct());
                 setQueryVersionState(seQuery);
                 seQuery.prepareQuery();
             } else {
@@ -444,7 +444,7 @@ class ArcSDEQuery {
     private SeQuery createSeQueryForQueryInfo(final boolean setReturnGeometryMasks)
             throws SeException, IOException {
 
-        SeQuery seQuery = new SeQuery(connection);
+        SeQuery seQuery = connection.createSeQuery();
         setQueryVersionState(seQuery);
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
 

@@ -201,10 +201,10 @@ public class TestData {
 
     public String getTemp_table() throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
-        SeConnection conn = getConnectionPool().getConnection();
+        ArcSDEPooledConnection conn = getConnectionPool().getConnection();
         String tempTableName;
         try {
-            tempTableName = getTemp_table(conn);
+            tempTableName = getTemp_table(conn.unWrap());
         } finally {
             conn.close();
         }
@@ -262,13 +262,13 @@ public class TestData {
         ArcSDEPooledConnection conn = connPool.getConnection();
         try {
             try {
-                SeLayer layer = new SeLayer(conn, tableName, "SHAPE");
+                SeLayer layer = conn.createSeLayer(tableName, "SHAPE");
                 layer.delete();
             } catch (SeException e) {
                 // LOGGER.log(Level.WARNING, "while deleteing layer " + tableName + " got '" +
                 // e.getSeError().getErrDesc() + "'");
             }
-            SeTable table = new SeTable(conn, tableName);
+            SeTable table = conn.createSeTable(tableName);
             table.delete();
         } catch (SeException e) {
             // LOGGER.log(Level.WARNING, "while deleteing table " + tableName + " got '" +
@@ -297,15 +297,15 @@ public class TestData {
              * Create a qualified table name with current user's name and the name of the table to
              * be created, "EXAMPLE".
              */
-            tempTableLayer = new SeLayer(conn);
-            String tableName = getTemp_table(conn);
-            tempTable = new SeTable(conn, tableName);
+            tempTableLayer = conn.createSeLayer();
+            String tableName = getTemp_table(conn.unWrap());
+            tempTable = conn.createSeTable(tableName);
             tempTableLayer.setTableName(tableName);
 
-            tempTableColumns = createBaseTable(conn, tempTable, tempTableLayer, configKeyword);
+            tempTableColumns = createBaseTable(conn.unWrap(), tempTable, tempTableLayer, configKeyword);
 
             if (insertTestData) {
-                insertData(tempTableLayer, conn, tempTableColumns);
+                insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,7 +327,7 @@ public class TestData {
         ArcSDEPooledConnection conn = connPool.getConnection();
         try {
             tempTable.truncate();
-            insertData(tempTableLayer, conn, tempTableColumns);
+            insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
         } finally {
             conn.close();
         }
@@ -843,8 +843,8 @@ public class TestData {
             final int shapeTypeMask) throws SeException {
         System.out.println("Creating layer " + tableName);
 
-        final SeLayer layer = new SeLayer(conn);
-        final SeTable table = new SeTable(conn, tableName);
+        final SeLayer layer = conn.createSeLayer();
+        final SeTable table = conn.createSeTable(tableName);
 
         try {
             table.delete();
@@ -881,7 +881,7 @@ public class TestData {
          * Register the column to be used as feature id and managed by sde
          */
         if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType) {
-            SeRegistration reg = new SeRegistration(conn, table.getName());
+            SeRegistration reg = conn.createSeRegistration(table.getName());
             LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
             reg.setRowIdColumnName("ROW_ID");
             reg.setRowIdColumnType(rowIdColumnType);
@@ -892,8 +892,7 @@ public class TestData {
         if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE == rowIdColumnType) {
             // make the table multiversioned
             System.err.println("Making " + tableName + " versioned...");
-            SeRegistration reg = new SeRegistration(conn);
-            reg.setTableName(tableName);
+            SeRegistration reg = conn.createSeRegistration( tableName );
             reg.getInfo();
             reg.setMultiVersion(true);
             reg.alter();
@@ -938,7 +937,8 @@ public class TestData {
      * @return the versioned table created
      * @throws Exception any exception thrown by sde
      */
-    public SeTable createVersionedTable(final SeConnection conn) throws Exception {
+    public SeTable createVersionedTable(final ArcSDEPooledConnection connection) throws Exception {
+        SeConnection conn = connection.unWrap();
         SeLayer layer = new SeLayer(conn);
         SeTable table;
 
@@ -991,11 +991,11 @@ public class TestData {
         return table;
     }
 
-    public void insertIntoVersionedTable(SeConnection conn,
+    public void insertIntoVersionedTable(ArcSDEPooledConnection conn,
             SeState state,
             String tableName,
             String nameField) throws SeException {
-        SeInsert insert = new SeInsert(conn);
+        SeInsert insert = conn.createSeInsert();
 
         SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
         insert.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);

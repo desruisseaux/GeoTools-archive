@@ -51,7 +51,7 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
     public TransactionDefaultVersionHandler(final ArcSDEPooledConnection connection) throws IOException {
         this.connection = connection;
         try {
-            defaultVersion = new SeVersion(connection, SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+            defaultVersion = connection.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
             defaultVersion.getInfo();
             // initialStateId = defaultVersion.getStateId();
         } catch (SeException e) {
@@ -64,16 +64,16 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
      * 
      * @see ArcSdeVersionHandler#
      */
-    public void setUpStream(final SeConnection connection, SeStreamOp streamOperation)
+    public void setUpStream(final ArcSDEPooledConnection connection, SeStreamOp streamOperation)
             throws IOException {
         if (transactionState == null) {
             try {
                 defaultVersion.getInfo();
-                SeState parentState = new SeState(connection, defaultVersion.getStateId());
+                SeState parentState = connection.createSeState(defaultVersion.getStateId());
                 if (parentState.isOpen()) {
                     parentState.close();
                 }
-                transactionState = new SeState(connection);
+                transactionState = connection.createSeState();
                 transactionState.create(parentState.getId());
             } catch (SeException e) {
                 throw new ArcSdeException(e);
@@ -142,10 +142,10 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
             // parent state is closed, create a new one for it
             defaultVersion.getInfo();
             final SeObjectId defaultVersionStateId = defaultVersion.getStateId();
-            final SeState defaultVersionState = new SeState(connection, defaultVersionStateId);
+            final SeState defaultVersionState = connection.createSeState(defaultVersionStateId);
             if (!defaultVersionState.isOpen()) {
                 // create a new open state as child of the current version closed state
-                SeState newOpenState = new SeState(connection);
+                SeState newOpenState = connection.createSeState(null);
                 newOpenState.create(defaultVersionStateId);
                 final SeObjectId newStateId = newOpenState.getId();
                 defaultVersion.changeState(newStateId);

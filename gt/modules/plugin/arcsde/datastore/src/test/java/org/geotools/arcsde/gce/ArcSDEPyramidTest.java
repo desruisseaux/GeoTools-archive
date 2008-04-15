@@ -106,7 +106,7 @@ public class ArcSDEPyramidTest extends TestCase {
         ArcSDEPooledConnection scon = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(conProps
+            SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
                     .getProperty("threebandtable")));
             q.prepareQuery();
             q.execute();
@@ -154,7 +154,7 @@ public class ArcSDEPyramidTest extends TestCase {
         ArcSDEPooledConnection scon = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            SeQuery q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(conProps
+            SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
                     .getProperty("fourbandtable")));
             q.prepareQuery();
             q.execute();

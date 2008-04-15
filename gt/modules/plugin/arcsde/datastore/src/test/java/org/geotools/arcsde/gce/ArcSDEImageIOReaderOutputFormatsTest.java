@@ -111,7 +111,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             // Set up a pyramid and readerprops for the four-band 2005 imagery
             scon = pool.getConnection();
             tableName = conProps.getProperty("fourbandtable");
-            q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
@@ -137,7 +137,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             // Set up a pyramid and readerprops for the three-band 2001 imagery
             scon = pool.getConnection();
             conProps.getProperty("threebandtable");
-            q = new SeQuery(scon, new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();

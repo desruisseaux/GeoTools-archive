@@ -495,7 +495,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int shapeIndex = 5;
         final int expectedCount = 7;
 
-        SeQuery query = new SeQuery(conn);
+        SeQuery query = conn.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -564,7 +564,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int shapeIndex = 2;
         final int expectedCount = 7;
 
-        SeQuery query = new SeQuery(conn);
+        SeQuery query = conn.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -624,7 +624,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         // final int shapeIndex = 5;
         final int expectedCount = 6;
 
-        SeQuery query = new SeQuery(conn);
+        SeQuery query = conn.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -684,7 +684,7 @@ public class SDEJavaApiJoinTest extends TestCase {
     public void testApiPlainSql() throws Exception {
         ArcSDEPooledConnection conn = store.getConnectionPool().getConnection();
 
-        final SeQuery query = new SeQuery(conn);
+        final SeQuery query = conn.createSeQuery();
         final String plainQuery = "SELECT " + InProcessViewSupportTestData.MASTER + ".ID, "
                 + InProcessViewSupportTestData.MASTER + ".SHAPE, "
                 + InProcessViewSupportTestData.CHILD + ".NAME  FROM "

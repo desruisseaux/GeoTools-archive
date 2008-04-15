@@ -227,7 +227,7 @@ public class RasterTestData {
             throws Exception {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
-        SeTable table = new SeTable(conn, tableName);
+        SeTable table = conn.createSeTable(tableName);
 
         // first column to be SDE managed feature id
         colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
@@ -238,7 +238,7 @@ public class RasterTestData {
         /*
          * Register the column to be used as feature id and managed by sde
          */
-        SeRegistration reg = new SeRegistration(conn, table.getName());
+        SeRegistration reg = conn.createSeRegistration(table.getName());
         LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
         reg.setRowIdColumnName("ROW_ID");
         final int rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
@@ -269,7 +269,7 @@ public class RasterTestData {
 
             // much of this code is from
             // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
-            SeRasterColumn rasCol = new SeRasterColumn(conn);
+            SeRasterColumn rasCol = conn.createSeRasterColumn();
             rasCol.setTableName(tableName);
             rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
             rasCol.setRasterColumnName("RASTER");
@@ -304,7 +304,7 @@ public class RasterTestData {
             attr.setRasterProducer(prod);
 
             try {
-                SeInsert insert = new SeInsert(conn);
+                SeInsert insert = conn.createSeInsert();
                 insert.intoTable(tableName, new String[] { "RASTER" });
                 // no buffered writes on raster loads
                 insert.setWriteMode(false);
@@ -385,7 +385,7 @@ public class RasterTestData {
         ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
 
         try {
-            SeQuery query = new SeQuery(conn, new String[] { conn.getRasterColumn(rasterName)
+            SeQuery query = conn.createSeQuery(new String[] { conn.getRasterColumn(rasterName)
                     .getName() }, new SeSqlConstruct(rasterName));
             conn.getLock().lock();
             query.prepareQuery();

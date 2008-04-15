@@ -251,7 +251,7 @@ public class ArcSDEAdapter {
 
         SeRegistration registration;
         try {
-            registration = new SeRegistration(connection, typeName);
+            registration = connection.createSeRegistration(typeName);
         } catch (SeException e) {
             throw new ArcSdeException("Can't get a registration object for " + typeName, e);
         }
@@ -334,7 +334,7 @@ public class ArcSDEAdapter {
 
         final SeQuery testQuery;
         try {
-            testQuery = new SeQuery(conn);
+            testQuery = conn.createSeQuery();
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
@@ -933,7 +933,7 @@ public class ArcSDEAdapter {
                 LOGGER.finer("full qualified type name provided by user: " + qualifiedName);
             }
 
-            layer = new SeLayer(connection);
+            layer = connection.createSeLayer();
             layer.setTableName(qualifiedName);
             layer.setCreationKeyword(configKeyword);
 
@@ -980,7 +980,7 @@ public class ArcSDEAdapter {
             table.dropColumn(HACK_COL_NAME);
 
             LOGGER.fine("setting up table registration with ArcSDE...");
-            SeRegistration reg = new SeRegistration(connection, table.getName());
+            SeRegistration reg = connection.createSeRegistration( table.getName() );
             if (rowIdColumn != null) {
                 LOGGER.fine("setting rowIdColumnName to " + rowIdColumn + " in table "
                         + reg.getTableName());
@@ -1010,7 +1010,7 @@ public class ArcSDEAdapter {
         SeTable table;
         final SeColumnDefinition[] tmpCol = { new SeColumnDefinition(hackColName,
                 SeColumnDefinition.TYPE_STRING, 4, 0, true) };
-        table = new SeTable(connection, qualifiedName);
+        table = connection.createSeTable(qualifiedName);
 
         try {
             LOGGER.warning("Remove the line 'table.delete()' for production use!!!");

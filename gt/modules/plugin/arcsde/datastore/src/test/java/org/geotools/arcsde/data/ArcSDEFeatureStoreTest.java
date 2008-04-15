@@ -205,7 +205,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             int objectId = (int) ArcSDEAdapter.getNumericFid(fid);
             String whereClause = "ROW_ID=" + objectId;
-            seQuery = new SeQuery(connection, new String[] { "ROW_ID", "INT32_COL", "STRING_COL" },
+            seQuery = connection.createSeQuery(new String[] { "ROW_ID", "INT32_COL", "STRING_COL" },
                     new SeSqlConstruct(typeName, whereClause));
             seQuery.prepareQuery();
             seQuery.execute();
@@ -1300,7 +1300,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                SeConnection conn = testData.getConnectionPool().getConnection();
+                ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
                 try {
                     SeTable versionedTable = testData.createVersionedTable(conn);
                     tableName = versionedTable.getQualifiedName();
@@ -1398,7 +1398,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                SeConnection conn = testData.getConnectionPool().getConnection();
+                ArcSDEPooledConnection conn = testData.getConnectionPool().getConnection();
                 try {
                     SeTable versionedTable = testData.createVersionedTable(conn);
                     tableName = versionedTable.getQualifiedName();

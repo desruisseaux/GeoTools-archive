@@ -459,4 +459,5 @@ public class ArcSDEConnectionPool {
         ret.append(pool.getNumIdle() + "/" + ((GenericObjectPool) pool).getMaxIdle() + "]");
         return ret.toString();
     }
+
 }
