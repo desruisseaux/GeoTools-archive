@@ -377,7 +377,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             // String where = null;
             String[] cols = { "SHAPE" };
             SeFilter[] spatFilters;
-            {
+            try {
                 SeExtent extent = new SeExtent(179, -1, 180, 0);
                 SeLayer layer = conn.getLayer(typeName);
                 SeShape filterShape = new SeShape(layer.getCoordRef());
@@ -386,6 +386,9 @@ public class ArcSDEJavaApiTest extends TestCase {
                 SeShapeFilter bboxFilter = new SeShapeFilter(typeName, layer.getSpatialColumn(),
                         filterShape, SeFilter.METHOD_ENVP, true);
                 spatFilters = new SeFilter[] { bboxFilter };
+            }
+            catch (SeException eek){
+                throw new ArcSdeException( eek );
             }
             SeQuery spatialQuery = null;
             SeSqlConstruct sqlCons = new SeSqlConstruct(typeName);
@@ -421,7 +424,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             String where = "INT32_COL < 5";
             String[] cols = { "SHAPE" };
             SeFilter[] spatFilters;
-            {
+            try {
                 SeExtent extent = new SeExtent(179, -1, 180, 0);
                 SeLayer layer = conn.getLayer(typeName);
                 SeShape filterShape = new SeShape(layer.getCoordRef());
@@ -430,6 +433,9 @@ public class ArcSDEJavaApiTest extends TestCase {
                 SeShapeFilter bboxFilter = new SeShapeFilter(typeName, layer.getSpatialColumn(),
                         filterShape, SeFilter.METHOD_ENVP, true);
                 spatFilters = new SeFilter[] { bboxFilter };
+            }
+            catch (SeException eek){
+                throw new ArcSdeException( eek );
             }
             SeQuery spatialQuery = null;
             SeSqlConstruct sqlCons = new SeSqlConstruct(typeName);
@@ -1094,7 +1100,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             } catch (SeException e) {
                 int sdeError = e.getSeError().getSdeError();
                 if (sdeError != -177) {
-                    throw e;
+                    throw new ArcSdeException( e );                    
                 }
                 // "VERSION ALREADY EXISTS", ignore and continue..
                 newVersion.getInfo();
