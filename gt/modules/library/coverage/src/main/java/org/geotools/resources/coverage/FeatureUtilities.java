@@ -274,7 +274,7 @@ public final class FeatureUtilities {
 			final int x = (int) (coords[0] + 0.5d);
 			final int y = (int) (coords[1] + 0.5d);
 			if (points != null)
-				points.add(new Point2D.Double(x, y));
+				points.add(new Point2D.Double(coords[0],coords[1]));
 
 			// send it back to the returned polygon
 			retValue.addPoint(x, y);

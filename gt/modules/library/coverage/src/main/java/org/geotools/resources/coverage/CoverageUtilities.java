@@ -521,4 +521,26 @@ public final class CoverageUtilities {
         }
         return requestedRes;
     }
+
+    /**
+     * Tries to estimate if the supplied affine transform is either a scale and
+     * translate transform or if it contains a rotations which is an integer
+     * multiple of PI/2.
+     * 
+     * @param sourceGridToWorldTransform an instance of {@link AffineTransform} to check against.
+     * @param EPS tolerance value for comparisons.
+     * @return <code>true</code> if this transform is "simple", <code>false</code> otherwise.
+     */
+    public static boolean isSimpleGridToWorldTransform(
+            final AffineTransform sourceGridToWorldTransform, double EPS) {
+        final double rotationEsteem = XAffineTransform.getRotation(sourceGridToWorldTransform);
+        // check if there is a valid rotation value (it could be 0!)
+        if (!Double.isNaN(rotationEsteem)) {
+                double  badRotation=Math.abs(rotationEsteem/(Math.PI/2));
+                if(Math.abs(badRotation-Math.floor(badRotation))<EPS)
+            	// there is no rotation and skew or there is a rotation multiple of PI/2
+            	return true;
+        }
+        return false;
+    }
 }
