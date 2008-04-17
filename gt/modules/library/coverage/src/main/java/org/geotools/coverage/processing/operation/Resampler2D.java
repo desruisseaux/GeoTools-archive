@@ -375,10 +375,10 @@ final class Resampler2D extends GridCoverage2D {
              *
              * - User provided no GridGeometry at all. Then, constructs an image of the same size
              *   than the source image and set an envelope big enough to contains the projected
-             *   coordinates. The transform will derivate from the grid range and the envelope.
+             *   coordinates. The transform will derive from the grid range and the envelope.
              *
              * - User provided only a grid range.  Then, set an envelope big enough to contains
-             *   the projected coordinates. The transform will derivate from the grid range and
+             *   the projected coordinates. The transform will derive from the grid range and
              *   the envelope.
              *
              * - User provided only a "grid to CRS" transform. Then, transform the projected
@@ -549,7 +549,7 @@ final class Resampler2D extends GridCoverage2D {
              *
              * NOTE 2: "Affine", "Scale", "Translate", "Rotate" and similar operations ignore
              *         the 'xmin', 'ymin', 'width' and 'height' image layout. Consequently, we
-             *         can't use this operation if the user provided explicitely a grid range.
+             *         can't use this operation if the user provided explicitly a grid range.
              *
              * NOTE 3: If the user didn't specified any grid geometry, then a yet cheaper approach
              *         is to just update the 'gridToCRS' value. We returns a grid coverage wrapping
