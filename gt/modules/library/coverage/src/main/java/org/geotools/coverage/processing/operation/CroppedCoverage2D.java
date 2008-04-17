@@ -115,9 +115,9 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 *            paletted images.
 	 * @param rasterSpaceROI
 	 *            in case we used the JAI's mosaic with a ROI this
-	 *            {@link java.awt.Polygon} will hold the used roi.ù
+	 *            {@link java.awt.Polygon} will hold the used roi.
 	 * @param hints
-     *          An optional set of hints, or {@code null} if none.
+         *            An optional set of hints, or {@code null} if none.
 	 */
 	private CroppedCoverage2D(InternationalString name,
 			PlanarImage sourceRaster, GridGeometry2D croppedGeometry,
