@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-import javax.media.jai.util.Range;
 import javax.units.ConversionException;
 import javax.units.Converter;
 import javax.units.Unit;

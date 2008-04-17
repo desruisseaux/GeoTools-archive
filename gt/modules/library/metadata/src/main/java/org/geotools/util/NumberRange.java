@@ -16,20 +16,19 @@
  */
 package org.geotools.util;
 
-import javax.media.jai.util.Range;
-
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
-
 /**
- * A range of numbers. {@linkplain #union Union} and {@linkplain #intersect intersection}
- * are computed as usual, except that widening conversions will be applied as needed.
- *
+ * A range of numbers. {@linkplain #union Union} and
+ * {@linkplain #intersect intersection} are computed as usual, except that
+ * widening conversions will be applied as needed.
+ * 
  * @since 2.0
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/src/main/java/org/geotools/util/NumberRange.java $
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -41,9 +40,11 @@ public class NumberRange extends Range {
 
     /**
      * Constructs an inclusive range of {@code byte} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final byte minimum, final byte maximum) {
         this(minimum, true, maximum, true);
@@ -51,24 +52,28 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code byte} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final byte minimum, final boolean isMinIncluded,
-                       final byte maximum, final boolean isMaxIncluded)
-    {
-        super(Byte.class, Byte.valueOf(minimum), isMinIncluded,
-                          Byte.valueOf(maximum), isMaxIncluded);
+            final byte maximum, final boolean isMaxIncluded) {
+        super(Byte.class, minimum, isMinIncluded, maximum, isMaxIncluded);
     }
 
     /**
      * Constructs an inclusive range of {@code short} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final short minimum, final short maximum) {
         this(minimum, true, maximum, true);
@@ -76,24 +81,29 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code short} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final short minimum, final boolean isMinIncluded,
-                       final short maximum, final boolean isMaxIncluded)
-    {
-        super(Short.class, Short.valueOf(minimum), isMinIncluded,
-                           Short.valueOf(maximum), isMaxIncluded);
+            final short maximum, final boolean isMaxIncluded) {
+        super(Short.class, Short.valueOf(minimum), isMinIncluded, Short
+                .valueOf(maximum), isMaxIncluded);
     }
 
     /**
      * Constructs an inclusive range of {@code int} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final int minimum, final int maximum) {
         this(minimum, true, maximum, true);
@@ -101,24 +111,29 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code int} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final int minimum, final boolean isMinIncluded,
-                       final int maximum, final boolean isMaxIncluded)
-    {
-        super(Integer.class, Integer.valueOf(minimum), isMinIncluded,
-                             Integer.valueOf(maximum), isMaxIncluded);
+            final int maximum, final boolean isMaxIncluded) {
+        super(Integer.class, Integer.valueOf(minimum), isMinIncluded, Integer
+                .valueOf(maximum), isMaxIncluded);
     }
 
     /**
      * Constructs an inclusive range of {@code long} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final long minimum, final long maximum) {
         this(minimum, true, maximum, true);
@@ -126,24 +141,29 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code long} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final long minimum, final boolean isMinIncluded,
-                       final long maximum, final boolean isMaxIncluded)
-    {
-        super(Long.class, Long.valueOf(minimum), isMinIncluded,
-                          Long.valueOf(maximum), isMaxIncluded);
+            final long maximum, final boolean isMaxIncluded) {
+        super(Long.class, Long.valueOf(minimum), isMinIncluded, Long
+                .valueOf(maximum), isMaxIncluded);
     }
 
     /**
      * Constructs an inclusive range of {@code float} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final float minimum, final float maximum) {
         this(minimum, true, maximum, true);
@@ -151,24 +171,29 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code float} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final float minimum, final boolean isMinIncluded,
-                       final float maximum, final boolean isMaxIncluded)
-    {
-        super(Float.class, Float.valueOf(minimum), isMinIncluded,
-                           Float.valueOf(maximum), isMaxIncluded);
+            final float maximum, final boolean isMaxIncluded) {
+        super(Float.class, Float.valueOf(minimum), isMinIncluded, Float
+                .valueOf(maximum), isMaxIncluded);
     }
 
     /**
      * Constructs an inclusive range of {@code double} values.
-     *
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * 
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
     public NumberRange(final double minimum, final double maximum) {
         this(minimum, true, maximum, true);
@@ -176,104 +201,134 @@ public class NumberRange extends Range {
 
     /**
      * Constructs a range of {@code double} values.
-     *
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
+     * 
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
      */
     public NumberRange(final double minimum, final boolean isMinIncluded,
-                       final double maximum, final boolean isMaxIncluded)
-    {
-        super(Double.class, Double.valueOf(minimum), isMinIncluded,
-                            Double.valueOf(maximum), isMaxIncluded);
+            final double maximum, final boolean isMaxIncluded) {
+        super(Double.class, Double.valueOf(minimum), isMinIncluded, Double
+                .valueOf(maximum), isMaxIncluded);
     }
 
     /**
-     * Constructs an inclusive range of {@link Comparable} objects.
-     * This constructor is used by {@link RangeSet#newRange} only.
-     *
-     * @param type The element class, usually one of {@link Byte}, {@link Short},
-     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
+     * Constructs an inclusive range of {@link Comparable} objects. This
+     * constructor is used by {@link RangeSet#newRange} only.
+     * 
+     * @param type
+     *            The element class, usually one of {@link Byte}, {@link Short},
+     *            {@link Integer}, {@link Long}, {@link Float} or
+     *            {@link Double}.
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
      */
-    NumberRange(final Class<? extends Number> type, final Comparable minimum, final Comparable maximum) {
+    NumberRange(final Class<? extends Number> type, final Comparable minimum,
+            final Comparable maximum) {
         super(type, minimum, maximum);
     }
 
     /**
      * Constructs an inclusive range of {@link Number} objects.
-     *
-     * @param type The element class, usually one of {@link Byte}, {@link Short},
-     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @param minimum The minimum value, inclusive.
-     * @param maximum The maximum value, <strong>inclusive</strong>.
-     * @throws ClassCastException if some elements are not instances of the specified class.
+     * 
+     * @param type
+     *            The element class, usually one of {@link Byte}, {@link Short},
+     *            {@link Integer}, {@link Long}, {@link Float} or
+     *            {@link Double}.
+     * @param minimum
+     *            The minimum value, inclusive.
+     * @param maximum
+     *            The maximum value, <strong>inclusive</strong>.
+     * @throws ClassCastException
+     *             if some elements are not instances of the specified class.
      */
-    public <N extends Number> NumberRange(final Class<? extends N> type, final N minimum, final N maximum)
-            throws ClassCastException
-    {
+    public <N extends Number> NumberRange(final Class<? extends N> type,
+            final N minimum, final N maximum) throws ClassCastException {
         super(type, (Comparable) minimum, (Comparable) maximum);
     }
 
     /**
      * Constructs a range of {@link Number} objects.
-     *
-     * @param type The element class, usually one of {@link Byte}, {@link Short},
-     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @param minimum The minimum value.
-     * @param isMinIncluded Defines whether the minimum value is included in the Range.
-     * @param maximum The maximum value.
-     * @param isMaxIncluded Defines whether the maximum value is included in the Range.
-     * @throws ClassCastException if some elements are not instances of the specified class.
+     * 
+     * @param type
+     *            The element class, usually one of {@link Byte}, {@link Short},
+     *            {@link Integer}, {@link Long}, {@link Float} or
+     *            {@link Double}.
+     * @param minimum
+     *            The minimum value.
+     * @param isMinIncluded
+     *            Defines whether the minimum value is included in the Range.
+     * @param maximum
+     *            The maximum value.
+     * @param isMaxIncluded
+     *            Defines whether the maximum value is included in the Range.
+     * @throws ClassCastException
+     *             if some elements are not instances of the specified class.
      */
     public <N extends Number> NumberRange(final Class<? extends N> type,
-                                          final N minimum, final boolean isMinIncluded,
-                                          final N maximum, final boolean isMaxIncluded)
-            throws ClassCastException
-    {
-        super(type, (Comparable)minimum, isMinIncluded, (Comparable)maximum, isMaxIncluded);
+            final N minimum, final boolean isMinIncluded, final N maximum,
+            final boolean isMaxIncluded) throws ClassCastException {
+        super(type, (Comparable) minimum, isMinIncluded, (Comparable) maximum,
+                isMaxIncluded);
     }
 
     /**
-     * Constructs a range with the same values than the specified range,
-     * casted to the specified type.
-     *
-     * @param type The element class, usually one of {@link Byte}, {@link Short},
-     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @param range The range to copy. The elements must be {@link Number} instances.
-     * @throws ClassCastException if some elements are not instances of the specified class.
+     * Constructs a range with the same values than the specified range, casted
+     * to the specified type.
+     * 
+     * @param type
+     *            The element class, usually one of {@link Byte}, {@link Short},
+     *            {@link Integer}, {@link Long}, {@link Float} or
+     *            {@link Double}.
+     * @param range
+     *            The range to copy. The elements must be {@link Number}
+     *            instances.
+     * @throws ClassCastException
+     *             if some elements are not instances of the specified class.
      */
-    @SuppressWarnings("unchecked")  // Check will be performed by super-class constructor
-    <N extends Number> NumberRange(final Class<? extends N> type, final Range range)
-            throws ClassCastException
-    {
-        this(type, ClassChanger.cast((N) range.getMinValue(), type), range.isMinIncluded(),
-                   ClassChanger.cast((N) range.getMaxValue(), type), range.isMaxIncluded());
+    @SuppressWarnings("unchecked")
+    // Check will be performed by super-class constructor
+    <N extends Number> NumberRange(final Class<? extends N> type,
+            final Range range) throws ClassCastException {
+        this(type, ClassChanger.cast((N) range.getMinValue(), type), range
+                .isMinIncluded(), ClassChanger.cast((N) range.getMaxValue(),
+                type), range.isMaxIncluded());
     }
 
     /**
-     * Constructs a range with the same type and the same values than the specified range.
-     * This is a copy constructor.
-     *
-     * @param range The range to copy. The elements must be {@link Number} instances.
-     * @throws ClassCastException if some elements are not instances of {@link Number}.
-     *
+     * Constructs a range with the same type and the same values than the
+     * specified range. This is a copy constructor.
+     * 
+     * @param range
+     *            The range to copy. The elements must be {@link Number}
+     *            instances.
+     * @throws ClassCastException
+     *             if some elements are not instances of {@link Number}.
+     * 
      * @since 2.4
      */
     public NumberRange(final Range range) throws ClassCastException {
-        this(getElementClass(range),
-             (Number) range.getMinValue(), range.isMinIncluded(),
-             (Number) range.getMaxValue(), range.isMaxIncluded());
+        this(getElementClass(range), (Number) range.getMinValue(), range
+                .isMinIncluded(), (Number) range.getMaxValue(), range
+                .isMaxIncluded());
     }
 
     /**
-     * Wraps the specified {@link Range} in a {@code NumberRange} object. If the specified
-     * range is already an instance of {@code NumberRange}, then it is returned unchanged.
-     *
-     * @param  range The range to wrap
-     * @return The same range than {@code range} as a {@code NumberRange} object.
+     * Wraps the specified {@link Range} in a {@code NumberRange} object. If the
+     * specified range is already an instance of {@code NumberRange}, then it
+     * is returned unchanged.
+     * 
+     * @param range
+     *            The range to wrap
+     * @return The same range than {@code range} as a {@code NumberRange}
+     *         object.
      */
     public static NumberRange wrap(final Range range) {
         if (range instanceof NumberRange) {
@@ -286,8 +341,7 @@ public class NumberRange extends Range {
      * Returns the type of minimum and maximum values.
      */
     private static Class<? extends Number> getElementClass(final Range range)
-            throws ClassCastException
-    {
+            throws ClassCastException {
         @SuppressWarnings("unchecked")
         final Class<? extends Number> type = range.getElementClass();
         if (!Number.class.isAssignableFrom(type)) {
@@ -309,16 +363,19 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Casts the specified range to the specified type. If this class is associated to a unit of
-     * measurement, then this method convert the {@code range} units to the same units than this
-     * instance. This method is overriden by {@link MeasurementRange} only in the way described
-     * above.
-     *
-     * @param type The class to cast to. Must be one of {@link Byte}, {@link Short},
-     *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
+     * Casts the specified range to the specified type. If this class is
+     * associated to a unit of measurement, then this method convert the
+     * {@code range} units to the same units than this instance. This method is
+     * overriden by {@link MeasurementRange} only in the way described above.
+     * 
+     * @param type
+     *            The class to cast to. Must be one of {@link Byte},
+     *            {@link Short}, {@link Integer}, {@link Long}, {@link Float}
+     *            or {@link Double}.
      * @return The casted range, or {@code range} if no cast is needed.
      */
-    NumberRange convertAndCast(final Range range, final Class<? extends Number> type) {
+    NumberRange convertAndCast(final Range range,
+            final Class<? extends Number> type) {
         if (type.equals(range.getElementClass())) {
             return wrap(range);
         }
@@ -327,26 +384,29 @@ public class NumberRange extends Range {
 
     /**
      * Casts this range to the specified type.
-     *
-     * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
-     *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @return The casted range, or {@code this} if this range already uses the specified type.
+     * 
+     * @param type
+     *            The class to cast to. Must be one of {@link Byte},
+     *            {@link Short}, {@link Integer}, {@link Long}, {@link Float}
+     *            or {@link Double}.
+     * @return The casted range, or {@code this} if this range already uses the
+     *         specified type.
      */
     public NumberRange castTo(final Class<? extends Number> type) {
         return convertAndCast(this, type);
     }
 
     /**
-     * Casts the given range to an instance of this class.
-     * To be overriden by {@link MeasurementRange} only.
+     * Casts the given range to an instance of this class. To be overriden by
+     * {@link MeasurementRange} only.
      */
     NumberRange cast(final Range range) {
         return new NumberRange(range);
     }
 
     /**
-     * Returns an initially empty array of the given length.
-     * To be overriden by {@link MeasurementRange} only.
+     * Returns an initially empty array of the given length. To be overriden by
+     * {@link MeasurementRange} only.
      */
     NumberRange[] newArray(final int length) {
         return new NumberRange[length];
@@ -364,8 +424,8 @@ public class NumberRange extends Range {
      * Returns {@code true} if the specified value is within this range.
      */
     public boolean contains(final Number value) {
-        final Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), value.getClass());
+        final Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), value.getClass());
         return castTo(type).containsImpl(ClassChanger.cast(value, type));
     }
 
@@ -381,8 +441,8 @@ public class NumberRange extends Range {
      */
     @Override
     public boolean contains(final Range range) {
-        final Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
+        final Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), getElementClass(range));
         return castTo(type).containsImpl(convertAndCast(range, type));
     }
 
@@ -398,8 +458,8 @@ public class NumberRange extends Range {
      */
     @Override
     public boolean intersects(final Range range) {
-        final Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
+        final Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), getElementClass(range));
         return castTo(type).intersectsImpl(convertAndCast(range, type));
     }
 
@@ -411,13 +471,13 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns the union of this range with the given range.
-     * Widening conversions will be applied as needed.
+     * Returns the union of this range with the given range. Widening
+     * conversions will be applied as needed.
      */
     @Override
     public NumberRange union(final Range range) {
-        final Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
+        final Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), getElementClass(range));
         return cast(castTo(type).unionImpl(convertAndCast(range, type)));
     }
 
@@ -429,25 +489,28 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns the intersection of this range with the given range.
-     * Widening conversions will be applied as needed.
+     * Returns the intersection of this range with the given range. Widening
+     * conversions will be applied as needed.
      */
     @Override
     public NumberRange intersect(final Range range) {
-        Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        final Range result = castTo(type).intersectImpl(convertAndCast(range, type));
+        Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), getElementClass(range));
+        final Range result = castTo(type).intersectImpl(
+                convertAndCast(range, type));
         /*
-         * Use a finer type capable to holds the result (since the intersection may have
-         * reduced the range), but not finer than the finest type of the ranges used in
-         * the intersection calculation.
+         * Use a finer type capable to holds the result (since the intersection
+         * may have reduced the range), but not finer than the finest type of
+         * the ranges used in the intersection calculation.
          */
-        type = ClassChanger.getFinestClass(getElementClass(), getElementClass(range));
-        return convertAndCast(result,
-                ClassChanger.getWidestClass(type,
-                ClassChanger.getWidestClass(
-                ClassChanger.getFinestClass(((Number)result.getMinValue()).doubleValue()),
-                ClassChanger.getFinestClass(((Number)result.getMaxValue()).doubleValue()))));
+        type = ClassChanger.getFinestClass(getElementClass(),
+                getElementClass(range));
+        return convertAndCast(result, ClassChanger.getWidestClass(type,
+                ClassChanger.getWidestClass(ClassChanger
+                        .getFinestClass(((Number) result.getMinValue())
+                                .doubleValue()), ClassChanger
+                        .getFinestClass(((Number) result.getMaxValue())
+                                .doubleValue()))));
     }
 
     /**
@@ -458,17 +521,19 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns the range of values that are in this range but not in the given range.
+     * Returns the range of values that are in this range but not in the given
+     * range.
      */
     @Override
     public NumberRange[] subtract(final Range range) {
-        Class<? extends Number> type =
-                ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        final Range[] result = castTo(type).subtractImpl(convertAndCast(range, type));
+        Class<? extends Number> type = ClassChanger.getWidestClass(
+                getElementClass(), getElementClass(range));
+        final Range[] result = castTo(type).subtractImpl(
+                convertAndCast(range, type));
         final NumberRange[] casted;
         if (result != null) {
             casted = newArray(result.length);
-            for (int i=0; i<result.length; i++) {
+            for (int i = 0; i < result.length; i++) {
                 casted[i] = cast(result[i]);
             }
         } else {
@@ -486,20 +551,22 @@ public class NumberRange extends Range {
 
     /**
      * Returns the {@linkplain #getMinValue minimum value} as a {@code double}.
-     * If this range is unbounded, then {@link Double#NEGATIVE_INFINITY} is returned.
+     * If this range is unbounded, then {@link Double#NEGATIVE_INFINITY} is
+     * returned.
      */
     public double getMinimum() {
         final Number value = (Number) getMinValue();
-        return (value!=null) ? value.doubleValue() : Double.NEGATIVE_INFINITY;
+        return (value != null) ? value.doubleValue() : Double.NEGATIVE_INFINITY;
     }
 
     /**
-     * Returns the {@linkplain #getMinimum() minimum value} with the specified inclusive or
-     * exclusive state. If this range is unbounded, then {@link Double#NEGATIVE_INFINITY} is
-     * returned.
-     *
-     * @param  inclusive {@code true} for the minimum value inclusive,
-     *         or {@code false} for the minimum value exclusive.
+     * Returns the {@linkplain #getMinimum() minimum value} with the specified
+     * inclusive or exclusive state. If this range is unbounded, then
+     * {@link Double#NEGATIVE_INFINITY} is returned.
+     * 
+     * @param inclusive
+     *            {@code true} for the minimum value inclusive, or {@code false}
+     *            for the minimum value exclusive.
      * @return The minimum value, inclusive or exclusive as requested.
      */
     public double getMinimum(final boolean inclusive) {
@@ -512,20 +579,22 @@ public class NumberRange extends Range {
 
     /**
      * Returns the {@linkplain #getMaxValue maximum value} as a {@code double}.
-     * If this range is unbounded, then {@link Double#POSITIVE_INFINITY} is returned.
+     * If this range is unbounded, then {@link Double#POSITIVE_INFINITY} is
+     * returned.
      */
     public double getMaximum() {
         final Number value = (Number) getMaxValue();
-        return (value!=null) ? value.doubleValue() : Double.POSITIVE_INFINITY;
+        return (value != null) ? value.doubleValue() : Double.POSITIVE_INFINITY;
     }
 
     /**
-     * Returns the {@linkplain #getMaximum() maximum value} with the specified inclusive or
-     * exclusive state. If this range is unbounded, then {@link Double#POSITIVE_INFINITY} is
-     * returned.
-     *
-     * @param  inclusive {@code true} for the maximum value inclusive,
-     *         or {@code false} for the maximum value exclusive.
+     * Returns the {@linkplain #getMaximum() maximum value} with the specified
+     * inclusive or exclusive state. If this range is unbounded, then
+     * {@link Double#POSITIVE_INFINITY} is returned.
+     * 
+     * @param inclusive
+     *            {@code true} for the maximum value inclusive, or {@code false}
+     *            for the maximum value exclusive.
      * @return The maximum value, inclusive or exclusive as requested.
      */
     public double getMaximum(final boolean inclusive) {

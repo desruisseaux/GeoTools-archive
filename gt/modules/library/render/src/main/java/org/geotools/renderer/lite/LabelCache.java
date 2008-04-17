@@ -19,17 +19,17 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
 
-import javax.media.jai.util.Range;
-
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.util.NumberRange;
+import org.geotools.util.Range;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * An interface for a label cache. 
  * 
  * @author jeichar
- * @since 0.9.0
+ * @since 2.2
  * @source $URL$
  */
 public interface LabelCache {
@@ -54,7 +54,7 @@ public interface LabelCache {
 	 * @param shape the shape to be labeled.  This is in screen coordinates.
 	 * @param scaleRange the scaleRange that the symbolizer is legal
 	 */
-	void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, Range scaleRange) ;
+	void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange scaleRange) ;
 	/**
 	 * Called to indicate that a layer is done rendering.  The method may draw labels if appropriate
 	 * for the labeling algorithm 

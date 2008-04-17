@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import javax.media.jai.util.Range;
 
 import org.opengis.util.Cloneable;
 

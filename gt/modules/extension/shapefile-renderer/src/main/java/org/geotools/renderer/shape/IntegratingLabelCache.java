@@ -25,6 +25,7 @@ import javax.media.jai.util.Range;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.lite.LabelCache;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -78,7 +79,7 @@ class IntegratingLabelCache implements LabelCache {
     }
 
     public void put(String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape,
-            Range scaleRange) {
+            NumberRange scaleRange) {
         wrapped.put(layerId, symbolizer, feature, shape, scaleRange);
     }
 

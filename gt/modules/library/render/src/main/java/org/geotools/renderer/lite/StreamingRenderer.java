@@ -44,7 +44,6 @@ import javax.media.jai.InterpolationBicubic;
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.util.Range;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -93,6 +92,7 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.geotools.util.Range;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -1629,7 +1629,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param layerId 
 	 */
 	final private void process(RenderableFeature rf, LiteFeatureTypeStyle style,
-			Range scaleRange, AffineTransform at,
+			NumberRange scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
 		boolean doElse = true;
@@ -1689,7 +1689,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	final private void processSymbolizers(final Graphics2D graphics,
 			final RenderableFeature drawMe, final Symbolizer[] symbolizers,
-			Range scaleRange, AffineTransform at,
+			NumberRange scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
 		final int length = symbolizers.length;

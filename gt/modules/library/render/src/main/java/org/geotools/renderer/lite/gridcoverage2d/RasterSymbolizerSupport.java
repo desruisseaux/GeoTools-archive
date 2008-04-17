@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.util.Range;
-
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
@@ -30,6 +28,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.RasterSymbolizer;
+import org.geotools.util.NumberRange;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.expression.Expression;
@@ -241,7 +240,7 @@ public final class RasterSymbolizerSupport {
 		Category category;
 		Color[] colors;
 		final int length = categories.length;
-		Range range;
+		NumberRange range;
 		int lower;
 		int upper;
 		for (int j = length; --j >= 0;) {

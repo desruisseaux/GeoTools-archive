@@ -7,10 +7,10 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
 
-import javax.media.jai.util.Range;
-
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.util.NumberRange;
+import org.geotools.util.Range;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -60,7 +60,7 @@ public class SynchronizedLabelCache implements LabelCache {
     }
 
     
-    public synchronized void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, Range scaleRange ) {
+    public synchronized void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, NumberRange scaleRange ) {
         wrapped.put(layerId, symbolizer, feature, shape, scaleRange);
     }
 

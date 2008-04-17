@@ -900,7 +900,7 @@ public class ShapefileRenderer implements GTRenderer {
      * @throws FactoryException
      */
     private void processSymbolizers( final Graphics2D graphics, final SimpleFeature feature,
-            final Symbolizer[] symbolizers, Range scaleRange, MathTransform transform, String layerId )
+            final Symbolizer[] symbolizers, NumberRange scaleRange, MathTransform transform, String layerId )
             throws TransformException, FactoryException {
         LiteShape2 shape;
 

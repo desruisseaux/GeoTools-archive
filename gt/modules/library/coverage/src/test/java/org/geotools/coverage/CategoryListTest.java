@@ -18,10 +18,10 @@ package org.geotools.coverage;
 
 import java.util.Arrays;
 import java.util.Random;
-import javax.media.jai.util.Range;
 
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.resources.XArray;
+import org.geotools.util.Range;
 
 import org.junit.*;
 import static org.junit.Assert.*;

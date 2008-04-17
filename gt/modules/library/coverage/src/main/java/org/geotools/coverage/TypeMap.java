@@ -27,7 +27,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.awt.image.SampleModel;
-import javax.media.jai.util.Range;
 
 import org.opengis.util.InternationalString;
 import org.opengis.coverage.ColorInterpretation;
@@ -40,6 +39,7 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.AbstractInternationalString;
+import org.geotools.util.Range;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 
