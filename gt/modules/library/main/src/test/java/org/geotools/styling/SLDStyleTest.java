@@ -429,10 +429,10 @@ public class SLDStyleTest extends TestCase {
         TextSymbolizer2 ts = (TextSymbolizer2) rule.getSymbolizers()[0];
         
         // abstract == property name
-        assertEquals("propertyOne", ((PropertyName) ts.getAbstract()).getPropertyName());
+        assertEquals("propertyOne", ((PropertyName) ts.getSnippet()).getPropertyName());
         
         // abstract == mixed literal + propertyName
-        Expression desc = ts.getDescription();
+        Expression desc = ts.getFeatureDescription();
         assertTrue(desc instanceof Function);
         assertEquals("strConcat", ((Function) desc).getName());
         assertEquals(2, ((Function) desc).getParameters().size());

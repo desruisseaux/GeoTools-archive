@@ -392,16 +392,16 @@ public class TextSymbolizerImpl implements TextSymbolizer2, Cloneable {
         buf.append( this.fonts );
         return buf.toString();
     }
-    public Expression getAbstract() {
+    public Expression getSnippet() {
         return abxtract;
     }
-    public void setAbstract(Expression abxtract) {
+    public void setSnippet(Expression abxtract) {
         this.abxtract = abxtract;
     }
-    public Expression getDescription() {
+    public Expression getFeatureDescription() {
         return description;
     }
-    public void setDescription(Expression description) {
+    public void setFeatureDescription(Expression description) {
         this.description = description;
     }
     public OtherText getOtherText() {

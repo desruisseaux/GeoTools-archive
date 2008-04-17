@@ -42,18 +42,18 @@ public interface TextSymbolizer2 extends TextSymbolizer {
      * an abstract (RSS) or a snippet (KML)
      * @return
      */
-    public Expression getAbstract();
+    public Expression getSnippet();
     
-    public void setAbstract(Expression expression);
+    public void setSnippet(Expression expression);
     
     /**
      * Description is used by text oriented renders such as KML and RSS to specify
      * a feature's description
      * @return
      */
-    public Expression getDescription();
+    public Expression getFeatureDescription();
     
-    public void setDescription(Expression description);
+    public void setFeatureDescription(Expression description);
     
     /**
      * Other text can be used to allow open ended extensions on text oriented output formats

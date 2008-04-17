@@ -1051,16 +1051,16 @@ public class SLDParser {
 				}
 			}
 			
-			if (childName.equalsIgnoreCase("Abstract")) {
+			if (childName.equalsIgnoreCase("Snippet")) {
 			    LOGGER.finest("Parsing non-standard Abstract in TextSymbolizer");
 			    if(symbol instanceof TextSymbolizer2)
-			        ((TextSymbolizer2)symbol).setAbstract(parseCssParameter(child, false));
+			        ((TextSymbolizer2)symbol).setSnippet(parseCssParameter(child, false));
 			}
 			
-			if (childName.equalsIgnoreCase("Description")) {
+			if (childName.equalsIgnoreCase("FeatureDescription")) {
                 LOGGER.finest("Parsing non-standard Description in TextSymbolizer");
                 if(symbol instanceof TextSymbolizer2)
-                    ((TextSymbolizer2)symbol).setDescription(parseCssParameter(child, false));
+                    ((TextSymbolizer2)symbol).setFeatureDescription(parseCssParameter(child, false));
             }
 			
 			if (childName.equalsIgnoreCase("OtherText")) {

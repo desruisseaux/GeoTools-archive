@@ -22,8 +22,8 @@
             <Label>
               <Literal>Point Label</Literal>
             </Label>
-            <Abstract><ogc:PropertyName>propertyOne</ogc:PropertyName></Abstract>
-            <Description>This one is mixed<ogc:PropertyName>propertyTwo</ogc:PropertyName></Description>
+            <Snippet><ogc:PropertyName>propertyOne</ogc:PropertyName></Snippet>
+            <FeatureDescription>This one is mixed<ogc:PropertyName>propertyTwo</ogc:PropertyName></FeatureDescription>
             <OtherText target="extrude">10</OtherText>
           </TextSymbolizer>
         </rule>
