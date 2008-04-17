@@ -56,6 +56,7 @@ import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
@@ -114,18 +115,20 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 *            paletted images.
 	 * @param rasterSpaceROI
 	 *            in case we used the JAI's mosaic with a ROI this
-	 *            {@link java.awt.Polygon} will hold the used roi.
+	 *            {@link java.awt.Polygon} will hold the used roi.ù
+	 * @param hints
+     *          An optional set of hints, or {@code null} if none.
 	 */
 	private CroppedCoverage2D(InternationalString name,
 			PlanarImage sourceRaster, GridGeometry2D croppedGeometry,
 			GridCoverage2D source, int actionTaken,
-			java.awt.Polygon rasterSpaceROI) {
+			java.awt.Polygon rasterSpaceROI, Hints hints) {
 		super(name.toString(), sourceRaster, croppedGeometry,
 				(GridSampleDimension[]) (actionTaken == 1 ? null : source
 						.getSampleDimensions().clone()),
 				new GridCoverage[] { source },
 				rasterSpaceROI != null ? Collections.singletonMap("GC_ROI",
-						rasterSpaceROI) : null);
+						rasterSpaceROI) : null,hints);
 	}
 
 	/**
@@ -144,7 +147,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 * @return The result as a grid coverage.
 	 */
 	static GridCoverage2D create(final ParameterValueGroup parameters,
-			RenderingHints hints, GridCoverage2D sourceCoverage,
+			Hints hints, GridCoverage2D sourceCoverage,
 			AffineTransform sourceGridToWorldTransform, double scaleFactor) {
 
 		// /////////////////////////////////////////////////////////////////////
@@ -307,7 +310,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			//
 			// ////////////////////////////////////////////////////////////////////
 			final GeneralGridRange newRange = new GeneralGridRange(
-					new GeneralEnvelope(finalGridRange));
+					new GeneralEnvelope(finalGridRange),PixelInCell.CELL_CORNER);
 			// we do not have to crop in this case (should not really happen at
 			// this time)
 			if (newRange.equals(sourceGridRange) && isSimpleTransform)
@@ -389,7 +392,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 				// raster space.
 				//
 				// //
-				final List points = new ArrayList(5);
+				final List<Point2D> points = new ArrayList<Point2D>(5);
 				rasterSpaceROI = FeatureUtilities.convertPolygonToPointArray(
 						modelSpaceROI, ProjectiveTransform
 								.create(sourceWorldToGridTransform), points);
@@ -436,18 +439,18 @@ final class CroppedCoverage2D extends GridCoverage2D {
 					croppedImage = processor.createNS(operatioName, pbj,
 							targetHints);
 			}
-			if (conserveEnvelope.booleanValue())
+			if (conserveEnvelope.booleanValue()&&isSimpleTransform)
 				return new CroppedCoverage2D(sourceCoverage.getName(),
 						croppedImage, new GridGeometry2D(new GeneralGridRange(
 								croppedImage), cropEnvelope), sourceCoverage,
-						actionTaken, rasterSpaceROI);
+						actionTaken, rasterSpaceROI,hints);
 			else
 				return new CroppedCoverage2D(sourceCoverage.getName(),
 						croppedImage, new GridGeometry2D(new GeneralGridRange(
 								croppedImage), sourceGridGeometry
 								.getGridToCRS2D(PixelOrientation.CENTER),
 								sourceCoverage.getCoordinateReferenceSystem()),
-						sourceCoverage, actionTaken, rasterSpaceROI);
+						sourceCoverage, actionTaken, rasterSpaceROI,hints);
 
 		} catch (TransformException e) {
 			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP), e);

@@ -140,7 +140,12 @@ public class Crop extends Operation2D {
 
 	/**
 	 * The parameter descriptor is basically a simple boolean that tells this
-	 * operation to conserve the envelope that it gets as input.
+	 * operation to try to conserve the envelope that it gets as input.
+	 * 
+	 * <p>
+	 * Note that this not always possible due to the fact that if we have a gridToWorldTransform
+	 * which is not a simple scale and translate we cannot conserve the envelope otherwise we would loos
+	 * the underlying transform.
 	 * 
 	 * <p>
 	 * See this class javadocs for an explanation.
