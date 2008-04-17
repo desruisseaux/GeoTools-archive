@@ -23,32 +23,26 @@ import org.geotools.process.Parameter;
 import org.geotools.process.Process;
 import org.geotools.process.impl.AbstractProcessFactory;
 import org.geotools.text.Text;
-import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * A simple process showing how to interact with a couple of geometry literals.
+ * A Buffer process used on a geometry object.
  * <p>
- * This process is based on the SFSQL specification and implemented by the JTS Topology Suite;
- * the interesting part is the process api used to make this concept avaialble to:
- * <ul>
- * <li>Java Programmer: via GEOM1, GEOM2 and RESULT
- * <li>User Interface: via getParameterInfo
- * </li>
+ * This process is based on the SFSQL specification and implemented by the JTS Topology Suite
  * 
  * @author Graham Davis
  */
-public class IntersectsFactory extends AbstractProcessFactory {
+public class BufferFactory extends AbstractProcessFactory {
     // making parameters available as static constants to help java programmers
-    /** First geometry for intersection */
+    /** Geometry for operation */
     static final Parameter<Geometry> GEOM1 =
-        new Parameter<Geometry>("geom1",Geometry.class, Text.text("Geometry 1") );
+        new Parameter<Geometry>("geom1", Geometry.class, Text.text("Geometry 1") );
     
-    /** Second geometry for intersection */
-    static final Parameter<Geometry> GEOM2 = 
-        new Parameter<Geometry>("geom2",Geometry.class, Text.text("Geometry 2") );
+    /** Buffer amount */
+    static final Parameter<Double> BUFFER = 
+        new Parameter<Double>("buffer", Double.class, Text.text("Buffer") );
     
     /**
      * Map used for getParameterInfo; used to describe operation requirements for user
@@ -57,44 +51,46 @@ public class IntersectsFactory extends AbstractProcessFactory {
     static final Map<String,Parameter<?>> prameterInfo = new TreeMap<String,Parameter<?>>();
     static {
         prameterInfo.put( GEOM1.key, GEOM1 );
-        prameterInfo.put( GEOM2.key, GEOM2 );
-    }
-
+        prameterInfo.put( BUFFER.key, BUFFER );
+    }    
+    
     static final Parameter<Geometry> RESULT = 
-        new Parameter<Geometry>("result",Geometry.class, Text.text("Result of Geometry1.intersect( Geometry2 )") );
-        
+        new Parameter<Geometry>("result", Geometry.class, Text.text("Result of Geometry.getBuffer( Buffer )") );
+     
     /**
-     * Map used for getParameterInfo; used to describe operation requirements for user
-     * interface creation.
+     * Map used to describe operation results.
      */
     static final Map<String,Parameter<?>> resultInfo = new TreeMap<String,Parameter<?>>();
     static {
         resultInfo.put( RESULT.key, RESULT );
     }
     
-	public Process create()
+	public Process create(Map<String, Object> parameters)
 			throws IllegalArgumentException {
-		return new IntersectionProcess( this );
+		return new BufferProcess( this );
 	}
 
 	public InternationalString getDescription() {
-		return new SimpleInternationalString("Intersection between two literal geometry");
+		return Text.text("Buffer a geometry");
 	}
 
-	public Map<String,Parameter<?>> getParameterInfo() {
-	    return Collections.unmodifiableMap( prameterInfo );
+	public Map<String, Parameter<?>> getParameterInfo() {
+		return Collections.unmodifiableMap( prameterInfo );
 	}
-	
-	public Map<String,Parameter<?>> getResultInfo(Map<String, Object> parameters)
-			throws IllegalArgumentException {
+
+	public Map<String, Parameter<?>> getResultInfo(
+			Map<String, Object> parameters) throws IllegalArgumentException {
 		return Collections.unmodifiableMap( resultInfo );
 	}
 
 	public InternationalString getTitle() {
 	    // please note that this is a title for display purposes only
 	    // finding an specific implementation by name is not possible
-	    //
-	    return Text.text("Intersection");
+	    return Text.text("Buffer");
+	}
+
+	public Process create() throws IllegalArgumentException {
+			return new BufferProcess( this );
 	}
 
 }
