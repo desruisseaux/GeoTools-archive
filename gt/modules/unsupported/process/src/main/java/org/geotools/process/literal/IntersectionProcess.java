@@ -28,13 +28,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
- * @author Jody
+ * @author gdavis
  */
 class IntersectionProcess implements Process {
 
-    private IntersectsFactory factory;
+    private IntersectionFactory factory;
 
-    public IntersectionProcess( IntersectsFactory intersectsFactory ) {
+    public IntersectionProcess( IntersectionFactory intersectsFactory ) {
         this.factory = intersectsFactory;
     }
 
@@ -43,27 +43,29 @@ class IntersectionProcess implements Process {
     }
 
     public Map<String, Object> process( Map<String, Object> input, ProgressListener monitor ) {
-        if( monitor == null ) monitor = new NullProgressListener();
-        try {
+        
+    	if( monitor == null ) monitor = new NullProgressListener();
+        
+    	try {
             monitor.started();
-            monitor.setTask( Text.text("Grab arguments") );
+            monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) input.get( IntersectsFactory.GEOM1.key );
-            Geometry geom2 = (Geometry) input.get( IntersectsFactory.GEOM2.key );
+            Geometry geom1 = (Geometry) input.get( IntersectionFactory.GEOM1.key );
+            Geometry geom2 = (Geometry) input.get( IntersectionFactory.GEOM2.key );
             
-            monitor.setTask( Text.text("Grab arguments") );
-            monitor.progress( 10.0f );
+            monitor.setTask( Text.text("Processing Intersection") );
+            monitor.progress( 25.0f );
             
             if( monitor.isCanceled() ){
                 return null; // user has canceled this operation
             }
             Geometry intersect = geom1.intersection( geom2 );
             
-            monitor.setTask( Text.text("Encode result" ));
+            monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
             Map<String, Object> result = new HashMap<String, Object>(1);
-            result.put( IntersectsFactory.RESULT.key, intersect );
+            result.put( IntersectionFactory.RESULT.key, intersect );
             monitor.complete(); // same as 100.0f
             
             return result;

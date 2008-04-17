@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
- * @author Jody
+ * @author Jody, gdavis
  */
 class UnionProcess implements Process {
 
@@ -44,13 +44,20 @@ class UnionProcess implements Process {
     }
 
     public Map<String, Object> process( Map<String, Object> input, ProgressListener monitor ) {
-        if( monitor == null ) monitor = new NullProgressListener();
+        
+    	if( monitor == null ) monitor = new NullProgressListener();
+        
         try {
             monitor.started();
-            monitor.setTask( Text.text("Grab arguments") );
+            monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            List<Geometry> list = (List<Geometry>) input.get( UnionFactory.GEOM1.key );
+            List<Geometry> list = (List<Geometry>) input.get( UnionFactory.GEOM1.key );          
             
+            int div = list.size();
+            if (div < 1) div = 1;
+            
+            int chunk = 80 / div;
+            int count = 1;
             Geometry result = null;
             for( Geometry geom : list ){
                 if( monitor.isCanceled() ) return null; // user has canceled this operation                
@@ -58,15 +65,18 @@ class UnionProcess implements Process {
                     result = geom;
                 }
                 else {
+                    monitor.setTask( Text.text("Processing Union " + count + " of " + list.size()) );
+                    count++;
+                    monitor.progress( 10.0f + chunk );                  	
                     result = result.union( geom );
                 }                
             }
             
-            monitor.setTask( Text.text("Encode result" ));
+            monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
             Map<String, Object> resultMap = new HashMap<String, Object>(1);
-            resultMap.put( IntersectsFactory.RESULT.key, result );
+            resultMap.put( IntersectionFactory.RESULT.key, result );
             monitor.complete(); // same as 100.0f
             
             return resultMap;

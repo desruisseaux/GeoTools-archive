@@ -34,17 +34,18 @@ import com.vividsolutions.jts.geom.Geometry;
  * This process is based on the SFSQL specification and implemented by the JTS Topology Suite;
  * the interesting part is the process api used to make this concept avaialble to:
  * <ul>
- * <li>Java Programmer: via GEOM1, GEOM2 and RESULT
+ * <li>Java Programmer: via GEOM1 and RESULT
  * <li>User Interface: via getParameterInfo
  * </li>
  * 
- * @author Graham Davis
+ * @author gdavis
  */
 public class UnionFactory extends AbstractProcessFactory {
     // making parameters available as static constants to help java programmers
-    /** First geometry for intersection */
+    /** First geometry for union */
     static final Parameter<Geometry> GEOM1 =
-        new Parameter<Geometry>("geom1",Geometry.class, Text.text("Geometry 1") );
+        new Parameter<Geometry>("geom", Geometry.class, Text.text("Geometry 1"),
+        		true, 2, -1, null, null);
     
 
     /**
@@ -57,7 +58,7 @@ public class UnionFactory extends AbstractProcessFactory {
     }
 
     static final Parameter<Geometry> RESULT = 
-        new Parameter<Geometry>("result",Geometry.class, Text.text("Result Unioning givn geometries )") );
+        new Parameter<Geometry>("result", Geometry.class, Text.text("Result Unioning given geometries )") );
         
     /**
      * Map used for getParameterInfo; used to describe operation requirements for user

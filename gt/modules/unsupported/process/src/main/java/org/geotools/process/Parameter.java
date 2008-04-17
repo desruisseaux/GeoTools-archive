@@ -23,7 +23,7 @@ import org.opengis.util.InternationalString;
 /**
  * A Parameter defines information about a valid process parameter.
  *
- * @author Graham Davis
+ * @author gdavis
  */
 public class Parameter<T> {
 	/**
@@ -51,11 +51,25 @@ public class Parameter<T> {
      **/
     public final boolean required;
     
+    /** What is the min and max number of this paramter there can be
+     * ( a value of -1 for min means 0 or more,
+     * a value of -1 for max means any number greater than or equal to the min value )
+     * 
+     * eg: a geometry union process can have any number of geom parameters,
+     * so by setting the max to -1 and the min to 2 we accomplish that.
+     */
+    public final int minOccurs;
+    public final int maxOccurs; 
+    
     /**
      * A sample value; often used as a default when prompting the end-user
      * to fill in the details before executing a process.
      */
     public final Object sample;
+    
+    /**
+     * Hints for the user interface
+     */
     
     /** "featureType" FeatureType to validate a Feature value against */
     public static final String FEATURE_TYPE = "featureType";
@@ -91,16 +105,19 @@ public class Parameter<T> {
 
     /** Mandatory information */
     public Parameter(String key, Class<T> type, InternationalString description ){
-        this( key, type, description, false, null, null );
+        this( key, type, description, false, 1, 1, null, null );
     }
     
     /** Addition of optional parameters */
     public Parameter(String key, Class<T> type, InternationalString description,
-                     boolean required, Object sample, Map<String,Object> metadata){
+                     boolean required, int min, int max, Object sample, 
+                     Map<String,Object> metadata){
         this.key = key;
         this.type = type;
         this.description = description;
         this.required = required;
+        this.minOccurs = min;
+        this.maxOccurs = max;
         this.sample = sample;
         this.metadata = metadata == null ? null : Collections.unmodifiableMap(metadata);
     }

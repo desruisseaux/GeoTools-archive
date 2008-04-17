@@ -23,7 +23,7 @@ import org.opengis.util.ProgressListener;
  * Used to process inputs and is reported using a ProgressListener.
  * Results are available after being run.
  *
- * @author Graham Davis
+ * @author gdavis
  */
 public interface Process {
 	/**
@@ -32,7 +32,7 @@ public interface Process {
 	 * @param monitor
 	 * @return Map of results (@see factory.getResultParameters for details), or null if canceled
 	 */
-	public Map<String,Object> process(Map<String,Object> input, ProgressListener monitor);
+	public Map<String,Object> process(Map<String, Object> input, ProgressListener monitor);
 	/**
 	 * ProcessFactory that created this process (useful if you want to check the process title etc..).
 	 * 

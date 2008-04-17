@@ -15,14 +15,20 @@
  */
 package org.geotools.process;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.process.literal.IntersectsFactory;
+import org.geotools.process.literal.BufferFactory;
+import org.geotools.process.literal.IntersectionFactory;
+import org.geotools.process.literal.UnionFactory;
+import org.geotools.resources.LazySet;
 
 
 /**
@@ -37,7 +43,7 @@ public class ProcessFactoryFinder extends FactoryFinder {
     private static FactoryRegistry registry;
 
     /**
-     * Do not allows any instantiation of this class.
+     * Do not allow any instantiation of this class.
      */
     private ProcessFactoryFinder() {
         // singleton
@@ -51,20 +57,49 @@ public class ProcessFactoryFinder extends FactoryFinder {
         assert Thread.holdsLock(ProcessFactoryFinder.class);
         if (registry == null) {
             registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
-            		IntersectsFactory.class}));
+            		ProcessFactory.class}));
         }
         return registry;
     }
-
+    
+    public static Set<ProcessFactory> getProcessFactories() {
+    	return new LazySet<ProcessFactory>(getServiceRegistry().getServiceProviders(
+        		ProcessFactory.class, null, null));
+    }
+    
     /**
-     * Finds all implementations of IntersectsFactory which have registered using
+     * Finds all implementations of BufferFactory which have registered using
      * the services mechanism, and that have the appropriate libraries on the
      * classpath.
      *
-     * @return An iterator over all discovered IntersectsFactory
+     * @return An iterator over all discovered BufferFactory
      */
-    public static synchronized Iterator<IntersectsFactory> getIntersectsFactory() throws FactoryRegistryException {
+    public static synchronized Iterator<BufferFactory> getBufferFactory() throws FactoryRegistryException {
         FactoryRegistry serviceRegistry = getServiceRegistry();
-        return getServiceRegistry().getServiceProviders(IntersectsFactory.class, null, null);   
+        return getServiceRegistry().getServiceProviders(BufferFactory.class, null, null);   
+    }    
+
+    /**
+     * Finds all implementations of IntersectionFactory which have registered using
+     * the services mechanism, and that have the appropriate libraries on the
+     * classpath.
+     *
+     * @return An iterator over all discovered IntersectionFactory
+     */
+    public static synchronized Iterator<IntersectionFactory> getIntersectsFactory() throws FactoryRegistryException {
+        FactoryRegistry serviceRegistry = getServiceRegistry();
+        return getServiceRegistry().getServiceProviders(IntersectionFactory.class, null, null);   
     }
+    
+    /**
+     * Finds all implementations of UnionFactory which have registered using
+     * the services mechanism, and that have the appropriate libraries on the
+     * classpath.
+     *
+     * @return An iterator over all discovered UnionFactory
+     */
+    public static synchronized Iterator<UnionFactory> getUnionFactory() throws FactoryRegistryException {
+        FactoryRegistry serviceRegistry = getServiceRegistry();
+        return getServiceRegistry().getServiceProviders(UnionFactory.class, null, null);   
+    }    
 }
