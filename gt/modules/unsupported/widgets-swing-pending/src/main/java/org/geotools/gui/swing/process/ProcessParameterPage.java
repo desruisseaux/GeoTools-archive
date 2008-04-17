@@ -166,19 +166,11 @@ public class ProcessParameterPage extends JPage {
         JComponent field = widget.doLayout();
         page.add(field);
         
-        page.doLayout(); // call to get the bounds calculated for new field
-        Rectangle newBounds = field.getBounds();
-        Rectangle currentBounds = page.getBounds();
-        page.setBounds(currentBounds.x, currentBounds.y, 
-        		currentBounds.width, 
-        		currentBounds.height + newBounds.height); // call to resize the form to fit new field
+        // resize the page and wizard to fit new component
+        page.validate();
+        getJProcessWizard().pack();
+        getJProcessWizard().validate();
      
-        currentBounds = this.getJProcessWizard().getBounds();
-        this.getJProcessWizard().setBounds(currentBounds.x, currentBounds.y, 
-        		currentBounds.width, 
-        		currentBounds.height + newBounds.height); // call to resize the form to fit new field
-        this.getJProcessWizard().doLayout(); // call to redraw form with new field
-        
         return widget;
 	}
 }
