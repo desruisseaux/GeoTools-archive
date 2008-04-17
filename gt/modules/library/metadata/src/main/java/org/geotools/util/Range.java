@@ -17,7 +17,6 @@ package org.geotools.util;
 
 import java.io.Serializable;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A range between a minimum and maximum comparable, the minimum/maximum may be

@@ -28,6 +28,7 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.metadata.IIOMetadata;
 import javax.media.jai.iterator.RectIter;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.image.ImageDimension;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Descriptions;
@@ -136,8 +137,8 @@ public class TextMatrixImageWriter extends TextImageWriter {
             names           = TextMatrixImageReader.Spi.NAMES;
             MIMETypes       = TextMatrixImageReader.Spi.MIME_TYPES;
             pluginClassName = "org.geotools.image.io.text.TextMatrixImageWriter";
-            vendorName      = "Geotools";
-            version         = "2.4";
+            vendorName      = "GeoTools";
+            version         = GeoTools.getVersion().toString();
         }
 
         /**

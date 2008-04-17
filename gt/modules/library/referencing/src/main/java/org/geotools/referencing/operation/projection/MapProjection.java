@@ -256,19 +256,15 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
-     * Constructor invoked by sub-classes when we can't rely on
-     * {@link #getParameterDescriptors} before the construction
-     * is completed. This is the case when the later method depends on
-     * the value of some class's attribute, which has not yet been set.
-     * An example is {@link Mercator#getParameterDescriptors}.
-     *
-     * This method is not public because it is not a very elegant hack, and
-     * a work around exists. For example Mercator_1SP and Mercator_2SP could
-     * be implemented by two separated classes, in which case {@link #getParameterDescriptors}
-     * returns a constant and can be safely invoked in a constructor. We do
-     * not always use this cleaner way in the projection package because it
-     * is going to contains a lot of.. well... projections, and we will try
-     * to reduce the amount of class declarations.
+     * Constructor invoked by sub-classes when we can't rely on {@link #getParameterDescriptors}
+     * before the construction is completed. This is the case when the later method depends on
+     * the value of some class's attribute, which has not yet been set. An example is
+     * {@link ObliqueMercator#getParameterDescriptors}.
+     * <p>
+     * This method is not public because it is not a very elegant hack, and a work around exists.
+     * For example {@code ObliqueMercator} two-points case could be implemented by as a separated
+     * classes, in which case {@link #getParameterDescriptors} returns a constant and can be safely
+     * invoked in a constructor.
      */
     MapProjection(final ParameterValueGroup values, Collection<GeneralParameterDescriptor> expected)
             throws ParameterNotFoundException
@@ -720,33 +716,29 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
-     * Transforms the specified coordinate and stores the result in {@code ptDst}.
-     * This method returns longitude as <var>x</var> values in the range {@code [-PI..PI]}
-     * and latitude as <var>y</var> values in the range {@code [-PI/2..PI/2]}. It will be
-     * checked by the caller, so this method doesn't need to performs this check.
+     * Transforms the specified coordinate and stores the result in {@code ptDst}. This method
+     * returns longitude as <var>x</var> values in the range {@code [-PI..PI]} and latitude as
+     * <var>y</var> values in the range {@code [-PI/2..PI/2]}. It will be checked by the caller,
+     * so this method doesn't need to performs this check.
      * <p>
-     * Input coordinates are also guarenteed to have the {@link #falseEasting}
-     * and {@link #falseNorthing} removed and be divided by {@link #globalScale}
-     * before this method is invoked. After this method is invoked, the
-     * {@link #centralMeridian} is added to the {@code x} results
-     * in {@code ptDst}. This means that projections that implement this method
-     * are performed on an ellipse (or sphere) with a semiMajor axis of 1.0.
+     * Input coordinates have the {@link #falseEasting} and {@link #falseNorthing} removed and are
+     * divided by {@link #globalScale} before this method is invoked. After this method is invoked,
+     * the {@link #centralMeridian} is added to the {@code x} results in {@code ptDst}. This means
+     * that projections that implement this method are performed on an ellipse (or sphere) with a
+     * semi-major axis of 1.
      * <p>
-     * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
-     * standardization, described above, is handled by {@code pj_inv.c}.
-     * Therefore when porting projections from PROJ.4, the inverse transform
-     * equations can be used directly here with minimal change.
-     * In the equations of Snyder, {@link #falseEasting}, {@link #falseNorthing}
-     * and {@link #scaleFactor} are usually not given.
-     * When implementing these equations here, you will not
-     * need to add the {@link #centralMeridian} to the output longitude or remove the
-     * {@link #semiMajor} ('<var>a</var>' or '<var>R</var>').
+     * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same standardization,
+     * described above, is handled by {@code pj_inv.c}. Therefore when porting projections
+     * from PROJ.4, the inverse transform equations can be used directly here with minimal
+     * change. In the equations of Snyder, {@link #falseEasting}, {@link #falseNorthing} and
+     * {@link #scaleFactor} are usually not given. When implementing these equations here, you
+     * will not need to add the {@link #centralMeridian} to the output longitude or remove the
+     * {@link #semiMajor} (<var>a</var> or <var>R</var>).
      *
      * @param x     The easting of the coordinate, linear distance on a unit sphere or ellipse.
      * @param y     The northing of the coordinate, linear distance on a unit sphere or ellipse.
      * @param ptDst the specified coordinate point that stores the result of transforming
-     *              {@code ptSrc}, or {@code null}. Ordinates will be in
-     *              <strong>radians</strong>.
+     *              {@code ptSrc}, or {@code null}. Ordinates will be in <strong>radians</strong>.
      * @return      the coordinate point after transforming {@code x}, {@code y}
      *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
@@ -755,36 +747,37 @@ public abstract class MapProjection extends AbstractMathTransform
             throws ProjectionException;
 
     /**
-     * Transforms the specified coordinate and stores the result in {@code ptDst}.
-     * This method is guaranteed to be invoked with values of <var>x</var> in the range
-     * {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
+     * Transforms the specified coordinate and stores the result in {@code ptDst}. This method is
+     * usually (but <strong>not</strong> guaranteed) to be invoked with values of <var>x</var> in
+     * the range {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
+     * Values outside those ranges are accepted (sometime with a warning logged) on the assumption
+     * that most implementations use those values only in trigonometric functions like
+     * {@linkplain Math#sin sin} and {@linkplain Math#cos cos}.
      * <p>
-     * Coordinates are also guaranteed to have the {@link #centralMeridian}
-     * removed from <var>x</var> before this method is invoked. After this method
-     * is invoked, the results in {@code ptDst} are multiplied by {@link #globalScale},
-     * and the {@link #falseEasting} and {@link #falseNorthing} are added.
-     * This means that projections that implement this method are performed on an
-     * ellipse (or sphere) with a semiMajor axis of 1.0.
+     * Coordinates have the {@link #centralMeridian} removed from <var>lambda</var> before this
+     * method is invoked. After this method is invoked, the results in {@code ptDst} are multiplied
+     * by {@link #globalScale}, and the {@link #falseEasting} and {@link #falseNorthing} are added.
+     * This means that projections that implement this method are performed on an ellipse (or sphere)
+     * with a semi-major axis of 1.
      * <p>
-     * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
-     * standardization, described above, is handled by {@code pj_fwd.c}.
-     * Therefore when porting projections from PROJ.4, the forward transform equations can
-     * be used directly here with minimal change. In the equations of Snyder,
-     * {@link #falseEasting}, {@link #falseNorthing} and {@link #scaleFactor}
-     * are usually not given. When implementing these equations here, you will not
-     * need to remove the {@link #centralMeridian} from <var>x</var> or apply the
-     * {@link #semiMajor} ('<var>a</var>' or '<var>R</var>').
+     * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same standardization,
+     * described above, is handled by {@code pj_fwd.c}. Therefore when porting projections
+     * from PROJ.4, the forward transform equations can be used directly here with minimal
+     * change. In the equations of Snyder, {@link #falseEasting}, {@link #falseNorthing} and
+     * {@link #scaleFactor} are usually not given. When implementing these equations here,
+     * you will not need to remove the {@link #centralMeridian} from <var>lambda</var> or apply
+     * the {@link #semiMajor} (<var>a</var> or <var>R</var>).
      *
-     * @param x     The longitude of the coordinate, in <strong>radians</strong>.
-     * @param y     The  latitude of the coordinate, in <strong>radians</strong>.
-     * @param ptDst the specified coordinate point that stores the result of transforming
-     *              {@code ptSrc}, or {@code null}. Ordinates will be in a
-     *              dimensionless unit, as a linear distance on a unit sphere or ellipse.
-     * @return      the coordinate point after transforming {@code x}, {@code y}
-     *              and storing the result in {@code ptDst}.
+     * @param lambda The longitude of the coordinate, in <strong>radians</strong>.
+     * @param phi    The  latitude of the coordinate, in <strong>radians</strong>.
+     * @param ptDst  the specified coordinate point that stores the result of transforming
+     *               {@code ptSrc}, or {@code null}. Ordinates will be in a
+     *               dimensionless unit, as a linear distance on a unit sphere or ellipse.
+     * @return       the coordinate point after transforming ({@code lambda}, {@code phi})
+     *               and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      */
-    protected abstract Point2D transformNormalized(double x, double y, final Point2D ptDst)
+    protected abstract Point2D transformNormalized(double lambda, double phi, final Point2D ptDst)
             throws ProjectionException;
 
     /**
@@ -794,8 +787,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * by removing the {@link #centralMeridian}, before invoking
      * <code>{@link #transformNormalized transformNormalized}(x, y, ptDst)</code>.
      * It also multiplies by {@link #globalScale} and adds the {@link #falseEasting} and
-     * {@link #falseNorthing} to the point returned by the {@code transformNormalized(...)}
-     * call.
+     * {@link #falseNorthing} to the point returned by the {@code transformNormalized(...)} call.
      *
      * @param ptSrc the specified coordinate point to be transformed.
      *              Ordinates must be in decimal degrees.
@@ -836,11 +828,10 @@ public abstract class MapProjection extends AbstractMathTransform
      * Transforms a list of coordinate point ordinal values. Ordinates must be
      * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
      *
-     * @throws ProjectionException if a point can't be transformed. This method try
-     *         to transform every points even if some of them can't be transformed.
-     *         Non-transformable points will have value {@link Double#NaN}. If more
-     *         than one point can't be transformed, then this exception may be about
-     *         an arbitrary point.
+     * @throws ProjectionException if a point can't be transformed. This method tries to transform
+     *         every points even if some of them can't be transformed. Non-transformable points will
+     *         have value {@link Double#NaN}. If more than one point can't be transformed, then this
+     *         exception may be about an arbitrary point.
      */
     public final void transform(final double[] src,  int srcOffset,
                                 final double[] dest, int dstOffset, int numPts)
@@ -887,11 +878,10 @@ public abstract class MapProjection extends AbstractMathTransform
      * Transforms a list of coordinate point ordinal values. Ordinates must be
      * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
      *
-     * @throws ProjectionException if a point can't be transformed. This method try
-     *         to transform every points even if some of them can't be transformed.
-     *         Non-transformable points will have value {@link Float#NaN}. If more
-     *         than one point can't be transformed, then this exception may be about
-     *         an arbitrary point.
+     * @throws ProjectionException if a point can't be transformed. This method tries to transform
+     *         every points even if some of them can't be transformed. Non-transformable points will
+     *         have value {@link Float#NaN}. If more than one point can't be transformed, then this
+     *         exception may be about an arbitrary point.
      */
     @Override
     public final void transform(final float[] src,  int srcOffset,
@@ -956,13 +946,11 @@ public abstract class MapProjection extends AbstractMathTransform
         /**
          * Inverse transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
          * <p>
-         *
-         * This method standardizes the {@code ptSrc} by removing the
-         * {@link #falseEasting} and {@link #falseNorthing} and dividing by
-         * {@link #globalScale} before invoking
+         * This method standardizes the {@code ptSrc} by removing the {@link #falseEasting}
+         * and {@link #falseNorthing} and dividing by {@link #globalScale} before invoking
          * <code>{@link #inverseTransformNormalized inverseTransformNormalized}(x, y, ptDst)</code>.
-         * It then adds the {@link #centralMeridian} to the {@code x} of the
-         * point returned by the {@code inverseTransformNormalized} call.
+         * It then adds the {@link #centralMeridian} to the {@code x} of the point returned by the
+         * {@code inverseTransformNormalized} call.
          *
          * @param ptSrc the specified coordinate point to be transformed.
          *              Ordinates must be in metres.
@@ -1006,7 +994,7 @@ public abstract class MapProjection extends AbstractMathTransform
          * Inverse transforms a list of coordinate point ordinal values.
          * Ordinates must be (<var>x</var>,<var>y</var>) pairs in metres.
          *
-         * @throws ProjectionException if a point can't be transformed. This method try
+         * @throws ProjectionException if a point can't be transformed. This method tries
          *         to transform every points even if some of them can't be transformed.
          *         Non-transformable points will have value {@link Double#NaN}. If more
          *         than one point can't be transformed, then this exception may be about
@@ -1057,7 +1045,7 @@ public abstract class MapProjection extends AbstractMathTransform
          * Inverse transforms a list of coordinate point ordinal values.
          * Ordinates must be (<var>x</var>,<var>y</var>) pairs in metres.
          *
-         * @throws ProjectionException if a point can't be transformed. This method try
+         * @throws ProjectionException if a point can't be transformed. This method tries
          *         to transform every points even if some of them can't be transformed.
          *         Non-transformable points will have value {@link Float#NaN}. If more
          *         than one point can't be transformed, then this exception may be about
@@ -1285,7 +1273,7 @@ public abstract class MapProjection extends AbstractMathTransform
         /*
          * NOTE: change sign to get the equivalent of Snyder (7-7).
          */
-        return tan(0.5 * (PI/2 - phi)) / pow((1-sinphi) / (1+sinphi), 0.5*excentricity);
+        return tan(0.5 * (PI/2 - phi)) / pow((1 - sinphi) / (1 + sinphi), 0.5*excentricity);
     }
 
 
@@ -1462,8 +1450,7 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         static boolean isSpherical(final ParameterValueGroup values) {
             try {
-                return doubleValue(SEMI_MAJOR, values) ==
-                       doubleValue(SEMI_MINOR, values);
+                return doubleValue(SEMI_MAJOR, values) == doubleValue(SEMI_MINOR, values);
             } catch (IllegalStateException exception) {
                 // Probably could not find the requested values -- gobble error and be forgiving.
                 // The error will probably be thrown at MapProjection construction time, which is

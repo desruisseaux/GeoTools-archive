@@ -224,7 +224,7 @@ public class TransverseMercator extends MapProjection {
 
         /* NOTE: meridinal distance at latitudeOfOrigin is always 0 */
         y = (mlfn(y, sinphi, cosphi) - ml0 +
-            sinphi*al*x*
+            sinphi * al * x *
             FC2 * ( 1.0 +
             FC4 * als * (5.0 - t + n*(9.0 + 4.0*n) +
             FC6 * als * (61.0 + t * (t - 58.0) + n*(270.0 - 330.0*t) +

@@ -483,7 +483,7 @@ fill:   for (final List<Tile> sameInputs : asArray) {
 
     /**
      * Returns this tree as a <cite>Swing</cite> tree model. The labels displayed in this tree
-     * may change in any future version. This method is provided only as a debugging tools.
+     * may change in any future version. This method is provided only as a debugging tool.
      */
     public synchronized TreeModel toSwingTree() throws IOException {
         if (swing == null) {

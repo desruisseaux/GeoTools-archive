@@ -31,6 +31,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.io.LineFormat;
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -706,8 +707,8 @@ public class TextRecordImageReader extends TextImageReader {
             names           = NAMES;
             MIMETypes       = MIME_TYPES;
             pluginClassName = "org.geotools.image.io.text.TextRecordImageReader";
-            vendorName      = "Geotools";
-            version         = "2.4";
+            vendorName      = "GeoTools";
+            version         = GeoTools.getVersion().toString();
             xColumn         = 0;
             yColumn         = 1;
             gridTolerance   = EPS;

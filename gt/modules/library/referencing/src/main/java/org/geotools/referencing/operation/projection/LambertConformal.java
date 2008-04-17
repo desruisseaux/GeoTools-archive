@@ -105,7 +105,7 @@ public abstract class LambertConformal extends MapProjection {
     /**
      * Internal variables for computation.
      */
-    private final double n,F,rho0;
+    private final double n, F, rho0;
 
     /**
      * {@code true} for Belgium 2SP.

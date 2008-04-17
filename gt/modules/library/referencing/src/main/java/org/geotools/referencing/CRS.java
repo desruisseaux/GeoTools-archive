@@ -1041,6 +1041,11 @@ public final class CRS {
              */
             final GeneralEnvelope e = new GeneralEnvelope(envelope);
             e.setCoordinateReferenceSystem(null);
+            if (targetPt != null) {
+                for (int i=envelope.getDimension(); --i>=0;) {
+                    targetPt.setOrdinate(i, e.getCenter(i));
+                }
+            }
             return e;
         }
         /*
@@ -1090,7 +1095,7 @@ public final class CRS {
             int n = ++coordinateNumber;
             for (int i=sourceDim; --i>=0;) {
                 switch (n % 3) {
-                    case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
+                    case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n /= 3; break;
                     case 1:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
                     case 2:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
                     default: throw new AssertionError(n); // Should never happen
@@ -1102,9 +1107,10 @@ public final class CRS {
     }
 
     /**
-     * Transforms an envelope using the given {@linkplain CoordinateOperation coordinate pperation}.
-     * The transformation is only approximative. Note that the returned envelope may not have the
-     * same number of dimensions than the original envelope.
+     * Transforms an envelope using the given {@linkplain CoordinateOperation coordinate operation}.
+     * The transformation is only approximative. It may be bigger than the smallest possible
+     * bounding box, but should not be smaller. Note that the returned envelope may not have
+     * the same number of dimensions than the original envelope.
      * <p>
      * This method can handle the case where the envelope contains the North or South pole,
      * or when it cross the &plusmn;180° longitude.
@@ -1135,6 +1141,55 @@ public final class CRS {
         MathTransform mt = operation.getMathTransform();
         final GeneralDirectPosition centerPt = new GeneralDirectPosition(mt.getTargetDimensions());
         final GeneralEnvelope transformed = transform(mt, envelope, centerPt);
+        /*
+         * If the source envelope crosses the expected range of valid coordinates, also projects
+         * the range bounds as a safety. Example: if the source envelope goes from 150 to 200°E,
+         * some map projections will interpret 200° as if it was -160°, and consequently produce
+         * an envelope which do not include the 180°W extremum. We will add those extremum points
+         * explicitly as a safety. It may leads to bigger than necessary target envelope, but the
+         * contract is to include at least the source envelope, not to returns the smallest one.
+         */
+        if (sourceCRS != null) {
+            final CoordinateSystem cs = sourceCRS.getCoordinateSystem();
+            if (cs != null) { // Should never be null, but check as a paranoiac safety.
+                DirectPosition sourcePt = null;
+                DirectPosition targetPt = null;
+                final int dimension = cs.getDimension();
+                for (int i=0; i<dimension; i++) {
+                    final CoordinateSystemAxis axis = cs.getAxis(i);
+                    if (axis == null) { // Should never be null, but check as a paranoiac safety.
+                        continue;
+                    }
+                    final double min = envelope.getMinimum(i);
+                    final double max = envelope.getMaximum(i);
+                    final double  v1 = axis.getMinimumValue();
+                    final double  v2 = axis.getMaximumValue();
+                    final boolean b1 = (v1 > min && v1 < max);
+                    final boolean b2 = (v2 > min && v2 < max);
+                    if (!b1 && !b2) {
+                        continue;
+                    }
+                    if (sourcePt == null) {
+                        sourcePt = new GeneralDirectPosition(dimension);
+                        for (int j=0; j<dimension; j++) {
+                            sourcePt.setOrdinate(j, envelope.getCenter(j));
+                        }
+                    }
+                    if (b1) {
+                        sourcePt.setOrdinate(i, v1);
+                        transformed.add(targetPt = mt.transform(sourcePt, targetPt));
+                    }
+                    if (b2) {
+                        sourcePt.setOrdinate(i, v2);
+                        transformed.add(targetPt = mt.transform(sourcePt, targetPt));
+                    }
+                    sourcePt.setOrdinate(i, envelope.getCenter(i));
+                }
+            }
+        }
+        /*
+         * Now takes the target CRS in account...
+         */
         final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
         if (targetCRS == null) {
             return transformed;
@@ -1183,6 +1238,9 @@ public final class CRS {
         final int dimension = targetCS.getDimension();
         for (int i=0; i<dimension; i++) {
             final CoordinateSystemAxis axis = targetCS.getAxis(i);
+            if (axis == null) { // Should never be null, but check as a paranoiac safety.
+                continue;
+            }
             boolean testMax = false; // Tells if we are testing the minimal or maximal value.
             do {
                 final double extremum = testMax ? axis.getMaximumValue() : axis.getMinimumValue();
@@ -1381,6 +1439,45 @@ public final class CRS {
         MathTransform2D mt = (MathTransform2D) transform;
         final Point2D.Double center = new Point2D.Double();
         destination = transform(mt, envelope, destination, center);
+        /*
+         * If the source envelope crosses the expected range of valid coordinates, also projects
+         * the range bounds as a safety. See the comments in transform(Envelope, ...).
+         */
+        final CoordinateReferenceSystem sourceCRS = operation.getSourceCRS();
+        if (sourceCRS != null) {
+            final CoordinateSystem cs = sourceCRS.getCoordinateSystem();
+            if (cs != null || cs.getDimension() != 2) { // Paranoiac check.
+                CoordinateSystemAxis axis = cs.getAxis(0);
+                double min = envelope.getMinX();
+                double max = envelope.getMaxX();
+                Point2D.Double pt = null;
+                for (int i=0; i<4; i++) {
+                    if (i == 2) {
+                        axis = cs.getAxis(1);
+                        min = envelope.getMinY();
+                        max = envelope.getMaxY();
+                    }
+                    final double v = (i & 1) == 0 ? axis.getMinimumValue() : axis.getMaximumValue();
+                    if (!(v > min && v < max)) {
+                        continue;
+                    }
+                    if (pt == null) {
+                        pt = new Point2D.Double();
+                    }
+                    if ((i & 2) == 0) {
+                        pt.x = v;
+                        pt.y = envelope.getCenterY();
+                    } else {
+                        pt.x = envelope.getCenterX();
+                        pt.y = v;
+                    }
+                    destination.add(mt.transform(pt, pt));
+                }
+            }
+        }
+        /*
+         * Now takes the target CRS in account...
+         */
         final CoordinateReferenceSystem targetCRS = operation.getTargetCRS();
         if (targetCRS == null) {
             return destination;
@@ -1400,6 +1497,9 @@ public final class CRS {
         for (int flag=0; flag<4; flag++) { // 2 dimensions and 2 extremums compacted in a flag.
             final int i = flag >> 1; // The dimension index being examined.
             final CoordinateSystemAxis axis = targetCS.getAxis(i);
+            if (axis == null) { // Should never be null, but check as a paranoiac safety.
+                continue;
+            }
             final double extremum = (flag & 1) == 0 ? axis.getMinimumValue() : axis.getMaximumValue();
             if (Double.isInfinite(extremum) || Double.isNaN(extremum)) {
                 continue;

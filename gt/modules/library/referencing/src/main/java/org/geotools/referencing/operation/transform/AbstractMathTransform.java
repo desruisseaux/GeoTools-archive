@@ -270,13 +270,13 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     {
         final int dimSource = getSourceDimensions();
         final int dimTarget = getTargetDimensions();
-        final double[] tmpPts = new double[numPts*Math.max(dimSource, dimTarget)];
+        final double[] tmpPts = new double[numPts * Math.max(dimSource, dimTarget)];
         for (int i=numPts*dimSource; --i>=0;) {
             tmpPts[i] = srcPts[srcOff+i];
         }
         transform(tmpPts, 0, tmpPts, 0, numPts);
         for (int i=numPts*dimTarget; --i>=0;) {
-            dstPts[dstOff+i] = (float)tmpPts[i];
+            dstPts[dstOff+i] = (float) tmpPts[i];
         }
     }
 
@@ -686,7 +686,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @return The longitude in the range &plusmn;&pi; radians.
      */
     protected static double rollLongitude(final double x) {
-        return x - (2*Math.PI)*Math.floor(x / (2*Math.PI) + 0.5);
+        return x - (2*Math.PI) * Math.floor(x / (2*Math.PI) + 0.5);
     }
 
     /**

@@ -340,7 +340,7 @@ public class Tile implements Comparable<Tile>, Serializable {
                 this.height = region.height;
             }
         }
-        this.gridToCRS  = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
+        this.gridToCRS = new AffineTransform(gridToCRS); // Really needs a new instance - no cache
         serialProvider = serial(provider);
     }
 

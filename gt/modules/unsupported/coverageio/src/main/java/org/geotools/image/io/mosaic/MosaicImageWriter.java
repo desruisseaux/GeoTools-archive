@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ExecutionException;
 import java.lang.reflect.UndeclaredThrowableException;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -498,9 +499,11 @@ public class MosaicImageWriter extends ImageWriter {
             }
         }
         final Set<Dimension> subsamplingDone = tiles.size() > 24 ? new HashSet<Dimension>() : null;
-        boolean selectedIsPreferredSize = false;
-        Tile selectedTile = null;
-        int subtileCount = 0;
+        boolean selectedHasPreferredSize = false;
+        int     selectedCount = 0;
+        Tile    selectedTile  = null;
+        Tile    fallbackTile  = null; // Used only if we failed to select a tile.
+        long    fallbackArea  = Long.MAX_VALUE;
         assert tree.containsAll(tiles);
 search: for (final Tile tile : tiles) {
             /*
@@ -521,9 +524,11 @@ search: for (final Tile tile : tiles) {
                  */
                 continue;
             }
-            // Reminder: Collection in next line will be modified.
+            // Reminder: Collection in next line will be modified, so it needs to be mutable.
             final Collection<Tile> enclosed = tree.containedIn(region);
-            if (enclosed.size() <= subtileCount) {
+            assert enclosed.contains(tile) : tile;
+            if (enclosed.size() <= selectedCount) {
+                assert selectedTile != null : selectedCount;
                 continue; // Already a smaller collection - no need to do more in this iteration.
             }
             /*
@@ -544,7 +549,12 @@ search: for (final Tile tile : tiles) {
                 }
             }
             long area = (long) region.width * (long) region.height;
-            if (area / smallestPixelArea > maximumPixelCount) {
+            area /= smallestPixelArea;
+            if (area > maximumPixelCount) {
+                if (area < fallbackArea) {
+                    fallbackArea = area;
+                    fallbackTile = tile;
+                }
                 continue;
             }
             /*
@@ -566,7 +576,8 @@ search: for (final Tile tile : tiles) {
                 }
                 final Rectangle subregion = subtile.getAbsoluteRegion();
                 area = (long) subregion.width * (long) subregion.height;
-                if (area / smallestPixelArea > maximumPixelCount) {
+                area /= smallestPixelArea;
+                if (area > maximumPixelCount) {
                     it.remove();
                     if (s.equals(finestSubsampling)) {
                         continue search;
@@ -582,14 +593,25 @@ search: for (final Tile tile : tiles) {
             final boolean isPreferredSize = (preferredSize != null) &&
                     region.width  / finestSubsampling.width  == preferredSize.width &&
                     region.height / finestSubsampling.height == preferredSize.height;
-            if (selectedTile == null || tileCount > subtileCount ||
-                    (isPreferredSize && !selectedIsPreferredSize))
+            if (selectedTile == null || tileCount > selectedCount ||
+                    (isPreferredSize && !selectedHasPreferredSize))
             {
                 selectedTile = tile;
-                subtileCount = tileCount;
-                selectedIsPreferredSize = isPreferredSize;
+                selectedCount = tileCount;
+                selectedHasPreferredSize = isPreferredSize;
                 imageSubsampling.setSize(finestSubsampling);
             }
+        }
+        /*
+         * The selected tile may still null if 'maximumPixelCount' is so small than even the
+         * smallest tile doesn't fit. We will return the smallest tile anyway, maybe letting
+         * a OutOfMemoryError to occurs in the caller if really the tile can't hole in the
+         * available memory. We perform this try anyway because estimation of available memory
+         * in Java is only approximative.
+         */
+        if (selectedTile == null) {
+            selectedTile = fallbackTile;
+            imageSubsampling.setSize(fallbackTile.getSubsampling());
         }
         return selectedTile;
     }
@@ -625,7 +647,7 @@ search: for (final Tile tile : tiles) {
         final Runtime runtime = Runtime.getRuntime();
         runtime.gc();
         final long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        return Math.min(1024*1024*1024, runtime.maxMemory() - 2*usedMemory);
+        return Math.min(128L*1024*1024, runtime.maxMemory() - 2*usedMemory);
     }
 
     /**
@@ -961,7 +983,7 @@ search: for (final Tile tile : tiles) {
          */
         public Spi() {
             vendorName      = "GeoTools";
-            version         = "1.0";
+            version         = GeoTools.getVersion().toString();
             names           = MosaicImageReader.Spi.NAMES;
             outputTypes     = MosaicImageReader.Spi.INPUT_TYPES;
             pluginClassName = "org.geotools.image.io.mosaic.MosaicImageWriter";

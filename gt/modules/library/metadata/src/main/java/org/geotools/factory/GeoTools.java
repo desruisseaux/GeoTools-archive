@@ -27,11 +27,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-import org.geotools.resources.XMath;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.logging.LoggerFactory;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.Version;
@@ -311,7 +311,7 @@ public final class GeoTools {
                         if (type.equals(Boolean.class)) {
                             value = Boolean.valueOf(property);
                         } else if (Number.class.isAssignableFrom(type)) try {
-                            value = XMath.valueOf(type, property);
+                            value = Classes.valueOf(type, property);
                         } catch (NumberFormatException e) {
                             unexpectedException(e);
                             continue;

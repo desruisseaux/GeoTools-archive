@@ -39,8 +39,9 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
-import org.geotools.image.io.metadata.MetadataMerge;
 import org.geotools.io.TableWriter;
+import org.geotools.factory.GeoTools;
+import org.geotools.image.io.metadata.MetadataMerge;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -354,6 +355,8 @@ public class MosaicImageReader extends ImageReader {
     /**
      * From the given set of tiles, select one tile to use as a prototype.
      * This method tries to select the tile which use the most specific reader.
+     *
+     * @return The most specific tile, or {@code null} if none.
      */
     private Tile getSpecificTile(final Collection<Tile> tiles) {
         Tile fallback = null;
@@ -382,10 +385,7 @@ public class MosaicImageReader extends ImageReader {
             }
             type = type.getSuperclass();
         }
-        if (fallback != null) {
-            return fallback;
-        }
-        throw new NoSuchElementException();
+        return fallback;
     }
 
     /**
@@ -672,8 +672,12 @@ public class MosaicImageReader extends ImageReader {
             case SUPPORTED_BY_ONE: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
                 final Tile tile = getSpecificTile(tiles);
-                type = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
-                assert type.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
+                if (tile != null) {
+                    type = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
+                    assert type.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
+                } else {
+                    type = super.getRawImageType(imageIndex);
+                }
                 break;
             }
             case SUPPORTED_BY_ALL: {
@@ -800,6 +804,10 @@ public class MosaicImageReader extends ImageReader {
             case SUPPORTED_BY_ONE: {
                 final Collection<Tile> tiles = getTileManager(imageIndex).getTiles();
                 final Tile tile = getSpecificTile(tiles);
+                if (tile == null) {
+                    final Collection<ImageTypeSpecifier> t = Collections.emptySet();
+                    return t.iterator();
+                }
                 types = tile.getImageReader(this, true, true).getImageTypes(imageIndex);
                 assert (types = containsAll(getImageTypes(tiles, null), types)) != null : incompatibleImageType(tile);
                 break;
@@ -1041,8 +1049,10 @@ public class MosaicImageReader extends ImageReader {
                         }
                         case SUPPORTED_BY_ONE: {
                             final Tile tile = getSpecificTile(tiles);
-                            imageType = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
-                            assert imageType.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
+                            if (tile != null) {
+                                imageType = tile.getImageReader(this, true, true).getRawImageType(imageIndex);
+                                assert imageType.equals(getRawImageType(tiles)) : incompatibleImageType(tile);
+                            }
                             break;
                         }
                         case SUPPORTED_BY_ALL: {
@@ -1051,7 +1061,13 @@ public class MosaicImageReader extends ImageReader {
                         }
                     }
                     if (imageType == null) {
-                        throw new IIOException(Errors.format(ErrorKeys.DESTINATION_NOT_SET));
+                        /*
+                         * This case occurs if the tiles collection is empty.  We want to produce
+                         * a fully transparent (or empty) image in such case. Remember that tiles
+                         * are not required to exist everywhere in the mosaic bounds,  so the set
+                         * of tiles in a particular sub-area is allowed to be empty.
+                         */
+                        imageType = getRawImageType(imageIndex);
                     }
                 }
                 final int width  = destRegion.x + destRegion.width;
@@ -1417,7 +1433,7 @@ public class MosaicImageReader extends ImageReader {
          */
         public Spi() {
             vendorName      = "GeoTools";
-            version         = "1.0";
+            version         = GeoTools.getVersion().toString();
             names           = NAMES;
             inputTypes      = INPUT_TYPES;
             pluginClassName = "org.geotools.image.io.mosaic.MosaicImageReader";

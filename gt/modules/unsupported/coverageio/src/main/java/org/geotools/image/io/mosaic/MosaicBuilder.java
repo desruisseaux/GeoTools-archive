@@ -643,7 +643,7 @@ public class MosaicBuilder {
             case CONSTANT_TILE_SIZE:       tiles = createTileManager(false); break;
             default: throw new IllegalStateException(layout.toString());
         }
-        if (mosaicEnvelope != null) {
+        if (mosaicEnvelope != null && !mosaicEnvelope.isNull()) {
             final GridToEnvelopeMapper mapper = createGridToEnvelopeMapper(tiles);
             mapper.setGridRange(new GridRange2D(untiledBounds));
             mapper.setEnvelope(mosaicEnvelope);

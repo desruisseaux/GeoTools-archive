@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2007, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,12 +16,10 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.Collection;
 import javax.imageio.metadata.IIOMetadataFormat;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
