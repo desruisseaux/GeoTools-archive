@@ -311,7 +311,7 @@ public class CropTest extends GridCoverageTest {
 		assertEquals(((GridGeometry2D) rotated.getGridGeometry())
 				.getGridToCRS2D(), ((GridGeometry2D) cropped.getGridGeometry())
 				.getGridToCRS2D());
-		assertNotSame(rotated.getEnvelope2D(),cropped.getEnvelope2D());
+		assertNotSame(cropEnvelope,cropped.getEnvelope2D());
 
 		// //
 		//
