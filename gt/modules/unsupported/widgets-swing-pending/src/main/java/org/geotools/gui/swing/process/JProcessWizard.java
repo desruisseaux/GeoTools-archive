@@ -3,8 +3,6 @@ package org.geotools.gui.swing.process;
 import java.awt.Dialog;
 import java.awt.HeadlessException;
 
-import org.geotools.process.literal.IntersectsFactory;
-
 public class JProcessWizard extends JWizard {
     private static final long serialVersionUID = -5885825548881784615L;    
     public JProcessWizard( String title ) throws HeadlessException {
@@ -20,16 +18,16 @@ public class JProcessWizard extends JWizard {
     private void initPages() {
         // hey eclisia implement this by looking at ProcessFinder :-D
         // registerWizardPanel( new JProcessPage() );
-        
-        IntersectsFactory factory = new IntersectsFactory(); // fake it!
-        InputParameterPage inputPage = new InputParameterPage( factory );
-        registerWizardPanel( inputPage );
-        setCurrentPanel( inputPage.getIdentifier() );
+    	
+    	ProcessSelectionPage selectionPage = new ProcessSelectionPage();    	
+        registerWizardPanel( selectionPage );
+        selectionPage.setJProcessWizard(this);
+        setCurrentPanel( selectionPage.getIdentifier() );
     }
 
     public static void main( String args[] ){
         JProcessWizard wizard = new JProcessWizard("Test Input Parameter UI");
         int result = wizard.showModalDialog();
-        System.out.println("finished "+result );
+        System.out.println("finished " + result );
     }
 }

@@ -46,7 +46,7 @@ public class JGeometryField extends AbstractParamWidget {
 	public Object getValue() {
 	    WKTReader reader = new WKTReader();
 	    String wkt = text.getText();
-	    if( wkt.length() != 0 ){
+	    if( wkt.length() == 0 ){
 	        return null;
 	    }
 	   
@@ -64,13 +64,18 @@ public class JGeometryField extends AbstractParamWidget {
 	 * @return Number of dimensions expected based on metadata, default of 2
 	 */
 	int getD(){
-	    CoordinateReferenceSystem crs = (CoordinateReferenceSystem) parameter.metadata.get( Parameter.CRS );
-	    if( crs == null ){
-	        return 2;
-	    }
-	    else {
-	        return crs.getCoordinateSystem().getDimension();
-	    }
+		try {
+		    CoordinateReferenceSystem crs = (CoordinateReferenceSystem) parameter.metadata.get( Parameter.CRS );
+		    if( crs == null ){
+		        return 2;
+		    }
+		    else {
+		        return crs.getCoordinateSystem().getDimension();
+		    }
+		}
+		finally {
+			return 2;
+		}
 	}
 	
 	public void setValue(Object value) {

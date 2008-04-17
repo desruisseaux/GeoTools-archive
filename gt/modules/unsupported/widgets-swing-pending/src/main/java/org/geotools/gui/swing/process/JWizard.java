@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
  * href="http://java.sun.com/developer/technicalArticles/GUI/swing/wizard/">Creating Wizard Dialogs
  * with Java</a>.
  * 
- * @author Jody
+ * @author Jody, gdavis
  */
 public class JWizard extends JDialog {
     private static final long serialVersionUID = 1L;
@@ -193,7 +193,7 @@ public class JWizard extends JDialog {
         if( page == null ) close( ERROR );
         
         current = page;
-        controller.syncButtonsToPage();
+        syncWizardButtons();
         
         page.aboutToDisplayPanel();
         
@@ -202,7 +202,10 @@ public class JWizard extends JDialog {
         page.displayingPanel();        
     }  
     
-    public void registerWizardPanel(JPage page) {
+    public void syncWizardButtons() {
+    	controller.syncButtonsToPage();
+	}
+	public void registerWizardPanel(JPage page) {
         cardPanel.add(page.getPage(), page.getIdentifier());
         page.setJProcessWizard( this );
         model.put( page.getIdentifier(), page );

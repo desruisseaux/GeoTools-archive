@@ -7,18 +7,23 @@ import javax.swing.JPanel;
 /**
  * This is a descriptor; identifying a page by id (and lazily creating it as needed).
  * 
- * @author Jody
+ * @author Jody, gdavis
  */
 public abstract class JPage {
     /**
      * Used to indicate which page we should start with.
      */
-    public static final String DEFAULT = "default";
+    public static final String DEFAULT = "Default";
 
     /**
      * Used to indicate that we are done and the wizard should close
      */
-    public static final String FINISH = "finish";
+    public static final String FINISH = "Finish";
+    
+    /**
+     * Used to indicate that there is a next step to complete
+     */
+    public static final String NEXT = "Next";    
 
     protected final JPanel page;
     protected final String identifier;

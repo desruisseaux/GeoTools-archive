@@ -26,7 +26,15 @@ public class JDoubleField extends AbstractParamWidget {
 
 	public Object getValue() {
 	    String val = blah.getText();
-		return new Double(val);
+	    if (val == null || val.equals("")) {
+	    	return new Double(0);
+	    }
+	    try {
+	    	return new Double(val);
+	    }
+	    catch (NumberFormatException e) {
+	    	return new Double(0);
+	    }
 	}
 
 	public void setValue(Object value) {
