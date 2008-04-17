@@ -277,7 +277,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  {@link PixelInCell#CELL_CORNER CELL_CORNER} for Java2D/JAI conventions.
      * @param gridToCRS The math transform which allows for the transformations from grid
      *                  coordinates to real world earth coordinates. May be {@code null},
-     *                  but this is not recommanded.
+     *                  but this is not recommended.
      * @param envelope  The envelope (including CRS) of a grid coverage, or {@code null} if none.
      *
      * @throws MismatchedDimensionException if the math transform and the envelope doesn't have

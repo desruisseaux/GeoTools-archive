@@ -257,8 +257,8 @@ public class GeneralGridRange implements GridRange, Serializable {
      * only if {@code anchor} is {@link PixelInCell#CELL_CENTER}. Users who don't want such
      * offset should specify {@link PixelInCell#CELL_CORNER}.
      * <p>
-     * The convention is specified as a {@link PixelInCell} code instead than the more detailled
-     * {@link org.opengis.metadata.spatial.PixelOrientation} because the later is restricted to
+     * The convention is specified as a {@link PixelInCell} code instead than the more detailed
+     * {@link org.opengis.metadata.spatial.PixelOrientation} because the latter is restricted to
      * the two-dimensional case while the former can be used for any number of dimensions.
      *
      * @param envelope
