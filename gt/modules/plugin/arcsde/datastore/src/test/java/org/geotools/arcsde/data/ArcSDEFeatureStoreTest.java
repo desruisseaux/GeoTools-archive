@@ -1328,13 +1328,13 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertEquals(0, initialCount);
 
             final WKTReader reader = new WKTReader();
-            Object[] content = new Object[2];
+            Object[] content = new Object[3];
             SimpleFeature feature;
             FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
             int count;
 
-            content[0] = "Feature name 1";
-            content[1] = reader.read("POINT (10 10)");
+            content[1] = "Feature name 1";
+            content[2] = reader.read("POINT (10 10)");
             feature = SimpleFeatureBuilder.build(schema, content, (String) null);
             collection = DataUtilities.collection(feature);
 

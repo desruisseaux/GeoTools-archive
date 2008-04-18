@@ -573,8 +573,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             }
 
             if (epsgCode == -1) {
-                LOGGER
-                        .warning("Couldn't determine EPSG code for this raster.  Using SDE's WKT-like coordSysDescription() instead.");
+                LOGGER.warning("Couldn't determine EPSG code for this raster."
+                        + "  Using SDE's WKT-like coordSysDescription() instead.");
                 crs = CRS.parseWKT(rCol.getCoordRef().getCoordSysDescription());
             } else {
                 crs = CRS.decode("EPSG:" + epsgCode);

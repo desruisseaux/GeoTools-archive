@@ -23,13 +23,16 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedImageAdapter;
 
 import org.geotools.arcsde.data.TestData;
+import org.geotools.arcsde.gce.producer.ArcSDERasterFloatProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBitPerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterOneBytePerBandProducerImpl;
 import org.geotools.arcsde.gce.producer.ArcSDERasterProducer;
@@ -46,7 +49,6 @@ import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRaster;
 import com.esri.sde.sdk.client.SeRasterAttr;
-import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterColumn;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRegistration;
@@ -56,6 +58,7 @@ import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PePCSDefs;
 import com.esri.sde.sdk.pe.PeProjectedCS;
+import com.sun.media.jai.util.PlanarImageProducer;
 
 public class RasterTestData {
 
@@ -115,6 +118,11 @@ public class RasterTestData {
         return testData.getTemp_table() + "_GRAYSCALERASTER";
     }
 
+    public String getFloatRasterTableName() throws SeException,
+            UnavailableArcSDEConnectionException, DataSourceException {
+        return testData.getTemp_table() + "_FLOATRASTER";
+    }
+
     public String getRasterTestDataProperty(String propName) {
         return conProps.getProperty(propName);
     }
@@ -162,7 +170,7 @@ public class RasterTestData {
         createRasterBusinessTempTable(tableName, conn);
         conn.close();
 
-        SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
+        SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 501, 898000 + 501);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
         String rasterFilename = conProps.getProperty("sampledata.rgbraster");
         ArcSDERasterProducer prod = new ArcSDERasterOneBytePerBandProducerImpl();
@@ -211,6 +219,26 @@ public class RasterTestData {
                 prod);
     }
 
+    public void loadFloatRaster() throws Exception {
+        // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
+        Session conn = testData.getConnectionPool().getConnection();
+        final String tableName = getFloatRasterTableName();
+
+        // clean out the table if it's currently in-place
+        testData.deleteTable(tableName);
+        // build the base business table. We'll add the raster data to it in a bit
+        createRasterBusinessTempTable(tableName, conn);
+        conn.close();
+
+        SeExtent imgExtent = new SeExtent(245900, 899600, 246300, 900000);
+        SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
+        String rasterFilename = conProps.getProperty("sampledata.floatraster");
+        ArcSDERasterProducer prod = new ArcSDERasterFloatProducerImpl();
+
+        importRasterImage(tableName, crs, rasterFilename, SeRaster.SE_PIXEL_TYPE_32BIT_REAL,
+                imgExtent, prod);
+    }
+
     public SeCoordinateReference getSeCRSFromPeProjectedCSId(int PeProjectedCSId) {
         SeCoordinateReference crs;
         try {
@@ -223,8 +251,7 @@ public class RasterTestData {
         return crs;
     }
 
-    public void createRasterBusinessTempTable(String tableName, Session conn)
-            throws Exception {
+    public void createRasterBusinessTempTable(String tableName, Session conn) throws Exception {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
         SeTable table = conn.createSeTable(tableName);
@@ -339,6 +366,7 @@ public class RasterTestData {
         testData.deleteTable(getRGBARasterTableName());
         testData.deleteTable(getGrayScaleOneByteRasterTableName());
         testData.deleteTable(getRGBColorMappedRasterTableName());
+        testData.deleteTable(getFloatRasterTableName());
     }
 
     /**
@@ -356,6 +384,10 @@ public class RasterTestData {
         return imageEquals(image, expected);
     }
 
+    public static boolean imageEquals(RenderedImage image1, RenderedImage image2) {
+        return imageEquals(image1, image2, true);
+    }
+
     /**
      * convenience method to test if two images are identical in their RGB pixel values
      * 
@@ -363,16 +395,44 @@ public class RasterTestData {
      * @param image2
      * @return
      */
-    public static boolean imageEquals(RenderedImage image1, RenderedImage image2) {
-        BufferedImage img1Buff = PlanarImage.wrapRenderedImage(image1).getAsBufferedImage();
-        BufferedImage img2Buff = PlanarImage.wrapRenderedImage(image2).getAsBufferedImage();
-        for (int xpos = 0; xpos < image1.getWidth(); xpos++) {
-            for (int ypos = 0; ypos < image1.getHeight(); ypos++) {
-                if (img1Buff.getRGB(xpos, ypos) != img2Buff.getRGB(xpos, ypos)) {
-                    System.out.println("pixel " + xpos + "," + ypos + " isn't identical");
-                    return false;
+    public static boolean imageEquals(RenderedImage image1, RenderedImage image2, boolean ignoreAlpha) {
+
+        final int h = image1.getHeight();
+        final int w = image2.getWidth();
+        
+        int skipBand = -1;
+        if (ignoreAlpha) {
+            skipBand = 3;
+        }
+        
+        for (int b = 0; b < image1.getData().getNumBands(); b++) {
+            if (b == skipBand) continue;
+            int[] img1data = image1.getData().getSamples(0, 0, image1.getWidth(),
+                    image1.getHeight(), b, new int[image1.getHeight() * image1.getWidth()]);
+            int[] img2data = image2.getData().getSamples(0, 0, image1.getWidth(),
+                    image1.getHeight(), b, new int[image1.getHeight() * image1.getWidth()]);
+            
+            if (!Arrays.equals(img1data, img2data)) {
+                // try to figure out which pixel (exactly) was different
+                for (int i = 0; i < img1data.length; i++) {
+                    if (img1data[i] != img2data[i]) {
+                        final int x = i % image1.getWidth();
+                        final int y = i / image1.getHeight();
+                        System.out.println("pixel " + i + " (possibly " + x + "," + y + ") differs: "  + img1data[i] + " != " + img2data[i]);
+                        return false;
+                    }
                 }
             }
+            
+            /*
+             * for (int xpos = 0; xpos < image1.getWidth(); xpos++) { System.out.println("checking
+             * column " + xpos); int[] img1data = image1.getData().getSamples(xpos, 0, 1,
+             * image1.getHeight(), b, new int[image1.getHeight()]); int[] img2data =
+             * image2.getData().getSamples(xpos, 0, 1, image1.getHeight(), b, new
+             * int[image1.getHeight()]); if (!Arrays.equals(img1data, img2data)) {
+             * System.out.println("pixels in column " + xpos + " are different"); return false; } }
+             */
+
         }
         return true;
     }

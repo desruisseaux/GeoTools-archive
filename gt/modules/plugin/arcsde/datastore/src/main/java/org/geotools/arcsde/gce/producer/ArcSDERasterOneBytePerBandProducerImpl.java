@@ -16,9 +16,7 @@
  */
 package org.geotools.arcsde.gce.producer;
 
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.SampleModel;
 
