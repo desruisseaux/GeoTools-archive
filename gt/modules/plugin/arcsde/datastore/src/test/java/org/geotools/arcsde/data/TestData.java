@@ -302,7 +302,8 @@ public class TestData {
             tempTable = conn.createSeTable(tableName);
             tempTableLayer.setTableName(tableName);
 
-            tempTableColumns = createBaseTable(conn.unWrap(), tempTable, tempTableLayer, configKeyword);
+            tempTableColumns = createBaseTable(conn.unWrap(), tempTable, tempTableLayer,
+                    configKeyword);
 
             if (insertTestData) {
                 insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
@@ -892,7 +893,7 @@ public class TestData {
         if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE == rowIdColumnType) {
             // make the table multiversioned
             System.err.println("Making " + tableName + " versioned...");
-            SeRegistration reg = conn.createSeRegistration( tableName );
+            SeRegistration reg = conn.createSeRegistration(tableName);
             reg.getInfo();
             reg.setMultiVersion(true);
             reg.alter();
@@ -956,13 +957,24 @@ public class TestData {
             // ignore, the table didn't exist already
         }
 
-        SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
         boolean isNullable = true;
-        colDefs[0] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 25, 0,
+        // first column to be SDE managed feature id
+        colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
+        colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 25, 0,
                 isNullable);
 
         table.create(colDefs, getConfigKeyword());
         layer.setSpatialColumnName("SHAPE");
+
+        /*
+         * Register the column to be used as feature id and managed by sde
+         */
+        SeRegistration reg = connection.createSeRegistration(table.getName());
+        LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
+        reg.setRowIdColumnName("ROW_ID");
+        reg.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE);
+        reg.alter();
 
         layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | SeLayer.SE_POINT_TYPE_MASK);
         layer.setGridSizes(1100.0, 0.0, 0.0);
