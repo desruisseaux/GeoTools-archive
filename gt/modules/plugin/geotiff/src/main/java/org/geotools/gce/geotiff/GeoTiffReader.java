@@ -37,6 +37,7 @@ package org.geotools.gce.geotiff;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -64,6 +66,8 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -185,13 +189,16 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Get a stream in order to read from it for getting the basic
-			// information for this coverfage
+			// information for this coverage
 			//
 			// /////////////////////////////////////////////////////////////////////
 			if ((source instanceof InputStream)
 					|| (source instanceof ImageInputStream))
 				closeMe = false;
-			inStream = ImageIO.createImageInputStream(source);
+			if(source instanceof ImageInputStream )
+				inStream=(ImageInputStream) source;
+			else
+				inStream = ImageIO.createImageInputStream(source);
 			if (inStream == null)
 				throw new IllegalArgumentException(
 						"No input stream for the provided source");
@@ -300,7 +307,9 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// setting the higher resolution avalaible for this coverage
 		//
 		// ///
-		highestRes = getResolution(originalEnvelope, actualDim, crs);
+		highestRes = new double[2];
+		highestRes[0]=XAffineTransform.getScaleX0(tempTransform);
+		highestRes[1]=XAffineTransform.getScaleY0(tempTransform);
 
 		// //
 		//
@@ -309,12 +318,9 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// //
 		if (numOverviews > 1) {
 			overViewResolutions = new double[numOverviews][2];
-			double res[];
 			for (int i = 0; i < numOverviews; i++) {
-				res = getResolution(originalEnvelope, new Rectangle(0, 0,
-						reader.getWidth(i+1), reader.getHeight(i+1)), crs);
-				overViewResolutions[i][0] = res[0];
-				overViewResolutions[i][1] = res[1];
+				overViewResolutions[i][0] = (highestRes[0]*this.originalGridRange.getLength(0))/reader.getWidth(i+1);
+				overViewResolutions[i][1] = (highestRes[1]*this.originalGridRange.getLength(1))/reader.getHeight(i+1);
 			}
 		} else
 			overViewResolutions = null;
@@ -419,28 +425,43 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		pbjRead.add(null);
 		pbjRead.add(readP);
 		pbjRead.add( readerSPI.createReaderInstance());
+		final RenderedOp coverageRaster=JAI.create("ImageRead", pbjRead,
+                        (RenderingHints) newHints);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// BUILDING COVERAGE
 		//
 		// /////////////////////////////////////////////////////////////////////
-		// get the raster -> model transformation and
-		//		 create the coverage
-		if (imageChoice.intValue() == 0) {
+                // I need to calculate a new transformation (raster2Model)
+                // between the cropped image and the required
+                // adjustedRequestEnvelope
+                final int ssWidth = coverageRaster.getWidth();
+                final int ssHeight = coverageRaster.getHeight();
+                if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.log(Level.FINE, "Coverage read: width = " + ssWidth
+                                        + " height = " + ssHeight);
+                }
 
-			final AffineTransform tempRaster2Model = new AffineTransform(
-					(AffineTransform) raster2Model);
-			tempRaster2Model.concatenate(new AffineTransform(readP
-					.getSourceXSubsampling(), 0, 0, readP
-					.getSourceYSubsampling(), 0, 0));
-			return createImageCoverage(JAI.create("ImageRead", pbjRead,
-					(RenderingHints) newHints), ProjectiveTransform
-					.create((AffineTransform) tempRaster2Model));
-
-		}
-		return createImageCoverage(JAI.create("ImageRead", pbjRead,
-				 (RenderingHints) newHints));
+                // //
+                //
+                // setting new coefficients to define a new affineTransformation
+                // to be applied to the grid to world transformation
+                // -----------------------------------------------------------------------------------
+                //
+                // With respect to the original envelope, the obtained planarImage
+                // needs to be rescaled and translated. The scaling factors are
+                // computed as the ratio
+                // between the cropped source region sizes and the read image sizes.
+                // The translate
+                // settings are represented by the offsets of the source region.
+                //
+                // //
+                final double scaleX = originalGridRange.getLength(0) / (1.0 * ssWidth);
+                final double scaleY = originalGridRange.getLength(1) / (1.0 * ssHeight);
+                final AffineTransform tempRaster2Model = new AffineTransform((AffineTransform) raster2Model);
+                tempRaster2Model.concatenate(new AffineTransform(scaleX, 0, 0, scaleY, 0, 0));
+                return createImageCoverage(coverageRaster, ProjectiveTransform.create((AffineTransform) tempRaster2Model));
 
 
 	}

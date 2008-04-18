@@ -169,30 +169,33 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			reader = spi.createReaderInstance();
 			reader.setInput(inputStream);
 			final IIOMetadata metadata = reader.getImageMetadata(0);
-			try {
-				final GeoTiffIIOMetadataDecoder metadataAdapter = new GeoTiffIIOMetadataDecoder(
-						metadata);
+			final GeoTiffIIOMetadataDecoder metadataAdapter = new GeoTiffIIOMetadataDecoder(
+					metadata);
 
-				if (metadataAdapter.getGeoKeyRevision() != 1) {
-					return false;
-				}
-			} catch (UnsupportedOperationException e) {
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+			if (metadataAdapter.getGeoKeyRevision() != 1) {
 				return false;
-			} finally {
-				if (reader != null) {
-					reader.dispose();
-				}
-				if (inputStream != null) {
-					inputStream.close();
-				}
 			}
+			
 
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
+		} finally {
+			if (reader != null) {
+				try{
+					reader.dispose();
+				}catch (Exception e) {
+					
+				}
+			}
+			if (inputStream != null) {
+				try{
+					inputStream.close();
+				}catch (Exception e) {
+					
+				}
+			}
 		}
 		return true;
 
