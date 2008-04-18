@@ -500,9 +500,8 @@ public final class CoverageUtilities {
             return false;
         }
         final AffineTransform at = (AffineTransform) transform;
-        final double scale = Math.abs(XAffineTransform.getRotation(at));
-        return scale < EPS; // This is enough for returning 'false' if 'scale' is NaN.
-//      return Math.abs(at.getShearX()) < EPS && Math.abs(at.getShearY()) < EPS;
+        final double rotation = Math.abs(XAffineTransform.getRotation(at));
+        return rotation < EPS; // This is enough for returning 'false' if 'scale' is NaN.
     }
 
     /**
@@ -526,21 +525,18 @@ public final class CoverageUtilities {
      * Tries to estimate if the supplied affine transform is either a scale and
      * translate transform or if it contains a rotations which is an integer
      * multiple of PI/2.
-     * 
-     * @param sourceGridToWorldTransform an instance of {@link AffineTransform} to check against.
+     *
+     * @param gridToCRS an instance of {@link AffineTransform} to check against.
      * @param EPS tolerance value for comparisons.
-     * @return <code>true</code> if this transform is "simple", <code>false</code> otherwise.
+     * @return {@code true} if this transform is "simple", {@code false} otherwise.
      */
-    public static boolean isSimpleGridToWorldTransform(
-            final AffineTransform sourceGridToWorldTransform, double EPS) {
-        final double rotationEsteem = XAffineTransform.getRotation(sourceGridToWorldTransform);
-        // check if there is a valid rotation value (it could be 0!)
-        if (!Double.isNaN(rotationEsteem)) {
-                double  badRotation=Math.abs(rotationEsteem/(Math.PI/2));
-                if(Math.abs(badRotation-Math.floor(badRotation))<EPS)
-            	// there is no rotation and skew or there is a rotation multiple of PI/2
-            	return true;
-        }
-        return false;
+    public static boolean isSimpleGridToWorldTransform(final AffineTransform gridToCRS, double EPS) {
+        final double rotation = XAffineTransform.getRotation(gridToCRS);
+        // Checks if there is a valid rotation value (it could be 0). If the result is an integer,
+        // then there is no rotation and skew or there is a rotation multiple of PI/2. Note that
+        // there is no need to check explicitly for NaN rotation angle since such value will be
+        // propagated as NaN by every math functions used here, and (NaN < EPS) returns false.
+        final double quadrantRotation = Math.abs(rotation / (Math.PI/2));
+        return Math.abs(quadrantRotation - Math.floor(quadrantRotation)) < EPS;
     }
 }
