@@ -211,12 +211,6 @@ public abstract class AbstractGridCoverage2DReader implements
 		// //
 		Integer imageChoice = new Integer(0);
 		
-		// we are able to handle overviews properly only if the transformation
-		// is  an affine transform with pure scale and translation, no rotational
-		// components
-		if (raster2Model != null && !CoverageUtilities.isScaleTranslate(raster2Model,AbstractGridCoverage2DReader.EPS))
-			return imageChoice;
-		
 		// //
 		//
 		// Init overview policy
@@ -373,8 +367,8 @@ public abstract class AbstractGridCoverage2DReader implements
             	 resolutionsLevels.add(new Resolution(overViewResolutions[i][0]/highestRes[0],overViewResolutions[i][0],overViewResolutions[i][1] , i+1));
              }
              Collections.sort(resolutionsLevels);
-        	}
-		}
+          }
+	}
        
 
         // Now search for the best matching resolution. 
@@ -678,7 +672,10 @@ public abstract class AbstractGridCoverage2DReader implements
 				if (crs2D != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
 					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
 					if (!tr.isIdentity())
+					{
 						envelope = CRS.transform(tr, envelope);
+						envelope.setCoordinateReferenceSystem(crs);
+					}
 				}
 				requestedRes = new double[2];
 				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
