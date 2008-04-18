@@ -54,6 +54,7 @@ import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.coverage.grid.Format;
@@ -66,6 +67,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -320,6 +322,9 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				//
 				// ///
 				highestRes = getResolution(originalEnvelope, actualDim, crs);
+				final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper(originalGridRange, originalEnvelope);
+				mapper.setPixelAnchor(PixelInCell.CELL_CENTER);
+				this.raster2Model=mapper.createTransform();
 
 			}
 
