@@ -27,12 +27,15 @@ import org.opengis.util.ProgressListener;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * 
+ * Process to intersect 2 geometries
  * @author gdavis
  */
 class IntersectionProcess implements Process {
 
     private IntersectionFactory factory;
+    private Map<String, Object> resultMap;
+    private Map<String, Object> inputMap;
+    private boolean started = false;    
 
     public IntersectionProcess( IntersectionFactory intersectsFactory ) {
         this.factory = intersectsFactory;
@@ -42,33 +45,33 @@ class IntersectionProcess implements Process {
         return factory;
     }
 
-    public Map<String, Object> process( Map<String, Object> input, ProgressListener monitor ) {
-        
-    	if( monitor == null ) monitor = new NullProgressListener();
+    public void process(ProgressListener monitor) {
+		if (started) return;
+		
+		started = true;
+		if( monitor == null ) monitor = new NullProgressListener();
+		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
         
     	try {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) input.get( IntersectionFactory.GEOM1.key );
-            Geometry geom2 = (Geometry) input.get( IntersectionFactory.GEOM2.key );
+            Geometry geom1 = (Geometry) inputMap.get( IntersectionFactory.GEOM1.key );
+            Geometry geom2 = (Geometry) inputMap.get( IntersectionFactory.GEOM2.key );
             
             monitor.setTask( Text.text("Processing Intersection") );
             monitor.progress( 25.0f );
             
             if( monitor.isCanceled() ){
-                return null; // user has canceled this operation
+                return; // user has canceled this operation
             }
             Geometry intersect = geom1.intersection( geom2 );
             
             monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
-            Map<String, Object> result = new HashMap<String, Object>(1);
-            result.put( IntersectionFactory.RESULT.key, intersect );
+            resultMap.put( IntersectionFactory.RESULT.key, intersect );
             monitor.complete(); // same as 100.0f
-            
-            return result;
         }
         catch (Exception eek){
             monitor.exceptionOccurred(eek);
@@ -76,7 +79,15 @@ class IntersectionProcess implements Process {
         finally {
             monitor.dispose();
         }
-        return null;
     }
+
+	public void setInput(Map<String, Object> input) {
+		// do any validation or pre-processing work here
+		this.inputMap = input;
+	}
+
+	public Map<String, Object> getResult() {
+		return resultMap;
+	}
 
 }

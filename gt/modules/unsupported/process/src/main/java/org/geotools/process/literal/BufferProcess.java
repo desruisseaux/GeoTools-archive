@@ -28,13 +28,16 @@ import org.opengis.util.ProgressListener;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * 
+ * Process for adding a buffer around a geometry
  * @author gdavis
  */
 class BufferProcess implements Process {
 
     private BufferFactory factory;
-
+    private Map<String, Object> resultMap;
+    private Map<String, Object> inputMap;
+    private boolean started = false;
+    
     public BufferProcess( BufferFactory bufferFactory ) {
         this.factory = bufferFactory;
     }
@@ -43,23 +46,25 @@ class BufferProcess implements Process {
         return factory;
     }
 
-	public Map<String, Object> process(Map<String, Object> input,
-			ProgressListener monitor) {
+	public void process(ProgressListener monitor) {
+		if (started) return;
 		
+		started = true;
 		if( monitor == null ) monitor = new NullProgressListener();
+		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
 		
         try {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) input.get( BufferFactory.GEOM1.key );          
-            Double buffer = (Double) input.get( BufferFactory.BUFFER.key );
+            Geometry geom1 = (Geometry) inputMap.get( BufferFactory.GEOM1.key );          
+            Double buffer = (Double) inputMap.get( BufferFactory.BUFFER.key );
             
             monitor.setTask( Text.text("Processing Buffer") );
             monitor.progress( 25.0f );
             
             if( monitor.isCanceled() ){
-                return null; // user has canceled this operation
+                return; // user has canceled this operation
             }
             
             Geometry result = geom1.buffer(buffer);
@@ -67,11 +72,9 @@ class BufferProcess implements Process {
             monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
-            Map<String, Object> resultMap = new HashMap<String, Object>(1);
             resultMap.put( BufferFactory.RESULT.key, result );
             monitor.complete(); // same as 100.0f
-            
-            return resultMap;
+
         }
         catch (Exception eek){
             monitor.exceptionOccurred(eek);
@@ -79,8 +82,17 @@ class BufferProcess implements Process {
         finally {
             monitor.dispose();
         }
-        return null;
-    }
+		
+	}
+
+	public void setInput(Map<String, Object> input) {
+		// do any validation or pre-processing work here
+		this.inputMap = input;
+	}
+
+	public Map<String, Object> getResult() {
+		return resultMap;
+	}
 
 
 }

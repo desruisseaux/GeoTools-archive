@@ -46,8 +46,10 @@ public class ProcessTest extends TestCase {
         map.put( IntersectionFactory.GEOM1.key, geom1 );
         map.put( IntersectionFactory.GEOM2.key, geom2 );
         
-        IntersectionProcess process = new IntersectionProcess( null );        
-        Map<String, Object> resultMap = process.process( map, null );
+        IntersectionProcess process = new IntersectionProcess( null );   
+        process.setInput(map);
+        process.process(null);
+        Map<String, Object> resultMap = process.getResult();
         
         assertNotNull( resultMap );
         Object result = resultMap.get(IntersectionFactory.RESULT.key);
@@ -67,10 +69,12 @@ public class ProcessTest extends TestCase {
         map.put( UnionFactory.GEOM1.key, list );
         
         UnionProcess process = new UnionProcess( null );        
-        Map<String, Object> resultMap = process.process( map, null );
+        process.setInput(map);
+        process.process(null);
+        Map<String, Object> resultMap = process.getResult();
         
         assertNotNull( resultMap );
-        Object result = resultMap.get(IntersectionFactory.RESULT.key);
+        Object result = resultMap.get(UnionFactory.RESULT.key);
         assertNotNull( result );
         assertTrue( "expected geometry", result instanceof Geometry );        
     } 
@@ -92,10 +96,12 @@ public class ProcessTest extends TestCase {
         map.put( UnionFactory.GEOM1.key, list );
         
         UnionProcess process = new UnionProcess( null );        
-        Map<String, Object> resultMap = process.process( map, null );
+        process.setInput(map);
+        process.process(null);
+        Map<String, Object> resultMap = process.getResult();
         
         assertNotNull( resultMap );
-        Object result = resultMap.get(IntersectionFactory.RESULT.key);
+        Object result = resultMap.get(UnionFactory.RESULT.key);
         assertNotNull( result );
         assertTrue( "expected geometry", result instanceof Geometry );        
     }   
@@ -111,7 +117,9 @@ public class ProcessTest extends TestCase {
         map.put( BufferFactory.BUFFER.key, buffer );
         
         BufferProcess process = new BufferProcess( null );        
-        Map<String, Object> resultMap = process.process( map, null );
+        process.setInput(map);
+        process.process(null);
+        Map<String, Object> resultMap = process.getResult();
         
         assertNotNull( resultMap );
         Object result = resultMap.get(BufferFactory.RESULT.key);

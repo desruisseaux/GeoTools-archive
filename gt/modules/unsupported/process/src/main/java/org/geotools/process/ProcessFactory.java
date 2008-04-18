@@ -22,14 +22,21 @@ import org.opengis.util.InternationalString;
 /**
  * Used to describe the parameters needed for a Process, and for creating a Process to use.
  *
- * @author Graham Davis
+ * @author gdavis
  */
 public interface ProcessFactory {
+	
+    /** Unique name
+     * <p>
+     * It is up to the implementor to ensure this name is unique
+     */
+	public String getName();	
+	
     /** Human readable title suitable for display.
      * <p>
      * Please note that this title is *not* stable across locale; if you want
-     * to remember a ProcessFactory between runs please use the classname
-     * (as we are not providing a name or uri)
+     * to remember a ProcessFactory between runs please use getName (which is
+     * dependent on the implementor to guarantee uniqueness) or use the classname
      */
 	public InternationalString getTitle();
 	

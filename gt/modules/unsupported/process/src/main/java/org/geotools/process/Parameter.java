@@ -88,6 +88,12 @@ public class Parameter<T> {
     public static final String ELEMENT = "element";
     
     /**
+     * "min" and "max" may be useful for restrictions for things like int sizes, etc.
+     */
+    public static final String MIN = "min";
+    public static final String MAX = "max";
+    
+    /**
      * Refinement of type; such as the FeatureType of a FeatureCollection, or component type of a List.
      * <p>
      * This information is supplied (along with type) to allow a process implementor communicate

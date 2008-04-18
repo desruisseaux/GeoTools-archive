@@ -93,4 +93,9 @@ public class UnionFactory extends AbstractProcessFactory {
 	    return Text.text("Union");
 	}
 
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

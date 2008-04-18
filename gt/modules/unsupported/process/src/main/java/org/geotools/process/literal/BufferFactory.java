@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * <p>
  * This process is based on the SFSQL specification and implemented by the JTS Topology Suite
  * 
- * @author Graham Davis
+ * @author gdavis
  */
 public class BufferFactory extends AbstractProcessFactory {
     // making parameters available as static constants to help java programmers
@@ -91,6 +91,11 @@ public class BufferFactory extends AbstractProcessFactory {
 
 	public Process create() throws IllegalArgumentException {
 			return new BufferProcess( this );
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

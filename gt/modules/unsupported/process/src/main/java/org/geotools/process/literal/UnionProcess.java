@@ -28,12 +28,15 @@ import org.opengis.util.ProgressListener;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * 
- * @author Jody, gdavis
+ *  Process to union 2 or more geometries together
+ * @author gdavis
  */
 class UnionProcess implements Process {
 
     private UnionFactory factory;
+    private Map<String, Object> resultMap;
+    private Map<String, Object> inputMap;
+    private boolean started = false;        
 
     public UnionProcess( UnionFactory unionFactory ) {
         this.factory = unionFactory;
@@ -43,15 +46,18 @@ class UnionProcess implements Process {
         return factory;
     }
 
-    public Map<String, Object> process( Map<String, Object> input, ProgressListener monitor ) {
-        
-    	if( monitor == null ) monitor = new NullProgressListener();
+    public void process(ProgressListener monitor) {
+		if (started) return;
+		
+		started = true;
+		if( monitor == null ) monitor = new NullProgressListener();
+		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
         
         try {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            List<Geometry> list = (List<Geometry>) input.get( UnionFactory.GEOM1.key );          
+            List<Geometry> list = (List<Geometry>) inputMap.get( UnionFactory.GEOM1.key );          
             
             int div = list.size();
             if (div < 1) div = 1;
@@ -60,7 +66,7 @@ class UnionProcess implements Process {
             int count = 1;
             Geometry result = null;
             for( Geometry geom : list ){
-                if( monitor.isCanceled() ) return null; // user has canceled this operation                
+                if( monitor.isCanceled() ) return; // user has canceled this operation                
                 if( result == null ) {
                     result = geom;
                 }
@@ -75,11 +81,8 @@ class UnionProcess implements Process {
             monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
-            Map<String, Object> resultMap = new HashMap<String, Object>(1);
-            resultMap.put( IntersectionFactory.RESULT.key, result );
+            resultMap.put( UnionFactory.RESULT.key, result );
             monitor.complete(); // same as 100.0f
-            
-            return resultMap;
         }
         catch (Exception eek){
             monitor.exceptionOccurred(eek);
@@ -87,7 +90,15 @@ class UnionProcess implements Process {
         finally {
             monitor.dispose();
         }
-        return null;
     }
+    
+	public void setInput(Map<String, Object> input) {
+		// do any validation or pre-processing work here
+		this.inputMap = input;
+	}
+
+	public Map<String, Object> getResult() {
+		return resultMap;
+	}   
 
 }

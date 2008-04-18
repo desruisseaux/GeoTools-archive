@@ -97,4 +97,9 @@ public class IntersectionFactory extends AbstractProcessFactory {
 	    return Text.text("Intersection");
 	}
 
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
