@@ -123,7 +123,7 @@ public class ProcessParameterPage extends JPage {
             
             // loop through and create the min number of widgets for this param
             for (int i=0; i<min; i++) {
-            	ParamWidget newWidget = createNewField(parameter);
+            	ParamWidget newWidget = createNewField(parameter, true);
 	            widgets.add(newWidget);
             }
             // add the widget(s) to the fields map
@@ -138,7 +138,7 @@ public class ProcessParameterPage extends JPage {
 		JButton butt = new JButton("+");
 		butt.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		    	createNewField(parameter);
+		    	createNewField(parameter, true);
 		    }
 		});
 		page.add(butt);
@@ -147,8 +147,9 @@ public class ProcessParameterPage extends JPage {
 	/**
 	 * Create a new widget and label for the given parameter
 	 * @param parameter
+	 * @param resize whether to resize the wizard after adding or not
 	 */
-	private ParamWidget createNewField(Parameter<?> parameter) {
+	private ParamWidget createNewField(Parameter<?> parameter, boolean resize) {
     	JLabel label;
         label = new JLabel(parameter.key);
         page.add(label);
@@ -165,11 +166,13 @@ public class ProcessParameterPage extends JPage {
         }
         JComponent field = widget.doLayout();
         page.add(field);
-        
-        // resize the page and wizard to fit new component
         page.validate();
-        getJProcessWizard().pack();
-        getJProcessWizard().validate();
+        
+        // resize the wizard to fit new component
+        if (resize) {
+        	getJProcessWizard().pack();
+        	getJProcessWizard().validate();
+        }
      
         return widget;
 	}

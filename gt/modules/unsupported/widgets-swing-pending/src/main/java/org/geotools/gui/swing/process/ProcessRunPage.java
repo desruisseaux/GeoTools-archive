@@ -75,7 +75,9 @@ public class ProcessRunPage extends JPage {
 		
 		Process process = this.factory.create();
 		final ProgressListener progress = new ProgressWindow(this.getJProcessWizard());
-		Map<String, Object> resultMap = process.process( paramMap, progress );
+		process.setInput(paramMap);
+		process.process( progress );
+		Map<String, Object> resultMap = process.getResult();
 
 		// when we get here, the processing is over so show the result
         JLabel title = new JLabel(factory.getTitle().toString());
