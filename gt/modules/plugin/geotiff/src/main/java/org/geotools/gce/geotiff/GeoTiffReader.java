@@ -450,11 +450,9 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
                 // -----------------------------------------------------------------------------------
                 //
                 // With respect to the original envelope, the obtained planarImage
-                // needs to be rescaled and translated. The scaling factors are
-                // computed as the ratio
-                // between the cropped source region sizes and the read image sizes.
-                // The translate
-                // settings are represented by the offsets of the source region.
+                // needs to be rescaled. The scaling factors are computed as the
+                // ratio between the cropped source region sizes and the read
+                // image sizes.
                 //
                 // //
                 final double scaleX = originalGridRange.getLength(0) / (1.0 * ssWidth);
