@@ -17,6 +17,8 @@ package org.geotools.coverage.processing.operation;
 
 import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -30,16 +32,17 @@ import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
  * The crop operation is responsible for selecting geographic subarea of the
@@ -96,7 +99,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL$
  * @todo make this operation work with a general polygon. instead of an
  *       envelope.
- * @todo make this operation work when having a shear
  * @todo make the tolerance for rotations parametric
  * @version $Id$
  * @author Simone Giannecchini
@@ -115,8 +117,8 @@ public class Crop extends Operation2D {
 	 * when doing the spatial crop.
 	 */
 	public static final ParameterDescriptor CROP_ENVELOPE = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "Envelope", Envelope.class, // Value
-			// class
+			Citations.GEOTOOLS, "Envelope", 
+			Envelope.class, // Value class
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
@@ -130,7 +132,8 @@ public class Crop extends Operation2D {
 	 * than ROI_OPTIMISATION_TOLERANCE*FULL_CROP.
 	 */
 	public static final ParameterDescriptor ROI_OPTIMISATION_TOLERANCE = new DefaultParameterDescriptor(
-			Citations.GEOTOOLS, "ROITolerance", Double.class, // Value class
+			Citations.GEOTOOLS, "ROITolerance", 
+			Double.class, // Value class
 			null, // Array of valid values
 			0.6,  // Default value
 			0.0,  // Minimal value
@@ -139,17 +142,18 @@ public class Crop extends Operation2D {
 			true); // Parameter is optional
 
 	/**
-	 * The parameter descriptor is basically a simple boolean that tells this
-	 * operation to try to conserve the envelope that it gets as input.
-	 * 
-	 * <p>
-	 * Note that this not always possible due to the fact that if we have a gridToWorldTransform
-	 * which is not a simple scale and translate we cannot conserve the envelope otherwise we would loos
-	 * the underlying transform.
-	 * 
-	 * <p>
-	 * See this class javadocs for an explanation.
-	 */
+         * The parameter descriptor is basically a simple boolean that tells
+         * this operation to try to conserve the envelope that it gets as input.
+         * 
+         * <p>
+         * <strong> Note that this might mean obtaining a coverage whose grid to
+         * world 2D has been slightly changed to account for the roundin which
+         * is applied in order to get integer coordinate for the raster to crop.
+         * </strong>
+         * <p>
+         * 
+         * See this class javadocs for an explanation.
+         */
 	public static final ParameterDescriptor CONSERVE_ENVELOPE = new DefaultParameterDescriptor(
 			Citations.GEOTOOLS, "ConserveEnvelope", Boolean.class, // Value
 			// class
@@ -300,4 +304,70 @@ public class Crop extends Operation2D {
 			return source;
 		}
 	}
+
+    static boolean assertionsEnabled() {
+        boolean assertions=false;
+        assert assertions=true;
+        return assertions;
+    }
+
+    /**
+     * Function to calculate the area of a polygon, according to the algorithm
+     * defined at http://local.wasp.uwa.edu.au/~pbourke/geometry/polyarea/
+     * 
+     * @param polyPoints
+     *            array of points in the polygon
+     * @return area of the polygon defined by pgPoints
+     */
+    static double area(Point2D[] polyPoints) {
+    	int i, j, n = polyPoints.length;
+    	double area = 0;
+    
+    	for (i = 0; i < n; i++) {
+    		j = (i + 1) % n;
+    		area += polyPoints[i].getX() * polyPoints[j].getY();
+    		area -= polyPoints[j].getX() * polyPoints[i].getY();
+    	}
+    	area /= 2.0;
+    	return (area);
+    }
+
+    /**
+         * In order to conserve the original envelope we used for this request
+         * we have to slightly correct the original grid to world transform in
+         * order to take into account the fact that we snapped the underlying
+         * raster to the integer grid. This would involve a "scale and
+         * translate" transformation which we are here accounting for.
+         * 
+         * @param cornerGridToWorld
+         *                original grid to world transform referred to the
+         *                corner of the cells in raster space.
+         * @param minX minimum x coordinate for the cropped raster in integer raster space.
+         * @param minY minimum y coordinate for the cropped raster in integer raster space.
+         * @param width width for the cropped raster in integer raster space.
+         * @param height height for the cropped raster in integer raster space.
+         * @param floatingPointRange range of the cropped raster in floating point raster space.
+         * @return a {@link MathTransform} which conserves the original envelope.
+         */
+        static MathTransform createCorrectedTranform(
+            final AffineTransform cornerGridToWorld, 
+            final double minX, 
+            final double minY,
+            final double width,
+            final double height,
+            final Rectangle2D floatingPointRange) {
+            
+            // computing the factor for the corrections affine transform to map
+            // from the integer raster space to the floating point raster space.
+            final double scaleX=floatingPointRange.getWidth()/width;
+            final double scaleY=floatingPointRange.getHeight()/height;
+            final double tx=floatingPointRange.getMinX()-minX*scaleX;
+            final double ty=floatingPointRange.getMinY()-minY*scaleY;
+            final AffineTransform translationTransform= new AffineTransform(scaleX,0,0,scaleY,tx,ty);
+            
+            //now correct the original grid to world transform
+            translationTransform.preConcatenate(cornerGridToWorld);
+            return ProjectiveTransform.create(translationTransform);
+    
+    }
 }

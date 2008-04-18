@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
@@ -54,7 +53,10 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.spatial.PixelOrientation;
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.TransformException;
@@ -82,6 +84,8 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	private final static PrecisionModel pm;
 
 	private final static GeometryFactory gf;
+
+        public static final double EPS = 1E-3;
 	static {
 		// getting default hints
 		final Hints defaultHints = GeoTools.getDefaultHints();
@@ -117,7 +121,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 *            in case we used the JAI's mosaic with a ROI this
 	 *            {@link java.awt.Polygon} will hold the used roi.
 	 * @param hints
-         *            An optional set of hints, or {@code null} if none.
+         *          An optional set of hints, or {@code null} if none.
 	 */
 	private CroppedCoverage2D(InternationalString name,
 			PlanarImage sourceRaster, GridGeometry2D croppedGeometry,
@@ -161,49 +165,27 @@ final class CroppedCoverage2D extends GridCoverage2D {
 				.getGridGeometry());
 		final GeneralGridRange sourceGridRange = (GeneralGridRange) sourceGridGeometry
 				.getGridRange();
-		final double rotationEsteem = XAffineTransform
-				.getRotation(sourceGridToWorldTransform);
+
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Now we try to understand if we have a simple scale and translate or a
 		// more elaborated grid-to-world transformation n which case a simple
 		// crop could not be enough, but we may need a more elaborated chain of
-		// operation in order to do a good job.
+		// operation in order to do a good job. As an instance if we
+                // have a rotation which is not multiple of PI/2 we have to use
+                // the mosaic with a ROI
 		//
 		// /////////////////////////////////////////////////////////////////////
-		boolean isSimpleTransform = false;
-		// check if there is a valid rotation value (it could be 0!)
-		if (!Double.isNaN(rotationEsteem)) {
-			// XXX make this parametric somehow
-			if (Math.abs(rotationEsteem) < 1E-3)
-				// there is no rotation
-				isSimpleTransform = true;
-		}
+	        final boolean isSimpleTransform = CoverageUtilities.isSimpleGridToWorldTransform(sourceGridToWorldTransform,EPS);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Managing Hints, especially for output coverage's layout purposes
 		//
 		// /////////////////////////////////////////////////////////////////////
-		RenderingHints targetHints = ImageUtilities
-				.getRenderingHints(sourceImage);
-		if (targetHints == null) {
-			targetHints = new RenderingHints(null);
-		} 
-		if (hints != null) {
-			targetHints.add(hints);
-		}
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Interpolation
-		//
-		// /////////////////////////////////////////////////////////////////////
-		Interpolation interpolation = (Interpolation) targetHints
-				.get(JAI.KEY_INTERPOLATION);
-		if (interpolation == null)
-			interpolation = (Interpolation) ImageUtilities.NN_INTERPOLATION_HINT
-					.get(JAI.KEY_INTERPOLATION);
+		final RenderingHints targetHints = prepareHints(hints, sourceImage);
+
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -217,29 +199,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 		// Layout
 		//
 		// //
-		ImageLayout layout = (ImageLayout) targetHints
-				.get(JAI.KEY_IMAGE_LAYOUT);
-		if (layout != null) {
-			layout = (ImageLayout) layout.clone();
-		} else {
-			layout = new ImageLayout(sourceImage);
-			layout.unsetTileLayout();
-			// At this point, only the color model and sample model are left
-			// valid.
-		}
-		// crop will ignore minx, miny width and height
-		if ((layout.getValidMask() & (ImageLayout.TILE_WIDTH_MASK
-				| ImageLayout.TILE_HEIGHT_MASK
-				| ImageLayout.TILE_GRID_X_OFFSET_MASK | ImageLayout.TILE_GRID_Y_OFFSET_MASK)) == 0) {
-			layout.setTileGridXOffset(layout.getMinX(sourceImage));
-			layout.setTileGridYOffset(layout.getMinY(sourceImage));
-			final int width = layout.getWidth(sourceImage);
-			final int height = layout.getHeight(sourceImage);
-			if (layout.getTileWidth(sourceImage) > width)
-				layout.setTileWidth(width);
-			if (layout.getTileHeight(sourceImage) > height)
-				layout.setTileHeight(height);
-		}
+		ImageLayout layout = initLayout(sourceImage, targetHints);
 		targetHints.put(JAI.KEY_IMAGE_LAYOUT, layout);
 
 		// /////////////////////////////////////////////////////////////////////
@@ -287,78 +247,73 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			// //
 			final AffineTransform sourceWorldToGridTransform = sourceGridToWorldTransform
 					.createInverse();
-			// finalGridRange will hold the rectangular crop area at the end of
-			// this operation
-			final Rectangle2D finalGridRange = XAffineTransform.transform(
-					sourceWorldToGridTransform, cropEnvelope.toRectangle2D(),
-					null);
-			// intersection with the original range in order to not try to crop
-			// outside the image bounds
-			XRectangle2D.intersect(finalGridRange, sourceGridRange
-					.toRectangle(), finalGridRange);
+                        // finalGridRange will hold the rectangular crop area at the end of
+                        // this operation
+                        Rectangle2D finalGridRange = XAffineTransform.transform(
+                                        sourceWorldToGridTransform, cropEnvelope.toRectangle2D(),
+                                        null);
+                        // intersection with the original range in order to not try to crop
+                        // outside the image bounds
+                        XRectangle2D.intersect(finalGridRange, sourceGridRange
+                                        .toRectangle(), finalGridRange);
+                        //if assertions are enabled we check that the envelope is close enough to the crop one
+                        if(isSimpleTransform&&Crop.assertionsEnabled()){
+                            final GeneralEnvelope testEnvelope = new GeneralEnvelope((Envelope)
+                                new Envelope2D(
+                                        cropEnvelope.getCoordinateReferenceSystem(),
+                                        XAffineTransform.transform(sourceGridToWorldTransform, finalGridRange,null)));
+                            assert testEnvelope.equals(cropEnvelope, XAffineTransform.getScale(sourceGridToWorldTransform)/2,false );
+                        }
+                        
 
-			// ////////////////////////////////////////////////////////////////////
-			//
-			//
-			// It is worth to point out that doing a crop the G2W transform
-			// should not change while the envelope might change a little bit as
-			// a consequence of the roundings of the underlying image datum
-			// which uses integer factors. This can be avoided using the
-			// conserveEnvelope param. If the user does not explicitly asks to
-			// conserve the crop envelope we will conserve the original
-			// grid-to-world transform.
-			//
-			// ////////////////////////////////////////////////////////////////////
-			final GeneralGridRange newRange = new GeneralGridRange(
-					new GeneralEnvelope(finalGridRange),PixelInCell.CELL_CORNER);
-			// we do not have to crop in this case (should not really happen at
-			// this time)
-			if (newRange.equals(sourceGridRange) && isSimpleTransform)
-				return sourceCoverage;
+                        // ////////////////////////////////////////////////////////////////////
+                        //
+                        //
+                        // It is worth to point out that doing a crop the G2W transform
+                        // should not change while the envelope might change as
+                        // a consequence of the rounding of the underlying image datum
+                        // which uses integer factors or in case the G2W is very
+                        // complex. This can be avoided using the
+                        // conserveEnvelope param. If the user does not
+                        // explicitly asks to conserve the crop envelope we will
+                        // conserve the original grid-to-world transform.
+                        //
+                        // ////////////////////////////////////////////////////////////////////
+                        GeneralGridRange newRange = new GeneralGridRange(
+                                        new GeneralEnvelope(finalGridRange),PixelInCell.CELL_CORNER);
+                        // we do not have to crop in this case (should not really happen at
+                        // this time)
+                        if (newRange.equals(sourceGridRange) && isSimpleTransform)
+                                return sourceCoverage;
 
-			// ////////////////////////////////////////////////////////////////////
-			//
-			// if I get here I have something to crop
-			// using the world-to-grid transform for going from envelope to the
-			// new grid range.
-			//
-			// ////////////////////////////////////////////////////////////////////
-			final int xAxis = sourceGridGeometry.gridDimensionX;
-			final int yAxis = sourceGridGeometry.gridDimensionY;
-			final double minX = newRange.getLower(xAxis);
-			final double minY = newRange.getLower(yAxis);
-			final double width = newRange.getLength(xAxis);
-			final double height = newRange.getLength(yAxis);
-			assert width > 0;
-			assert height > 0;
+                        // ////////////////////////////////////////////////////////////////////
+                        //
+                        // if I get here I have something to crop
+                        // using the world-to-grid transform for going from envelope to the
+                        // new grid range.
+                        //
+                        // ////////////////////////////////////////////////////////////////////
+                        final int xAxis = sourceGridGeometry.gridDimensionX;
+                        final int yAxis = sourceGridGeometry.gridDimensionY;
+                        double minX = newRange.getLower(xAxis);
+                        double minY = newRange.getLower(yAxis);
+                        double width = newRange.getLength(xAxis);
+                        double height = newRange.getLength(yAxis);
+                        assert width > 0;
+                        assert height > 0;   			
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// get the rendered image and crop it
+			// Check if we need to use mosaic or crop
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final PlanarImage croppedImage;
 			final ParameterBlock pbj = new ParameterBlock();
 			pbj.addSource(sourceImage);
-			java.awt.Polygon rasterSpaceROI = null;
-			if (isSimpleTransform) {
+			java.awt.Polygon rasterSpaceROI=null;
+                        String operatioName=null;
+                        if (!isSimpleTransform) {
 
-				// /////////////////////////////////////////////////////////////////////
-				//
-				// We got a simple scale and translate transform, JAI crop will
-				// suffice.
-				//
-				// /////////////////////////////////////////////////////////////////////
-				// executing the crop
-				pbj.add(Float.valueOf((float) minX));
-				pbj.add(Float.valueOf((float) minY));
-				pbj.add(Float.valueOf((float) width));
-				pbj.add(Float.valueOf((float) height));
-				if (!useProvidedProcessor)
-					croppedImage = JAI.create("Crop", pbj, targetHints);
-				else
-					croppedImage = processor.createNS("Crop", pbj, targetHints);
-			} else {
 				// /////////////////////////////////////////////////////////////////////
 				//
 				// We don't have a simple scale and translate transform, JAI
@@ -396,61 +351,103 @@ final class CroppedCoverage2D extends GridCoverage2D {
 				rasterSpaceROI = FeatureUtilities.convertPolygonToPointArray(
 						modelSpaceROI, ProjectiveTransform
 								.create(sourceWorldToGridTransform), points);
-
-				final double cropArea = ((GeneralGridRange) newRange)
-						.toRectangle().width
-						* ((GeneralGridRange) newRange).toRectangle().height;
-				final double roiArea = Math.abs(area((Point2D[]) points
-						.toArray(new Point2D[] {})));
-				final double roiOpt = parameters.parameter("ROITolerance")
-						.doubleValue();
-				final String operatioName;
-				if (roiOpt * cropArea > roiArea) {
-					// executing the mosaic
+				final boolean doMosaic = decideJAIOperation(parameters,rasterSpaceROI.getBounds2D(), points);
+				if (doMosaic) {
+				        assert isSimpleTransform==false;
+					// prepare the params for the mosaic
 					final ROIShape roi = new ROIShape(rasterSpaceROI);
 					pbj.add(MosaicDescriptor.MOSAIC_TYPE_OVERLAY);
 					pbj.add(null);
 					pbj.add(new ROI[] { roi });
 					pbj.add(null);
-					pbj.add(CoverageUtilities
+ 					pbj.add(CoverageUtilities
 							.getBackgroundValues(sourceCoverage));
-					// nice trick, we use the layout to do the actual crop
-					Rectangle2D roiBounds = roi.getBounds2D();
-					XRectangle2D.intersect(roiBounds, sourceGridRange
-							.toRectangle(), roiBounds);
-					layout.setMinX((int) (roiBounds.getMinX() + 0.5));
-					layout.setWidth((int) (roiBounds.getWidth() + 0.5));
-					layout.setMinY((int) (roiBounds.getMinY() + 0.5));
-					layout.setHeight((int) (roiBounds.getHeight() + 0.5));
+	
+ 					//prepare the fina layout
+					final Rectangle2D bounds = roi.getBounds2D();
+					XRectangle2D.intersect(bounds, sourceGridRange
+							.toRectangle(), bounds);	
+					final GeneralGridRange newRange2 = new GeneralGridRange(
+	                                        new GeneralEnvelope(bounds),PixelInCell.CELL_CORNER);
+        	                        // we do not have to crop in this case (should not really happen at
+        	                        // this time)
+        	                        if (newRange2.equals(sourceGridRange) && isSimpleTransform)
+        	                                return sourceCoverage;
+        	                        assert newRange2.getLength(xAxis)>0;
+        	                        assert newRange2.getLength(yAxis)>0;
 
+        	                              // nice trick, we use the layout to do the actual crop
+					layout.setMinX(newRange2.getLower(xAxis));
+					layout.setWidth( newRange2.getLength(xAxis) );
+					layout.setMinY(newRange2.getLower(yAxis));
+					layout.setHeight( newRange2.getLength(yAxis));
 					operatioName = "Mosaic";
-				} else {
-					// executing the crop
-					pbj.add(Float.valueOf((float) minX));
-					pbj.add(Float.valueOf((float) minY));
-					pbj.add(Float.valueOf((float) width));
-					pbj.add(Float.valueOf((float) height));
-					operatioName = "Crop";
-				}
+				} 
 
-				if (!useProvidedProcessor)
-					croppedImage = JAI.create(operatioName, pbj, targetHints);
-				else
-					croppedImage = processor.createNS(operatioName, pbj,
-							targetHints);
 			}
+                        //do we still have to set the operation name? If so that means we have to go for crop.
+                        if(operatioName==null) {
+                            // executing the crop
+                            pbj.add((float) minX);
+                            pbj.add((float) minY);
+                            pbj.add((float) width);
+                            pbj.add((float) height);
+                            operatioName = "Crop";
+                        }
+                        // /////////////////////////////////////////////////////////////////////
+                        //
+                        // Apply operation
+                        //
+                        // /////////////////////////////////////////////////////////////////////
+                        if (!useProvidedProcessor)
+                                croppedImage = JAI.create(operatioName, pbj, targetHints);
+                        else
+                                croppedImage = processor.createNS(operatioName, pbj,targetHints);
+                        
+                        
+                        
+                        // /////////////////////////////////////////////////////////////////////
+                        //
+                        // Final clean up, try to see if we can conserve the original envelope
+                        //
+                        // /////////////////////////////////////////////////////////////////////
 			if (conserveEnvelope.booleanValue()&&isSimpleTransform)
-				return new CroppedCoverage2D(sourceCoverage.getName(),
-						croppedImage, new GridGeometry2D(new GeneralGridRange(
-								croppedImage), cropEnvelope), sourceCoverage,
-						actionTaken, rasterSpaceROI,hints);
+			{
+			        assert rasterSpaceROI==null;
+			        //conserve the input envelope
+			        return new CroppedCoverage2D(
+        			            sourceCoverage.getName(),
+                                            croppedImage,
+                                            new GridGeometry2D(
+                                                    new GeneralGridRange(croppedImage),
+                                                    PixelInCell.CELL_CORNER,
+                                                    Crop.createCorrectedTranform(
+                                                            sourceGridToWorldTransform,
+                                                            minX,
+                                                            minY,
+                                                            width, 
+                                                            height, 
+                                                            finalGridRange),
+                                                    cropEnvelope.getCoordinateReferenceSystem(),
+                                                    hints),
+                                            sourceCoverage,
+                                            actionTaken, 
+                                            null,
+                                            hints);
+			}
 			else
-				return new CroppedCoverage2D(sourceCoverage.getName(),
-						croppedImage, new GridGeometry2D(new GeneralGridRange(
-								croppedImage), sourceGridGeometry
-								.getGridToCRS2D(PixelOrientation.CENTER),
-								sourceCoverage.getCoordinateReferenceSystem()),
-						sourceCoverage, actionTaken, rasterSpaceROI,hints);
+			    //conserve the input grid to world transformation
+			    return new CroppedCoverage2D(
+			            sourceCoverage.getName(),
+			            croppedImage, 
+			            new GridGeometry2D(
+			                    new GeneralGridRange(croppedImage), 
+			                    sourceGridGeometry.getGridToCRS2D(PixelOrientation.CENTER),
+			                    sourceCoverage.getCoordinateReferenceSystem()),
+			            sourceCoverage, 
+			            actionTaken, 
+			            rasterSpaceROI,
+			            hints);
 
 		} catch (TransformException e) {
 			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP), e);
@@ -460,24 +457,80 @@ final class CroppedCoverage2D extends GridCoverage2D {
 
 	}
 
-	/**
-	 * Function to calculate the area of a polygon, according to the algorithm
-	 * defined at http://local.wasp.uwa.edu.au/~pbourke/geometry/polyarea/
-	 * 
-	 * @param polyPoints
-	 *            array of points in the polygon
-	 * @return area of the polygon defined by pgPoints
-	 */
-	private static double area(Point2D[] polyPoints) {
-		int i, j, n = polyPoints.length;
-		double area = 0;
-
-		for (i = 0; i < n; i++) {
-			j = (i + 1) % n;
-			area += polyPoints[i].getX() * polyPoints[j].getY();
-			area -= polyPoints[j].getX() * polyPoints[i].getY();
+    /**
+     * @param hints
+     * @param sourceImage
+     * @return
+     */
+    private static RenderingHints prepareHints(Hints hints,
+            final RenderedImage sourceImage) {
+        RenderingHints targetHints = ImageUtilities
+				.getRenderingHints(sourceImage);
+		if (targetHints == null) {
+			targetHints = new RenderingHints(null);
+		} 
+		if (hints != null) {
+			targetHints.add(hints);
 		}
-		area /= 2.0;
-		return (area);
+		
+        return targetHints;
+    }
+
+    /**
+     * Initialize a layout object using the provided {@link RenderedImage} and the provided {@link Hints}.
+     * 
+     * @param sourceImage {@link RenderedImage} to use for initializing the returned layout.
+     * @param hints  {@link Hints} to use for initializing the returned layout.
+     * @return an {@link ImageLayout} instance.
+     */
+    private static ImageLayout initLayout(final RenderedImage sourceImage,
+            RenderingHints hints) {
+        ImageLayout layout = (ImageLayout) hints.get(JAI.KEY_IMAGE_LAYOUT);
+	if (layout != null) {
+	    layout = (ImageLayout) layout.clone();
+	 } else {
+	     layout = new ImageLayout(sourceImage);
+	     layout.unsetTileLayout();
+	     // At this point, only the color model and sample model are left
+	     // valid.
+	 }
+	// crop will ignore minx, miny width and height
+	if ((layout.getValidMask() & 
+	        (ImageLayout.TILE_WIDTH_MASK
+	                | ImageLayout.TILE_HEIGHT_MASK
+				| ImageLayout.TILE_GRID_X_OFFSET_MASK | ImageLayout.TILE_GRID_Y_OFFSET_MASK)) == 0) {
+	    layout.setTileGridXOffset(layout.getMinX(sourceImage));
+	    layout.setTileGridYOffset(layout.getMinY(sourceImage));
+	    final int width = layout.getWidth(sourceImage);
+	    final int height = layout.getHeight(sourceImage);
+	    if (layout.getTileWidth(sourceImage) > width)
+	        layout.setTileWidth(width);
+	    if (layout.getTileHeight(sourceImage) > height)
+	        layout.setTileHeight(height);
 	}
+        return layout;
+    }
+
+    /**
+     * Decides whether we would benefit from using a mosaic instead of a crop
+     * @param parameters
+     * @param finalGridRange
+     * @param points
+     * @return
+     * @throws InvalidParameterTypeException
+     * @throws ParameterNotFoundException
+     */
+    private static boolean decideJAIOperation(
+            final ParameterValueGroup parameters, Rectangle2D finalGridRange,
+            final List<Point2D> points) throws InvalidParameterTypeException,
+            ParameterNotFoundException {
+        final double cropArea = finalGridRange.getWidth()
+        		* finalGridRange.getHeight();
+        final double roiArea = Math.abs(Crop.area((Point2D[]) points
+        		.toArray(new Point2D[] {})));
+        final double roiOpt = parameters.parameter("ROITolerance")
+        		.doubleValue();
+        final boolean doMosaic=roiOpt * cropArea > roiArea;
+        return doMosaic;
+    }
 }
