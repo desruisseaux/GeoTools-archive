@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
-
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.PropertyIsLike;
 
 /**
  * Encodes a filter into a SQL WHERE statement for MySQL.  This class adds
@@ -28,14 +30,15 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author Chris Holmes, TOPP
  * @author Debasish Sahu, debasish.sahu@rmsi.com
+ * @author Harry Bullen
  *
  * @source $URL$
  */
-public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.FilterVisitor {
+public class SQLEncoderMySQL extends org.geotools.data.jdbc.FilterToSQL implements org.opengis.filter.FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
-    /** To write geometry so postgis can read it. */
+    /** To write geometry so mysql can read it. */
     private static WKTWriter wkt = new WKTWriter();
 
     /** The standard SQL multicharacter wild card. */
@@ -129,18 +132,17 @@ public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.F
     }
 
     /**
-     * Turns a geometry filter into the postgis sql bbox statement.
+     * Turns a geometry filter into the mySQL bbox statement.
      *
      * @param filter the geometry filter to be encoded.
      *
      * @throws RuntimeException for IO exception (need a better error)
      */
-    public void visit(GeometryFilter filter) throws RuntimeException {
-        LOGGER.finer("exporting GeometryFilter");
-
-        if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
-            DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
-            DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
+    
+    public Object visit(BBOX filter, Object extra)
+    {
+            DefaultExpression left = (DefaultExpression) filter.getExpression1();
+            DefaultExpression right = (DefaultExpression) filter.getExpression2();
 
             // left and right have to be valid expressions
             try {
@@ -149,7 +151,8 @@ public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.F
                 if (left == null) {
                     out.write(defaultGeom);
                 } else {
-                    left.accept(this);
+			// we want this to be returned as a Geometry
+                    left.accept(this,Geometry.class);
                 }
 
                 out.write(", ");
@@ -157,17 +160,15 @@ public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.F
                 if (right == null) {
                     out.write(defaultGeom);
                 } else {
-                    right.accept(this);
+			// we want this to be returned as a Geometry
+                    right.accept(this,Geometry.class);
                 }
 
                 out.write(")");
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
             }
-        } else {
-            LOGGER.warning("exporting unknown filter type, only bbox supported");
-            throw new RuntimeException("Only BBox is currently supported");
-        }
+	    return extra;
     }
 
     /**
@@ -177,24 +178,25 @@ public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.F
      * @param expression the expression to visit and encode.
      *
      * @throws IOException for IO exception (need a better error)
+     * TODO: this should use WKB
      */
-    public void visitLiteralGeometry(LiteralExpression expression)
+    public void visitLiteralGeometry(Literal expression)
         throws IOException {
-        Geometry bbox = (Geometry) expression.getLiteral();
+        Geometry bbox = (Geometry) expression.getValue();
         String geomText = wkt.write(bbox);
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
 
-    public void visit(LikeFilter filter) {
+    public void visit(PropertyIsLike filter) {
         try {
-            String pattern = filter.getPattern();
+            String pattern = filter.getLiteral();
 
             pattern = pattern.replaceAll(escapedWildcardMulti, SQL_WILD_MULTI);
             pattern = pattern.replaceAll(escapedWildcardSingle, SQL_WILD_SINGLE);
 
             //pattern = pattern.replace('\\', ''); //get rid of java escapes.
             out.write("UPPER(");
-            ((Expression) filter.getValue()).accept(this);
+            filter.getExpression().accept(this,null);
             out.write(") LIKE ");
             out.write("UPPER('" + pattern + "')");
 

@@ -16,6 +16,7 @@
 package org.geotools.data.mysql;
 
 import java.io.IOException;
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -43,11 +45,13 @@ import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.CRS;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -208,9 +212,13 @@ public class MySQLDataStore extends JDBCDataStore {
      *         determine additional types.  This will only be thrown by the
      *         default implementation if a type is present that is not present
      *         in the TYPE_MAPPINGS.
+     * NOTE: the srid of the features stored is used to build an CRS assuming 
+     * that it an ESPG srid
      */
     protected AttributeDescriptor buildAttributeType(ResultSet rs)
         throws IOException {
+	// these come from the Interface DatabaseMetaData in java.sql
+	final int TABLE_NAME = 3;
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
@@ -223,7 +231,7 @@ public class MySQLDataStore extends JDBCDataStore {
                 String typeNameLower = typeName.toLowerCase();
                 AttributeTypeBuilder builder = new AttributeTypeBuilder();
 
-                //TODO: Get at CRS info, put geometry stuff in its own method
+                //TODO: put geometry stuff in its own method
                 if ("geometry".equals(typeNameLower)) {
                     builder.setBinding(Geometry.class);
                 } else if ("point".equals(typeNameLower)) {
@@ -244,6 +252,19 @@ public class MySQLDataStore extends JDBCDataStore {
                     //nothing else we can do
                     return super.buildAttributeType(rs);
                 }
+
+		//get CRS we are making the assumtion that the srid coresponds
+		// to the EPSG srid.  Which may not be true.
+		int srid = determineSRID(rs.getString(TABLE_NAME), rs.getString(COLUMN_NAME) );
+		CoordinateReferenceSystem crs = null;
+		try{
+			crs = CRS.decode("EPSG:"+ srid);
+		} catch (Exception e) {
+			crs = null;
+		}
+		builder.setCRS(crs);
+
+		// set some other stuff like name and return
                 builder.setNillable(true);
                 builder.setName(rs.getString(COLUMN_NAME));
                 return builder.buildDescriptor(rs.getString(COLUMN_NAME));
@@ -319,4 +340,27 @@ public class MySQLDataStore extends JDBCDataStore {
     public void setWKBEnabled(boolean enabled) {
         wkbEnabled = enabled;
     }
+
+    protected int determineSRID(String table, String column)
+	    throws IOException{
+    	Connection con = null;
+  	try {
+
+		// Gets a connection for the stored  JDBCDataStore and uses it to make a statament
+		con = getConnection(Transaction.AUTO_COMMIT);
+		Statement stmt = con.createStatement();
+		ResultSet rslt =  stmt.executeQuery("SELECT SRID(" + column + ") FROM  " + table + " LIMIT 1;");
+		if ( rslt.next() ) {
+		   int srid = rslt.getInt(1);
+		   JDBCUtils.close(stmt);
+		   return srid;
+		}
+		throw new DataSourceException( "In table: " + table + ", geometry column: " + column + " was not able to return a valid srid.");
+        } catch (SQLException sqle) {
+            String message = sqle.getMessage();
+            throw new DataSourceException(message, sqle);
+        } finally {
+            JDBCUtils.close(con, Transaction.AUTO_COMMIT, null);
+        }
+   }
 }

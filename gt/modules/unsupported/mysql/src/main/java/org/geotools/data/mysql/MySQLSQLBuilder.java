@@ -19,30 +19,30 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.filter.SQLEncoder;
+import org.geotools.data.jdbc.FilterToSQL;
 
 
 /**
- * A MySQL-specific instance of DefaultSQLBuilder, which supports MySQL 4.1's geometric
+ * A MySQL-specific instance of GeoAPISQLBuilder, which supports MySQL 4.1's geometric
  * datatypes.
  * @author Gary Sheppard garysheppard@psu.edu
  * @author Andrea Aime aaime@users.sourceforge.net
  * @source $URL$
  */
-public class MySQLSQLBuilder extends DefaultSQLBuilder {
+public class MySQLSQLBuilder extends GeoAPISQLBuilder {
     private boolean wkbEnabled;
 
     /**
      * @deprecated please use MySQLSQLBuilder(encoder, ft)
      * @param encoder
      */
-    public MySQLSQLBuilder(SQLEncoder encoder) {
-        super(encoder);
+    public MySQLSQLBuilder(FilterToSQL encoder) {
+        super(encoder, null, null);
     }
 
-    public MySQLSQLBuilder(SQLEncoder encoder, SimpleFeatureType ft) {
+    public MySQLSQLBuilder(FilterToSQL encoder, SimpleFeatureType ft) {
         super(encoder, ft, null);
     }
 

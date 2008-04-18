@@ -75,7 +75,7 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
             false);
     
     public static final Param WKBENABLED = new Param("wkb enabled", Boolean.class,
-            "set to true if Well Known Binary should be used to read PostGIS "
+            "set to true if Well Known Binary should be used to read MySQL"
             + "data (experimental)", false, new Boolean(true));
 
     /** Array with all of the params */
