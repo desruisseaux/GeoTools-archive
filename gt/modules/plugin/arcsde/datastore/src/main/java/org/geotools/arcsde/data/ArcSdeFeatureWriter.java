@@ -715,8 +715,6 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             // We are going to inspect the column defintions in order to
             // determine which attributes are actually mutable...
             final SeColumnDefinition[] columnDefinitions = getTable().describe();
-            final String shapeAttributeName;
-            shapeAttributeName = getLayer().getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
 
             // use LinkedHashMap to respect column order
             LinkedHashMap<Integer, String> columnList = new LinkedHashMap<Integer, String>();
@@ -728,9 +726,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 columnDefinition = columnDefinitions[actualIndex];
                 columnName = columnDefinition.getName();
 
-                if (fidReader instanceof FIDReader.SdeManagedFidReader
-                        && columnName.equals(shapeAttributeName)) {
-                    continue;
+                if (fidReader instanceof FIDReader.SdeManagedFidReader) {
+                    if (columnName.equals(fidReader.getFidColumn()))
+                        continue;
                 }
 
                 // ignore SeColumns for which we don't have a known mapping
