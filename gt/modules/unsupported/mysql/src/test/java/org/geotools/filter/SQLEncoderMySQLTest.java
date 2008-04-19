@@ -37,19 +37,21 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
-
-
 /**
- * Unit test for SQLEncoderPostgis.  This is a complimentary  test suite with
- * the filter test suite.
- *
+ * Unit test for SQLEncoderPostgis. This is a complimentary test suite with the
+ * filter test suite.
+ * 
  * @author Chris Holmes, TOPP
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mysql/src/test/java/org/geotools/filter/SQLEncoderMySQLTest.java $
  */
 public class SQLEncoderMySQLTest extends TestCase {
     /** Standard logging instance */
-    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
-    //protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.filter");
+
+    // protected static AttributeTypeFactory attFactory =
+    // AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
     protected static SimpleFeatureType testSchema = null;
@@ -62,6 +64,7 @@ public class SQLEncoderMySQLTest extends TestCase {
 
     /** folder where test data is stored.. */
     String dataFolder = "";
+
     protected boolean setup = false;
 
     public SQLEncoderMySQLTest(String testName) {
@@ -71,7 +74,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         dataFolder = System.getProperty("dataFolder");
 
         if (dataFolder == null) {
-            //then we are being run by maven
+            // then we are being run by maven
             dataFolder = System.getProperty("basedir");
             dataFolder += "/tests/unit/testData";
         }
@@ -88,30 +91,23 @@ public class SQLEncoderMySQLTest extends TestCase {
     }
 
     protected void prepareFeatures() throws SchemaException, IllegalAttributeException {
-        //_log.getLoggerRepository().setThreshold(Level.INFO);
+        // _log.getLoggerRepository().setThreshold(Level.INFO);
         // Create the schema attributes
         LOGGER.finer("creating flat feature...");
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.add("testGeometry", LineString.class);
         LOGGER.finer("created geometry attribute");
 
-        builder.add("testBoolean",
-                Boolean.class);
+        builder.add("testBoolean", Boolean.class);
 
-        builder.add("testCharacter",
-                Character.class);
+        builder.add("testCharacter", Character.class);
         builder.add("testByte", Byte.class);
-        builder.add("testShort",
-                Short.class);
-        builder.add("testInteger",
-                Integer.class);
+        builder.add("testShort", Short.class);
+        builder.add("testInteger", Integer.class);
         builder.add("testLong", Long.class);
-        builder.add("testFloat",
-                Float.class);
-        builder.add("testDouble",
-                Double.class);
-        builder.add("testString",
-                String.class);
+        builder.add("testFloat", Float.class);
+        builder.add("testDouble", Double.class);
+        builder.add("testString", String.class);
 
         builder.setName("testSchema");
         // Builds the schema
@@ -142,13 +138,14 @@ public class SQLEncoderMySQLTest extends TestCase {
         testFeature = SimpleFeatureBuilder.build(testSchema, attributes, "fid.5");
         LOGGER.finer("...flat feature created");
 
-        //_log.getLoggerRepository().setThreshold(Level.DEBUG);
+        // _log.getLoggerRepository().setThreshold(Level.DEBUG);
     }
 
     /**
      * Main for test runner.
-     *
-     * @param args DOCUMENT ME!
+     * 
+     * @param args
+     *            DOCUMENT ME!
      */
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -156,7 +153,7 @@ public class SQLEncoderMySQLTest extends TestCase {
 
     /**
      * Required suite builder.
-     *
+     * 
      * @return A test suite for this unit test.
      */
     public static Test suite() {
@@ -165,7 +162,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         return suite;
     }
 
-    public void test1() throws Exception {
+    public void testBbox() throws Exception {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         LiteralExpressionImpl right = new BBoxExpressionImpl(new Envelope(0, 300, 0, 300));
@@ -180,15 +177,16 @@ public class SQLEncoderMySQLTest extends TestCase {
         String out = encoder.encodeToString(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
-        //assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
-        //    + " ((0 0, 0 300, 300 300, 300 0, 0 0))'" + ", 2356)", out);
+        assertEquals(
+                "WHERE MBRIntersects(testGeometry, GeometryFromText(\'POLYGON ((0 0, 0 300, 300 300, 300 0, 0 0))\', 2356))",
+                out);
     }
 
-    public void test2() throws Exception {
+    public void testBboxDefaultGeometry() throws Exception {
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         GeometryFilter gf = factory.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         LiteralExpressionImpl left = new BBoxExpressionImpl(new Envelope(10, 300, 10, 300));
-        gf.addLeftGeometry(left);
+        gf.addRightGeometry(left);
 
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
         encoder.setDefaultGeometry("testGeometry");
@@ -196,10 +194,8 @@ public class SQLEncoderMySQLTest extends TestCase {
         String out = encoder.encodeToString(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
-        //assertEquals(out,
-        //    "WHERE GeometryFromText("
-        //    + "'POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))'"
-        //    + ", 2346) && \"testGeometry\"");
+        assertEquals("WHERE MBRIntersects(testGeometry, "
+                + "GeometryFromText(\'POLYGON ((10 10, 10 300, 300 300, 300 10, 10 10))\', 2346))", out);
     }
 
     public void testFid() throws Exception {
@@ -213,20 +209,21 @@ public class SQLEncoderMySQLTest extends TestCase {
         LOGGER.fine("Resulting SQL filter is \n" + out);
         LOGGER.fine(out + "|" + "WHERE (gid = '345')");
 
-        //assertEquals(out, "WHERE (gid = '345')");
+         assertEquals(out, "WHERE (gid = '345')");
     }
 
-    public void test3() throws Exception {
+    public void testCompareToDouble() throws Exception {
         FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
         CompareFilter compFilter = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
         compFilter.addLeftValue(filterFac.createAttributeExpression(testSchema, "testInteger"));
         compFilter.addRightValue(filterFac.createLiteralExpression(new Double(5)));
 
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
+        encoder.setFeatureType(testSchema);
         String out = encoder.encodeToString(compFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
-        //assertEquals(out, "WHERE \"testInteger\" = 5.0");
+        assertEquals("WHERE testInteger = 5.0", out);
     }
 
     public void testException() throws Exception {
@@ -241,11 +238,11 @@ public class SQLEncoderMySQLTest extends TestCase {
         try {
             SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
             String out = encoder.encodeToString(gf);
-            LOGGER.fine("out is " + out);
+            fail("We do not support beyond filters");
         } catch (FilterToSQLException e) {
             LOGGER.fine(e.getMessage());
 
-            //  assertEquals("Filter type not supported", e.getMessage());
+            // assertEquals("Filter type not supported", e.getMessage());
         }
     }
 }
