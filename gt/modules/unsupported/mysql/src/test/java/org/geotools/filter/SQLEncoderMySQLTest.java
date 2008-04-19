@@ -23,6 +23,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+
+import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.AttributeTypeBuilder;
@@ -175,7 +177,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         SQLEncoderMySQL encoder = new SQLEncoderMySQL();
         encoder.setSRID(2356);
 
-        String out = encoder.encode(gf);
+        String out = encoder.encodeToString(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals("WHERE \"testGeometry\" && GeometryFromText('POLYGON"
@@ -191,7 +193,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
         encoder.setDefaultGeometry("testGeometry");
 
-        String out = encoder.encode(gf);
+        String out = encoder.encodeToString(gf);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals(out,
@@ -207,7 +209,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         SQLEncoderMySQL encoder = new SQLEncoderMySQL();
         encoder.setFIDMapper(new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "road"));
 
-        String out = encoder.encode((AbstractFilterImpl) fidFilter);
+        String out = encoder.encodeToString((AbstractFilterImpl) fidFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
         LOGGER.fine(out + "|" + "WHERE (gid = '345')");
 
@@ -221,7 +223,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         compFilter.addRightValue(filterFac.createLiteralExpression(new Double(5)));
 
         SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
-        String out = encoder.encode(compFilter);
+        String out = encoder.encodeToString(compFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
         //assertEquals(out, "WHERE \"testInteger\" = 5.0");
@@ -238,9 +240,9 @@ public class SQLEncoderMySQLTest extends TestCase {
 
         try {
             SQLEncoderMySQL encoder = new SQLEncoderMySQL(2346);
-            String out = encoder.encode(gf);
+            String out = encoder.encodeToString(gf);
             LOGGER.fine("out is " + out);
-        } catch (SQLEncoderException e) {
+        } catch (FilterToSQLException e) {
             LOGGER.fine(e.getMessage());
 
             //  assertEquals("Filter type not supported", e.getMessage());
