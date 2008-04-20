@@ -197,7 +197,7 @@
     <!-- mappane-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>mappane</artifactId>
+      <artifactId>gt-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
 

@@ -68,7 +68,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>mappane</artifactId>
+      <artifactId>gt-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->

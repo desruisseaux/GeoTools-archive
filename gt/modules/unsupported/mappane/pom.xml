@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mappane</artifactId>
+  <artifactId>gt-mappane</artifactId>
   <name>JMapPane Implementation</name>
   <description>
     Provides an implementation of JMapPane (a swing widget capable of
