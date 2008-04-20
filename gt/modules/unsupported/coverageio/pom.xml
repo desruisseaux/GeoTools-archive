@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>coverageio</artifactId>
+  <artifactId>gt-coverageio</artifactId>
   <packaging>jar</packaging>
   <name>Coverage I/O base classes</name>
   <description>
@@ -75,24 +75,24 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>metadata</artifactId>
+      <artifactId>gt-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

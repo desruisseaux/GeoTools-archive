@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>imagepyramid</artifactId>
+  <artifactId>gt-imagepyramid</artifactId>
   <packaging>jar</packaging>
   <name>imagepyramid datasource module</name>
   <description>
@@ -63,27 +63,27 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>imagemosaic</artifactId>
+        <artifactId>gt-imagemosaic</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -103,7 +103,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -113,14 +113,14 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>  
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

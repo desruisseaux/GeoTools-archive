@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>example</artifactId>
+  <artifactId>gt-example</artifactId>
   <packaging>jar</packaging>
   <name>Geotools Example Demo</name>
   <description>
@@ -78,44 +78,44 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>cql</artifactId>
+      <artifactId>gt-cql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!--  GeoTools Plugins -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>gt-wfs</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>geometry</artifactId>
+      <artifactId>gt-geometry</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <!--  GeoTools Extentions -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wms</artifactId>
+      <artifactId>gt-wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -125,18 +125,18 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>widgets-swing</artifactId>
+      <artifactId>gt-widgets-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>filter</artifactId>
+      <artifactId>gt-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
         <!-- GeoTools unsupported -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>widgets-swing-pending</artifactId>
+      <artifactId>gt-widgets-swing-pending</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

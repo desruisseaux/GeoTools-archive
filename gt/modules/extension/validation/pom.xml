@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>validation</artifactId>
+  <artifactId>gt-validation</artifactId>
   <packaging>jar</packaging>
   <name>Validation Processor and Framework</name>
   <description>
@@ -84,30 +84,30 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>directory</artifactId>
+      <artifactId>gt-directory</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>graph</artifactId>
+      <artifactId>gt-graph</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-shapefile</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope> <!-- Should be "test", but this dependencies appears in the main directory! -->
     </dependency>

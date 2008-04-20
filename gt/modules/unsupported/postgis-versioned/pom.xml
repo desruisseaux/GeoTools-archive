@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>postgis-versioned</artifactId>
+  <artifactId>gt-postgis-versioned</artifactId>
   <packaging>jar</packaging>
   <name>Versioned PostGIS module</name>
   <description>
@@ -73,20 +73,20 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Depend on the test code as well -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

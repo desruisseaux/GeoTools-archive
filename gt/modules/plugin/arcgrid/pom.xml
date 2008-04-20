@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>arcgrid</artifactId>
+  <artifactId>gt-arcgrid</artifactId>
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
   <description>
@@ -64,17 +64,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
         <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -86,7 +86,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

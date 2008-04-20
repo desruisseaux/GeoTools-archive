@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>jdbc</artifactId>
+  <artifactId>gt-jdbc</artifactId>
   <packaging>jar</packaging>
   <name>JDBC DataStore Support</name>
   <description>
@@ -62,12 +62,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
      <dependency>

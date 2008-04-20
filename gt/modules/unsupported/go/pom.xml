@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>go</artifactId>
+  <artifactId>gt-go</artifactId>
   <packaging>jar</packaging>
   <name>GO-1 implementation</name>
   <description>
@@ -77,7 +77,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

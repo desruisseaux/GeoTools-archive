@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>mappane-use</artifactId>
+  <artifactId>gt-mappane-use</artifactId>
   <packaging>jar</packaging>
   <name>Demos of the JMapPane</name>
   <description>
@@ -81,17 +81,17 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -101,7 +101,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

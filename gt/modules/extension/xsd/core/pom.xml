@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>gt-core</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
   <description>
@@ -84,7 +84,7 @@
   <dependencies> 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>graph</artifactId>
+      <artifactId>gt-graph</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

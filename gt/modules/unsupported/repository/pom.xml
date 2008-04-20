@@ -14,7 +14,7 @@
   </parent>
 
   <groupId>org.geotools</groupId>
-  <artifactId>repository</artifactId>
+  <artifactId>gt-repository</artifactId>
   <packaging>jar</packaging>
   <name>Repository</name>
 
@@ -49,37 +49,37 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wms</artifactId>
+      <artifactId>gt-wms</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>gt-wfs</artifactId>
       <version>${project.version}</version>
     </dependency>   
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>property</artifactId>
+      <artifactId>gt-property</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->

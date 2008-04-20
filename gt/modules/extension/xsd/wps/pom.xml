@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>wps</artifactId>
+  <artifactId>gt-wps</artifactId>
   <packaging>jar</packaging>
   <name>WPS XML Support</name>
   
@@ -67,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>ows</artifactId>
+      <artifactId>gt-ows</artifactId>
       <version>${project.version}</version>
     </dependency>    
   </dependencies>

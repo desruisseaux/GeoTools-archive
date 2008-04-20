@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>image</artifactId>
+  <artifactId>gt-image</artifactId>
   <packaging>jar</packaging>
   <name>WorldImage datasource module</name>
   <description>
@@ -69,19 +69,19 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

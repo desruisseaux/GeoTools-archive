@@ -26,7 +26,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>jts-wrapper</artifactId>
+  <artifactId>gt-jts-wrapper</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19107 implementation using JTS</name>
   <description>
@@ -70,7 +70,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

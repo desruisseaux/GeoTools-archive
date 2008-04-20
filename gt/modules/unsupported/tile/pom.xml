@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>tile</artifactId>
+  <artifactId>gt-tile</artifactId>
   <packaging>jar</packaging>
   <name>Tile Client</name>
   <description>
@@ -63,23 +63,23 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>repository</artifactId>
+      <artifactId>gt-repository</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

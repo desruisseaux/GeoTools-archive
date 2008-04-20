@@ -53,7 +53,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>widgets-swing-pending</artifactId>
+  <artifactId>gt-widgets-swing-pending</artifactId>
   <packaging>jar</packaging>
   <name>widgets-swing-pending</name>
   <description>Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.</description>
@@ -150,47 +150,47 @@
     <!-- api-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- coverage-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
 
 <!-- epsg-hsql-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version> 
     </dependency>
 
     <!-- geotiff-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>geotiff</artifactId>
+      <artifactId>gt-geotiff</artifactId>
       <version>${project.version}</version> 
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>image</artifactId>
+      <artifactId>gt-image</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>legacy</artifactId>
+      <artifactId>gt-legacy</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <!-- main-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -204,19 +204,19 @@
     <!-- metadata-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>metadata</artifactId>
+      <artifactId>gt-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>cql</artifactId>
+      <artifactId>gt-cql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>oracle-spatial</artifactId>
+      <artifactId>gt-oracle-spatial</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -224,13 +224,13 @@
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -238,62 +238,62 @@
     <!-- referencing-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- render-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- shapefile-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- shapefile-renderer-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile-renderer</artifactId>
+      <artifactId>gt-shapefile-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- xml-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>xml</artifactId>
+      <artifactId>gt-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- xml-filter-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>filter</artifactId>
+      <artifactId>gt-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- xml-gml2-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>gml2</artifactId>
+      <artifactId>gt-gml2</artifactId>
       <version>${project.version}</version>
     </dependency>  
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>widgets-swing</artifactId>
+      <artifactId>gt-widgets-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- xml-sld-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>sld</artifactId>
+      <artifactId>gt-sld</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -321,7 +321,7 @@
     <!-- jts-wrapper -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jts-wrapper</artifactId>
+      <artifactId>gt-jts-wrapper</artifactId>
       <version>${project.version}</version>
     </dependency>
     
@@ -363,21 +363,21 @@
     <!-- WFS datastore -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>gt-wfs</artifactId>
       <version>${project.version}</version>
     </dependency>
       
     <!-- WMS datastore -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>wms</artifactId>
+      <artifactId>gt-wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <!-- process -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>process</artifactId>
+      <artifactId>gt-process</artifactId>
       <version>${project.version}</version>
     </dependency>    
 

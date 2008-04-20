@@ -12,20 +12,20 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
   </parent>
 
   <groupId>org.geotools</groupId>
-  <artifactId>xml-gpx</artifactId>
+  <artifactId>gt-xml-gpx</artifactId>
   <packaging>jar</packaging>
   <name>GPS eXchange XML Bindings</name>
   
   <dependencies>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>gt-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

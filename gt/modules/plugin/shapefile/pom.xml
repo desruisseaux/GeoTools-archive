@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>shapefile</artifactId>
+  <artifactId>gt-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Shapefile module</name>
   <description>
@@ -122,19 +122,19 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- because main and sample-data depend on referencing we need a tie breaker -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -153,7 +153,7 @@
     <!-- We need this to make the referencing module useful -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

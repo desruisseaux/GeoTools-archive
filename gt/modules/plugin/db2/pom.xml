@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>db2</artifactId>
+  <artifactId>gt-db2</artifactId>
   <packaging>jar</packaging>
   <name>DB2 Spatial Extender module</name>
   <description>
@@ -63,18 +63,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

@@ -9,7 +9,7 @@
   </parent>
 
   <groupId>org.geotools</groupId>
-  <artifactId>caching</artifactId>
+  <artifactId>gt-caching</artifactId>
   <packaging>jar</packaging>
   <name>Caching</name>
   <description>
@@ -43,12 +43,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 <!--    <dependency>
@@ -58,12 +58,12 @@
     </dependency> -->
 <!--    <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>hsql</artifactId>
+      <artifactId>gt-hsql</artifactId>
       <version>${project.version}</version>
     </dependency> -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile-renderer</artifactId>
+      <artifactId>gt-shapefile-renderer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

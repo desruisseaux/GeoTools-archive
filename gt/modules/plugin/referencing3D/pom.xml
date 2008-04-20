@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>referencing3D</artifactId>
+  <artifactId>gt-referencing3D</artifactId>
   <packaging>jar</packaging>
   <name>Vertical coordinate transformations</name>
   <description>
@@ -75,7 +75,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

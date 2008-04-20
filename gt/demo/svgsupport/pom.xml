@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>gt-svgsupport</artifactId>
   <packaging>jar</packaging>
   <name>SVG support</name>
   <description>
@@ -63,7 +63,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

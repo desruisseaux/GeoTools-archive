@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>oracle-spatial</artifactId>
+  <artifactId>gt-oracle-spatial</artifactId>
   <packaging>jar</packaging>
   <name>Oracle Spatial Module</name>
   <description>
@@ -138,18 +138,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

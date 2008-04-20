@@ -81,13 +81,6 @@
     </plugins>
   </build-->
 
-  <!-- =========================================================== -->
-  <!--     Build configuration                                     -->
-  <!-- =========================================================== -->
-  <build>
-    <finalName>gt-ext-xsd-${artifactId}-${version}</finalName>
-  </build>
-
   <modules>
     <module>core</module>
     <module>gml2</module>

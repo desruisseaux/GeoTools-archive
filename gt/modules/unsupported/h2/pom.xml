@@ -16,7 +16,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>h2</artifactId>
+  <artifactId>gt-h2</artifactId>
   <packaging>jar</packaging>
   <name>H2 DataStore</name>
   <description>
@@ -51,17 +51,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>data</artifactId>
+      <artifactId>gt-data</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -94,7 +94,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

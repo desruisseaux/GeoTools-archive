@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>hsql</artifactId>
+  <artifactId>gt-hsql</artifactId>
   <packaging>jar</packaging>
   <name>HSQL datasource module</name>
   <description>
@@ -65,7 +65,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

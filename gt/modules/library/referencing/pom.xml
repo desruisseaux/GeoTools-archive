@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>referencing</artifactId>
+  <artifactId>gt-referencing</artifactId>
   <packaging>jar</packaging>
   <name>Referencing services</name>
   <description>
@@ -159,14 +159,14 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>metadata</artifactId>
+      <artifactId>gt-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

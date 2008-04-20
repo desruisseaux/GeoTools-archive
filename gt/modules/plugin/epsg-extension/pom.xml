@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-extension</artifactId>
+  <artifactId>gt-epsg-extension</artifactId>
   <packaging>jar</packaging>
   <name>Extensions to EPSG authority factory</name>
   <description>
@@ -79,12 +79,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

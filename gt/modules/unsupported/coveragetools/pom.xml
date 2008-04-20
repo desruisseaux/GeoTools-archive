@@ -12,7 +12,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>coveragetools</artifactId>
+  <artifactId>gt-coveragetools</artifactId>
   <packaging>jar</packaging>
   <name>Coverage tools</name>
   <description>
@@ -58,27 +58,27 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>arcgrid</artifactId>
+      <artifactId>gt-arcgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>geotiff</artifactId>
+      <artifactId>gt-geotiff</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>image</artifactId>
+      <artifactId>gt-image</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>imagemosaic</artifactId>
+      <artifactId>gt-imagemosaic</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>imagepyramid</artifactId>
+      <artifactId>gt-imagepyramid</artifactId>
       <version>${project.version}</version>
     </dependency>
 

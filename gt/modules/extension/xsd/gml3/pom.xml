@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>gml3</artifactId>
+  <artifactId>gt-gml3</artifactId>
   <packaging>jar</packaging>
   <name>GML3 XML Support</name>
   <description>
@@ -61,37 +61,37 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>gt-core</artifactId>
       <version>${project.version}</version>
     </dependency>   
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>gml2</artifactId>
+      <artifactId>gt-gml2</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>    

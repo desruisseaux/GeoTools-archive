@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mysql</artifactId>
+  <artifactId>gt-mysql</artifactId>
   <packaging>jar</packaging>
   <name>MySQL DataStore Implementation</name>
   <description>
@@ -84,7 +84,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

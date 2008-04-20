@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>libraryJTS</artifactId>
+  <artifactId>gt-libraryJTS</artifactId>
   <packaging>jar</packaging>
   <name>Geotools JTS Library Demo</name>
   <description>

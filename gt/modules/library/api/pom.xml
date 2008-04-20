@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>api</artifactId>
+  <artifactId>gt-api</artifactId>
   <packaging>jar</packaging>
   <name>API interfaces</name>
   <description>
@@ -85,7 +85,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

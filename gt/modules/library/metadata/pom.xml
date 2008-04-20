@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>metadata</artifactId>
+  <artifactId>gt-metadata</artifactId>
   <packaging>jar</packaging>
   <name>Metadata</name>
   <description>

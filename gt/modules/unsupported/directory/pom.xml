@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>directory</artifactId>
+  <artifactId>gt-directory</artifactId>
   <packaging>jar</packaging>
   <name>Directory module</name>
   <description>
@@ -74,12 +74,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gml</artifactId>
+      <artifactId>gt-gml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

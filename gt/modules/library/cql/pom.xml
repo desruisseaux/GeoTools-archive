@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>cql</artifactId>
+  <artifactId>gt-cql</artifactId>
   <packaging>jar</packaging>
   <name>OGC CQL to Filter parser</name>
   <description>
@@ -79,13 +79,13 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>gt-geomedia</artifactId>
   <packaging>jar</packaging>
   <name>GeoMedia datastore implementation</name>
   <description>
@@ -63,7 +63,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

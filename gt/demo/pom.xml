@@ -52,19 +52,19 @@
       <!-- GeoTools Library -->
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>main</artifactId>
+        <artifactId>gt-main</artifactId>
         <version>${project.version}</version>
       </dependency>
     
      <!-- GeoTools Plugin -->
      <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>epsg-wkt</artifactId>
+        <artifactId>gt-epsg-wkt</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>shapefile</artifactId>
+        <artifactId>gt-shapefile</artifactId>
         <version>${project.version}</version>
       </dependency>
       
@@ -77,7 +77,6 @@
   <!--         copies all JARs in a single directory.              -->
   <!-- =========================================================== -->
   <build>
-    <finalName>gt-demo-${artifactId}-${version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.geotools.maven</groupId>

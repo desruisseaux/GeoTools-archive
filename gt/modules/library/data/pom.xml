@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>data</artifactId>
+  <artifactId>gt-data</artifactId>
   <packaging>jar</packaging>
   <name>DataStore Support</name>
   <description>
@@ -78,7 +78,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

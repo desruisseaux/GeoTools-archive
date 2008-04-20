@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>brewer</artifactId>
+  <artifactId>gt-brewer</artifactId>
   <packaging>jar</packaging>
   <name>Brewer module</name>
   <description>
@@ -81,17 +81,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>postgis</artifactId>
+      <artifactId>gt-postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

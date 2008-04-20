@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-access</artifactId>
+  <artifactId>gt-epsg-access</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using MS-Access database</name>
   <description>
@@ -68,7 +68,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

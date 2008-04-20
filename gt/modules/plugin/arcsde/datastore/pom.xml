@@ -19,7 +19,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>arcsde</artifactId>
+  <artifactId>gt-arcsde</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE DataStore plugin</name>
   <description> ArcSDE DataStore plugin. </description>
@@ -83,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>gt-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!--
@@ -91,7 +91,7 @@
     is not being executed as it relies in non available data.
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jts-wrapper</artifactId>
+      <artifactId>gt-jts-wrapper</artifactId>
       <version>${project.version}</version>
     </dependency>
      -->
@@ -101,30 +101,30 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>cql</artifactId>
+      <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt-cql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt-epsg-wkt</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-render</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -146,7 +146,7 @@
       <dependencies>
         <dependency>
           <groupId>org.geotools</groupId>
-          <artifactId>sde-dummy</artifactId>
+          <artifactId>gt-sde-dummy</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
         </dependency>

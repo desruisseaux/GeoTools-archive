@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>graph</artifactId>
+  <artifactId>gt-graph</artifactId>
   <packaging>jar</packaging>
   <name>Feature Based Graphs and Networks</name>
   <description>
@@ -80,7 +80,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

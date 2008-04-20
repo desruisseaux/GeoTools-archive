@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>sld</artifactId>
+  <artifactId>gt-sld</artifactId>
   <packaging>jar</packaging>
   <name>SLD XML Support</name>
   <description>
@@ -62,32 +62,32 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>gt-core</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>filter</artifactId>
+      <artifactId>gt-filter</artifactId>
       <version>${project.version}</version>
     </dependency>    
   </dependencies>

@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>coverageio-netcdf</artifactId>
+  <artifactId>gt-coverageio-netcdf</artifactId>
   <packaging>jar</packaging>
   <name>Coverage I/O for NetCDF format</name>
   <description>
@@ -66,22 +66,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>metadata</artifactId>
+      <artifactId>gt-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
+      <artifactId>gt-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>coverageio</artifactId>
+      <artifactId>gt-coverageio</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

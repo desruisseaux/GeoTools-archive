@@ -25,7 +25,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>property</artifactId>
+  <artifactId>gt-property</artifactId>
   <packaging>jar</packaging>
   <name>Property File DataStore</name>
   <description>
@@ -65,12 +65,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt-epsg-hsql</artifactId>
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>

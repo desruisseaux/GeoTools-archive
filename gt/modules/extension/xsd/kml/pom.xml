@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>kml</artifactId>
+  <artifactId>gt-kml</artifactId>
   <packaging>jar</packaging>
   <name>KML XML Support</name>
   <description>
@@ -61,7 +61,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>gt-core</artifactId>
       <version>${project.version}</version>
     </dependency>    
   </dependencies>

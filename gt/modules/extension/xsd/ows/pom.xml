@@ -23,7 +23,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.xsd</groupId>
-  <artifactId>ows</artifactId>
+  <artifactId>gt-ows</artifactId>
   <packaging>jar</packaging>
   <name>OWS XML Support</name>
   <description>
@@ -66,7 +66,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.xsd</groupId>
-      <artifactId>filter</artifactId>
+      <artifactId>gt-filter</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

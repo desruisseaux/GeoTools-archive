@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>sample-data</artifactId>
+  <artifactId>gt-sample-data</artifactId>
   <packaging>jar</packaging>
   <name>Sample data module</name>
   <description>

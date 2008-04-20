@@ -79,14 +79,6 @@
        </modules>
      </profile>
   </profiles>
-  
-  
-  <!-- =========================================================== -->
-  <!--     Build configuration                                     -->
-  <!-- =========================================================== -->
-  <build>
-    <finalName>gt-uns-${artifactId}-${version}</finalName>
-  </build>
 
   <modules>
     <module>coverageio</module>
@@ -102,6 +94,7 @@
     <module>mappane</module>
     <module>mif</module>
     <module>mysql</module>
+    <module>ogc</module>
     <module>oracle-spatial</module>
     <module>postgis-versioned</module>
     <module>process</module>
@@ -110,7 +103,6 @@
     <module>vpf</module>
     <module>widgets-swing-pending</module>
     <module>xml-gpx</module>
-    <module>ogc</module>
   </modules>
 
 </project>

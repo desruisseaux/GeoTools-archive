@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>sde-dummy</artifactId>
+  <artifactId>gt-sde-dummy</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE dummy api</name>
   <description>

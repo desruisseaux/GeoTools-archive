@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>tiger</artifactId>
+  <artifactId>gt-tiger</artifactId>
   <packaging>jar</packaging>
   <name>TIGER/Line 2000 datastore implementation</name>
   <description>
@@ -63,7 +63,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

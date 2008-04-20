@@ -79,29 +79,29 @@
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>data</artifactId>
+			<artifactId>gt-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>cql</artifactId>
+			<artifactId>gt-cql</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools.xsd</groupId>
-			<artifactId>gml3</artifactId>
+			<artifactId>gt-gml3</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.geotools.demo</groupId>
-			<artifactId>property</artifactId>
+			<artifactId>gt-property</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>sample-data</artifactId>
+			<artifactId>gt-sample-data</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

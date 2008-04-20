@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>notifying-collections</artifactId>
+  <artifactId>gt-notifying-collections</artifactId>
   <packaging>jar</packaging>
   <name>Notifying Collections</name>
   <description>
