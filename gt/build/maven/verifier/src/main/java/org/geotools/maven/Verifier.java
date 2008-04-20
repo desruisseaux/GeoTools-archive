@@ -17,11 +17,10 @@ package org.geotools.maven;
 
 import java.io.File;
 
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.FileUtils;
 
 
 // Note: javadoc in class and fields descriptions must be XHTML.
@@ -39,12 +38,20 @@ import org.codehaus.plexus.util.FileUtils;
  */
 public class Verifier extends AbstractMojo {
     /**
-     * Name of the generated JAR.
-     *
-     * @parameter expression="${project.build.finalName}"
-     * @required
+     * The GeoTools group ID. Every modules are required to belong to this group or a child group.
      */
-    private String jarName;
+    private static final String GROUP_ID = "org.geotools";
+
+    /**
+     * The group ID of Maven plugins used only for building.
+     * Those modules do not need a {@code gt-} prefix.
+     */
+    private static final String BUILD_GROUP_ID = GROUP_ID + ".maven";
+
+    /**
+     * The prefix to prepend before module names.
+     */
+    private static final String PREFIX = "gt-";
 
     /**
      * The Maven project running this plugin.
@@ -55,12 +62,25 @@ public class Verifier extends AbstractMojo {
     private MavenProject project;
 
     /**
-     * Verifies the compliance of current pom.xml with GeoTools conventions.
+     * The root {@code pom.xml}.
+     */
+    private MavenProject root;
+
+    /**
+     * Verifies the compliance of current {@code pom.xml} with GeoTools conventions.
      *
      * @throws MojoExecutionException if a convention is violated.
      */
     public void execute() throws MojoExecutionException {
-        ensureNameConsistency();
+        root = project;
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+        verifyName();
+        verifyURL(project.getUrl());
+        final Scm scm = project.getScm();
+        verifyURL(scm.getConnection());
+        verifyURL(scm.getUrl());
     }
 
     /**
@@ -69,7 +89,7 @@ public class Verifier extends AbstractMojo {
      * "org.geotools.maven" group since they are used for GeoTools build only. We do not
      * prefix fully-qualified artifactId like "org.w3.xlink" neither.
      */
-    private void ensureNameConsistency() throws MojoExecutionException {
+    private void verifyName() throws MojoExecutionException {
         String groupId = project.getGroupId();
         checkGroup(groupId);
         final MavenProject parent = project.getParent();
@@ -88,8 +108,8 @@ public class Verifier extends AbstractMojo {
         String expectedId = directory.getName();
         boolean isJAR = project.getPackaging().equals("jar");
         if (!exclude(artifactId)) {
-            if (isJAR && !groupId.startsWith("org.geotools.maven") && artifactId.indexOf('.') < 0) {
-                expectedId = "gt-" + expectedId;
+            if (isJAR && !groupId.startsWith(BUILD_GROUP_ID) && artifactId.indexOf('.') < 0) {
+                expectedId = PREFIX + expectedId;
             }
             if (!expectedId.equals(artifactId)) {
                 throw new MojoExecutionException("Invalid <artifactId> \"" + artifactId +
@@ -123,9 +143,40 @@ public class Verifier extends AbstractMojo {
      * Ensures that the given group ID is a geotools one.
      */
     private static void checkGroup(final String groupId) throws MojoExecutionException {
-        if (!groupId.equals("org.geotools") && !groupId.startsWith("org.geotools.")) {
+        if (!groupId.equals(GROUP_ID) && !groupId.startsWith(GROUP_ID + '.')) {
             throw new MojoExecutionException("Invalid <groupId>: \"" + groupId +
-                    "\". It must be \"org.geotools\" or a submodule.");
+                    "\". It must be \"" + GROUP_ID + "\" or a subgroup.");
+        }
+    }
+
+    /**
+     * Verifies URL or SCM informations.
+     */
+    private void verifyURL(String url) throws MojoExecutionException {
+        if (url == null) {
+            return;
+        }
+        final File rootDirectory = root.getFile().getParentFile();
+        File directory = project.getFile().getParentFile();
+        while (isSvnCheckout(directory)) {
+            final String expected = directory.getName();
+            final int split = url.lastIndexOf('/');
+            final String name;
+            if (split >= 0) {
+                name = url.substring(split + 1);
+                url = url.substring(0, split);
+            } else {
+                name = "";
+            }
+            if (!name.equals(expected)) {
+                throw new MojoExecutionException("Illegal URL: found \"" + name +
+                        "\" but expected \"" + expected + "\". Please check the " +
+                        "<scm> and <url> declarations in the pom.xml file.");
+            }
+            directory = directory.getParentFile();
+            if (directory == null || directory.equals(rootDirectory)) {
+                break;
+            }
         }
     }
 

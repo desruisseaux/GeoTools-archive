@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id$              
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id$
      ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
     <artifactId>build</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -61,9 +61,13 @@
     </dependency>
   </dependencies>
 
-  
+
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
+  <!--                                                             -->
+  <!--     We do not list "verifier" here because doing so         -->
+  <!--     introduces a cyclic dependencies.  It has to be         -->
+  <!--     built and deployed separatly when needed.               -->
   <!-- =========================================================== -->
   <modules>
     <module>archetype</module>
@@ -74,9 +78,8 @@
     <module>jjtree-javacc</module>
     <module>rmic</module>
     <module>unopkg</module>
-    <module>verifier</module>
     <module>xmlcodegen</module>
   </modules>
-  
+
 
 </project>
