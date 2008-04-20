@@ -74,6 +74,7 @@
     <module>jjtree-javacc</module>
     <module>rmic</module>
     <module>unopkg</module>
+    <module>verifier</module>
     <module>xmlcodegen</module>
   </modules>
   

@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.FileUtils;
  * used only as Maven plugins.
  *
  * @goal verify
- * @phase compile
+ * @phase verify
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
