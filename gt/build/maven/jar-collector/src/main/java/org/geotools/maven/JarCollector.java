@@ -15,13 +15,8 @@
  */
 package org.geotools.maven;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -87,11 +82,6 @@ public class JarCollector extends AbstractMojo {
     private MavenProject project;
 
     /**
-     * The list of JAR names read from {@code "GtJars.txt"} file.
-     */
-    private final List<String> names = new ArrayList<String>();
-
-    /**
      * Copies the {@code .jar} files to the collect directory.
      *
      * @throws MojoExecutionException if the plugin execution failed.
@@ -154,10 +144,8 @@ public class JarCollector extends AbstractMojo {
                 throw new MojoExecutionException("Failed to create binaries directory.");
             }
         }
-        int count = 1;
         FileUtils.copyFileToDirectory(jarFile, collect);
         if (dependencies != null) {
-            fillNamesFromResources();
             for (final Artifact artifact : dependencies) {
                 final String scope = artifact.getScope();
                 if (scope != null &&  // Maven 2.0.6 bug?
@@ -165,12 +153,9 @@ public class JarCollector extends AbstractMojo {
                     scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME)))
                 {
                     final File file = artifact.getFile();
-                    if (artifact.getGroupId().startsWith("org.geotools")) {
-                        final String finalName = prefixedName(file);
-                        FileUtils.copyFile(file, new File(collect, finalName));
-                    } else {
+                    if (!artifact.getGroupId().startsWith("org.geotools")) {
                         final File copy = new File(collect, file.getName());
-                        if (!copy.exists()) {
+                        if (copy.exists()) {
                             /*
                              * Copies the dependency only if it was not already copied. Note that
                              * the module's JAR was copied inconditionnaly above (because it may
@@ -178,58 +163,12 @@ public class JarCollector extends AbstractMojo {
                              * dependencies list changed, it will be copied inconditionnaly when
                              * the module for this JAR will be processed by Maven.
                              */
-                            FileUtils.copyFileToDirectory(file, collect);
-                            count++;
+                            continue;
                         }
                     }
+                    FileUtils.copyFileToDirectory(file, collect);
                 }
             }
         }
-        getLog().info("Copied "+count+" JAR to parent directory.");
-    }
-
-    /**
-     * Fill the list of jar names with the values found in the resource file.
-     *
-     * @throws IOException if the reading of the resource file fails.
-     */
-    private void fillNamesFromResources() throws IOException {
-        final InputStream input = getClass().getResourceAsStream("GtJars.txt");
-        final BufferedReader buffer = new BufferedReader(new InputStreamReader(input));
-        String line;
-        while ((line = buffer.readLine()) != null) {
-            names.add(line.trim());
-        }
-        buffer.close();
-    }
-
-    /**
-     * Tests a file name with the ones present in the resource file, and returns the
-     * shortest matching name in the resource file.
-     *
-     * @param  file The file to test against the names in the resource file.
-     * @return The shortest name with a {@code gt-} prefix, or a generated name
-     *         if no matching name was found in the text file.
-     */
-    private String prefixedName(final File file) {
-        final String fileName = file.getName();
-        String match = null;
-        for (final String candidateName : names) {
-            if (candidateName.endsWith(fileName)) {
-                if (match == null) {
-                    match = candidateName;
-                } else {
-                    // There is already a name that has matched previously, we just keep
-                    // the name which is the shortest between them.
-                    if (candidateName.length() < match.length()) {
-                        match = candidateName;
-                    }
-                }
-            }
-        }
-        if (match == null) {
-            match = "gt-" + fileName;
-        }
-        return match;
     }
 }
