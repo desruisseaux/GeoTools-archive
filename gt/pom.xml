@@ -1174,7 +1174,7 @@
           <additionalparam>-keywords</additionalparam>
           <breakiterator>true</breakiterator>
           <excludePackageNames>
-            org.geotools.resources:org.geotools.maven:com
+            org.geotools.resources:org.geotools.maven:com:net.opengis:org.w3:javax:it.geosolutions
           </excludePackageNames>
 
           <!-- Custom taglets implemented in Java. -->
