@@ -23,6 +23,7 @@ import java.util.List;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -355,95 +356,96 @@ public class PolygonHandler implements ShapeHandler {
 
     public void write(ByteBuffer buffer, Object geometry) {
         MultiPolygon multi;
-
+        
         if (geometry instanceof MultiPolygon) {
-            multi = (MultiPolygon) geometry;
+          multi = (MultiPolygon) geometry;
         } else {
-            multi = geometryFactory
-                    .createMultiPolygon(new Polygon[] { (Polygon) geometry });
+          multi = geometryFactory.createMultiPolygon(new Polygon[] { (Polygon) geometry });
         }
-
+        
         Envelope box = multi.getEnvelopeInternal();
         buffer.putDouble(box.getMinX());
         buffer.putDouble(box.getMinY());
         buffer.putDouble(box.getMaxX());
         buffer.putDouble(box.getMaxY());
-
-        // need to find the total number of rings and points
-        int nrings = 0;
-
-        for (int t = 0; t < multi.getNumGeometries(); t++) {
-            Polygon p;
-            p = (Polygon) multi.getGeometryN(t);
-            nrings = nrings + 1 + p.getNumInteriorRing();
-        }
-
-        int u = 0;
-        int[] pointsPerRing = new int[nrings];
-
-        for (int t = 0; t < multi.getNumGeometries(); t++) {
-            Polygon p;
-            p = (Polygon) multi.getGeometryN(t);
-            pointsPerRing[u] = p.getExteriorRing().getNumPoints();
-            u++;
-
-            for (int v = 0; v < p.getNumInteriorRing(); v++) {
-                pointsPerRing[u] = p.getInteriorRingN(v).getNumPoints();
-                u++;
+        
+        //need to find the total number of rings and points
+        final int nrings;
+        final CoordinateSequence []coordinates;
+        {
+            List allCoords = new ArrayList();
+            for (int t = 0; t < multi.getNumGeometries(); t++) {
+              Polygon p;
+              p = (Polygon) multi.getGeometryN(t);
+              allCoords.add(p.getExteriorRing().getCoordinateSequence());
+              for(int ringN = 0; ringN < p.getNumInteriorRing(); ringN++){
+                  allCoords.add(p.getInteriorRingN(ringN).getCoordinateSequence());
+              }
             }
+            coordinates = (CoordinateSequence[])allCoords.toArray(new CoordinateSequence[allCoords.size()]);
+            nrings = coordinates.length;
         }
-
-        int npoints = multi.getNumPoints();
-
+        
+        final int npoints = multi.getNumPoints();
+        
         buffer.putInt(nrings);
         buffer.putInt(npoints);
-
+        
         int count = 0;
-
         for (int t = 0; t < nrings; t++) {
-            buffer.putInt(count);
-            count = count + pointsPerRing[t];
+          buffer.putInt(count);
+          count = count + coordinates[t].size();
         }
-
-        // write out points here!
-        Coordinate[] coords = multi.getCoordinates();
-
-        for (int t = 0; t < coords.length; t++) {
-            buffer.putDouble(coords[t].x);
-            buffer.putDouble(coords[t].y);
+        
+        final double[] zExtreame = {Double.NaN, Double.NaN};
+        
+        //write out points here!.. and gather up min and max z values
+        for (int ringN = 0; ringN < nrings; ringN++) {
+            CoordinateSequence coords = coordinates[ringN];
+            
+            JTSUtilities.zMinMax(coords, zExtreame);
+            
+            final int seqSize = coords.size();
+            for(int coordN = 0; coordN < seqSize; coordN++){
+                buffer.putDouble(coords.getOrdinate(coordN, 0));
+                buffer.putDouble(coords.getOrdinate(coordN, 1));
+            }
         }
-
+        
         if (shapeType == ShapeType.POLYGONZ) {
-            // z
-            double[] zExtreame = JTSUtilities.zMinMax(multi.getCoordinates());
-
-            if (Double.isNaN(zExtreame[0])) {
-                buffer.putDouble(0.0);
-                buffer.putDouble(0.0);
-            } else {
-                buffer.putDouble(zExtreame[0]);
-                buffer.putDouble(zExtreame[1]);
-            }
-
-            for (int t = 0; t < npoints; t++) {
-                double z = coords[t].z;
-
-                if (Double.isNaN(z)) {
-                    buffer.putDouble(0.0);
-                } else {
-                    buffer.putDouble(z);
-                }
-            }
+          //z      
+          if (Double.isNaN(zExtreame[0])) {
+            buffer.putDouble(0.0);
+            buffer.putDouble(0.0);
+          } else {
+            buffer.putDouble(zExtreame[0]);
+            buffer.putDouble(zExtreame[1]);
+          }
+          
+          for (int ringN = 0; ringN < nrings; ringN++) {
+              CoordinateSequence coords = coordinates[ringN];
+          
+              final int seqSize = coords.size();
+              double z;
+              for (int coordN = 0; coordN < seqSize; coordN++) {
+                  z = coords.getOrdinate(coordN, 2);
+                  if (Double.isNaN(z)) {
+                      buffer.putDouble(0.0);
+                  } else {
+                      buffer.putDouble(z);
+                  }
+              }
+          }
         }
-
+        
         if (shapeType == ShapeType.POLYGONM || shapeType == ShapeType.POLYGONZ) {
-            // m
+          //m
+          buffer.putDouble(-10E40);
+          buffer.putDouble(-10E40);
+          
+          for (int t = 0; t < npoints; t++) {
             buffer.putDouble(-10E40);
-            buffer.putDouble(-10E40);
-
-            for (int t = 0; t < npoints; t++) {
-                buffer.putDouble(-10E40);
-            }
+          }
         }
     }
 

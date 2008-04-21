@@ -21,6 +21,7 @@ package org.geotools.data.shapefile.shp;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -30,6 +31,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * A collection of utility methods for use with JTS and the shapefile package.
@@ -51,22 +53,42 @@ public class JTSUtilities {
      * Determine the min and max "z" values in an array of Coordinates.
      * 
      * @param cs
-     *                The array to search.
+     *            The array to search.
      * @return An array of size 2, index 0 is min, index 1 is max.
+     * @deprecated use zMinMax(CoordinateSequence)
      */
     public static final double[] zMinMax(final Coordinate[] cs) {
+        double []result = {Double.NaN, Double.NaN};
+        zMinMax(new CoordinateArraySequence(cs), result);
+        return result;
+    }
+
+    /**
+     * Determine the min and max "z" values in an array of Coordinates.
+     * 
+     * @param cs
+     *            The array to search.
+     * @param target
+     *            array with at least two elements where to hold the min and max
+     *            zvalues. target[0] will be filled with the minimum zvalue,
+     *            target[1] with the maximum. The array current values, if not
+     *            NaN, will be taken into acount in the computation.
+     */
+    public static final void zMinMax(final CoordinateSequence cs, double[] target) {
+        if (cs.getDimension() < 3) {
+            return;
+        }
         double zmin;
         double zmax;
         boolean validZFound = false;
-        double[] result = new double[2];
 
         zmin = Double.NaN;
         zmax = Double.NaN;
 
         double z;
-
-        for (int t = cs.length - 1; t >= 0; t--) {
-            z = cs[t].z;
+        final int size = cs.size();
+        for (int t = size - 1; t >= 0; t--) {
+            z = cs.getOrdinate(t, 2);
 
             if (!(Double.isNaN(z))) {
                 if (validZFound) {
@@ -85,10 +107,12 @@ public class JTSUtilities {
             }
         }
 
-        result[0] = (zmin);
-        result[1] = (zmax);
-
-        return result;
+        if(!Double.isNaN(zmin)){
+            target[0] = zmin;
+        }
+        if(!Double.isNaN(zmax)){
+            target[1] = (zmax);
+        }
     }
 
     /**

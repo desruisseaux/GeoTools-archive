@@ -316,31 +316,37 @@ public class MultiLineHandler implements ShapeHandler {
         buffer.putDouble(box.getMaxX());
         buffer.putDouble(box.getMaxY());
 
-        int numParts = multi.getNumGeometries();
+        final int numParts = multi.getNumGeometries();
+        final CoordinateSequence[] lines = new CoordinateSequence[numParts];
+        final double[] zExtreame = {Double.NaN, Double.NaN};
+        final int npoints = multi.getNumPoints();
 
         buffer.putInt(numParts);
-        int npoints = multi.getNumPoints();
         buffer.putInt(npoints);
 
-        LineString[] lines = new LineString[numParts];
-        int idx = 0;
-
-        for (int i = 0; i < numParts; i++) {
-            lines[i] = (LineString) multi.getGeometryN(i);
-            buffer.putInt(idx);
-            idx = idx + lines[i].getNumPoints();
+        {
+            int idx = 0;
+            for (int i = 0; i < numParts; i++) {
+                lines[i] = ((LineString) multi.getGeometryN(i)).getCoordinateSequence();
+                buffer.putInt(idx);
+                idx = idx + lines[i].size();
+            }
         }
-
-        Coordinate[] coords = multi.getCoordinates();
-
-        for (int t = 0; t < npoints; t++) {
-            buffer.putDouble(coords[t].x);
-            buffer.putDouble(coords[t].y);
+        
+        for(int lineN = 0; lineN < lines.length; lineN++){
+            CoordinateSequence coords = lines[lineN];
+            if (shapeType == ShapeType.ARCZ) {
+                JTSUtilities.zMinMax(coords, zExtreame);
+            }
+            final int ncoords = coords.size();
+            
+            for (int t = 0; t < ncoords; t++) {
+                buffer.putDouble(coords.getX(t));
+                buffer.putDouble(coords.getY(t));
+            }
         }
 
         if (shapeType == ShapeType.ARCZ) {
-            double[] zExtreame = JTSUtilities.zMinMax(coords);
-
             if (Double.isNaN(zExtreame[0])) {
                 buffer.putDouble(0.0);
                 buffer.putDouble(0.0);
@@ -349,18 +355,20 @@ public class MultiLineHandler implements ShapeHandler {
                 buffer.putDouble(zExtreame[1]);
             }
 
-            for (int t = 0; t < npoints; t++) {
-                double z = coords[t].z;
-
-                if (Double.isNaN(z)) {
-                    buffer.putDouble(0.0);
-                } else {
-                    buffer.putDouble(z);
+            for(int lineN = 0; lineN < lines.length; lineN++){
+                final CoordinateSequence coords = lines[lineN];
+                final int ncoords = coords.size();
+                double z;
+                for (int t = 0; t < ncoords; t++) {
+                    z = coords.getOrdinate(t, 2);    
+                    if (Double.isNaN(z)) {
+                        buffer.putDouble(0.0);
+                    } else {
+                        buffer.putDouble(z);
+                    }
                 }
             }
-        }
 
-        if (shapeType == ShapeType.ARCZ) {
             buffer.putDouble(-10E40);
             buffer.putDouble(-10E40);
 
