@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id$              
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id$
      ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -145,7 +145,7 @@
       </distributionManagement>
     </profile>
   </profiles>
-  
+
 
   <!-- =========================================================== -->
   <!--     Project Description                                     -->
@@ -156,7 +156,7 @@
   <version>2.5-SNAPSHOT</version>
   <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
-  
+
   <scm>
     <connection>
       scm:svn:http://svn.geotools.org/geotools/trunk/gt/
@@ -496,7 +496,7 @@
         <role>Documentation</role>
         <role>Module Mantainer</role>
       </roles>
-    </developer>    
+    </developer>
     <developer>
       <name>Luca Sigfrido Percich</name>
       <id>lpercich</id>
@@ -506,7 +506,7 @@
         <role>Java Developer</role>
         <role>Module Mantainer</role>
       </roles>
-    </developer>    
+    </developer>
   </developers>
 
   <contributors>
@@ -636,7 +636,7 @@
         <artifactId>batik-script</artifactId>
         <version>1.6</version>
       </dependency>
-      
+
       <!-- XML -->
       <dependency>
         <groupId>jdom</groupId>
@@ -659,7 +659,7 @@
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>3.1</version>  <!-- Same as the dependency in commons-pool -->
-      </dependency>    
+      </dependency>
       <dependency>
         <groupId>commons-pool</groupId>
         <artifactId>commons-pool</artifactId>
@@ -774,7 +774,7 @@
         <artifactId>ecore</artifactId>
         <version>2.2.2</version>
       </dependency>
- 
+
       <!-- Tests or legacy -->
       <dependency>
         <groupId>junit</groupId>
@@ -1071,6 +1071,24 @@
 
 
       <!-- ======================================================= -->
+      <!--     Checks compliance with GeoTools conventions.        -->
+      <!-- ======================================================= -->
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>verifier</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+
+
+      <!-- ======================================================= -->
       <!--     JAR packaging.                                      -->
       <!-- ======================================================= -->
       <plugin>
@@ -1084,6 +1102,8 @@
           </archive>
         </configuration>
       </plugin>
+
+
 
       <!-- ======================================================= -->
       <!--     Source packaging.                                      -->
@@ -1131,7 +1151,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        
+
         <configuration>
             <!-- Necessary to enable javadoc to handle J2SE 1.5 features. -->
           <source>1.5</source>
@@ -1147,9 +1167,9 @@
           <encoding>UTF-8</encoding>
             <!-- Whether to build an aggregated report at the root.-->
           <aggregate>true</aggregate>
-          
+
             <!-- Set an additional parameter for the command line. -->
-          <additionalparam>-keywords</additionalparam> 
+          <additionalparam>-keywords</additionalparam>
           <breakiterator>true</breakiterator>
           <excludePackageNames>
             org.geotools.resources:org.geotools.maven:com
@@ -1221,7 +1241,7 @@
             </tag>
           </tags>
 
-          <!-- Creates links to existing javadoc-generated         --> 
+          <!-- Creates links to existing javadoc-generated         -->
           <!-- documentation of external referenced classes.       -->
           <links>
             <link>http://java.sun.com/j2se/1.4/docs/api</link>
@@ -1316,7 +1336,7 @@
         <artifactId>maven-site-plugin</artifactId>
         <configuration>
           <!-- Generates the site in English and French -->
-          <!-- Set to English only for now because of a bug 
+          <!-- Set to English only for now because of a bug
                in French resources
           <locales>en,fr</locales>
           -->
@@ -1333,19 +1353,19 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
       </plugin>
-      
+
       <!-- Report on the test results of the project -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
-      
+
       <!-- Code coverage report -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
       </plugin>
-      
+
       <!-- Verification of coding rules. -->
       <!-- Disabled, nobody is using it at the moment
       <plugin>
@@ -1353,23 +1373,23 @@
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       -->
-      
+
       <!-- HTML based, cross-reference version of Java source code -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jxr-maven-plugin</artifactId>
       </plugin>
-      
+
       <!-- Report on various tags found in the code -->
 <!-- out of the build until library/render works with this plugin (NPE)
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
       </plugin>
--->      
-      
+-->
+
       <!-- SVN activities during the last 30 days -->
-      <!-- Disabled for now, because this plugin crash with a 
+      <!-- Disabled for now, because this plugin crash with a
            NullPointerException.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -1405,7 +1425,7 @@
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
     </repository>
-    
+
     <repository>
       <snapshots>
         <enabled>false</enabled>
@@ -1443,7 +1463,7 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </pluginRepository> 
+    </pluginRepository>
   </pluginRepositories>
 
 

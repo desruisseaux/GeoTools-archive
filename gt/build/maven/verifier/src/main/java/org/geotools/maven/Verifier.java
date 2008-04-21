@@ -77,10 +77,12 @@ public class Verifier extends AbstractMojo {
             root = root.getParent();
         }
         verifyName();
-        verifyURL(project.getUrl());
-        final Scm scm = project.getScm();
-        verifyURL(scm.getConnection());
-        verifyURL(scm.getUrl());
+        if (!exclude(project.getArtifactId())) {
+            verifyURL(project.getUrl());
+            final Scm scm = project.getScm();
+            verifyURL(scm.getConnection());
+            verifyURL(scm.getUrl());
+        }
     }
 
     /**
@@ -155,6 +157,10 @@ public class Verifier extends AbstractMojo {
     private void verifyURL(String url) throws MojoExecutionException {
         if (url == null) {
             return;
+        }
+        if (url.endsWith("/")) {
+            // Remove the last character {@code /} in the url.
+            url = url.substring(0, url.length() - 1);
         }
         final File rootDirectory = root.getFile().getParentFile();
         File directory = project.getFile().getParentFile();
