@@ -27,6 +27,15 @@
   <artifactId>gt-validation</artifactId>
   <packaging>jar</packaging>
   <name>Validation Processor and Framework</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/validation/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/validation/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/validation/</url>
+  </scm>
+
   <description>
     Validation module (and validator batch tool) for use with geotools2.
     This library has been ported to geotools2 as part of the VWFS project

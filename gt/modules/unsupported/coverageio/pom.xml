@@ -27,6 +27,15 @@
   <artifactId>gt-coverageio</artifactId>
   <packaging>jar</packaging>
   <name>Coverage I/O base classes</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio/</url>
+  </scm>
+
   <description>
     Base classes for image and coverage I/O operations. Contains some codecs for ASCII grids.
   </description>
@@ -38,7 +47,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
 
 
   <!-- =========================================================== -->

@@ -18,7 +18,7 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-oracle-spatial</artifactId>
   <packaging>jar</packaging>
   <name>Oracle Spatial Module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/oracle-spatial/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/oracle-spatial/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/oracle-spatial/</url>
+  </scm>
+
   <description>
     Module offers GeoTools DataStore support for Oracle Spatial.
   </description>
@@ -130,11 +139,11 @@
         </properties>
     </profile>
   </profiles>
-  
+
+
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
-  
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -154,8 +163,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
- 
 
   <build>
     <plugins>

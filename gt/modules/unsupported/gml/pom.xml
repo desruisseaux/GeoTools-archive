@@ -18,7 +18,7 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-gml</artifactId>
   <packaging>jar</packaging>
   <name>GML module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/gml/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml/</url>
+  </scm>
+
   <description>
     Used to extract features from a GML file. The GML parser was 
     developed by Refractions Research and conforms to GML 2.x.
@@ -121,6 +130,5 @@
       </plugin>
     </plugins>
   </build>
-  
-  
+
 </project>

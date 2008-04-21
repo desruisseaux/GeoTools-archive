@@ -18,7 +18,7 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-epsg-hsql</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using HSQL database</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-hsql/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-hsql/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-hsql/</url>
+  </scm>
+
   <description>
     Connection to an embedded EPSG database in HSQL format.
     This database is built from the SQL scripts delivered by EPSG.
@@ -121,4 +130,5 @@
       <scope>test</scope>
     </dependency>    
   </dependencies>
+
 </project>

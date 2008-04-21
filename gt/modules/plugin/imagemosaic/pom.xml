@@ -27,6 +27,15 @@
   <artifactId>gt-imagemosaic</artifactId>
   <packaging>jar</packaging>
   <name>imagemosaic datasource module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/imagemosaic/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagemosaic/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagemosaic/</url>
+  </scm>
+
   <description>
     Datasource created to read a mosaic of georeferenced images or geotiff
     (and in future also JPEG2K).
@@ -132,6 +141,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 
 </project>

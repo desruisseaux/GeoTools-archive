@@ -27,6 +27,15 @@
   <artifactId>gt-core</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/core/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/core/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/core/</url>
+  </scm>
+
   <description>
     Schema based xml parsing. This module contains tools for creating 
     bindings from xml types to java types. Schema modelling is based 

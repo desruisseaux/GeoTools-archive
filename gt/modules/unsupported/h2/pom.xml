@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
@@ -19,6 +27,15 @@
   <artifactId>gt-h2</artifactId>
   <packaging>jar</packaging>
   <name>H2 DataStore</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/h2/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/h2/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/h2/</url>
+  </scm>
+
   <description>
 	DataStore support for H2 Database.
   </description>

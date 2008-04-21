@@ -27,6 +27,15 @@
   <artifactId>gt-go</artifactId>
   <packaging>jar</packaging>
   <name>GO-1 implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/go/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/go/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/go/</url>
+  </scm>
+
   <description>
     Provides a GO-1 (Geospatial Object) implementation. This module contains
     geometry implementations optimized for rendering, as well as a renderer.

@@ -19,6 +19,7 @@
     <version>2.5-SNAPSHOT</version>
   </parent>
 
+
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
@@ -26,6 +27,15 @@
   <artifactId>gt-geometry</artifactId>
   <packaging>jar</packaging>
   <name>Geometries</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/geometry/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geometry/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geometry/</url>
+  </scm>
+
   <description>
     Implementations of ISO 19107 (Spatial Schema).
   </description>
@@ -131,6 +141,7 @@
     </plugins>
   </build>
 
+
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
@@ -171,7 +182,6 @@
 	    <scope>test</scope>
 	</dependency>       
   </dependencies>
-
 
 
   <!-- =========================================================== -->

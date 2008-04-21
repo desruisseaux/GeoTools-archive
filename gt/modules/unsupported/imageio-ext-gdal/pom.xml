@@ -27,6 +27,14 @@
   <artifactId>gt-imageio-ext-gdal</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module leveraging on the ImageI/O-Ext project</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/imageio-ext-gdal/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/imageio-ext-gdal/</url>
+  </scm>
 
   <description>
     Extension of the of Grid Coverage plugins, leveraging on the GDAL raster data access
@@ -66,6 +74,7 @@
       </roles>
     </developer>
   </developers>
+
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
@@ -131,4 +140,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>

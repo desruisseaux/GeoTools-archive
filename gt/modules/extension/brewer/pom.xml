@@ -27,6 +27,15 @@
   <artifactId>gt-brewer</artifactId>
   <packaging>jar</packaging>
   <name>Brewer module</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/brewer/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/brewer/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/brewer/</url>
+  </scm>
+
   <description>
     Brewer module, which contains ColorBrewer, etc.
   </description>

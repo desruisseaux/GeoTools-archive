@@ -27,6 +27,15 @@
   <artifactId>gt-coverageio-netcdf</artifactId>
   <packaging>jar</packaging>
   <name>Coverage I/O for NetCDF format</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio-netcdf/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coverageio-netcdf/</url>
+  </scm>
+
   <description>
     Coverage I/O for NetCDF format.
   </description>
@@ -38,7 +47,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
 
 
   <!-- =========================================================== -->

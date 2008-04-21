@@ -19,13 +19,14 @@
   <artifactId>gt-ecw</artifactId>
   <packaging>jar</packaging>
   <name>ECW gridcoverage module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/ecw/</url>
 
- <!--  <scm>-->
- <!--   <connection>-->
- <!--     scm:svn:http://svn.geotools.org/geotools/trunk/modules/unsupported/ecw/-->
- <!--   </connection>-->
- <!--   <url>http://svn.geotools.org/geotools/trunk/modules/unsupported/ecw/</url>-->
- <!-- </scm>-->
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ecw/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/ecw/</url>
+  </scm>
 
   <description>
     Datasource created to read ECW format.
@@ -111,4 +112,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>

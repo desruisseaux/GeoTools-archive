@@ -26,6 +26,15 @@
   <artifactId>gt-example</artifactId>
   <packaging>jar</packaging>
   <name>Geotools Example Demo</name>
+  <url>http://maven.geotools.fr/reports/demo/example/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/example/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/example/</url>
+  </scm>
+
   <description>
       Geotools 2 example for FOSS4G
   </description>

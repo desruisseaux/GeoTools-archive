@@ -27,6 +27,15 @@
   <artifactId>gt-introduction</artifactId>
   <packaging>jar</packaging>
   <name>Demo Introduction to Geotools</name>
+  <url>http://maven.geotools.fr/reports/demo/introduction/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/introduction/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/introduction/</url>
+  </scm>
+
   <description>
     An introductory demonstration application.
   </description>

@@ -26,6 +26,15 @@
   <artifactId>gt-ows</artifactId>
   <packaging>jar</packaging>
   <name>OWS XML Support</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/ows/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/ows/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/ows/</url>
+  </scm>
+
   <description>
     Filter XML support for Geotools.
   </description>

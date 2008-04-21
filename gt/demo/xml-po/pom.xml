@@ -18,7 +18,7 @@
     <artifactId>demo</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,18 +27,31 @@
   <artifactId>gt-xml-po</artifactId>
   <packaging>jar</packaging>
   <name>Purchase Order XML Support</name>
-	
+
+  <url>http://maven.geotools.fr/reports/demo/xml-po/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/xml-po/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/xml-po/</url>
+  </scm>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
-      <dependency>
-          <groupId>openejb</groupId>
-          <artifactId>jaxb-api</artifactId>
-          <version>2.0EA3</version>
-      </dependency>
-      <dependency>
-          <groupId>org.geotools.xsd</groupId>
-          <artifactId>xsd</artifactId>
-          <version>${project.version}</version>
-      </dependency>
+    <dependency>
+      <groupId>openejb</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.0EA3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>xsd</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -48,33 +61,33 @@
         <artifactId>jaxb2-maven-plugin</artifactId>
         <configuration>
           <packageName>org.geotools.po</packageName>
-	       	<outputDirectory>${project.build.sourceDirectory}</outputDirectory>
-         </configuration>
-       </plugin>
-       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-          </configuration>
-       </plugin>
-			 <plugin>
-				<groupId>org.geotools.maven</groupId>
-				<artifactId>xmlcodegen</artifactId>
-				<version>${project.version}</version>	
-				<configuration>
-					<schemaLocation>po.xsd</schemaLocation>
-					<destinationPackage>org.geotools.po.bindings</destinationPackage>
-					<constructorArguments>
-						<constructorArgument>
-							<name>factory</name>
-							<type>org.geotools.po.ObjectFactory</type>
-						</constructorArgument>
-					</constructorArguments>
-				</configuration>
-			 </plugin>
-     </plugins>
-   </build>
+          <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>xmlcodegen</artifactId>
+        <version>${project.version}</version>	
+        <configuration>
+          <schemaLocation>po.xsd</schemaLocation>
+          <destinationPackage>org.geotools.po.bindings</destinationPackage>
+          <constructorArguments>
+            <constructorArgument>
+              <name>factory</name>
+              <type>org.geotools.po.ObjectFactory</type>
+            </constructorArgument>
+          </constructorArguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 	
 </project>

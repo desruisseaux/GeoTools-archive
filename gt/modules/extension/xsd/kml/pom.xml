@@ -26,6 +26,15 @@
   <artifactId>gt-kml</artifactId>
   <packaging>jar</packaging>
   <name>KML XML Support</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/kml/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/kml/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/kml/</url>
+  </scm>
+
   <description>
     Filter XML support for Geotools.
   </description>

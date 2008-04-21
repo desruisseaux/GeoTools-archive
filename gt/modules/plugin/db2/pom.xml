@@ -27,6 +27,15 @@
   <artifactId>gt-db2</artifactId>
   <packaging>jar</packaging>
   <name>DB2 Spatial Extender module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/db2/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/db2/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/db2/</url>
+  </scm>
+
   <description>
     Provides a standard interface to the DB2 Spatial Extender.
     More information can be found at: http://www.software.ibm.com/data/spatial.
@@ -94,7 +103,6 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
 
 
   <!-- ==================================================== -->

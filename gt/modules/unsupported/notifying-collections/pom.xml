@@ -23,6 +23,15 @@
   <artifactId>gt-notifying-collections</artifactId>
   <packaging>jar</packaging>
   <name>Notifying Collections</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/notifying-collections/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/notifying-collections/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/notifying-collections/</url>
+  </scm>
+
   <description>
 	  Commons Events is a set of classes to enable 
 	  changes to objects to be observed.  It includes 
@@ -30,7 +39,6 @@
 	  and the associated events and event handling 
 	  mechanisms.
   </description>
-
 
 
   <!-- ==================================================== -->
@@ -45,7 +53,6 @@
 
   <contributors>
   </contributors>
-
 
 
   <!-- ==================================================== -->
@@ -72,7 +79,6 @@
   </dependencies>
 
 
-
   <!-- ==================================================== -->
   <!--     Compilation (including non-standard plugins)     -->
   <!-- ==================================================== -->
@@ -90,6 +96,5 @@
         </plugin>
       </plugins>
   </build>
-	
 
 </project>

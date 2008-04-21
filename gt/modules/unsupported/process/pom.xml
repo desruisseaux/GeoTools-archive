@@ -60,7 +60,15 @@
   <artifactId>gt-process</artifactId>
   <packaging>jar</packaging>
   <name>Process</name>
-  
+  <url>http://maven.geotools.fr/reports/modules/unsupported/process/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/process/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/process/</url>
+  </scm>
+
   <description>
     This is an API for creating processes/operations.
   </description>
@@ -148,7 +156,7 @@
           </excludes>
         </configuration>
       </plugin>
-      
+
       <!-- ====    Testing          ============================== -->
       <!-- ====    Code Formatting  ============================== -->
       <!--
@@ -179,7 +187,7 @@
       </plugin>
       -->
     </plugins>
-    
+
   </build>
 
 </project>

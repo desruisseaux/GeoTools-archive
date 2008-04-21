@@ -18,7 +18,7 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-tile</artifactId>
   <packaging>jar</packaging>
   <name>Tile Client</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/tile/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/tile/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/tile/</url>
+  </scm>
+
   <description>
     Tile module, supports the retrival of GridCoverage from external tile servers.
   </description>

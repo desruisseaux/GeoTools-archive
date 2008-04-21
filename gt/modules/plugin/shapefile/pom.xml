@@ -18,7 +18,7 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Shapefile module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/shapefile/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/</url>
+  </scm>
+
   <description>
     (todo)
   </description>
@@ -179,6 +188,5 @@
       </plugin>
     </plugins>
   </build>
-
 
 </project>

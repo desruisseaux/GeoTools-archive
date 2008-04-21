@@ -27,6 +27,15 @@
   <artifactId>gt-postgis-versioned</artifactId>
   <packaging>jar</packaging>
   <name>Versioned PostGIS module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/postgis-versioned/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/postgis-versioned/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/postgis-versioned/</url>
+  </scm>
+
   <description>
     Used to extract and edit features from a PostGIS database along with
     feature versioning. PostGIS was developed by Refractions Research.
@@ -111,5 +120,6 @@
       </plugin>
     </plugins>
   </build>
+
 </project>
 

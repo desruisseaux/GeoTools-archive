@@ -26,6 +26,15 @@
   <artifactId>gt-libraryJTS</artifactId>
   <packaging>jar</packaging>
   <name>Geotools JTS Library Demo</name>
+  <url>http://maven.geotools.fr/reports/demo/libraryJTS/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/libraryJTS/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/libraryJTS/</url>
+  </scm>
+
   <description>
       Geotools demo of the Java Topology Suite library
   </description>

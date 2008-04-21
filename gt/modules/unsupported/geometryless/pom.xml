@@ -18,7 +18,7 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-geometryless</artifactId>
   <packaging>jar</packaging>
   <name>Generic (geometryless) DataStore implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/geometryless/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geometryless/</url>
+  </scm>
+
   <description>
     The JDBC module contains an implementation of the DataStore interface 
     (found in data), as well as the older DataSource interface (found in 

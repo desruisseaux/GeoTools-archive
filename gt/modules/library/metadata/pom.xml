@@ -27,6 +27,15 @@
   <artifactId>gt-metadata</artifactId>
   <packaging>jar</packaging>
   <name>Metadata</name>
+  <url>http://maven.geotools.fr/reports/modules/library/metadata/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/metadata/</url>
+  </scm>
+
   <description>
     Contains implementations of metadata and some core utilities classes.
   </description>
@@ -148,6 +157,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-
 
 </project>

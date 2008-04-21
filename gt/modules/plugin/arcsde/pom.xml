@@ -15,6 +15,8 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
+
+
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
@@ -30,11 +32,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
   <!-- =========================================================== -->
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
   <developers>
-     <developer>
+    <developer>
       <name>Saul Farber</name>
       <id>saul.farber</id>
       <email>Saul.Farber@state.ma.us</email>
@@ -55,7 +59,7 @@
     </developer>
   </developers>
 
-    <properties>
+  <properties>
     <!-- default SDE version is 9.0.  These jars are freely available (err,
         at least they're available on maven.geotools.fr and were down-
         loaded without a click-through license.  If you have newer jars
@@ -63,14 +67,15 @@
         them yourself, and then set the sde.version maven property -->
     <sde.version>9.0</sde.version>
   </properties>
-  
+
+
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
     <module>datastore</module>
   </modules>
-  
+
   <profiles>
     <profile>
       <id>autoSDEDummyJars</id>
@@ -98,4 +103,5 @@
       </activation>
     </profile>
   </profiles>
+
 </project>

@@ -18,13 +18,23 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
+
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt-mappane</artifactId>
   <name>JMapPane Implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/mappane/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mappane/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mappane/</url>
+  </scm>
+
   <description>
     Provides an implementation of JMapPane (a swing widget capable of
     displaying a map) as used in demos.
@@ -38,7 +48,7 @@
     </license>
   </licenses>
 
-  
+
   <!-- =========================================================== -->
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
@@ -71,8 +81,8 @@
       </roles>
     </developer>
   </developers>
-  
-  
+
+
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
@@ -98,9 +108,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    
   </dependencies>
-  
-  
+
 </project>
 

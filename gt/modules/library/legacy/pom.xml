@@ -27,6 +27,15 @@
   <artifactId>gt-legacy</artifactId>
   <packaging>jar</packaging>
   <name>Legacy API and implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/library/legacy/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/legacy/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/legacy/</url>
+  </scm>
+
   <description>
     The legacy module contains the old geotools feature module interfaces
     and implementations

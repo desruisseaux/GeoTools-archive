@@ -27,6 +27,15 @@
   <artifactId>gt-openoffice</artifactId>
   <packaging>jar</packaging>
   <name>Bridges to OpenOffice suite</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/openoffice/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/</url>
+  </scm>
+
   <description>
     Provides some Geotools's fonctionalities as OpenOffice plugins. For 
     example, the plugin provides coordinate operation services as formulas 

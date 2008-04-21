@@ -18,7 +18,7 @@
     <artifactId>unsupported</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,8 +27,17 @@
   <artifactId>gt-gml3</artifactId>
   <packaging>jar</packaging>
   <name>GML Data Store</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/gml3/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml3/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml3/</url>
+  </scm>
+
   <description>
-		Datastore module based on Geographic Markup Language Version 3.1.1.
+    Datastore module based on Geographic Markup Language Version 3.1.1.
   </description>
 
   <licenses>
@@ -55,6 +64,7 @@
       </roles>
     </developer>
   </developers>
+
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->

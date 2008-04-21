@@ -27,6 +27,15 @@
   <artifactId>gt-xml</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing Support</name>
+  <url>http://maven.geotools.fr/reports/modules/library/xml/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/xml/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/xml/</url>
+  </scm>
+
   <description>
     XML Parser based on the XDO design.
   </description>

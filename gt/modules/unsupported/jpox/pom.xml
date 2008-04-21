@@ -27,6 +27,15 @@
   <artifactId>gt-jpox</artifactId>
   <packaging>jar</packaging>
   <name>JPOX Support</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/jpox/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/jpox/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/jpox/</url>
+  </scm>
+
   <description>
     JPOX module, contains helper code for those using JPOX Spatial to map POJOs
     into the GeoTools codebase.
@@ -134,6 +143,5 @@
     </dependency>
 
   </dependencies>
-
 
 </project>

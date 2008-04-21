@@ -27,6 +27,15 @@
   <artifactId>gt-widgets-swing</artifactId>
   <packaging>jar</packaging>
   <name>Swing widgets</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/widgets-swing/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/widgets-swing/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/widgets-swing/</url>
+  </scm>
+
   <description>
     Provides dialog box, status bar, etc. using Swing framework.
   </description>

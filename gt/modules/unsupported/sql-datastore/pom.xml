@@ -27,14 +27,14 @@
   <artifactId>gt-sql-datastore</artifactId>
   <packaging>jar</packaging>
   <name>DataStore InProcess SQL View helper classes</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/community-schemas/sql-datastore/</url>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/sql-datastore/</url>
 
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/sql-datastore
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/sql-datastore
     </connection>
     <url>
-      http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/sql-datastore
+      http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/sql-datastore
     </url>
   </scm>
 

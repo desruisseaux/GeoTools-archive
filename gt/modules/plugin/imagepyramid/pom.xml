@@ -18,7 +18,7 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-imagepyramid</artifactId>
   <packaging>jar</packaging>
   <name>imagepyramid datasource module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/imagepyramid/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagepyramid/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagepyramid/</url>
+  </scm>
+
   <description>
     Datasource created to read a pyramid of georeferenced images or geotiff 
     (and in future also JPEG2K).
@@ -137,6 +146,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 
 </project>

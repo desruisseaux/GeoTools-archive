@@ -27,6 +27,15 @@
   <artifactId>gt-sld</artifactId>
   <packaging>jar</packaging>
   <name>SLD XML Support</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/sld/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/sld/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/sld/</url>
+  </scm>
+
   <description>
     SLD XML support for Geotools.
   </description>

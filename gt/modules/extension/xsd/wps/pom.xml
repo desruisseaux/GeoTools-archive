@@ -26,7 +26,15 @@
   <artifactId>gt-wps</artifactId>
   <packaging>jar</packaging>
   <name>WPS XML Support</name>
-  
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/wps/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/wps/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/wps/</url>
+  </scm>
+
   <description>
     Web Processing Service XML support for Geotools.
   </description>

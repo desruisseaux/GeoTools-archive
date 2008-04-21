@@ -18,7 +18,7 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-epsg-wkt</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using WKT file</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-wkt/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-wkt/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-wkt/</url>
+  </scm>
+
   <description>
     EPSG and AUTO authority factories are defined for data.crs.CRSService.
     These codes are used to provide CoordinateRegerenceSystem for GCE and
@@ -85,6 +94,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 
 </project>

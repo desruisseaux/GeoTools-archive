@@ -27,6 +27,15 @@
   <artifactId>gt-data</artifactId>
   <packaging>jar</packaging>
   <name>DataStore Support</name>
+  <url>http://maven.geotools.fr/reports/modules/library/data/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/data/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/data/</url>
+  </scm>
+
   <description>
     Abstract datastore implementation and helper classes.
   </description>

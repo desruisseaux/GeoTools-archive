@@ -27,6 +27,15 @@
   <artifactId>gt-mappane-use</artifactId>
   <packaging>jar</packaging>
   <name>Demos of the JMapPane</name>
+  <url>http://maven.geotools.fr/reports/demo/mappane-use/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/mappane-use/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/mappane-use/</url>
+  </scm>
+
   <description>
     Demos for Geotools 2.
   </description>

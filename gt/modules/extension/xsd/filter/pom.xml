@@ -27,6 +27,15 @@
   <artifactId>gt-filter</artifactId>
   <packaging>jar</packaging>
   <name>Filter XML Support</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/filter/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/filter/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/filter/</url>
+  </scm>
+
   <description>
     Filter XML support for Geotools.
   </description>

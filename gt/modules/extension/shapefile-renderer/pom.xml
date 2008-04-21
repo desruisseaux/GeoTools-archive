@@ -27,6 +27,15 @@
   <artifactId>gt-shapefile-renderer</artifactId>
   <packaging>jar</packaging>
   <name>Renderer optimized for shapefiles</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/shapefile-renderer/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/shapefile-renderer/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/shapefile-renderer/</url>
+  </scm>
+
   <description>
     (todo)
   </description>

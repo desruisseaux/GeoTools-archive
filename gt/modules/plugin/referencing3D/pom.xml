@@ -18,7 +18,7 @@
     <artifactId>plugin</artifactId>
     <version>2.5-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -27,6 +27,15 @@
   <artifactId>gt-referencing3D</artifactId>
   <packaging>jar</packaging>
   <name>Vertical coordinate transformations</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/referencing3D/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/referencing3D/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/referencing3D/</url>
+  </scm>
+
   <description>
     Transforms coordinates from "heights above the ellipsoid" to "heights above
     the geoid". This module provides the algorithms from an Earth Gravitational 
@@ -79,6 +88,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-
 
 </project>

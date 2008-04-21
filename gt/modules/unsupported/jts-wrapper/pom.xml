@@ -15,12 +15,12 @@
     <version>2.5-SNAPSHOT</version>
   </parent>
 
-
-<properties>
+  <properties>
     <allow.test.skip>true</allow.test.skip>
     <allow.test.failure.ignore>true</allow.test.failure.ignore>
     <maven.test.skip>true</maven.test.skip>
-</properties>
+  </properties>
+
 
   <!-- ==================================================== -->
   <!--     Module description                               -->
@@ -29,11 +29,19 @@
   <artifactId>gt-jts-wrapper</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19107 implementation using JTS</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/jts-wrapper/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/jts-wrapper/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/jts-wrapper/</url>
+  </scm>
+
   <description>
      This is a basic 2D ISO 19107 implementation which uses 
      JTS for the computational geometry.
   </description>
-
 
 
   <!-- ==================================================== -->
@@ -63,7 +71,6 @@
   </contributors>
 
 
-
   <!-- ==================================================== -->
   <!--     Dependencies                                     -->
   <!-- ==================================================== -->
@@ -89,14 +96,13 @@
       <artifactId>commons-logging</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
-	<dependency>
-	    <groupId>picocontainer</groupId>
-	    <artifactId>picocontainer</artifactId>
-	    <version>3</version>
-	    <scope>test</scope>
-	</dependency> 
+    <dependency>
+      <groupId>picocontainer</groupId>
+      <artifactId>picocontainer</artifactId>
+      <version>3</version>
+      <scope>test</scope>
+    </dependency> 
   </dependencies>
-
 
 
   <!-- ==================================================== -->

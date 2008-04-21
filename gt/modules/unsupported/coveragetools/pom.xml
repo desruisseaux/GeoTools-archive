@@ -1,4 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id$
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -15,6 +27,15 @@
   <artifactId>gt-coveragetools</artifactId>
   <packaging>jar</packaging>
   <name>Coverage tools</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/coveragetools/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coveragetools/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/coveragetools/</url>
+  </scm>
+
   <description>
     Coverage tools (tools for building overviews, pyramids and the like)
   </description>

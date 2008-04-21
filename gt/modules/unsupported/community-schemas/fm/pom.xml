@@ -23,6 +23,15 @@
   <groupId>org.geotools</groupId>
   <artifactId>fm</artifactId>
   <name>ISO Feature Implementation module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/community-schemas/fm/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/fm/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/community-schemas/fm/</url>
+  </scm>
+
   <description>
     The main module contains the key interfaces and default
     implementations that are used by other GeoTools modules.

@@ -27,6 +27,15 @@
   <artifactId>gt-jdbc</artifactId>
   <packaging>jar</packaging>
   <name>JDBC DataStore Support</name>
+  <url>http://maven.geotools.fr/reports/modules/library/jdbc/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/</url>
+  </scm>
+
   <description>
     Abstract datastore implementation and helper classes / apis to be extended
     by datastores backed by releational databases accesible via jdbc.

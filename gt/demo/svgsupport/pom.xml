@@ -27,6 +27,15 @@
   <artifactId>gt-svgsupport</artifactId>
   <packaging>jar</packaging>
   <name>SVG support</name>
+  <url>http://maven.geotools.fr/reports/demo/svgsupport/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/svgsupport/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/svgsupport/</url>
+  </scm>
+
   <description>
     (todo)
   </description>

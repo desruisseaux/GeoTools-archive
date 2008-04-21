@@ -51,7 +51,7 @@
     </profile>
   </profiles>
   -->
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -60,6 +60,15 @@
   <artifactId>gt-gpx</artifactId>
   <packaging>jar</packaging>
   <name>GPS eXchange Data Store</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/gpx/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gpx/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gpx/</url>
+  </scm>
+
   <description>
     GPS eXchange (gpx) is an xml data format used by many GPS managing application.
     This data store uses the ml-gpx parsing/encoding module to load/save gpx files,
@@ -143,7 +152,7 @@
           </excludes>
         </configuration>
       </plugin>
-      
+
       <!-- ====    Testing          ============================== -->
       <!-- ====    Code Formatting  ============================== -->
       <!--
@@ -174,7 +183,7 @@
       </plugin>
       -->
     </plugins>
-    
+
   </build>
 
 </project>

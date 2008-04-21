@@ -19,7 +19,6 @@
     <version>2.5-SNAPSHOT</version>
   </parent>
 
-  
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -28,6 +27,15 @@
   <artifactId>gt-property</artifactId>
   <packaging>jar</packaging>
   <name>Property File DataStore</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/property/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/property/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/property/</url>
+  </scm>
+
   <description>
     DataStore based on standard Java properties files, origional created
     as demo; now serves as a useful reference implementation.
@@ -75,6 +83,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  
-  
+
 </project>

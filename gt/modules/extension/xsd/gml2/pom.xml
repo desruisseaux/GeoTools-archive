@@ -26,6 +26,15 @@
   <artifactId>gt-gml2</artifactId>
   <packaging>jar</packaging>
   <name>GML2 XML Support</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xsd/gml2/</url>
+
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml2/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/gml2/</url>
+  </scm>
+
   <description>
     GML2 XML support for Geotools.
   </description>
