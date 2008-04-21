@@ -27,6 +27,7 @@ import org.picocontainer.defaults.InstanceComponentAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -210,22 +211,22 @@ public abstract class Configuration {
     /**
      * XSD instance
      */
-    protected XSD xsd;
+    private final XSD xsd;
 
     /**
      * List of configurations depended on.
      */
-    private List dependencies;
+    private final List dependencies;
 
     /**
      * List of parser properties.
      */
-    private List properties;
+    private final List properties;
 
     /**
      * Internal context
      */
-    private MutablePicoContainer context;
+    private final MutablePicoContainer context;
 
     /**
      * Creates a new configuration.
@@ -244,7 +245,7 @@ public abstract class Configuration {
             dependencies.add(new XSConfiguration());
         }
 
-        properties = new ArrayList();
+        properties = Collections.synchronizedList(new ArrayList());
         context = new DefaultPicoContainer();
     }
 
@@ -272,6 +273,10 @@ public abstract class Configuration {
      * Configuration configuration = ...
      * configuration.getProperties().add( Parser.Properties.... );
      * </pre>
+     * </p>
+     * <p>
+     * Beware this class is not thread safe so take the needed precautions 
+     * when using the list returned by this method.
      * </p>
      * @return A list of hte set parser properties.
      */
@@ -533,7 +538,8 @@ public abstract class Configuration {
             }
 
             //set any parser properties
-            for (Iterator p = dependency.getProperties().iterator(); p.hasNext();) {
+            List properties = new ArrayList(dependency.getProperties());
+            for (Iterator p = properties.iterator(); p.hasNext();) {
                 QName property = (QName) p.next();
 
                 try {
