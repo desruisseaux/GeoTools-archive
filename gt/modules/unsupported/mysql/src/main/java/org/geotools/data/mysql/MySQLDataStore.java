@@ -21,10 +21,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -228,43 +225,27 @@ public class MySQLDataStore extends JDBCDataStore {
             if (dataType == Types.OTHER || dataType == Types.BINARY) {
                 //this is MySQL-specific; handle it
                 String typeName = rs.getString(TYPE_NAME);
-                String typeNameLower = typeName.toLowerCase();
                 AttributeTypeBuilder builder = new AttributeTypeBuilder();
 
-                //TODO: put geometry stuff in its own method
-                if ("geometry".equals(typeNameLower)) {
-                    builder.setBinding(Geometry.class);
-                } else if ("point".equals(typeNameLower)) {
-                    builder.setBinding(Point.class);
-                } else if ("linestring".equals(typeNameLower)) {
-                    builder.setBinding(LineString.class);
-                } else if ("polygon".equals(typeNameLower)) {
-                    builder.setBinding(Polygon.class);
-                } else if ("multipoint".equals(typeNameLower)) {
-                    builder.setBinding(MultiPoint.class);
-                } else if ("multilinestring".equals(typeNameLower)) {
-                    builder.setBinding(MultiLineString.class);
-                } else if ("multipolygon".equals(typeNameLower)) {
-                    builder.setBinding(MultiPolygon.class);
-                } else if ("geometrycollection".equals(typeNameLower)) {
-                    builder.setBinding(GeometryCollection.class);
-                } else {
+				Class geom = getGeomClass(typeName);
+                if ( geom == null) {
                     //nothing else we can do
                     return super.buildAttributeType(rs);
                 }
+				builder.setBinding(geom);
 
-		//get CRS we are making the assumtion that the srid coresponds
-		// to the EPSG srid.  Which may not be true.
-		int srid = determineSRID(rs.getString(TABLE_NAME), rs.getString(COLUMN_NAME) );
-		CoordinateReferenceSystem crs = null;
-		try{
-			crs = CRS.decode("EPSG:"+ srid);
-		} catch (Exception e) {
-			crs = null;
-		}
-		builder.setCRS(crs);
+				//get CRS we are making the assumtion that the srid coresponds
+				// to the EPSG srid.  Which may not be true.
+				int srid = determineSRID(rs.getString(TABLE_NAME), rs.getString(COLUMN_NAME) );
+				CoordinateReferenceSystem crs = null;
+				try{
+					crs = CRS.decode("EPSG:"+ srid);
+				} catch (Exception e) {
+					crs = null;
+				}
+				builder.setCRS(crs);
 
-		// set some other stuff like name and return
+				// set some other stuff like name and return
                 builder.setNillable(true);
                 builder.setName(rs.getString(COLUMN_NAME));
                 return builder.buildDescriptor(rs.getString(COLUMN_NAME));
@@ -275,6 +256,30 @@ public class MySQLDataStore extends JDBCDataStore {
             throw new IOException("SQL exception occurred: " + e.getMessage());
         }
     }
+
+    /** Map of mysql geometries to jts geometries */
+    private static Map<String,Class> GEOM_TYPE_MAP = new HashMap<String,Class>();
+
+    static {
+        GEOM_TYPE_MAP.put("GEOMETRY", Geometry.class);
+        GEOM_TYPE_MAP.put("POINT", Point.class);
+        GEOM_TYPE_MAP.put("LINESTRING", LineString.class);
+        GEOM_TYPE_MAP.put("POLYGON", Polygon.class);
+        GEOM_TYPE_MAP.put("MULTIPOINT", MultiPoint.class);
+        GEOM_TYPE_MAP.put("MULTILINESTRING", MultiLineString.class);
+        GEOM_TYPE_MAP.put("MULTIPOLYGON", MultiPolygon.class);
+        GEOM_TYPE_MAP.put("GEOMETRYCOLLECTION", GeometryCollection.class);
+    }
+
+ 
+	/** Returns the geomoty class associated with the string passed in or null
+ 	*/
+    static public Class getGeomClass(String type)
+    {
+		return GEOM_TYPE_MAP.get(type.toUpperCase());
+    }
+
+
 
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getSqlBuilder(java.lang.String)
