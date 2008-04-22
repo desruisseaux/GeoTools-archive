@@ -255,7 +255,7 @@ public class ColorMap implements Serializable {
      *
      * @see #recolor
      */
-    public void setGeophysicsRange(final CharSequence category, final MeasurementRange range) {
+    public void setGeophysicsRange(final CharSequence category, final MeasurementRange<?> range) {
         setRange(category, range);
     }
 
@@ -282,7 +282,7 @@ public class ColorMap implements Serializable {
      *
      * @see #recolor
      */
-    public void setRelativeRange(final CharSequence category, final NumberRange range) {
+    public void setRelativeRange(final CharSequence category, final NumberRange<?> range) {
         if (range instanceof MeasurementRange) {
             // The MeasurementRange type is reserved for geophysics ranges.
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "range"));
@@ -321,8 +321,8 @@ public class ColorMap implements Serializable {
      *         apply to any quantitative category.
      * @return The geophysics range, or {@code null} if none.
      */
-    public MeasurementRange getGeophysicsRange(final CharSequence category) {
-        final NumberRange range = getRange(category);
+    public MeasurementRange<?> getGeophysicsRange(final CharSequence category) {
+        final NumberRange<?> range = getRange(category);
         return (range instanceof MeasurementRange) ? (MeasurementRange) range : null;
     }
 
@@ -420,7 +420,7 @@ public class ColorMap implements Serializable {
             lower = round(minimum,  minIncluded);
             upper = round(maximum, !maxIncluded);
         }
-        return new NumberRange(lower, true, upper, false);
+        return NumberRange.create(lower, true, upper, false);
     }
 
     /**

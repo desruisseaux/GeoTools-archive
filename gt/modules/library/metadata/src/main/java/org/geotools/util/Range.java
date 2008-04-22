@@ -16,6 +16,7 @@
 package org.geotools.util;
 
 import java.io.Serializable;
+import javax.units.Unit;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -38,6 +39,13 @@ import org.geotools.resources.i18n.ErrorKeys;
  *   <li><p>{@link #subtract} returns an empty array if the whole range is subtracted.</p></li>
  * </ul>
  *
+ * The exact {@linkplain #getElementClass element class} doesn't need to be known at compile time.
+ * Widening conversions are allowed as needed (subclasses like {@link NumberRange} do that). This
+ * class is weakly parameterized in order to allow this flexibility. If any constructor or method
+ * is invoked with an argument value of illegal class, then an {@link IllegalArgumentException} is
+ * thrown. The {@link ClassCastException} is thrown only in case of bug in the {@code Range} class
+ * or subclasses implementation.
+ *
  * @since 2.5
  * @source $URL$
  * @version $Id$
@@ -55,12 +63,12 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
     /**
      * The class of elements.
      */
-    private final Class<T> elementClass;
+    final Class<T> elementClass;
 
     /**
      * The minimal and maximal value.
      */
-    private final T minValue, maxValue;
+    final T minValue, maxValue;
 
     /**
      * Whatever the minimal or maximum value is included.
@@ -119,6 +127,9 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
         this.maxValue      = maxValue;
         this.isMinIncluded = isMinIncluded && minValue != null;
         this.isMaxIncluded = isMaxIncluded && maxValue != null;
+        checkElementClass();
+        if (minValue != null) ensureCompatible(minValue.getClass());
+        if (maxValue != null) ensureCompatible(maxValue.getClass());
     }
 
     /**
@@ -134,9 +145,7 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
     /**
      * Ensures that the given argument is non-null.
      */
-    private static void ensureNonNull(final String name, final Object value)
-            throws IllegalArgumentException
-    {
+    static void ensureNonNull(final String name, final Object value) throws IllegalArgumentException {
         if (value == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
@@ -145,12 +154,37 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
     /**
      * Ensures that the given range use the same element class than this range.
      */
-    private void ensureCompatible(final Range<?> range) throws IllegalArgumentException {
+    @SuppressWarnings("unchecked")
+    private Range<? extends T> ensureCompatible(final Range<?> range) throws IllegalArgumentException {
         ensureNonNull("range", range);
-        if (!elementClass.isAssignableFrom(range.elementClass)) {
+        ensureCompatible(range.elementClass);
+        return (Range<? extends T>) range;
+    }
+
+    /**
+     * Ensures that the given type is compatible with the type expected by this range.
+     */
+    private void ensureCompatible(final Class<?> type) throws IllegalArgumentException {
+        if (!elementClass.isAssignableFrom(type)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    range.elementClass, elementClass));
+                    type, elementClass));
         }
+    }
+
+    /**
+     * Ensures that {@link #elementClass} is compatible with the type expected by this range class.
+     * Used at construction time for argument check. To be overriden by {@link NumberRange} only.
+     */
+    void checkElementClass() throws IllegalArgumentException {
+    }
+
+    /**
+     * Returns an initially empty array of the given length. To be overriden by {@link NumberRange}
+     * and subclasses in order to create arrays of more specific type.
+     */
+    @SuppressWarnings("unchecked") // Generic array creation.
+    Range<T>[] newArray(final int length) {
+        return new Range[length];
     }
 
     /**
@@ -227,22 +261,36 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
      * {@code null} value. This is consistent with the {@linkplain Range class javadoc} stating
      * that null {@linkplain #getMinValue minimum} or {@linkplain #getMaxValue maximum} values
      * are exclusive.
+     *
+     * @throws IllegalArgumentException is the given value can not be converted to a valid type
+     *         through widening conversion.
      */
-    public boolean contains(final T value) {
+    public boolean contains(final Comparable<?> value) throws IllegalArgumentException {
         if (value == null) {
             return false;
         }
+        ensureCompatible(value.getClass());
+        @SuppressWarnings("unchecked")
+        final T c = (T) value;
+        return containsNC(c);
+    }
+
+    /**
+     * Implementation of {@link #contains(T)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final boolean containsNC(final T value) {
         if (minValue != null) {
-            final int c = value.compareTo(minValue);
-            if (c <= 0) {
+            final int c = minValue.compareTo(value);
+            if (c >= 0) {
                 if (c != 0 || !isMinIncluded) {
                     return false;
                 }
             }
         }
         if (maxValue != null) {
-            final int c = value.compareTo(maxValue);
-            if (c >= 0) {
+            final int c = maxValue.compareTo(value);
+            if (c <= 0) {
                 if (c != 0 || !isMaxIncluded) {
                     return false;
                 }
@@ -253,9 +301,19 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
 
     /**
      * Returns {@code true} if this range contains fully the given range.
+     *
+     * @throws IllegalArgumentException is the given range can not be converted to a valid type
+     *         through widening conversion.
      */
-    public boolean contains(final Range<? extends T> range) {
-        ensureCompatible(range);
+    public boolean contains(final Range<?> range) throws IllegalArgumentException {
+        return containsNC(ensureCompatible(range));
+    }
+
+    /**
+     * Implementation of {@link #contains(Range)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final boolean containsNC(final Range<? extends T> range) {
         return (minValue == null || compareMinTo(range.minValue, range.isMinIncluded ? 0 : +1) <= 0) &&
                (maxValue == null || compareMaxTo(range.maxValue, range.isMaxIncluded ? 0 : -1) >= 0);
    }
@@ -263,10 +321,20 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
     /**
      * Returns {@code true} if this range intersects the given range.
      *
+     * @throws IllegalArgumentException is the given range can not be converted to a valid type
+     *         through widening conversion.
+     *
      * @see javax.media.jai.util.Range#intersects
      */
-    public boolean intersects(final Range<? extends T> range) {
-        ensureCompatible(range);
+    public boolean intersects(final Range<?> range) throws IllegalArgumentException {
+        return intersectsNC(ensureCompatible(range));
+    }
+
+    /**
+     * Implementation of {@link #intersects(Range)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final boolean intersectsNC(final Range<? extends T> range) {
         return compareMinTo(range.maxValue, range.isMaxIncluded ? 0 : -1) <= 0 &&
                compareMaxTo(range.minValue, range.isMinIncluded ? 0 : +1) >= 0;
     }
@@ -276,12 +344,23 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
      *
      * @param  range The range to intersect.
      * @return The intersection of this range with the provided range.
+     * @throws IllegalArgumentException is the given range can not be converted to a valid type
+     *         through widening conversion.
      *
      * @see javax.media.jai.util.Range#intersect
      */
-    public Range<T> intersect(final Range<T> range){
-        ensureCompatible(range);
-        final Range<T> intersect, min, max;
+    public Range<?> intersect(final Range<?> range) throws IllegalArgumentException {
+        return intersectNC(ensureCompatible(range));
+    }
+
+    /**
+     * Implementation of {@link #intersect(Range)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final Range<? extends T> intersectNC(final Range<? extends T> range)
+            throws IllegalArgumentException
+    {
+        final Range<? extends T> intersect, min, max;
         min = compareMinTo(range.minValue, range.isMinIncluded ? 0 : +1) < 0 ? range : this;
         max = compareMaxTo(range.maxValue, range.isMaxIncluded ? 0 : -1) > 0 ? range : this;
         if (min == max) {
@@ -306,11 +385,20 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
      *
      * @param  range The range to substract.
      * @return This range without the given range.
+     * @throws IllegalArgumentException is the given range can not be converted to a valid type
+     *         through widening conversion.
      *
      * @see javax.media.jai.util.Range#subtract
      */
-    @SuppressWarnings("unchecked") // Generic array creation.
-    public Range<T>[] subtract(final Range<T> range) {
+    public Range<?>[] subtract(final Range<?> range) throws IllegalArgumentException {
+        return subtractNC(ensureCompatible(range));
+    }
+
+    /**
+     * Implementation of {@link #subtract(Range)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final Range<T>[] subtractNC(final Range<? extends T> range) throws IllegalArgumentException {
         final Range<T> subtract;
         if (!intersects(range)) {
             subtract = this;
@@ -321,32 +409,44 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
                 if (clipMax) {
                     // The given range contains fully this range.
                     assert range.contains(this) : range;
-                    return new Range[0];
+                    return newArray(0);
                 }
                 subtract = create(range.maxValue, !range.isMaxIncluded, maxValue, isMaxIncluded);
             } else {
                 if (!clipMax) {
-                    return new Range[] {
-                        create(minValue, isMinIncluded, range.minValue, !range.isMinIncluded),
-                        create(range.maxValue, !range.isMaxIncluded, maxValue, isMaxIncluded)
-                    };
+                    final Range<T>[] array = newArray(2);
+                    array[0] = create(minValue, isMinIncluded, range.minValue, !range.isMinIncluded);
+                    array[1] = create(range.maxValue, !range.isMaxIncluded, maxValue, isMaxIncluded);
+                    return array;
                 }
                 subtract = create(minValue, isMinIncluded, range.minValue, !range.isMinIncluded);
             }
         }
         assert contains(subtract) : subtract;
         assert !subtract.intersects(range) : subtract;
-        return new Range[] {subtract};
+        final Range<T>[] array = newArray(1);
+        array[0] = subtract;
+        return array;
     }
 
     /**
      * Returns the union of this range with the given range.
      *
+     * @throws IllegalArgumentException is the given range can not be converted to a valid type
+     *         through widening conversion.
+     *
      * @see javax.media.jai.util.Range#union
      */
-    public Range<T> union(final Range<T> range) {
-        ensureCompatible(range);
-        final Range<T> union, min, max;
+    public Range<?> union(final Range<?> range) throws IllegalArgumentException {
+        return unionNC(ensureCompatible(range));
+    }
+
+    /**
+     * Implementation of {@link #union(Range)} to be invoked directly by subclasses.
+     * "NC" stands for "No Cast" - this method do not try to cast the value to a compatible type.
+     */
+    final Range<?> unionNC(final Range<? extends T> range) throws IllegalArgumentException {
+        final Range<? extends T> union, min, max;
         min = compareMinTo(range.minValue, range.isMinIncluded ? 0 : +1) > 0 ? range : this;
         max = compareMaxTo(range.maxValue, range.isMaxIncluded ? 0 : -1) < 0 ? range : this;
         if (min == max) {
@@ -479,6 +579,13 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
     }
 
     /**
+     * To be overriden by {@link MeasurementRange} only.
+     */
+    Unit getUnits() {
+        return null;
+    }
+
+    /**
      * Returns a string representation of this range.
      */
     @Override
@@ -500,6 +607,10 @@ public class Range<T extends Comparable<? super T>> implements Serializable  {
             buffer.append(maxValue);
         }
         buffer.append(isMaxIncluded ? ']' : ')');
+        final Unit units = getUnits();
+        if (units != null) {
+            buffer.append(' ').append(units);
+        }
         return buffer.toString();
     }
 }

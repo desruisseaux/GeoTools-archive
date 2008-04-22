@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +61,6 @@ import org.opengis.go.display.primitive.Graphic;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.DerivedCRS;
 
-import org.geotools.util.RangeSet;
 import org.geotools.resources.GraphicsUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.i18n.Vocabulary;
@@ -70,6 +68,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.util.RangeSet;
+import org.geotools.util.Range;
 
 
 /**
@@ -122,7 +122,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
      *
      * @see #setOffscreenBuffered
      */
-    private RangeSet offscreenZRanges;
+    private RangeSet<Double> offscreenZRanges;
 
     /**
      * Statistics about rendering. Used for logging messages only.
@@ -153,7 +153,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
      */
     private final class ComponentListener extends ComponentAdapter {
         /** Invoked when the component's size changes. */
-        public void componentResized(final ComponentEvent event) {
+        @Override public void componentResized(final ComponentEvent event) {
             synchronized (BufferedCanvas2D.this) {
                 checkDisplayBounds();
                 zoomChanged(null);
@@ -161,7 +161,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
         }
 
         /** Invoked when the component's position changes. */
-        public void componentMoved(final ComponentEvent event) {
+        @Override public void componentMoved(final ComponentEvent event) {
             synchronized (BufferedCanvas2D.this) {
                 checkDisplayBounds();
                 zoomChanged(null); // Translation term has changed.
@@ -169,7 +169,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
         }
 
         /** Invoked when the component has been made invisible. */
-        public void componentHidden(final ComponentEvent event) {
+        @Override public void componentHidden(final ComponentEvent event) {
             synchronized (BufferedCanvas2D.this) {
                 clearCache();
             }
@@ -198,6 +198,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
      * If no title were {@linkplain #setTitle explicitly set}, then
      * this method returns the title of the window which contains this canvas.
      */
+    @Override
     public String getTitle() {
         String title = super.getTitle();
         if (title == null) {
@@ -227,6 +228,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
      * @see JComponent#getDefaultLocale
      * @see Locale#getDefault
      */
+    @Override
     public Locale getLocale() {
         if (owner != null) try {
             return owner.getLocale();
@@ -244,6 +246,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
      * If no bounds were {@linkplain #setDisplayBounds explicitly set}, then this method
      * returns the {@linkplain Component#getBounds() widget bounds}.
      */
+    @Override
     public synchronized Shape getDisplayBounds() {
         Shape bounds = super.getDisplayBounds();
         if (bounds.equals(XRectangle2D.INFINITY) && owner!=null) {
@@ -264,6 +267,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Graphic add(Graphic graphic) {
         graphic = super.add(graphic);
         flushOffscreenBuffer(graphic.getZOrderHint());
@@ -274,6 +278,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
     /**
      * Removes the given {@code Graphic} from this canvas.
      */
+    @Override
     public synchronized void remove(final Graphic graphic) {
         repaint(); // Must be invoked first
         flushOffscreenBuffer(graphic.getZOrderHint());
@@ -283,6 +288,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
     /**
      * Remove all graphics from this canvas.
      */
+    @Override
     public synchronized void removeAll() {
         repaint(); // Must be invoked first
         flushOffscreenBuffers();
@@ -292,6 +298,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
     /**
      * Invoked automatically when a graphic registered in this canvas changed.
      */
+    @Override
     protected void graphicPropertyChanged(final AbstractGraphic graphic,
                                           final PropertyChangeEvent event)
     {
@@ -529,7 +536,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
                             break;
                         }
                     }
-                    assert offscreenZRanges.indexOfRange(new Double(zOrder)) == offscreenIndex;
+                    assert offscreenZRanges.indexOfRange(Double.valueOf(zOrder)) == offscreenIndex;
                     /*
                      * We have found the begining of a range to be rendered using offscreen
                      * buffer. Search the index of the last graphic in this range, exclusive.
@@ -851,6 +858,7 @@ renderOffscreen:while (true) {
      * @todo Rename as {@code scaleChanged} and expect a {@code ScaleChangeEvent} argument with
      *       old and new scale, affine transform change and affine transform change scaled.
      */
+    @Override
     protected void zoomChanged(final AffineTransform change) {
         if (change!=null && change.isIdentity()) {
             return;
@@ -895,7 +903,7 @@ renderOffscreen:while (true) {
      */
     public synchronized ImageType getOffscreenBuffered(final double zOrder) {
         if (offscreenZRanges != null) {
-            final int index = offscreenZRanges.indexOfRange(new Double(zOrder));
+            final int index = offscreenZRanges.indexOfRange(Double.valueOf(zOrder));
             if (index >= 0) {
                 return offscreenIsVolatile[index] ? ImageType.VOLATILE : ImageType.BUFFERED;
             }
@@ -908,7 +916,7 @@ renderOffscreen:while (true) {
      * {@linkplain Graphic#getZOrderHint z-order}.
      */
     private void setOffscreenBuffered(final double zOrder, final ImageType type) {
-        final int index = offscreenZRanges.indexOfRange(new Double(zOrder));
+        final int index = offscreenZRanges.indexOfRange(Double.valueOf(zOrder));
         if (index >= 0) {
             offscreenIsVolatile[index] = ImageType.VOLATILE.equals(type);
         }
@@ -943,7 +951,7 @@ renderOffscreen:while (true) {
          * Save the references to the old images and their status (type, need repaint, etc.).
          * We will try to reuse existing images after the range set has been updated.
          */
-        final Map       oldIndexMap;
+        final Map<Range,Integer> oldIndexMap;
         final Image[]   oldBuffers = offscreenBuffers;
         final boolean[] oldTypes   = offscreenIsVolatile;
         final boolean[] oldNeeds   = offscreenNeedRepaint;
@@ -951,13 +959,13 @@ renderOffscreen:while (true) {
             if (ImageType.NONE.equals(type)) {
                 return;
             }
-            offscreenZRanges = new RangeSet(Double.class);
-            oldIndexMap      = Collections.EMPTY_MAP;
+            offscreenZRanges = new RangeSet<Double>(Double.class);
+            oldIndexMap      = Collections.emptyMap();
         } else {
             int index=0;
-            oldIndexMap = new HashMap();
-            for (final Iterator it=offscreenZRanges.iterator(); it.hasNext();) {
-                if (oldIndexMap.put(it.next(), new Integer(index++)) != null) {
+            oldIndexMap = new HashMap<Range,Integer>();
+            for (final Range<Double> range : offscreenZRanges) {
+                if (oldIndexMap.put(range, Integer.valueOf(index++)) != null) {
                     throw new AssertionError(); // Should not happen
                 }
             }
@@ -980,14 +988,15 @@ renderOffscreen:while (true) {
         offscreenIsVolatile  = new boolean[offscreenBuffers.length];
         offscreenNeedRepaint = new boolean[offscreenBuffers.length];
         int index = 0;
-        for (final Iterator it=offscreenZRanges.iterator(); it.hasNext(); index++) {
-            final Integer oldInteger = (Integer) oldIndexMap.remove(it.next());
+        for (final Range<Double> range : offscreenZRanges) {
+            final Integer oldInteger = oldIndexMap.remove(range);
             if (oldInteger != null) {
-                final int oldIndex = oldInteger.intValue();
+                final int oldIndex = oldInteger;
                 offscreenBuffers    [index] = oldBuffers[oldIndex];
                 offscreenIsVolatile [index] = oldTypes  [oldIndex];
                 offscreenNeedRepaint[index] = oldNeeds  [oldIndex];
             }
+            index++;
         }
         assert index == offscreenBuffers.length : index;
         setOffscreenBuffered(lower, lowerType);
@@ -995,8 +1004,8 @@ renderOffscreen:while (true) {
         /*
          * Release resources used by remaining (now unused) images.
          */
-        for (final Iterator it=oldIndexMap.values().iterator(); it.hasNext();) {
-            final Image image = oldBuffers[((Integer) it.next()).intValue()];
+        for (final Integer i : oldIndexMap.values()) {
+            final Image image = oldBuffers[i];
             if (image != null) {
                 image.flush();
             }
@@ -1012,7 +1021,7 @@ renderOffscreen:while (true) {
      */
     private void flushOffscreenBuffer(final double zOrder) {
         if (offscreenZRanges != null) {
-            final int index = offscreenZRanges.indexOfRange(new Double(zOrder));
+            final int index = offscreenZRanges.indexOfRange(Double.valueOf(zOrder));
             if (index >= 0) {
                 offscreenNeedRepaint[index] = true;
             }
@@ -1038,6 +1047,7 @@ renderOffscreen:while (true) {
     /**
      * Returns extended information to print for the given graphic in the {@link #toString} method.
      */
+    @Override
     String toStringExt(final Graphic graphic) {
         final ImageType type = getOffscreenBuffered(graphic.getZOrderHint());
         return ImageType.NONE.equals(type) ? super.toStringExt(graphic) : type.name();
@@ -1049,6 +1059,7 @@ renderOffscreen:while (true) {
      * for a while. Note that this method doesn't changes the renderer setting; it will just slow
      * down the first rendering after this method call.
      */
+    @Override
     protected void clearCache() {
         flushOffscreenBuffers();
         if (offscreenBuffers != null) {
@@ -1063,6 +1074,7 @@ renderOffscreen:while (true) {
      * of referencing a canvas or any of its graphics after a call to {@code dispose()}
      * are undefined.
      */
+    @Override
     public void dispose() {
         flushOffscreenBuffers();
         offscreenZRanges     = null;

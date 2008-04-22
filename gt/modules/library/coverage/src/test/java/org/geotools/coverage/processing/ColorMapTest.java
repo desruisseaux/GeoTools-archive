@@ -135,7 +135,7 @@ public class ColorMapTest extends TestCase {
      * Applies a relative range.
      */
     public void testRelativeRange() {
-        map.setRelativeRange("Temperature", new NumberRange(20, 70));
+        map.setRelativeRange("Temperature", NumberRange.create(20, 70));
         assertSame(band, map.recolor(band, ARGB));
         assertEquals(Color.GRAY  .getRGB(), ARGB[  0]);
         assertEquals(Color.GREEN .getRGB(), ARGB[  1]);
@@ -153,7 +153,7 @@ public class ColorMapTest extends TestCase {
      * Applies a geophysics range.
      */
     public void testGeophysicsRange() {
-        map.setGeophysicsRange("Temperature", new MeasurementRange(5, 20, SI.CELSIUS));
+        map.setGeophysicsRange("Temperature", MeasurementRange.create(5, 20, SI.CELSIUS));
         assertSame(band, map.recolor(band, ARGB));
         assertEquals(Color.GRAY  .getRGB(), ARGB[  0]);
         assertEquals(Color.GREEN .getRGB(), ARGB[  1]);

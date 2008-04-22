@@ -17,7 +17,6 @@
 package org.geotools.util;
 
 import java.util.Date;
-import javax.media.jai.util.Range;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.Converter;
@@ -35,7 +34,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DateRange extends Range {
+public class DateRange extends Range<Date> {
     /**
      * For cross-version compatibility.
      */
@@ -69,7 +68,7 @@ public class DateRange extends Range {
      * @throws ConversionException if the given range doesn't have a
      *         {@linkplain MeasurementRange#getUnits unit} compatible with milliseconds.
      */
-    public DateRange(final MeasurementRange range, final Date origin) throws ConversionException {
+    public DateRange(final MeasurementRange<?> range, final Date origin) throws ConversionException {
         this(range, getConverter(range.getUnits()), origin.getTime());
     }
 
@@ -77,7 +76,7 @@ public class DateRange extends Range {
      * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
      * call in constructors").
      */
-    private DateRange(final MeasurementRange range, final Converter converter, final long origin)
+    private DateRange(final MeasurementRange<?> range, final Converter converter, final long origin)
             throws ConversionException
     {
         super(Date.class,
@@ -108,7 +107,7 @@ public class DateRange extends Range {
      */
     @Override
     public Date getMinValue() {
-        return clone((Date) super.getMinValue());
+        return clone(super.getMinValue());
     }
 
     /**
@@ -116,6 +115,6 @@ public class DateRange extends Range {
      */
     @Override
     public Date getMaxValue() {
-        return clone((Date) super.getMaxValue());
+        return clone(super.getMaxValue());
     }
 }

@@ -36,19 +36,25 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public final class Classes {
     /**
+     * Constants to be used in {@code switch} statements.
+     */
+    public static final byte DOUBLE=8, FLOAT=7, LONG=6, INTEGER=5, SHORT=4, BYTE=3,
+                            CHARACTER=2, BOOLEAN=1, OTHER=0;
+
+    /**
      * Mapping between a primitive type and its wrapper, if any.
      */
     private static final Map<Class<?>,Classes> MAPPING = new HashMap<Class<?>,Classes>(16);
     static {
-        new Classes(Double   .TYPE, Double   .class, true,  false, (byte) Double   .SIZE);
-        new Classes(Float    .TYPE, Float    .class, true,  false, (byte) Float    .SIZE);
-        new Classes(Long     .TYPE, Long     .class, false, true,  (byte) Long     .SIZE);
-        new Classes(Integer  .TYPE, Integer  .class, false, true,  (byte) Integer  .SIZE);
-        new Classes(Short    .TYPE, Short    .class, false, true,  (byte) Short    .SIZE);
-        new Classes(Byte     .TYPE, Byte     .class, false, true,  (byte) Byte     .SIZE);
-        new Classes(Character.TYPE, Character.class, false, false, (byte) Character.SIZE);
-        new Classes(Boolean  .TYPE, Boolean  .class, false, false, (byte) 1);
-        new Classes(Void     .TYPE, Void     .class, false, false, (byte) 0);
+        new Classes(Double   .TYPE, Double   .class, true,  false, (byte) Double   .SIZE, DOUBLE   );
+        new Classes(Float    .TYPE, Float    .class, true,  false, (byte) Float    .SIZE, FLOAT    );
+        new Classes(Long     .TYPE, Long     .class, false, true,  (byte) Long     .SIZE, LONG     );
+        new Classes(Integer  .TYPE, Integer  .class, false, true,  (byte) Integer  .SIZE, INTEGER  );
+        new Classes(Short    .TYPE, Short    .class, false, true,  (byte) Short    .SIZE, SHORT    );
+        new Classes(Byte     .TYPE, Byte     .class, false, true,  (byte) Byte     .SIZE, BYTE     );
+        new Classes(Character.TYPE, Character.class, false, false, (byte) Character.SIZE, CHARACTER);
+        new Classes(Boolean  .TYPE, Boolean  .class, false, false, (byte) 1,              BOOLEAN  );
+        new Classes(Void     .TYPE, Void     .class, false, false, (byte) 0,              OTHER    );
     }
 
     /** The primitive type.                     */ private final Class<?> primitive;
@@ -56,16 +62,20 @@ public final class Classes {
     /** {@code true} for floating point number. */ private final boolean  isFloat;
     /** {@code true} for integer number.        */ private final boolean  isInteger;
     /** The size in bytes.                      */ private final byte     size;
+    /** Constant to be used in switch statement.*/ private final byte     ordinal;
 
     /**
      * Creates a mapping between a primitive type and its wrapper.
      */
-    private Classes(Class<?> primitive, Class<?> wrapper, boolean isFloat, boolean isInteger, byte size) {
+    private Classes(Class<?> primitive, Class<?> wrapper, boolean isFloat, boolean isInteger,
+                    byte size, byte ordinal)
+    {
         this.primitive = primitive;
         this.wrapper   = wrapper;
         this.isFloat   = isFloat;
         this.isInteger = isInteger;
         this.size      = size;
+        this.ordinal   = ordinal;
         if (MAPPING.put(primitive, this) != null || MAPPING.put(wrapper, this) != null) {
             throw new AssertionError(); // Should never happen.
         }
@@ -73,10 +83,19 @@ public final class Classes {
 
     /**
      * Returns the class of the specified object, or {@code null} if {@code object} is null.
+     * This method is also useful for fetching the class of an object known only by its bound
+     * type. As of Java 6, the usual pattern:
+     *
+     * <blockquote><pre>
+     * Number n = 0;
+     * Class<? extends Number> c = n.getClass();
+     * </pre></blockquote>
+     *
+     * doesn't seem to work if {@link Number} is replaced by a parametired type {@code T}.
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<? extends T> getClass(final T object) {
-        return (object != null) ? (Class) object.getClass() : null;
+        return (object != null) ? (Class<? extends T>) object.getClass() : null;
     }
 
     /**
@@ -271,7 +290,7 @@ compare:for (int i=0; i<c1.length; i++) {
     }
 
     /**
-     * Changes a primitive class to its wrapper (e.g. {@code double} to {@link Double}).
+     * Changes a primitive class to its wrapper (e.g. {@code int} to {@link Integer}).
      * If the specified class is not a primitive type, then it is returned unchanged.
      *
      * @param  type The primitive type (may be {@code null}).
@@ -280,6 +299,28 @@ compare:for (int i=0; i<c1.length; i++) {
     public static Class<?> primitiveToWrapper(final Class<?> type) {
         final Classes mapping = MAPPING.get(type);
         return (mapping != null) ? mapping.wrapper : type;
+    }
+
+    /**
+     * Changes a wrapper class to its primitive (e.g. {@link Integer} to {@code int}).
+     * If the specified class is not a wrapper type, then it is returned unchanged.
+     *
+     * @param  type The wrapper type (may be {@code null}).
+     * @return The type as a primitive.
+     */
+    public static Class<?> wrapperToPrimitive(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) ? mapping.primitive : type;
+    }
+
+    /**
+     * Returns one of {@link #DOUBLE}, {@link #FLOAT}, {@link #LONG}, {@link #INTEGER},
+     * {@link #SHORT}, {@link #BYTE}, {@link #CHARACTER}, {@link #BOOLEAN} or {@link #OTHER}
+     * constants for the given type. This is a commodity for usage in {@code switch} statememnts.
+     */
+    public static byte getEnumConstant(final Class<?> type) {
+        final Classes mapping = MAPPING.get(type);
+        return (mapping != null) ? mapping.ordinal : OTHER;
     }
 
     /**

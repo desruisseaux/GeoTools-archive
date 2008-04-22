@@ -163,7 +163,7 @@ public final class RangeTest {
 
     @Test
     public void testUnionN(){
-        Range<Integer> range;
+        Range<?> range;
 
         range = new Range<Integer>(Integer.class, 0);
         assertEquals(new Range<Integer>(Integer.class, 0), range);

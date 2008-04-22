@@ -36,10 +36,10 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testConversion() {
-        final MeasurementRange range = new MeasurementRange(1000f, 2000f, SI.METER);
+        final MeasurementRange<Float> range = MeasurementRange.create(1000f, 2000f, SI.METER);
         assertSame(range, range.convertTo(SI.METER));
         final Unit KILOMETER = SI.KILO(SI.METER);
-        assertEquals(new MeasurementRange(1f, 2f, KILOMETER), range.convertTo(KILOMETER));
+        assertEquals(MeasurementRange.create(1f, 2f, KILOMETER), range.convertTo(KILOMETER));
     }
 
     /**
@@ -47,7 +47,7 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testIntegerBounds() {
-        final NumberRange range = new NumberRange(10, 20);
+        final NumberRange<Integer> range = NumberRange.create(10, 20);
         assertEquals(10, range.getMinimum(     ), 0);
         assertEquals(10, range.getMinimum(true ), 0);
         assertEquals( 9, range.getMinimum(false), 0);
@@ -61,15 +61,15 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testIntegerIntersect() {
-        NumberRange r1 = new NumberRange(10, 20);
-        NumberRange r2 = new NumberRange(15, 30);
+        NumberRange<Integer> r1 = NumberRange.create(10, 20);
+        NumberRange<Integer> r2 = NumberRange.create(15, 30);
         assertTrue (r1.equals(r1));
         assertTrue (r2.equals(r2));
         assertFalse(r1.equals(r2));
         assertEquals(Integer.class, r1.getElementClass());
         assertEquals(Integer.class, r2.getElementClass());
-        assertEquals(new NumberRange(10, 30), r1.union(r2));
-        assertEquals(new NumberRange(15, 20), r1.intersect(r2));
+        assertEquals(NumberRange.create(10, 30), r1.union(r2));
+        assertEquals(NumberRange.create(15, 20), r1.intersect(r2));
     }
 
     /**
@@ -77,12 +77,12 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testDoubleIntersect() {
-        NumberRange r1 = new NumberRange(10.0, 20.0);
-        NumberRange r2 = new NumberRange(15.0, 30.0);
+        NumberRange<Double> r1 = NumberRange.create(10.0, 20.0);
+        NumberRange<Double> r2 = NumberRange.create(15.0, 30.0);
         assertEquals(Double.class, r1.getElementClass());
         assertEquals(Double.class, r2.getElementClass());
-        assertEquals(new NumberRange(10.0, 30.0), r1.union(r2));
-        assertEquals(new NumberRange(15.0, 20.0), r1.intersect(r2));
+        assertEquals(NumberRange.create(10.0, 30.0), r1.union(r2));
+        assertEquals(NumberRange.create(15.0, 20.0), r1.intersect(r2));
     }
 
     /**
@@ -90,15 +90,15 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testIntegerDoubleIntersect() {
-        NumberRange r1 = new NumberRange(10, 20);
-        NumberRange r2 = new NumberRange(15.0, 30.0);
+        NumberRange<Integer> r1 = NumberRange.create(10, 20);
+        NumberRange<Double>  r2 = NumberRange.create(15.0, 30.0);
         assertEquals(Integer.class, r1.getElementClass());
         assertEquals(Double .class, r2.getElementClass());
-        assertEquals(new NumberRange(10.0, 30.0), r1.union(r2));
-        assertEquals(new NumberRange(15, 20), r1.intersect(r2));
+        assertEquals(NumberRange.create(10.0, 30.0), r1.union(r2));
+        assertEquals(NumberRange.create(15, 20), r1.intersect(r2));
 
-        r2 = new NumberRange(15.5, 30.0);
-        assertEquals(new NumberRange(15.5f, 20.0f), r1.intersect(r2));
+        r2 = NumberRange.create(15.5, 30.0);
+        assertEquals(NumberRange.create(15.5f, 20.0f), r1.intersect(r2));
     }
 
     /**
@@ -106,15 +106,15 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testDoubleIntegerIntersect() {
-        NumberRange r1 = new NumberRange(10.0, 20.0);
-        NumberRange r2 = new NumberRange(15, 30);
+        NumberRange<Double>  r1 = NumberRange.create(10.0, 20.0);
+        NumberRange<Integer> r2 = NumberRange.create(15, 30);
         assertEquals(Double .class, r1.getElementClass());
         assertEquals(Integer.class, r2.getElementClass());
-        assertEquals(new NumberRange(10.0, 30.0), r1.union(r2));
-        assertEquals(new NumberRange(15, 20), r1.intersect(r2));
+        assertEquals(NumberRange.create(10.0, 30.0), r1.union(r2));
+        assertEquals(NumberRange.create(15, 20), r1.intersect(r2));
 
-        r1 = new NumberRange(10.0, 20.5);
-        assertEquals(new NumberRange(15.0f, 20.5f), r1.intersect(r2));
+        r1 = NumberRange.create(10.0, 20.5);
+        assertEquals(NumberRange.create(15.0f, 20.5f), r1.intersect(r2));
     }
 
     /**
@@ -123,14 +123,14 @@ public final class MeasurementRangeTest {
     @Test
     public void testIntersectWithConversion() {
         final Unit KILOMETER = SI.KILO(SI.METER);
-        NumberRange r1 = new MeasurementRange(1000f, 2000f, SI.METER);
-        NumberRange r2 = new MeasurementRange(1.5f, 3f, KILOMETER);
+        NumberRange<Float> r1 = MeasurementRange.create(1000f, 2000f, SI.METER);
+        NumberRange<Float> r2 = MeasurementRange.create(1.5f, 3f, KILOMETER);
         assertEquals(Float.class, r1.getElementClass());
         assertEquals(Float.class, r2.getElementClass());
-        assertEquals(new MeasurementRange(1000f, 3000f, SI.METER ), r1.union    (r2));
-        assertEquals(new MeasurementRange(1f,    3f,    KILOMETER), r2.union    (r1));
-        assertEquals(new MeasurementRange(1500f, 2000f, SI.METER ), r1.intersect(r2));
-        assertEquals(new MeasurementRange(1.5f,  2f,    KILOMETER), r2.intersect(r1));
+        assertEquals(MeasurementRange.create(1000f, 3000f, SI.METER ), r1.union    (r2));
+        assertEquals(MeasurementRange.create(1f,    3f,    KILOMETER), r2.union    (r1));
+        assertEquals(MeasurementRange.create(1500f, 2000f, SI.METER ), r1.intersect(r2));
+        assertEquals(MeasurementRange.create(1.5f,  2f,    KILOMETER), r2.intersect(r1));
     }
 
     /**
@@ -138,7 +138,7 @@ public final class MeasurementRangeTest {
      */
     @Test
     public void testToString() {
-        final MeasurementRange range = new MeasurementRange(10, 20, SI.KILO(SI.METER));
+        final MeasurementRange<Float> range = MeasurementRange.create(10f, 20f, SI.KILO(SI.METER));
         assertEquals("[10.0, 20.0] km", range.toString());
     }
 }

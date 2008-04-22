@@ -145,7 +145,9 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      *         not a concern since the registration usually take place during the
      *         class initialization ("static" constructor).
      */
-    public static synchronized void register(final ClassChanger<?,?> converter) throws IllegalStateException {
+    public static synchronized void register(final ClassChanger<?,?> converter)
+            throws IllegalStateException
+    {
         int i;
         for (i=0; i<changers.length; i++) {
             if (changers[i].source.isAssignableFrom(converter.source)) {
@@ -214,8 +216,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * @return {@code null} if {@code object} was null; otherwise
      *         {@code object} if the supplied object is already an instance
      *         of {@link Number}; otherwise a new number with the numerical value.
-     * @throws ClassNotFoundException if {@code object} is not an instance
-     *         of a registered class.
+     * @throws ClassNotFoundException if {@code object} is not an instance of a registered class.
      */
     @SuppressWarnings("unchecked")
     public static Number toNumber(final Comparable<?> object) throws ClassNotFoundException {
@@ -301,7 +302,9 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * {@link Short}, {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      */
     @SuppressWarnings("unchecked")
-    public static <N extends Number> N cast(final Number n, final Class<N> c) {
+    public static <N extends Number> N cast(final Number n, final Class<N> c)
+            throws IllegalArgumentException
+    {
         if (n==null || n.getClass().equals(c)) {
             return (N) n;
         }
@@ -319,7 +322,9 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * must be instance of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
-    public static Class<? extends Number> getWidestClass(final Number n1, final Number n2) {
+    public static Class<? extends Number> getWidestClass(final Number n1, final Number n2)
+            throws IllegalArgumentException
+    {
         return getWidestClass((n1!=null) ? n1.getClass() : null,
                               (n2!=null) ? n2.getClass() : null);
     }
@@ -331,6 +336,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      */
     public static Class<? extends Number> getWidestClass(final Class<? extends Number> c1,
                                                          final Class<? extends Number> c2)
+            throws IllegalArgumentException
     {
         if (c1 == null) return c2;
         if (c2 == null) return c1;
@@ -344,6 +350,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      */
     public static Class<? extends Number> getFinestClass(final Class<? extends Number> c1,
                                                          final Class<? extends Number> c2)
+            throws IllegalArgumentException
     {
         if (c1 == null) return c2;
         if (c2 == null) return c1;
@@ -354,7 +361,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * Returns the smallest class capable to hold the specified value.
      */
     public static Class<? extends Number> getFinestClass(final double value) {
-        final long lg = (long)value;
+        final long lg = (long) value;
         if (value == lg) {
             if (lg >=    Byte.MIN_VALUE  &&  lg <=    Byte.MAX_VALUE) return    Byte.class;
             if (lg >=   Short.MIN_VALUE  &&  lg <=   Short.MAX_VALUE) return   Short.class;
@@ -371,7 +378,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     /**
      * Returns the rank (in the {@link #TYPES_BY_SIZE} array) of the specified class.
      */
-    private static int getRank(final Class<? extends Number> c) {
+    private static int getRank(final Class<? extends Number> c) throws IllegalArgumentException {
         for (int i=0; i<TYPES_BY_SIZE.length; i++) {
             if (TYPES_BY_SIZE[i].isAssignableFrom(c)) {
                 return i;

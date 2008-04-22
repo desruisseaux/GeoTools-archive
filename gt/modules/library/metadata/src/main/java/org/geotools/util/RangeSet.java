@@ -26,12 +26,12 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 import org.opengis.util.Cloneable;
-
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import static org.geotools.resources.Classes.*;
 
 
 /**
@@ -43,7 +43,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Consequently, ranges returned by {@link #iterator} may not be the same than added ranges.
  * <p>
  * All entries in this set can be seen as {@link Range} objects.
- * This class is not thread-safe.
+ * This class is <strong>not</strong> thread-safe.
  *
  * @since 2.0
  * @source $URL$
@@ -51,13 +51,13 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  * @author Andrea Aime
  */
-public class RangeSet extends AbstractSet<Range>
-        implements SortedSet<Range>, Cloneable, Serializable
+public class RangeSet<T extends Comparable<? super T>> extends AbstractSet<Range<T>>
+        implements SortedSet<Range<T>>, Cloneable, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3222336180818126987L;
+    private static final long serialVersionUID = 2439002271813328080L;
 
     /**
      * The comparator for ranges. Defined only in order to comply to {@link #comparator}
@@ -70,77 +70,53 @@ public class RangeSet extends AbstractSet<Range>
             int cmax = r1.getMaxValue().compareTo(r2.getMaxValue());
             if (cmin == 0) cmin = (r1.isMinIncluded() ? -1 : 0) - (r2.isMinIncluded() ? -1 : 0);
             if (cmax == 0) cmax = (r1.isMaxIncluded() ? +1 : 0) - (r2.isMaxIncluded() ? +1 : 0);
-            if (cmin==cmax) return cmax; // Easy case: min and max are both greater, smaller or eq.
-            if (cmin==0)    return cmax; // Easy case: only max value differ.
-            if (cmax==0)    return cmin; // Easy case: only min value differ.
+            if (cmin == cmax) return cmax; // Easy case: min and max are both greater, smaller or eq.
+            if (cmin == 0)    return cmax; // Easy case: only max value differ.
+            if (cmax == 0)    return cmin; // Easy case: only min value differ.
             // One range is included in the other.
             throw new IllegalArgumentException("Unordered ranges");
         }
     };
 
     /**
-     * Tableau de correspondances  entre  les type primitifs
-     * et leurs "wrappers". Les classes aux index pairs sont
-     * les types primitifs, tandis que les classes aux index
-     * impairs sont leurs "wrappers".
+     * The {@linkplain #getElementClass element class} of ranges.
      */
-    private static final Class<?>[] PRIMITIVES = {
-        Double   .TYPE,    Double   .class,
-        Float    .TYPE,    Float    .class,
-        Long     .TYPE,    Long     .class,
-        Integer  .TYPE,    Integer  .class,
-        Short    .TYPE,    Short    .class,
-        Byte     .TYPE,    Byte     .class,
-        Character.TYPE,    Character.class
-    };
+    private final Class<T> elementClass;
 
     /**
-     * The primitive types, as an index in the {@link #PRIMITIVES} array divided by 2.
+     * Identical to {@code elementClass} except if the later is a {@link Number} subclass.
+     * In the later case, this field is set to <code>{@link Number}.class</code>.
      */
-    private static final byte DOUBLE=0, FLOAT=1, LONG=2, INTEGER=3, SHORT=4, BYTE=5, CHARACTER=6,
-                              OTHER = -1;
+    private final Class<?> relaxedClass;
 
     /**
-     * Le type des données de l'intervalle.  Il s'agit du type
-     * qui sera spécifié aux objets {@link Range} représentant
-     * un intervalle.
+     * Identical to {@code elementClass} except if the later is the wrapper of some
+     * primitive type. In the later case this field is set to that primitive type.
+     * This is the type to be used in arrays.
      */
-    private final Class<?> type;
-
-    /**
-     * Ce champ a une valeur identique à {@code type}, sauf
-     * si {@code elementType} est un type primitif. Dans ce
-     * cas, il sera <code>{@link Number}.class</code>.
-     */
-    private final Class<?> relaxedType;
-
-    /**
-     * Le type des données utilisé dans le tableau {@code array}.
-     * Il s'agira souvent du même type que {@code type}, sauf si
-     * ce dernier était le "wrapper" d'un des types primitifs du Java.
-     * Dans ce cas, {@code elementType} sera ce type primitif.
-     */
-    private final Class<?> elementType;
+    private final Class<?> arrayElementClass;
 
     /**
      * The primitive type, as one of {@code DOUBLE}, {@code FLOAT}, {@code LONG},
      * {@code INTEGER}, {@code SHORT}, {@code BYTE}, {@code CHARACTER} or
      * {@code OTHER} enumeration.
      */
-    private final byte indexType;
+    private final byte arrayElementCode;
 
     /**
      * Tableau d'intervalles.   Il peut s'agir d'un tableau d'un des types primitifs
      * du Java   (par exemple {@code int[]} ou {@code float[]}),   ou d'un
      * tableau de type {@code Comparable[]}. Les éléments de ce tableau doivent
      * obligatoirement être en ordre strictement croissant et sans doublon.
-     * <br><br>
+     * <p>
      * La longueur de ce tableau est le double du nombre d'intervalles.  Il aurait
      * été plus efficace d'utiliser une variable séparée  (pour ne pas être obligé
      * d'agrandir ce tableau à chaque ajout d'un intervalle), mais malheureusement
      * le J2SE 1.4 ne nous fournit pas de méthode {@code Arrays.binarySearch}
      * qui nous permettent de spécifier les limites du tableau  (voir RFE #4306897
      * à http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
+     *
+     * @todo Revisit when we will be allowed to compile for Java 6.
      */
     private Object array;
 
@@ -153,7 +129,7 @@ public class RangeSet extends AbstractSet<Range>
 
     /**
      * {@code true} if and only if the element class represents a primitive type.
-     * This is equivalents to {@code elementType.isPrimitive()} and is computed
+     * This is equivalents to {@code primitiveType.isPrimitive()} and is computed
      * once for ever for performance reason.
      */
     private final boolean isPrimitive;
@@ -173,69 +149,57 @@ public class RangeSet extends AbstractSet<Range>
     private final boolean isNumeric;
 
     /**
-     * Construct an empty set of range.
+     * Constructs an empty set of range.
      *
      * @param  type The class of the range elements. It must be a primitive
      *         type or a class implementing {@link Comparable}.
      * @throws IllegalArgumentException if {@code type} is not a
      *         primitive type or a class implementing {@link Comparable}.
      */
-    public RangeSet(Class<?> type) throws IllegalArgumentException {
-        // If 'type' is a primitive type,
-        // find the corresponding wrapper.
-        byte indexType = OTHER;
-        for (int i=0; i<PRIMITIVES.length; i+=2) {
-            if (PRIMITIVES[i].equals(type)) {
-                type = PRIMITIVES[i+1];
-                indexType = (byte) (i/2);
-                break;
-            }
-        }
+    public RangeSet(final Class<T> type) throws IllegalArgumentException {
         if (!Comparable.class.isAssignableFrom(type)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_COMPARABLE_CLASS_$1, type));
         }
-        Class elementType = ClassChanger.getTransformedClass(type); // e.g. change Date --> Long
+        Class<?> elementType = ClassChanger.getTransformedClass(type); // e.g. change Date --> Long
         useClassChanger   = (elementType != type);
-        // If 'elementType' is a wrapper class,
-        // find the corresponding primitive type.
-        for (int i=0; i<PRIMITIVES.length; i+=2) {
-            if (PRIMITIVES[i+1].equals(elementType)) {
-                elementType = PRIMITIVES[i];
-                indexType = (byte) (i/2);
-                break;
-            }
+        elementClass      = type;
+        arrayElementClass = wrapperToPrimitive(elementType);
+        arrayElementCode  = getEnumConstant(arrayElementClass);
+        isPrimitive       = arrayElementClass.isPrimitive();
+        isNumeric         = Number.class.isAssignableFrom(type);
+        relaxedClass      = isNumeric ? Number.class : type;
+    }
+
+    /**
+     * Converts a value from an arbitrary type to the wrapper of {@link #arrayElementClass}.
+     */
+    private Comparable<?> toArrayElement(Comparable<?> value) {
+        if (!relaxedClass.isInstance(value)) {
+            throw new IllegalArgumentException(value == null ?
+                    Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "value") :
+                    Errors.format(ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), elementClass));
         }
-        this.type        = type;
-        this.indexType   = indexType;
-        this.elementType = elementType;
-        this.isPrimitive = elementType.isPrimitive();
-        this.isNumeric   = Number.class.isAssignableFrom(type);
-        this.relaxedType = isNumeric ? Number.class : type;
-    }
-
-    /**
-     * Returns the {@link #type} as a subtype of {@link Number}.
-     */
-    @SuppressWarnings("unchecked")
-    private Class<? extends Number> getNumericType() {
-        assert Number.class.isAssignableFrom(type) : type;
-        return (Class<? extends Number>) type;
-    }
-
-    /**
-     * Returns the {@link #type} as a subtype of {@link Comparable}.
-     */
-    @SuppressWarnings("unchecked")
-    private Class<? extends Comparable> getComparableType() {
-        assert Comparable.class.isAssignableFrom(type) : type;
-        return (Class<? extends Comparable>) type;
+        if (useClassChanger) try {
+            value = (Comparable) ClassChanger.toNumber(value);
+        } catch (ClassNotFoundException cause) {
+            /*
+             * Should not happen since the constructor should have make sure
+             * that this operation is legal for value of class 'type'.
+             */
+            final ClassCastException exception = new ClassCastException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), elementClass));
+            exception.initCause(cause);
+            throw exception;
+        }
+        return value;
     }
 
     /**
      * Returns the comparator associated with this sorted set.
      */
-    public Comparator<Range> comparator() {
-        return COMPARATOR;
+    @SuppressWarnings("unchecked") // Because we share the same static COMPARATOR instance.
+    public Comparator<Range<T>> comparator() {
+        return (Comparator) COMPARATOR;
     }
 
     /**
@@ -251,70 +215,49 @@ public class RangeSet extends AbstractSet<Range>
      * Returns the number of ranges in this set.
      */
     public int size() {
-        return (array!=null) ? Array.getLength(array)/2 : 0;
+        return (array != null) ? Array.getLength(array)/2 : 0;
     }
 
     /**
-     * Add a range to this set. Range may be added in any order.
-     * If the specified range overlap an existing range, the two
-     * range will be merged as of {@link Range#union}.
-     * <br><br>
-     * Note: current version do not support open interval (i.e.
-     *       {@code Range.is[Min/Max]Included()} must return
-     *       {@code true}). It may be fixed in a future version.
+     * Add a range to this set. Range may be added in any order. If the specified range
+     * overlap an existing range, the two range will be merged as of {@link Range#union}.
+     * <p>
+     * Note: current version do not support open interval (i.e. {@code Range.is[Min/Max]Included()}
+     * must return {@code true}).
      *
-     * @param  range The range to add. The {@code RangeSet} class
-     *         will never modify the supplied {@link Range} object.
+     * @param  range The range to add.
      * @return {@code true} if this set changed as a result of the call.
-     * @throws ClassCastException if the argument is not a {@link Range} object.
      *
      * @todo support open intervals.
      */
     @Override
-    public boolean add(final Range range) throws ClassCastException {
+    public boolean add(final Range<T> range) throws ClassCastException {
         if (!range.isMinIncluded() || !range.isMaxIncluded()) {
-            // TODO: support open intervals.
             throw new UnsupportedOperationException("Open interval not yet supported");
         }
-        return add(range.getMinValue(), range.getMaxValue());
+        return add((Comparable) range.getMinValue(), (Comparable) range.getMaxValue());
     }
 
     /**
-     * Add a range of values to this set. Range may be added in any order.
-     * If the specified range overlap an existing range, the two ranges
-     * will be merged.
+     * Adds a range of values to this set. Range may be added in any order.
+     * If the specified range overlap an existing range, the two ranges will be merged.
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
      * @return {@code true} if this set changed as a result of the call.
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
-    public boolean add(Comparable lower, Comparable upper) throws IllegalArgumentException {
-        if (!relaxedType.isAssignableFrom(lower.getClass())) {
-            throw new IllegalArgumentException(String.valueOf(lower));
-        }
-        if (!relaxedType.isAssignableFrom(upper.getClass())) {
-            throw new IllegalArgumentException(String.valueOf(upper));
-        }
-        @SuppressWarnings("unchecked")
-        final int c = lower.compareTo(upper);
-        if (c > 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
-        }
-        if (useClassChanger) {
-            try {
-                lower = (Comparable) ClassChanger.toNumber(lower);
-                upper = (Comparable) ClassChanger.toNumber(upper);
-            } catch (ClassNotFoundException exception) {
-                // Should not happen, since this operation is legal according the constructor.
-                final ClassCastException e = new ClassCastException(exception.getLocalizedMessage());
-                e.initCause(exception);
-                throw e;
-            }
+    public <N> boolean add(final Comparable<? super N> min, final Comparable<? super N> max)
+            throws IllegalArgumentException
+    {
+        Comparable lower = toArrayElement(min);
+        Comparable upper = toArrayElement(max);
+        if (lower.compareTo(upper) > 0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, min, max));
         }
         if (array == null) {
             modCount++;
-            array = Array.newInstance(elementType, 2);
+            array = Array.newInstance(arrayElementClass, 2);
             Array.set(array, 0, lower);
             Array.set(array, 1, upper);
             return true;
@@ -335,7 +278,7 @@ public class RangeSet extends AbstractSet<Range>
              *             <---^           ^
              *             lower(i=3)   upper(i=5)
              */
-            if (((i0=~i0) & 1) != 0) { // Attention: c'est ~ et non -
+            if (((i0 = ~i0) & 1) != 0) { // Attention: c'est ~ et non -
                 lower = (Comparable) Array.get(array, --i0);
                 i1 = binarySearch(upper);
             } else {
@@ -349,7 +292,7 @@ public class RangeSet extends AbstractSet<Range>
                  *          ^                 ^
                  *       lower(i=2)        upper(i=5)
                  */
-                if (i0!=Array.getLength(array) && (i1=binarySearch(upper))!= ~i0) {
+                if (i0 != Array.getLength(array) && (i1 = binarySearch(upper)) != ~i0) {
                     modCount++;
                     Array.set(array, i0, lower);
                 } else {
@@ -367,7 +310,7 @@ public class RangeSet extends AbstractSet<Range>
                     modCount++;
                     final Object old = array;
                     final int length = Array.getLength(array);
-                    array = Array.newInstance(elementType, length+2);
+                    array = Array.newInstance(arrayElementClass, length+2);
                     System.arraycopy(old,  0, array,  0,          i0);
                     System.arraycopy(old, i0, array, i0+2, length-i0);
                     Array.set(array, i0+0, lower);
@@ -394,8 +337,8 @@ public class RangeSet extends AbstractSet<Range>
              *             ^             ^-->
              *          lower(i=2)     upper(i=5)
              */
-            if (((i1=~i1) & 1) != 0) { // Attention: c'est ~ et non -
-                upper = (Comparable)Array.get(array, i1);
+            if (((i1 = ~i1) & 1) != 0) { // Attention: c'est ~ et non -
+                upper = (Comparable) Array.get(array, i1);
             } else {
                 /*
                  * Si la date de fin ne tombe pas dans une plage déjà
@@ -425,11 +368,11 @@ public class RangeSet extends AbstractSet<Range>
             modCount++;
             final Object old = array;
             final int length = Array.getLength(array);
-            array = Array.newInstance(elementType, length-n);
+            array = Array.newInstance(arrayElementClass, length-n);
             System.arraycopy(old,  0, array,  0, i0);
             System.arraycopy(old, i1, array, i0, length-i1);
         }
-        assert (Array.getLength(array) & 1)==0;
+        assert (Array.getLength(array) & 1) == 0;
         return modCountChk != modCount;
     }
 
@@ -525,28 +468,13 @@ public class RangeSet extends AbstractSet<Range>
      * @return {@code true} if this set changed as a result of the call.
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
-    public boolean remove(Comparable lower, Comparable upper) throws IllegalArgumentException {
-        if (!relaxedType.isAssignableFrom(lower.getClass())) {
-            throw new IllegalArgumentException(String.valueOf(lower));
-        }
-        if (!relaxedType.isAssignableFrom(upper.getClass())) {
-            throw new IllegalArgumentException(String.valueOf(upper));
-        }
-        @SuppressWarnings("unchecked")
-        final int c = lower.compareTo(upper);
-        if (c >= 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
-        }
-        if (useClassChanger) {
-            try {
-                lower = (Comparable) ClassChanger.toNumber(lower);
-                upper = (Comparable) ClassChanger.toNumber(upper);
-            } catch (ClassNotFoundException exception) {
-                // Should not happen, since this operation is legal according the constructor.
-                final ClassCastException e = new ClassCastException(exception.getLocalizedMessage());
-                e.initCause(exception);
-                throw e;
-            }
+    public <N> boolean remove(final Comparable<? super N> min, final Comparable<? super N> max)
+            throws IllegalArgumentException
+    {
+        Comparable lower = toArrayElement(min);
+        Comparable upper = toArrayElement(max);
+        if (lower.compareTo(upper) >= 0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, min, max));
         }
         // if already empty, or range outside the current set, nothing to change
         if (array == null) {
@@ -582,7 +510,7 @@ public class RangeSet extends AbstractSet<Range>
                      */
                     final Object old = array;
                     final int length = Array.getLength(array);
-                    array = Array.newInstance(elementType, length + 2);
+                    array = Array.newInstance(arrayElementClass, length + 2);
                     System.arraycopy(old, 0,  array, 0, i0);
                     System.arraycopy(old, i0, array, i0 + 2, length - i0);
                     Array.set(array, i0 + 0, lower);
@@ -652,7 +580,7 @@ public class RangeSet extends AbstractSet<Range>
             modCount++;
             final Object old = array;
             final int length = Array.getLength(array);
-            array = Array.newInstance(elementType, length - n);
+            array = Array.newInstance(arrayElementClass, length - n);
             System.arraycopy(old, 0, array, 0, i0);
             System.arraycopy(old, i1, array, i0, length - i1);
         }
@@ -741,33 +669,16 @@ public class RangeSet extends AbstractSet<Range>
      *        {@link #toNumber} prior to call this method.
      */
     private int binarySearch(final Comparable value) {
-        switch (indexType) {
-            case DOUBLE:   return Arrays.binarySearch((double[]) array, ((Number)value).doubleValue());
-            case FLOAT:    return Arrays.binarySearch((float []) array, ((Number)value).floatValue ());
-            case LONG:     return Arrays.binarySearch((long  []) array, ((Number)value).longValue  ());
-            case INTEGER:  return Arrays.binarySearch((int   []) array, ((Number)value).intValue   ());
-            case SHORT:    return Arrays.binarySearch((short []) array, ((Number)value).shortValue ());
-            case BYTE:     return Arrays.binarySearch((byte  []) array, ((Number)value).byteValue  ());
-            case CHARACTER:return Arrays.binarySearch((char[]) array,((Character)value).charValue  ());
-            default:       return Arrays.binarySearch((Object[]) array, value);
+        switch (arrayElementCode) {
+            case DOUBLE:   return Arrays.binarySearch((double[]) array, ((Number)    value).doubleValue());
+            case FLOAT:    return Arrays.binarySearch((float []) array, ((Number)    value).floatValue ());
+            case LONG:     return Arrays.binarySearch((long  []) array, ((Number)    value).longValue  ());
+            case INTEGER:  return Arrays.binarySearch((int   []) array, ((Number)    value).intValue   ());
+            case SHORT:    return Arrays.binarySearch((short []) array, ((Number)    value).shortValue ());
+            case BYTE:     return Arrays.binarySearch((byte  []) array, ((Number)    value).byteValue  ());
+            case CHARACTER:return Arrays.binarySearch((char  []) array, ((Character) value).charValue  ());
+            default:       return Arrays.binarySearch((Object[]) array,              value);
         }
-    }
-
-    /**
-     * Wrap the specified value in a number, if needed.
-     */
-    private Comparable toNumber(Comparable value) {
-        assert type.isAssignableFrom(value.getClass()) : value;
-        if (useClassChanger) try {
-            value = (Comparable)ClassChanger.toNumber(value);
-        } catch (ClassNotFoundException exception) {
-            // Should not happen since the constructor should have make sure
-            // that this operation is legal for value of class 'type'.
-            final ClassCastException e = new ClassCastException(value.getClass().getName());
-            e.initCause(exception);
-            throw e;
-        }
-        return value;
     }
 
     /**
@@ -776,11 +687,11 @@ public class RangeSet extends AbstractSet<Range>
      * @param lower The lower value, inclusive.
      * @param upper The upper value, inclusive.
      */
-    private Range newRange(final Comparable lower, final Comparable upper) {
+    private Range<T> newRange(final T lower, final T upper) {
         if (isNumeric) {
-            return new NumberRange(getNumericType(), lower, upper);
+            return new NumberRange(elementClass, lower, upper);
         } else {
-            return new Range(type, lower, upper);
+            return new Range<T>(elementClass, lower, upper);
         }
     }
 
@@ -788,18 +699,16 @@ public class RangeSet extends AbstractSet<Range>
      * Returns the value at the specified index.
      * Even index are lower bounds, while odd index are upper bounds.
      */
-    private Comparable get(final int index) {
+    private T get(final int index) {
         Comparable value = (Comparable) Array.get(array, index);
         if (useClassChanger) try {
-            value = ClassChanger.toComparable((Number)value, getComparableType());
+            value = ClassChanger.toComparable((Number) value, elementClass);
         } catch (ClassNotFoundException exception) {
             // Should not happen, since class type should
             // have been checked by all 'add(...)' methods
-            final ClassCastException e = new ClassCastException(value.getClass().getName());
-            e.initCause(exception);
-            throw e;
+            throw new IllegalStateException(exception);
         }
-        return value;
+        return elementClass.cast(value);
     }
 
     /**
@@ -812,12 +721,12 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      * @throws ClassCastException if range elements are not convertible to numbers.
      */
-    public final double getMinValueAsDouble(int index) throws IndexOutOfBoundsException,
-                                                              ClassCastException
+    public final double getMinValueAsDouble(int index)
+            throws IndexOutOfBoundsException, ClassCastException
     {
         index *= 2;
-        return (isPrimitive) ? Array.getDouble(array, index)
-                             : ((Number) Array.get(array, index)).doubleValue();
+        return (isPrimitive) ? Array.getDouble(array, index) :
+                ((Number) Array.get(array, index)).doubleValue();
     }
 
     /**
@@ -830,12 +739,12 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      * @throws ClassCastException if range elements are not convertible to numbers.
      */
-    public final double getMaxValueAsDouble(int index) throws IndexOutOfBoundsException,
-                                                              ClassCastException
+    public final double getMaxValueAsDouble(int index)
+            throws IndexOutOfBoundsException, ClassCastException
     {
         index = 2*index + 1;
-        return (isPrimitive) ? Array.getDouble(array, index)
-                             : ((Number) Array.get(array, index)).doubleValue();
+        return (isPrimitive) ? Array.getDouble(array, index) :
+                ((Number) Array.get(array, index)).doubleValue();
     }
 
     /**
@@ -846,7 +755,7 @@ public class RangeSet extends AbstractSet<Range>
      * @return The index of the range which contains this value, or -1 if there is no such range.
      */
     public int indexOfRange(final Comparable value) {
-        int index = binarySearch(toNumber(value));
+        int index = binarySearch(toArrayElement(value));
         if (index < 0) {
             // Found an insertion point. Make sure that the insertion
             // point is inside a range (i.e. before the maximum value).
@@ -865,11 +774,12 @@ public class RangeSet extends AbstractSet<Range>
      */
     @Override
     public boolean contains(final Object object) {
-        final Range range = (Range) object;
-        if (type.equals(range.getElementClass())) {
+        @SuppressWarnings("unchecked") // We are going to check just the line after.
+        final Range<T> range = (Range<T>) object;
+        if (elementClass.equals(range.elementClass)) {
             if (range.isMinIncluded() && range.isMaxIncluded()) {
-                final int index = binarySearch(toNumber(range.getMinValue()));
-                if (index>=0 && (index&1)==0) {
+                final int index = binarySearch(toArrayElement(range.getMinValue()));
+                if (index >= 0 && (index & 1)==0) {
                     @SuppressWarnings("unchecked")
                     final int c = get(index+1).compareTo(range.getMaxValue());
                     return c == 0;
@@ -884,7 +794,7 @@ public class RangeSet extends AbstractSet<Range>
      *
      * @throws NoSuchElementException if the set is empty.
      */
-    public Range first() throws NoSuchElementException {
+    public Range<T> first() throws NoSuchElementException {
         if (array!=null && Array.getLength(array)!=0) {
             return newRange(get(0), get(1));
         }
@@ -896,7 +806,7 @@ public class RangeSet extends AbstractSet<Range>
      *
      * @throws NoSuchElementException if the set is empty.
      */
-    public Range last() throws NoSuchElementException {
+    public Range<T> last() throws NoSuchElementException {
         if (array != null) {
             final int length = Array.getLength(array);
             if (length != 0) {
@@ -914,7 +824,7 @@ public class RangeSet extends AbstractSet<Range>
      * @param  upper High endpoint (exclusive) of the sub set.
      * @return A view of the specified range within this sorted set.
      */
-    public SortedSet<Range> subSet(final Range lower, final Range upper) {
+    public SortedSet<Range<T>> subSet(final Range<T> lower, final Range<T> upper) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -925,7 +835,7 @@ public class RangeSet extends AbstractSet<Range>
      * @param  upper High endpoint (exclusive) of the headSet.
      * @return A view of the specified initial range of this sorted set.
      */
-    public SortedSet<Range> headSet(final Range upper) {
+    public SortedSet<Range<T>> headSet(final Range<T> upper) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -936,7 +846,7 @@ public class RangeSet extends AbstractSet<Range>
      * @param  lower Low endpoint (inclusive) of the tailSet.
      * @return A view of the specified final range of this sorted set.
      */
-    public SortedSet<Range> tailSet(final Range lower) {
+    public SortedSet<Range<T>> tailSet(final Range<T> lower) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -945,7 +855,7 @@ public class RangeSet extends AbstractSet<Range>
      * All elements are {@link Range} objects.
      */
     @Override
-    public java.util.Iterator<Range> iterator() {
+    public java.util.Iterator<Range<T>> iterator() {
         return new Iterator();
     }
 
@@ -957,7 +867,7 @@ public class RangeSet extends AbstractSet<Range>
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class Iterator implements java.util.Iterator<Range> {
+    private final class Iterator implements java.util.Iterator<Range<T>> {
         /**
          * Modification count at construction time.
          */
@@ -966,7 +876,7 @@ public class RangeSet extends AbstractSet<Range>
         /**
          * The array length.
          */
-        private int length = (array!=null) ? Array.getLength(array) : 0;
+        private int length = (array != null) ? Array.getLength(array) : 0;
 
         /**
          * Current position in {@link RangeSet#array}.
@@ -977,16 +887,16 @@ public class RangeSet extends AbstractSet<Range>
          * Returns {@code true} if the iteration has more elements.
          */
         public boolean hasNext() {
-            return position<length;
+            return position < length;
         }
 
         /**
          * Returns the next element in the iteration.
          */
-        public Range next() {
+        public Range<T> next() {
             if (hasNext()) {
-                final Comparable lower = get(position++);
-                final Comparable upper = get(position++);
+                final T lower = get(position++);
+                final T upper = get(position++);
                 if (RangeSet.this.modCount != modCount) {
                     // Check it last, in case a change occured
                     // while we was constructing the element.
@@ -1002,9 +912,9 @@ public class RangeSet extends AbstractSet<Range>
          * last element returned by the iterator.
          */
         public void remove() {
-            if (position!=0) {
+            if (position != 0) {
                 if (RangeSet.this.modCount == modCount) {
-                    final Object newArray = Array.newInstance(elementType, length-=2);
+                    final Object newArray = Array.newInstance(arrayElementClass, length-=2);
                     System.arraycopy(array, position, newArray, position-=2, length-position);
                     System.arraycopy(array, 0,        newArray, 0,           position);
                     array = newArray;
@@ -1025,9 +935,9 @@ public class RangeSet extends AbstractSet<Range>
      */
     @Override
     public int hashCode() {
-        int code = type.hashCode();
-        if (array!=null) {
-            for (int i=Array.getLength(array); (i-=8)>=0;) {
+        int code = elementClass.hashCode();
+        if (array != null) {
+            for (int i=Array.getLength(array); (i -= 8) >= 0;) {
                 code = code*37 + Array.get(array, i).hashCode();
             }
         }
@@ -1042,8 +952,8 @@ public class RangeSet extends AbstractSet<Range>
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final RangeSet that = (RangeSet) object;
-            if (Utilities.equals(this.type, that.type)) {
-                switch (indexType) {
+            if (Utilities.equals(this.elementClass, that.elementClass)) {
+                switch (arrayElementCode) {
                     case DOUBLE:   return Arrays.equals((double[])this.array, (double[])that.array);
                     case FLOAT:    return Arrays.equals((float [])this.array, ( float[])that.array);
                     case LONG:     return Arrays.equals((long  [])this.array, (  long[])that.array);
@@ -1063,23 +973,24 @@ public class RangeSet extends AbstractSet<Range>
      */
     @Override
     public RangeSet clone() {
+        final RangeSet set;
         try {
-            final RangeSet set = (RangeSet) super.clone();
-            switch (set.indexType) {
-                case DOUBLE:   set.array = ((double[])set.array).clone(); break;
-                case FLOAT:    set.array = ((float [])set.array).clone(); break;
-                case LONG:     set.array = ((long  [])set.array).clone(); break;
-                case INTEGER:  set.array = ((int   [])set.array).clone(); break;
-                case SHORT:    set.array = ((short [])set.array).clone(); break;
-                case BYTE:     set.array = ((byte  [])set.array).clone(); break;
-                case CHARACTER:set.array = ((char  [])set.array).clone(); break;
-                default:       set.array = ((Object[])set.array).clone(); break;
-            }
-            return set;
+            set = (RangeSet) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(exception);
         }
+        switch (set.arrayElementCode) {
+            case DOUBLE:   set.array = ((double[])set.array).clone(); break;
+            case FLOAT:    set.array = ((float [])set.array).clone(); break;
+            case LONG:     set.array = ((long  [])set.array).clone(); break;
+            case INTEGER:  set.array = ((int   [])set.array).clone(); break;
+            case SHORT:    set.array = ((short [])set.array).clone(); break;
+            case BYTE:     set.array = ((byte  [])set.array).clone(); break;
+            case CHARACTER:set.array = ((char  [])set.array).clone(); break;
+            default:       set.array = ((Object[])set.array).clone(); break;
+        }
+        return set;
     }
 
     /**
