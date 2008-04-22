@@ -19,16 +19,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.process.literal.BufferFactory;
-import org.geotools.process.literal.IntersectionFactory;
-import org.geotools.process.literal.UnionFactory;
 import org.geotools.resources.LazySet;
+import org.geotools.util.NullProgressListener;
 
 
 /**
@@ -66,40 +66,59 @@ public class ProcessFactoryFinder extends FactoryFinder {
     	return new LazySet<ProcessFactory>(getServiceRegistry().getServiceProviders(
         		ProcessFactory.class, null, null));
     }
-    
-    /**
-     * Finds all implementations of BufferFactory which have registered using
-     * the services mechanism, and that have the appropriate libraries on the
-     * classpath.
-     *
-     * @return An iterator over all discovered BufferFactory
-     */
-    public static synchronized Iterator<BufferFactory> getBufferFactory() throws FactoryRegistryException {
-        FactoryRegistry serviceRegistry = getServiceRegistry();
-        return getServiceRegistry().getServiceProviders(BufferFactory.class, null, null);   
-    }    
 
     /**
-     * Finds all implementations of IntersectionFactory which have registered using
-     * the services mechanism, and that have the appropriate libraries on the
-     * classpath.
-     *
-     * @return An iterator over all discovered IntersectionFactory
+     * Look up a Factory by name.
+     * 
+     * @param name Name of Factory
+     * @return ProcessFactory with matching name
      */
-    public static synchronized Iterator<IntersectionFactory> getIntersectsFactory() throws FactoryRegistryException {
-        FactoryRegistry serviceRegistry = getServiceRegistry();
-        return getServiceRegistry().getServiceProviders(IntersectionFactory.class, null, null);   
+    public static synchronized ProcessFactory createProcessFactory( String name){
+        for( ProcessFactory factory : getProcessFactories() ){
+            if( name.equals( factory.getName() )){
+                return factory;
+            }
+        }
+        return null; // go fish
+    }
+    
+    public static synchronized Process createProcess(String name){
+        ProcessFactory factory = createProcessFactory( name );
+        if( factory == null ) return null;
+        
+        return factory.create();
+    }
+    
+    public static synchronized Map<String,Object> execute(String name, Map<String,Object> input ){
+        Process process = createProcess( name );
+        if( process == null ) return null;
+        
+        process.setInput( input );
+        process.process( new NullProgressListener() );
+        
+        return process.getResult();
+    }
+    
+    public static Callable<Map<String,Object>> createCallable( final Process process, final Map<String,Object> input ){        
+        return new Callable<Map<String,Object>>(){
+            public Map<String, Object> call() throws Exception {
+                process.setInput( input );
+                process.process( new NullProgressListener() );
+                return process.getResult();
+            }            
+        };
     }
     
     /**
-     * Finds all implementations of UnionFactory which have registered using
-     * the services mechanism, and that have the appropriate libraries on the
-     * classpath.
-     *
-     * @return An iterator over all discovered UnionFactory
+     * This progress listener checks if the current Thread is interrupted, it
+     * acts as a bridge between Future and ProgressListener code.
+     * 
+     * @author Jody
      */
-    public static synchronized Iterator<UnionFactory> getUnionFactory() throws FactoryRegistryException {
-        FactoryRegistry serviceRegistry = getServiceRegistry();
-        return getServiceRegistry().getServiceProviders(UnionFactory.class, null, null);   
-    }    
+    static class CallableProgressListener extends NullProgressListener {
+        @Override
+        public boolean isCanceled() {
+            return Thread.currentThread().isInterrupted();
+        }
+    }
 }

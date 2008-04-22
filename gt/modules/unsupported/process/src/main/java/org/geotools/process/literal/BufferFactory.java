@@ -90,12 +90,11 @@ public class BufferFactory extends AbstractProcessFactory {
 	}
 
 	public Process create() throws IllegalArgumentException {
-			return new BufferProcess( this );
+	    return new BufferProcess( this );
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "buffer";
 	}
 
 }

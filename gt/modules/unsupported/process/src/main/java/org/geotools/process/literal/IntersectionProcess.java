@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
+import org.geotools.process.impl.SimpleProcess;
 import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.opengis.util.ProgressListener;
@@ -27,67 +28,27 @@ import org.opengis.util.ProgressListener;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Process to intersect 2 geometries
+ * Process to intersect 2 geometries.
+ * <p>
+ * We are treating this as a SimpleProcess (intersection is so quick it is hard
+ * to report progress).
+ * 
  * @author gdavis
  */
-class IntersectionProcess implements Process {
-
-    private IntersectionFactory factory;
-    private Map<String, Object> resultMap;
-    private Map<String, Object> inputMap;
-    private boolean started = false;    
-
+class IntersectionProcess extends SimpleProcess {
     public IntersectionProcess( IntersectionFactory intersectsFactory ) {
-        this.factory = intersectsFactory;
+        super( intersectsFactory );
     }
 
     public ProcessFactory getFactory() {
         return factory;
     }
 
-    public void process(ProgressListener monitor) {
-		if (started) return;
-		
-		started = true;
-		if( monitor == null ) monitor = new NullProgressListener();
-		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
+    public void process() {
+	    Geometry geom1 = (Geometry) get( IntersectionFactory.GEOM1.key );
+        Geometry geom2 = (Geometry) get( IntersectionFactory.GEOM2.key );
         
-    	try {
-            monitor.started();
-            monitor.setTask( Text.text("Grabbing arguments") );
-            monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) inputMap.get( IntersectionFactory.GEOM1.key );
-            Geometry geom2 = (Geometry) inputMap.get( IntersectionFactory.GEOM2.key );
-            
-            monitor.setTask( Text.text("Processing Intersection") );
-            monitor.progress( 25.0f );
-            
-            if( monitor.isCanceled() ){
-                return; // user has canceled this operation
-            }
-            Geometry intersect = geom1.intersection( geom2 );
-            
-            monitor.setTask( Text.text("Encoding result" ));
-            monitor.progress( 90.0f );
-            
-            resultMap.put( IntersectionFactory.RESULT.key, intersect );
-            monitor.complete(); // same as 100.0f
-        }
-        catch (Exception eek){
-            monitor.exceptionOccurred(eek);
-        }
-        finally {
-            monitor.dispose();
-        }
+        result.put( IntersectionFactory.RESULT.key, geom1.intersection( geom2 ) );
     }
-
-	public void setInput(Map<String, Object> input) {
-		// do any validation or pre-processing work here
-		this.inputMap = input;
-	}
-
-	public Map<String, Object> getResult() {
-		return resultMap;
-	}
 
 }

@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
+import org.geotools.process.impl.AbstractProcess;
+import org.geotools.process.impl.AbstractProcessFactory;
 import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.opengis.util.ProgressListener;
@@ -31,34 +33,28 @@ import com.vividsolutions.jts.geom.Geometry;
  * Process for adding a buffer around a geometry
  * @author gdavis
  */
-class BufferProcess implements Process {
-
-    private BufferFactory factory;
-    private Map<String, Object> resultMap;
-    private Map<String, Object> inputMap;
+class BufferProcess extends AbstractProcess {
     private boolean started = false;
     
     public BufferProcess( BufferFactory bufferFactory ) {
-        this.factory = bufferFactory;
+        super( bufferFactory );
     }
 
     public ProcessFactory getFactory() {
         return factory;
     }
 
-	public void process(ProgressListener monitor) {
-		if (started) return;
-		
+	public void process(ProgressListener monitor){
+		if (started) throw new IllegalStateException("Process can only be run once");
 		started = true;
-		if( monitor == null ) monitor = new NullProgressListener();
-		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
 		
+		if( monitor == null ) monitor = new NullProgressListener();		
         try {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            Geometry geom1 = (Geometry) inputMap.get( BufferFactory.GEOM1.key );          
-            Double buffer = (Double) inputMap.get( BufferFactory.BUFFER.key );
+            Geometry geom1 = (Geometry) input.get( BufferFactory.GEOM1.key );          
+            Double buffer = (Double) input.get( BufferFactory.BUFFER.key );
             
             monitor.setTask( Text.text("Processing Buffer") );
             monitor.progress( 25.0f );
@@ -67,12 +63,12 @@ class BufferProcess implements Process {
                 return; // user has canceled this operation
             }
             
-            Geometry result = geom1.buffer(buffer);
+            Geometry resultGeom = geom1.buffer(buffer);
             
             monitor.setTask( Text.text("Encoding result" ));
             monitor.progress( 90.0f );
             
-            resultMap.put( BufferFactory.RESULT.key, result );
+            result.put( BufferFactory.RESULT.key, resultGeom );
             monitor.complete(); // same as 100.0f
 
         }
@@ -81,17 +77,7 @@ class BufferProcess implements Process {
         }
         finally {
             monitor.dispose();
-        }
-		
-	}
-
-	public void setInput(Map<String, Object> input) {
-		// do any validation or pre-processing work here
-		this.inputMap = input;
-	}
-
-	public Map<String, Object> getResult() {
-		return resultMap;
+        }		
 	}
 
 
