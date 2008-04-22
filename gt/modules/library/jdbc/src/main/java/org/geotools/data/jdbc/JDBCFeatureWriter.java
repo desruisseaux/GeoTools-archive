@@ -354,6 +354,20 @@ public class JDBCFeatureWriter implements FeatureWriter<SimpleFeatureType, Simpl
         } else {
             reader.close();
         }
+    }    
+    
+    /**
+     * Encodes the tableName, default is to do nothing, but postgis will
+     * override and put double quotes around the tablename.
+     */
+    protected String encodeName(String tableName) {
+        return tableName;
     }
-
+    
+    /**
+     * Encodes the colName, default just calls {@link #encodeName(String)}.
+     */
+    protected String encodeColumnName(String colName) {
+        return encodeName(colName);
+    }
 }

@@ -268,21 +268,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     }
 
     /**
-     * Encodes the tableName, default is to do nothing, but postgis will
-     * override and put double quotes around the tablename.
-     */
-    protected String encodeName(String tableName) {
-    	return tableName;
-    }
-    
-    /**
-     * Encodes the colName, default just calls {@link #encodeName(String)}.
-     */
-    protected String encodeColumnName(String colName) {
-    	return encodeName(colName);
-    }
-
-    /**
      * Turns a geometry into the textual version needed for the sql statement
      *
      * @param geom
