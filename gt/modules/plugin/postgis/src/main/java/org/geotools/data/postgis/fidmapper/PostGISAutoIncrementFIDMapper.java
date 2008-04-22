@@ -18,6 +18,7 @@ package org.geotools.data.postgis.fidmapper;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
@@ -70,13 +71,26 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
         }
 
         /**
-         * Attempts to determine the FID after it was inserted, using three techniques:
+         * Attempts to determine the FID after it was inserted, using four techniques:
          * 1. SELECT currval(pg_get_serial_sequence(...))
          * 2. SELECT currval(sequence name) <-- using other methods to get name
          * 3. SELECT fid ... ORDER BY fid DESC LIMIT 1
          */
         public String retriveId( Connection conn, SimpleFeature feature, Statement statement )
             throws IOException {
+            //this approach works when using prepared statements through PostgisPSFeatureWriter, 
+            //commenting out until it becomes supported
+//            try {
+//                //may the insert statement being done with "RETURNING pk"?. In that case statement.getResultset() contains the needed information
+//                ResultSet generatedKeys = statement.getResultSet();
+//                if(generatedKeys != null && generatedKeys.next()){
+//                    Object key = generatedKeys.getObject(1);
+//                    return String.valueOf(key);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+            
             ResultSet rs = null;
             if (can_usepg_get_serial_sequence) {
                 try {
@@ -88,9 +102,9 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
                     }
                     sql = sql + getTableName() + "\"','" + getColumnName() + "'))";
                     rs = statement.executeQuery(sql); 
-                    if (rs.next() && rs.getString("currval") != null)
+                    if (rs.next() && rs.getString("currval") != null){
                         return rs.getString("currval");
-                    else {
+                    }else {
                         can_usepg_get_serial_sequence = false;
                     }
                 } catch (Exception e) {
