@@ -39,12 +39,11 @@ public class ChannelSelectionImpl
     }
 
     public SelectedChannelType[] getSelectedChannels() {
-        SelectedChannelType[] ret;
-
-        if (gray == null) {
-            ret = new SelectedChannelType[] { red, green, blue };
-        } else {
-            ret = new SelectedChannelType[] { gray };
+    	SelectedChannelType[] ret=null;
+    	if (gray != null) {
+        	ret = new SelectedChannelType[] { gray };
+        } else if(red!=null||green!=null||blue!=null){
+        	ret = new SelectedChannelType[] { red, green, blue };
         }
 
         return ret;
@@ -86,4 +85,16 @@ public class ChannelSelectionImpl
                 + channels.length);
         }
     }
+
+	public void accept(StyleVisitor visitor) {
+		if(gray!=null)
+			visitor.visit(gray);
+		else
+		{
+			visitor.visit(red);
+			visitor.visit(green);
+			visitor.visit(blue);
+		}
+		
+	}
 }

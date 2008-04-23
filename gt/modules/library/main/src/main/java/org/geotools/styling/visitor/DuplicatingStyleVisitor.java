@@ -37,11 +37,13 @@ import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
+import org.geotools.styling.ImageOutline;
 import org.geotools.styling.LabelPlacement;
 import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.NamedLayer;
+import org.geotools.styling.OverlapBehavior;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
@@ -862,4 +864,30 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         }
 	    pages.push(copy);
     }
+    
+	public void visit(ContrastEnhancement contrastEnhancement) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void visit(ImageOutline outline) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void visit(ChannelSelection cs) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void visit(OverlapBehavior ob) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void visit(SelectedChannelType sct) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void visit(ShadedRelief sr) {
+		// TODO Auto-generated method stub
+		
+	}
 }

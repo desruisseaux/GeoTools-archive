@@ -47,5 +47,7 @@ public interface SelectedChannelType {
 
     public ContrastEnhancement getContrastEnhancement();
 
-    //public Expression getContrastEnhancement();
+    public void accept(StyleVisitor visitor);
+
+    // public Expression getContrastEnhancement();
 }

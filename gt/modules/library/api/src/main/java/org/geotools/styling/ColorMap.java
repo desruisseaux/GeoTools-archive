@@ -56,4 +56,15 @@ public interface ColorMap {
     public void setType(int type);
 
     void accept(StyleVisitor visitor);
+
+    /**
+     * Tells me to use 65536 colors even if 256 could suffice.
+     *
+     * @param extended
+     *            <code>true</code> for using 65536 colors, <code>false</code>
+     *            for using 256.
+     */
+    public void setExtendedColors(boolean extended);
+
+    public boolean getExtendedColors();
 }

@@ -29,6 +29,7 @@ import java.util.List;
 public class ColorMapImpl implements ColorMap {
     private List<ColorMapEntry> list = new ArrayList<ColorMapEntry>();
     private int type = ColorMap.TYPE_RAMP;
+	private boolean extendedColors;
 
     public void addColorMapEntry(ColorMapEntry entry) {
         list.add(entry);
@@ -62,4 +63,13 @@ public class ColorMapImpl implements ColorMap {
     public void accept(StyleVisitor visitor) {
         visitor.visit(this);
     }
+
+	public boolean getExtendedColors() {
+		return extendedColors;
+	}
+
+	public void setExtendedColors(boolean extended) {
+		extendedColors=extended;
+		
+	}
 }

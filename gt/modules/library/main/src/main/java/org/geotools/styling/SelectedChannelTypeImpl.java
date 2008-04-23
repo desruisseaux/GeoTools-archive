@@ -69,4 +69,9 @@ public class SelectedChannelTypeImpl implements SelectedChannelType {
 
         return enhancement;
     }
+
+	public void accept(StyleVisitor visitor) {
+		visitor.visit(this);
+		
+	}
 }

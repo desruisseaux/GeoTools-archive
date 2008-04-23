@@ -101,4 +101,6 @@ public interface ChannelSelection {
      * @return array of channels
      */
     SelectedChannelType[] getSelectedChannels();
+
+    public void accept(StyleVisitor visitor);
 }

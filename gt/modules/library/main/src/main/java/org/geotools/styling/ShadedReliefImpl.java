@@ -81,4 +81,9 @@ public class ShadedReliefImpl implements ShadedRelief {
     public void setReliefFactor(Expression reliefFactor) {
         this.reliefFactor = reliefFactor;
     }
+
+	public void accept(StyleVisitor visitor) {
+		visitor.visit(this);
+		
+	}
 }

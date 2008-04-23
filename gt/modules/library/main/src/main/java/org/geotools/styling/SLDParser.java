@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.filter.ExpressionBuilder;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -1236,6 +1238,30 @@ public class SLDParser {
 	private ColorMap parseColorMap(Node root) {
 		ColorMap symbol = factory.createColorMap();
 		
+		if (root.hasAttributes()) {
+			final NamedNodeMap atts = root.getAttributes();
+			final Node typeAtt = atts.getNamedItem("type");
+			if (typeAtt != null) {
+				final String type = typeAtt.getNodeValue();
+				
+				if ("ramp".equalsIgnoreCase(type)) {
+					symbol.setType(ColorMap.TYPE_RAMP);
+				}
+				else
+				if ("intervals".equalsIgnoreCase(type)) {
+					symbol.setType(ColorMap.TYPE_INTERVALS);
+				}
+				else
+				if ("values".equalsIgnoreCase(type)) {
+					symbol.setType(ColorMap.TYPE_VALUES);
+				}
+				else
+					if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.fine(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,"ColorMapType",type));
+
+			}
+		}
+		
 		NodeList children = root.getChildNodes();
 
 		for (int i = 0; i < children.getLength(); i++) {
@@ -1274,16 +1300,20 @@ public class SLDParser {
 			}
 
 			if (childName.equalsIgnoreCase("SourceChannelName")) {
-				symbol.setChannelName(child.getNodeValue());
+				if (child.getFirstChild() != null && child.getFirstChild().getNodeType() == Node.TEXT_NODE)
+					symbol.setChannelName(child.getFirstChild().getNodeValue());
 			}
 
 			if (childName.equalsIgnoreCase("ContrastEnhancement")) {
-				try {
-					symbol.setContrastEnhancement((Expression) ExpressionBuilder
-							.parse(child.getNodeValue()));
+				symbol.setContrastEnhancement(parseContrastEnhancement(child));
+				
+				/*try {
+					if (child.getFirstChild() != null && child.getFirstChild().getNodeType() == Node.TEXT_NODE)
+						symbol.setContrastEnhancement((Expression) ExpressionBuilder
+								.parse(child.getFirstChild().getNodeValue()));
 				} catch (Exception e) {
 					// TODO: handle exception
-				}
+				}*/
 			}
 		}
 
@@ -1351,10 +1381,18 @@ public class SLDParser {
 				symbol.setHistogram();
 			}
 
+			if (childName.equalsIgnoreCase("Logarithmic")) {
+				symbol.setLogarithmic();
+			}
+
+			if (childName.equalsIgnoreCase("Exponential")) {
+				symbol.setExponential();
+			}
+
 			if (childName.equalsIgnoreCase("GammaValue")) {
 				try {
 					symbol.setGammaValue((Expression) ExpressionBuilder
-							.parse(child.getNodeValue()));
+							.parse(child.getFirstChild().getNodeValue()));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -1386,7 +1424,7 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("ReliefFactor")) {
 				try {
 					symbol.setReliefFactor((Expression) ExpressionBuilder
-							.parse(child.getNodeValue()));
+							.parse(child.getFirstChild().getNodeValue()));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}

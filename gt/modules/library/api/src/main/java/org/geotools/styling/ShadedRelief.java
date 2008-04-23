@@ -79,4 +79,6 @@ public interface ShadedRelief {
      * @return an expression which evaluates to a double.
      */
     public Expression getReliefFactor();
+
+    public void accept(StyleVisitor visitor);
 }

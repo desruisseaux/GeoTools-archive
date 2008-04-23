@@ -435,4 +435,54 @@ public final class ColorUtilities {
         }
         return true;
     }
+
+    /**
+     * Provide the minimum allowe value for a certain data type.
+     * @param dataType the data type to suggest a maximum value for.
+     * @return the data type maximum value for.
+     */
+	public static double getMinimum(int dataType) {
+		switch (dataType) {
+		case DataBuffer.TYPE_BYTE:
+			return 0;
+		case DataBuffer.TYPE_SHORT:
+			return Short.MIN_VALUE;
+		case DataBuffer.TYPE_INT:
+			return Integer.MIN_VALUE;
+		case DataBuffer.TYPE_DOUBLE:
+			return Long.MIN_VALUE;
+		case DataBuffer.TYPE_FLOAT:
+			return -Float.MAX_VALUE;
+
+		default:
+			//@todo
+			throw new IllegalArgumentException();
+
+		}
+	}
+	
+    /**
+     * Provide the maximum allowe value for a certain data type.
+     * @param dataType the data type to suggest a maximum value for.
+     * @return the data type maximum value for.
+     */
+	public static double getMaximum(int dataType) {
+		switch (dataType) {
+		case DataBuffer.TYPE_BYTE:
+			return 255;
+		case DataBuffer.TYPE_SHORT:
+			return Short.MAX_VALUE;
+		case DataBuffer.TYPE_INT:
+			return Integer.MAX_VALUE;
+		case DataBuffer.TYPE_DOUBLE:
+			return Long.MAX_VALUE;
+		case DataBuffer.TYPE_FLOAT:
+			return Float.MAX_VALUE;
+
+		default:
+			//@todo
+			throw new IllegalArgumentException();
+
+		}
+	}
 }

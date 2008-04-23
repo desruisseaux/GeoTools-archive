@@ -100,7 +100,20 @@ public class ContrastEnhancementImpl implements ContrastEnhancement {
         type = filterFactory.literal("NORMALIZE");
     }
 
+    public void setLogarithmic() {
+        type = filterFactory.literal("LOGARITHMIC");
+    }
+
+    public void setExponential() {
+        type = filterFactory.literal("EXPONENTIAL");
+    }
+
     public void setType(Expression type) {
         this.type = type;
     }
+
+	public void accept(StyleVisitor visitor) {
+		visitor.visit(this);
+		
+	}
 }

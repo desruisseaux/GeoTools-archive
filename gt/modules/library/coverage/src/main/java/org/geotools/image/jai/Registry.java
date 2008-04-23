@@ -19,14 +19,18 @@ package org.geotools.image.jai;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.awt.image.renderable.ContextualRenderedImageFactory;
 import java.awt.image.renderable.RenderedImageFactory;
 
 import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptor;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.registry.RIFRegistry;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 import org.geotools.util.logging.Logging;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.AbstractGridCoverage;
 import org.geotools.resources.i18n.Loggings;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -171,7 +175,40 @@ public final class Registry {
     public static void setNativeAccelerationAllowed(final String operation, final boolean allowed) {
     	setNativeAccelerationAllowed(operation, allowed, JAI.getDefaultInstance());
     }
-
+	/**
+	 * Register the "SampleTranscode" image operation to the operation registry
+	 * of the specified JAI instance. This method is invoked by the static
+	 * initializer of {@link GridSampleDimension}.
+	 * @param jai is he {@link JAI} instance in which we ant to register this operation.
+	 * @param descriptor is the {@link OperationDescriptor} for the JAI operation to register.
+	 * @param name is the name of the operation to register.
+	 * @param crif is the rendered image facotry for this operation.
+	 * @return <code>true</code> if everything goes well, <code>false</code> otherwise.
+	 */
+	public static boolean registerRIF(
+			final JAI jai,
+			final OperationDescriptor descriptor,
+			final String name,
+			final ContextualRenderedImageFactory crif) {
+		final OperationRegistry registry = jai.getOperationRegistry();
+		try {
+			registry.registerDescriptor(descriptor);
+			registry.registerFactory(RenderedRegistryMode.MODE_NAME,
+					name, "geotools.org",crif);
+			return true;
+		} catch (IllegalArgumentException exception) {
+			final LogRecord record = Loggings.format(Level.SEVERE,
+					LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, name);
+			// Note: GridSampleDimension is the public class that use this
+			// transcoder.
+			record.setSourceClassName(GridSampleDimension.class.getName());
+			record.setSourceMethodName("<classinit>");
+			record.setThrown(exception);
+			AbstractGridCoverage.LOGGER.log(record);
+		}
+		return false;
+	}
+	
     /**
      * Logs the specified record.
      */

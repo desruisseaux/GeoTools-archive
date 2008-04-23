@@ -20,8 +20,10 @@
 package org.geotools.renderer.shape;
 
 import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
+import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeConstraint;
@@ -29,15 +31,19 @@ import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
+import org.geotools.styling.ImageOutline;
 import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.NamedLayer;
+import org.geotools.styling.OverlapBehavior;
 import org.geotools.styling.PointPlacement;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SelectedChannelType;
+import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleVisitor;
@@ -359,6 +365,36 @@ public class OpacityFinder implements StyleVisitor {
 	}
 
 	public void visit(ColorMapEntry arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(ContrastEnhancement contrastEnhancement) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(ImageOutline outline) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(ChannelSelection cs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(OverlapBehavior ob) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(SelectedChannelType sct) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void visit(ShadedRelief sr) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -29,6 +29,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.gml.producer.FeatureTransformer;
 import org.geotools.referencing.NamedIdentifier;
@@ -38,6 +39,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -278,35 +280,69 @@ public class SLDTransformer extends TransformerBase {
             end("TextSymbolizer");
         }
 
-        public void visit(RasterSymbolizer raster) {
-            if (raster == null) {
-                return;
-            }
+		public void visit(RasterSymbolizer raster) {
+			if (raster == null) {
+				return;
+			}
 
-            start("RasterSymbolizer");
+			start("RasterSymbolizer");
 
-            if (raster.getGeometryPropertyName() != null) {
-                encodeGeometryProperty(raster.getGeometryPropertyName());
-            }
+			if (raster.getGeometryPropertyName() != null) {
+				encodeGeometryProperty(raster.getGeometryPropertyName());
+			}
 
-            if (raster.getOpacity() != null) {
-                start("Opacity");
-                filterTranslator.encode(raster.getOpacity());
-                end("Opacity");
-            }
+			if (raster.getOpacity() != null) {
+				element("Opacity", raster.getOpacity());
+			}
 
-            if (raster.getOverlap() != null) {
-                start("OverlapBehavior");
-                filterTranslator.encode(raster.getOverlap());
-                end("OverlapBehavior");
-            }
+			if (raster.getOverlap() != null) {
+				start("OverlapBehavior");
+				final String pn = ((AttributeExpressionImpl) raster
+						.getOverlap()).getPropertyName();
+				start(pn);
+				end(pn);
+				end("OverlapBehavior");
+			}
 
-            if (raster.getColorMap() != null) {
-        		raster.getColorMap().accept(this);
-            }
+			if (raster.getImageOutline() != null) {
+				start("ImageOutline");
+				raster.getImageOutline().accept(this);
+				end("ImageOutline");
+			}
 
-            end("RasterSymbolizer");
-        }
+			if (raster.getChannelSelection() != null) {
+				start("ChannelSelection");
+				final ChannelSelection cs = raster.getChannelSelection();
+				if (cs.getGrayChannel() != null) {
+					start("GrayChannel");
+					cs.getGrayChannel().accept(this);
+					end("GrayChannel");
+				} else {
+					start("RedChannel");
+					cs.getRGBChannels()[0].accept(this);
+					end("RedChannel");
+
+					start("GreenChannel");
+					cs.getRGBChannels()[1].accept(this);
+					end("GreenChannel");
+
+					start("BlueChannel");
+					cs.getRGBChannels()[2].accept(this);
+					end("BlueChannel");
+				}
+				end("ChannelSelection");
+			}
+
+			if (raster.getColorMap() != null) {
+				raster.getColorMap().accept(this);
+			}
+
+			if (raster.getShadedRelief() != null) {
+				raster.getShadedRelief().accept(this);
+			}
+			
+			end("RasterSymbolizer");
+		}
 
         public void visit(ColorMap colorMap) {
         	ColorMapEntry[] mapEntries = colorMap.getColorMapEntries();
@@ -857,11 +893,85 @@ public class SLDTransformer extends TransformerBase {
                     m.invoke(o, new Object[] { this });
                 } catch (NoSuchMethodException nsme) {
                     throw new IllegalArgumentException("Cannot encode " + o);
-                } catch (Exception e) {
-                    throw new RuntimeException("Internal transformation exception",
-                        e);
-                }
-            }
-        }
-    }
+				} catch (Exception e) {
+					throw new RuntimeException(
+							"Internal transformation exception", e);
+				}
+			}
+		}
+
+		public void visit(ContrastEnhancement ce) {
+			if (ce == null)
+				return;
+			start("ContrastEnhancement");
+			// histogram
+			Literal exp = (Literal) ce.getType();
+			if (exp != null) {
+				final String val = (String) exp.getValue();
+				start(val);
+				end(val);
+			}
+			
+			//gamma
+			exp=(Literal)ce.getGammaValue();
+			if (exp != null) {
+				element("GammaValue", exp);
+			}
+			end("ContrastEnhancement");
+
+		}
+
+		public void visit(ImageOutline outline) {
+			if(outline==null)
+				return;
+			start("ImageOutline");
+			outline.getSymbolizer().accept(this);
+			end("ImageOutline");
+		}
+
+		public void visit(ChannelSelection cs) {
+			if(cs==null)
+				return;
+			start("ChannelSelection");
+			final SelectedChannelType[] sct = cs.getSelectedChannels();
+			for (int i = 0; i < sct.length && sct != null; i++)
+				visit(sct[i]);
+			end("ChannelSelection");
+
+		}
+
+		public void visit(OverlapBehavior ob) {
+			start("OverlapBehavior");
+			final String pn = (String) ob.getValue();
+			start(pn);
+			end(pn);
+			end("OverlapBehavior");
+
+		}
+
+		public void visit(SelectedChannelType sct) {
+			element("SourceChannelName", sct.getChannelName());
+			final ContrastEnhancement ce = sct.getContrastEnhancement();
+			if (ce != null)
+				ce.accept(this);
+
+		}
+
+		public void visit(ShadedRelief sr) {
+			start("ShadedRelief");
+			//brightnessonly
+			if(sr.isBrightnessOnly())
+				element("BrightnessOnly", "true");
+			else
+				element("BrightnessOnly", "false");
+			
+			//relief factor
+			if(sr.getReliefFactor()!=null)
+			{
+				element("ReliefFactor",sr.getReliefFactor());
+			}
+			end("ShadedRelief");
+
+		}
+	}
 }

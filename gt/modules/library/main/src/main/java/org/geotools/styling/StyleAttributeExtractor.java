@@ -483,7 +483,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
     }
 
     public void visit(FeatureTypeConstraint ftc) {
-        // TODO Auto-generated method stub
+        ftc.accept(this);
     }
 
 	public void visit(ColorMap map) {
@@ -495,6 +495,36 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
 	}
 
 	public void visit(ColorMapEntry entry) {
-		// TODO Auto-generated method stub
+		entry.accept(this);
+	}
+
+	public void visit(ContrastEnhancement contrastEnhancement) {
+		// nothing to do
+		
+	}
+
+	public void visit(ImageOutline outline) {
+		// nothing to do
+		
+	}
+
+	public void visit(ChannelSelection cs) {
+		// nothing to do
+		
+	}
+
+	public void visit(OverlapBehavior ob) {
+		// nothing to do
+		
+	}
+
+	public void visit(SelectedChannelType sct) {
+		// nothing to do
+		
+	}
+
+	public void visit(ShadedRelief sr) {
+		// nothing to do
+		
 	}
 }

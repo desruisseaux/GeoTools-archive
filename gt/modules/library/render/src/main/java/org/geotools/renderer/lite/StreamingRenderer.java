@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBicubic;
 import javax.media.jai.InterpolationBilinear;
@@ -65,7 +64,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.Decimator;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -73,7 +71,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -94,6 +91,7 @@ import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.geotools.util.Range;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -105,11 +103,8 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -2238,6 +2233,19 @@ public final class StreamingRenderer implements GTRenderer {
 		return canTransform;
 	}
 
+	public static MathTransform getMathTransform(
+			CoordinateReferenceSystem sourceCRS,
+			CoordinateReferenceSystem destCRS) {
+		try {
+			return CRS.findMathTransform(sourceCRS, destCRS, true);
+		} catch (OperationNotFoundException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+
+		} catch (FactoryException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+		}
+		return null;
+	}
 	
 	private class RenderableFeature {
 		Object content;

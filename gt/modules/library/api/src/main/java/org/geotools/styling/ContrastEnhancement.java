@@ -69,4 +69,10 @@ public interface ContrastEnhancement {
     public void setNormalize();
 
     public void setHistogram();
+
+    public void setLogarithmic();
+
+    public void setExponential();
+
+    public void accept(StyleVisitor visitor);
 }

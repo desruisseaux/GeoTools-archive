@@ -15,8 +15,10 @@
  */
 package org.geotools.image;
 
+// J2SE dependencies
 import java.awt.Image;
 import java.awt.image.*;
+import java.awt.image.renderable.ParameterBlock;
 import java.awt.Color;
 import java.awt.Transparency;
 import java.awt.RenderingHints;
@@ -44,10 +46,14 @@ import java.util.Locale;
 import java.util.logging.Logger;
 import java.lang.reflect.InvocationTargetException;
 
+// Image I/O and JAI dependencies
 import javax.media.jai.*;
 import javax.media.jai.operator.*;
+
+
 import com.sun.media.jai.util.ImageUtil;
 
+// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Arguments;
@@ -364,6 +370,26 @@ public class ImageWorker {
         }
         commonHints.add(new RenderingHints(key,value));
         return this;
+    }
+
+    /**
+     * Set a map of rendering hints  to use for all images to be computed by this class. This method
+     * applies only to the next images to be computed; images already computed before this method
+     * call (if any) will not be affected.
+     * 
+     * <p>
+     * If <code>hints</code> is null we won't modify this list.
+     * @return This ImageWorker
+     * @see #setRenderingHint(RenderingHints)
+     */
+	public final ImageWorker setRenderingHints(final RenderingHints
+			hints) {
+        if (commonHints == null) {
+            commonHints = new RenderingHints(null);
+        }
+        if(hints!=null)
+        	commonHints.add(hints);
+		return this;
     }
 
     /**
@@ -748,32 +774,33 @@ public class ImageWorker {
             return this;
         }
         tileCacheEnabled(false);
-        final int numBands = getNumBands();
-        if ((numBands & 1) == 0) {
-            retainBands(numBands - 1);
-        }
-        forceColorSpaceRGB();
-        final RenderingHints hints = getRenderingHints();
-        if (error) {
-            if (false) {
-                // color quantization, disabled for now.
-                final RenderedOp temp = ColorQuantizerDescriptor.create(image,
-                        ColorQuantizerDescriptor.MEDIANCUT, 254, 200, null, 1, 1, hints);
-                final ImageLayout layout= new ImageLayout();
-                layout.setColorModel(temp.getColorModel());
-                hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-                LookupTableJAI lookup = (LookupTableJAI) temp.getProperty("JAI.LookupTable");
-            }
-            // error diffusion
-            final KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG;
-            final LookupTableJAI colorMap = ColorCube.BYTE_496;
-            image = ErrorDiffusionDescriptor.create(image, colorMap, ditherMask, hints);
-        } else {
-            // ordered dither
-            final KernelJAI[] ditherMask = KernelJAI.DITHER_MASK_443;
-            final ColorCube colorMap = ColorCube.BYTE_496;
-            image = OrderedDitherDescriptor.create(image, colorMap, ditherMask, hints);
-        }
+		if (getNumBands() % 2 == 0)
+			retainBands(getNumBands() - 1);
+		forceColorSpaceRGB();
+		final RenderingHints hints = getRenderingHints();
+		if (error) {
+			// color quantization
+			// final RenderedOp temp = ColorQuantizerDescriptor.create(image,
+			// ColorQuantizerDescriptor.MEDIANCUT, new Integer(254),
+			// new Integer(200), null, new Integer(1), new Integer(1),
+			// getRenderingHints());
+			// final ImageLayout layout= new ImageLayout();
+			// layout.setColorModel(temp.getColorModel());
+			// hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout));
+
+			// error diffusion
+			final KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG;
+			final LookupTableJAI colorMap = ColorCube.BYTE_496;
+			// (LookupTableJAI) temp.getProperty("JAI.LookupTable");
+			image = ErrorDiffusionDescriptor.create(image, colorMap,
+					ditherMask, hints);
+		} else {
+			// ordered dither
+			final KernelJAI[] ditherMask = KernelJAI.DITHER_MASK_443;
+			final ColorCube colorMap = ColorCube.BYTE_496;
+			image = OrderedDitherDescriptor.create(image, colorMap, ditherMask,
+					hints);
+		}
         tileCacheEnabled(true);
         invalidateStatistics();
 
@@ -1083,8 +1110,103 @@ public class ImageWorker {
         assert isColorSpaceRGB();
         return this;
     }
+	
+	/**
+	 * Forces the {@linkplain #image} color model to the
+	 *  IHS color space. If the current color
+	 * space is already of IHS type, then this
+	 * method does nothing. This operation may loose the alpha channel.
+	 * 
+	 * @return this {@link ImageWorker}.
+	 * 
+	 * @see ColorConvertDescriptor
+	 */
+	public final ImageWorker forceColorSpaceIHS() {
+		if (!(image.getColorModel().getColorSpace() instanceof IHSColorSpace)) {
+			forceComponentColorModel();
+			 // Create a ColorModel to convert the image to IHS.
+			final IHSColorSpace ihs = IHSColorSpace.getInstance();
+			final int numBits=image.getColorModel().getComponentSize(0);
+			final ColorModel ihsColorModel = new ComponentColorModel(ihs, new int[] {
+					numBits, numBits, numBits }, false, false, Transparency.OPAQUE,
+					image.getSampleModel().getDataType());
+			// Create a ParameterBlock for the conversion.
+			final ParameterBlock pb = new ParameterBlock();
+			pb.addSource(image);
+			pb.add(ihsColorModel);
+			// Do the conversion.
+			image = JAI.create("colorconvert", pb);
+			invalidateStatistics();
+		}
 
-    /**
+		// All post conditions for this method contract.
+		assert image.getColorModel().getColorSpace() instanceof IHSColorSpace;
+		return this;
+	}
+
+	/**
+	 * Add the bands to the Component Color Model
+	 * 
+	 * @param writeband
+	 *            number of bands after the bandmerge.
+	 * 
+	 * @return this {@link ImageWorker}.
+	 * 
+	 */
+	public final ImageWorker bandMerge(int writeband) {
+		ParameterBlock pb = new ParameterBlock();
+
+		PlanarImage sourceImage = PlanarImage
+				.wrapRenderedImage(getRenderedImage());
+
+		int numBands = sourceImage.getSampleModel().getNumBands();
+
+		// getting first band
+		final RenderedImage firstBand = JAI.create("bandSelect", sourceImage,
+				new int[] { 0 });
+
+		// adding to the image
+		final int length=writeband-numBands;
+		for (int i = 0; i < length; i++) {
+			pb.removeParameters();
+			pb.removeSources();
+
+			pb.addSource(sourceImage);
+			pb.addSource(firstBand);
+			sourceImage = JAI.create("bandmerge", pb);
+
+			pb.removeParameters();
+			pb.removeSources();
+		}
+
+		image = (RenderedImage) sourceImage;
+		invalidateStatistics();
+
+		// All post conditions for this method contract.
+		assert image.getSampleModel().getNumBands() == writeband;
+		return this;
+	}
+	
+	/**
+	 * Perform a BandMerge operation between the underlying image and the provided one.
+	 * 
+	 * @param image
+	 *            to merge with the underlying one.
+	 * @param before <code>true</code> if we want to use first the provided image, <code>false</code>
+	 *  otherwise.
+	 * 
+	 * @return this {@link ImageWorker}.
+	 * 
+	 */
+	public final ImageWorker addBand(RenderedImage image, boolean before) {
+
+		this.image = BandMergeDescriptor.create(this.image, image, this.getRenderingHints());
+		invalidateStatistics();
+
+		return this;
+	}
+
+	/**
      * Forces the {@linkplain #image} color model to the
      * {@linkplain ColorSpace#CS_GRAY GRAYScale color space}. If the current
      * color space is already of {@linkplain ColorSpace#TYPE_GRAY  type}, then
@@ -1154,8 +1276,12 @@ public class ImageWorker {
         if (numColorBands == 1 && hasAlpha) {
             retainFirstBand();
             return this;
-        }
-        /*
+		}			
+		//remove the alpha band
+		if (numColorBands != numBands) {
+			this.retainBands(numBands);
+		}
+		/*
          * We have more than one band. Note that there is no need to remove the
          * alpha band before to apply the "bandCombine" operation - it is
          * suffisient to let the coefficient for the alpha band to the 0 value.
@@ -1657,56 +1783,71 @@ public class ImageWorker {
      * @todo This now should work only if {@code newValue} is 255
      *       and {@code maskValue} is {@code false}.
      */
-    public final ImageWorker mask(RenderedImage mask, final boolean maskValue, int newValue) {
-        /*
-         * Makes sure that the underlying image is indexed.
-         */
-        tileCacheEnabled(false);
-        forceIndexColorModel(true);
-        final RenderingHints hints = new RenderingHints(JAI.KEY_TILE_CACHE, null);
-        /*
-         * special case for newValue == 255 && !maskValue.
-         */
-        if (newValue == 255 && !maskValue) {
-            /*
-             * Build a lookup table in order to make the transparent pixels
-             * equal to 255 and all the others equal to 0.
-             */
-            final byte[] lutData = new byte[256]; // Initially filled to 0.
-            lutData[0] = (byte) 255; // for transparent pixels.
-            final LookupTableJAI lut = new LookupTableJAI(lutData);
-            mask = LookupDescriptor.create(mask, lut, hints);
-            /*
-             * Adding to the other image exploiting the implict clamping.
-             */
-            image = AddDescriptor.create(image, mask, getRenderingHints());
-            tileCacheEnabled(true);
-            invalidateStatistics();
-        } else {
-            // General case. It has to be binary
-            if (!isBinary()) {
-                binarize();
-            }
-            // Now if we mask with 1 we have to invert the mask.
-            if (maskValue) {
-                mask = NotDescriptor.create(mask, new RenderingHints(
-                        JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE));
-            }
-            // And with the image to zero the interested pixels.
-            tileCacheEnabled(false);
-            image = AndDescriptor.create(mask, image, getRenderingHints());
+	public final ImageWorker mask(RenderedImage mask, final boolean maskValue,
+			int newValue) {
 
-            // Add the new value to the mask.
-            mask = AddConstDescriptor.create(mask, new double[] { newValue },
-                    new RenderingHints(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE));
+		/*
+		 * Make sure that the underlying image is indexed.
+		 */
+		tileCacheEnabled(false);
+		forceIndexColorModel(true);
+		final RenderingHints hints = new RenderingHints(JAI.KEY_TILE_CACHE,
+				null);
 
-            // Add the mask to the image to mask with the new value
-            image = AddDescriptor.create(mask, image, getRenderingHints());
-            tileCacheEnabled(true);
-            invalidateStatistics();
-        }
-        return this;
-    }
+		/*
+		 * special case for newValue == 255 && !maskValue.
+		 */
+		if (newValue == 255 && !maskValue) {
+			/*
+			 * Build a lookup table in order to make the transparent pixels
+			 * equal to 255 and all the others equal to 0.
+			 * 
+			 */
+			final byte[] lutData = new byte[256];
+			// mapping all the non-transparent pixels to opaque
+			Arrays.fill(lutData, (byte) 0);
+			// for transparent pixels
+			lutData[0] = (byte) 255;
+			final LookupTableJAI lut = new LookupTableJAI(lutData);
+			mask = LookupDescriptor.create(mask, lut, hints);
+
+			/*
+			 * Adding to the other image exploiting the implict clamping
+			 * 
+			 */
+			image = AddDescriptor.create(image, mask, getRenderingHints());
+			tileCacheEnabled(true);
+			invalidateStatistics();
+			return this;
+		} else {
+			// general case
+
+			// it has to be binary
+			if (!isBinary())
+				binarize();
+
+			// now if we mask with 1 we have to invert the mask
+			if (maskValue)
+				mask = NotDescriptor.create(mask, new RenderingHints(
+						JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE));
+
+			// and with the image to zero the interested pixels
+			tileCacheEnabled(false);
+			image = AndDescriptor.create(mask, image, getRenderingHints());
+
+			// add the new value to the mask
+			mask = AddConstDescriptor.create(mask, new double[] { newValue },
+					new RenderingHints(JAI.KEY_REPLACE_INDEX_COLOR_MODEL,
+							Boolean.FALSE));
+
+			// add the mask to the image to mask with the new value
+			image = AddDescriptor.create(mask, image, getRenderingHints());
+			tileCacheEnabled(true);
+			invalidateStatistics();
+			return this;
+		}
+
+	}
 
     /**
      * Takes two rendered or renderable source images, and adds every pair of pixels, one from
