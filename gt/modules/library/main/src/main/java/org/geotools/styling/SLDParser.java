@@ -919,9 +919,8 @@ public class SLDParser {
         // its
         // siblings will also be parsed
         Node firstChild = child.getFirstChild();
-        final short nodeType = firstChild.getNodeType();
         while (firstChild != null
-                && nodeType != Node.ELEMENT_NODE) {
+                && firstChild.getNodeType() != Node.ELEMENT_NODE) {
             // advance to the first actual element (rather than whitespace)
             firstChild = firstChild.getNextSibling();
         }
@@ -1702,7 +1701,7 @@ public class SLDParser {
     private Stroke parseStroke(Node root) {
         Stroke stroke = factory.getDefaultStroke();
         NodeList list = findElements(((Element) root), "GraphicFill");
-        final int length = list.getLength();
+        int length = list.getLength();
         if (length > 0) {
             LOGGER.finest("stroke: found a graphic fill " + list.item(0));
 
@@ -1728,7 +1727,7 @@ public class SLDParser {
         }
 
         list = findElements(((Element) root), "GraphicStroke");
-
+        length = list.getLength();
         if (length > 0) {
             LOGGER.finest("stroke: found a graphic stroke " + list.item(0));
 
@@ -1754,7 +1753,7 @@ public class SLDParser {
         }
 
         list = findElements(((Element) root), "CssParameter");
-
+        length = list.getLength();
         for (int i = 0; i < length; i++) {
             Node child = list.item(i);
 
@@ -1838,7 +1837,7 @@ public class SLDParser {
 
         Fill fill = factory.getDefaultFill();
         NodeList list = findElements(((Element) root), "GraphicFill");
-        final int length = list.getLength();
+        int length = list.getLength();
         if (length > 0) {
             LOGGER.finest("fill found a graphic fill " + list.item(0));
 
@@ -1864,7 +1863,7 @@ public class SLDParser {
         }
 
         list = findElements(((Element) root), "CssParameter");
-
+        length = list.getLength();
         for (int i = 0; i < length; i++) {
             Node child = list.item(i);
 
@@ -2010,7 +2009,7 @@ public class SLDParser {
 
         Font font = factory.getDefaultFont();
         NodeList list = findElements(((Element) root), "CssParameter");
-        final int length = list.getLength();
+        int length = list.getLength();
         for (int i = 0; i < length; i++) {
             Node child = list.item(i);
 
