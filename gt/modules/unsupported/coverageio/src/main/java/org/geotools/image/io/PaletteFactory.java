@@ -17,7 +17,7 @@
 package org.geotools.image.io;
 
 import java.awt.Color;
-import java.awt.image.IndexColorModel;
+import java.awt.image.IndexColorModel;  // For javadoc
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -54,7 +54,7 @@ import org.geotools.util.CanonicalSet;
  *   028   000   104
  *   026   000   106
  *   025   000   107
- * <i>etc...</i>
+ * <cite>etc...</cite>
  * </pre></blockquote>
  *
  * The number of RGB codes doesn't have to match the target {@linkplain IndexColorModel#getMapSize
@@ -73,6 +73,11 @@ public class PaletteFactory {
      * this file will be used by {@link #getAvailableNames}.
      */
     private static final String LIST_FILE = "list.txt";
+
+    /**
+     * The default sub-directory, relative to the {@code PaletteFactory} class directory.
+     */
+    private static final File DEFAULT_DIRECTORY = new File("colors");
 
     /**
      * The default palette factory.
@@ -99,7 +104,7 @@ public class PaletteFactory {
      * {@code classloader} and {@code loader} can be non-null. If both are {@code null},
      * then loading will occurs from the system current working directory.
      */
-    private final Class loader;
+    private final Class<?> loader;
 
     /**
      * The base directory from which to search for palette definition files.
@@ -149,13 +154,7 @@ public class PaletteFactory {
      */
     public synchronized static PaletteFactory getDefault() {
         if (defaultFactory == null) {
-            defaultFactory = new PaletteFactory(
-            /* fallback factory */ null,
-            /* class loader     */ PaletteFactory.class,
-            /* root directory   */ new File("colors"),
-            /* extension        */ ".pal",
-            /* character set    */ Charset.forName("ISO-8859-1"),
-            /* locale           */ Locale.US);
+            defaultFactory = new PaletteFactory();
             scanForPlugins(null);
         }
         return defaultFactory;
@@ -195,10 +194,63 @@ public class PaletteFactory {
              */
             final PaletteFactory factory = it.next();
             if (existings.add(factory.getClass())) {
-                factory.fallback = defaultFactory;
+                PaletteFactory tail = factory;
+                while (tail.fallback != null) {
+                    tail = tail.fallback;
+                }
+                tail.fallback = defaultFactory;
                 defaultFactory = factory;
             }
         }
+    }
+
+    /**
+     * Constructs a default palette factory using this {@linkplain #getClass object class} for
+     * loading palette definition files. The default directory is {@code "colors"} relative to
+     * the directory of the subclass extending this class. The character encoding is ISO-8859-1
+     * and the locale is {@linkplain Locale#US US}.
+     * <p>
+     * This constructor is protected because is it merely a convenience for subclasses registering
+     * themself as a service in the {@code META-INF/services/org.geotools.image.io.PaletteFactory}
+     * file. Users should invoke {@link #getDefault} instead, which will returns a shared instance
+     * of this class together with any custom factories found on the class path.
+     *
+     * @since 2.5
+     */
+    protected PaletteFactory() {
+        this.classloader = null;
+        this.loader      = getClass();
+        this.directory   = DEFAULT_DIRECTORY;
+        this.extension   = ".pal";
+        this.charset     = Charset.forName("ISO-8859-1");
+        this.locale      = Locale.US;
+    }
+
+    /**
+     * Constructs a palette factory using loading palette definition files in a specific directory.
+     * No {@linkplain ClassLoader class loader} is used for loading the files.
+     *
+     * @param directory The base directory for palette definition files relative to current
+     *                  directory, or {@code null} for {@code "."}.
+     * @param extension File name extension, or {@code null} if there is no extension
+     *                  to add to filename. If non-null, this extension will be automatically
+     *                  appended to filename. It should starts with the {@code '.'} character.
+     * @param charset   The charset to use for parsing files, or {@code null} for the default.
+     * @param locale    The locale to use for parsing files, or {@code null} for the default.
+     *
+     * @since 2.5
+     */
+    public PaletteFactory(final File    directory,
+                          final String  extension,
+                          final Charset charset,
+                          final Locale  locale)
+    {
+        this.classloader = null;
+        this.loader      = null;
+        this.directory   = directory;
+        this.extension   = startWithDot(extension);
+        this.charset     = charset;
+        this.locale      = locale;
     }
 
     /**
@@ -222,18 +274,15 @@ public class PaletteFactory {
     public PaletteFactory(final PaletteFactory fallback,
                           final ClassLoader    loader,
                           final File           directory,
-                                String         extension,
+                          final String         extension,
                           final Charset        charset,
                           final Locale         locale)
     {
-        if (extension!=null && !extension.startsWith(".")) {
-            extension = '.' + extension;
-        }
         this.fallback    = fallback;
         this.classloader = loader;
         this.loader      = null;
         this.directory   = directory;
-        this.extension   = extension;
+        this.extension   = startWithDot(extension);
         this.charset     = charset;
         this.locale      = locale;
     }
@@ -262,22 +311,29 @@ public class PaletteFactory {
      * @since 2.2
      */
     public PaletteFactory(final PaletteFactory fallback,
-                          final Class          loader,
+                          final Class<?>       loader,
                           final File           directory,
-                                String         extension,
+                          final String         extension,
                           final Charset        charset,
                           final Locale         locale)
     {
-        if (extension!=null && !extension.startsWith(".")) {
-            extension = '.' + extension;
-        }
         this.fallback    = fallback;
         this.classloader = null;
         this.loader      = loader;
         this.directory   = directory;
-        this.extension   = extension;
+        this.extension   = startWithDot(extension);
         this.charset     = charset;
         this.locale      = locale;
+    }
+
+    /**
+     * Ensures that the given string starts with a dot.
+     */
+    private static String startWithDot(String extension) {
+        if (extension != null && !extension.startsWith(".")) {
+            extension = '.' + extension;
+        }
+        return extension;
     }
 
     /**

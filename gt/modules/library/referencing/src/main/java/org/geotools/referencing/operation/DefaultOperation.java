@@ -39,6 +39,7 @@ import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.util.UnsupportedImplementationException;
 
 
@@ -202,21 +203,28 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      * @throws UnsupportedImplementationException if the math transform implementation do not
      *         provide information about parameters.
      */
-    private static ParameterValueGroup getParameterValues(final MathTransform mt,
+    private static ParameterValueGroup getParameterValues(MathTransform mt,
             final ParameterDescriptorGroup descriptor, boolean required)
     {
-        if (mt instanceof ConcatenatedTransform) {
-            final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
-            final ParameterValueGroup param1 = getParameterValues(ct.transform1, descriptor, false);
-            final ParameterValueGroup param2 = getParameterValues(ct.transform2, descriptor, false);
-            if (param1==null && param2!=null) return param2;
-            if (param2==null && param1!=null) return param1;
-            required = true;
-        }
-        if (mt instanceof AbstractMathTransform) {
-            final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
-            if (param != null) {
-                return param;
+        while (mt != null) {
+            if (mt instanceof ConcatenatedTransform) {
+                final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
+                final ParameterValueGroup param1 = getParameterValues(ct.transform1, descriptor, false);
+                final ParameterValueGroup param2 = getParameterValues(ct.transform2, descriptor, false);
+                if (param1 == null && param2 != null) return param2;
+                if (param2 == null && param1 != null) return param1;
+                required = true;
+            }
+            if (mt instanceof AbstractMathTransform) {
+                final ParameterValueGroup param = ((AbstractMathTransform) mt).getParameterValues();
+                if (param != null) {
+                    return param;
+                }
+            }
+            if (mt instanceof PassThroughTransform) {
+                mt = ((PassThroughTransform) mt).getSubTransform();
+            } else {
+                break;
             }
         }
         if (required) {

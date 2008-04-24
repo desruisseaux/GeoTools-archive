@@ -353,7 +353,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
                         if (matrix.getElement(j,i) != 0) n1++;
                         if (matrix.getElement(i,j) != 0) n2++;
                     }
-                    if (n1!=1 || n2!=1) {
+                    if (n1 != 1 || n2 != 1) {
                         return false;
                     }
                 }
@@ -365,9 +365,10 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
 
     /**
      * Checks if an operation method and a math transform have a compatible number of source
-     * and target dimensions. In the special case of a {@linkplain PassThroughTransform pass
-     * through transform}, the method's dimensions may be checked against the
-     * {@linkplain PassThroughTransform#getSubTransform sub transform}'s dimensions.
+     * and target dimensions. In the particular case of a {@linkplain PassThroughTransform pass
+     * through transform} with more dimension than the expected number, the check will rather be
+     * performed against the {@linkplain PassThroughTransform#getSubTransform sub transform}.
+     * <p>
      * This convenience method is provided for argument checking.
      *
      * @param  method    The operation method to compare to the math transform, or {@code null}.
@@ -391,6 +392,9 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
                     } else if (isTrivial(c.transform2)) {
                         transform = c.transform1;
                     } else {
+                        // The transform is something more complex than an axis switch.
+                        // Stop the loop with the current illegal transform and let the
+                        // exception be thrown after the loop.
                         break;
                     }
                 } else if (transform instanceof PassThroughTransform) {

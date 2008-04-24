@@ -417,6 +417,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
         formatter.append(firstAffectedOrdinate);
         if (numTrailingOrdinates != 0) {
             formatter.append(numTrailingOrdinates);
+            formatter.setInvalidWKT(PassThroughTransform.class);
         }
         formatter.append(subTransform);
         return "PASSTHROUGH_MT";
