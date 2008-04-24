@@ -382,7 +382,7 @@ public class ImageMosaicReaderTest extends TestCase {
 					.findFormat(rgbURL)).getReader(rgbURL,new Hints(Hints.MAX_ALLOWED_TILES,new Integer(1000))).read(null);
 			assertTrue(true);
 		}catch (Exception e) {
-			assertTrue(false);
+		    fail( e.getLocalizedMessage() );
 		}
 	}
 

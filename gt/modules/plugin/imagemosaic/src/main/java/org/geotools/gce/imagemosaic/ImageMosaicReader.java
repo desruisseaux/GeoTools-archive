@@ -370,13 +370,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 */
 	private void loadProperties() throws UnsupportedEncodingException,
 			IOException, FileNotFoundException {
+	    
 		String temp = URLDecoder.decode(sourceURL.getFile(), "UTF8");
 		final int index = temp.lastIndexOf(".");
 		if (index != -1)
 			temp = temp.substring(0, index);
 		final File propertiesFile = new File(new StringBuffer(temp).append(
 				".properties").toString());
-		assert propertiesFile.exists() && propertiesFile.isFile();
+		if( !propertiesFile.exists() || !propertiesFile.isFile() ){
+		    throw new FileNotFoundException("Properties file, descibing the ImageMoasic, does not exist:"+propertiesFile);
+		}
 		final Properties properties = new Properties();
 		properties.load(new BufferedInputStream(new FileInputStream(
 				propertiesFile)));

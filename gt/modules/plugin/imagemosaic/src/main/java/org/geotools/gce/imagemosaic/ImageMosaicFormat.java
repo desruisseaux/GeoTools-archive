@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -222,41 +223,59 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
                 temp = temp.substring(0, index);
             final File propertiesFile = new File(new StringBuffer(temp).append(".properties")
                     .toString());
-            assert propertiesFile.exists() && propertiesFile.isFile();
+            if( !propertiesFile.exists() || !propertiesFile.isFile() ){
+                throw new FileNotFoundException("Properties file, descibing the ImageMoasic, does not exist:"+propertiesFile);
+            }
+            
             final Properties properties = new Properties();
             properties.load(new BufferedInputStream(new FileInputStream(propertiesFile)));
 
             // load the envelope
             final String envelope = properties.getProperty("Envelope2D");
-            String[] pairs = envelope.split(" ");
-            final double cornersV[][] = new double[2][2];
-            String pair[];
-            for( int i = 0; i < 2; i++ ) {
-                pair = pairs[i].split(",");
-                cornersV[i][0] = Double.parseDouble(pair[0]);
-                cornersV[i][1] = Double.parseDouble(pair[1]);
-            }
-
-            // resolutions levels
-            Integer.parseInt(properties.getProperty("LevelsNum"));
-            final String levels = properties.getProperty("Levels");
-            pairs = levels.split(" ");
-            pair = pairs[0].split(",");
-            Double.parseDouble(pair[0]);
-            Double.parseDouble(pair[1]);
-            if (!properties.containsKey("Name"))
-                return false;
             try {
-                if (!properties.containsKey("ExpandToRGB")) {
-                    if (LOGGER.isLoggable(Level.INFO))
-                        LOGGER
-                                .info("Unable to find ExpandToRGB field. This mosaic may malfunction if the field was forgotten.");
-                    return true;
+                String[] pairs = envelope.split(" ");
+                final double cornersV[][] = new double[2][2];
+                String pair[];
+                for( int i = 0; i < 2; i++ ) {
+                    pair = pairs[i].split(",");
+                    cornersV[i][0] = Double.parseDouble(pair[0]);
+                    cornersV[i][1] = Double.parseDouble(pair[1]);
                 }
-            } catch (Throwable t) {
             }
-            return true;
-        } catch (Exception e) {
+            catch( IndexOutOfBoundsException formatException ){
+                throw new IOException("Could not parse Envelope2D="+envelope+"(check uses of space and comma)", formatException );
+            }
+            catch( Exception unExpected ){
+                throw new IOException("Could not parse Envelope2D="+envelope, unExpected );
+            }
+            // resolutions levels
+            final String levels = properties.getProperty("Levels");            
+            try {
+                Integer.parseInt(properties.getProperty("LevelsNum"));
+                String[] pairs = levels.split(" ");
+                String[] pair = pairs[0].split(",");
+                Double.parseDouble(pair[0]);
+                Double.parseDouble(pair[1]);
+                if (!properties.containsKey("Name"))
+                    return false;
+                try {
+                    if (!properties.containsKey("ExpandToRGB")) {
+                        if (LOGGER.isLoggable(Level.INFO))
+                            LOGGER
+                                    .info("Unable to find ExpandToRGB field. This mosaic may malfunction if the field was forgotten.");
+                        return true;
+                    }
+                } catch (Throwable t) {
+                }
+                return true;
+            }
+            catch( IndexOutOfBoundsException formatException ){
+                throw new IOException("Could not parse Levels="+levels+"(check uses of space and comma)", formatException );
+            }
+            catch( Exception unExpected ){
+                throw new IOException("Could not parse LevelsNum and Levels information", unExpected );
+            }
+       } catch (Exception e) {
             if (LOGGER.isLoggable(Level.FINE))
                 LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
             return false;
