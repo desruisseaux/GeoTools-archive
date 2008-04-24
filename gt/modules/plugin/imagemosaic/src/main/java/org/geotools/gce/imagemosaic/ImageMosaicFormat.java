@@ -243,10 +243,10 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
                 }
             }
             catch( IndexOutOfBoundsException formatException ){
-                throw new IOException("Could not parse Envelope2D="+envelope+"(check uses of space and comma)", formatException );
+                throw (IOException) new IOException("Could not parse Envelope2D="+envelope+"(check uses of space and comma)").initCause(formatException );
             }
             catch( Exception unExpected ){
-                throw new IOException("Could not parse Envelope2D="+envelope, unExpected );
+                throw (IOException) new IOException("Could not parse Envelope2D="+envelope).initCause(unExpected );
             }
             // resolutions levels
             final String levels = properties.getProperty("Levels");            
@@ -270,10 +270,10 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements Forma
                 return true;
             }
             catch( IndexOutOfBoundsException formatException ){
-                throw new IOException("Could not parse Levels="+levels+"(check uses of space and comma)", formatException );
+                throw (IOException) new IOException("Could not parse Levels="+levels+"(check uses of space and comma)").initCause( formatException );
             }
             catch( Exception unExpected ){
-                throw new IOException("Could not parse LevelsNum and Levels information", unExpected );
+                throw (IOException) new IOException("Could not parse LevelsNum and Levels information").initCause( unExpected );
             }
        } catch (Exception e) {
             if (LOGGER.isLoggable(Level.FINE))
