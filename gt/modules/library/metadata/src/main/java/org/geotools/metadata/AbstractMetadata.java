@@ -163,6 +163,19 @@ public abstract class AbstractMetadata {
         if (object==null || !object.getClass().equals(getClass())) {
             return false;
         }
+        /*
+         * Opportunist usage of hash code if they are already computed. If they are not, we will
+         * not compute them - they are not sure to be faster than checking directly for equality,
+         * and hash code could be invalidated later anyway if the object change. Note that we
+         * don't need to synchronize since reading int fields are garanteed to be atomic in Java.
+         */
+        final int c0 = hashCode;
+        if (c0 != 0) {
+            final int c1 = ((AbstractMetadata) object).hashCode;
+            if (c1 != 0 && c0 != c1) {
+                return false;
+            }
+        }
         final MetadataStandard standard = getStandard();
         /*
          * DEADLOCK WARNING: A deadlock may occur if the same pair of objects is being compared

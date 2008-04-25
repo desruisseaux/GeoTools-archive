@@ -43,11 +43,11 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
     private static final long serialVersionUID = 5730550742604669102L;
 
     /**
-     * If a XML marshalling with JAXB is under progress, the thread doing this marshalling.
-     * Otherwise {@code null}. This implementation assumes that JAXB performs marshalling in
-     * the same thread than the one that invoke the {@code beforeMarshal(...)} method.
+     * If a XML marshalling with JAXB is under progress, value {@link Boolean#TRUE}. Otherwise
+     * {@link Boolean#FALSE}. This implementation assumes that JAXB performs marshalling in the
+     * same thread than the one that invoke the {@code beforeMarshal(...)} method.
      */
-    private transient ThreadLocal<Thread> xmlMarshalling;
+    private transient ThreadLocal<Boolean> xmlMarshalling;
 
     /**
      * Constructs an initially empty metadata entity.
@@ -113,9 +113,9 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
             if (!marshalling) {
                 return;
             }
-            xmlMarshalling = new ThreadLocal<Thread>();
+            xmlMarshalling = new ThreadLocal<Boolean>();
         }
-        xmlMarshalling.set(marshalling ? Thread.currentThread() : null);
+        xmlMarshalling.set(Boolean.valueOf(marshalling));
     }
 
     /**
@@ -132,10 +132,10 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
     protected final <E> Collection<E> xmlOptional(final Collection<E> elements) {
         assert Thread.holdsLock(this);
         if (elements != null && elements.isEmpty()) {
-            final ThreadLocal<Thread> xmlMarshalling = this.xmlMarshalling;
+            final ThreadLocal<Boolean> xmlMarshalling = this.xmlMarshalling;
             if (xmlMarshalling != null) {
-                final Thread thread = xmlMarshalling.get();
-                if (thread == Thread.currentThread()) {
+                final Boolean isMarshalling = xmlMarshalling.get();
+                if (Boolean.TRUE.equals(isMarshalling)) {
                     return null;
                 }
             }
