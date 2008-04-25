@@ -365,8 +365,8 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * @param  elementType The element type (used only if {@code c} is null).
      * @return {@code c}, or a new collection if {@code c} is null.
      */
-    protected final <E> Collection<E> nonNullCollection(final Collection<E> c,
-                                                        final Class<E> elementType)
+    protected final <E> Collection<E> nonNullCollection(
+            final Collection<E> c, final Class<E> elementType)
     {
         assert Thread.holdsLock(this);
         if (c != null) {

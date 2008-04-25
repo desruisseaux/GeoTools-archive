@@ -43,10 +43,12 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
     private static final long serialVersionUID = 5730550742604669102L;
 
     /**
-     * A flag that indicates if a marshalling process from JAXB has been launched.
+     * If a XML marshalling with JAXB is under progress, the thread doing this marshalling.
+     * Otherwise {@code null}. This implementation assumes that JAXB performs marshalling in
+     * the same thread than the one that invoke the {@code beforeMarshal(...)} method.
      */
-    private transient ThreadLocal<Boolean> isMarshalling;
-    
+    private transient ThreadLocal<Thread> xmlMarshalling;
+
     /**
      * Constructs an initially empty metadata entity.
      */
@@ -97,37 +99,45 @@ public class MetadataEntity extends ModifiableMetadata implements Serializable {
     }
 
     /**
-     * Specify the value for the flag {@code isMarshalling}. If this flag is not instanciated,
-     * then a new boolean is created for this thread. Else the current value for this flag is 
-     * just set with the wished one.
-     * 
-     * @param marshalling The value the flag has to take.
+     * Invoked with value {@code true} if a XML marshalling is begining,
+     * or {@code false} if XML marshalling ended.
+     *
+     * @since 2.5
+     *
+     * @todo Current implementation will not work if more than one thread are marshalling in
+     *       same time. It may also leave the object in an unstable state if the marshalling
+     *       failed with an exception. We need to find a better mechanism.
      */
-    protected final synchronized void isMarshalling(final boolean marshalling) {
-        if (isMarshalling == null) {
+    protected final synchronized void xmlMarshalling(final boolean marshalling) {
+        if (xmlMarshalling == null) {
             if (!marshalling) {
                 return;
             }
-            isMarshalling = new ThreadLocal<Boolean>();
+            xmlMarshalling = new ThreadLocal<Thread>();
         }
-        isMarshalling.set(marshalling);
+        xmlMarshalling.set(marshalling ? Thread.currentThread() : null);
     }
 
     /**
-     * Returns the collection specified if the flag {@code isMarshalling} is set to {@code false}.
-     * In this case the marshalling is not in process, because it has been called from another way,
-     * so we always return the collection.
-     * If we are marshalling the collection, then we do not want to return an empty collection.
-     * 
-     * @param elements The collection to return.
-     * @return The collection specified, or {@code null} if we are marshalling.
+     * If a XML marshalling is under progress and the given collection is empty, returns
+     * {@code null}. Otherwise returns the collection unchanged. This method is invoked
+     * by implementation having optional elements to ommit when empty.
+     *
+     * @param  elements The collection to return.
+     * @return The given collection, or {@code null} if the collection is empty and a marshalling
+     *         is under progress.
+     *
+     * @since 2.5
      */
     protected final <E> Collection<E> xmlOptional(final Collection<E> elements) {
+        assert Thread.holdsLock(this);
         if (elements != null && elements.isEmpty()) {
-            // Copy the reference in order to avoid the need for synchronization.
-            final ThreadLocal<Boolean> isMarshalling = this.isMarshalling;
-            if (isMarshalling != null && Boolean.TRUE.equals(isMarshalling.get())) {
-                return null;
+            final ThreadLocal<Thread> xmlMarshalling = this.xmlMarshalling;
+            if (xmlMarshalling != null) {
+                final Thread thread = xmlMarshalling.get();
+                if (thread == Thread.currentThread()) {
+                    return null;
+                }
             }
         }
         return elements;

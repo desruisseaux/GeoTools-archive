@@ -156,11 +156,23 @@ public abstract class AbstractMetadata {
      * is the case by default if every childs are subclasses of {@code AbstractMetadata}.
      */
     @Override
-    public synchronized boolean equals(final Object object) {
-        if (object!=null && object.getClass().equals(getClass())) {
-            return getStandard().shallowEquals(this, object, false);
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
         }
-        return false;
+        if (object==null || !object.getClass().equals(getClass())) {
+            return false;
+        }
+        final MetadataStandard standard = getStandard();
+        /*
+         * DEADLOCK WARNING: A deadlock may occur if the same pair of objects is being compared
+         * in an other thread (see http://jira.codehaus.org/browse/GEOT-1777). Ideally we would
+         * synchronize on 'this' and 'object' atomically (RFE #4210659). Since we can't in Java
+         * a workaround is to always get the locks in the same order. Unfortunatly we have no
+         * garantee that the caller didn't looked the object himself. For now the safest approach
+         * is to not synchronize at all.
+         */
+        return standard.shallowEquals(this, object, false);
     }
 
     /**

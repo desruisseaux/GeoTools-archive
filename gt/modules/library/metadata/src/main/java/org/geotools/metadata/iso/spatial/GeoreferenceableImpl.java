@@ -213,24 +213,24 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     }
 
     /**
-     * Sets the {@code isMarshalling} flag to {@code true}, since the marshalling
+     * Sets the {@code xmlMarshalling} flag to {@code true}, since the marshalling
      * process is going to be done.
      * This method is automatically called by JAXB, when the marshalling begins.
      * 
      * @param marshaller Not used in this implementation.
      */
 ///    private void beforeMarshal(Marshaller marshaller) {
-///        isMarshalling(true);
+///        xmlMarshalling(true);
 ///    }
 
     /**
-     * Sets the {@code isMarshalling} flag to {@code false}, since the marshalling
+     * Sets the {@code xmlMarshalling} flag to {@code false}, since the marshalling
      * process is finished.
      * This method is automatically called by JAXB, when the marshalling ends.
      * 
      * @param marshaller Not used in this implementation
      */
 ///    private void afterMarshal(Marshaller marshaller) {
-///        isMarshalling(false);
+///        xmlMarshalling(false);
 ///    }
 }
