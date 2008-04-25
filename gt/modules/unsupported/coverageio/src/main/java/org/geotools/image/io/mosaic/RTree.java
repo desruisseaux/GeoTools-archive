@@ -191,6 +191,7 @@ final class RTree {
         assert subsamplingDone.isEmpty() && subsamplingToTry.isEmpty() && distinctBounds.isEmpty();
         subsampling = new Dimension(xSubsampling, ySubsampling);
         SelectedNode bestCandidate = null;
+        int bestCandidateCount = 0;
         try {
             do {
                 final SelectedNode candidate = addTileCandidate(root, Long.MAX_VALUE);
@@ -201,8 +202,10 @@ final class RTree {
                  * cheaper set of tiles.
                  */
                 if (candidate != null) {
+                    final int candidateCount;
                     try {
                         candidate.filter(distinctBounds);
+                        candidateCount = distinctBounds.size();
                     } finally {
                         distinctBounds.clear();
                     }
@@ -212,6 +215,7 @@ final class RTree {
                         }
                     }
                     bestCandidate = candidate;
+                    bestCandidateCount = candidateCount;
                     setSubsampling(subsampling);
                 }
             } while ((subsampling = subsamplingToTry.poll()) != null);
@@ -223,7 +227,7 @@ final class RTree {
          * TODO: sort the result. I'm not sure that it is worth, but if we decide that it is,
          * we could use the Comparator<GridNode> implemented by the GridNode class.
          */
-        final List<Tile> tiles = new ArrayList<Tile>(distinctBounds.size());
+        final List<Tile> tiles = new ArrayList<Tile>(bestCandidateCount);
         if (bestCandidate != null) {
             assert bestCandidate.checkValidity() != null : bestCandidate;
             bestCandidate.getTiles(tiles);

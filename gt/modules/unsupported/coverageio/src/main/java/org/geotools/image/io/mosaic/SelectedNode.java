@@ -123,15 +123,20 @@ final class SelectedNode extends TreeNode {
     }
 
     /**
-     * Removes the nodes having the same bounding box than another tile. If such matchs are found,
-     * they are probably tiles at a different resolution.  Retains the one which minimize the disk
-     * reading, and discards the other one. This check is not generic since we search for an exact
-     * match, but this case is common enough. Handling it with a {@link java.util.HashMap} will
-     * help to reduce the amount of tiles to handle in a more costly way later.
+     * Removes the nodes having the same bounding box than this tile, then process recursively for
+     * children. If such matchs are found, they are probably tiles at a different resolution.
+     * Retains the one which minimize the disk reading, and discards the other ones.
+     * <p>
+     * This check is not generic since we search for an exact match, but this case is common
+     * enough. Handling it with a {@link java.util.HashMap} will help to reduce the amount of
+     * tiles to handle in a more costly way later.
+     *
+     * @param overlaps An initially empty map. Will be filled through recursive invocation
+     *        of this method while we iterate down the tree.
      */
     final void filter(final Map<Rectangle,SelectedNode> overlaps) {
         /*
-         * Must process children first because if any of them are removed, it will lowered
+         * Must process children first because if any of them are removed, it will lower
          * the cost and consequently can change the decision taken at the end of this method.
          */
         SelectedNode child = (SelectedNode) firstChildren();
