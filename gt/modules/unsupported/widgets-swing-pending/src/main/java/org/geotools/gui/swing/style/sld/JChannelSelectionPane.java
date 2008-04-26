@@ -22,7 +22,9 @@ import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.style.StyleElementEditor;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.ChannelSelection;
+import org.geotools.styling.ChannelSelectionImpl;
 import org.geotools.styling.Fill;
+import org.geotools.styling.SelectedChannelType;
 import org.geotools.styling.StyleBuilder;
 
 /**
@@ -38,6 +40,7 @@ public class JChannelSelectionPane extends javax.swing.JPanel implements StyleEl
      */
     public JChannelSelectionPane() {
         initComponents();
+        lock();
     }
 
     public void setLayer(MapLayer layer) {
@@ -51,16 +54,23 @@ public class JChannelSelectionPane extends javax.swing.JPanel implements StyleEl
     public void setEdited(ChannelSelection channel) {
         this.channel = channel;
         if (channel != null) {
-            channel.getGrayChannel();
-            channel.getRGBChannels();
-            channel.getSelectedChannels();
+            guiGray.setEdited(channel.getGrayChannel());
+            SelectedChannelType[] sct = channel.getRGBChannels();
+            
+            if(sct!= null && sct.length==3){
+                guiRed.setEdited(sct[0]);
+                guiGreen.setEdited(sct[1]);
+                guiBlue.setEdited(sct[2]);
+            }
         }
+        
+        lock();
     }
 
     public ChannelSelection getEdited() {
 
         if (channel == null) {
-            
+            channel = new ChannelSelectionImpl();
         }
 
         apply();
@@ -69,12 +79,34 @@ public class JChannelSelectionPane extends javax.swing.JPanel implements StyleEl
 
     public void apply() {
         if (channel != null) {
+            if(guiChkRGB.isSelected()){
+                SelectedChannelType[] sct = new SelectedChannelType[3];
+                sct[0] = guiRed.getEdited();
+                sct[1] = guiGreen.getEdited();
+                sct[2] = guiBlue.getEdited();
+            }else{
+                channel.setGrayChannel(guiGray.getEdited());
+            }
         }
     }
 
     public Component getComponent(){
         return this;
     }
+    
+    private void lock(){
+        boolean b = guiChkRGB.isSelected();
+        
+        guiRed.setEnabled(b);
+        guiGreen.setEnabled(b);
+        guiBlue.setEnabled(b);
+        guiGray.setEnabled(!b);
+        guiLblRed.setEnabled(b);
+        guiLblGreen.setEnabled(b);
+        guiLblBlue.setEnabled(b);
+        guiLblGray.setEnabled(!b);
+    }
+    
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -84,40 +116,52 @@ public class JChannelSelectionPane extends javax.swing.JPanel implements StyleEl
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSelectedChannelTypePane1 = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
-        jSelectedChannelTypePane4 = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
-        jSelectedChannelTypeTable1 = new org.geotools.gui.swing.style.sld.JSelectedChannelTypeTable();
-        jXTitledSeparator1 = new org.jdesktop.swingx.JXTitledSeparator();
-        jXTitledSeparator2 = new org.jdesktop.swingx.JXTitledSeparator();
-        jSelectedChannelTypePane5 = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
-        jXTitledSeparator3 = new org.jdesktop.swingx.JXTitledSeparator();
-        jXTitledSeparator4 = new org.jdesktop.swingx.JXTitledSeparator();
-        jSelectedChannelTypePane6 = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
-        jXTitledSeparator5 = new org.jdesktop.swingx.JXTitledSeparator();
+        group = new javax.swing.ButtonGroup();
+        guiGray = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
+        guiRed = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
+        guiLblGray = new org.jdesktop.swingx.JXTitledSeparator();
+        guiLblRed = new org.jdesktop.swingx.JXTitledSeparator();
+        guiGreen = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
+        guiLblGreen = new org.jdesktop.swingx.JXTitledSeparator();
+        guiLblBlue = new org.jdesktop.swingx.JXTitledSeparator();
+        guiBlue = new org.geotools.gui.swing.style.sld.JSelectedChannelTypePane();
         jSeparator1 = new javax.swing.JSeparator();
+        guiChkRGB = new javax.swing.JRadioButton();
+        guiChkGray = new javax.swing.JRadioButton();
 
-        jXTitledSeparator1.setForeground(new java.awt.Color(102, 102, 102));
+        guiLblGray.setForeground(new java.awt.Color(102, 102, 102));
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/geotools/gui/swing/style/sld/Bundle"); // NOI18N
-        jXTitledSeparator1.setTitle(bundle.getString("gray")); // NOI18N
-        jXTitledSeparator1.setFont(jXTitledSeparator1.getFont().deriveFont(jXTitledSeparator1.getFont().getStyle() | java.awt.Font.BOLD));
+        guiLblGray.setTitle(bundle.getString("gray")); // NOI18N
+        guiLblGray.setFont(guiLblGray.getFont().deriveFont(guiLblGray.getFont().getStyle() | java.awt.Font.BOLD));
 
-        jXTitledSeparator2.setForeground(new java.awt.Color(204, 0, 0));
-        jXTitledSeparator2.setTitle(bundle.getString("red")); // NOI18N
-        jXTitledSeparator2.setFont(jXTitledSeparator2.getFont().deriveFont(jXTitledSeparator2.getFont().getStyle() | java.awt.Font.BOLD));
+        guiLblRed.setForeground(new java.awt.Color(204, 0, 0));
+        guiLblRed.setTitle(bundle.getString("red")); // NOI18N
+        guiLblRed.setFont(guiLblRed.getFont().deriveFont(guiLblRed.getFont().getStyle() | java.awt.Font.BOLD));
 
-        jXTitledSeparator3.setForeground(new java.awt.Color(0, 204, 0));
-        jXTitledSeparator3.setTitle(bundle.getString("green")); // NOI18N
-        jXTitledSeparator3.setFont(jXTitledSeparator3.getFont().deriveFont(jXTitledSeparator3.getFont().getStyle() | java.awt.Font.BOLD));
+        guiLblGreen.setForeground(new java.awt.Color(0, 204, 0));
+        guiLblGreen.setTitle(bundle.getString("green")); // NOI18N
+        guiLblGreen.setFont(guiLblGreen.getFont().deriveFont(guiLblGreen.getFont().getStyle() | java.awt.Font.BOLD));
 
-        jXTitledSeparator4.setForeground(new java.awt.Color(0, 0, 204));
-        jXTitledSeparator4.setTitle(bundle.getString("blue")); // NOI18N
-        jXTitledSeparator4.setFont(jXTitledSeparator4.getFont().deriveFont(jXTitledSeparator4.getFont().getStyle() | java.awt.Font.BOLD));
-
-        jXTitledSeparator5.setAlpha(0.5F);
-        jXTitledSeparator5.setTitle(bundle.getString("selecteds")); // NOI18N
-        jXTitledSeparator5.setFont(jXTitledSeparator5.getFont().deriveFont(jXTitledSeparator5.getFont().getStyle() | java.awt.Font.BOLD));
+        guiLblBlue.setForeground(new java.awt.Color(0, 0, 204));
+        guiLblBlue.setTitle(bundle.getString("blue")); // NOI18N
+        guiLblBlue.setFont(guiLblBlue.getFont().deriveFont(guiLblBlue.getFont().getStyle() | java.awt.Font.BOLD));
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        guiChkRGB.setSelected(true);
+        guiChkRGB.setText("RGB");
+        guiChkRGB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkRGBActionPerformed(evt);
+            }
+        });
+
+        guiChkGray.setText("Gray");
+        guiChkGray.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkGrayActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -125,68 +169,77 @@ public class JChannelSelectionPane extends javax.swing.JPanel implements StyleEl
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(jSelectedChannelTypePane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jSelectedChannelTypePane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jSelectedChannelTypePane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(18, 18, 18)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, guiLblRed, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(guiRed, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, guiLblGreen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, guiLblBlue, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, guiGreen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(guiBlue, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(guiChkRGB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(guiChkGray)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jSelectedChannelTypePane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jXTitledSeparator5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jSelectedChannelTypeTable1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, guiLblGray, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, guiGray, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
 
-        layout.linkSize(new java.awt.Component[] {jSelectedChannelTypePane1, jSelectedChannelTypePane4, jSelectedChannelTypePane5, jSelectedChannelTypePane6, jSelectedChannelTypeTable1, jXTitledSeparator1, jXTitledSeparator2, jXTitledSeparator3, jXTitledSeparator4, jXTitledSeparator5}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {guiBlue, guiGray, guiGreen, guiLblBlue, guiLblGray, guiLblGreen, guiLblRed, guiRed}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(jXTitledSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(guiChkGray)
+                    .add(guiChkRGB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jSeparator1)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(guiLblRed, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectedChannelTypePane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(guiRed, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jXTitledSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(guiLblGreen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectedChannelTypePane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(guiGreen, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jXTitledSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(guiLblBlue, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectedChannelTypePane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
-                        .add(jXTitledSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(guiBlue, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(guiLblGray, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectedChannelTypePane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(12, 12, 12)
-                        .add(jXTitledSeparator5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectedChannelTypeTable1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                        .add(guiGray, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+private void guiChkGrayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkGrayActionPerformed
+    lock();
+}//GEN-LAST:event_guiChkGrayActionPerformed
+
+private void guiChkRGBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkRGBActionPerformed
+    lock();
+}//GEN-LAST:event_guiChkRGBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane jSelectedChannelTypePane1;
-    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane jSelectedChannelTypePane4;
-    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane jSelectedChannelTypePane5;
-    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane jSelectedChannelTypePane6;
-    private org.geotools.gui.swing.style.sld.JSelectedChannelTypeTable jSelectedChannelTypeTable1;
+    private javax.swing.ButtonGroup group;
+    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane guiBlue;
+    private javax.swing.JRadioButton guiChkGray;
+    private javax.swing.JRadioButton guiChkRGB;
+    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane guiGray;
+    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane guiGreen;
+    private org.jdesktop.swingx.JXTitledSeparator guiLblBlue;
+    private org.jdesktop.swingx.JXTitledSeparator guiLblGray;
+    private org.jdesktop.swingx.JXTitledSeparator guiLblGreen;
+    private org.jdesktop.swingx.JXTitledSeparator guiLblRed;
+    private org.geotools.gui.swing.style.sld.JSelectedChannelTypePane guiRed;
     private javax.swing.JSeparator jSeparator1;
-    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator1;
-    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator2;
-    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator3;
-    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator4;
-    private org.jdesktop.swingx.JXTitledSeparator jXTitledSeparator5;
     // End of variables declaration//GEN-END:variables
 }
