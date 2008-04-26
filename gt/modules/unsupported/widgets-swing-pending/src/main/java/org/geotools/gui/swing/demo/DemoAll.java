@@ -78,16 +78,6 @@ import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.gui.swing.propertyedit.filterproperty.JCQLPropertyPanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
-import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
-import org.geotools.gui.swing.toolbox.tooltree.JToolTree;
-import org.geotools.gui.swing.toolbox.tooltree.ToolTreeListener;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetTool;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolDescriptor;
-import org.geotools.gui.swing.toolbox.widgettool.WidgetToolListener;
-import org.geotools.gui.swing.toolbox.widgettool.clipping.ClippingTTDescriptor;
-import org.geotools.gui.swing.toolbox.widgettool.shapecreation.ShapeCreationTTDescriptor;
-import org.geotools.gui.swing.toolbox.widgettool.svg2mif.SVG2MIFTTDescriptor;
-import org.geotools.gui.swing.toolbox.widgettool.vdem2csv.VDem2CSVTTDescriptor;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -112,15 +102,10 @@ public class DemoAll extends javax.swing.JFrame {
     private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
     private final SourceGroup subsource = new SourceGroup();
     private final StyleGroup substyle = new StyleGroup();
-    private final JToolTree tooltree = new JToolTree();
     private final ImageDecoration overBackImage = new ImageDecoration();
     private final ColorDecoration overBackColor = new ColorDecoration();
     private final NavigationDecoration overNavigation = new NavigationDecoration();
     private final MiniMapDecoration overMiniMap = new MiniMapDecoration();
-    private final WidgetToolDescriptor shapeTool = new ShapeCreationTTDescriptor();
-    private final WidgetToolDescriptor vdem2csvTool = new VDem2CSVTTDescriptor();
-    private final WidgetToolDescriptor svg2mifTool = new SVG2MIFTTDescriptor();
-    private final WidgetToolDescriptor clipTool = new ClippingTTDescriptor();
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
@@ -170,70 +155,6 @@ public class DemoAll extends javax.swing.JFrame {
             }
         });
 
-        pantoolbox.add(BorderLayout.CENTER, tooltree);
-
-
-        tooltree.addTool(shapeTool);
-        tooltree.addTool(svg2mifTool);
-        tooltree.addTool(vdem2csvTool);
-        tooltree.addTool(clipTool);
-
-        tooltree.addToolTreeListener(new ToolTreeListener() {
-
-            public void treeToolActivated(WidgetToolDescriptor tool) {
-                MapContext[] contexts = tree.getContexts();
-                List<MapLayer> layers = new ArrayList<MapLayer>();
-
-                for (MapContext context : contexts) {
-                    MapLayer[] lst = context.getLayers();
-                    for (MapLayer layer : lst) {
-                        layers.add(layer);
-                    }
-                }
-                MapLayer[] lst = layers.toArray(new MapLayer[layers.size()]);
-
-
-                Map parameters = new HashMap();
-                parameters.put("layers", lst);
-
-                JDialog dialog = new JDialog();
-                dialog.setTitle(tool.getTitle());
-
-                WidgetTool wt = tool.createTool(parameters);
-
-                wt.addWidgetToolListener(new WidgetToolListener() {
-
-                    public void objectCreated(Object[] objs) {
-                        for (Object obj : objs) {
-                            if (obj instanceof DataStore) {
-                                RandomStyleFactory rsf = new RandomStyleFactory();
-
-                                DataStore store = (DataStore) obj;
-
-                                try {
-                                    String name = store.getTypeNames()[0];
-                                    FeatureSource<SimpleFeatureType, SimpleFeature> source = store.getFeatureSource(name);
-                                    MapLayer layer = new DefaultMapLayer(source, rsf.createRandomVectorStyle(source));
-
-                                    if (tree.getActiveContext() != null) {
-                                        tree.getActiveContext().addLayer(layer);
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        }
-                    }
-                });
-
-                dialog.setContentPane(wt.getComponent());
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setModal(true);
-                dialog.setVisible(true);
-            }
-        });
 
         map.getRenderingStrategy().setContext(context);
         minimap.setRelatedMap2D(map);
@@ -328,7 +249,6 @@ public class DemoAll extends javax.swing.JFrame {
 
         LayerStylePropertyPanel styles = new LayerStylePropertyPanel();
         styles.addPropertyPanel(new JSimpleStylePanel());
-        styles.addPropertyPanel(new JXMLStylePanel());
         lstproperty.add(styles);
 
         property.setPropertyPanels(lstproperty);
@@ -379,7 +299,6 @@ public class DemoAll extends javax.swing.JFrame {
         jSplitPane2 = new javax.swing.JSplitPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
-        pantoolbox = new javax.swing.JPanel();
         pan_minimap = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
@@ -488,9 +407,6 @@ public class DemoAll extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("ContextTree", tree);
 
-        pantoolbox.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("ToolBox", pantoolbox);
-
         jSplitPane2.setTopComponent(jTabbedPane1);
 
         pan_minimap.setLayout(new java.awt.BorderLayout());
@@ -500,11 +416,11 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
@@ -928,7 +844,6 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
     private javax.swing.JPanel pan_minimap;
-    private javax.swing.JPanel pantoolbox;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
 }
