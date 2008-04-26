@@ -18,11 +18,8 @@ package org.geotools.demo.widgets;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -67,9 +64,7 @@ import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.map.map2d.decoration.ColorDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.ImageDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.InformationDecoration.LEVEL;
-import org.geotools.gui.swing.map.map2d.decoration.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.decoration.NavigationDecoration;
-import org.geotools.gui.swing.map.map2d.minimap.JMiniMap;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.propertyedit.LayerCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
@@ -95,7 +90,6 @@ public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private final JDefaultEditableMap2D map;
-    private final JMiniMap minimap;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -105,7 +99,6 @@ public class DemoAll extends javax.swing.JFrame {
     private final ImageDecoration overBackImage = new ImageDecoration();
     private final ColorDecoration overBackColor = new ColorDecoration();
     private final NavigationDecoration overNavigation = new NavigationDecoration();
-    private final MiniMapDecoration overMiniMap = new MiniMapDecoration();
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
@@ -115,13 +108,11 @@ public class DemoAll extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         map = new JDefaultEditableMap2D();
-        minimap = new JMiniMap();
 
         final MapContext context = buildContext();
         initTree(tree, map);
 
         pan_mappane.add(BorderLayout.CENTER, map);
-        pan_minimap.add(BorderLayout.CENTER, minimap);
 
         tree.addContext(context);
 
@@ -157,8 +148,6 @@ public class DemoAll extends javax.swing.JFrame {
 
 
         map.getRenderingStrategy().setContext(context);
-        minimap.setRelatedMap2D(map);
-
 
         Thread t = new Thread() {
 
@@ -296,10 +285,8 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane = new javax.swing.JPanel();
         gui_map2dinfo = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
         jPanel4 = new javax.swing.JPanel();
-        jSplitPane2 = new javax.swing.JSplitPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
-        pan_minimap = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
@@ -331,7 +318,6 @@ public class DemoAll extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem6 = new javax.swing.JMenuItem();
         gui_Chknavigationlayer = new javax.swing.JCheckBoxMenuItem();
-        gui_Chkminimaplayer = new javax.swing.JCheckBoxMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
 
@@ -402,26 +388,11 @@ public class DemoAll extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jpanel8);
 
-        jSplitPane2.setDividerLocation(300);
-        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jPanel4.setLayout(new java.awt.BorderLayout());
 
         jTabbedPane1.addTab("ContextTree", tree);
 
-        jSplitPane2.setTopComponent(jTabbedPane1);
-
-        pan_minimap.setLayout(new java.awt.BorderLayout());
-        jSplitPane2.setRightComponent(pan_minimap);
-
-        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-        );
+        jPanel4.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         jSplitPane1.setLeftComponent(jPanel4);
 
@@ -617,14 +588,6 @@ public class DemoAll extends javax.swing.JFrame {
         });
         jMenu6.add(gui_Chknavigationlayer);
 
-        gui_Chkminimaplayer.setText("Minimap");
-        gui_Chkminimaplayer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gui_ChkminimaplayerActionPerformed(evt);
-            }
-        });
-        jMenu6.add(gui_Chkminimaplayer);
-
         jMenu4.add(jMenu6);
 
         jMenuBar1.add(jMenu4);
@@ -751,14 +714,6 @@ public class DemoAll extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void gui_ChkminimaplayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_ChkminimaplayerActionPerformed
-        if (gui_Chkminimaplayer.isSelected()) {
-            map.addDecoration(overMiniMap);
-        } else {
-            map.removeDecoration(overMiniMap);
-        }
-}//GEN-LAST:event_gui_ChkminimaplayerActionPerformed
-
     private void guiChkSubStyleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkSubStyleActionPerformed
         if (guiChkSubStyle.isSelected()) {
             tree.addSubNodeGroup(substyle);
@@ -804,7 +759,6 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkSubSource;
     private javax.swing.JCheckBoxMenuItem guiChkSubStyle;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
-    private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
     private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
     private org.geotools.gui.swing.map.map2d.control.JMap2DNavigationBar gui_map2dnavigation;
@@ -837,13 +791,11 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
-    private javax.swing.JPanel pan_minimap;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
 }
