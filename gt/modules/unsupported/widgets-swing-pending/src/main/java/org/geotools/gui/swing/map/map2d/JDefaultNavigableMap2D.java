@@ -96,13 +96,14 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     
     @Override
     public void setActionState(ACTION_STATE state) {
-        super.setActionState(state);
                         
         if (state == ACTION_STATE.NAVIGATE && !navigationHandler.isInstalled()) {
             navigationHandler.install(this);
         } else if (state != ACTION_STATE.NAVIGATE && navigationHandler.isInstalled()) {
             navigationHandler.uninstall();
         }
+        
+        super.setActionState(state);
 
     }
     

@@ -156,7 +156,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     @Override
     public void setActionState(ACTION_STATE state) {
 
-        if (state == ACTION_STATE.EDIT) {
+        if (state == ACTION_STATE.EDIT ) {
             editionHandler.installListeners(this);
         } else {
             editionHandler.uninstallListeners();

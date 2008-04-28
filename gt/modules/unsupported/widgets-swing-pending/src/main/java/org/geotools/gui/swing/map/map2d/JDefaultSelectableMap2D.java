@@ -337,7 +337,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     //---------------------MAP2D OVERLOAD---------------------------------------  
     @Override
     public void setActionState(ACTION_STATE state) {
-        super.setActionState(state);
         
         if (state == ACTION_STATE.SELECT && !selectionHandler.isInstalled()) {
             selectionHandler.install(this);
@@ -345,6 +344,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             selectionHandler.uninstall();
         }
         
+        super.setActionState(state);        
     }
 
     @Override
