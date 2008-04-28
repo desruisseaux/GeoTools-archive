@@ -48,7 +48,7 @@ public class IdCapabilitiesImpl implements IdCapabilities {
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("FunctionsImpl[");
+        buf.append("IdCapabilitiesImpl[");
         if( fid){
             buf.append(" FeatureId");
         }
