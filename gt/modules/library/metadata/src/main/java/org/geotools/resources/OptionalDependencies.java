@@ -17,7 +17,11 @@
 package org.geotools.resources;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.lang.reflect.Constructor;
+import javax.swing.JTree;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -131,6 +135,31 @@ public final class OptionalDependencies {
     }
 
     /**
+     * Returns a copy of the tree starting at the given node.
+     *
+     * @param  tree The tree to copy (may be {@code null}).
+     * @return A mutable copy of the given tree, or {@code null} if the tree was null.
+     * @todo Use {@code getUserObject} when we can.
+     *
+     * @since 2.5
+     */
+    public static MutableTreeNode copy(final TreeNode node) {
+        if (node == null) {
+            return null;
+        }
+        final DefaultMutableTreeNode target = new DefaultMutableTreeNode(
+                node.toString(), node.getAllowsChildren());
+        final Enumeration children = node.children();
+        if (children != null) {
+            while (children.hasMoreElements()) {
+                final TreeNode child = (TreeNode) children.nextElement();
+                target.add(copy(child));
+            }
+        }
+        return target;
+    }
+
+    /**
      * Construit une chaîne de caractères qui contiendra le
      * noeud spécifié ainsi que tous les noeuds enfants.
      *
@@ -162,6 +191,52 @@ public final class OptionalDependencies {
             last = format(model, model.getChild(node,i), buffer, level+1, last, lineSeparator);
         }
         return last;
+    }
+
+    /**
+     * Writes a graphical representation of the specified tree model in the given buffer.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     *
+     * @param  tree          The tree to format.
+     * @param  buffer        Where to format the tree.
+     * @param  lineSeparator The line separator, or {@code null} for the system default.
+     * @throws IOException if an error occured while writting in the given buffer.
+     *
+     * @since 2.5
+     */
+    public static void format(final TreeModel tree, final Appendable buffer, String lineSeparator)
+            throws IOException
+    {
+        final Object root = tree.getRoot();
+        if (root != null) {
+            if (lineSeparator == null) {
+                lineSeparator = System.getProperty("line.separator", "\n");
+            }
+            format(tree, root, buffer, 0, new boolean[64], lineSeparator);
+        }
+    }
+
+    /**
+     * Writes a graphical representation of the specified tree in the given buffer.
+     * <p>
+     * This method should not be defined here, since this class is about optional dependencies.
+     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
+     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     *
+     * @param  node          The root node of the tree to format.
+     * @param  buffer        Where to format the tree.
+     * @param  lineSeparator The line separator, or {@code null} for the system default.
+     * @throws IOException if an error occured while writting in the given buffer.
+     *
+     * @since 2.5
+     */
+    public static void format(final TreeNode node, final Appendable buffer, String lineSeparator)
+            throws IOException
+    {
+        format(new DefaultTreeModel(node, true), buffer, lineSeparator);
     }
 
     /**
@@ -209,48 +284,32 @@ public final class OptionalDependencies {
     }
 
     /**
-     * Writes a graphical representation of the specified tree model in the given buffer.
-     * <p>
-     * This method should not be defined here, since this class is about optional dependencies.
-     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
-     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     * Display the given tree in a Swing frame. This is a convenience
+     * method for debugging purpose only.
      *
-     * @param  tree          The tree to format.
-     * @param  buffer        Where to format the tree.
-     * @param  lineSeparator The line separator, or {@code null} for the system default.
-     * @throws IOException if an error occured while writting in the given buffer.
+     * @param tree The tree to display in a Swing frame.
+     * @param title The frame title, or {@code null} if none.
      *
      * @since 2.5
      */
-    public static void format(final TreeModel tree, final Appendable buffer, String lineSeparator)
-            throws IOException
-    {
-        final Object root = tree.getRoot();
-        if (root != null) {
-            if (lineSeparator == null) {
-                lineSeparator = System.getProperty("line.separator", "\n");
-            }
-            format(tree, root, buffer, 0, new boolean[64], lineSeparator);
-        }
+    public static void show(final TreeNode node, final String title) {
+        show(new DefaultTreeModel(node, true), title);
     }
 
     /**
-     * Writes a graphical representation of the specified tree in the given buffer.
-     * <p>
-     * This method should not be defined here, since this class is about optional dependencies.
-     * It should be defined in {@link org.geotools.gui.swing.tree.Trees} instead. However we put
-     * it here (for now) because it is used in some module that don't want to depend on widgets.
+     * Display the given tree in a Swing frame. This is a convenience
+     * method for debugging purpose only.
      *
-     * @param  node          The root node of the tree to format.
-     * @param  buffer        Where to format the tree.
-     * @param  lineSeparator The line separator, or {@code null} for the system default.
-     * @throws IOException if an error occured while writting in the given buffer.
+     * @param tree The tree to display in a Swing frame.
+     * @param title The frame title, or {@code null} if none.
      *
      * @since 2.5
      */
-    public static void format(final TreeNode node, final Appendable buffer, String lineSeparator)
-            throws IOException
-    {
-        format(new DefaultTreeModel(node, true), buffer, lineSeparator);
+    public static void show(final TreeModel tree, final String title) {
+        final JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(new JScrollPane(new JTree(tree)));
+        frame.pack();
+        frame.setVisible(true);
     }
 }

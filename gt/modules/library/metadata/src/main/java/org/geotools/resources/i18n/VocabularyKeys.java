@@ -526,6 +526,11 @@ public final class VocabularyKeys {
     public static final int HIDE = 67;
 
     /**
+     * Hiden
+     */
+    public static final int HIDEN = 248;
+
+    /**
      * Horizontal
      */
     public static final int HORIZONTAL = 68;
