@@ -87,6 +87,10 @@ public class XSLongBinding implements SimpleBinding {
         throws Exception {
         String text = (String) value;
 
+        if(text == null || text.length() == 0){
+            return null;
+        }
+
         if (text.charAt(0) == '+') {
             text = text.substring(1);
         }

@@ -116,6 +116,11 @@ public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
         //do the parsing
         String text = instance.getText();
 
+        //eliminate newlines, repeated spaces, etc
+        final String anyBlankSeq = "\\s+";
+        final String singleSpace = " ";
+        text = text.replaceAll(anyBlankSeq, singleSpace);
+
         //first tokenize by tuple seperators
         StringTokenizer tuples = new StringTokenizer(text, ts);
         CoordinateSequence seq = null;

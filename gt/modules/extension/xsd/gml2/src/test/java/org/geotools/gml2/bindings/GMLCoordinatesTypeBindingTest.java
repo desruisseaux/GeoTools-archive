@@ -81,4 +81,22 @@ public class GMLCoordinatesTypeBindingTest extends AbstractGMLBindingTest {
         assertEquals(c.getCoordinate(1), new Coordinate(9.10, 11.12));
         assertEquals(c.getCoordinate(2), new Coordinate(13.14, 15.16));
     }
+
+    /**
+     * Data coming with multiple blanks or newlines shouldn't happen, but it does
+     */
+    public void testParseMultipleBlankCharacters() throws Exception {
+        coordinates.setText("\n12.34,56.78\n 9.10,11.12\t\t\n 13.14,15.16\t\n  ");
+
+        Node node = createNode(coordinates, null, null, null, null);
+        GMLCoordinatesTypeBinding strategy = (GMLCoordinatesTypeBinding) container
+            .getComponentInstanceOfType(GMLCoordinatesTypeBinding.class);
+
+        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinates, node, null);
+        assertNotNull(c);
+        assertEquals(3, c.size());
+        assertEquals(c.getCoordinate(0), new Coordinate(12.34, 56.78));
+        assertEquals(c.getCoordinate(1), new Coordinate(9.10, 11.12));
+        assertEquals(c.getCoordinate(2), new Coordinate(13.14, 15.16));
+    }
 }
