@@ -81,7 +81,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
     }
     
     public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource) {
-        return new InternalGetLegendGraphicRequest(onlineResource);
+        return new InternalGetLegendGraphicRequest(onlineResource, this);
     }
     
     public GetStylesRequest createGetStylesRequest( URL onlineResource, Layer[] layers ) throws UnsupportedOperationException {
@@ -194,12 +194,18 @@ public class WMS1_1_0 extends WMS1_0_0 {
 	
 	public static class InternalGetLegendGraphicRequest extends AbstractGetLegendGraphicRequest {
 
-        public InternalGetLegendGraphicRequest( URL onlineResource) {
+		public InternalGetLegendGraphicRequest( URL onlineResource, WMS1_1_0 creator) {
             super(onlineResource);
+            // Apparently getLegend graphic is only supported for 1.1.0 SLD WMS. 
+            // Only 1.1.1 supports GetLegendGraphic as a main query.  As far as I can tell
+            // So this allows The WMS 1.1.1 strategy to put its version number.
+            // I think this should be done for all cases my self but I don't
+            // want to make such a big change.
+            setProperty(VERSION, creator.getVersion());
         }
 
         protected void initVersion() {
-            setProperty(VERSION, "1.0.0");
+            setProperty(VERSION, "1.1.0");
         }
         
         public Response createResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
