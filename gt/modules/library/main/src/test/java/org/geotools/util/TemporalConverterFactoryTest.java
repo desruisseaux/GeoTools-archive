@@ -19,7 +19,43 @@ public class TemporalConverterFactoryTest extends TestCase {
 	protected void setUp() throws Exception {
 		factory = new TemporalConverterFactory();
 	}
-	
+
+	/**
+	 * When converting from Calendar to Date from ArcSDE we run into a problem
+	 * where the Dates are out by a very small number. Basically we need to 
+	 * look at the Calendar and see if it represents an *entire* day.
+	 * 
+	 * @throws Exception
+	 */
+    public void testStitchInTime() throws Exception {
+        Converter converter = factory.createConverter( Calendar.class, Date.class, null );
+        
+        Calendar calendar = Calendar.getInstance();
+        
+        // Year, month, date, hour, minute, second.
+        calendar.set(2004, 06, 1);
+        for( int i=1; i<=12;i++){
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            Date date = converter.convert( calendar, Date.class );
+            pause();
+            assertNotNull( date );
+            assertEquals( calendar.getTime(), date );            
+        }        
+        calendar.set(2004, 06, 1, 12, 30 );
+        Date date = converter.convert( calendar, Date.class );
+        pause();
+        assertNotNull( date );
+        assertEquals( calendar.getTime(), date );
+    }
+    
+    /** Pause for one tick of the clock ... */
+    public static void pause(){
+        long pause = System.currentTimeMillis() + 15; // 15 is about the resolution of a system clock
+        while( System.currentTimeMillis() < pause ){
+            Thread.yield();
+        }
+    }
+    
 	public void testCalendarToDate() throws Exception {
 		Calendar calendar = Calendar.getInstance();
 		assertNotNull( factory.createConverter( Calendar.class, Date.class, null ) );
@@ -29,6 +65,9 @@ public class TemporalConverterFactoryTest extends TestCase {
 		assertNotNull( date );
 		assertEquals( calendar.getTime(), date );
 	}
+	// java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=true,lenient=true,zone=sun.util.calendar.ZoneInfo[id="America/Los_Angeles",offset=-28800000,dstSavings=3600000,useDaylight=true,transitions=185,lastRule=java.util.SimpleTimeZone[id=America/Los_Angeles,offset=-28800000,dstSavings=3600000,useDaylight=true,startYear=0,startMode=3,startMonth=2,startDay=8,startDayOfWeek=1,startTime=7200000,startTimeMode=0,endMode=3,endMonth=10,endDay=1,endDayOfWeek=1,endTime=7200000,endTimeMode=0]],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=1,YEAR=2004,MONTH=6,WEEK_OF_YEAR=17,WEEK_OF_MONTH=4,DAY_OF_MONTH=6,DAY_OF_YEAR=116,DAY_OF_WEEK=6,DAY_OF_WEEK_IN_MONTH=4,AM_PM=1,HOUR=3,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=468,ZONE_OFFSET=-28800000,DST_OFFSET=3600000]
+	// cachedFixedDate 733157
+	// 
 	
 	public void testCalendarToTime() throws Exception {
 		Calendar calendar = Calendar.getInstance();

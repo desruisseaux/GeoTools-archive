@@ -40,6 +40,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -296,12 +297,18 @@ public class SLDTransformer extends TransformerBase {
 			}
 
 			if (raster.getOverlap() != null) {
-				start("OverlapBehavior");
-				final String pn = ((AttributeExpressionImpl) raster
-						.getOverlap()).getPropertyName();
-				start(pn);
-				end(pn);
-				end("OverlapBehavior");
+				Expression overlaps = raster.getOverlap();
+				if( overlaps instanceof PropertyName){
+				    final String pn = ((PropertyName)overlaps).getPropertyName();
+				    
+	                start("OverlapBehavior");				    
+	                start(pn);
+	                end(pn);
+	                end("OverlapBehavior");	                
+				}
+				else {
+				    element("OverlapBehavior", overlaps);
+				}
 			}
 
 			if (raster.getImageOutline() != null) {
@@ -311,26 +318,37 @@ public class SLDTransformer extends TransformerBase {
 			}
 
 			if (raster.getChannelSelection() != null) {
-				start("ChannelSelection");
-				final ChannelSelection cs = raster.getChannelSelection();
+				final ChannelSelection cs = raster.getChannelSelection();				
 				if (cs.getGrayChannel() != null) {
-					start("GrayChannel");
-					cs.getGrayChannel().accept(this);
+				    start("ChannelSelection");
+				    SelectedChannelType gray = cs.getGrayChannel();
+				    
+				    start("GrayChannel");
+				    gray.accept(this);
 					end("GrayChannel");
-				} else {
-					start("RedChannel");
-					cs.getRGBChannels()[0].accept(this);
+                    
+					end("ChannelSelection");                    					
+				} else if( cs.getRGBChannels() != null && cs.getRGBChannels().length ==3 && cs.getRGBChannels()[0] != null && cs.getRGBChannels()[1] != null && cs.getRGBChannels()[2] != null){				    
+				    start("ChannelSelection");
+	                SelectedChannelType[] rgb = cs.getRGBChannels();
+				    
+				    start("RedChannel");
+	                rgb[0].accept(this);
 					end("RedChannel");
 
 					start("GreenChannel");
-					cs.getRGBChannels()[1].accept(this);
+					rgb[1].accept(this);
 					end("GreenChannel");
 
 					start("BlueChannel");
-					cs.getRGBChannels()[2].accept(this);
+					rgb[2].accept(this);
 					end("BlueChannel");
+
+					end("ChannelSelection");					
 				}
-				end("ChannelSelection");
+				else {
+				    // we have an invalid ChannelSelection ?
+				}
 			}
 
 			if (raster.getColorMap() != null) {
