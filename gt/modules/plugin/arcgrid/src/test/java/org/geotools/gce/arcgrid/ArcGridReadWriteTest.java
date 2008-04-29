@@ -97,13 +97,13 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 		final GeneralEnvelope e2 = (GeneralEnvelope) gc2.getEnvelope();
 
 		/** Checking Envelopes */
-		if ((e1.getLowerCorner().getOrdinate(0) != e1.getLowerCorner()
+		if ((e1.getLowerCorner().getOrdinate(0) != e2.getLowerCorner()
 				.getOrdinate(0))
-				|| (e1.getLowerCorner().getOrdinate(1) != e1.getLowerCorner()
+				|| (e1.getLowerCorner().getOrdinate(1) != e2.getLowerCorner()
 						.getOrdinate(1))
-				|| (e1.getUpperCorner().getOrdinate(0) != e1.getUpperCorner()
+				|| (e1.getUpperCorner().getOrdinate(0) != e2.getUpperCorner()
 						.getOrdinate(0))
-				|| (e1.getUpperCorner().getOrdinate(1) != e1.getUpperCorner()
+				|| (e1.getUpperCorner().getOrdinate(1) != e2.getUpperCorner()
 						.getOrdinate(1))) {
 			throw new Exception("GridCoverage Envelopes are not equal"
 					+ e1.toString() + e2.toString());
