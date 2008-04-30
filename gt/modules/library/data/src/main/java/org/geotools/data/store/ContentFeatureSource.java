@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.Icon;
-
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
@@ -32,6 +30,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
@@ -93,6 +92,8 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
     protected SimpleFeatureType schema;
     
+    private QueryCapabilities queryCapabilities;
+    
   
     /**
      * Creates the new feature source from a query.
@@ -107,6 +108,7 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
     public ContentFeatureSource(ContentEntry entry, Query query) {
         this.entry = entry;
         this.query = query;
+        this.queryCapabilities = new QueryCapabilities();
         
         //set up hints
         hints = new HashSet<Hints.ClassKey>();
@@ -864,4 +866,8 @@ public abstract class ContentFeatureSource implements FeatureSource<SimpleFeatur
      */
 
     //protected abstract FeatureCollection<SimpleFeatureType, SimpleFeature> readonly(ContentState state, Filter filter);
+
+    public QueryCapabilities getQueryCapabilities() {
+        return this.queryCapabilities;
+    }
 }

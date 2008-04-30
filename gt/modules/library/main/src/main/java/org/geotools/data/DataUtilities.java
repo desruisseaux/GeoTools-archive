@@ -1541,6 +1541,11 @@ public class DataUtilities {
      * <li>
      * filter: the filtets of both queries are or'ed
      * </li>
+     * <li>
+     * <b>any other query property is ignored</b> and no guarantees are made of
+     * their return values, so client code shall explicitly care of hints, startIndex, etc.,
+     * if needed.
+     * </li>
      * </ul>
      * </p>
      *

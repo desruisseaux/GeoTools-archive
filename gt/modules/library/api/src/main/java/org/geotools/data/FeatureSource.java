@@ -126,6 +126,15 @@ public interface FeatureSource<T extends FeatureType, F extends Feature>{
     DataAccess<T, F> getDataStore();
 
     /**
+     * Returns and indication of what query capabilities this FeatureSource
+     * supports natively.
+     * 
+     * @return a QueryCapabilities object containing the native query capabilities.
+     * @since 2.5
+     */
+    QueryCapabilities getQueryCapabilities();
+    
+    /**
      * Adds a listener to the list that's notified each time a change to the
      * FeatureStore occurs.
      *

@@ -717,20 +717,15 @@ public abstract class JDBC1DataStore implements DataStore {
 				buf.append(" WHERE '1' = '0'"); // NO-OP it
 				sqlQuery = buf.toString();
 			} else {
-				sqlQuery = sqlBuilder.buildSQLQuery(typeName, mapper,
-						attrTypes, preFilter);
+				final Integer offset = query.getStartIndex();
+                Integer limit = null;
+                if(query.getMaxFeatures() != Integer.MAX_VALUE){
+                    limit = new Integer(query.getMaxFeatures());
+                }
+                sqlQuery = sqlBuilder.buildSQLQuery(typeName, mapper,
+						attrTypes, preFilter, query.getSortBy(), offset, limit);
 			}
 
-			//order by clause
-			if ( query.getSortBy() != null ) {
-				//encode the sortBy clause
-				StringBuffer buf = new StringBuffer();
-				buf.append( sqlQuery );
-				sqlBuilder.sqlOrderBy( buf, query.getSortBy() );
-				
-				sqlQuery = buf.toString();
-			}
-			
 			LOGGER.fine("sql is " + sqlQuery);
 		} catch (SQLEncoderException e) {
 			throw new DataSourceException("Error building SQL Query", e);

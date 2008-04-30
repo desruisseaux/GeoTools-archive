@@ -17,6 +17,7 @@
  */
 package org.geotools.data.jdbc;
 
+import org.geotools.data.Query;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -60,6 +61,9 @@ public interface SQLBuilder {
      * @param mapper    an FIDMapper
      * @param attrTypes the array of AttributeType elements for the select statement
      * @param filter    the filter to convert to a where statement
+     * @param sortBy 
+     * @param offset
+     * @param limit
      *
      * @return a String representing an SQL statement
      *
@@ -67,8 +71,14 @@ public interface SQLBuilder {
      * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
      */
     public String buildSQLQuery(String typeName, FIDMapper mapper, 
+            AttributeDescriptor[] attrTypes, Filter filter, SortBy[] sortBy, Integer offset, Integer limit) throws SQLEncoderException;
+
+    /**
+     * @deprecated use {@link #buildSQLQuery(String, FIDMapper, AttributeDescriptor[], Filter, SortBy[], Integer, Integer)}
+     */
+    public String buildSQLQuery(String typeName, FIDMapper mapper, 
             AttributeDescriptor[] attrTypes, Filter filter) throws SQLEncoderException;
-    
+
     /**
      * Returns the Filter required for post processing.
      * <p>
@@ -128,7 +138,21 @@ public interface SQLBuilder {
      * sql: <code>ORDER BY &lt;property1&gt; [ASC|DESC], ....</code>
      * </p>
      * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
+     * @deprecated 
      */
     public void sqlOrderBy( StringBuffer sql, SortBy[] sortBy ) throws SQLEncoderException;
     
+    /**
+     * Constructs ORDER BY clause.
+     * <p>
+     * sql: <code>ORDER BY &lt;property1&gt; [ASC|DESC], ....</code>
+     * </p>
+     * 
+     * @param sql buffer where the complete query is being built
+     * @param mapper where to inferr the primary key fields from in case the sortBy list contains
+     *            {@link SortBy#NATURAL_ORDER} or {@link SortBy#REVERSE_ORDER}
+     * @param sortBy the order by criteria, possibly <code>null</code> 
+     * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
+     */
+    public void sqlOrderBy( StringBuffer sql, FIDMapper mapper, SortBy[] sortBy ) throws SQLEncoderException;
 }

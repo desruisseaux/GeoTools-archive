@@ -15,9 +15,21 @@
  */
 package org.geotools.data.postgis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.geotools.data.Query;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
+import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
+import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
+import org.geotools.data.postgis.fidmapper.OIDFidMapper;
+import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -25,6 +37,8 @@ import org.geotools.filter.SQLEncoderPostgis;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -69,23 +83,82 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         this.ft = ft;
         encoder.setFeatureType( ft );
     }
+    
+    /**
+     * Overrides to support offset and maxFeatures
+     */
+    @Override
+    public String buildSQLQuery(String typeName,
+            FIDMapper mapper,
+            AttributeDescriptor[] attrTypes,
+            org.opengis.filter.Filter filter,
+            SortBy[] sortBy,
+            Integer offset,
+            Integer limit) throws SQLEncoderException {
+        
+        if(offset != null){
+            //we need to add the PK as sorting order regardless of the client asking for a specific order or not
+            //so we can ensure a consistent order if the client asks for ordering over an attribute other than the PK
+            List<SortBy> sortAtts = new ArrayList<SortBy>();
+            if(sortBy != null){
+                sortAtts.addAll(Arrays.asList(sortBy));
+            }
+            if(!(sortAtts.contains(SortBy.NATURAL_ORDER) || sortAtts.contains(SortBy.REVERSE_ORDER))){
+                //no natural order contained in the required list, append PK ordering...
+                sortAtts.add(SortBy.NATURAL_ORDER);
+            }
+            sortBy = sortAtts.toArray(new SortBy[sortAtts.size()]);
+        }
+        
+        final String selectStatement = super.buildSQLQuery(typeName, mapper, attrTypes, filter, sortBy, offset, limit);
+        StringBuilder sb = new StringBuilder(selectStatement);
+        
+        if(offset != null){
+            sb.append(" OFFSET ").append(offset);
+        }
+        
+        if(limit != null){
+            sb.append(" LIMIT ").append(limit);
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Overrides to support NATURAL_ORDER and REVERSE_ORDER
+     */
+    @Override
+    protected void addOrderByPK(StringBuffer sql, FIDMapper mapper, SortOrder sortOrder)
+            throws SQLEncoderException {
+        if (mapper == null || mapper.getColumnCount() == 0) {
+            throw new SQLEncoderException(
+                    "NATURAL_ORDER and REVERSE_ORDER is not supported without a primary key");
+        }
+
+        final String order = SortOrder.ASCENDING == sortOrder ? "ASC" : "DESC";
+        String colName;
+        final int columnCount = mapper.getColumnCount();
+        for (int idx = 0; idx < columnCount; idx++) {
+            colName = mapper.getColumnName(idx);
+            sql.append(colName).append(" ").append(order);
+            if (idx < columnCount - 1) {
+                sql.append(", ");
+            }
+        }
+    }
 
     /**
      * Produces the select information required.
-     * 
      * <p>
      * The featureType, if known, is always requested.
      * </p>
-     * 
      * <p>
      * sql: <code>featureID (,attributeColumn)</code>
      * </p>
-     * 
      * <p>
-     * We may need to provide AttributeReaders with a hook so they can request
-     * a wrapper function.
+     * We may need to provide AttributeReaders with a hook so they can request a wrapper function.
      * </p>
-     *
+     * 
      * @param sql
      * @param mapper
      * @param attributes

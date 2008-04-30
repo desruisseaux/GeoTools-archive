@@ -15,6 +15,7 @@
  */
 package org.geotools.data.jdbc;
 
+import org.geotools.data.Query;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -202,6 +203,11 @@ public class GeoAPISQLBuilder implements SQLBuilder {
      * Filter.
      * </p>
      *
+     * <p>
+     * Subclasses that support {@link Query#getStartIndex() startIndex} should override as
+     * appropriate.
+     * </p>
+     * 
      * @param typeName The name of the table (feature type) to be queried
      * @param mapper FIDMapper to identify the FID columns in the table
      * @param attrTypes The specific attribute columns to be selected
@@ -214,20 +220,45 @@ public class GeoAPISQLBuilder implements SQLBuilder {
      *         by the encoder class
      * FIXME:  Throw FilterToSQLException when the parent interface is fixed.
      */
-    public String buildSQLQuery(String typeName, FIDMapper mapper,
-        AttributeDescriptor[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
+    public String buildSQLQuery(String typeName,
+            FIDMapper mapper,
+            AttributeDescriptor[] attrTypes,
+            Filter filter,
+            SortBy[] sortBy,
+            Integer offset,
+            Integer limit) throws SQLEncoderException {
+        if (offset != null && offset.intValue() != 0) {
+            throw new UnsupportedOperationException("Requested an startIndex of " + offset
+                    + " where its not supported");
+        }
         StringBuffer sqlBuffer = new StringBuffer();
-
         sqlBuffer.append("SELECT ");
         sqlColumns(sqlBuffer, mapper, attrTypes);
         sqlFrom(sqlBuffer, typeName);
         encoder.setFIDMapper(mapper);
         sqlWhere(sqlBuffer, filter);
-
+        
+        //order by clause
+        if ( sortBy != null ) {
+            //encode the sortBy clause
+            sqlOrderBy( sqlBuffer, null, sortBy);
+        }
+        
         String sqlStmt = sqlBuffer.toString();
 
         return sqlStmt;
     }
+
+    /**
+     * @deprecated use {@link #buildSQLQuery(String, FIDMapper, AttributeDescriptor[], Filter, SortBy[], Integer, Integer)}
+     */
+    public String buildSQLQuery(String typeName,
+            FIDMapper mapper,
+            AttributeDescriptor[] attrTypes,
+            Filter filter) throws SQLEncoderException {
+        return buildSQLQuery(typeName, mapper, attrTypes, filter, null, null, null);
+    }
+    
 
     /**
      * Appends the names of the columns to be selected.
@@ -278,6 +309,13 @@ public class GeoAPISQLBuilder implements SQLBuilder {
     }
     
     /**
+     * @deprecated
+     */
+    public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
+        sqlOrderBy(sql, null, sortBy);
+    }
+
+    /**
      * Generates the order by clause.
      * <p>
      * This uses the standard ASC,DESC sql keywords to denote ascending,descending
@@ -286,7 +324,7 @@ public class GeoAPISQLBuilder implements SQLBuilder {
      * 
      * FIXME:  Throw FilterToSQLException when the parent interface is fixed.
      */
-    public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
+    public void sqlOrderBy(StringBuffer sql, FIDMapper mapper, SortBy[] sortBy) throws SQLEncoderException {
     	if ( sortBy == null || sortBy.length == 0 ) 
     		return;	//nothing to sort on
     	
@@ -314,5 +352,5 @@ public class GeoAPISQLBuilder implements SQLBuilder {
     	}
     	
     }
-    
+
 }

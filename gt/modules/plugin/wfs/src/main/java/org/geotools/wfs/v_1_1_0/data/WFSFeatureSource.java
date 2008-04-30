@@ -11,6 +11,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -30,19 +31,23 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
 
     private SimpleFeatureType featureType;
 
-    public WFSFeatureSource(final WFS_1_1_0_DataStore dataStore, final String typeName,
-            final WFS110ProtocolHandler protocolHandler) throws IOException {
+    private QueryCapabilities queryCapabilities;
+
+    public WFSFeatureSource(final WFS_1_1_0_DataStore dataStore,
+                            final String typeName,
+                            final WFS110ProtocolHandler protocolHandler) throws IOException {
         this.typeName = typeName;
         this.dataStore = dataStore;
         this.protocolHandler = protocolHandler;
+        this.queryCapabilities = new QueryCapabilities();
         this.featureType = dataStore.getSchema(typeName);
     }
 
-    public Name getName(){
+    public Name getName() {
         QName name = protocolHandler.getFeatureTypeInfo(typeName).getName();
         return new NameImpl(name.getNamespaceURI(), name.getLocalPart());
     }
-    
+
     /**
      * @see FeatureSource#getDataStore()
      */
@@ -142,4 +147,7 @@ public class WFSFeatureSource implements FeatureSource<SimpleFeatureType, Simple
         return named;
     }
 
+    public QueryCapabilities getQueryCapabilities() {
+        return this.queryCapabilities;
+    }
 }

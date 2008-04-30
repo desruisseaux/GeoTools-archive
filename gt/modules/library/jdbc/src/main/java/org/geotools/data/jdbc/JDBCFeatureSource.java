@@ -37,6 +37,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
@@ -92,6 +93,8 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
     /** JDBCDataStore based dataStore used to aquire content */
     private JDBC1DataStore dataStore;
 
+    protected QueryCapabilities queryCapabilities;
+    
     /**
      * JDBCFeatureSource creation.
      * 
@@ -107,6 +110,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         SimpleFeatureType featureType) {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
+        this.queryCapabilities = new QueryCapabilities();
     }
     
     /**
@@ -249,10 +253,12 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         if ((request.getTypeName() != null) && !typeName.equals(request.getTypeName())) {
             throw new IOException("Cannot query " + typeName + " with:" + request);
         }
+        
         if (request.getTypeName() == null) {
             request = new DefaultQuery(request);
             ((DefaultQuery) request).setTypeName(featureType.getTypeName());
         }
+        
         return new JDBCFeatureCollection(this, request);
     }
 
@@ -445,4 +451,8 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
      public Set getSupportedHints() {
             return dataStore.getSupportedHints();
      }
+
+    public QueryCapabilities getQueryCapabilities() {
+        return queryCapabilities;
+    }
 }

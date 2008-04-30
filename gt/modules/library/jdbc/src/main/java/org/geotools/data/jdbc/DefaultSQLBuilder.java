@@ -15,6 +15,7 @@
  */
 package org.geotools.data.jdbc;
 
+import org.geotools.data.Query;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -218,12 +219,25 @@ public class DefaultSQLBuilder implements SQLBuilder {
     }
 
     /**
+     * @deprecated
+     */
+    public String buildSQLQuery(String typeName, FIDMapper mapper,
+            AttributeDescriptor[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
+        return buildSQLQuery(typeName, mapper, attrTypes, filter, (SortBy[])null, null, null);
+    }
+    
+    /**
      * Constructs the full SQL SELECT statement for the supplied Filter.
      * 
      * <p>
      * The statement is constructed by concatenating the SELECT column list,
      * FROM table specification and WHERE clause appropriate to the supplied
-     * Filter.
+     * Filte.
+     * </p>
+     * 
+     * <p>
+     * Subclasses that support {@link Query#getStartIndex() startIndex} should override as
+     * appropriate.
      * </p>
      *
      * @param typeName The name of the table (feature type) to be queried
@@ -237,8 +251,14 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * @throws SQLEncoderException Not thrown by this method but may be thrown
      *         by the encoder class
      */
-    public String buildSQLQuery(String typeName, FIDMapper mapper,
-        AttributeDescriptor[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
+    public String buildSQLQuery(String typeName,
+            FIDMapper mapper,
+            AttributeDescriptor[] attrTypes,
+            Filter filter,
+            SortBy[] sortBy,
+            Integer offset,
+            Integer limit) throws SQLEncoderException {
+
         StringBuffer sqlBuffer = new StringBuffer();
 
         sqlBuffer.append("SELECT ");
@@ -247,11 +267,17 @@ public class DefaultSQLBuilder implements SQLBuilder {
         encoder.setFIDMapper(mapper);
         sqlWhere(sqlBuffer, filter);
 
+        //order by clause
+        if ( sortBy != null ) {
+            //encode the sortBy clause
+            sqlOrderBy( sqlBuffer, mapper, sortBy);
+        }
+        
         String sqlStmt = sqlBuffer.toString();
 
         return sqlStmt;
     }
-
+    
     /**
      * Appends the names of the columns to be selected.
      * 
@@ -299,6 +325,14 @@ public class DefaultSQLBuilder implements SQLBuilder {
         sql.append(encoder.escapeName(geomAttribute.getLocalName()));
     }
     
+
+    /**
+     * @deprecated
+     */
+    public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
+        sqlOrderBy(sql, null, sortBy);
+    }
+
     /**
      * Generates the order by clause.
      * <p>
@@ -306,33 +340,53 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * sort respectivley.
      * </p>
      */
-    public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
-    	if ( sortBy == null || sortBy.length == 0 ) 
-    		return;	//nothing to sort on
-    	
-    	sql.append( " ORDER BY ");
-    	for ( int i = 0; i < sortBy.length; i++ ) {
-    		AttributeDescriptor type = (AttributeDescriptor) sortBy[i].getPropertyName().evaluate( ft );
-    		if ( type != null ) {
-    			sql.append( encoder.escapeName( type.getLocalName() ) );
-    		}
-    		else {
-    			sql.append( encoder.escapeName( sortBy[i].getPropertyName().getPropertyName() ) );	
-    		}
-    		
-    		
-    		if ( SortOrder.DESCENDING.equals( sortBy[i].getSortOrder() ) ) {
-    			sql.append( " DESC");
-    		}
-    		else {
-    			sql.append( " ASC");
-    		}
-    		
-    		if ( i < sortBy.length-1 ) {
-    			sql.append( ", ");
-    		}
-    	}
-    	
+    public void sqlOrderBy(StringBuffer sql, FIDMapper mapper, SortBy[] sortBy)
+            throws SQLEncoderException {
+        if (sortBy == null || sortBy.length == 0)
+            return; // nothing to sort on
+
+        sql.append(" ORDER BY ");
+        for (int i = 0; i < sortBy.length; i++) {
+            final SortBy sortAttribute = sortBy[i];
+            if (SortBy.NATURAL_ORDER.equals(sortAttribute)
+                    || SortBy.REVERSE_ORDER.equals(sortAttribute)) {
+                addOrderByPK(sql, mapper, sortAttribute.getSortOrder());
+            } else {
+                AttributeDescriptor type = (AttributeDescriptor) sortAttribute.getPropertyName()
+                        .evaluate(ft);
+                if (type != null) {
+                    sql.append(encoder.escapeName(type.getLocalName()));
+                } else {
+                    sql.append(encoder
+                            .escapeName(sortAttribute.getPropertyName().getPropertyName()));
+                }
+
+                if (SortOrder.DESCENDING.equals(sortAttribute.getSortOrder())) {
+                    sql.append(" DESC");
+                } else {
+                    sql.append(" ASC");
+                }
+            }
+
+            if (i < sortBy.length - 1) {
+                sql.append(", ");
+            }
+        }
     }
-    
+
+    /**
+     * @param sql the buffer where the select statement is being built, already contains the "ORDER
+     *            BY " clause, only needs to be appended with the PK fields.
+     * @param mapper the fid mapper where to get the PK fields from, may be null, in which case
+     *            implementations should either throw an exception or not, depending on whether they
+     *            actually need it.
+     * @param sortOrder the order in which to encode the PK fields (eg,
+     *            <code>"pkAtt1 DESC, pkAtt2 DESC"</code>)
+     * @throws SQLEncoderException by default, subclasses shall override if pk ordering is supported
+     */
+    protected void addOrderByPK(StringBuffer sql, FIDMapper mapper, SortOrder sortOrder)
+            throws SQLEncoderException {
+        throw new SQLEncoderException("NATURAL_ORDER or REVERSE_ORDER "
+                + "ordering is not supported for this FeatureType");
+    }
 }

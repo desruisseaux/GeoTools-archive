@@ -702,7 +702,9 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	//TODO: Implement filtering for bbox and read in only the need attributes 
 	Collection queryLayer(MapLayer currLayer, CollectionSource source) {
-		
+		//REVISIT: this method does not make sense. Always compares
+	    //new DefaultQuery(DefaultQuery.ALL) for reference equality with Query.All. GR.
+	    
 		Collection results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
@@ -869,6 +871,8 @@ public final class StreamingRenderer implements GTRenderer {
 
 		// now, if a definition query has been established for this layer, be
 		// sure to respect it by combining it with the bounding box one.
+		// Currently this definition query is being set dynamically in geoserver
+		// as per the user's filter, maxFeatures and startIndex WMS GetMap custom parameters
 		definitionQuery = currLayer.getQuery();
 
 		if (definitionQuery != Query.ALL) {
@@ -882,6 +886,11 @@ public final class StreamingRenderer implements GTRenderer {
 		query.setCoordinateSystem(featCrs);
 		query.setHints(new Hints(Hints.JTS_COORDINATE_SEQUENCE_FACTORY, new LiteCoordinateSequenceFactory()));
 
+		// handle startIndex comming from user's request
+		if(definitionQuery.getStartIndex() != null){
+		    query.setStartIndex(definitionQuery.getStartIndex());
+		}
+		
 		if (isMemoryPreloadingEnabled()) {
 			// TODO: attache a feature listener, we must erase the memory cache
 			// if
@@ -1042,6 +1051,7 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
+	 * @deprecated this method shall be killed, its of no use
 	 */
 	private boolean isMemoryPreloadingEnabled() {
 		if (rendererHints == null)

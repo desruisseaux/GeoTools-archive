@@ -53,7 +53,11 @@ class ALLQuery implements Query {
     public final int getMaxFeatures() {
         return DEFAULT_MAX; // consider Integer.MAX_VALUE
     }
-
+    
+    public Integer getStartIndex(){
+        return null;
+    }
+    
     public final Filter getFilter() {
         return Filter.INCLUDE;
     }

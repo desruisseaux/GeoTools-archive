@@ -7,6 +7,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -90,4 +91,7 @@ public class WrappingPostgisFeatureSource implements FeatureSource<SimpleFeature
         return wrapped.getSupportedHints();
     }
 
+    public QueryCapabilities getQueryCapabilities() {
+        return wrapped.getQueryCapabilities();
+    }
 }

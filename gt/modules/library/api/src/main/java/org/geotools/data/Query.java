@@ -172,6 +172,8 @@ public interface Query {
      */
     int getMaxFeatures();
 
+    Integer getStartIndex();
+
     /**
      * The Filter can be used to define constraints on a query.  If no Filter
      * is present then the query is unconstrained and all feature instances

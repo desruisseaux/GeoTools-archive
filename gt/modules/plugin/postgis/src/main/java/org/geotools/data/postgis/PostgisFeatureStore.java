@@ -30,6 +30,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.data.jdbc.JDBCUtils;
@@ -53,6 +54,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -111,7 +113,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     /** the name of the column to use for the featureId */
     protected FIDMapper fidMapper;
 
-    public PostgisFeatureStore(PostgisDataStore postgisDataStore, SimpleFeatureType featureType)
+    public PostgisFeatureStore(final PostgisDataStore postgisDataStore, final SimpleFeatureType featureType)
         throws IOException {
         super(postgisDataStore, featureType);
         tableName = featureType.getTypeName();
@@ -130,6 +132,27 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             encoder.setSRID(srid);
             encoder.setFIDMapper(fidMapper);
         }
+        queryCapabilities = new QueryCapabilities(){
+            @Override
+            public boolean isOffsetSupported(){
+                return true;
+            }
+
+            @Override
+            public boolean supportsSorting(SortBy[] sortAttributes){
+                for(int i = 0; i < sortAttributes.length; i++){
+                    SortBy sortBy = sortAttributes[i];
+                    if(SortBy.NATURAL_ORDER == sortBy){
+                        continue;
+                    }
+                    String attName = sortBy.getPropertyName().getPropertyName();
+                    if(featureType.getAttribute(attName) == null){
+                       return false; 
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     protected int getSRID(String geomName) throws IOException {

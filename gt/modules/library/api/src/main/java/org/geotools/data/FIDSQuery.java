@@ -54,6 +54,10 @@ class FIDSQuery implements Query {
     public int getMaxFeatures() {
         return DEFAULT_MAX; // consider Integer.MAX_VALUE
     }
+    
+    public Integer getStartIndex(){
+        return null;
+    }
 
     public Filter getFilter() {
         return Filter.INCLUDE;

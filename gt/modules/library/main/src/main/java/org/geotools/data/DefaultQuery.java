@@ -48,6 +48,8 @@ public class DefaultQuery implements Query {
     /** The maximum numbers of features to fetch */
     private int maxFeatures = Query.DEFAULT_MAX;
 
+    private Integer startIndex = null;
+    
     /** The filter to constrain the request. */
     private Filter filter = Filter.INCLUDE;
 
@@ -161,6 +163,7 @@ public class DefaultQuery implements Query {
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
       this.version = query.getVersion();
       this.hints = query.getHints();
+      this.startIndex = query.getStartIndex();
     }
     
     /**
@@ -257,6 +260,17 @@ public class DefaultQuery implements Query {
         return this.maxFeatures;
     }
 
+    public Integer getStartIndex(){
+        return this.startIndex;
+    }
+    
+    public void setStartIndex(Integer startIndex){
+        if(startIndex != null && startIndex.intValue() < 0){
+            throw new IllegalArgumentException("startIndex shall be a positive integer: " + startIndex);
+        }
+        this.startIndex = startIndex;
+    }
+    
     /**
      * Sets the max features to retrieved by this query.
      *
@@ -385,7 +399,8 @@ public class DefaultQuery implements Query {
                 | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
                 | ((getVersion() == null) ? 0 : getVersion().hashCode())
                 | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
-                | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode());
+                | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode())
+                | getStartIndex();
     }
 
     /**
@@ -420,7 +435,7 @@ public class DefaultQuery implements Query {
                                            : getCoordinateSystem().equals(other.getCoordinateSystem()))
         && ((getCoordinateSystemReproject() == null) ? (other.getCoordinateSystemReproject() == null)
                                                    : getCoordinateSystemReproject().equals(other.getCoordinateSystemReproject()))                                           
-        ;
+        && (getStartIndex() == other.getStartIndex());
     }
     /**
      * Over ride of toString

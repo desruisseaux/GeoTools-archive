@@ -29,6 +29,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.QueryCapabilities;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -37,6 +38,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -51,6 +53,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     private ArcSdeResourceInfo resourceInfo;
 
     protected ArcSdeVersionHandler versionHandler;
+    
+    private QueryCapabilities queryCapabilities;
 
     public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo,
                                final ArcSDEDataStore dataStore,
@@ -58,6 +62,24 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
         this.typeInfo = typeInfo;
         this.dataStore = dataStore;
         this.versionHandler = versionHandler;
+        this.queryCapabilities = new QueryCapabilities(){
+            @Override
+            public boolean supportsSorting(SortBy[] sortAttributes){
+                final SimpleFeatureType featureType = typeInfo.getFeatureType();
+                for(int i = 0; i < sortAttributes.length; i++){
+                    SortBy sortBy = sortAttributes[i];
+                    if(SortBy.NATURAL_ORDER == sortBy){
+                        //TODO: we should be able to support natural order
+                        return false;
+                    }
+                    String attName = sortBy.getPropertyName().getPropertyName();
+                    if(featureType.getAttribute(attName) == null){
+                       return false; 
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     /**
@@ -80,6 +102,11 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
             this.resourceInfo = new ArcSdeResourceInfo(this.typeInfo, this);
         }
         return this.resourceInfo;
+    }
+
+
+    public QueryCapabilities getQueryCapabilities() {
+        return this.queryCapabilities;
     }
 
     /**

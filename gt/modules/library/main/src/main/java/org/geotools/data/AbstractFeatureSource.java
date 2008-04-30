@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.swing.Icon;
-
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.data.store.EmptyFeatureCollection;
@@ -80,6 +78,8 @@ public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatu
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     
     protected Set hints = Collections.EMPTY_SET;
+    
+    protected QueryCapabilities queryCapabilities = new QueryCapabilities();
     
     public AbstractFeatureSource() {
         // just to keep the default constructor around
@@ -158,6 +158,11 @@ public abstract class AbstractFeatureSource implements FeatureSource<SimpleFeatu
             
         };
     }
+    
+    public QueryCapabilities getQueryCapabilities(){
+        return queryCapabilities;
+    }
+    
     /**
      * Retrieve the Transaction this FeatureSource<SimpleFeatureType, SimpleFeature> is operating against.
      *
