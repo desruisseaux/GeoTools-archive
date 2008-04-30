@@ -691,18 +691,22 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// getting name for the prj file
 			final String sourceAsString;
 
-			if (source instanceof File) {
+			if (source instanceof File)
 				sourceAsString = ((File) source).getAbsolutePath();
-			} else {
+			else
 				sourceAsString = ((URL) source).getFile();
-			}
 
-			final int index = sourceAsString.lastIndexOf(".");
-			final StringBuffer base = new StringBuffer(sourceAsString
-					.substring(0, index)).append(".prj");
+			int index = sourceAsString.lastIndexOf(".");
+			final StringBuffer prjFileName;
+			if (index == -1)
+				prjFileName = new StringBuffer(sourceAsString);
+			else
+				prjFileName = new StringBuffer(sourceAsString.substring(0,
+						index));
+			prjFileName.append(".prj");
 
 			// does it exist?
-			final File prjFile = new File(base.toString());
+			final File prjFile = new File(prjFileName.toString());
 			if (prjFile.exists()) {
 				// it exists then we have top read it
 				PrjFileReader projReader = null;
