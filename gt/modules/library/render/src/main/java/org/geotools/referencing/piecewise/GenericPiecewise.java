@@ -44,14 +44,10 @@ import com.sun.media.jai.opimage.RIFUtil;
 import com.sun.media.jai.util.ImageUtil;
 
 /**
- * Images are created using the {@code         GenericPiecewise.CRIF} inner
- * class, where "CRIF" stands for
- * {@link java.awt.image.renderable.ContextualRenderedImageFactory} . The image
- * operation name is "org.geotools.GenericPiecewise".
- * 
- * @version $Id: GenericPiecewise.java 29282 2008-02-13 21:32:09Z simboss $
- * @author Simone Giannecchini - GeoSolutions
- * @since 2.4
+ * Images are created using the    {@code            GenericPiecewise.CRIF}    inner class, where "CRIF" stands for   {@link java.awt.image.renderable.ContextualRenderedImageFactory}    . The image operation name is "org.geotools.GenericPiecewise".
+ * @version    $Id: GenericPiecewise.java 29282 2008-02-13 21:32:09Z simboss $
+ * @author    Simone Giannecchini - GeoSolutions
+ * @since    2.4
  */
 public class GenericPiecewise extends ColormapOpImage {
 
@@ -65,14 +61,14 @@ public class GenericPiecewise extends ColormapOpImage {
 	 */
 	private final DefaultPiecewiseTransform1D piecewise;
 
-	private boolean isByteData;
+	private final boolean isByteData;
 
 	private byte[][] lut;
 	
 	private double gapsValue = Double.NaN;
 	private boolean hasGapsValue = false;
 
-	private boolean useLast;
+	private final boolean useLast;
 
 
 	/**
@@ -93,7 +89,7 @@ public class GenericPiecewise extends ColormapOpImage {
 		this.piecewise = lic;
         // Ensure that the number of sets of breakpoints is either unity
         // or equal to the number of bands.
-        int numBands = sampleModel.getNumBands();
+        final int numBands = sampleModel.getNumBands();
 
 
         // Set the byte data flag.
@@ -107,7 +103,7 @@ public class GenericPiecewise extends ColormapOpImage {
 		// in the input range
 		//
 		// ////////////////////////////////////////////////////////////////////
-		if (this.piecewise.isHasDefault()) {
+		if (this.piecewise.hasDefault()) {
 			gapsValue=piecewise.getDefaultValue();
 			hasGapsValue = true;
 		}
@@ -129,7 +125,7 @@ public class GenericPiecewise extends ColormapOpImage {
             // Initialize the lookup table.
             try {
 				createLUT(numBands);
-			} catch (TransformException e) {
+			} catch (final TransformException e) {
 				final RuntimeException re= new RuntimeException(e);
 				throw re;
 			}
@@ -199,7 +195,7 @@ public class GenericPiecewise extends ColormapOpImage {
 
 							} while (!iterator.nextPixelDone());
 					} while (!iterator.nextLineDone());
-			} catch (Exception cause) {
+			} catch (final Exception cause) {
 				final RasterFormatException exception = new RasterFormatException(
 						cause.getLocalizedMessage());
 				exception.initCause(cause);
@@ -210,8 +206,8 @@ public class GenericPiecewise extends ColormapOpImage {
 	}
 
 
-	private PiecewiseTransform1DElement domainSearch(WritableRectIter iterator,
-			PiecewiseTransform1DElement last, int bandNumber) throws TransformException {
+	private PiecewiseTransform1DElement domainSearch(final WritableRectIter iterator,
+			PiecewiseTransform1DElement last, final int bandNumber) throws TransformException {
 		
 		 
 			 
@@ -345,7 +341,7 @@ public class GenericPiecewise extends ColormapOpImage {
 				return false;
 			}
 			final RenderedImage source = (RenderedImage) param.getSource(0);
-			final Domain1D lic = (Domain1D) param.getObjectParameter(0);
+			final DefaultPiecewiseTransform1D lic = (DefaultPiecewiseTransform1D) param.getObjectParameter(0);
 			if (lic == null)
 				return false;
 			final int numBands = source.getSampleModel().getNumBands();
@@ -371,8 +367,7 @@ public class GenericPiecewise extends ColormapOpImage {
 		public RenderedImage create(final ParameterBlock param,
 				final RenderingHints hints) {
 			final RenderedImage image = (RenderedImage) param.getSource(0);
-			final DefaultPiecewiseTransform1D lic = (DefaultPiecewiseTransform1D) param
-					.getObjectParameter(0);
+			final DefaultPiecewiseTransform1D lic = (DefaultPiecewiseTransform1D) param.getObjectParameter(0);
 			return new GenericPiecewise(image, lic, hints);
 		}
 
@@ -403,9 +398,9 @@ public class GenericPiecewise extends ColormapOpImage {
 	 * @param numBands 
 	 * @throws TransformException 
 	 */
-	private void createLUT(int numBands) throws TransformException {
+	private void createLUT(final int numBands) throws TransformException {
 	    // Allocate memory for the data array references.
-	    byte[][] data = new byte[numBands][];
+	    final byte[][] data = new byte[numBands][];
 	
 	    // Generate the data for each band.
 	    for(int band = 0; band < numBands; band++) {
@@ -413,7 +408,7 @@ public class GenericPiecewise extends ColormapOpImage {
 	        data[band] = new byte[256];
 	
 	        // Cache the references to avoid extra indexing.
-	        byte[] table = data[band];
+	        final byte[] table = data[band];
 
 	
 	        // Initialize the lookup table data.
@@ -488,12 +483,12 @@ public class GenericPiecewise extends ColormapOpImage {
 	/**
 	 * Transform the colormap according to the rescaling parameters.
 	 */
-	protected void transformColormap(byte[][] colormap) {
+	protected void transformColormap(final byte[][] colormap) {
 	
 	    for(int b = 0; b < 3; b++) {
-	        byte[] map = colormap[b];
-	    byte[] luTable = lut[b >= lut.length ? 0 : b];
-	        int mapSize = map.length;
+	        final byte[] map = colormap[b];
+	    final byte[] luTable = lut[b >= lut.length ? 0 : b];
+	        final int mapSize = map.length;
 	
 	        for(int i = 0; i < mapSize; i++) {
 	            map[i] = luTable[(map[i] & 0xFF)];
@@ -501,68 +496,4 @@ public class GenericPiecewise extends ColormapOpImage {
 	    }
 	}
 
-
-//	/**
-//	 * Piecewises to the pixel values within a specified rectangle.
-//	 *
-//	 * @param sources   Cobbled sources, guaranteed to provide all the
-//	 *                  source data necessary for computing the rectangle.
-//	 * @param dest      The tile containing the rectangle to be computed.
-//	 * @param destRect  The rectangle within the tile to be computed.
-//	 */
-//	protected void computeRect(PlanarImage[] sources,
-//	                           WritableRaster dest,
-//	                           Rectangle destRect) {
-//	    // Retrieve format tags.
-//	    RasterFormatTag[] formatTags = getFormatTags();
-//	
-//	    if(isByteData) {
-//	        computeRectByte(sources[0], dest, destRect);
-//	    } else {
-//	    	computeRectInternal(sources, dest, destRect);
-//	        RasterAccessor dst =
-//	            new RasterAccessor(dest, destRect, formatTags[1],
-//	                               getColorModel());
-//	        RasterAccessor src =
-//	            new RasterAccessor(sources[0], destRect, formatTags[0],
-//	                               getSourceImage(0).getColorModel());
-//	
-//	        switch (dst.getDataType()) {
-//	        case DataBuffer.TYPE_USHORT:
-//	            computeRectUShort(src, dst);
-//	            break;
-//	        case DataBuffer.TYPE_SHORT:
-//	            computeRectShort(src, dst);
-//	            break;
-//	        case DataBuffer.TYPE_INT:
-//	            computeRectInt(src, dst);
-//	            break;
-//	        case DataBuffer.TYPE_FLOAT:
-//	            computeRectFloat(src, dst);
-//	            break;
-//	        case DataBuffer.TYPE_DOUBLE:
-//	            computeRectDouble(src, dst);
-//	            break;
-//	        }
-//	
-//	        dst.copyDataToRaster();
-//	    }
-//	}
-
-//
-//	private void computeRectByte(PlanarImage planarImage,
-//	                             WritableRaster dest,
-//	                             Rectangle destRect) {
-//
-//		final int minTileX=planarImage.getMinTileX();
-//		final int minTileY=planarImage.getMinTileY();
-//		final int maxTileX=planarImage.getNumXTiles()+minTileX;
-//		final int maxTileY=planarImage.getNumYTiles()+minTileY;
-//		for(int i=minTileX;i<maxTileX;i++){
-//			for(int j=minTileY;i<maxTileY;i++){
-//				
-//			}
-//		}
-//	    lut.lookup(planarImage[0], dest, destRect);
-//	}
 }

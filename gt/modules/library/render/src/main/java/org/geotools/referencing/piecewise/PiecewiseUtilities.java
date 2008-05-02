@@ -52,14 +52,13 @@ class PiecewiseUtilities {
 	 static void domainElementsOverlap(DomainElement1D[] domainElements, int idx) {
 		// Two domain elements have overlapping ranges;
 		// Format an error message...............
-		final NumberRange range1 = (NumberRange) domainElements[idx - 1]
+		final NumberRange<?> range1 = domainElements[idx - 1]
 				.getRange();
-		final NumberRange range2 = (NumberRange) domainElements[idx].getRange();
+		final NumberRange<?> range2 =  domainElements[idx].getRange();
 		final Comparable[] args = new Comparable[] { range1.getMinValue(),
 				range1.getMaxValue(), range2.getMinValue(),
 				range2.getMaxValue() };
-		final int argsLength = args.length;
-		for (int j = 0; j < argsLength; j++) {
+		for (int j = 0; j < args.length; j++) {
 			if (args[j] instanceof Number) {
 				final double value = ((Number) args[j]).doubleValue();
 				if (Double.isNaN(value)) {
@@ -222,10 +221,10 @@ class PiecewiseUtilities {
 	 *            the next representable number, or 0 to return the number with
 	 *            no change.
 	 */
-	static double doubleValue(final Class type,
-			final Comparable number, final int direction) {
+	static double doubleValue(final Class<?> type,
+			final Number number, final int direction) {
 		assert (direction >= -1) && (direction <= +1) : direction;
-		return XMath.rool(type, ((Number) number).doubleValue(), direction);
+		return XMath.rool(type, number.doubleValue(), direction);
 	}
 
 	/**
@@ -246,9 +245,9 @@ class PiecewiseUtilities {
 	 * {@code geophysicsValueRange}.
 	 */
 	static MathTransform1D createLinearTransform1D(
-			final NumberRange sourceRange, final NumberRange destinationRange) {
-		final Class sType = sourceRange.getElementClass();
-		final Class dType = destinationRange.getElementClass();
+			final NumberRange<?> sourceRange, final NumberRange<?> destinationRange) {
+		final Class<?> sType = sourceRange.getElementClass();
+		final Class<?> dType = destinationRange.getElementClass();
 		/*
 		 * First, find the direction of the adjustment to apply to the ranges if
 		 * we wanted all values to be inclusives. Then, check if the adjustment

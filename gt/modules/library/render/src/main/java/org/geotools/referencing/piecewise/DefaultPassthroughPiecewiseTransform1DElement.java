@@ -24,7 +24,6 @@ import org.geotools.renderer.i18n.Errors;
 import org.geotools.util.NumberRange;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -58,7 +57,7 @@ class DefaultPassthroughPiecewiseTransform1DElement extends DefaultPiecewiseTran
 	 */
 	DefaultPassthroughPiecewiseTransform1DElement(CharSequence name)
 			throws IllegalArgumentException {
-		super(name,  new NumberRange(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
+		super(name,  NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 	}
 
 	/**
@@ -71,7 +70,7 @@ class DefaultPassthroughPiecewiseTransform1DElement extends DefaultPiecewiseTran
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	DefaultPassthroughPiecewiseTransform1DElement(CharSequence name, final NumberRange valueRange)
+	DefaultPassthroughPiecewiseTransform1DElement(CharSequence name, final NumberRange<?> valueRange)
 			throws IllegalArgumentException {
 		super(name,  valueRange);
 	}

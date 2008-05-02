@@ -28,7 +28,7 @@ import org.opengis.util.InternationalString;
  * @author Simone Giannecchini, GeoSolutions
  * 
  */
-public interface Domain1D extends List/* <DomainElement1D> */{
+public interface Domain1D<T extends DomainElement1D> extends List<T>{
 
 	/**
 	 * Returns the name of this object. The default implementation returns the
@@ -44,7 +44,7 @@ public interface Domain1D extends List/* <DomainElement1D> */{
 	 * @return The range of values.
 	 * 
 	 */
-	public abstract NumberRange getApproximateDomainRange();
+	public abstract NumberRange<?> getApproximateDomainRange();
 
 	/**
 	 * Returns the {@link DomainElement1D} of the specified sample value. If no {@link DomainElement1D} fits,
@@ -54,14 +54,14 @@ public interface Domain1D extends List/* <DomainElement1D> */{
 	 *            The value.
 	 * @return The domain element of the supplied value, or {@code null}.
 	 */
-	public DomainElement1D getDomainElement(final double sample);
+	public T getDomainElement(final double sample);
 
 	/**
 	 * Returns the underlying array of {@link DomainElement1D}s.
 	 * 
 	 * @return the underlying array of {@link DomainElement1D}s.
 	 */
-	public DomainElement1D[] getDomainElements();
+	public T[] getDomainElements();
 
 	/**
 	 * Tell us if there is a gap in this {@link Domain1D} which means a range

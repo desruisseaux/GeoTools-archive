@@ -23,10 +23,8 @@ import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
 /**
- * This class implements the {@link DomainElement1D} interface in order to provide
- * basic capabilities for {@link DomainElement1D} subclasses.
- * 
- * @author Simone Giannecchini, GeoSolutions.
+ * This class implements the   {@link DomainElement1D}   interface in order to provide basic capabilities for   {@link DomainElement1D}   subclasses.
+ * @author   Simone Giannecchini, GeoSolutions.
  */
 public class DefaultDomainElement1D implements DomainElement1D {
 
@@ -54,11 +52,9 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 * @see Comparable#compareTo(Object)
 	 * @todo we could improve this check for the specific case when the two minimums are equal
 	 */
-	public int compareTo(Object o) {
-		if (o instanceof DefaultDomainElement1D)
-			return new Double(inputMinimum).compareTo(new Double(
-					((DefaultDomainElement1D) o).inputMinimum));
-		throw new ClassCastException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, o));
+	public int compareTo(DomainElement1D o) {
+		return new Double(inputMinimum).compareTo(new Double(((DefaultDomainElement1D) o).inputMinimum));
+
 	}
 
 	/**
@@ -108,7 +104,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	/**
 	 * @see DomainElement1D#contains(NumberRange)
 	 */
-	public boolean contains(NumberRange range) {
+	public boolean contains(NumberRange<?> range) {
 		return inputRange.contains(range);
 	}
 
@@ -127,37 +123,28 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	}
 
 	/**
-	 * The domain element name.
-	 * 
-	 * @uml.property name="name"
-	 */
+     * The domain element name.
+     * @uml.property  name="name"
+     */
 	private InternationalString name;
 
 	/**
-	 * The minimal sample value (inclusive). This domain element is made of all values
-	 * in the range {@code    inputMinimum} to {@code    inputMaximum}
-	 * inclusive.
-	 * 
-	 * @uml.property name="inputMinimum"
-	 */
+     * The minimal sample value (inclusive). This domain element is made of all values in the range    {@code       inputMinimum}    to    {@code       inputMaximum}   inclusive.
+     * @uml.property  name="inputMinimum"
+     */
 	private double inputMinimum;
 
 	/**
-	 * The maximal sample value (inclusive). This domain element is made of all values
-	 * in the range {@code    inputMinimum} to {@code    inputMaximum}
-	 * inclusive.
-	 * 
-	 * @uml.property name="inputMaximum"
-	 */
+     * The maximal sample value (inclusive). This domain element is made of all values in the range    {@code       inputMinimum}    to    {@code       inputMaximum}   inclusive.
+     * @uml.property  name="inputMaximum"
+     */
 	private double inputMaximum;
 
 	/**
-	 * The range of values {@code   [inputMinimum..maximum]} . May be computed
-	 * only when first requested, or may be user-supplied .
-	 * 
-	 * @uml.property name="inputRange"
-	 */
-	private NumberRange inputRange;
+     * The range of values   {@code     [inputMinimum..maximum]}   . May be computed only when first requested, or may be user-supplied .
+     * @uml.property  name="inputRange"
+     */
+	private NumberRange<?> inputRange;
 
 	/**
 	 * Is lower input bound infinite?
@@ -170,17 +157,15 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	private boolean inputMaximumInf;
 
 	/**
-	 * Is upper input bound NaN?
-	 * 
-	 * @uml.property name="inputMaximumNaN"
-	 */
+     * Is upper input bound NaN?
+     * @uml.property  name="inputMaximumNaN"
+     */
 	private boolean inputMaximumNaN;
 
 	/**
-	 * Is lower input bound NaN?
-	 * 
-	 * @uml.property name="inputMinimumNaN"
-	 */
+     * Is lower input bound NaN?
+     * @uml.property  name="inputMinimumNaN"
+     */
 	private boolean inputMinimumNaN;
 
 	/**
@@ -198,7 +183,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 *             in case one of the input arguments is invalid.
 	 */
 	public DefaultDomainElement1D(final CharSequence name,
-			final NumberRange inputRange) throws IllegalArgumentException {
+			final NumberRange<?> inputRange) throws IllegalArgumentException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Initial checks
@@ -214,7 +199,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 		// /////////////////////////////////////////////////////////////////////
 		this.name = SimpleInternationalString.wrap(name);
 		this.inputRange = inputRange;
-		Class type = inputRange.getElementClass();
+		Class<?> type = inputRange.getElementClass();
 		boolean minInc = inputRange.isMinIncluded();
 		boolean maxInc = inputRange.isMaxIncluded();
 		final double tempMin = inputRange.getMinimum();
@@ -262,25 +247,19 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	}
 
 	/**
-	 * Getter method for this {@link DomainElement1D} 's name.
-	 * 
-	 * @return this {@link DefaultDomainElement1D} 's name.
-	 * @uml.property name="name"
-	 */
+     * Getter method for this  {@link DomainElement1D}  's name.
+     * @return  this  {@link DefaultDomainElement1D}  's name.
+     * @uml.property  name="name"
+     */
 	public InternationalString getName() {
 		return name;
 	}
 	
 	/**
-	 * Retrieves the upper bound of the range where this {@link DomainElement1D} is
-	 * defined. 
-	 * 
-	 * <P>
-	 * <strong>This is just a convenience method</strong>
-	 * 
-	 * @return the upper bound of the range where this {@link DomainElement1D} is
-	 *         defined.
-	 */
+     * Retrieves the upper bound of the range where this   {@link DomainElement1D}   is defined.  <P> <strong>This is just a convenience method</strong>
+     * @return   the upper bound of the range where this   {@link DomainElement1D}   is  defined.
+     * @uml.property  name="inputMaximum"
+     */
 	public double getInputMaximum() {
 		return inputMaximum;
 	}
@@ -301,31 +280,19 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	}
 
 	/**
-	 * Tells us if the upper bound of the range where this {@link DomainElement1D} is
-	 * defined is NaN.
-	 * 
-	 *  <P>
-	 *  <strong>This is just a convenience method</strong>
-	 * 
-	 * @return <code>true</code> if the upper bound of the range where this
-	 *         {@link DomainElement1D} is defined is NaN, <code>false</code>
-	 *         otherwise.
-	 */
+     * Tells us if the upper bound of the range where this   {@link DomainElement1D}   is defined is NaN. <P> <strong>This is just a convenience method</strong>
+     * @return   <code>true</code> if the upper bound of the range where this  {@link DomainElement1D}   is defined is NaN, <code>false</code>  otherwise.
+     * @uml.property  name="inputMaximumNaN"
+     */
 	public boolean isInputMaximumNaN() {
 		return inputMaximumNaN;
 	}
 
 	/**
-	 * Retrieves the lower bound of the range where this {@link DomainElement1D} is
-	 * defined. 
-	 * 
-	 * 
-	 * <P>
-	 * <strong>This is just a convenience method</strong>
-	 * 
-	 * @return the lower bound of the range where this {@link DomainElement1D} is
-	 *         defined.
-	 */
+     * Retrieves the lower bound of the range where this   {@link DomainElement1D}   is defined.  <P> <strong>This is just a convenience method</strong>
+     * @return   the lower bound of the range where this   {@link DomainElement1D}   is  defined.
+     * @uml.property  name="inputMinimum"
+     */
 	public double getInputMinimum() {
 		return inputMinimum;
 	}
@@ -346,27 +313,19 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	}
 
 	/**
-	 * This method retrieves the input range.
-	 * 
-	 * @return the input range.
-	 * @uml.property name="inputRange"
-	 */
-	public NumberRange getRange() {
-		return new NumberRange(inputRange);
+     * This method retrieves the input range.
+     * @return  the input range.
+     * @uml.property  name="inputRange"
+     */
+	public NumberRange<?> getRange() {
+		return NumberRange.wrap(inputRange);
 	}
 
 	/**
-	 * Tells us if the lower bound of the range where this {@link DomainElement1D} is
-	 * defined is NaN 
-	 * 
-	 * 
-	 *  <P>
-	 *  <strong>This is just a convenience method</strong>
-	 * 
-	 * @return <code>true</code> if the lower bound of the range where this
-	 *         {@link DomainElement1D} is defined is NaN, <code>false</code>
-	 *         otherwise.
-	 */
+     * Tells us if the lower bound of the range where this   {@link DomainElement1D}   is defined is NaN  <P> <strong>This is just a convenience method</strong>
+     * @return   <code>true</code> if the lower bound of the range where this  {@link DomainElement1D}   is defined is NaN, <code>false</code>  otherwise.
+     * @uml.property  name="inputMinimumNaN"
+     */
 	public boolean isInputMinimumNaN() {
 		return inputMinimumNaN;
 	}

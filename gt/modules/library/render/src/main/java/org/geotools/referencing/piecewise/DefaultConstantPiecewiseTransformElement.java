@@ -21,7 +21,6 @@ import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
 import org.geotools.util.NumberRange;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
@@ -33,7 +32,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  * 
  */
 class DefaultConstantPiecewiseTransformElement extends DefaultLinearPiecewiseTransform1DElement implements
-		PiecewiseTransform1DElement, MathTransform1D, Comparable, Serializable {
+		PiecewiseTransform1DElement, MathTransform1D, Comparable<DomainElement1D>, Serializable {
 
 	/**
 	 * 
@@ -53,9 +52,9 @@ class DefaultConstantPiecewiseTransformElement extends DefaultLinearPiecewiseTra
 	 *             in case the input values are illegal.
 	 */
 	DefaultConstantPiecewiseTransformElement(CharSequence name,
-			final NumberRange inRange, final double outVal)
+			final NumberRange<?> inRange, final double outVal)
 			throws IllegalArgumentException {
-		super(name, inRange, new NumberRange(outVal, outVal));
+		super(name, inRange, NumberRange.create(outVal, outVal));
 
 	}
 
@@ -73,9 +72,9 @@ class DefaultConstantPiecewiseTransformElement extends DefaultLinearPiecewiseTra
 	 *             in case the input values are illegal.
 	 */
 	 DefaultConstantPiecewiseTransformElement(CharSequence name,
-			final NumberRange inRange, final int outVal)
+			final NumberRange<?> inRange, final int outVal)
 			throws IllegalArgumentException {
-		super(name, inRange, new NumberRange(outVal, outVal));
+		super(name, inRange, NumberRange.create(outVal, outVal));
 	}
 
 
@@ -92,9 +91,9 @@ class DefaultConstantPiecewiseTransformElement extends DefaultLinearPiecewiseTra
 	 *             in case the input values are illegal.
 	 */
 	DefaultConstantPiecewiseTransformElement(CharSequence name,
-			final NumberRange inRange, final byte outVal)
+			final NumberRange<?> inRange, final byte outVal)
 			throws IllegalArgumentException {
-		super(name, inRange, new NumberRange(outVal, outVal));
+		super(name, inRange, NumberRange.create(outVal, outVal));
 	}
 
 	/**

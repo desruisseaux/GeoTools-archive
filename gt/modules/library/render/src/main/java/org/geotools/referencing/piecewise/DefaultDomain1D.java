@@ -27,18 +27,17 @@ import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
 
 /**
- * Convenience implementation of the {@link Domain1D} interface.
- * 
- * @author Simone Giannecchini
+ * Convenience implementation of the    {@link Domain1D}    interface.
+ * @author    Simone Giannecchini
  */
-public class DefaultDomain1D extends AbstractList implements Domain1D {
+public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T> implements Domain1D<T>{
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.geotools.referencing.piecewise.Domain1D#getDomainElements()
 	 */
-	public DomainElement1D[] getDomainElements() {
-		return (DomainElement1D[]) elements.clone();
+	public T[] getDomainElements() {
+		return (T[]) elements.clone();
 	}
 
 	/*
@@ -46,6 +45,10 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	 * 
 	 * @see org.geotools.referencing.piecewise.Domain1D#getName()
 	 */
+	/**
+     * @return
+     * @uml.property  name="name"
+     */
 	public synchronized InternationalString getName() {
 		if (name == null) {
 			final StringBuffer buffer = new StringBuffer(30);
@@ -68,15 +71,14 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	 * 
 	 * @see org.geotools.referencing.piecewise.Domain1D#getRange()
 	 */
-	public NumberRange getApproximateDomainRange() {
+	public NumberRange<?> getApproximateDomainRange() {
 		synchronized (elements) {
 			// @todo TODO should I include the NaN value?
 			if (range == null) {
-				NumberRange range = null;
-				for (int i = 0; i < elements.length; i++) {
-					final NumberRange extent = (NumberRange) elements[i].getRange();
-					if (!Double.isNaN(extent.getMinimum())
-							&& !Double.isNaN(extent.getMaximum())) {
+				NumberRange<?> range = null;
+				for (DomainElement1D element:elements) {
+					final NumberRange<?> extent = (NumberRange<?>) element.getRange();
+					if (!Double.isNaN(extent.getMinimum())&& !Double.isNaN(extent.getMaximum())) {
 						if (range != null) {
 							range = NumberRange.wrap(range.union(extent));
 						} else {
@@ -91,12 +93,10 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	}
 
 	/**
-	 * The list of elements. This list most be sorted in increasing order of
-	 * left range element.
-	 * 
-	 * @uml.property name="elements"
-	 * @uml.associationEnd multiplicity="(0 -1)"
-	 */
+     * The list of elements. This list most be sorted in increasing order of left range element.
+     * @uml.property  name="elements"
+     * @uml.associationEnd  multiplicity="(0 -1)"
+     */
 	private DefaultDomainElement1D[] elements;
 
 	/**
@@ -114,30 +114,23 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	private DefaultDomainElement1D main;
 
 	/**
-	 * List of {@link #inputMinimum} values for each domain element in
-	 * {@link #elements} . This array <strong>must</strong> be in increasing
-	 * order. Actually, this is the need to sort this array that determines the
-	 * element order in {@link #elements} .
-	 */
+     * List of   {@link #inputMinimum}   values for each domain element in  {@link #elements}   . This array <strong>must</strong> be in increasing order. Actually, this is the need to sort this array that determines the element order in   {@link #elements}   .
+     * @uml.property  name="minimums"
+     */
 	private double[] minimums;
 
 	/**
-	 * The name for this domain element list. Will be constructed only when first
-	 * needed.
-	 * 
-	 * @see #getName
-	 * @uml.property name="name"
-	 */
+     * The name for this domain element list. Will be constructed only when first needed.
+     * @see  #getName
+     * @uml.property  name="name"
+     */
 	private InternationalString name;
 
 	/**
-	 * The range of values in this domain element list. This is the union of the range
-	 * of values of every elements, excluding {@code    NaN} values. This field
-	 * will be computed only when first requested.
-	 * 
-	 * @uml.property name="range"
-	 */
-	private NumberRange range;
+     * The range of values in this domain element list. This is the union of the range of values of every elements, excluding   {@code      NaN}   values. This field will be computed only when first requested.
+     * @uml.property  name="range"
+     */
+	private NumberRange<?> range;
 
 	/**
 	 * Constructor for {@link DefaultDomain1D}.
@@ -156,10 +149,9 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	 */
 	private void init(DefaultDomainElement1D[] inDomainElements)
 			throws IllegalArgumentException, MissingResourceException {
-		// @todo CHECK ME
+		// @todo TODOCHECK ME
 		if (inDomainElements == null)
-			inDomainElements = new DefaultDomainElement1D[] { new DefaultPassthroughPiecewiseTransform1DElement(
-					"p0") };
+			inDomainElements = new DefaultDomainElement1D[] { new DefaultPassthroughPiecewiseTransform1DElement("p0") };
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -205,8 +197,7 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 				// Check if there is a gap between this domain element and the
 				// previous one.
 				if (!Double.isNaN(inMinimum)
-						&& inMinimum != ((NumberRange) previous.getRange())
-								.getMaximum(false)) {
+						&& inMinimum != ((NumberRange<?>) previous.getRange()).getMaximum(false)) {
 					hasGaps = true;
 				}
 			}
@@ -250,7 +241,7 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	 *            The value.
 	 * @return The domain element of the supplied value, or {@code null}.
 	 */
-	public DomainElement1D getDomainElement(final double value) {
+	public T getDomainElement(final double value) {
 
 		int i = getDomainElementIndex(value);
 
@@ -276,7 +267,7 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 		if (i < elements.length) {
 			domainElement1D = elements[i];
 			if (domainElement1D.contains(value))
-				return domainElement1D;
+				return (T) domainElement1D;
 			// if the index was 0, unles we caught the smallest minimum we have
 			// got something smaller than the leftmost domain
 			if (i == 0)
@@ -292,12 +283,12 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 		// //
 		domainElement1D = elements[i - 1];
 		if (domainElement1D.contains(value))
-			return domainElement1D;
+			return (T) domainElement1D;
 
 		// //
 		//
 		// Well, if we get here, we have definitely fallen into a gap or the
-		// value is beyond the limits of the last fomain, too bad....
+		// value is beyond the limits of the last domain, too bad....
 		//
 		// //
 		assert i >= elements.length || hasGaps : value;
@@ -348,8 +339,8 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	/**
 	 * Returns the element at the specified position in this list.
 	 */
-	public Object get(final int i) {
-		return elements[i];
+	public T get(final int i) {
+		return (T) elements[i];
 	}
 
 	/**
@@ -366,7 +357,7 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	 */
 	public boolean equals(final Object object) {
 		if (object.getClass().equals(this.getClass())) {
-			final DefaultDomain1D that = (DefaultDomain1D) object;
+			final DefaultDomain1D<?> that = (DefaultDomain1D<?>) object;
 			if (Arrays.equals(this.elements, that.elements)) {
 				assert Arrays.equals(this.minimums, that.minimums);
 				return true;
@@ -386,14 +377,18 @@ public class DefaultDomain1D extends AbstractList implements Domain1D {
 	}
 
 	/**
-	 * Return what seems to be the main {@link DomainElement1D} for this list.
-	 * 
-	 * @return what seems to be the main {@link DomainElement1D} for this list.
-	 */
+     * Return what seems to be the main   {@link DomainElement1D}   for this list.
+     * @return   what seems to be the main   {@link DomainElement1D}   for this list.
+     * @uml.property  name="main"
+     */
 	public DomainElement1D getMain() {
 		return main;
 	}
 
+	/**
+     * @return
+     * @uml.property  name="minimums"
+     */
 	public double[] getMinimums() {
 		return (double[]) minimums.clone();
 	}

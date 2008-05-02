@@ -22,16 +22,14 @@ import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
 import org.geotools.util.NumberRange;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * Convenience implementation of the {@link DefaultPiecewiseTransform1DElement} .
- * 
- * @author Simone Giannecchini, GeoSolutions
+ * Convenience implementation of the   {@link DefaultPiecewiseTransform1DElement}   .
+ * @author   Simone Giannecchini, GeoSolutions
  */
 public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D implements
 		PiecewiseTransform1DElement {
@@ -41,10 +39,9 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	private static final long serialVersionUID = 7422178060824402864L;
 	/**
-	 * The math transform  
-	 * 
-	 * @uml.property name="transform"
-	 */
+     * The math transform
+     * @uml.property  name="transform"
+     */
 	private MathTransform1D transform;
 
 	/**
@@ -67,7 +64,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange inRange,
+			final NumberRange<?> inRange,
 			final double value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -86,7 +83,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange inRange,
+			final NumberRange<?> inRange,
 			final byte value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -105,7 +102,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange inRange,
+			final NumberRange<?> inRange,
 			final int value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -123,8 +120,8 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name, 
-			final NumberRange inRange,
-			final NumberRange outRange) {	
+			final NumberRange<?> inRange,
+			final NumberRange<?> outRange) {	
 		return new DefaultLinearPiecewiseTransform1DElement(name,inRange,outRange);
 	}
 	
@@ -139,7 +136,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name)
 			throws IllegalArgumentException {
-		return new DefaultPassthroughPiecewiseTransform1DElement(name,  new NumberRange(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
+		return new DefaultPassthroughPiecewiseTransform1DElement(name,  NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 	}
 
 	/**
@@ -153,7 +150,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public  static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name, 
-			final NumberRange valueRange)
+			final NumberRange<?> valueRange)
 			throws IllegalArgumentException {
 		return new DefaultPassthroughPiecewiseTransform1DElement(name,  valueRange);
 	}	
@@ -167,7 +164,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	protected DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange valueRange)
+	protected DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<?> valueRange)
 			throws IllegalArgumentException {
 		super(name, valueRange);
 	}
@@ -185,7 +182,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	public DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange valueRange,
+	public DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<?> valueRange,
 			final MathTransform1D transform) throws IllegalArgumentException {
 		super(name, valueRange);
 		// /////////////////////////////////////////////////////////////////////
@@ -213,11 +210,10 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	}
 
 	/**
-	 * Getter for the underlying {@link MathTransform1D} .
-	 * 
-	 * @return the underlying {@link MathTransform1D} .
-	 * @uml.property name="transform"
-	 */
+     * Getter for the underlying  {@link MathTransform1D}  .
+     * @return  the underlying  {@link MathTransform1D}  .
+     * @uml.property  name="transform"
+     */
 	protected synchronized MathTransform1D getTransform() {
 		return transform;
 	}
@@ -255,7 +251,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	public synchronized double derivative(double value)
 			throws TransformException {
 		if (transform == null)
-			//  @todo
+			//  @todo TODO
 			throw new IllegalStateException();
 		if (contains(value))
 			return transform.derivative(value);
@@ -355,6 +351,10 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 
 	}
 
+	/**
+     * @param  mathTransform
+     * @uml.property  name="inverse"
+     */
 	protected synchronized void setInverse(MathTransform1D mathTransform) {
 		if (this.inverse == null)
 			this.inverse = mathTransform;
@@ -362,6 +362,10 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 			throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_STATE));
 	}
 
+	/**
+     * @param  transform
+     * @uml.property  name="transform"
+     */
 	protected synchronized void setTransform(MathTransform1D transform) {
 		PiecewiseUtilities.ensureNonNull("transform", transform);
 		if (this.transform == null)

@@ -31,7 +31,7 @@ import org.opengis.util.InternationalString;
  * @author Simone Giannecchini, GeoSolutions
  * 
  */
-public interface DomainElement1D extends Serializable, Comparable/*<Object>*/ {
+public interface DomainElement1D extends Serializable, Comparable<DomainElement1D> {
 
 	/**
 	 * Returns the domain element name.
@@ -43,10 +43,6 @@ public interface DomainElement1D extends Serializable, Comparable/*<Object>*/ {
 	 */
 	public boolean equals(final Object object);
 
-	/**
-	 * Compares the specified object with this domain element.
-	 */
-	public int compareTo(Object o);
 
 	/**
 	 * Provides access to the input {@link NumberRange} for this
@@ -54,7 +50,7 @@ public interface DomainElement1D extends Serializable, Comparable/*<Object>*/ {
 	 * 
 	 * @return the range where this {@link DomainElement1D} is defined.
 	 */
-	public NumberRange getRange();
+	public NumberRange<?> getRange();
 
 
 	/**
@@ -88,6 +84,6 @@ public interface DomainElement1D extends Serializable, Comparable/*<Object>*/ {
 	 * @return <code>true</code> if the {@link NumberRange} belongs to this
 	 *         {@link DomainElement1D}, <code>false</code> otherwise.
 	 */
-	public boolean contains(final NumberRange range);
+	public boolean contains(final NumberRange<?> range);
 
 }

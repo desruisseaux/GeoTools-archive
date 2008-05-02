@@ -27,10 +27,8 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 /**
- * Convenience class for linear transformations that maps an interval to another
- * interval.
- * 
- * @author Simone Giannecchini, GeoSolutions
+ * Convenience class for linear transformations that maps an interval to another interval.
+ * @author  Simone Giannecchini, GeoSolutions
  */
 public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTransform1DElement implements
 		PiecewiseTransform1DElement {
@@ -44,32 +42,32 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 			.getLogger("org.geotools.referencing.piecewise.DefaultLinearPiecewiseTransform1DElement");
 
 	/**
-	 * @uml.property name="outputMaximum"
-	 */
+     * @uml.property  name="outputMaximum"
+     */
 	private double outputMaximum;
 	/**
-	 * @uml.property name="outputMinimum"
-	 */
+     * @uml.property  name="outputMinimum"
+     */
 	private double outputMinimum;
 	/**
-	 * @uml.property name="outputRange"
-	 */
-	private NumberRange outputRange;
+     * @uml.property  name="outputRange"
+     */
+	private NumberRange<?> outputRange;
 	/**
-	 * @uml.property name="outputMinimumNaN"
-	 */
+     * @uml.property  name="outputMinimumNaN"
+     */
 	private boolean outputMinimumNaN;
 	/**
-	 * @uml.property name="outputMaximumNaN"
-	 */
+     * @uml.property  name="outputMaximumNaN"
+     */
 	private boolean outputMaximumNaN;
 	/**
-	 * @uml.property name="outputMinimumInfinite"
-	 */
+     * @uml.property  name="outputMinimumInfinite"
+     */
 	private boolean outputMinimumInfinite;
 	/**
-	 * @uml.property name="outputMaximumInfinite"
-	 */
+     * @uml.property  name="outputMaximumInfinite"
+     */
 	private boolean outputMaximumInfinite;
 
 
@@ -84,8 +82,8 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 	 * @param outRange
 	 *            for this {@link DefaultLinearPiecewiseTransform1DElement}.
 	 */
-	public DefaultLinearPiecewiseTransform1DElement(CharSequence name, NumberRange inRange,
-			NumberRange outRange) {
+	public DefaultLinearPiecewiseTransform1DElement(CharSequence name, NumberRange<?> inRange,
+			NumberRange<?> outRange) {
 		super(name, inRange);
 		this.outputRange = outRange;
 		// /////////////////////////////////////////////////////////////////////
@@ -98,7 +96,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 		// the output class can only be integer
 		//
 		// //
-		final Class type = outRange.getElementClass();
+		final Class<?> type = outRange.getElementClass();
 		boolean minInc = outRange.isMinIncluded();
 		boolean maxInc = outRange.isMaxIncluded();
 		outputMinimum = PiecewiseUtilities.doubleValue(type, outRange
@@ -167,7 +165,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 						outputRange.getMaxValue()));
 
 		final MathTransform1D transform = PiecewiseUtilities.createLinearTransform1D(inRange,
-				new NumberRange(outputMinimum, outputMaximum));
+				NumberRange.create(outputMinimum, outputMaximum));
 		setTransform(transform);
 
 		// //
@@ -202,77 +200,64 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 	}
 
 	/**
-	 * Returns the maximum output values for this {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * 
-	 * @return the maximum output values for this {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * @uml.property name="outputMaximum"
-	 */
+     * Returns the maximum output values for this  {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @return  the maximum output values for this  {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @uml.property  name="outputMaximum"
+     */
 	public double getOutputMaximum() {
 		return outputMaximum;
 	}
 
 	/**
-	 * Returns the minimum output values for this {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * 
-	 * @return the minimum output values for this {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * @uml.property name="outputMinimum"
-	 */
+     * Returns the minimum output values for this  {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @return  the minimum output values for this  {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @uml.property  name="outputMinimum"
+     */
 	public double getOutputMinimum() {
 		return outputMinimum;
 	}
 
 	/**
-	 * Returns the range for the output values for this
-	 * {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * 
-	 * @return the range for the output values for this
-	 *         {@link DefaultLinearPiecewiseTransform1DElement} ;
-	 * @uml.property name="outputRange"
-	 */
-	public NumberRange getOutputRange() {
-		return new NumberRange(outputRange);
+     * Returns the range for the output values for this {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @return  the range for the output values for this {@link DefaultLinearPiecewiseTransform1DElement}  ;
+     * @uml.property  name="outputRange"
+     */
+	public NumberRange<?> getOutputRange() {
+		return NumberRange.wrap(outputRange);
 	}
 
 	/**
-	 * Tells me if the lower boundary of the output range is NaN
-	 * 
-	 * @return <code>true</code> if the lower boundary of the output range is
-	 *         NaN, <code>false</code> otherwise.
-	 * @uml.property name="outputMinimumNaN"
-	 */
+     * Tells me if the lower boundary of the output range is NaN
+     * @return  <code>true</code> if the lower boundary of the output range is  NaN, <code>false</code> otherwise.
+     * @uml.property  name="outputMinimumNaN"
+     */
 	public boolean isOutputMinimumNaN() {
 		return outputMinimumNaN;
 	}
 
 	/**
-	 * Tells me if the upper boundary of the output range is NaN
-	 * 
-	 * @return <code>true</code> if the upper boundary of the output range is
-	 *         NaN, <code>false</code> otherwise.
-	 * @uml.property name="outputMaximumNaN"
-	 */
+     * Tells me if the upper boundary of the output range is NaN
+     * @return  <code>true</code> if the upper boundary of the output range is  NaN, <code>false</code> otherwise.
+     * @uml.property  name="outputMaximumNaN"
+     */
 	public boolean isOutputMaximumNaN() {
 		return outputMaximumNaN;
 	}
 
 	/**
-	 * Tells me if the lower boundary of the output range is infinite
-	 * 
-	 * @return <code>true</code> if the lower boundary of the output range is
-	 *         infinite, <code>false</code> otherwise.
-	 * @uml.property name="outputMinimumInfinite"
-	 */
+     * Tells me if the lower boundary of the output range is infinite
+     * @return  <code>true</code> if the lower boundary of the output range is  infinite, <code>false</code> otherwise.
+     * @uml.property  name="outputMinimumInfinite"
+     */
 	public boolean isOutputMinimumInfinite() {
 		return outputMinimumInfinite;
 	}
 
 	/**
-	 * Tells me if the upper boundary of the output range is infinite
-	 * 
-	 * @return <code>true</code> if the upper boundary of the output range is
-	 *         infinite, <code>false</code> otherwise.
-	 * @uml.property name="outputMaximumInfinite"
-	 */
+     * Tells me if the upper boundary of the output range is infinite
+     * @return  <code>true</code> if the upper boundary of the output range is  infinite, <code>false</code> otherwise.
+     * @uml.property  name="outputMaximumInfinite"
+     */
 	public boolean isOutputMaximumInfinite() {
 		return outputMaximumInfinite;
 	}
@@ -306,7 +291,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 	 * @see org.geotools.referencing.piecewise.DefaultPiecewiseTransform1DElement#toString()
 	 */
 	public String toString() {
-		final StringBuffer buffer= new StringBuffer(super.toString());
+		final StringBuilder buffer= new StringBuilder(super.toString());
 		buffer.append("\n").append("output range=").append(this.outputRange);
 		return buffer.toString();
 	}

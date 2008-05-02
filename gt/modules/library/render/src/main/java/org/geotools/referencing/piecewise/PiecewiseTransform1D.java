@@ -24,7 +24,7 @@ import org.opengis.referencing.operation.MathTransform1D;
  * @author Simone Giannecchini, GeoSolutions.
  * 
  */
-public interface PiecewiseTransform1D extends Domain1D, MathTransform1D {
+public interface PiecewiseTransform1D<T extends PiecewiseTransform1DElement> extends Domain1D<T>, MathTransform1D {
 
 	/**
 	 * Indicates whether or not this {@link PiecewiseTransform1D} has a default value which
@@ -32,14 +32,14 @@ public interface PiecewiseTransform1D extends Domain1D, MathTransform1D {
 	 * 
 	 * @return a <code>boolean</code> to indicate whether or not this {@link PiecewiseTransform1D} has a default value.
 	 */
-	public boolean isHasDefault() ;
+	public boolean hasDefault() ;
 
 
 	/**
 	 * The default value which will be returned when asked to transform a value outside the valid domain elements.
 	 * 
 	 * <p>
-	 * In case {@link #isHasDefault()} return <code>false</code> this value has no meaning.
+	 * In case {@link #hasDefault()} return <code>false</code> this value has no meaning.
 	 * 
 	 * @return The default value which will be returned when asked to transform a value outside the valid domain elements.
 	 */
