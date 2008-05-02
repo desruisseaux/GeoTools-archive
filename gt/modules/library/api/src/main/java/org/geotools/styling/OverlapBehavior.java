@@ -50,12 +50,22 @@ import org.geotools.filter.ConstantExpression;
  * @source $URL$
  */
 public class OverlapBehavior extends ConstantExpression {
-    public static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior("LATEST_ON_TOP");
-    public static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior("EARLIEST_ON_TOP");
-    public static final OverlapBehavior AVERAGE = new OverlapBehavior("AVERAGE");
-    public static final OverlapBehavior RANDOM = new OverlapBehavior("RANDOM");
+    public final static String AVERAGE_RESCTRICTION= "AVERAGE";
+    public final static String RANDOM_RESCTRICTION= "RANDOM";
+    public final static String LATEST_ON_TOP_RESCTRICTION= "LATEST_ON_TOP";
+    public final static String EARLIEST_ON_TOP_RESCTRICTION= "EARLIEST_ON_TOP";
+    public final static String UNSPECIFIED_RESCTRICTION = "UNSPECIFIED";
+    
+    public static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior(OverlapBehavior.LATEST_ON_TOP_RESCTRICTION);
+    public static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior(OverlapBehavior.EARLIEST_ON_TOP_RESCTRICTION);
+    public static final OverlapBehavior AVERAGE = new OverlapBehavior(OverlapBehavior.AVERAGE_RESCTRICTION);
+    public static final OverlapBehavior RANDOM = new OverlapBehavior(OverlapBehavior.RANDOM_RESCTRICTION);
 
     private OverlapBehavior(String value) {
         super(value);
+    }
+    
+    public void accept(StyleVisitor visitor){
+        visitor.visit(this);
     }
 }

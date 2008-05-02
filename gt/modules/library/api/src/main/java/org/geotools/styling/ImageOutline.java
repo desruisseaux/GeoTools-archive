@@ -55,4 +55,7 @@ public interface ImageOutline {
      * @param symbolizer The new symbolizer, one of {@see PolygonSymbolizer},{@see LineSymbolizer}.
      */
     void setSymbolizer(Symbolizer symbolizer);
+    
+    
+    void accept(StyleVisitor visitor);
 }
