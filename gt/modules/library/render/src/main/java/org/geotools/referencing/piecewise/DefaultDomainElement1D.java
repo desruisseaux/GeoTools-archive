@@ -317,7 +317,9 @@ public class DefaultDomainElement1D implements DomainElement1D {
      * @return  the input range.
      * @uml.property  name="inputRange"
      */
-	public NumberRange<?> getRange() {
+	@SuppressWarnings("unchecked")
+	public NumberRange getRange() {
+		
 		return NumberRange.wrap(inputRange);
 	}
 

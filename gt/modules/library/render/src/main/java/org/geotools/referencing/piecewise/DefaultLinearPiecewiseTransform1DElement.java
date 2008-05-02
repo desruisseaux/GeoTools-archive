@@ -222,7 +222,8 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
      * @return  the range for the output values for this {@link DefaultLinearPiecewiseTransform1DElement}  ;
      * @uml.property  name="outputRange"
      */
-	public NumberRange<?> getOutputRange() {
+	@SuppressWarnings("unchecked")
+	public NumberRange getOutputRange() {
 		return NumberRange.wrap(outputRange);
 	}
 
