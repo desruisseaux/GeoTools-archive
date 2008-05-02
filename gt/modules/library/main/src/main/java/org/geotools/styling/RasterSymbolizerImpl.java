@@ -47,7 +47,7 @@ public class RasterSymbolizerImpl implements RasterSymbolizer {
     public RasterSymbolizerImpl(FilterFactory factory) {
         filterFactory = factory;
         opacity = filterFactory.literal(1.0);
-        overlap = filterFactory.literal("Random");
+        overlap = filterFactory.literal(OverlapBehavior.RANDOM);
     }
 
     public int hashcode() {

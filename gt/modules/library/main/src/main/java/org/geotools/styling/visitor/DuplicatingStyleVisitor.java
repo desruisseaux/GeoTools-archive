@@ -428,6 +428,14 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         symbolizer.accept(this);
         return (Symbolizer) pages.pop();
     }
+    
+    protected OverlapBehavior copy(OverlapBehavior ob) {
+        if( ob == null ) return null;
+        
+        ob.accept(this);
+        return (OverlapBehavior) pages.pop();
+    }
+    
     protected ContrastEnhancement copy(ContrastEnhancement contrast) {
         if( contrast == null ) return null;
         
@@ -866,28 +874,71 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     }
     
 	public void visit(ContrastEnhancement contrastEnhancement) {
-		// TODO Auto-generated method stub
+		final ContrastEnhancement copy=sf.createContrastEnhancement();
+		copy.setType(contrastEnhancement.getType());
+		copy.setGammaValue(contrastEnhancement.getGammaValue());
+		if( STRICT && !copy.equals( contrastEnhancement )){
+	              throw new IllegalStateException("Was unable to duplicate provided contrastEnhancement:"+contrastEnhancement );
+	        }
+	        pages.push(copy);
 		
 	}
 	
 	public void visit(ImageOutline outline) {
-		// TODO Auto-generated method stub
+	    //copy the symbolizer
+	    final Symbolizer symb=outline.getSymbolizer();
+	    final Symbolizer copySymb=copy(symb);
+	    
+            final ImageOutline copy=sf.createImageOutline(copySymb);
+            copy.setSymbolizer(copySymb);
+            if( STRICT && !copy.equals( outline )){
+                  throw new IllegalStateException("Was unable to duplicate provided ImageOutline:"+outline );
+            }
+            pages.push(copy);
 		
 	}
 	public void visit(ChannelSelection cs) {
-		// TODO Auto-generated method stub
+	    //get the channels
+	    final SelectedChannelType sct[]=copy(cs.getSelectedChannels());
+            final ChannelSelection copy=sf.createChannelSelection(sct);
+            if( STRICT && !copy.equals( cs )){
+                  throw new IllegalStateException("Was unable to duplicate provided ChannelSelection:"+cs );
+            }
+            pages.push(copy);
 		
 	}
 	public void visit(OverlapBehavior ob) {
-		// TODO Auto-generated method stub
+		final String behavior= (String) ob.getValue();
+		if(behavior.equalsIgnoreCase(OverlapBehavior.AVERAGE_RESCTRICTION))
+		    pages.push(OverlapBehavior.AVERAGE_RESCTRICTION);
+		else
+		    if(behavior.equalsIgnoreCase(OverlapBehavior.EARLIEST_ON_TOP_RESCTRICTION))
+		        pages.push(OverlapBehavior.EARLIEST_ON_TOP_RESCTRICTION);
+	              else
+	                    if(behavior.equalsIgnoreCase(OverlapBehavior.LATEST_ON_TOP_RESCTRICTION))
+	                        pages.push(OverlapBehavior.LATEST_ON_TOP_RESCTRICTION);
+	                    else
+	                            if(behavior.equalsIgnoreCase(OverlapBehavior.RANDOM_RESCTRICTION))
+	                                pages.push(OverlapBehavior.RANDOM_RESCTRICTION);
+	                            else
+	                                throw new IllegalStateException("Was unable to duplicate provided OverlapBehavior:"+ob );
+		
 		
 	}
 	public void visit(SelectedChannelType sct) {
-		// TODO Auto-generated method stub
-		
+		final SelectedChannelType copy= sf.createSelectedChannelType(sct.getChannelName(), copy(sct.getContrastEnhancement()));
+	        if( STRICT && !copy.equals( sct )){
+	            throw new IllegalStateException("Was unable to duplicate provided SelectedChannelType:"+sct );
+	            }
+	        pages.push(copy);
 	}
 	public void visit(ShadedRelief sr) {
-		// TODO Auto-generated method stub
+            final ShadedRelief copy= sf.createShadedRelief(copy(sr.getReliefFactor()));
+            copy.setBrightnessOnly(sr.isBrightnessOnly());
+            if( STRICT && !copy.equals( sr )){
+                throw new IllegalStateException("Was unable to duplicate provided ShadedRelief:"+sr );
+                }
+            pages.push(copy);
 		
 	}
 }

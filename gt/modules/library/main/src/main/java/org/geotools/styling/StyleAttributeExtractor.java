@@ -31,10 +31,9 @@ import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
-  * ===========================================================================
-  * if you're modifying this, you probably should also take a look at StyleAttributeExtractorTruncated
-  * ===========================================================================
-  *
+ * A simple visitor whose purpose is to extract the set of attributes used by a Style, that is, those that the Style expects to find in order to work properly
+ * @author  wolf
+ * @source  $URL$
  */
 
 public class StyleAttributeExtractor extends FilterAttributeExtractor
@@ -499,32 +498,32 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
 	}
 
 	public void visit(ContrastEnhancement contrastEnhancement) {
-		// nothing to do
+		contrastEnhancement.accept(this);
 		
 	}
 
 	public void visit(ImageOutline outline) {
-		// nothing to do
+		outline.getSymbolizer().accept(this);
 		
 	}
 
 	public void visit(ChannelSelection cs) {
-		// nothing to do
+		cs.accept(this);
 		
 	}
 
 	public void visit(OverlapBehavior ob) {
-		// nothing to do
+		ob.accept(this);
 		
 	}
 
 	public void visit(SelectedChannelType sct) {
-		// nothing to do
+		sct.accept(this);
 		
 	}
 
 	public void visit(ShadedRelief sr) {
-		// nothing to do
+	    sr.accept(this);
 		
 	}
 }

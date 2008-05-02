@@ -34,6 +34,15 @@ public class ChannelSelectionImpl
         return gray;
     }
 
+    /**
+     * Retrieves the RGB channel that were selected.
+     * 
+     * <strong> Note that in case there is no RGB selection the returned
+     * {@link SelectedChannelType} array will contain null elements.
+     * 
+     * @return {@link SelectedChannelType} array that contains the
+     *         {@link SelectedChannelType} elements for the RGB channels.
+     */
     public SelectedChannelType[] getRGBChannels() {
         return new SelectedChannelType[] { red, green, blue };
     }
@@ -87,14 +96,7 @@ public class ChannelSelectionImpl
     }
 
 	public void accept(StyleVisitor visitor) {
-		if(gray!=null)
-			visitor.visit(gray);
-		else
-		{
-			visitor.visit(red);
-			visitor.visit(green);
-			visitor.visit(blue);
-		}
-		
+	        visitor.visit(this);
+	
 	}
 }

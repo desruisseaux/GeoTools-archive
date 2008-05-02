@@ -61,4 +61,8 @@ public class ImageOutlineImpl implements ImageOutline {
         return result;
 	}
 
+    public void accept(StyleVisitor visitor) {
+        visitor.visit(this);
+    }
+
 }

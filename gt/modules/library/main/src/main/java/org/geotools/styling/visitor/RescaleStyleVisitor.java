@@ -21,7 +21,6 @@ import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
-import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Symbol;
 import org.opengis.filter.FilterFactory2;
