@@ -27,7 +27,7 @@ import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.image.ImageWorker;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.renderer.gridcoverage.RasterSymbolizerTest;
+import org.geotools.renderer.lite.gridcoverage2d.RasterSymbolizerTest;
 import org.geotools.util.NumberRange;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
