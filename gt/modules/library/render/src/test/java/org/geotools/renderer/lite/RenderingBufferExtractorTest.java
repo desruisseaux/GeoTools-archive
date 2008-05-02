@@ -11,6 +11,9 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 
+/**
+ * @author  pc
+ */
 public class RenderingBufferExtractorTest extends TestCase {
     StyleBuilder sb = new StyleBuilder();
 

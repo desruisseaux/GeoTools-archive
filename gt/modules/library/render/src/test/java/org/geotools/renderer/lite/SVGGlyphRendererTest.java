@@ -14,6 +14,9 @@ import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 
+/**
+ * @author    pc
+ */
 public class SVGGlyphRendererTest extends TestCase {
 
     private SVGGlyphRenderer renderer;

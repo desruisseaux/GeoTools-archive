@@ -81,9 +81,8 @@ import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 /**
- * @author jamesm
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/module/render/test/org/geotools/renderer/lite/Rendering2DTest.java $
+ * @author  jamesm
+ * @source  $URL$
  */
 public class Rendering2DTest extends TestCase {
 
@@ -92,7 +91,9 @@ public class Rendering2DTest extends TestCase {
 	 */
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
-	private final int xCenter = -74, yCenter = 41;
+	private final int xCenter = -74;
+
+    private final int yCenter = 41;
 
 	static final String LINE = "linefeature";
 
