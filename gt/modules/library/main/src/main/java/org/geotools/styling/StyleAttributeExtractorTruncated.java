@@ -44,12 +44,14 @@ public class StyleAttributeExtractorTruncated extends StyleAttributeExtractor
 	
 	  public void visit(RasterSymbolizer rs) 
 	  {
-	        if (rs.getImageOutline() != null) {
-	            rs.getImageOutline().accept(this);
-	        }
-
-	        if (rs.getOpacity() != null) {
-	            rs.getOpacity().accept(this, null);
+	        if(rs!=null){	
+	            if (rs.getImageOutline() != null) {
+	                rs.getImageOutline().accept(this);
+	            }
+    
+	            if (rs.getOpacity() != null) {
+	                rs.getOpacity().accept(this, null);
+	            }
 	        }
 	    }
 
