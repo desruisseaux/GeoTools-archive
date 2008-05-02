@@ -33,13 +33,11 @@ public class RootNodeTest extends TestCase {
 		final GridCoverage2D gc = CoverageFactoryFinder.getGridCoverageFactory(null)
 				.create(
 						"name",
-						PlanarImage.wrapRenderedImage(RasterSymbolizerTest
-								.getSynthetic(Double.NaN)),
-						new GeneralEnvelope(new double[] { -90, -180 },
-								new double[] { 90, 180 }),
-						new GridSampleDimension[] { new GridSampleDimension(
-								"sd", new Category[] { new Category("",
-										Color.BLACK, 0) }, null) }, null, null);
+						PlanarImage.wrapRenderedImage(RasterSymbolizerTest.getSynthetic(Double.NaN)),
+						new GeneralEnvelope(new double[] { -90, -180 },new double[] { 90, 180 }),
+						new GridSampleDimension[] { new GridSampleDimension("sd", new Category[] { new Category("",Color.BLACK, 0) }, null) },
+						null,
+						null);
 
 		root1 = new RootNode(gc);
 		root2 = new RootNode(gc);
