@@ -55,18 +55,21 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Literal;
 
 /**
- * Parses a style or part of it and returns the size of the largest stroke and the biggest point
- * symbolizer whose width is specified with a literal expression.<br>
- * Also provides an indication wheter the stroke width is accurate, or if a non literal width has
- * been found.
+ * Parses a style or part of it and returns the size of the largest stroke and the biggest point symbolizer whose width is specified with a literal expression.<br> Also provides an indication whether the stroke width is accurate, or if a non literal width has been found.
  */
 
 public class MetaBufferEstimator extends FilterAttributeExtractor implements StyleVisitor {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
+    /**
+     * @uml.property  name="estimateAccurate"
+     */
     boolean estimateAccurate = true;
 
+    /**
+     * @uml.property  name="buffer"
+     */
     int buffer = 0;
 
     /**
@@ -79,10 +82,18 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
         buffer = 0;
     }
 
+    /**
+     * @return
+     * @uml.property  name="buffer"
+     */
     public int getBuffer() {
         return buffer;
     }
 
+    /**
+     * @return
+     * @uml.property  name="estimateAccurate"
+     */
     public boolean isEstimateAccurate() {
         return estimateAccurate;
     }
@@ -338,7 +349,7 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
     }
 
     public void visit(FeatureTypeConstraint ftc) {
-        // TODO Auto-generated method stub
+       ftc.accept(this);
     }
 
     public void visit(ColorMap map) {
@@ -355,27 +366,27 @@ public class MetaBufferEstimator extends FilterAttributeExtractor implements Sty
 	}
 
 	public void visit(ImageOutline outline) {
-		// TODO Auto-generated method stub
+	       outline.accept(this);
 		
 	}
 
 	public void visit(ChannelSelection cs) {
-		// TODO Auto-generated method stub
+	 // nothing to do here
 		
 	}
 
 	public void visit(OverlapBehavior ob) {
-		// TODO Auto-generated method stub
+	    // nothing to do here
 		
 	}
 
 	public void visit(SelectedChannelType sct) {
-		// TODO Auto-generated method stub
+	 // nothing to do here
 		
 	}
 
 	public void visit(ShadedRelief sr) {
-		// TODO Auto-generated method stub
+	 // nothing to do here
 		
 	}
 }
