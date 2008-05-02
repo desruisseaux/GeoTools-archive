@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,13 +48,13 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.expression.Expression;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -67,19 +66,32 @@ import org.opengis.referencing.operation.TransformException;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * A helper class for rendering {@link GridCoverage} objects. Support for grid
- * coverage SLD stylers is still limited.
- * 
- * @author Simone Giannecchini
- * @author Andrea Aime
- * @author Alessio Fabiani
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/library/render/src/main/java/org/geotools/renderer/lite/gridcoverage2d/GridCoverageRenderer.java $
- * @version $Id$
- * 
- * @task Add support for SLD styles
+ * A helper class for rendering  {@link GridCoverage}  objects. Support for grid coverage SLD stylers is still limited.
+ * @author  Simone Giannecchini
+ * @author  Andrea Aime
+ * @author  Alessio Fabiani
+ * @source  $URL$
+ * @version  $Id$
+ * @task  Add support for SLD styles
  */
 public final class GridCoverageRenderer {
+    
+    /**
+     * Helper function
+     * * @param symbolizer 
+     */
+    static float getOpacity(RasterSymbolizer symbolizer) {
+            float alpha = 1.0f;
+            Expression exp = symbolizer.getOpacity();
+            if (exp == null){
+                    return alpha;
+            }
+            Number number = (Number) exp.evaluate(null,Float.class);
+            if (number == null){
+                    return alpha;
+            }
+            return number.floatValue();
+    }    
     /**
      * This variable is use for testing purposes in order to force this
      * {@link GridCoverageRenderer} to dump images at various steps on the disk.
@@ -536,12 +548,12 @@ public final class GridCoverageRenderer {
         // ///////////////////////////////////////////////////////////////////
         if (LOGGER.isLoggable(Level.FINE))
             LOGGER.fine(new StringBuilder("Raster Symbolizer ").toString());
-        final RasterSymbolizerSupport rsp = new RasterSymbolizerSupport(
-                symbolizer);
-        final GridCoverage2D recoloredGridCoverage = (GridCoverage2D) rsp
-                .recolorCoverage(preSymbolizer);
-        final RenderedImage finalImage = recoloredGridCoverage
-                .geophysics(false).getRenderedImage();
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine(new StringBuffer("Raster Symbolizer ").toString());
+        final RasterSymbolizerHelper rsp = new RasterSymbolizerHelper (preSymbolizer,this.hints);
+        rsp.visit(symbolizer);
+        final GridCoverage2D recoloredGridCoverage = (GridCoverage2D) rsp.getOutput();
+        final RenderedImage finalImage = recoloredGridCoverage.geophysics(false).getRenderedImage();
 
         // ///////////////////////////////////////////////////////////////////
         //
@@ -589,7 +601,7 @@ public final class GridCoverageRenderer {
         // //
         // Opacity
         // //
-        final float alpha = rsp.getOpacity();
+        final float alpha = getOpacity(symbolizer);
         final Composite oldAlphaComposite = graphics.getComposite();
         graphics.setComposite(AlphaComposite.getInstance(
                 AlphaComposite.SRC_OVER, alpha));
