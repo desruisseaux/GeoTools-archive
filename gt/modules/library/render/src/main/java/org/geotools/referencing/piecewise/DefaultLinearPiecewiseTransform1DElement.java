@@ -224,7 +224,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
      */
 	@SuppressWarnings("unchecked")
 	public NumberRange getOutputRange() {
-		return NumberRange.wrap(outputRange);
+		return outputRange;
 	}
 
 	/**

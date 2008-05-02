@@ -319,8 +319,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
      */
 	@SuppressWarnings("unchecked")
 	public NumberRange getRange() {
-		
-		return NumberRange.wrap(inputRange);
+		return new NumberRange(inputRange);
 	}
 
 	/**
