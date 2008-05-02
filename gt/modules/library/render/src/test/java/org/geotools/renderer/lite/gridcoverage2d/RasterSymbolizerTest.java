@@ -113,7 +113,6 @@ public class RasterSymbolizerTest extends TestCase {
 		suite.addTest(new RasterSymbolizerTest("test3BandsByte_SLD"));
 		suite.addTest(new RasterSymbolizerTest("test3BandsByte_ColorMap_SLD"));
 		suite.addTest(new RasterSymbolizerTest("test4BandsUInt16_SLD"));
-		suite.addTest(new RasterSymbolizerTest("test1BandFloat32_ColorMap_SLD"));
 		return suite;
 	}
 
