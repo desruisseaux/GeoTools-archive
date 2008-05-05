@@ -35,9 +35,9 @@ class ConstantColorMapElement extends LinearColorMapElement
 	private static final long serialVersionUID = -4754147707013696371L;
 
 	ConstantColorMapElement(CharSequence name, final Color color,
-			final NumberRange inRange, final int outVal)
+			final NumberRange<? extends Number> inRange, final int outVal)
 			throws IllegalArgumentException {
-		super(name, new Color[] { color }, inRange, new NumberRange(outVal,
+		super(name, new Color[] { color }, inRange, NumberRange.create(outVal,
 				outVal));
 	}
 	
@@ -48,7 +48,7 @@ class ConstantColorMapElement extends LinearColorMapElement
 	ConstantColorMapElement(final CharSequence name,
 			final Color color, final short value, final int sample)
 			throws IllegalArgumentException {
-		this(name,  color , new NumberRange(value, value),
+		this(name,  color , NumberRange.create(value, value),
 				sample);
 
 	}
@@ -59,7 +59,7 @@ class ConstantColorMapElement extends LinearColorMapElement
 	ConstantColorMapElement(final CharSequence name,
 			final Color color, final int value, final int sample)
 			throws IllegalArgumentException {
-		this(name,  color , new NumberRange(value, value),
+		this(name,  color , NumberRange.create(value, value),
 				sample);
 
 	}
@@ -70,7 +70,7 @@ class ConstantColorMapElement extends LinearColorMapElement
 	ConstantColorMapElement(final CharSequence name,
 			final Color color, final float value, final int sample)
 			throws IllegalArgumentException {
-		this(name,  color , new NumberRange(value, value),
+		this(name,  color , NumberRange.create(value, value),
 				sample);
 
 	}
@@ -83,7 +83,7 @@ class ConstantColorMapElement extends LinearColorMapElement
 	ConstantColorMapElement(final CharSequence name,
 			final Color color, final double value, final int sample)
 			throws IllegalArgumentException {
-		this(name,  color , new NumberRange(value, value),
+		this(name,  color , NumberRange.create(value, value),
 				sample);
 
 	}

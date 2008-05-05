@@ -52,9 +52,9 @@ class PiecewiseUtilities {
 	 static void domainElementsOverlap(DomainElement1D[] domainElements, int idx) {
 		// Two domain elements have overlapping ranges;
 		// Format an error message...............
-		final NumberRange<?> range1 = domainElements[idx - 1]
+		final NumberRange<? extends Number> range1 = domainElements[idx - 1]
 				.getRange();
-		final NumberRange<?> range2 =  domainElements[idx].getRange();
+		final NumberRange<? extends Number> range2 =  domainElements[idx].getRange();
 		final Comparable[] args = new Comparable[] { range1.getMinValue(),
 				range1.getMaxValue(), range2.getMinValue(),
 				range2.getMaxValue() };
@@ -221,7 +221,7 @@ class PiecewiseUtilities {
 	 *            the next representable number, or 0 to return the number with
 	 *            no change.
 	 */
-	static double doubleValue(final Class<?> type,
+	static double doubleValue(final Class<? extends Number> type,
 			final Number number, final int direction) {
 		assert (direction >= -1) && (direction <= +1) : direction;
 		return XMath.rool(type, number.doubleValue(), direction);
@@ -245,9 +245,9 @@ class PiecewiseUtilities {
 	 * {@code geophysicsValueRange}.
 	 */
 	static MathTransform1D createLinearTransform1D(
-			final NumberRange<?> sourceRange, final NumberRange<?> destinationRange) {
-		final Class<?> sType = sourceRange.getElementClass();
-		final Class<?> dType = destinationRange.getElementClass();
+			final NumberRange<? extends Number> sourceRange, final NumberRange<? extends Number> destinationRange) {
+		final Class<? extends Number> sType = sourceRange.getElementClass();
+		final Class<? extends Number> dType = destinationRange.getElementClass();
 		/*
 		 * First, find the direction of the adjustment to apply to the ranges if
 		 * we wanted all values to be inclusives. Then, check if the adjustment

@@ -53,7 +53,9 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 * @todo we could improve this check for the specific case when the two minimums are equal
 	 */
 	public int compareTo(DomainElement1D o) {
-		return new Double(inputMinimum).compareTo(new Double(((DefaultDomainElement1D) o).inputMinimum));
+	        if( o instanceof DefaultDomainElement1D)
+	            return new Double(inputMinimum).compareTo( ((DefaultDomainElement1D)o).inputMinimum);
+	        return new Double(inputMinimum).compareTo(o.getRange().getMinimum());
 
 	}
 
@@ -144,7 +146,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
      * The range of values   {@code     [inputMinimum..maximum]}   . May be computed only when first requested, or may be user-supplied .
      * @uml.property  name="inputRange"
      */
-	private NumberRange<?> inputRange;
+	private NumberRange<? extends Number> inputRange;
 
 	/**
 	 * Is lower input bound infinite?
@@ -199,7 +201,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 		// /////////////////////////////////////////////////////////////////////
 		this.name = SimpleInternationalString.wrap(name);
 		this.inputRange = inputRange;
-		Class<?> type = inputRange.getElementClass();
+		Class<? extends Number> type = inputRange.getElementClass();
 		boolean minInc = inputRange.isMinIncluded();
 		boolean maxInc = inputRange.isMaxIncluded();
 		final double tempMin = inputRange.getMinimum();
@@ -317,9 +319,8 @@ public class DefaultDomainElement1D implements DomainElement1D {
      * @return  the input range.
      * @uml.property  name="inputRange"
      */
-	@SuppressWarnings("unchecked")
-	public NumberRange getRange() {
-		return new NumberRange(inputRange);
+	public NumberRange<? extends Number> getRange() {
+		return NumberRange.wrap(inputRange);
 	}
 
 	/**

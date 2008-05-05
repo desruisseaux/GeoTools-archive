@@ -70,7 +70,7 @@ class DefaultPassthroughPiecewiseTransform1DElement extends DefaultPiecewiseTran
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	DefaultPassthroughPiecewiseTransform1DElement(CharSequence name, final NumberRange<?> valueRange)
+	DefaultPassthroughPiecewiseTransform1DElement(CharSequence name, final NumberRange<? extends Number> valueRange)
 			throws IllegalArgumentException {
 		super(name,  valueRange);
 	}

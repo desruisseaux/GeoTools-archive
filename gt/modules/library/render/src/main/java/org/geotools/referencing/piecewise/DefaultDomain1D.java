@@ -30,25 +30,15 @@ import org.opengis.util.InternationalString;
  * Convenience implementation of the    {@link Domain1D}    interface.
  * @author    Simone Giannecchini
  */
-public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T> implements Domain1D<T>{
+public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends AbstractList<T> implements Domain1D<T>{
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.geotools.referencing.piecewise.Domain1D#getDomainElements()
-	 */
-	public T[] getDomainElements() {
-		return (T[]) elements.clone();
-	}
+
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.geotools.referencing.piecewise.Domain1D#getName()
 	 */
-	/**
-     * @return
-     * @uml.property  name="name"
-     */
 	public synchronized InternationalString getName() {
 		if (name == null) {
 			final StringBuffer buffer = new StringBuffer(30);
@@ -71,16 +61,16 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 * 
 	 * @see org.geotools.referencing.piecewise.Domain1D#getRange()
 	 */
-	public NumberRange<?> getApproximateDomainRange() {
+	public NumberRange<? extends Number> getApproximateDomainRange() {
 		synchronized (elements) {
 			// @todo TODO should I include the NaN value?
 			if (range == null) {
 				NumberRange<?> range = null;
-				for (DomainElement1D element:elements) {
-					final NumberRange<?> extent = (NumberRange<?>) element.getRange();
+				for (T element:elements) {
+					final NumberRange<? extends Number> extent =  element.getRange();
 					if (!Double.isNaN(extent.getMinimum())&& !Double.isNaN(extent.getMaximum())) {
 						if (range != null) {
-							range = new NumberRange(range.union(extent));
+							range = NumberRange.wrap(range.union(extent));
 						} else {
 							range = extent;
 						}
@@ -93,11 +83,10 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	}
 
 	/**
-     * The list of elements. This list most be sorted in increasing order of left range element.
-     * @uml.property  name="elements"
-     * @uml.associationEnd  multiplicity="(0 -1)"
-     */
-	private DefaultDomainElement1D[] elements;
+         * The list of elements. This list most be sorted in increasing order of
+         * left range element.
+         */
+	private T[] elements;
 
 	/**
 	 * {@code  true} if there is gaps between elements, or {@code  false}
@@ -111,25 +100,29 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 * domain element is the quantitative domain element with the widest range of sample
 	 * values.
 	 */
-	private DefaultDomainElement1D main;
+	private T main;
 
 	/**
-     * List of   {@link #inputMinimum}   values for each domain element in  {@link #elements}   . This array <strong>must</strong> be in increasing order. Actually, this is the need to sort this array that determines the element order in   {@link #elements}   .
-     * @uml.property  name="minimums"
-     */
+         * List of {@link #inputMinimum} values for each domain element in
+         * {@link #elements} . This array <strong>must</strong> be in
+         * increasing order. Actually, this is the need to sort this array that
+         * determines the element order in {@link #elements} .
+         */
 	private double[] minimums;
 
 	/**
-     * The name for this domain element list. Will be constructed only when first needed.
-     * @see  #getName
-     * @uml.property  name="name"
-     */
+         * The name for this domain element list. Will be constructed only when
+         * first needed.
+         * 
+         * @see #getName
+         */
 	private InternationalString name;
 
 	/**
-     * The range of values in this domain element list. This is the union of the range of values of every elements, excluding   {@code      NaN}   values. This field will be computed only when first requested.
-     * @uml.property  name="range"
-     */
+         * The range of values in this domain element list. This is the union of
+         * the range of values of every elements, excluding {@code      NaN}
+         * values. This field will be computed only when first requested.
+         */
 	private NumberRange<?> range;
 
 	/**
@@ -138,7 +131,7 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 * @param inDomainElements
 	 *            {@link DomainElement1D} objects that make up this list.
 	 */
-	public DefaultDomain1D(DefaultDomainElement1D[] inDomainElements) {
+	public DefaultDomain1D(T[] inDomainElements) {
 		init(inDomainElements);
 	}
 
@@ -147,33 +140,29 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 * @throws IllegalArgumentException
 	 * @throws MissingResourceException
 	 */
-	private void init(DefaultDomainElement1D[] inDomainElements)
+	@SuppressWarnings("unchecked")
+    private void init(T[] inDomainElements)
 			throws IllegalArgumentException, MissingResourceException {
+	    
+	    // /////////////////////////////////////////////////////////////////////
+            //
+            // input checks
+            //
+            // /////////////////////////////////////////////////////////////////////
+            PiecewiseUtilities.ensureNonNull("DomainElement1D[]", inDomainElements);
+            
 		// @todo TODOCHECK ME
 		if (inDomainElements == null)
-			inDomainElements = new DefaultDomainElement1D[] { new DefaultPassthroughPiecewiseTransform1DElement("p0") };
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// input checks
-		//
-		// /////////////////////////////////////////////////////////////////////
-		PiecewiseUtilities.ensureNonNull("DomainElement1D[]", inDomainElements);
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Get the input elements and check that the type is correct.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		this.elements = (DefaultDomainElement1D[]) inDomainElements.clone();
+		    this.elements = (T[])  new DefaultDomainElement1D[]{ new DefaultPassthroughPiecewiseTransform1DElement("p0")};
+		else
+		    this.elements =  inDomainElements.clone();
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Sort the input elements.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (this.elements != null)
-			Arrays.sort(this.elements);
+		Arrays.sort(this.elements);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -210,9 +199,9 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 		 * sample values.
 		 */
 		double range = 0;
-		DefaultDomainElement1D main = null;
+		T main = null;
 		for (int i = elements.length; --i >= 0;) {
-			final DefaultDomainElement1D candidate = elements[i];
+			final T candidate = elements[i];
 			if (Double.isInfinite(candidate.getInputMinimum())
 					&& Double.isInfinite(candidate.getInputMaximum())) {
 				range = Double.POSITIVE_INFINITY;
@@ -241,7 +230,7 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 *            The value.
 	 * @return The domain element of the supplied value, or {@code null}.
 	 */
-	public T getDomainElement(final double value) {
+	public T findDomainElement(final double value) {
 
 		int i = getDomainElementIndex(value);
 
@@ -252,7 +241,7 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 		// //
 		if (i < 0)
 			return null;
-		DefaultDomainElement1D domainElement1D;
+		T domainElement1D;
 		if (i > elements.length)
 			return null;
 
@@ -267,8 +256,8 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 		if (i < elements.length) {
 			domainElement1D = elements[i];
 			if (domainElement1D.contains(value))
-				return (T) domainElement1D;
-			// if the index was 0, unles we caught the smallest minimum we have
+				return  domainElement1D;
+			// if the index was 0, unless we caught the smallest minimum we have
 			// got something smaller than the leftmost domain
 			if (i == 0)
 				return null;
@@ -283,7 +272,7 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 		// //
 		domainElement1D = elements[i - 1];
 		if (domainElement1D.contains(value))
-			return (T) domainElement1D;
+			return  domainElement1D;
 
 		// //
 		//
@@ -340,7 +329,7 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	 * Returns the element at the specified position in this list.
 	 */
 	public T get(final int i) {
-		return (T) elements[i];
+		return elements[i];
 	}
 
 	/**
@@ -377,27 +366,28 @@ public class DefaultDomain1D<T extends DomainElement1D>  extends AbstractList<T>
 	}
 
 	/**
-     * Return what seems to be the main   {@link DomainElement1D}   for this list.
-     * @return   what seems to be the main   {@link DomainElement1D}   for this list.
-     * @uml.property  name="main"
-     */
-	public DomainElement1D getMain() {
+         * Return what seems to be the main {@link DomainElement1D} for this
+         * list.
+         * 
+         * @return what seems to be the main {@link DomainElement1D} for this
+         *         list.
+         */
+	public T getMain() {
 		return main;
 	}
 
 	/**
-     * @return
-     * @uml.property  name="minimums"
-     */
+         * @return
+         */
 	public double[] getMinimums() {
 		return (double[]) minimums.clone();
 	}
 
-	public boolean contains(Object o) {
-		if (o instanceof Double) {
-			return getDomainElement(((Double) o).doubleValue()) != null;
-		}
-		return false;
-	}
+//	public boolean contains(Object o) {
+//		if (o instanceof Double) {
+//			return findDomainElement(((Double) o).doubleValue()) != null;
+//		}
+//		return false;
+//	}
 
 }

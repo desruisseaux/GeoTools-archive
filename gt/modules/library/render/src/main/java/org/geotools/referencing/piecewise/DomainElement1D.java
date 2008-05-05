@@ -50,7 +50,7 @@ public interface DomainElement1D extends Serializable, Comparable<DomainElement1
 	 * 
 	 * @return the range where this {@link DomainElement1D} is defined.
 	 */
-	public NumberRange<?> getRange();
+	public NumberRange<? extends Number> getRange();
 
 
 	/**
@@ -84,6 +84,6 @@ public interface DomainElement1D extends Serializable, Comparable<DomainElement1
 	 * @return <code>true</code> if the {@link NumberRange} belongs to this
 	 *         {@link DomainElement1D}, <code>false</code> otherwise.
 	 */
-	public boolean contains(final NumberRange<?> range);
+	public boolean contains(final NumberRange<? extends Number> range);
 
 }

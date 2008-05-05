@@ -30,8 +30,8 @@ import org.opengis.referencing.operation.TransformException;
  * Convenience implementation of the   {@link PiecewiseTransform1D}   interface which subclass the   {@link DefaultDomain1D}   class in order to provide a suitable framework to handle a list of   {@link PiecewiseTransform1DElement}   s. <p>
  * @author   Simone Giannecchini, GeoSolutions
  */
-public class DefaultPiecewiseTransform1D extends DefaultDomain1D<DefaultPiecewiseTransform1DElement>
-		implements PiecewiseTransform1D<DefaultPiecewiseTransform1DElement> {
+public class DefaultPiecewiseTransform1D<T extends DefaultPiecewiseTransform1DElement> extends DefaultDomain1D<T>
+		implements PiecewiseTransform1D<T> {
 
 	private boolean hasDefaultValue;
 	/**
@@ -40,7 +40,7 @@ public class DefaultPiecewiseTransform1D extends DefaultDomain1D<DefaultPiecewis
 	private double defaultValue;
 
 	public DefaultPiecewiseTransform1D(
-			final DefaultPiecewiseTransform1DElement[] domainElements,
+			final T[] domainElements,
 			final  double defaultValue) {
 		super(domainElements);
 		this.hasDefaultValue=true;
@@ -49,7 +49,7 @@ public class DefaultPiecewiseTransform1D extends DefaultDomain1D<DefaultPiecewis
 
 
 
-	public DefaultPiecewiseTransform1D(final DefaultPiecewiseTransform1DElement[] domainElements) {
+	public DefaultPiecewiseTransform1D(final T[] domainElements) {
 		super(
 				domainElements != null && !(domainElements instanceof DefaultConstantPiecewiseTransformElement[]) ? 
 						domainElements : 
@@ -65,10 +65,10 @@ public class DefaultPiecewiseTransform1D extends DefaultDomain1D<DefaultPiecewis
 	 * @see org.opengis.referencing.operation.MathTransform1D#transform(double)
 	 */
 	public double transform(final double value) throws TransformException {
-		final PiecewiseTransform1DElement piece = (PiecewiseTransform1DElement) getDomainElement(value);
+		final T piece = findDomainElement(value);
 		if (piece == null) {
 			//do we have a default value?
-			if(hasDefault())
+			if(hasDefaultValue())
 				return getDefaultValue();
 			throw new TransformException(Errors.format(ErrorKeys.TRANSFORM_EVALUATION_$1,new Double(value)));
 		}
@@ -182,7 +182,7 @@ public class DefaultPiecewiseTransform1D extends DefaultDomain1D<DefaultPiecewis
 
 
 
-	public boolean hasDefault() {
+	public boolean hasDefaultValue() {
 		return hasDefaultValue;
 	}
 

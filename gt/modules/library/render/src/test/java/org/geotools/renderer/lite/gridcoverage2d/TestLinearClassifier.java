@@ -64,12 +64,12 @@ public class TestLinearClassifier extends TestCase {
 
 	public static TestSuite suite() {
 		TestSuite suite = new TestSuite();
-		suite.addTest(new TestLinearClassifier("testSWAN"));
-		suite.addTest(new TestLinearClassifier("testSWANGAP"));
-		suite.addTest(new TestLinearClassifier("testSynthetic_Double"));
-		suite.addTest(new TestLinearClassifier("testSynthetic_Float"));
+//		suite.addTest(new TestLinearClassifier("testSWAN"));
+//		suite.addTest(new TestLinearClassifier("testSWANGAP"));
+//		suite.addTest(new TestLinearClassifier("testSynthetic_Double"));
+//		suite.addTest(new TestLinearClassifier("testSynthetic_Float"));
 		suite.addTest(new TestLinearClassifier("testSpearfish"));
-		suite.addTest(new TestLinearClassifier("testNoDataOnly"));
+//		suite.addTest(new TestLinearClassifier("testNoDataOnly"));
 
 		return suite;
 	}
@@ -179,32 +179,32 @@ public class TestLinearClassifier extends TestCase {
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final LinearColorMapElement c0 = LinearColorMapElement
-					.create("c0", Color.BLACK, new NumberRange(
+					.create("c0", Color.BLACK, NumberRange.create(
 							Double.NEGATIVE_INFINITY, false, 10, true), 0);
 
 			final LinearColorMapElement c1 = LinearColorMapElement
-					.create("c2", Color.blue, new NumberRange(10.0, false,
+					.create("c2", Color.blue, NumberRange.create(10.0, false,
 							100.0, true), 1);
 
 			final LinearColorMapElement c3 = LinearColorMapElement
-					.create("c3", Color.green, new NumberRange(100.0, false,
+					.create("c3", Color.green, NumberRange.create(100.0, false,
 							300.0, true), 2);
 
 			final LinearColorMapElement c4 = LinearColorMapElement
 					.create("c4", new Color[] { Color.green, Color.red },
-							new NumberRange(300.0, false, 400, true),
-							new NumberRange(3, 1000));
+							NumberRange.create(300.0, false, 400, true),
+							NumberRange.create(3, 1000));
 
 			final LinearColorMapElement c5 = LinearColorMapElement
 					.create("c5", new Color[] { Color.red, Color.white },
-							new NumberRange(400.0, false, 1000, true),
-							new NumberRange(1001, 2000));
+							NumberRange.create(400.0, false, 1000, true),
+							NumberRange.create(1001, 2000));
 
 			final LinearColorMapElement c6 = LinearColorMapElement
 					.create("c6", Color.red, 1001.0, 2001);
 
 			final LinearColorMapElement c7 = LinearColorMapElement
-					.create("nodata", new Color(0, 0, 0, 0), new NumberRange(
+					.create("nodata", new Color(0, 0, 0, 0), NumberRange.create(
 							Double.NaN, Double.NaN), 2201);
 
 			final LinearColorMap list = new LinearColorMap("",
@@ -282,32 +282,32 @@ public class TestLinearClassifier extends TestCase {
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final LinearColorMapElement c0 = LinearColorMapElement
-					.create("c0", Color.BLACK, new NumberRange(
+					.create("c0", Color.BLACK, NumberRange.create(
 							Double.NEGATIVE_INFINITY, false, 10, true), 0);
 
 			final LinearColorMapElement c1 = LinearColorMapElement
-					.create("c2", Color.blue, new NumberRange(10.0f, false,
+					.create("c2", Color.blue, NumberRange.create(10.0f, false,
 							100.0f, true), 1);
 
 			final LinearColorMapElement c3 = LinearColorMapElement
-					.create("c3", Color.green, new NumberRange(100.0f, false,
+					.create("c3", Color.green, NumberRange.create(100.0f, false,
 							300.0f, true), 2);
 
 			final LinearColorMapElement c4 = LinearColorMapElement
 					.create("c4", new Color[] { Color.green, Color.red },
-							new NumberRange(300.0f, false, 400.0f, true),
-							new NumberRange(3, 1000));
+							NumberRange.create(300.0f, false, 400.0f, true),
+							NumberRange.create(3, 1000));
 
 			final LinearColorMapElement c5 = LinearColorMapElement
 					.create("c5", new Color[] { Color.red, Color.white },
-							new NumberRange(400.0f, false, 1000.0f, true),
-							new NumberRange(1001, 2000));
+							NumberRange.create(400.0f, false, 1000.0f, true),
+							NumberRange.create(1001, 2000));
 
 			final LinearColorMapElement c6 = LinearColorMapElement
 					.create("c6", Color.red, 1001.0f, 2001);
 
 			final LinearColorMapElement c7 = LinearColorMapElement
-					.create("nodata", new Color(0, 0, 0, 0), new NumberRange(
+					.create("nodata", new Color(0, 0, 0, 0), NumberRange.create(
 							Double.NaN, Double.NaN), 2201);
 
 			final LinearColorMap list = new LinearColorMap("",
@@ -373,27 +373,27 @@ public class TestLinearClassifier extends TestCase {
 
 		for (int i = 0; i < TEST_NUM; i++) {
 			final LinearColorMapElement c0 = LinearColorMapElement
-					.create("c0", Color.yellow, new NumberRange(
+					.create("c0", Color.yellow, NumberRange.create(
 							Double.NEGATIVE_INFINITY, false, 1100, true), 5);
 
 			final LinearColorMapElement c1 = LinearColorMapElement
-					.create("c2", Color.blue, new NumberRange(1100.0, false,
+					.create("c2", Color.blue, NumberRange.create(1100.0, false,
 							1200.0, true), 1);
 
 			final LinearColorMapElement c3 = LinearColorMapElement
-					.create("c3", Color.green, new NumberRange(1200.0, false,
+					.create("c3", Color.green, NumberRange.create(1200.0, false,
 							1400.0, true), 7);
 
 			final LinearColorMapElement c4 = LinearColorMapElement
-					.create("c4", Color.blue, new NumberRange(1400.0, false,
+					.create("c4", Color.blue, NumberRange.create(1400.0, false,
 							1600, true), 1);
 
 			final LinearColorMapElement c5 = LinearColorMapElement
-					.create("c4", Color.CYAN, new NumberRange(1600.0, false,
+					.create("c4", Color.CYAN, NumberRange.create(1600.0, false,
 							Double.POSITIVE_INFINITY, true), 11);
 
 			final LinearColorMapElement c6 = LinearColorMapElement
-					.create("nodata", new Color(0, 0, 0, 0), new NumberRange(
+					.create("nodata", new Color(0, 0, 0, 0), NumberRange.create(
 							Double.NaN, Double.NaN), 0);
 
 			final LinearColorMap list = new LinearColorMap("",
@@ -464,32 +464,32 @@ public class TestLinearClassifier extends TestCase {
 
 		for (int i = 0; i < TEST_NUM; i++) {
 			final LinearColorMapElement c0 = LinearColorMapElement
-					.create("c0", Color.green, new NumberRange(
+					.create("c0", Color.green, NumberRange.create(
 							Double.NEGATIVE_INFINITY, 0.3), 51);
 
 			final LinearColorMapElement c1 = LinearColorMapElement
-					.create("c2", Color.yellow, new NumberRange(0.3, false,
+					.create("c2", Color.yellow, NumberRange.create(0.3, false,
 							0.6, true), 1);
 			
 			final LinearColorMapElement c1b = LinearColorMapElement
-			.create("c2", Color.BLACK, new NumberRange(0.3, false,
+			.create("c2", Color.BLACK, NumberRange.create(0.3, false,
 					0.6, true), 1);
 			final LinearColorMapElement c1c = LinearColorMapElement
-			.create("c2", Color.yellow, new NumberRange(0.3, false,
+			.create("c2", Color.yellow, NumberRange.create(0.3, false,
 					0.6, true), 1);
 			assertFalse(c1.equals(c1b));
 			assertTrue(c1.equals(c1c));
 
 			final LinearColorMapElement c3 = LinearColorMapElement
-					.create("c3", Color.red, new NumberRange(0.60, false, 0.90,
+					.create("c3", Color.red, NumberRange.create(0.60, false, 0.90,
 							true), 2);
 
 			final LinearColorMapElement c4 = LinearColorMapElement
-					.create("c4", Color.BLUE, new NumberRange(0.9, false,
+					.create("c4", Color.BLUE, NumberRange.create(0.9, false,
 							Double.POSITIVE_INFINITY, true), 3);
 
 			final LinearColorMapElement nodata = LinearColorMapElement
-					.create("nodata", new Color(0, 0, 0, 0), new NumberRange(
+					.create("nodata", new Color(0, 0, 0, 0), NumberRange.create(
 							-9.0, -9.0), 4);
 
 			final LinearColorMap list = new LinearColorMap("testSWAN",
@@ -566,23 +566,23 @@ public class TestLinearClassifier extends TestCase {
 
 		for (int i = 0; i < TEST_NUM; i++) {
 			final LinearColorMapElement c0 = LinearColorMapElement
-					.create("c0", Color.green, new NumberRange(
+					.create("c0", Color.green, NumberRange.create(
 							Double.NEGATIVE_INFINITY, 0.3), 51);
 
 			final LinearColorMapElement c1 = LinearColorMapElement
-					.create("c2", Color.yellow, new NumberRange(0.3, false,
+					.create("c2", Color.yellow, NumberRange.create(0.3, false,
 							0.6, true), 1);
 
 			final LinearColorMapElement c3 = LinearColorMapElement
-					.create("c3", Color.red, new NumberRange(0.70, false, 0.90,
+					.create("c3", Color.red, NumberRange.create(0.70, false, 0.90,
 							true), 2);
 
 			final LinearColorMapElement c4 = LinearColorMapElement
-					.create("c4", Color.BLUE, new NumberRange(0.9, false,
+					.create("c4", Color.BLUE, NumberRange.create(0.9, false,
 							Double.POSITIVE_INFINITY, true), 3);
 
 			final LinearColorMapElement nodata = LinearColorMapElement
-					.create("nodata", Color.red, new NumberRange(
+					.create("nodata", Color.red, NumberRange.create(
 							-9.0, -9.0), 4);
 
 			final LinearColorMap list = new LinearColorMap("testSWAN",
@@ -667,7 +667,7 @@ public class TestLinearClassifier extends TestCase {
 		for (int i = 0; i < TEST_NUM; i++) {
 	
 			final LinearColorMapElement n0 = LinearColorMapElement
-					.create("nodata", new Color(0, 0, 0, 0), new NumberRange(
+					.create("nodata", new Color(0, 0, 0, 0), NumberRange.create(
 							Double.NaN, Double.NaN), 9999);
 	
 			final LinearColorMap list = new LinearColorMap("",

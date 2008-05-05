@@ -52,7 +52,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 	/**
      * @uml.property  name="outputRange"
      */
-	private NumberRange<?> outputRange;
+	private NumberRange<? extends Number> outputRange;
 	/**
      * @uml.property  name="outputMinimumNaN"
      */
@@ -82,8 +82,8 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 	 * @param outRange
 	 *            for this {@link DefaultLinearPiecewiseTransform1DElement}.
 	 */
-	public DefaultLinearPiecewiseTransform1DElement(CharSequence name, NumberRange<?> inRange,
-			NumberRange<?> outRange) {
+	public DefaultLinearPiecewiseTransform1DElement(CharSequence name, NumberRange<? extends Number> inRange,
+			NumberRange<? extends Number> outRange) {
 		super(name, inRange);
 		this.outputRange = outRange;
 		// /////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 		// the output class can only be integer
 		//
 		// //
-		final Class<?> type = outRange.getElementClass();
+		final Class<? extends Number> type = outRange.getElementClass();
 		boolean minInc = outRange.isMinIncluded();
 		boolean maxInc = outRange.isMaxIncluded();
 		outputMinimum = PiecewiseUtilities.doubleValue(type, outRange
@@ -222,8 +222,7 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
      * @return  the range for the output values for this {@link DefaultLinearPiecewiseTransform1DElement}  ;
      * @uml.property  name="outputRange"
      */
-	@SuppressWarnings("unchecked")
-	public NumberRange getOutputRange() {
+	public NumberRange<? extends Number> getOutputRange() {
 		return outputRange;
 	}
 

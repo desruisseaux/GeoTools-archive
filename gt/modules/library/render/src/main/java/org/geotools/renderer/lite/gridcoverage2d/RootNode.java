@@ -122,8 +122,8 @@ class RootNode extends BaseCoverageProcessingNode implements
 	 * 
 	 * @see org.geotools.renderer.lite.gridcoverage2d.BaseCoverageProcessingNode#getSources()
 	 */
-	public List/*<CoverageProcessingNode>*/ getSources() {
-		return Collections.EMPTY_LIST;
+	public List<CoverageProcessingNode> getSources() {
+		return Collections.emptyList();
 		
 	}
 

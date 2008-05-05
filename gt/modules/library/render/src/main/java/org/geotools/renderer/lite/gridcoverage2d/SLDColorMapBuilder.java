@@ -32,7 +32,7 @@ public class SLDColorMapBuilder {
 	public final static Color defaultGapsColor= new Color(0,0,0,0);
 
 	/**List of {@link LinearColorMapElement} we are putting together to create the final {@link LinearColorMap}**/
-	private final List<ColorMapTransformElement> colormapElements = new ArrayList<ColorMapTransformElement>();
+	private final List<LinearColorMapElement> colormapElements = new ArrayList<LinearColorMapElement>();
 
 	/**
      * {@link LinearColorMapType}      *
@@ -237,7 +237,7 @@ public class SLDColorMapBuilder {
 			switch (linearColorMapType) {
 			case ColorMap.TYPE_RAMP:
 				colormapElements.add(LinearColorMapElement.create(label, newColorValue,
-						new NumberRange(Double.NEGATIVE_INFINITY, false, q,
+						NumberRange.create(Double.NEGATIVE_INFINITY, false, q,
 								false), 0));
 				break;
 			case ColorMap.TYPE_VALUES:
@@ -246,7 +246,7 @@ public class SLDColorMapBuilder {
 				break;
 			case ColorMap.TYPE_INTERVALS:
 				colormapElements.add(LinearColorMapElement.create(label, newColorValue,
-						new NumberRange(Double.NEGATIVE_INFINITY, false, q,
+						NumberRange.create(Double.NEGATIVE_INFINITY, false, q,
 								false), 0));
 				break;
 			default:
@@ -282,9 +282,9 @@ public class SLDColorMapBuilder {
 			case ColorMap.TYPE_RAMP:
 				colormapElements.add(LinearColorMapElement.create(label,
 						new Color[] { lastColorValue, newColorValue },
-						new NumberRange(((NumberRange) previous.getRange())
+						NumberRange.create(((NumberRange<? extends Number>) previous.getRange())
 								.getMaximum(), true, q, false),
-						new NumberRange((int) previous.getOutputMaximum() ,
+						NumberRange.create((int) previous.getOutputMaximum() ,
 								colorsPerColorMapElement
 										+ (int) previous.getOutputMaximum())));
 				break;
@@ -294,7 +294,7 @@ public class SLDColorMapBuilder {
 				break;
 			case ColorMap.TYPE_INTERVALS:
 				colormapElements.add(LinearColorMapElement.create(label,
-						newColorValue, new NumberRange(((NumberRange) previous
+						newColorValue, NumberRange.create(((NumberRange<? extends Number>) previous
 								.getRange()).getMaximum(), true, q, false),
 						newColorMapElementIndex));
 				break;
@@ -355,8 +355,6 @@ public class SLDColorMapBuilder {
 			if(preservedValuesColor!=null)
 				colorsToDistribute--;
 
-//			//keep into account index for first and last category.
-//			colorsToDistribute-=2;
 			
 			//compute the number of colors we can use for each color map element
 			colorsPerColorMapElement = (int) ((colorsToDistribute ) /
@@ -607,8 +605,8 @@ public class SLDColorMapBuilder {
 			//
 			// //
 			last=LinearColorMapElement.create(
-					"ColorMapEntry"+this.colormapElements.size(), lastColorValue, new NumberRange(
-							((NumberRange) previous.getRange()).getMaximum(),
+					"ColorMapEntry"+this.colormapElements.size(), lastColorValue, NumberRange.create(
+						 previous.getRange().getMaximum(),
 							true, Double.POSITIVE_INFINITY, false),
 					(int) previous.getOutputMaximum());
 			this.colormapElements.add(last);
@@ -632,7 +630,7 @@ public class SLDColorMapBuilder {
 							org.geotools.resources.i18n.Vocabulary.format(
 									org.geotools.resources.i18n.VocabularyKeys.NODATA)+ Integer.toString(i + 1), 
 									preservedValuesColor, 
-									new NumberRange(((Double) preservedValues.get(i)).doubleValue(),((Double) preservedValues.get(i)).doubleValue()),
+									NumberRange.create( preservedValues.get(i), preservedValues.get(i)),
 									value
 			);
 		}

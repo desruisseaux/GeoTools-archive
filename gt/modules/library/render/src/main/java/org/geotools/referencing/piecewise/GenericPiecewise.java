@@ -49,7 +49,7 @@ import com.sun.media.jai.util.ImageUtil;
  * @author    Simone Giannecchini - GeoSolutions
  * @since    2.4
  */
-public class GenericPiecewise extends ColormapOpImage {
+public class GenericPiecewise<T extends PiecewiseTransform1DElement> extends ColormapOpImage {
 
 	/**
 	 * The operation name.
@@ -59,7 +59,7 @@ public class GenericPiecewise extends ColormapOpImage {
 	/**
 	 * DefaultPiecewiseTransform1D that we'll use to transform this image. We'll apply it ato all of its bands.
 	 */
-	private final DefaultPiecewiseTransform1D piecewise;
+	private final PiecewiseTransform1D<T> piecewise;
 
 	private final boolean isByteData;
 
@@ -83,7 +83,7 @@ public class GenericPiecewise extends ColormapOpImage {
 	 *            The rendering hints.
 	 */
 	private GenericPiecewise(final RenderedImage image,
-			final DefaultPiecewiseTransform1D lic,
+			final PiecewiseTransform1D<T> lic,
 			final RenderingHints hints) {
 		super(image, RIFUtil.getImageLayoutHint(hints), hints, false);
 		this.piecewise = lic;
@@ -103,7 +103,7 @@ public class GenericPiecewise extends ColormapOpImage {
 		// in the input range
 		//
 		// ////////////////////////////////////////////////////////////////////
-		if (this.piecewise.hasDefault()) {
+		if (this.piecewise.hasDefaultValue()) {
 			gapsValue=piecewise.getDefaultValue();
 			hasGapsValue = true;
 		}
@@ -234,11 +234,11 @@ public class GenericPiecewise extends ColormapOpImage {
 				transformElement = last;
 			else {
 				last = transformElement = (PiecewiseTransform1DElement) piecewise
-						.getDomainElement(value);
+						.findDomainElement(value);
 			}
 		} else
 			transformElement = (PiecewiseTransform1DElement) piecewise
-					.getDomainElement(value);
+					.findDomainElement(value);
 
 		// //
 		//
@@ -335,13 +335,15 @@ public class GenericPiecewise extends ColormapOpImage {
 		 * @param message
 		 *            A buffer for formatting an error message if any.
 		 */
-		protected boolean validateParameters(final String modeName,
+	
+		@SuppressWarnings("unchecked")
+                protected boolean validateParameters(final String modeName,
 				final ParameterBlock param, final StringBuffer message) {
 			if (!super.validateParameters(modeName, param, message)) {
 				return false;
 			}
 			final RenderedImage source = (RenderedImage) param.getSource(0);
-			final DefaultPiecewiseTransform1D lic = (DefaultPiecewiseTransform1D) param.getObjectParameter(0);
+			final PiecewiseTransform1D lic =  (PiecewiseTransform1D) param.getObjectParameter(0);
 			if (lic == null)
 				return false;
 			final int numBands = source.getSampleModel().getNumBands();
@@ -364,10 +366,11 @@ public class GenericPiecewise extends ColormapOpImage {
 		 * imaging operation for a given {@link ParameterBlock} and
 		 * {@link RenderingHints}.
 		 */
+	        @SuppressWarnings("unchecked")
 		public RenderedImage create(final ParameterBlock param,
 				final RenderingHints hints) {
 			final RenderedImage image = (RenderedImage) param.getSource(0);
-			final DefaultPiecewiseTransform1D lic = (DefaultPiecewiseTransform1D) param.getObjectParameter(0);
+			final PiecewiseTransform1D lic = (PiecewiseTransform1D) param.getObjectParameter(0);
 			return new GenericPiecewise(image, lic, hints);
 		}
 
@@ -428,11 +431,11 @@ public class GenericPiecewise extends ColormapOpImage {
 						piecewiseElement = lastPiecewiseElement;
 					else {
 						lastPiecewiseElement = piecewiseElement = (PiecewiseTransform1DElement) piecewise
-								.getDomainElement(value);
+								.findDomainElement(value);
 					}
 				} else
 					piecewiseElement = (PiecewiseTransform1DElement) piecewise
-							.getDomainElement(value);
+							.findDomainElement(value);
 
 				// //
 				//

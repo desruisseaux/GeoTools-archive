@@ -32,14 +32,14 @@ public interface PiecewiseTransform1D<T extends PiecewiseTransform1DElement> ext
 	 * 
 	 * @return a <code>boolean</code> to indicate whether or not this {@link PiecewiseTransform1D} has a default value.
 	 */
-	public boolean hasDefault() ;
+	public boolean hasDefaultValue() ;
 
 
 	/**
 	 * The default value which will be returned when asked to transform a value outside the valid domain elements.
 	 * 
 	 * <p>
-	 * In case {@link #hasDefault()} return <code>false</code> this value has no meaning.
+	 * In case {@link #hasDefaultValue()} return <code>false</code> this value has no meaning.
 	 * 
 	 * @return The default value which will be returned when asked to transform a value outside the valid domain elements.
 	 */

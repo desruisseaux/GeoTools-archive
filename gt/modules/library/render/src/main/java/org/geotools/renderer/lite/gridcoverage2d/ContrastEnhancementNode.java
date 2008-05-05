@@ -601,7 +601,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				//
 				////
 				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
-						"exponential-contrast-enhancement-transform", new NumberRange(minimum[0],maximum[0]), 
+						"exponential-contrast-enhancement-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 
 									/*
@@ -628,7 +628,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 
 						});
 				
-				final PiecewiseTransform1D transform = new DefaultPiecewiseTransform1D(
+				final PiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> (
 						new DefaultPiecewiseTransform1DElement[] {mainElement},0);
 
 					final ParameterBlockJAI pbj = new ParameterBlockJAI(
@@ -688,7 +688,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				//
 				////
 				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
-						"logarithmic-contrast-enhancement-transform", new NumberRange(minimum[0],maximum[0]), 
+						"logarithmic-contrast-enhancement-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 
 									/*
@@ -716,7 +716,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 									
 						});
 				
-				final PiecewiseTransform1D transform = new DefaultPiecewiseTransform1D(
+				final PiecewiseTransform1D<DefaultPiecewiseTransform1DElement>  transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> (
 						new DefaultPiecewiseTransform1DElement[] {mainElement},0);
 
 					final ParameterBlockJAI pbj = new ParameterBlockJAI(
@@ -837,7 +837,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				//
 				////
 				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
-						"gamma-correction-transform", new NumberRange(minimum[0],maximum[0]), 
+						"gamma-correction-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 
 									/*
@@ -864,7 +864,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 
 						});
 				
-				final PiecewiseTransform1D transform = new DefaultPiecewiseTransform1D(
+				final PiecewiseTransform1D<DefaultPiecewiseTransform1DElement>  transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> (
 						new DefaultPiecewiseTransform1DElement[] {mainElement},0);
 
 					final ParameterBlockJAI pbj = new ParameterBlockJAI(

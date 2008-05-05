@@ -27,7 +27,6 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.piecewise.DefaultLinearPiecewiseTransform1DElement;
 import org.geotools.referencing.piecewise.DefaultPiecewiseTransform1D;
-import org.geotools.referencing.piecewise.DomainElement1D;
 import org.geotools.referencing.piecewise.PiecewiseTransform1DElement;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
@@ -102,9 +101,9 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 
 	private final Color defaultColor;
 	
-	private DefaultPiecewiseTransform1D piecewise;
+	private DefaultPiecewiseTransform1D<LinearColorMapElement> piecewise;
 	
-	private DefaultPiecewiseTransform1D preFilteringPiecewise;
+	private DefaultPiecewiseTransform1D<LinearColorMapElement> preFilteringPiecewise;
 
 	private Color preFilteringColor;
 
@@ -246,7 +245,7 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 						(DefaultLinearPiecewiseTransform1DElement) domainElementsToPreserve[i- domainElements.length]:
 							(DefaultLinearPiecewiseTransform1DElement) domainElements[i];
 			final ColorMapTransformElement v0 = (ColorMapTransformElement) c0;
-			final NumberRange outRange0 = c0.getOutputRange();
+			final NumberRange<? extends Number> outRange0 = c0.getOutputRange();
 			final Color[] colors0 = v0.getColors();
 			final int minimum0 = (int) outRange0.getMinimum();
 			final int maximum0 = (int) outRange0.getMaximum();
@@ -272,7 +271,7 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 							DefaultLinearPiecewiseTransform1DElement) domainElementsToPreserve[j- domainElements.length]:
 								(DefaultLinearPiecewiseTransform1DElement) domainElements[j];
 				final ColorMapTransformElement v1 = (ColorMapTransformElement) c1;
-				final NumberRange outRange1 = c1.getOutputRange();
+				final NumberRange<? extends Number> outRange1 = c1.getOutputRange();
 				if (outRange1.intersects(outRange0)) {
 					
 					// do they intersect?
@@ -394,7 +393,7 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 			}
 
 			//create the prefiltering piecewise
-			this.preFilteringPiecewise=preFilteringElements==null?null:new DefaultPiecewiseTransform1D(preFilteringElements);
+			this.preFilteringPiecewise=preFilteringElements==null?null:new DefaultPiecewiseTransform1D<LinearColorMapElement>(preFilteringElements);
 			
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -432,7 +431,7 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 				}
 				//now see what happened
 				if(defaultColorFound)
-					this.piecewise= new DefaultPiecewiseTransform1D(this.standardElements,defaultColorIndex);
+					this.piecewise= new DefaultPiecewiseTransform1D<LinearColorMapElement>(this.standardElements,defaultColorIndex);
 				else
 				{
 					//check the bit vector for the first place available
@@ -448,13 +447,13 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 						tempARGB[tempARGB.length-1]=defaultColor.getRGB();
 						ARGB=tempARGB;	
 					}
-					this.piecewise= new DefaultPiecewiseTransform1D(this.standardElements,max);
+					this.piecewise= new DefaultPiecewiseTransform1D<LinearColorMapElement>(this.standardElements,max);
 				}
 
 			}
 			else
 			{
-				this.piecewise= new DefaultPiecewiseTransform1D(this.standardElements);
+				this.piecewise= new DefaultPiecewiseTransform1D<LinearColorMapElement>(this.standardElements);
 			}
 			
 			colorModel = new IndexColorModel(ColorUtilities
@@ -671,9 +670,9 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 		return this.piecewise.getDefaultValue();
 	}
 
-	public boolean hasDefault() {
+	public boolean hasDefaultValue() {
 		initColorModel();
-		return this.piecewise.hasDefault();
+		return this.piecewise.hasDefaultValue();
 	}
 
 	public NumberRange<?> getApproximateDomainRange() {
@@ -681,12 +680,15 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 		return this.piecewise.getApproximateDomainRange();
 	}
 
-	public LinearColorMapElement getDomainElement(double sample) {
+	public LinearColorMapElement findDomainElement(double sample) {
 		initColorModel();
 		final boolean prefiltering=this.preFilteringElements != null;
-		if(prefiltering&&this.preFilteringPiecewise.contains(new Double(sample)))
-			return (LinearColorMapElement) preFilteringPiecewise.getDomainElement(sample);
-		return (LinearColorMapElement) piecewise.getDomainElement(sample);
+		LinearColorMapElement retValue=null;
+		if(prefiltering)
+		    retValue= preFilteringPiecewise.findDomainElement(sample);
+		if(retValue==null)
+		    retValue= piecewise.findDomainElement(sample);
+		return retValue;
 	}
 
 	public LinearColorMapElement[] getDomainElements() {
@@ -713,7 +715,7 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 
 	public double transform(double value) throws TransformException {
 		initColorModel();
-		PiecewiseTransform1DElement transform=(PiecewiseTransform1DElement) getDomainElement(value);
+		PiecewiseTransform1DElement transform=(PiecewiseTransform1DElement) findDomainElement(value);
 		if(transform!=null)
 			return transform.transform(value);
 		return this.preFilteringPiecewise.transform(value);

@@ -64,7 +64,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange<?> inRange,
+			final NumberRange<? extends Number> inRange,
 			final double value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -83,7 +83,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange<?> inRange,
+			final NumberRange<? extends Number> inRange,
 			final byte value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -102,7 +102,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name,
-			final NumberRange<?> inRange,
+			final NumberRange<? extends Number> inRange,
 			final int value){
 		return new DefaultConstantPiecewiseTransformElement(name, inRange, value);
 	}
@@ -120,8 +120,8 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name, 
-			final NumberRange<?> inRange,
-			final NumberRange<?> outRange) {	
+			final NumberRange<? extends Number> inRange,
+			final NumberRange<? extends Number> outRange) {	
 		return new DefaultLinearPiecewiseTransform1DElement(name,inRange,outRange);
 	}
 	
@@ -150,7 +150,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 */
 	public  static DefaultPiecewiseTransform1DElement create(
 			final CharSequence name, 
-			final NumberRange<?> valueRange)
+			final NumberRange<? extends Number> valueRange)
 			throws IllegalArgumentException {
 		return new DefaultPassthroughPiecewiseTransform1DElement(name,  valueRange);
 	}	
@@ -164,7 +164,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	protected DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<?> valueRange)
+	protected DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<? extends Number> valueRange)
 			throws IllegalArgumentException {
 		super(name, valueRange);
 	}
@@ -182,7 +182,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	public DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<?> valueRange,
+	public DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<? extends Number> valueRange,
 			final MathTransform1D transform) throws IllegalArgumentException {
 		super(name, valueRange);
 		// /////////////////////////////////////////////////////////////////////
@@ -389,7 +389,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 * @see org.geotools.referencing.piecewise.DefaultDomainElement1D#toString()
 	 */
 	public String toString() {
-		final StringBuffer buffer= new StringBuffer(super.toString());
+		final StringBuilder buffer= new StringBuilder(super.toString());
 		buffer.append("\n").append("wkt transform=").append(this.transform.toWKT());
 		return buffer.toString();
 	}

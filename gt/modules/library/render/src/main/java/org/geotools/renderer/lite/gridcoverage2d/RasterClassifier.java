@@ -34,6 +34,7 @@ import javax.media.jai.PointOpImage;
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
+import javax.media.jai.util.ImagingException;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.image.TransfertRectIter;
@@ -173,7 +174,7 @@ public class RasterClassifier extends PointOpImage {
 		// ////////////////////////////////////////////////////////////////////
 		double gapsValue = Double.NaN;
 		boolean hasGapsValue = false;
-		if (this.pieces.hasDefault()) {
+		if (this.pieces.hasDefaultValue()) {
 				gapsValue = this.pieces.getDefaultValue();
 				hasGapsValue = true;
 		}
@@ -220,10 +221,10 @@ public class RasterClassifier extends PointOpImage {
 									if (last != null && last.contains(value))
 										transform = last;
 									else {
-										last = transform = pieces.getDomainElement(value);
+										last = transform = pieces.findDomainElement(value);
 									}
 								} else
-									transform = (PiecewiseTransform1DElement) pieces.getDomainElement(value);
+									transform = (PiecewiseTransform1DElement) pieces.findDomainElement(value);
 
 								// //
 								//
@@ -256,11 +257,9 @@ public class RasterClassifier extends PointOpImage {
 
 							} while (!iterator.nextPixelDone());
 					} while (!iterator.nextLineDone());
-			} catch (Exception cause) {
-				final RasterFormatException exception = new RasterFormatException(
-						cause.getLocalizedMessage());
-				exception.initCause(cause);
-				throw exception;
+			} catch (Throwable cause) {
+				throw  new ImagingException(
+						cause.getLocalizedMessage(),cause);
 			}
 			if (bandIndex != -1)
 				break;

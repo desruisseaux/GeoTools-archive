@@ -22,7 +22,7 @@ import org.opengis.util.InternationalString;
 
 /**
  * An immutable {@link Domain1D} as a list of {@link DomainElement1D}. {@link DomainElement1D} are sorted by their 
- * values. Overlapping ranges are not allowed. The{@link #getDomainElement(double)} method is responsible for 
+ * values. Overlapping ranges are not allowed. The{@link #findDomainElement(double)} method is responsible for 
  * finding the right {@link DomainElement1D} for an arbitrary domain value.
  * 
  * @author Simone Giannecchini, GeoSolutions
@@ -44,7 +44,7 @@ public interface Domain1D<T extends DomainElement1D> extends List<T>{
 	 * @return The range of values.
 	 * 
 	 */
-	public abstract NumberRange<?> getApproximateDomainRange();
+	public abstract NumberRange<? extends Number> getApproximateDomainRange();
 
 	/**
 	 * Returns the {@link DomainElement1D} of the specified sample value. If no {@link DomainElement1D} fits,
@@ -54,14 +54,7 @@ public interface Domain1D<T extends DomainElement1D> extends List<T>{
 	 *            The value.
 	 * @return The domain element of the supplied value, or {@code null}.
 	 */
-	public T getDomainElement(final double sample);
-
-	/**
-	 * Returns the underlying array of {@link DomainElement1D}s.
-	 * 
-	 * @return the underlying array of {@link DomainElement1D}s.
-	 */
-	public T[] getDomainElements();
+	public T findDomainElement(final double sample);
 
 	/**
 	 * Tell us if there is a gap in this {@link Domain1D} which means a range

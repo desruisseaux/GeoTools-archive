@@ -51,12 +51,12 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
 	private Color[] colors;
 
 	public static LinearColorMapElement create(final CharSequence name,
-			final Color[] colors, final NumberRange valueRange,
-			final NumberRange sampleRange) throws IllegalArgumentException {
+			final Color[] colors, final NumberRange<? extends Number> valueRange,
+			final NumberRange<? extends Number> sampleRange) throws IllegalArgumentException {
 		return new LinearColorMapElement(name, colors, valueRange, sampleRange);
 	}
 	public static LinearColorMapElement create(CharSequence name, final Color color,
-			final NumberRange inRange, final int outVal)
+			final NumberRange<? extends Number> inRange, final int outVal)
 			throws IllegalArgumentException {
 		return new ConstantColorMapElement(name, color, inRange, outVal);
 	}
@@ -125,8 +125,8 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
 	 *             {@link IndexColorModel} limitations.
 	 */
 	LinearColorMapElement(final CharSequence name,
-			final Color[] colors, final NumberRange valueRange,
-			final NumberRange sampleRange) throws IllegalArgumentException {
+			final Color[] colors, final NumberRange<? extends Number> valueRange,
+			final NumberRange<? extends Number> sampleRange) throws IllegalArgumentException {
 		super(name, valueRange, checkSampleRange(sampleRange));
 //		//@todo check this test
 //		final int inEquals = ColorMapUtilities.compare(getInputMaximum(), getInputMinimum());
@@ -163,10 +163,10 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
 	 * @return the input {@link NumberRange} if everything goes well.
 	 * @see IndexColorModel
 	 */
-	private static NumberRange checkSampleRange(NumberRange numberRange) {
+	private static NumberRange<? extends Number> checkSampleRange(NumberRange<? extends Number> numberRange) {
 		if (numberRange == null)
 			throw new IllegalArgumentException();
-		final Class elementClass = numberRange.getElementClass();
+		final Class<?> elementClass = numberRange.getElementClass();
 		if (!elementClass.equals(Integer.class)
 				&& !elementClass.equals(Byte.class)
 				&& !elementClass.equals(Short.class))
