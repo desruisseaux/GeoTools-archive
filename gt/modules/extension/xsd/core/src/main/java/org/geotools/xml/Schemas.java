@@ -646,6 +646,30 @@ public class Schemas {
     }
 
     /**
+     * Determines if the type of an element is a sub-type of another element.
+     * 
+     * @param e1 The element.
+     * @param e2 The element to be tested as a base type.
+     * 
+     * @since 2.5
+     */
+    public static final boolean isBaseType(XSDElementDeclaration e1, XSDElementDeclaration e2 ) {
+        XSDTypeDefinition type = e1.getType();
+        while( type != null ) {
+            if ( type.equals( e2.getType() ) ) {
+                return true;
+            }
+            
+            if ( type.equals( type.getBaseType() ) ) {
+                break;
+            }
+            
+            type = type.getBaseType();
+        }
+        
+        return false;
+    }
+    /**
      * Returns the minimum number of occurences of an element within a complex
      * type.
      *
