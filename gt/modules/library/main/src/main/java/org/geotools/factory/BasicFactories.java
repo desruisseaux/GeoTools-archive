@@ -19,7 +19,7 @@ package org.geotools.factory;
 import java.util.Map;
 
 // OpenGIS dependencies
-import org.opengis.display.FeatureDisplayFactory;
+//import org.opengis.display.FeatureDisplayFactory;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.go.CommonCapabilities;
@@ -120,18 +120,6 @@ public class BasicFactories implements CommonFactory {
         throw new FactoryRegistryException(unsupportedFactory(CommonCapabilities.class));
     }
 
-    /**
-     * Returns the {@linkplain FeatureDisplayFactory feature display factory} singleton.
-     * <p>
-     * <strong>NOTE:</strong> This method is not yet supported in Geotools.
-     * The default implementation thrown an exception in all case.
-     *
-     * @throws FactoryNotFoundException if no factory was found for the requested type.
-     * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
-     */
-    public FeatureDisplayFactory getFeatureDisplayFactory() throws FactoryRegistryException {
-        throw new FactoryNotFoundException(unsupportedFactory(FeatureDisplayFactory.class));
-    }
 
     /**
      * Returns the {@linkplain FeatureTypeFactory feature type factory} singleton.
