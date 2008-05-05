@@ -17,6 +17,8 @@ package org.geotools.kml;
 
 import org.picocontainer.MutablePicoContainer;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.kml.bindings.BoundaryTypeBinding;
 import org.geotools.kml.bindings.ColorBinding;
@@ -78,6 +80,7 @@ public class KMLConfiguration extends Configuration {
         container.registerComponentInstance(styleFactory);
         container.registerComponentInstance(styleBuilder);
         container.registerComponentInstance(new GeometryFactory());
+        container.registerComponentInstance(CoordinateArraySequenceFactory.instance());
         container.registerComponentInstance(new StyleMap());
     }
 

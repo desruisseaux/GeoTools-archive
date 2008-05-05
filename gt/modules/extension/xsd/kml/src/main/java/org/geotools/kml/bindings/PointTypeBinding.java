@@ -17,6 +17,7 @@ package org.geotools.kml.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.kml.KML;
@@ -80,8 +81,18 @@ public class PointTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Coordinate[] coordinates = (Coordinate[]) node.getChildValue(KML.coordinates.getLocalPart());
+        CoordinateSequence coordinates = 
+            (CoordinateSequence) node.getChildValue(KML.coordinates.getLocalPart());
 
-        return geometryFactory.createPoint(coordinates[0]);
+        return geometryFactory.createPoint(coordinates.getCoordinate(0));
+    }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        if ( KML.coordinates.equals( name ) ) {
+            Point p = (Point) object;
+            return p.getCoordinateSequence();
+        }
+        
+        return null;
     }
 }

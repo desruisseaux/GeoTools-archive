@@ -17,6 +17,7 @@ package org.geotools.kml.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import org.geotools.kml.KML;
@@ -80,8 +81,17 @@ public class LinearRingTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Coordinate[] coordinates = (Coordinate[]) node.getChildValue(KML.coordinates.getLocalPart());
+        CoordinateSequence coordinates = (CoordinateSequence) node.getChildValue(KML.coordinates.getLocalPart());
 
         return geometryFactory.createLinearRing(coordinates);
+    }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        if ( KML.coordinates.equals( name ) ) {
+            LinearRing l = (LinearRing) object;
+            return l.getCoordinateSequence();
+        }
+        
+        return null;
     }
 }

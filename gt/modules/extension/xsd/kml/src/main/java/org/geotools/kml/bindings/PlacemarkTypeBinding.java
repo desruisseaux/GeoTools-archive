@@ -105,4 +105,13 @@ public class PlacemarkTypeBinding extends AbstractComplexBinding {
 
         return b.buildFeature(feature.getID());
     }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        SimpleFeature feature = (SimpleFeature) object;
+        if ( KML.Geometry.equals( name ) ) {
+            return feature.getDefaultGeometry();
+        }
+        
+        return null;
+    }
 }

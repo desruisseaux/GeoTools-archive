@@ -15,8 +15,11 @@
  */
 package org.geotools.kml.bindings;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import org.opengis.feature.simple.SimpleFeature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.kml.KML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -69,5 +72,13 @@ public class KmlTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return node.getChildValue(SimpleFeature.class);
+    }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        if ( KML.Feature.equals( name ) ) {
+            return object;
+        }
+        
+        return null;
     }
 }

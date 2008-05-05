@@ -127,4 +127,17 @@ public class MultiGeometryTypeBinding extends AbstractComplexBinding {
         return geometryFactory.createGeometryCollection((Geometry[]) geometries.toArray(
                 new Geometry[geometries.size()]));
     }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        GeometryCollection gc = (GeometryCollection) object;
+        if ( KML.Geometry.equals( name ) ) {
+            Geometry[] g = new Geometry[gc.getNumGeometries()];
+            for ( int i = 0; i < g.length; i++ ) {
+                g[i] = gc.getGeometryN(i);
+            }
+            return g;
+        }
+        
+        return null;
+    }
 }

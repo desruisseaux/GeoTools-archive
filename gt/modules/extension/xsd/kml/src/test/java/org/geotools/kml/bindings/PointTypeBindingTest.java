@@ -15,10 +15,14 @@
  */
 package org.geotools.kml.bindings;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.kml.KML;
 import org.geotools.kml.KMLTestSupport;
 import org.geotools.xml.Binding;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 public class PointTypeBindingTest extends KMLTestSupport {
@@ -37,5 +41,13 @@ public class PointTypeBindingTest extends KMLTestSupport {
 
         assertEquals(1d, p.getX(), 0.1);
         assertEquals(1d, p.getY(), 0.2);
+    }
+    
+    public void testEncode() throws Exception {
+        Point p = new GeometryFactory().createPoint(new Coordinate(1,1));
+        Document dom = encode( p, KML.Point );
+        
+        Element coordinates = getElementByQName(dom, KML.coordinates );
+        assertNotNull( coordinates );
     }
 }

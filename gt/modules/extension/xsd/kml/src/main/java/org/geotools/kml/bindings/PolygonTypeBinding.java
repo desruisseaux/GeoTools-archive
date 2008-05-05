@@ -93,4 +93,23 @@ public class PolygonTypeBinding extends AbstractComplexBinding {
 
         return geometryFactory.createPolygon(outer, inner);
     }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        Polygon p = (Polygon) object;
+        if ( "outerBoundaryIs".equals( name.getLocalPart() ) ) {
+            return p.getExteriorRing();
+        }
+        else if ( "innerBoundaryIs".equals( name.getLocalPart() ) ) {
+            if ( p.getNumInteriorRing() > 0 ) {
+                LinearRing[] interior = new LinearRing[p.getNumInteriorRing()];
+                for ( int i = 0; i < interior.length; i++ ) {
+                    interior[i] = (LinearRing) p.getInteriorRingN(i);
+                }
+                
+                return interior;
+            }
+        }
+        
+        return null;
+    }
 }

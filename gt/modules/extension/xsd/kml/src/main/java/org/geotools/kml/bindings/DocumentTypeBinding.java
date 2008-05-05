@@ -15,10 +15,15 @@
  */
 package org.geotools.kml.bindings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.kml.KML;
@@ -51,8 +56,7 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class DocumentTypeBinding extends AbstractComplexBinding {
-    static final SimpleFeatureType featureType;
-
+    public static final SimpleFeatureType featureType;
     static {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.init(FeatureTypeBinding.featureType);
@@ -103,4 +107,22 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
 
         return b.buildFeature(feature.getID());
     }
+    
+    public List getProperties(Object object) throws Exception {
+        Object[] prop = new Object[2];
+        prop[0] = KML.Placemark;
+        if ( object instanceof FeatureCollection ) {
+            //TODO: this does not close the iterator!!
+            prop[1] = ((FeatureCollection)object).iterator();
+        }
+        else if ( object instanceof SimpleFeature ) {
+            SimpleFeature feature = (SimpleFeature) object;
+            prop[1] = feature.getAttribute( "Feature" );
+        }
+        
+        ArrayList l = new ArrayList();
+        l.add( prop );
+        return l;
+    }
 }
+

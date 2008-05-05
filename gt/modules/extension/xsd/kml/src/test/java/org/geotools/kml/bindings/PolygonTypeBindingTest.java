@@ -15,10 +15,16 @@
  */
 package org.geotools.kml.bindings;
 
+import javax.xml.namespace.QName;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.kml.KML;
 import org.geotools.kml.KMLTestSupport;
 import org.geotools.xml.Binding;
+import org.w3c.dom.Document;
 
 
 public class PolygonTypeBindingTest extends KMLTestSupport {
@@ -42,5 +48,23 @@ public class PolygonTypeBindingTest extends KMLTestSupport {
         Polygon p = (Polygon) parse();
 
         assertEquals(1, p.getNumInteriorRing());
+    }
+    
+    public void testEncode() throws Exception {
+        Polygon p = new GeometryFactory().createPolygon(
+            new GeometryFactory().createLinearRing(
+                new Coordinate[]{ new Coordinate(1,1), new Coordinate(2,2), 
+                    new Coordinate(3,3), new Coordinate(1,1) }
+            ), new LinearRing[] {
+                new GeometryFactory().createLinearRing(
+                        new Coordinate[]{ new Coordinate(1,1), new Coordinate(2,2), 
+                            new Coordinate(3,3), new Coordinate(1,1) }
+                )
+            }
+        );
+        Document dom = encode( p, KML.Polygon );
+        
+        assertNotNull( getElementByQName(dom, new QName( KML.NAMESPACE, "outerBoundaryIs") ) );
+        assertNotNull( getElementByQName(dom, new QName( KML.NAMESPACE, "innerBoundaryIs") ) );
     }
 }

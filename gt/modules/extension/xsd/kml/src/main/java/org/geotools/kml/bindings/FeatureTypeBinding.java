@@ -180,4 +180,44 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
         //&lt;element minOccurs="0" name="Metadata" type="kml:MetadataType"/&gt;
         return b.buildFeature((String) node.getAttributeValue("id"));
     }
+    
+    public Object getProperty(Object object, QName name) throws Exception {
+        SimpleFeature feature = (SimpleFeature) object;
+        
+        if ( "id".equals( name.getLocalPart() ) ) {
+            return feature.getID(); 
+        }
+        
+        //&lt;element minOccurs="0" name="name" type="string"/&gt;
+        if ( "name".equals( name.getLocalPart() ) ) {
+            return feature.getAttribute( "name" );
+        }
+        
+        //&lt;element minOccurs="0" name="description" type="string"/&gt;
+        if ( "description".equals( name.getLocalPart() ) ) {
+            return feature.getAttribute( "description" );
+        }
+      
+        if ( KML.styleUrl.equals( name ) )  {
+            URI uri = (URI) feature.getAttribute( "Style" );
+            if ( uri != null ) {
+                return styleMap.get( uri );
+            }
+        }
+        
+        //&lt;element default="1" minOccurs="0" name="visibility" type="boolean"/&gt;
+        //&lt;element default="1" minOccurs="0" name="open" type="boolean"/&gt;
+        //&lt;element minOccurs="0" name="address" type="string"/&gt;
+        //&lt;element minOccurs="0" name="phoneNumber" type="string"/&gt;
+        //&lt;element minOccurs="0" name="Snippet" type="kml:SnippetType"/&gt;
+        //&lt;element minOccurs="0" name="description" type="string"/&gt;
+        //&lt;element minOccurs="0" ref="kml:LookAt"/&gt;
+        //&lt;element minOccurs="0" ref="kml:TimePrimitive"/&gt;
+        //&lt;element minOccurs="0" ref="kml:styleUrl"/&gt;
+        //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:StyleSelector"/&gt;
+        //&lt;element minOccurs="0" ref="kml:Region"/&gt;
+        //&lt;element minOccurs="0" name="Metadata" type="kml:MetadataType"/&gt;
+        
+        return super.getProperty(object, name);
+    }
 }
