@@ -26,16 +26,6 @@ http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" version="1.0.0">
 						<ColorMapEntry color="#0000ff" quantity="5.0" opacity="1"/>
 						<ColorMapEntry color="#ffffff" quantity="200.0" opacity="1"/>
 					</ColorMap>	
-					<ImageOutline>
-						<Stroke>
-							<CssParameter name="stroke">
-								<ogc:Literal>#AA3333</ogc:Literal>
-							</CssParameter>
-							<CssParameter name="stroke-width">
-								<ogc:Literal>2</ogc:Literal>
-							</CssParameter>
-						</Stroke>
-					</ImageOutline>
 				    <Opacity>1.0</Opacity>
 				</RasterSymbolizer>
 			</Rule>
