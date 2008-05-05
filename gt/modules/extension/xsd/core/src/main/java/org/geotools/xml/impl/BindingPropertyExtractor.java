@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
+import org.geotools.xml.Schemas;
 
 
 /**
@@ -140,17 +141,46 @@ O:
                             name.getLocalPart());
                 }
 
-                //wrap it in a particle
-                XSDParticle particle = XSDFactory.eINSTANCE.createXSDParticle();
-                particle.setContent(elementDecl);
-
-                if (values.size() > 1) {
-                    //make a multi property
-                    particle.setMaxOccurs(-1);
-                } else {
-                    //single property
-                    particle.setMaxOccurs(1);
+                //look for a particle in the containing type which is either 
+                // a) a base type of the element
+                // b) in the same subsittuion group
+                // if found use the particle to dervice multiplicity
+                XSDParticle reference = null;
+                for ( Iterator p = Schemas.getChildElementParticles(element.getType(), true).iterator(); p.hasNext(); ) {
+                    XSDParticle particle = (XSDParticle) p.next();
+                    XSDElementDeclaration el = (XSDElementDeclaration) particle.getContent();
+                    if ( el.isElementDeclarationReference() ) {
+                        el = el.getResolvedElementDeclaration();
+                    }
+                    
+                    if ( Schemas.isBaseType(elementDecl, el) ) {
+                        reference = particle;
+                        break;
+                    }
                 }
+                
+                //wrap the property in a particle
+                XSDParticle particle = XSDFactory.eINSTANCE.createXSDParticle();
+                XSDElementDeclaration wrapper = XSDFactory.eINSTANCE.createXSDElementDeclaration();
+                wrapper.setResolvedElementDeclaration( elementDecl );
+                particle.setContent(wrapper);
+                //particle.setContent(elementDecl);
+
+                //if there is a reference, derive multiplicity
+                if ( reference != null ) {
+                    particle.setMaxOccurs( reference.getMaxOccurs() );
+                }
+                else {
+                    //dervice from collection
+                    if ( values.size() > 1) {
+                        //make a multi property
+                        particle.setMaxOccurs(-1);
+                    } else {
+                        //single property
+                        particle.setMaxOccurs(1);
+                    }    
+                }
+                
 
                 particles.put(name, particle);
             }
