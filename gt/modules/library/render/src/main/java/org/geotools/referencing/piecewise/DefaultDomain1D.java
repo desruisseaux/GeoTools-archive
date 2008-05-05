@@ -70,7 +70,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 					final NumberRange<? extends Number> extent =  element.getRange();
 					if (!Double.isNaN(extent.getMinimum())&& !Double.isNaN(extent.getMaximum())) {
 						if (range != null) {
-							range = NumberRange.wrap(range.union(extent));
+							range = new NumberRange(range.union(extent));
 						} else {
 							range = extent;
 						}
