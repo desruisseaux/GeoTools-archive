@@ -16,7 +16,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.geotools.process.ProcessFactory;
-import org.geotools.process.ProcessFactoryFinder;
+import org.geotools.process.Processors;
 import org.geotools.process.literal.IntersectionFactory;
 
 
@@ -40,7 +40,7 @@ public class ProcessSelectionPage extends JPage {
     public ProcessSelectionPage( Map<String, Object> input ) {
         super("process selection");
         this.input = input;
-        processFactories = ProcessFactoryFinder.getProcessFactories();
+        processFactories = Processors.getProcessFactories();
         selectedFactory = null;
     }
 

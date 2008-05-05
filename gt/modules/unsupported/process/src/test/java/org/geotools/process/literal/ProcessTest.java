@@ -46,10 +46,8 @@ public class ProcessTest extends TestCase {
         map.put( IntersectionFactory.GEOM1.key, geom1 );
         map.put( IntersectionFactory.GEOM2.key, geom2 );
         
-        IntersectionProcess process = new IntersectionProcess( null );   
-        process.setInput(map);
-        process.process(null);
-        Map<String, Object> resultMap = process.getResult();
+        IntersectionProcess process = new IntersectionProcess( null );           
+        Map<String, Object> resultMap = process.execute(map, null);
         
         assertNotNull( resultMap );
         Object result = resultMap.get(IntersectionFactory.RESULT.key);
@@ -68,10 +66,8 @@ public class ProcessTest extends TestCase {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put( UnionFactory.GEOM1.key, list );
         
-        UnionProcess process = new UnionProcess( null );        
-        process.setInput(map);
-        process.process(null);
-        Map<String, Object> resultMap = process.getResult();
+        UnionProcess process = new UnionProcess();        
+        Map<String, Object> resultMap = process.execute( map, null );
         
         assertNotNull( resultMap );
         Object result = resultMap.get(UnionFactory.RESULT.key);
@@ -95,10 +91,8 @@ public class ProcessTest extends TestCase {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put( UnionFactory.GEOM1.key, list );
         
-        UnionProcess process = new UnionProcess( null );        
-        process.setInput(map);
-        process.process(null);
-        Map<String, Object> resultMap = process.getResult();
+        UnionProcess process = new UnionProcess();        
+        Map<String, Object> resultMap = process.execute( map, null );
         
         assertNotNull( resultMap );
         Object result = resultMap.get(UnionFactory.RESULT.key);
@@ -117,9 +111,7 @@ public class ProcessTest extends TestCase {
         map.put( BufferFactory.BUFFER.key, buffer );
         
         BufferProcess process = new BufferProcess( null );        
-        process.setInput(map);
-        process.process(null);
-        Map<String, Object> resultMap = process.getResult();
+        Map<String, Object> resultMap = process.execute( map, null );
         
         assertNotNull( resultMap );
         Object result = resultMap.get(BufferFactory.RESULT.key);

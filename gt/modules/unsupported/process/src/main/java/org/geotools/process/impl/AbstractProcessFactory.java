@@ -25,4 +25,12 @@ import org.geotools.process.ProcessFactory;
  */
 public abstract class AbstractProcessFactory implements ProcessFactory {
 
+    public String getName() {
+        String factoryName = this.getClass().getSimpleName();
+        if( factoryName.endsWith("Factory")){
+            return factoryName.substring(0, factoryName.length()-7);
+        }
+        return factoryName;
+    }
+    
 }

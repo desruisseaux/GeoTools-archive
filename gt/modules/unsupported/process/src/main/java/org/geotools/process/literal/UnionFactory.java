@@ -70,7 +70,7 @@ public class UnionFactory extends AbstractProcessFactory {
     }
     
 	public Process create(){
-		return new UnionProcess( this );
+		return new UnionProcess();
 	}
 
 	public InternationalString getDescription() {
@@ -94,8 +94,7 @@ public class UnionFactory extends AbstractProcessFactory {
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Union";
 	}
 
 }

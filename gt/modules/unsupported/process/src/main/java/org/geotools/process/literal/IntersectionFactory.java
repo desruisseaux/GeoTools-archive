@@ -98,8 +98,7 @@ public class IntersectionFactory extends AbstractProcessFactory {
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Intersect";
 	}
 
 }

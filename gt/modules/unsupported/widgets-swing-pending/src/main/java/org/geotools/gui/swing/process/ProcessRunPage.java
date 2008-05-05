@@ -25,7 +25,7 @@ import org.geotools.gui.swing.ProgressWindow;
 import org.geotools.process.Parameter;
 import org.geotools.process.Process;
 import org.geotools.process.ProcessFactory;
-import org.geotools.process.ProcessFactoryFinder;
+import org.geotools.process.Processors;
 import org.geotools.process.literal.IntersectionFactory;
 import org.geotools.text.Text;
 import org.opengis.util.ProgressListener;
@@ -74,10 +74,9 @@ public class ProcessRunPage extends JPage {
 		page.setLayout(new GridLayout(0, 2));
 		
 		Process process = this.factory.create();
-		final ProgressListener progress = new ProgressWindow(this.getJProcessWizard());
-		process.setInput(paramMap);
-		process.process( progress );
-		Map<String, Object> resultMap = process.getResult();
+		
+		final ProgressListener progress = new ProgressWindow(this.getJProcessWizard());		
+		Map<String, Object> resultMap = process.execute(paramMap, progress );
 
 		// when we get here, the processing is over so show the result
         JLabel title = new JLabel(factory.getTitle().toString());

@@ -16,9 +16,26 @@
 package org.geotools.process;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.opengis.util.ProgressListener;
 
+/**
+ * A Process that returns a result and reports progress.
+ * Implementors define a single method called <tt>execute</tt>
+ * that accepts the inputs to process and a ProgressListener.
+ *
+ * <p>The <tt>Process</tt> interface is similar to {@link
+ * java.lang.Callable}, in that both are designed for classes whose
+ * instances are potentially executed by another thread.  A
+ * <tt>Callable</tt>, however, does not report progress.
+ *
+ * <p> The {@link Executors} class contains utility methods to
+ * convert from other common forms to <tt>Callable</tt> classes.
+ *
+ * @see Executor
+ * 
 /**
  * Used to process inputs and is reported using a ProgressListener.
  * Results are available after being run.
@@ -27,32 +44,11 @@ import org.opengis.util.ProgressListener;
  */
 public interface Process {
 	/**
-	 * Execute this process with the provided interfaces.
-	 * NOTE:  This method should only ever be called once
-	 * @param monitor listener for handling the progress of the process
-	 * @param monitor
-	 * @return Map of results (@see factory.getResultParameters for details), or null if canceled
-	 */
-	public void process(ProgressListener monitor);
-	
-	/**
-	 * ProcessFactory that created this process (useful if you want to check the process title etc..).
+	 * Execute this process with the provided inputs.
 	 * 
-	 * @return ProcessFactory that created this process.
+	 * @param input Input parameters for this process
+	 * @param monitor listener for handling the progress of the process
+	 * @return Map of results, (@see ProcessFactory for details), or null if canceled
 	 */
-	public ProcessFactory getFactory();
-	
-	/**
-	 * Set the input parameters for this process
-	 * @param input map of inputs
-	 */
-	public void setInput(Map<String,Object> input);
-	
-	/**
-	 * Get the output map of results.  User can monitor when a process is complete and
-	 * the results are ready through the ProgressListener passed to the process() method.
-	 * @param input Map for output
-	 */
-	public Map<String,Object> getResult();	
-	
+	public Map<String,Object> execute(Map<String,Object> input, ProgressListener monitor);	
 }

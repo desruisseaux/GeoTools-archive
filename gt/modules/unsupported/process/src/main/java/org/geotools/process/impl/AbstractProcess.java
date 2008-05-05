@@ -15,30 +15,10 @@ import org.opengis.util.ProgressListener;
  * </p>
  * @author Jody
  */
-public class AbstractProcess implements Process {
-    
+public abstract class AbstractProcess implements Process {   
     protected ProcessFactory factory;
-    protected Map<String, Object> result = new HashMap<String, Object>();
-    protected Map<String, Object> input;
-
     protected AbstractProcess( ProcessFactory factory ){
         this.factory = factory;
     }    
-    public ProcessFactory getFactory() {
-        return factory;
-    }
-    public Map<String, Object> getResult() {
-        return result;
-    }
-
-    public void process( ProgressListener monitor ) {
-        // implement your own process here
-        // you can refer to input
-        // and result as needed
-    }
-    
-    public void setInput( Map<String, Object> input ) {
-        this.input = input;
-    }
- 
+     
 }

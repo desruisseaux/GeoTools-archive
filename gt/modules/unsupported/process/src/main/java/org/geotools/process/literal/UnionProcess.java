@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.process.Process;
-import org.geotools.process.ProcessFactory;
 import org.geotools.text.Text;
 import org.geotools.util.NullProgressListener;
 import org.opengis.util.ProgressListener;
@@ -32,32 +31,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author gdavis
  */
 class UnionProcess implements Process {
-
-    private UnionFactory factory;
-    private Map<String, Object> resultMap;
-    private Map<String, Object> inputMap;
-    private boolean started = false;        
-
-    public UnionProcess( UnionFactory unionFactory ) {
-        this.factory = unionFactory;
+    public UnionProcess() {
     }
 
-    public ProcessFactory getFactory() {
-        return factory;
-    }
-
-    public void process(ProgressListener monitor) {
-		if (started) return;
-		
-		started = true;
+    @SuppressWarnings("unchecked")
+    public Map<String,Object> execute(Map<String,Object> input, ProgressListener monitor) {
 		if( monitor == null ) monitor = new NullProgressListener();
-		if (resultMap == null) resultMap = new HashMap<String, Object>(1);
+		Map<String,Object> resultMap = new HashMap<String, Object>(1);
         
         try {
             monitor.started();
             monitor.setTask( Text.text("Grabbing arguments") );
             monitor.progress( 10.0f );
-            List<Geometry> list = (List<Geometry>) inputMap.get( UnionFactory.GEOM1.key );          
+            List<Geometry> list = (List<Geometry>) input.get( UnionFactory.GEOM1.key );          
             
             int div = list.size();
             if (div < 1) div = 1;
@@ -66,7 +52,7 @@ class UnionProcess implements Process {
             int count = 1;
             Geometry result = null;
             for( Geometry geom : list ){
-                if( monitor.isCanceled() ) return; // user has canceled this operation                
+                if( monitor.isCanceled() ) return null; // user has canceled this operation                
                 if( result == null ) {
                     result = geom;
                 }
@@ -83,22 +69,14 @@ class UnionProcess implements Process {
             
             resultMap.put( UnionFactory.RESULT.key, result );
             monitor.complete(); // same as 100.0f
+            return resultMap;
         }
         catch (Exception eek){
             monitor.exceptionOccurred(eek);
+            return null;
         }
         finally {
             monitor.dispose();
         }
-    }
-    
-	public void setInput(Map<String, Object> input) {
-		// do any validation or pre-processing work here
-		this.inputMap = input;
-	}
-
-	public Map<String, Object> getResult() {
-		return resultMap;
-	}   
-
+    }    
 }

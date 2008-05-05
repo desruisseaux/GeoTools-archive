@@ -21,6 +21,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -32,7 +33,10 @@ import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -60,6 +64,7 @@ public class ExpressionTest extends TestCase {
 
 	static FilterFactory filterFactory = FilterFactoryFinder
 			.createFilterFactory();
+	static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2( null );
 
 	boolean set = false;
 
@@ -239,13 +244,20 @@ public class ExpressionTest extends TestCase {
 		assertEquals("test string data", testLiteral.evaluate(testObj));
 	}
 
+	public void testMinFunction() {
+	    PropertyName a = ff.property("testInteger");
+	    Literal b = ff.literal( 1004.0 );
+        Function min = ff.function("min", a, b );
+        
+	}
+	
 	/**
 	 * Tests the min function expression.
 	 * 
 	 * @throws IllegalFilterException
 	 *             if filter problems
 	 */
-	public void testMinFunction() throws IllegalFilterException {
+	public void testMinFunctionOld() throws IllegalFilterException {
 		Expression a = new AttributeExpressionImpl(testSchema, "testInteger");
 		Expression b = new LiteralExpressionImpl(new Double(1004));
 
