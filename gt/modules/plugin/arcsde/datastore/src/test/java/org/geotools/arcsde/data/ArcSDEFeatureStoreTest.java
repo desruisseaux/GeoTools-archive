@@ -1418,7 +1418,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertTrue(info.isVersioned());
 
             final SimpleFeatureType schema = store.getSchema();
-
+            assertNull( schema.getAttribute("ROW_ID") );
+            
             final int initialCount = store.getCount(Query.ALL);
             assertEquals(0, initialCount);
 

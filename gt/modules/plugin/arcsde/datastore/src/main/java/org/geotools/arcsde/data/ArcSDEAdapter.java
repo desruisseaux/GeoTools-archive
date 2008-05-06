@@ -433,13 +433,16 @@ public class ArcSDEAdapter {
                     LOGGER.info("Found an unsupported ArcSDE data type: " + sdeType
                             + " for column " + attName + ". Ignoring it.");
                     continue;
-                }
+                }                
                 // @TODO: add restrictions once the Restrictions utility methods
                 // are implemented
                 // Set restrictions = Restrictions.createLength(name, typeClass,
                 // fieldLen);
             }
-
+            int rowIdType = colDef.getRowIdType();
+            if( colDef.getRowIdType() == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE ){
+                continue; // skip over things we cannot edit modify or otherwise treat as attributes
+            }
             AttributeTypeBuilder b = new AttributeTypeBuilder();
             b.setBinding(typeClass);
             b.setName(attName);
