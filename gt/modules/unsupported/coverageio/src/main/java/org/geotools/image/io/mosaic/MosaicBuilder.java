@@ -21,8 +21,6 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -59,11 +57,6 @@ import org.geotools.resources.image.ImageUtilities;
  * @author Martin Desruisseaux
  */
 public class MosaicBuilder {
-    /**
-     * Default value for {@link #prefix}. Current implementation uses "L" as in "Level".
-     */
-    private static final String DEFAULT_PREFIX = "L";
-
     /**
      * The default tile size in pixels.
      */
@@ -124,21 +117,9 @@ public class MosaicBuilder {
     private int[] subsamplings;
 
     /**
-     * The expected size of row and column filed in generated names.
+     * The filename formatter.
      */
-    private transient int overviewFieldSize, rowFieldSize, columnFieldSize;
-
-    /**
-     * The prefix to put before tile filenames. If {@code null}, will be inferred
-     * from the source filename.
-     */
-    private String prefix;
-
-    /**
-     * File extension to be given to filenames. Computed automatically by
-     * {@link #createTileManager}.
-     */
-    private transient String extension;
+    private final FilenameFormatter formatter;
 
     /**
      * The logging level for tiling information during reads and writes.
@@ -161,10 +142,13 @@ public class MosaicBuilder {
     public MosaicBuilder(final TileManagerFactory factory) {
         this.factory = (factory != null) ? factory : TileManagerFactory.DEFAULT;
         layout = TileLayout.CONSTANT_TILE_SIZE;
+        formatter = new FilenameFormatter();
     }
 
     /**
      * Returns the logging level for tile information during read and write operations.
+     *
+     * @return The current logging level.
      */
     public Level getLogLevel() {
         return level;
@@ -173,6 +157,8 @@ public class MosaicBuilder {
     /**
      * Sets the logging level for tile information during read and write operations.
      * The default value is {@link Level#FINE}. A {@code null} value restore the default.
+     *
+     * @param level The new logging level.
      */
     public void setLogLevel(Level level) {
         if (level == null) {
@@ -185,6 +171,8 @@ public class MosaicBuilder {
      * Returns the tile layout. The default value is
      * {@link TileLayout#CONSTANT_TILE_SIZE CONSTANT_TILE_SIZE}, which is the most efficient
      * layout available in {@code org.geotools.image.io.mosaic} implementation.
+     *
+     * @return An identification of current tile layout.
      */
     public TileLayout getTileLayout() {
         return layout;
@@ -194,6 +182,8 @@ public class MosaicBuilder {
      * Sets the tile layout to the specified value. Valid values are
      * {@link TileLayout#CONSTANT_TILE_SIZE CONSTANT_TILE_SIZE} and
      * {@link TileLayout#CONSTANT_GEOGRAPHIC_AREA CONSTANT_GEOGRAPHIC_AREA}.
+     *
+     * @param layout An identification of new tile layout.
      */
     public void setTileLayout(final TileLayout layout) {
         if (layout != null) {
@@ -212,6 +202,8 @@ public class MosaicBuilder {
     /**
      * Returns the tile directory, or {@code null} for current directory. The directory
      * may be either relative or absolute. The default value is {@code null}.
+     *
+     * @return The current tiles directory.
      */
     public File getTileDirectory() {
         return directory;
@@ -220,6 +212,8 @@ public class MosaicBuilder {
     /**
      * Sets the directory where tiles will be read or written. May be a relative or absolute
      * path, or {@code null} (the default) for current directory.
+     *
+     * @param directory The new tiles directory.
      */
     public void setTileDirectory(final File directory) {
         this.directory = directory;
@@ -229,6 +223,8 @@ public class MosaicBuilder {
      * Returns the {@linkplain ImageReader image reader} provider to use for reading tiles.
      * The initial value is {@code null}, which means that the provider should be the same
      * than the one detected by {@link #writeFromUntiledImage writeFromUntiledImage}.
+     *
+     * @return The current image reader provider for tiles.
      */
     public ImageReaderSpi getTileReaderSpi() {
         return tileReaderSpi;
@@ -238,6 +234,8 @@ public class MosaicBuilder {
      * Sets the {@linkplain ImageReader image reader} provider for each tiles to be read.
      * A {@code null} value means that the provider should be automatically detected by
      * {@link #writeFromUntiledImage writeFromUntiledImage}.
+     *
+     * @param provider The new image reader provider for tiles.
      */
     public void setTileReaderSpi(final ImageReaderSpi provider) {
         this.tileReaderSpi = provider;
@@ -248,6 +246,7 @@ public class MosaicBuilder {
      * searchs a provider for the given name in the default {@link IIORegistry} and delegates to
      * {@link #setTileReaderSpi(ImageReaderSpi)}.
      *
+     * @param format The image format name for tiles.
      * @throws IllegalArgumentException if no provider was found for the given name.
      */
     public void setTileReaderSpi(String format) throws IllegalArgumentException {
@@ -270,6 +269,8 @@ public class MosaicBuilder {
     /**
      * Returns the envelope for the mosaic as a whole, or {@code null} if none. This is optional,
      * but if specified this builder uses it for assigning values to {@link Tile#getGridToCRS}.
+     *
+     * @return The current envelope, or {@code null} if none.
      */
     public Envelope getMosaicEnvelope() {
         return (mosaicEnvelope != null) ? mosaicEnvelope.clone() : null;
@@ -287,6 +288,8 @@ public class MosaicBuilder {
      * {@link #createGridToEnvelopeMapper createGridToEnvelopeMapper} method. The default behavior
      * fits most typical cases however.
      *
+     * @param envelope The new envelope, or {@code null} if none.
+     *
      * @see #createGridToEnvelopeMapper
      */
     public void setMosaicEnvelope(final Envelope envelope) {
@@ -296,6 +299,8 @@ public class MosaicBuilder {
     /**
      * Returns the bounds of the untiled image, or {@code null} if not set. In the later case, the
      * bounds will be inferred from the input image when {@link #writeFromUntiledImage} is invoked.
+     *
+     * @return The current untiled image bounds.
      */
     public Rectangle getUntiledImageBounds() {
         return (untiledBounds != null) ? (Rectangle) untiledBounds.clone() : null;
@@ -304,6 +309,8 @@ public class MosaicBuilder {
     /**
      * Sets the bounds of the untiled image to the specified value.
      * A {@code null} value discarts any value previously set.
+     *
+     * @param bounds The new untiled image bounds.
      */
     public void setUntiledImageBounds(final Rectangle bounds) {
         untiledBounds = (bounds != null) ? new Rectangle(bounds) : null;
@@ -313,6 +320,8 @@ public class MosaicBuilder {
      * Returns the tile size. If no tile size has been explicitly set, then a default tile size
      * will be computed from the {@linkplain #getUntiledImageBounds untiled image bounds}. If no
      * size can be computed, then this method returns {@code null}.
+     *
+     * @return The current tile size.
      *
      * @see #suggestTileSize
      */
@@ -333,6 +342,8 @@ public class MosaicBuilder {
 
     /**
      * Sets the tile size. A {@code null} value discarts any value previously set.
+     *
+     * @param size The new tile size.
      */
     public void setTileSize(final Dimension size) {
         if (size == null) {
@@ -411,6 +422,8 @@ public class MosaicBuilder {
      * some subsamplings from the {@linkplain #getUntiledImageBounds untiled image bounds} and
      * {@linkplain #getTileSize tile size}. If no subsampling can be computed, then this method
      * returns {@code null}.
+     *
+     * @return The current subsamplings for each overview levels.
      */
     public Dimension[] getSubsamplings() {
         if (subsamplings == null) {
@@ -507,7 +520,7 @@ public class MosaicBuilder {
             }
             /*
              * Trims the subsamplings which would produce tiles smaller than the minimum size
-             * (for CONSTANT_GEOGRAPHIC_AREA layoy) or which would produce more than one tile
+             * (for CONSTANT_GEOGRAPHIC_AREA layout) or which would produce more than one tile
              * enclosing the whole image (for CONSTANT_TILE_SIZE layout). First, we calculate
              * as (nx,ny) the maximum subsamplings expected (inclusive). Then we search those
              * maximum in the actual subsampling and assign to (nx,ny) the new array length.
@@ -547,6 +560,8 @@ public class MosaicBuilder {
      * the {@linkplain #getUntiledImageBounds untiled image bounds} and {@linkplain #getTileSize
      * tile size} in order to have only entire tiles (i.e. tiles in last columns and last rows
      * don't need to be cropped).
+     *
+     * @param subsamplings The new subsamplings for each overview levels.
      */
     public void setSubsamplings(final Dimension[] subsamplings) {
         final int[] newSubsamplings;
@@ -574,6 +589,8 @@ public class MosaicBuilder {
      * Sets uniform subsamplings for overview computations. This convenience method delegates to
      * {@link #setSubsamplings(Dimension[])} with the same value affected to both
      * {@linkplain Dimension#width width} and {@linkplain Dimension#height height}.
+     *
+     * @param subsamplings The new subsamplings for each overview levels.
      */
     public void setSubsamplings(final int[] subsamplings) {
         final Dimension[] newSubsamplings;
@@ -600,6 +617,7 @@ public class MosaicBuilder {
      *   <li>{@link #setTileReaderSpi}</li>
      * </ul>
      *
+     * @return The tile manager created from the information returned by getter methods.
      * @throws IOException if an I/O operation was required and failed. The default implementation
      *         does not perform any I/O, but subclasses are allowed to do so.
      */
@@ -617,26 +635,7 @@ public class MosaicBuilder {
         if (tileSize == null) {
             tileSize = ImageUtilities.toTileSize(untiledBounds.getSize());
         }
-        /*
-         * Selects an arbitrary prefix if none was explicitly defined. Then
-         * selects the longuest file extension (e.g. "tiff" instead of "tif").
-         */
-        if (prefix == null) {
-            prefix = DEFAULT_PREFIX;
-        }
-        extension = "";
-        final String[] suffix = tileReaderSpi.getFileSuffixes();
-        if (suffix != null) {
-            for (int i=0; i<suffix.length; i++) {
-                final String s = suffix[i];
-                if (s.length() > extension.length()) {
-                    extension = s;
-                }
-            }
-        }
-        overviewFieldSize = 0;
-        rowFieldSize      = 0;
-        columnFieldSize   = 0;
+        formatter.initialize(tileReaderSpi);
         final TileManager tiles;
         switch (layout) {
             case CONSTANT_GEOGRAPHIC_AREA: tiles = createTileManager(true);  break;
@@ -680,7 +679,7 @@ public class MosaicBuilder {
                 subsamplings[i-1] = new Dimension(i,i);
             }
         }
-        overviewFieldSize = ((int) Math.log10(subsamplings.length)) + 1;
+        formatter.computeOverviewFieldSize(subsamplings.length);
         for (int overview=0; overview<subsamplings.length; overview++) {
             final Dimension subsampling = subsamplings[overview];
             imageBounds.setRect(untiledBounds);
@@ -693,7 +692,7 @@ public class MosaicBuilder {
             final int ymin = imageBounds.y;
             final int xmax = imageBounds.x + imageBounds.width;
             final int ymax = imageBounds.y + imageBounds.height;
-            computeFieldSizes(imageBounds, tileBounds);
+            formatter.computeFieldSizes(imageBounds, tileBounds);
             int x=0, y=0;
             for (tileBounds.y = ymin; tileBounds.y < ymax; tileBounds.y += tileBounds.height) {
                 x = 0;
@@ -738,50 +737,6 @@ public class MosaicBuilder {
             }
         }
         return subsamplings[i];
-    }
-
-    /**
-     * Computes the values for {@link #columnFieldSize} and {@link #rowFieldSize}.
-     * They will be used by {@link #generateFilename}.
-     */
-    private void computeFieldSizes(final Rectangle imageBounds, final Rectangle tileBounds) {
-        final StringBuilder buffer = new StringBuilder();
-        format26(buffer, imageBounds.width / tileBounds.width, 0);
-        columnFieldSize = buffer.length();
-        buffer.setLength(0);
-        format10(buffer, imageBounds.height / tileBounds.height, 0);
-        rowFieldSize = buffer.length();
-    }
-
-    /**
-     * Formats a number in base 10.
-     *
-     * @param buffer The buffer where to write the row number.
-     * @param n      The row number to format, starting at 0.
-     * @param size   The expected width (for padding with '0').
-     */
-    private static void format10(final StringBuilder buffer, final int n, final int size) {
-        final String s = Integer.toString(n + 1);
-        for (int i=size-s.length(); --i >= 0;) {
-            buffer.append('0');
-        }
-        buffer.append(s);
-    }
-
-    /**
-     * Formats a column in base 26. For example the first column is {@code 'A'}. If there is
-     * more columns than alphabet has letters, then another letter is added in the same way.
-     *
-     * @param buffer The buffer where to write the column number.
-     * @param n      The column number to format, starting at 0.
-     * @param size   The expected width (for padding with 'A').
-     */
-    private static void format26(final StringBuilder buffer, int n, final int size) {
-        if (size > 1 || n >= 26) {
-            format26(buffer, n / 26, size - 1);
-            n %= 26;
-        }
-        buffer.append((char) ('A' + n));
     }
 
     /**
@@ -880,28 +835,7 @@ public class MosaicBuilder {
     public TileManager createTileManager(final Object input, final int inputIndex,
                                          final boolean writeTiles) throws IOException
     {
-        if (prefix == null) {
-            String filename;
-            if (input instanceof File) {
-                filename = ((File) input).getName();
-            } else if (input instanceof URI || input instanceof URL || input instanceof CharSequence) {
-                filename = input.toString();
-                filename = filename.substring(filename.lastIndexOf('/') + 1);
-            } else {
-                filename = DEFAULT_PREFIX;
-            }
-            int length = filename.lastIndexOf('.');
-            if (length < 0) {
-                length = filename.length();
-            }
-            int i;
-            for (i=0; i<length; i++) {
-                if (!Character.isLetter(filename.charAt(i))) {
-                    break;
-                }
-            }
-            prefix = filename.substring(0, i);
-        }
+        formatter.ensurePrefixSet(input);
         final Writer writer = new Writer(inputIndex, writeTiles);
         writer.setLogLevel(getLogLevel());
         try {
@@ -945,11 +879,7 @@ public class MosaicBuilder {
      * @return A filename based on the position of the tile in the whole raster.
      */
     protected String generateFilename(final int overview, final int column, final int row) {
-        final StringBuilder buffer = new StringBuilder(prefix);
-        format10(buffer, overview, overviewFieldSize); buffer.append('_');
-        format26(buffer, column,   columnFieldSize);
-        format10(buffer, row,      rowFieldSize);
-        return buffer.append('.').append(extension).toString();
+        return formatter.generateFilename(overview, column, row);
     }
 
     /**

@@ -177,7 +177,7 @@ public class TileManagerFactory extends AbstractFactory {
      * Creates a single {@linkplain TileManager tile manager} from the given array
      * of tiles. This method is automatically invoked by {@code create} methods.
      * The tile array has already been cloned and can be given directly to the
-     * {@linkplain TileManager#TileManager tile manager constructor}.
+     * {@linkplain TreeTileManager#TreeTileManager tile manager constructor}.
      * <p>
      * Subclasses can override this method if they want to create other kinds of tile managers.
      *
@@ -185,6 +185,6 @@ public class TileManagerFactory extends AbstractFactory {
      * @return The tile manager for the given tiles.
      */
     protected TileManager createGeneric(final Tile[] tiles) {
-        return new TileManager(tiles);
+        return new TreeTileManager(tiles);
     }
 }

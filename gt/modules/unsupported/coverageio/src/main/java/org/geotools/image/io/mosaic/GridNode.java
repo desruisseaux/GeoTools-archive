@@ -145,13 +145,9 @@ final class GridNode extends TreeNode implements Comparable<GridNode> {
         /*
          * Special case: checks if the first node contains all subsequent nodes. If this is true,
          * then there is no need to keep the special root TreeNode with the tile field set to null.
-         * We can keep directly the first node instead. Doing so reduces very slightly the amount
-         * of iterations in the search methods (probably an impercetible gain), and (probably more
-         * noticeable) allows the multi-threading to be more effective since otherwise we would
-         * have a single thread.
-         *
-         * Note that this special case should NOT be extended further the first node,
-         * otherwise the tiles prior the retained node would be discarted.
+         * We can keep directly the first node instead. Note that this special case should NOT be
+         * extended further the first node, otherwise the tiles prior the retained node would be
+         * discarted.
          */
         GridNode root = null;
         if (nodes.length != 0) {

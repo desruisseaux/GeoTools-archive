@@ -187,6 +187,50 @@ public class Tile implements Comparable<Tile>, Serializable {
     private AffineTransform gridToCRS;
 
     /**
+     * Creates a new tile which is a copy of the given one except for input and region.
+     * The subsampling (and consequently the <cite>grid to CRS</cite> transform), image
+     * index and image reader SPI are copied unchanged.
+     *
+     * @param tile
+     *          The tile to copy.
+     * @param input
+     *          The input to be given to the image reader, or {@code null} for the same input
+     *          than the given tile.
+     * @param region
+     *          The region in the destination image, or {@code null} for the same region than
+     *          the given tile. If non-null, then the {@linkplain Rectangle#width width} and
+     *          {@linkplain Rectangle#height height} should match the image size.
+     * @throws IllegalArgumentException
+     *          If a required argument is {@code null} or some argument has an invalid value.
+     */
+    public Tile(final Tile tile, final Object input, final Rectangle region)
+            throws IllegalArgumentException
+    {
+        ensureNonNull("tile", tile);
+        if (region != null) {
+            if (region.isEmpty()) {
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, region));
+            }
+            x      = region.x;
+            y      = region.y;
+            width  = region.width;
+            height = region.height;
+        } else {
+            x      = tile.x;
+            y      = tile.y;
+            width  = tile.width;
+            height = tile.height;
+        }
+        this.input     = (input != null) ? input : tile.input;
+        provider       = tile.provider;
+        serialProvider = tile.serialProvider;
+        imageIndex     = tile.imageIndex;
+        xSubsampling   = tile.xSubsampling;
+        ySubsampling   = tile.ySubsampling;
+        gridToCRS      = tile.gridToCRS;
+    }
+
+    /**
      * Creates a tile for the given provider, input and location. This constructor can be used when
      * the size of the image to be read by the supplied reader is unknown. This size will be
      * fetched automatically the first time {@link #getRegion} is invoked.
@@ -381,7 +425,7 @@ public class Tile implements Comparable<Tile>, Serializable {
     /**
      * Ensures that the given argument is non-null.
      */
-    private static void ensureNonNull(final String argument, final Object value) {
+    static void ensureNonNull(final String argument, final Object value) {
         if (value == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, argument));
         }
@@ -462,7 +506,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * dispose} the reader or change its configuration, unless the {@code mosaic} argument was
      * null.
      *
-     * @param MosaicImageReader The caller, or {@code null} if none.
+     * @param mosaic          The caller, or {@code null} if none.
      * @param seekForwardOnly If {@code true}, images and metadata may only be read
      *                        in ascending order from the input source.
      * @param ignoreMetadata  If {@code true}, metadata may be ignored during reads.
@@ -563,6 +607,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * Returns the image reader provider (never {@code null}). This is the provider used for
      * creating the {@linkplain ImageReader image reader} to be used for reading this tile.
      *
+     * @return The image reader provider.
+     *
      * @see ImageReaderSpi#createReaderInstance()
      */
     public ImageReaderSpi getImageReaderSpi() {
@@ -608,6 +654,8 @@ public class Tile implements Comparable<Tile>, Serializable {
     /**
      * Returns the input to be given to the image reader for reading this tile.
      *
+     * @return The image input.
+     *
      * @see ImageReader#setInput
      */
     public Object getInput() {
@@ -627,7 +675,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      *   <li>For other classes, returns {@code "class"} followed by the unqualified class name.</li>
      * </ul>
      *
-     * @param A short string representation of the input (never {@code null}).
+     * @return A short string representation of the input (never {@code null}).
      */
     public String getInputName() {
         String name = getInputName(getInput());
@@ -659,6 +707,8 @@ public class Tile implements Comparable<Tile>, Serializable {
 
     /**
      * Returns a format name inferred from the {@linkplain #getImageReaderSpi provider}.
+     *
+     * @return The format name.
      */
     public String getFormatName() {
         return toString(getImageReaderSpi());
@@ -666,6 +716,8 @@ public class Tile implements Comparable<Tile>, Serializable {
 
     /**
      * Returns the image index to be given to the image reader for reading this tile.
+     *
+     * @return The image index, numbered from 0.
      *
      * @see ImageReader#read(int)
      */
@@ -708,6 +760,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * identical since it may have been {@linkplain AffineTransform#translate translated}
      * in order to get a uniform grid geometry for every tiles in a {@link TileManager}.
      *
+     * @return The "grid to real world" transform, or {@code null} if undefined.
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
      *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
@@ -742,6 +795,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * is of {@linkplain Dimension dimension} kind because the value can also be interpreted as
      * relative "pixel size".
      *
+     * @return The subsampling along <var>x</var> and <var>y</var> axis.
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
      *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
@@ -783,6 +837,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      *       that this tile can handle, not greater than the given subsampling.</li>
      * </ul>
      *
+     * @param  subsampling The subsampling along <var>x</var> and <var>y</var> axis.
+     * @return A subsampling equals or finer than the given one.
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
      *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
@@ -825,6 +881,7 @@ public class Tile implements Comparable<Tile>, Serializable {
      * offset} are specified. If the user specified a destination offset, then the tile location
      * will be translated accordingly for the image being read.
      *
+     * @return The tile upper-left corner.
      * @throws IllegalStateException If this tile has been {@linkplain #Tile(ImageReaderSpi,
      *         Object, int, Dimension, AffineTransform) created without location} and not yet
      *         processed by {@link TileManagerFactory}.
@@ -1057,6 +1114,10 @@ public class Tile implements Comparable<Tile>, Serializable {
      * have inputs of the same kind (preferrably {@link File}, {@link URL}, {@link URI} or
      * {@link String}), and there is no duplicated ({@linkplain #getInput input},
      * {@linkplain #getImageIndex image index}) pair.
+     *
+     * @param  other The tile to compare with.
+     * @return -1 if this tile should be read before {@code other}, +1 if it should be read
+     *         after or 0 if equals.
      */
     public final int compareTo(final Tile other) {
         int c = compareInputs(input, other.input);
@@ -1089,6 +1150,9 @@ public class Tile implements Comparable<Tile>, Serializable {
      * if they have the same {@linkplain #getImageReaderSpi provider}, {@linkplain #getInput
      * input}, {@linkplain #getImageIndex image index}, {@linkplain #getRegion region} and
      * {@linkplain #getSubsampling subsampling}.
+     *
+     * @param object The object to compare with.
+     * @return {@code true} if both objects are equal.
      */
     @Override
     public boolean equals(final Object object) {
@@ -1198,6 +1262,8 @@ public class Tile implements Comparable<Tile>, Serializable {
      * table in iteration order. Tip: consider sorting the tiles before to invoke this method;
      * tiles are {@linkplain Comparable comparable} for this purpose.
      *
+     * @param tiles The tiles to format in a table.
+     * @return A string representation of the given tiles as a table.
      * @see java.util.Collections#sort(List)
      */
     public static String toString(final Collection<Tile> tiles) {

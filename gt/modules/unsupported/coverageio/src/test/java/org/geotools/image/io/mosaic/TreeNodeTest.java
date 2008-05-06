@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
+import org.geotools.resources.OptionalDependencies;
 
 
 /**
@@ -49,6 +50,42 @@ public class TreeNodeTest extends TestBase {
         super.setUp();
         assertEquals(4733, targetTiles.length);
         root = new GridNode(targetTiles);
+    }
+
+    /**
+     * Ensures that the view as a Swing tree is the same one that we get if we copy every
+     * nodes in the default Swing tree node implementations.
+     */
+    public void testSwingTree() {
+        final javax.swing.tree.TreeNode copy = OptionalDependencies.copy(root);
+        final int n = assertTreeEqual(root, copy, null, null);
+        assertEquals(4737, n);
+        final String text1 = OptionalDependencies.toString(root);
+        final String text2 = OptionalDependencies.toString(copy);
+        assertEquals(text1, text2);
+    }
+
+    /**
+     * Ensures that the given nodes are equals. This method invokes itself recursively for
+     * checking children equality. Returns the number of node compared.
+     */
+    private static int assertTreeEqual(
+            final javax.swing.tree.TreeNode node,       final javax.swing.tree.TreeNode copy,
+            final javax.swing.tree.TreeNode nodeParent, final javax.swing.tree.TreeNode copyParent)
+    {
+        int n = 1;
+        assertSame(copyParent, copy.getParent());
+        assertSame(nodeParent, node.getParent());
+        assertEquals(copy.isLeaf(),            node.isLeaf());
+        assertEquals(copy.getAllowsChildren(), node.getAllowsChildren());
+        assertEquals(copy.toString(),          node.toString());
+        assertEquals(copy.getChildCount(),     node.getChildCount());
+        for (int i=0; i<copy.getChildCount(); i++) {
+            assertEquals(i, copy.getIndex(copy.getChildAt(i)));
+            assertEquals(i, node.getIndex(node.getChildAt(i)));
+            n += assertTreeEqual(node.getChildAt(i), copy.getChildAt(i), node, copy);
+        }
+        return n;
     }
 
     /**
@@ -129,7 +166,13 @@ public class TreeNodeTest extends TestBase {
     public void testRTree() throws IOException {
         final RTree tree = new RTree(root);
         if (false) {
-            show(root);
+            /*
+             * For some unknown reason, using directly the root as the TreeNode leads to display
+             * anomalies. We have to copy in Swing default implementation. I don't know why since
+             * we have done our best in "testSwingTree" for ensuring that the original and the
+             * copy were identical.
+             */
+            show(OptionalDependencies.copy(root));
         }
         assertEquals(new Rectangle(SOURCE_SIZE*4, SOURCE_SIZE*2), tree.getBounds());
         assertEquals(new Dimension(TARGET_SIZE,   TARGET_SIZE),   tree.getTileSize());

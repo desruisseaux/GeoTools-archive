@@ -103,7 +103,7 @@ public abstract class TestBase extends TestCase {
     /**
      * Shows the given tree in a Swing widget. This is used for debugging purpose only.
      */
-    final void show(final TreeNode root) {
+    final void show(final javax.swing.tree.TreeNode root) {
         final Thread thread = Thread.currentThread();
         final JFrame frame = new JFrame("TreeNode");
         frame.addWindowListener(new WindowAdapter() {
