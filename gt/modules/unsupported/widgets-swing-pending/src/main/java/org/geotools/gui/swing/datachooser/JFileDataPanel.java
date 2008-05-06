@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -40,6 +41,7 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.TransformException;
@@ -140,20 +142,15 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         return dataStore;
     }
 
-    private GridCoverage getGridCoverage(File f) {
+    private GridCoverageReader getGridCoverageReader(File f) {
         Map<String, Object> map = new HashMap<String, Object>();
-        GridCoverage cover = null;
         try {
             map.put("url", f.toURI().toURL());
-            cover = GridCoverageFinder.getGridCoverage(map);
+            return GridCoverageFinder.getGridCoverage(map);
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
-            return null;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
         }
-        return cover;
+        return null;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -182,11 +179,11 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                 }
             } else {
 
-                source = getGridCoverage(f);
+                source = getGridCoverageReader(f);
                 if (source != null) {
                     try {
                         Style style = rsf.createRasterStyle();
-                        MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
+                        MapLayer layer = new DefaultMapLayer((AbstractGridCoverage2DReader) source, style);
                         layer.setTitle(f.getName());
                         layers.add(layer);
                     } catch (TransformException ex) {

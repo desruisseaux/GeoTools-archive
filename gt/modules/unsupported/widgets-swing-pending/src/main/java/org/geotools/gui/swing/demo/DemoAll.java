@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -27,6 +28,7 @@ import org.apache.commons.collections.map.SingletonMap;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.graph.util.SwingUtil;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.TreeContextEvent;
@@ -78,9 +80,12 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.resources.SwingUtilities;
 import org.geotools.styling.Style;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import com.sun.java.swing.SwingUtilities2;
 
 /**
  *
@@ -748,7 +753,15 @@ public class DemoAll extends javax.swing.JFrame {
         }
 
 
-        new DemoAll().setVisible(true);
+        final DemoAll demo= new DemoAll();
+        demo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        javax.swing.SwingUtilities.invokeLater(new Runnable(){
+
+            public void run() {
+                demo.pack();
+                demo.setVisible(true);
+            }});
+
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bg_backlayer;

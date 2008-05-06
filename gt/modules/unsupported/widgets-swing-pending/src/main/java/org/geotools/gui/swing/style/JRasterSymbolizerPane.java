@@ -16,6 +16,7 @@
 package org.geotools.gui.swing.style;
 
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class JRasterSymbolizerPane extends javax.swing.JPanel implements Symboli
 
         guiOpacity.setType(JExpressionPane.EXP_TYPE.NUMBER);
 
-        tabDemo.addMouseListener(new MouseListener() {
+        tabDemo.addMouseListener(new MouseAdapter() {
 
             public void mouseClicked(MouseEvent e) {
                 int ligne;
@@ -65,18 +66,6 @@ public class JRasterSymbolizerPane extends javax.swing.JPanel implements Symboli
                 if (ligne < tabDemo.getModel().getRowCount() && ligne >= 0) {
                     setEdited((RasterSymbolizer) tabDemo.getModel().getValueAt(ligne, 0));
                 }
-            }
-
-            public void mousePressed(MouseEvent e) {
-            }
-
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            public void mouseExited(MouseEvent e) {
             }
         });
     }
@@ -114,7 +103,7 @@ public class JRasterSymbolizerPane extends javax.swing.JPanel implements Symboli
         StyleBuilder sb = new StyleBuilder();
 
         Style style = sb.createStyle();
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(getEdited()));
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle("GridCoverage",getEdited()));
 
         return style;
     }
