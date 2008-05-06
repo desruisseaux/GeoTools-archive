@@ -41,8 +41,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.renderer.lite.gridcoverage2d.RasterSymbolizerHelper;
-import org.geotools.renderer.lite.gridcoverage2d.SubchainStyleVisitorCoverageProcessingAdapter;
 import org.geotools.resources.image.ComponentColorModelJAI;
 import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ChannelSelectionImpl;
