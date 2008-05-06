@@ -142,11 +142,23 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         return dataStore;
     }
 
-    private GridCoverageReader getGridCoverageReader(File f) {
+    private GridCoverage getGridCoverage(File f) {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
             map.put("url", f.toURI().toURL());
             return GridCoverageFinder.getGridCoverage(map);
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    
+    private GridCoverageReader getGridCoverageReader(File f) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            map.put("url", f.toURI().toURL());
+            return GridCoverageFinder.getGridCoverageReader(map);
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         }
@@ -183,6 +195,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                 if (source != null) {
                     try {
                         Style style = rsf.createRasterStyle();
+//                        MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
                         MapLayer layer = new DefaultMapLayer((AbstractGridCoverage2DReader) source, style);
                         layer.setTitle(f.getName());
                         layers.add(layer);

@@ -60,7 +60,6 @@ import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 
 
@@ -77,7 +76,7 @@ public class DemoExplorer extends JFrame {
 
     public DemoExplorer() {
         super();
-
+                
         restoreTabs();
         initGui();
 
