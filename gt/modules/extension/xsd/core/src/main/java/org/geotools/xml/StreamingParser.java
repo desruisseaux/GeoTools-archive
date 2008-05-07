@@ -17,6 +17,8 @@ package org.geotools.xml;
 
 import org.xml.sax.SAXException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -24,8 +26,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.geotools.xml.impl.ElementNameStreamingParserHandler;
 import org.geotools.xml.impl.StreamingParserHandler;
 import org.geotools.xml.impl.TypeStreamingParserHandler;
-import org.geotools.xml.impl.jxpath.JXPathStreamingParserHandler;
-
 
 /**
  * XML parser capable of streaming.
@@ -176,9 +176,42 @@ public class StreamingParser {
      */
     public StreamingParser(Configuration configuration, InputStream input, String xpath)
         throws ParserConfigurationException, SAXException {
-        this(configuration, input, new JXPathStreamingParserHandler(configuration, xpath));
+        this(configuration, input, createJXpathStreamingParserHandler(configuration,xpath));
     }
 
+    /**
+     * Method for dynamic creation of the xpath streaming parser handler.
+     * <p>
+     * We do this to allow the jxpath component to be removed... and avoid its 
+     * dependencies.
+     * </p>
+     * @param configuration
+     * @param xpath
+     * @return
+     */
+    static StreamingParserHandler createJXpathStreamingParserHandler(Configuration configuration, String xpath)
+        throws ParserConfigurationException {
+        
+        Class clazz;
+        try {
+            clazz = Class.forName( "org.geotools.xml.impl.jxpath.JXPathStreamingParserHandler");
+        } catch (ClassNotFoundException e) {
+            throw (ParserConfigurationException) new ParserConfigurationException().initCause(e);
+        }
+        
+        Constructor c;
+        try {
+            c = clazz.getConstructor(new Class[]{Configuration.class,String.class});
+            return (StreamingParserHandler) c.newInstance(new Object[]{configuration,xpath});
+        }
+        catch( Exception e ) {
+            //shoudl not happen
+            throw new RuntimeException( e );
+        }
+        
+        //return new JXPathStreamingParserHandler(configuration, xpath)    
+    }
+    
     /**
      * Internal constructor.
      */
