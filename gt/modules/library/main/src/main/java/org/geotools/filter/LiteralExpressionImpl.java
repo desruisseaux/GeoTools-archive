@@ -18,7 +18,6 @@ package org.geotools.filter;
 import java.math.BigDecimal;
 
 import org.geotools.filter.expression.Value;
-import org.geotools.util.CommonsConverterFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
