@@ -36,8 +36,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {
     
-    private static final CommonsConverterFactory commonsConv = new CommonsConverterFactory();
-	
     /** Holds a reference to the literal. */
     private Object literal = null;
     
