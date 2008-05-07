@@ -320,7 +320,8 @@ public class DefaultDomainElement1D implements DomainElement1D {
      * @uml.property  name="inputRange"
      */
 	public NumberRange<? extends Number> getRange() {
-		return NumberRange.wrap(inputRange);
+	    return inputRange;
+		//return NumberRange.wrap(inputRange);
 	}
 
 	/**

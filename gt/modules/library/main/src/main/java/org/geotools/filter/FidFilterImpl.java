@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.geotools.filter.expression.PropertyAccessor;
@@ -143,7 +144,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 	 * @return
 	 */
 	private Set fids() {
-		HashSet set = new HashSet();
+		Set set = new TreeSet();
 		for (Iterator i = fids.iterator(); i.hasNext();) {
 			Identifier id = (Identifier) i.next();
 			set.add(id.toString());
