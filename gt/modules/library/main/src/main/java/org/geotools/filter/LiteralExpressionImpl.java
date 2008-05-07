@@ -238,36 +238,36 @@ public class LiteralExpressionImpl extends DefaultExpression
         } else {
             String s = (String) literal;
             
-        // check if it's a number
-        try {
-            BigDecimal bd = new BigDecimal(s);
-            
-            // check if it has a decimal part 
-            if(bd.scale() > 0) {
-                double d = bd.doubleValue();
-                // if too big for double, it will become infinite
-                if(!Double.isInfinite(d))
-                    parsedValue = d;
-                else
-                    parsedValue = bd;
-            } else {
-                // it's integral, see if we can convert it to a long or int
-                try {
-                    long l = bd.longValueExact();
-                    // if this test passes, it's actually an int
-                    if((int) l == l)
-                        parsedValue = new Integer((int) l);
+            // check if it's a number
+            try {
+                BigDecimal bd = new BigDecimal(s);
+                
+                // check if it has a decimal part 
+                if(bd.scale() > 0) {
+                    double d = bd.doubleValue();
+                    // if too big for double, it will become infinite
+                    if(!Double.isInfinite(d))
+                        parsedValue = d;
                     else
-                        parsedValue = new Long(l);
-                } catch(Exception e) {
-                    // was too big for a long
-                    parsedValue = bd.toBigIntegerExact();
+                        parsedValue = bd;
+                } else {
+                    // it's integral, see if we can convert it to a long or int
+                    try {
+                        long l = bd.longValueExact();
+                        // if this test passes, it's actually an int
+                        if((int) l == l)
+                            parsedValue = new Integer((int) l);
+                        else
+                            parsedValue = new Long(l);
+                    } catch(Exception e) {
+                        // was too big for a long
+                        parsedValue = bd.toBigIntegerExact();
+                    }
                 }
+            } catch(Exception e) {
+                // ok, it's not a number, let's keep it as it is
+                parsedValue = literal;
             }
-        } catch(Exception e) {
-            // ok, it's not a number, let's keep it as it is
-            parsedValue = literal;
-        }
             
             
         }  
