@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 //import org.geotools.filter.FilterCapabilities;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.LikeFilterImpl;
 import org.geotools.util.Converters;
@@ -784,91 +785,82 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /**
      * Export the contents of a Literal Expresion
      *
-     * @param expression the Literal to export
+     * @param expression
+     * the Literal to export
      *
-     * @throws RuntimeException for io exception with writer
+     * @throws RuntimeException
+     * for io exception with writer
      */
-    public Object visit(Literal expression, Object context) throws RuntimeException {
+    public Object visit(Literal expression, Object context)
+            throws RuntimeException {
         LOGGER.finer("exporting LiteralExpression");
 
-        //type to convert the literal to
-        Class target = (Class)context;
-        
+        // type to convert the literal to
+        Class target = (Class) context;
+
         try {
+            Object literal = null;
             
-            //handle the null case
-            if ( expression.getValue() == null ) {
-                out.write( "NULL" );
-                return context;
+            // HACK: let expression figure out the right value for numbers,
+            // since the context is almost always improperly set and the
+            // numeric converters try to force floating points to integrals 
+            if(target != null && !(Number.class.isAssignableFrom(target))) 
+                // use the target type
+                literal = expression.evaluate(null, target);
+            
+            // if the target was not known, of the conversion failed, try the
+            // type guessing dance literal expression does only for the following
+            // method call
+            if(literal == null)
+                literal = expression.evaluate(null);
+            
+            // if that failed as well, grab the value as is
+            if(literal == null)
+                literal = expression.getValue();
+            
+            // handle geometry case
+            if (literal instanceof Geometry) {
+                // call this method for backwards compatibility with subclasses
+                visitLiteralGeometry(CommonFactoryFinder.getFilterFactory(null).literal(literal));
+            } else {
+                // write out the literal allowing subclasses to override this
+                // behaviour (for writing out dates and the like using the BDMS custom functions)
+                writeLiteral(literal);
             }
-            
-			Object literal = null;
-			
-			if ( target == Geometry.class && expression.getValue() instanceof Geometry ) {
-				//call this method for backwards compatability with subclasses
-				visitLiteralGeometry( expression );
-				return context;
-			}
-			else if ( target != null ){
-				//convert the literal to the required type
-				//JD except for numerics, let the database do the converstion
 
-				if (   Number.class.isAssignableFrom( target ) ) {
-					//dont convert
-				}
-				else {
-					//convert
-					literal = expression.evaluate( null, target );
-				}
-				
-				if ( literal == null ) {
-					//just use string
-					literal = expression.getValue().toString();
-				}
-				
-				//geometry hook
-				//if ( literal instanceof Geometry ) {
-				if ( Geometry.class.isAssignableFrom( target ) ) {
-					visitLiteralGeometry( expression );
-				}
-				//else if ( literal instanceof Number ) {
-				else if ( Number.class.isAssignableFrom( target ) ) {
-					out.write( literal.toString() );
-				}
-				//else if ( literal instanceof String ) {
-				else if ( String.class.isAssignableFrom( target ) ) {
-                    // sigle quotes must be escaped to have a valid sql string
-                    String escaped = literal.toString().replaceAll("'", "''");
-					out.write( "'" + escaped + "'" );
-				}
-				else if ( Date.class.isAssignableFrom( target ) ) {
-				    //wrap a date in quotes so the datebase will parse
-				    out.write( "'" + literal.toString() + "'" );
-				}
-				else {
-				    //just use string value, no quotes
-				    out.write( literal.toString() );
-				}
-			}
-			else {
-					//convert back to a string
-					String encoding = (String)Converters.convert( literal, String.class , null );
-					if ( encoding == null ) {
-						//could not convert back to string, use original l value
-						encoding = expression.getValue().toString();
-					}
-					
-
-                // sigle quotes must be escaped to have a valid sql string
-                    String escaped = encoding.replaceAll("'", "''");
-					out.write( "'" + escaped + "'");
-				}
-			
-		} catch (IOException e) {
-			 throw new RuntimeException("IO problems writing literal", e);
-		}
+        } catch (IOException e) {
+            throw new RuntimeException("IO problems writing literal", e);
+        }
         return context;
     }
+
+    /**
+     * Writes out a non null, non geometry literal. The base class properly handles
+     * null, numeric and booleans (true|false), and turns everything else into a string.
+     * Subclasses are expected to override this shall they need a different treatment
+     * (e.g. for dates)
+     * @param literal
+     * @throws IOException
+     */
+    protected void writeLiteral(Object literal) throws IOException {
+        if(literal == null) {
+          out.write("NULL");
+        } else if(literal instanceof Number || literal instanceof Boolean) {
+            out.write(String.valueOf(literal));
+        } else {
+            // we don't know what this is, let's convert back to a string
+            String encoding = (String) Converters.convert(literal,
+                    String.class, null);
+            if (encoding == null) {
+                // could not convert back to string, use original l value
+                encoding = literal.toString();
+            }
+
+            // sigle quotes must be escaped to have a valid sql string
+            String escaped = encoding.replaceAll("'", "''");
+            out.write("'" + escaped + "'");
+        }
+    } 
 
     /**
      * Subclasses must implement this method in order to encode geometry

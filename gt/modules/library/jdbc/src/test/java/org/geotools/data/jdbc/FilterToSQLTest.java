@@ -28,6 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
 
 
@@ -151,5 +152,16 @@ public class FilterToSQLTest extends TestCase {
         FilterToSQL encoder = new FilterToSQL(output);
         encoder.encode(equals);
         assertEquals("WHERE attribute = 'A''A'", output.toString());
+    }
+    
+    public void testNumberEscapes() throws Exception {
+        Add a = filterFac.add(filterFac.property("testAttr"), filterFac.literal(5));
+        PropertyIsEqualTo equal = filterFac.equal(filterFac.property("testAttr"), a, false);
+        StringWriter output = new StringWriter();
+        FilterToSQL encoder = new FilterToSQL(output);
+        // this test must pass even when the target feature type is not known
+        // encoder.setFeatureType(integerFType);
+        encoder.encode(equal);
+        assertEquals("WHERE testAttr = testAttr + 5", output.toString());
     }
 }
