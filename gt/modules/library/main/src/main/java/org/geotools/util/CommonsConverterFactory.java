@@ -15,10 +15,13 @@
  */
 package org.geotools.util;
 
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.BigDecimalConverter;
+import org.apache.commons.beanutils.converters.BigIntegerConverter;
 import org.apache.commons.beanutils.converters.BooleanConverter;
 import org.apache.commons.beanutils.converters.ByteConverter;
 import org.apache.commons.beanutils.converters.CharacterConverter;
@@ -85,8 +88,11 @@ public class CommonsConverterFactory implements ConverterFactory {
 		ConvertUtils.register( new ByteConverter(null), Byte.class );
 		ConvertUtils.register( new ShortConverter(null), Short.class );
 		ConvertUtils.register( new IntegerConverter(null), Integer.class );
-		ConvertUtils.register( new DoubleConverter(null), Double.class );
+		ConvertUtils.register( new LongConverter(null), Long.class );
+		ConvertUtils.register( new BigIntegerConverter(null), BigInteger.class );
 		ConvertUtils.register( new FloatConverter(null), Float.class );
+		ConvertUtils.register( new DoubleConverter(null), Double.class );
+		ConvertUtils.register( new BigDecimalConverter(null), BigDecimalConverter.class );
 		
 		ConvertUtils.register( new BooleanConverter(null), Boolean.class );
 		ConvertUtils.register( new CharacterConverter(null), Character.class );
