@@ -86,6 +86,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     
     /**
      * Overrides to support offset and maxFeatures
+     * @see DefaultSQLBuilder#buildSQLQuery(String, FIDMapper, AttributeDescriptor[], org.opengis.filter.Filter, SortBy[], Integer, Integer)
      */
     @Override
     public String buildSQLQuery(String typeName,

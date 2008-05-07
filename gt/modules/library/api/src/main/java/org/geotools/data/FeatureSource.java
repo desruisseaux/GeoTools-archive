@@ -257,7 +257,8 @@ public interface FeatureSource<T extends FeatureType, F extends Feature>{
      * using <code>getFeatures(Query).getBounds()</code> as a an alternative.
      * </p>
      *
-     * @param query Contains the Filter and MaxFeatures to find the bounds for.
+     * @param query Contains the Filter, and optionally MaxFeatures and StartIndex to 
+     *  find the bounds for.
      *
      * @return The bounding box of the datasource or null if unknown and too
      *         expensive for the method to calculate or any errors occur.
@@ -268,15 +269,19 @@ public interface FeatureSource<T extends FeatureType, F extends Feature>{
 
     /**
      * Gets the number of the features that would be returned by this query.
-     *
-     * <p></p>
-     *
+     * 
      * <p>
      * If getBounds(Query) returns <code>-1</code> due to expense consider
      * using <code>getFeatures(Query).getCount()</code> as a an alternative.
      * </p>
+     * <p>
+     * This method should take into account the Query's {@link Query#getMaxFeatures() maxFeatures}
+     * and {@link Query#getStartIndex() startIndex}, if present, in order to 
+     * consistently return the number of features the query would return.
+     * </p>
      *
-     * @param query Contains the Filter and MaxFeatures to find the bounds for.
+     * @param query Contains the Filter, and optionally MaxFeatures and StartIndex to 
+     *  find the count for.
      *
      * @return The number of Features provided by the Query or <code>-1</code>
      *         if count is too expensive to calculate or any errors or occur.

@@ -48,6 +48,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -110,7 +112,26 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         SimpleFeatureType featureType) {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
-        this.queryCapabilities = new QueryCapabilities();
+        //We assume jdbc datastores can sort by any field. Be sure to override
+        //if you support @id, NATURAL_ORDER, or REVERSE_ORDER
+        this.queryCapabilities = new QueryCapabilities(){
+            @Override
+            public boolean supportsSorting(SortBy[] sortAttributes){
+                final SimpleFeatureType featureType = JDBCFeatureSource.this.featureType;
+                for(int i = 0; i < sortAttributes.length; i++){
+                    SortBy sortBy = sortAttributes[i];
+                    PropertyName propertyName = sortBy.getPropertyName();
+                    String attName = (String)propertyName.evaluate(featureType, String.class);
+                    if(attName == null){
+                        attName = propertyName.getPropertyName();
+                    }
+                    if(featureType.getAttribute(attName) == null){
+                       return false; 
+                    }
+                }
+                return false;
+            }  
+        };
     }
     
     /**
@@ -257,6 +278,13 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
         if (request.getTypeName() == null) {
             request = new DefaultQuery(request);
             ((DefaultQuery) request).setTypeName(featureType.getTypeName());
+        }
+        
+        final QueryCapabilities queryCapabilities = getQueryCapabilities();
+        if(request.getSortBy() != null){
+           if(!queryCapabilities.supportsSorting(request.getSortBy())){
+               throw new DataSourceException("DataStore cannot provide the requested sort order");
+           }
         }
         
         return new JDBCFeatureCollection(this, request);
@@ -452,6 +480,21 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
             return dataStore.getSupportedHints();
      }
 
+     /**
+      * Returns the default jdbc query capabilities, subclasses should 
+      * override to advertise their specific capabilities where they differ.
+      * <p>
+      * For instance, the capabilities returned:
+      * <ul>
+      * <li>Does not support startIndex
+      * <li>Supports sorting by any attribute in the feature type. Be sure to override
+      * if that's not the case, or you also support sorting by @id, SortBy.NATURAL_ORDER,
+      * or SortBy.REVERSE_ORDER.
+      * </ul>
+      * </p>
+      * 
+      * @see FeatureSource#getQueryCapabilities()
+      */
     public QueryCapabilities getQueryCapabilities() {
         return queryCapabilities;
     }
