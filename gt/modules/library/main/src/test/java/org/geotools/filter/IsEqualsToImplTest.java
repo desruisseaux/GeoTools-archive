@@ -44,6 +44,14 @@ public class IsEqualsToImplTest extends TestCase {
         PropertyIsEqualTo equal = filterFactory.equals(e1, e2);
         assertTrue(equal.evaluate(null));
     }
+    
+    public void testOperandsIntFloatString() {
+        Expression e1 = filterFactory.literal(1);
+        Expression e2 = filterFactory.literal("1.2");
+
+        PropertyIsEqualTo equal = filterFactory.equals(e1, e2);
+        assertFalse(equal.evaluate(null));
+    }
 
     public void testOperandsLongInt() {
         Expression e1 = filterFactory.literal(1);
