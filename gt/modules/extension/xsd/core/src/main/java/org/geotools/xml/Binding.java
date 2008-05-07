@@ -17,8 +17,6 @@ package org.geotools.xml;
 
 import java.awt.List;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.MultiPolygon;
-
 
 /**
  * A specialized handler for a specific type in an xml schema.
