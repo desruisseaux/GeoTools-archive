@@ -16,15 +16,9 @@
 package org.geotools.filter;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
 
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.expression.Value;
 import org.geotools.util.CommonsConverterFactory;
-import org.geotools.util.Converter;
-import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
