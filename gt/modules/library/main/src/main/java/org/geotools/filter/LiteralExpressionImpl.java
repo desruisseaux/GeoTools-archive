@@ -15,9 +15,16 @@
  */
 package org.geotools.filter;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.expression.Value;
+import org.geotools.util.CommonsConverterFactory;
+import org.geotools.util.Converter;
+import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
@@ -34,6 +41,8 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {
+    
+    private static final CommonsConverterFactory commonsConv = new CommonsConverterFactory();
 	
     /** Holds a reference to the literal. */
     private Object literal = null;
@@ -218,26 +227,54 @@ public class LiteralExpressionImpl extends DefaultExpression
         //try and be somewhat smart about this.
         
         //ASSERTION: literal is always a string.
+        
+        // caching, don't try to reparse over and over the same literal
         if(parsedValue != null)
             return parsedValue;
         
+        // actual parsing
         if (literal == null || !(literal instanceof String)) {
             parsedValue = literal;
         } else {
             String s = (String) literal;
-            Value v = new Value(s);
-            Class[] contexts = new Class[] {Integer.class, BigInteger.class, Double.class};
-            for (int i = 0; i < contexts.length && parsedValue == null; i++) {
-                parsedValue = v.value(contexts[i]);
-            }
-            if(parsedValue == null)
-                parsedValue = literal;
+            
+// check if it's a number
+try {
+    BigDecimal bd = new BigDecimal(s);
+    
+    // check if it has a decimal part 
+    if(bd.scale() > 0) {
+        double d = bd.doubleValue();
+        // if too big for double, it will become infinite
+        if(!Double.isInfinite(d))
+            parsedValue = d;
+        else
+            parsedValue = bd;
+    } else {
+        // it's integral, see if we can convert it to a long or int
+        try {
+            long l = bd.longValueExact();
+            // if this test passes, it's actually an int
+            if((int) l == l)
+                parsedValue = new Integer((int) l);
+            else
+                parsedValue = new Long(l);
+        } catch(Exception e) {
+            // was too big for a long
+            parsedValue = bd.toBigIntegerExact();
+        }
+    }
+} catch(Exception e) {
+    // ok, it's not a number, let's keep it as it is
+    parsedValue = literal;
+}
+            
+            
         }  
         return parsedValue;
     }
     
     public Object evaluate(Object feature, Class context) {
-        
         Value v = new Value( literal );
         return v.value(context);
     }

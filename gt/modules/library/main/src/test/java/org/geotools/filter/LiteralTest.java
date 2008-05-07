@@ -18,9 +18,11 @@
 package org.geotools.filter;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
+
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -33,20 +35,14 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @source $URL$
  */
 public class LiteralTest extends TestCase {
-    public LiteralTest(java.lang.String testName) {
-        super(testName);
+    
+    FilterFactory ff;
+
+    @Override
+    protected void setUp() throws Exception {
+        ff = CommonFactoryFinder.getFilterFactory(null);
     }
-
-    public static void main(java.lang.String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite(LiteralTest.class);
-
-        return suite;
-    }
-
+    
     public void testValidConstruction() throws Exception {
         LiteralExpression a = new LiteralExpressionImpl(new Double(10));
         LiteralExpression b = new LiteralExpressionImpl("Label");
@@ -55,14 +51,20 @@ public class LiteralTest extends TestCase {
         LiteralExpression d = new LiteralExpressionImpl(gf.createGeometryCollection(null));
     }
 
-//    public void testInvalidConstruction1() throws Exception {
-//        try {
-//            LiteralExpression a = new LiteralExpressionImpl(new Double(10));
-//            LiteralExpression b = new LiteralExpressionImpl(a);
-//        } catch (IllegalFilterException ife) {
-//            return;
-//        }
-//
-//        fail("ExpressionLiterals can not contain " + "other excepresions");
-//    }
+    public void testInvalidConstruction1() throws Exception {
+        try {
+            LiteralExpression a = new LiteralExpressionImpl(new Double(10));
+            LiteralExpression b = new LiteralExpressionImpl(a);
+        } catch (IllegalFilterException ife) {
+            return;
+        }
+    }
+    
+    public void testConversion() throws Exception {
+        assertEquals("abc", ff.literal("abc").evaluate(null));
+        assertEquals(new Integer(12), ff.literal("12").evaluate(null));
+        assertEquals(new Double(12.0), ff.literal("12.0").evaluate(null));
+        assertEquals(new Double(12.5), ff.literal("12.5").evaluate(null));
+        assertEquals(new Long(Long.MAX_VALUE), ff.literal(Long.MAX_VALUE + "").evaluate(null));
+    }
 }
