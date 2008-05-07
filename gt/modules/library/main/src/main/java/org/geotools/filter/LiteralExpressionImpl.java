@@ -35,6 +35,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public class LiteralExpressionImpl extends DefaultExpression
     implements LiteralExpression {
     
+    private static BigDecimal MAX_LONG = BigDecimal.valueOf(Long.MAX_VALUE);
+    private static BigDecimal MIN_LONG = BigDecimal.valueOf(Long.MIN_VALUE);
+    
     /** Holds a reference to the literal. */
     private Object literal = null;
     
@@ -243,16 +246,17 @@ public class LiteralExpressionImpl extends DefaultExpression
                         parsedValue = bd;
                 } else {
                     // it's integral, see if we can convert it to a long or int
-                    try {
-                        long l = bd.longValueExact();
+                    if(bd.compareTo(MIN_LONG) >= 0 && bd.compareTo(MAX_LONG) <= 0) {
+                        // in range to be a long 
+                        long l = bd.longValue();
                         // if this test passes, it's actually an int
                         if((int) l == l)
                             parsedValue = new Integer((int) l);
                         else
                             parsedValue = new Long(l);
-                    } catch(Exception e) {
-                        // was too big for a long
-                        parsedValue = bd.toBigIntegerExact();
+                    } else {
+                        // out of range, switch to big decimal
+                        parsedValue = bd.toBigInteger();
                     }
                 }
             } catch(Exception e) {

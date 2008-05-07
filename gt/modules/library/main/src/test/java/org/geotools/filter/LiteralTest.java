@@ -18,11 +18,12 @@
 package org.geotools.filter;
 
 
+import java.math.BigInteger;
+
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -66,5 +67,8 @@ public class LiteralTest extends TestCase {
         assertEquals(new Double(12.0), ff.literal("12.0").evaluate(null));
         assertEquals(new Double(12.5), ff.literal("12.5").evaluate(null));
         assertEquals(new Long(Long.MAX_VALUE), ff.literal(Long.MAX_VALUE + "").evaluate(null));
+        BigInteger doubleMaxLong = BigInteger.valueOf(Long.MAX_VALUE).multiply(BigInteger.valueOf(2));
+        assertEquals(doubleMaxLong, ff.literal(doubleMaxLong.toString()).evaluate(null));
+
     }
 }
