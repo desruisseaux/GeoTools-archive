@@ -1220,21 +1220,22 @@ public class ShapefileRenderer implements GTRenderer {
         MapLayer[] layers = context.getLayers();
         layerIndexInfo = new IndexInfo[layers.length];
 
-        for( int i = 0; i < layers.length; i++ ) {
-            DataStore ds = (DataStore) layers[i].getFeatureSource().getDataStore();
+        int i=0;
+        for(MapLayer layer:layers ) {
+            DataStore ds = (DataStore) layer.getFeatureSource().getDataStore();
             if( ds instanceof ShapefileDataStore ){
-
 	            ShapefileDataStore sds = (ShapefileDataStore) ds;
-	
 	            try {
 	                layerIndexInfo[i] = useIndex(sds);
 	            } catch (Exception e) {
 	                layerIndexInfo[i] = new IndexInfo(IndexType.NONE, ShapefileRendererUtil.getShpFiles(sds));
-	                LOGGER.fine("Exception while trying to use index" + e.getLocalizedMessage());
+	                if(LOGGER.isLoggable(Level.FINE))
+	                    LOGGER.fine("Exception while trying to use index" + e.getLocalizedMessage());
 	            }
 	        }else{
 	        	layerIndexInfo[i]=STREAMING_RENDERER_INFO;
 	        }
+            i++;
         }
     }
 
