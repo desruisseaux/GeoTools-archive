@@ -42,6 +42,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.AbstractFilterVisitor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.util.NullProgressListener;
 
 import org.opengis.feature.FeatureVisitor;
@@ -310,7 +311,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
             	//                	//builder.sqlColumns(sql,)
             	//                sql.append(builder.toString());
             	//            } else {
-            	sql.append(expression.toString());
+            	sqlBuilder.encode(sql, expression);
             	//            }
             }
             
@@ -365,7 +366,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
 	 * @author Cory Horner, Refractions
 	 * 
 	 */
-    class ExpressionSimplifier extends DefaultFilterVisitor {
+    class ExpressionSimplifier extends DuplicatingFilterVisitor {
         public Object visit(PropertyName expression, Object extraData) {
             String xpath = expression.getPropertyName();
             

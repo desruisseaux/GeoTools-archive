@@ -23,6 +23,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.factory.Hints;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
 
 /** Provides an interface for SQL statement construction.
@@ -138,10 +140,20 @@ public interface SQLBuilder {
      * sql: <code>ORDER BY &lt;property1&gt; [ASC|DESC], ....</code>
      * </p>
      * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
-     * @deprecated 
+     * @deprecated use {@link #sqlOrderBy(StringBuffer, FIDMapper, SortBy[])}
      */
     public void sqlOrderBy( StringBuffer sql, SortBy[] sortBy ) throws SQLEncoderException;
     
+    /**
+     * Lower level method allowing for the encoding of a single expession in sql
+     */
+    public void encode(StringBuffer sql, Expression expression) throws SQLEncoderException;
+
+    /**
+     * Lower level method allowing for the encoding of a single filter in sql
+     */
+
+    public void encode(StringBuffer sql, Filter filter) throws SQLEncoderException;
     /**
      * Constructs ORDER BY clause.
      * <p>

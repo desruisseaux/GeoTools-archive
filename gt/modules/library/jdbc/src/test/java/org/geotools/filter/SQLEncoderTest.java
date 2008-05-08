@@ -15,14 +15,11 @@
  */
 package org.geotools.filter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Add;
 
 
 
@@ -36,6 +33,7 @@ import org.opengis.filter.PropertyIsEqualTo;
  */
 public class SQLEncoderTest extends SQLFilterTestSupport {
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
+    private org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 //
 //    /** Test suite for this test case */
 //    TestSuite suite = null;
@@ -158,6 +156,26 @@ public class SQLEncoderTest extends SQLFilterTestSupport {
         encoder.encode(output, Filter.EXCLUDE);
         assertEquals(output.getBuffer().toString(), "WHERE FALSE");
     }
+    
+    public void testExpression() throws Exception {
+        Add a = ff.add(ff.property("col"), ff.literal(5));
+        SQLEncoder encoder = new SQLEncoder();
+        assertEquals("col + 5", encoder.encode(a));
+        
+        encoder.setSqlNameEscape("\"");
+        assertEquals("\"col\" + 5", encoder.encode(a));
+    }
+    
+//    This actually breaks, see GEOT-1801
+//    public void testFunction() throws Exception {
+//        PropertyIsEqualTo equal = ff.equal(ff.property("col"), ff.function("abs", ff.literal(5)), false);
+//        SQLEncoder encoder = new SQLEncoder();
+//        assertTrue(encoder.getCapabilities().fullySupports(equal));
+//        encoder.encode(equal);
+//    }
+    
+    
+    
 //
 //    /* public void test14() contains geom filter, not supported
 //       throws Exception {

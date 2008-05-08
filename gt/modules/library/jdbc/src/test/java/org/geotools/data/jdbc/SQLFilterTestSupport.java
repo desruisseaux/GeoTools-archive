@@ -58,7 +58,7 @@ public abstract class SQLFilterTestSupport extends TestCase {
         super(name);
     }
 
-    protected void setUp() throws SchemaException, IllegalAttributeException {
+    protected void setUp() throws Exception {
         if (setup) {
             return;
         } else {

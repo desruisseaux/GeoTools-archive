@@ -17,17 +17,17 @@ package org.geotools.data.jdbc;
 
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.Filter;
 import org.geotools.factory.Hints;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.Filters;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
@@ -373,6 +373,17 @@ public class DefaultSQLBuilder implements SQLBuilder {
             }
         }
     }
+
+    public void encode(StringBuffer sql, Expression expression) throws SQLEncoderException {
+        sql.append(encoder.encode(expression));
+    }
+
+    public void encode(StringBuffer sql, Filter filter) throws SQLEncoderException {
+        // we reuse the encoder method already available and get rid of the first where
+        // statement encountered
+        sql.append(encoder.encode(filter).replaceAll("^\\s*WHERE\\s*", ""));
+    }
+    
 
     /**
      * @param sql the buffer where the select statement is being built, already contains the "ORDER

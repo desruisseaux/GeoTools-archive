@@ -232,8 +232,6 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
             try {
                 out.write("WHERE ");
                 Filters.accept( filter, this );
-
-                //out.write(";");
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
                 throw new SQLEncoderException("Problem writing filter: ", ioe);
@@ -256,6 +254,28 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     public String encode(org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringWriter output = new StringWriter();
         encode(output, filter);
+
+        return output.getBuffer().toString();
+    }
+    
+    public void encode(Writer out, org.opengis.filter.expression.Expression expression) throws SQLEncoderException {
+        this.out = out;
+        ((DefaultExpression) expression).accept(this);
+    }
+    
+    /**
+     * Performs the encoding, returns a string of the encoded SQL.
+     *
+     * @param expression the expression to be encoded.
+     *
+     * @return the correspondent SQL snippet
+     *
+     * @throws SQLEncoderException If expression type not supported, or if there
+     *         were io problems.
+     */
+    public String encode(org.opengis.filter.expression.Expression expression) throws SQLEncoderException {
+        StringWriter output = new StringWriter();
+        encode(output, expression);
 
         return output.getBuffer().toString();
     }
@@ -802,4 +822,6 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
             throw new RuntimeException(IO_ERROR, ioe);
         }
     }
+
+    
 }

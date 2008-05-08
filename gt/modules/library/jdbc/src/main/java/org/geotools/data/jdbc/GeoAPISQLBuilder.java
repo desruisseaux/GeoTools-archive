@@ -27,6 +27,7 @@ import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -353,4 +354,21 @@ public class GeoAPISQLBuilder implements SQLBuilder {
     	
     }
 
+    public void encode(StringBuffer sql, Expression expression)
+            throws SQLEncoderException {
+        try {
+            sql.append(encoder.encodeToString(expression));
+        } catch (FilterToSQLException fse) {
+            throw new SQLEncoderException("", fse);
+        }
+    }
+
+    public void encode(StringBuffer sql, Filter filter)
+            throws SQLEncoderException {
+        try {
+            sql.append(encoder.encodeToString(filter).replaceAll("^\\s*WHERE\\s*", ""));
+        } catch (FilterToSQLException fse) {
+            throw new SQLEncoderException("", fse);
+        }
+    }
 }

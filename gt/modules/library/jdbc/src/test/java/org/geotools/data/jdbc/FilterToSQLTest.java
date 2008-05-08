@@ -47,12 +47,12 @@ public class FilterToSQLTest extends TestCase {
     
     private SimpleFeatureType integerFType;
     private SimpleFeatureType stringFType;
+    private FilterToSQL encoder;
+    private StringWriter output;
 
-    public FilterToSQLTest(String testName) throws Exception {
-        super(testName);
-        
-        Logger log = LOGGER;
+    public void setUp() throws Exception {
         Level debugLevel = Level.FINE;
+        Logger log = LOGGER;
         while (log != null) {
             log.setLevel(debugLevel);
             for (int i = 0; i < log.getHandlers().length; i++) {
@@ -71,20 +71,16 @@ public class FilterToSQLTest extends TestCase {
         ftb.add("testAttr", String.class);
         stringFType = ftb.buildFeatureType();
         
+        output = new StringWriter();
+        encoder = new FilterToSQL(output);
     }
     
-    public void setUp() {
-    }
-
     public void testIntegerContext() throws Exception {
         
         Expression literal = filterFac.literal(5);
         Expression prop = filterFac.property(integerFType.getAttributes().get(0).getLocalName());
         PropertyIsEqualTo filter = filterFac.equals(prop, literal);
         
-
-        StringWriter output = new StringWriter();
-        FilterToSQL encoder = new FilterToSQL(output);
         encoder.setFeatureType(integerFType);
         encoder.encode(filter);
         
@@ -93,14 +89,11 @@ public class FilterToSQLTest extends TestCase {
     }
     
     public void testStringContext() throws Exception {
-        
         Expression literal = filterFac.literal(5);
         Expression prop = filterFac.property(stringFType.getAttributes().get(0).getLocalName());
         PropertyIsEqualTo filter = filterFac.equals(prop, literal);
         
 
-        StringWriter output = new StringWriter();
-        FilterToSQL encoder = new FilterToSQL(output);
         encoder.setFeatureType(stringFType);
         encoder.encode(filter);
         
@@ -109,15 +102,11 @@ public class FilterToSQLTest extends TestCase {
     }
     
     public void testInclude() throws Exception {
-        StringWriter output = new StringWriter();
-        FilterToSQL encoder = new FilterToSQL(output);
         encoder.encode(Filter.INCLUDE);
         assertEquals(output.getBuffer().toString(), "WHERE TRUE");
     }
     
     public void testExclude() throws Exception {
-        StringWriter output = new StringWriter();
-        FilterToSQL encoder = new FilterToSQL(output);
         encoder.encode(Filter.EXCLUDE);
         assertEquals(output.getBuffer().toString(), "WHERE FALSE");
     }
@@ -130,12 +119,15 @@ public class FilterToSQLTest extends TestCase {
     }
     
     public void testEscapeQuote() throws FilterToSQLException {
-        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-        PropertyIsEqualTo equals = ff.equals(ff.property("attribute"), ff.literal("A'A"));
-        StringWriter output = new StringWriter();
-        FilterToSQL encoder = new FilterToSQL(output);
+        PropertyIsEqualTo equals = filterFac.equals(filterFac.property("attribute"), filterFac.literal("A'A"));
         encoder.encode(equals);
         assertEquals("WHERE attribute = 'A''A'", output.toString());
+    }
+    
+    public void testExpression() throws Exception {
+        Add a = filterFac.add(filterFac.property("testAttr"), filterFac.literal(5));
+        encoder.encode(a);
+        assertEquals("testAttr + 5", output.toString());
     }
     
     public void testEscapeQuoteFancy() throws FilterToSQLException  {

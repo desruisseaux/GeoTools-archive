@@ -42,9 +42,9 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 	static boolean WKB_ENABLED = true;
 	static boolean CHECK_TYPE = false;
 	
-	Fixture f;
-	ManageableDataSource pool;
-	DataStore data;
+	protected PostgisTests.Fixture f;
+	protected ManageableDataSource pool;
+	protected DataStore data;
 	
 	public AbstractPostgisDataTestCase(String name) {
 		super(name);

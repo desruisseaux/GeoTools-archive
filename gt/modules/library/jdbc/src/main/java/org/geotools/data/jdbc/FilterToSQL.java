@@ -18,17 +18,13 @@ package org.geotools.data.jdbc;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-//import org.geotools.filter.FilterCapabilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.LikeFilterImpl;
@@ -65,7 +61,6 @@ import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.NilExpression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
-import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -207,6 +202,40 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         StringWriter out = new StringWriter();
         this.out = out;
         this.encode(filter);
+        return out.getBuffer().toString();
+    }
+    
+    /**
+     * Performs the encoding, sends the encoded sql to the writer passed in.
+     *
+     * @param filter the Filter to be encoded.
+     *
+     * @throws OpenGISFilterToOpenGISFilterToSQLEncoderException If filter type not supported, or if there
+     *         were io problems.
+     */
+    public void encode(Expression expression) throws FilterToSQLException {
+        if (out == null) throw new FilterToSQLException("Can't encode to a null writer.");
+        expression.accept(this, null);
+    }
+    
+    /**
+     * purely a convenience method.
+     * 
+     * Equivalent to:
+     * 
+     *  StringWriter out = new StringWriter();
+     *  new FilterToSQL(out).encode(filter);
+     *  out.getBuffer().toString();
+     * 
+     * @param filter
+     * @return a string representing the filter encoded to SQL.
+     * @throws FilterToSQLException
+     */
+    
+    public String encodeToString(Expression expression) throws FilterToSQLException {
+        StringWriter out = new StringWriter();
+        this.out = out;
+        this.encode(expression);
         return out.getBuffer().toString();
     }
     
@@ -800,11 +829,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 
         try {
             Object literal = null;
-            
-            // HACK: let expression figure out the right value for numbers,
-            // since the context is almost always improperly set and the
-            // numeric converters try to force floating points to integrals 
-            if(target != null && !(Number.class.isAssignableFrom(target))) 
+            if(target != null) 
                 // use the target type
                 literal = expression.evaluate(null, target);
             

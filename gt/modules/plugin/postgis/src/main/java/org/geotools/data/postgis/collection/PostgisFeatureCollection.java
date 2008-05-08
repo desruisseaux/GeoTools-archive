@@ -33,8 +33,8 @@ import org.geotools.data.jdbc.JDBCFeatureSource;
  */
 public class PostgisFeatureCollection extends JDBCFeatureCollection  {
 
-	public PostgisFeatureCollection(JDBCFeatureSource arg0, Query arg1) throws IOException  {
-		super(arg0, arg1);
+	public PostgisFeatureCollection(JDBCFeatureSource source, Query query) throws IOException  {
+		super(source, query);
 	}
 	
 }
