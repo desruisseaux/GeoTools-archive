@@ -478,7 +478,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
                 newId = Long.valueOf(newRowId.longValue());
             }
 
-            // insertStream.flushBufferedWrites();
+            insertStream.flushBufferedWrites(); // jg: my customer wanted this uncommented
             closeStream(insertStream);
             versionHandler.editOperationWritten(insertStream);
 
