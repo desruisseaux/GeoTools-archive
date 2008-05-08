@@ -259,7 +259,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// //
 				////
 				//
-				// @todo TODo HACK we need to convert to byte the image when going to
+				// @todo TODO HACK we need to convert to byte the image when going to
 				// apply HISTOGRAM anyway
 				//
 				////
@@ -436,16 +436,26 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				final int numSourceBands=source.getNumSampleDimensions();
 				final int numActualBands= finalImage.getSampleModel().getNumBands();
 				if(numActualBands==numSourceBands)
-					output = getCoverageFactory().create("ce_coverage", finalImage,
-						(GridGeometry2D)source.getGridGeometry(),source.getSampleDimensions(),new GridCoverage[]{source},new HashMap(source.getProperties()));
+					output = getCoverageFactory().create(
+					        "ce_coverage"+source.getName().toString(), 
+					        finalImage,
+					        (GridGeometry2D)source.getGridGeometry(),
+					        source.getSampleDimensions(),
+					        new GridCoverage[]{source},
+					        new HashMap(source.getProperties()));
 				else
 				{
 					//replicate input bands
 					final GridSampleDimension sd[]= new GridSampleDimension[numActualBands];
 					for(int i=0;i<numActualBands;i++)
 						sd[i]=(GridSampleDimension) source.getSampleDimension(0);
-					output = getCoverageFactory().create("ce_coverage", finalImage,
-							(GridGeometry2D)source.getGridGeometry(),sd,new GridCoverage[]{source},new HashMap(source.getProperties()));
+					output = getCoverageFactory().create(
+					        "ce_coverage"+source.getName().toString(), 
+					        finalImage,
+					        (GridGeometry2D)source.getGridGeometry(),
+					        sd,
+					        new GridCoverage[]{source},
+					        new HashMap(source.getProperties()));
 				}
 
 

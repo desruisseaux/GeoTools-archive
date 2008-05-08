@@ -20,6 +20,8 @@ import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.RenderedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -32,6 +34,8 @@ import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.BandMergeDescriptor;
 import javax.media.jai.operator.FormatDescriptor;
 
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.TypeMap;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.factory.Hints;
@@ -49,6 +53,7 @@ import org.opengis.util.InternationalString;
  * operation for usage withing SLD 1.0 processing.
  * 
  * @author Simone Giannecchini, GeoSolutions.
+ * TODO we should preserve properties
  * 
  */
 class BandMergeNode extends BaseCoverageProcessingNode implements
@@ -154,6 +159,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 			GridGeometry2D gridGeometry = null;
 			ImageLayout layout = null;
 			final Hints hints = getHints();
+			final List<GridCoverage2D> sourceGridCoverages= new ArrayList<GridCoverage2D>();
 			do {
 				// //
 				//
@@ -162,6 +168,7 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 				// //
 				final CoverageProcessingNode currentSourceNode = (CoverageProcessingNode) it.next();
 				final GridCoverage2D currentSourceCoverage = (GridCoverage2D) currentSourceNode.getOutput();
+				sourceGridCoverages.add(currentSourceCoverage);
 				final GridGeometry2D gg = (GridGeometry2D) currentSourceCoverage.getGridGeometry();
 				if (gridGeometry == null) {
 					// get the envelope for the first source.
@@ -209,8 +216,17 @@ class BandMergeNode extends BaseCoverageProcessingNode implements
 				hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
 			op = FormatDescriptor.create(op, new Integer(op.getSampleModel()
 					.getDataType()), hints);
-			return getCoverageFactory().create("BandMerge", op, gridGeometry,
-					null, null, null);
+			final GridSampleDimension [] sd= new GridSampleDimension[op.getSampleModel().getNumBands()];
+			for(int i=0;i<sd.length;i++)
+			    sd[i]= new GridSampleDimension(TypeMap.getColorInterpretation(op.getColorModel(), i).name());
+		                
+			return getCoverageFactory().create(
+			        "BandMerge",
+			        op,
+			        gridGeometry,
+			        null, 
+			        sourceGridCoverages.toArray(new GridCoverage[sourceGridCoverages.size()]),
+			        null);
 
 		}
 		throw new IllegalStateException(Errors.format(

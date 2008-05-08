@@ -41,6 +41,7 @@ import org.geotools.styling.StyleVisitor;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.logging.Logging;
 import org.opengis.coverage.SampleDimensionType;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.util.InternationalString;
 
 /**
@@ -94,7 +95,7 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 	 * {@link LinearColorMap} we'll help us buld the colormapped
 	 * image.
 	 */
-	private LinearColorMap classification;
+	private LinearColorMap colorMapTransform;
 
 	/**
      * Do we want 16 bits or 8 bits colormap?
@@ -180,7 +181,7 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// Create the list of no data classification domain elements. Note that all of them 
+			// Create the list of no data colorMapTransform domain elements. Note that all of them 
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final LinearColorMapElement noDataCategories[] = new LinearColorMapElement[candidateNoDataValues.length];
@@ -190,10 +191,10 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// Create the list of classification categories
+			// Create the list of colorMapTransform categories
 			//
 			// /////////////////////////////////////////////////////////////////////
-			classification = builder.buildLinearColorMap();
+			colorMapTransform = builder.buildLinearColorMap();
 
 		} else
 			this.type = -1;
@@ -259,29 +260,56 @@ class ColorMapNode extends StyleVisitorCoverageProcessingNodeAdapter implements
 	 * than one band is an error.
 	 */
 	protected GridCoverage2D execute() {
-		final CoverageProcessingNode sourceNode = getSource(0);
-		ensureSourceNotNull(sourceNode, this.getName().toString());
-		final GridCoverage2D sourceCoverage = (GridCoverage2D) sourceNode.getOutput();
-		ensureSourceNotNull(sourceCoverage, this.getName().toString());
-		if (classification != null) {
-		    //get input image
-		    final RenderedImage sourceImage = sourceCoverage.getRenderedImage();
-		    ensureSourceNotNull(sourceImage, this.getName().toString());
-		    //prepare the classification operation
-		    final ParameterBlock pbj = new ParameterBlock();
-		    pbj.addSource(sourceImage).add(classification);
-		    final RenderedOp classified = JAI.create(RasterClassifier.OPERATION_NAME,pbj);
-		    
-		    //prepare the output coverage by specifying its bands
-		    final int outputBands=sourceImage.getColorModel().getNumComponents();
-		    assert outputBands==1||outputBands==3;
-		    final GridSampleDimension [] sd= new GridSampleDimension[outputBands];
-		    for(int i=0;i<outputBands;i++)
-		        sd[i]= new GridSampleDimension(TypeMap.getColorInterpretation(classified.getColorModel(), i).name());
+	    ///////////////////////////////////////////////////////////////////
+	    //
+	    //get the source for this node and ensure it is correct
+	    //
+	    ///////////////////////////////////////////////////////////////////
+	    final CoverageProcessingNode sourceNode = getSource(0);
+	    ensureSourceNotNull(sourceNode, this.getName().toString());
+	    final GridCoverage2D sourceCoverage = (GridCoverage2D) sourceNode.getOutput();
+	    ensureSourceNotNull(sourceCoverage, this.getName().toString());
+	    
+	    ///////////////////////////////////////////////////////////////////
+            //
+	    //now apply the colormap if one exists
+	    //
+            ///////////////////////////////////////////////////////////////////
+	    if (colorMapTransform != null) {
+	        //get input image
+	        final RenderedImage sourceImage = sourceCoverage.getRenderedImage();
+	        ensureSourceNotNull(sourceImage, this.getName().toString());
+	        //prepare the colorMapTransform operation
+	        final ParameterBlock pbj = new ParameterBlock();
+	        pbj.addSource(sourceImage).add(colorMapTransform);
+	        final RenderedOp classified = JAI.create(RasterClassifier.OPERATION_NAME,pbj);
 
-		    return getCoverageFactory().create("color_mapped_"+sourceCoverage.getName().toString(), classified,getSource(0).getOutput().getEnvelope());
-		}
-		return sourceCoverage;	
+	        ////
+	        //
+	        // prepare the output coverage by specifying its bands
+	        //
+	        ////
+	        final int outputBands=sourceImage.getColorModel().getNumComponents();
+	        assert outputBands==1||outputBands==3;
+	        final GridSampleDimension [] sd= new GridSampleDimension[outputBands];
+	        for(int i=0;i<outputBands;i++)
+		        sd[i]= new GridSampleDimension(TypeMap.getColorInterpretation(classified.getColorModel(), i).name());
+	        
+	        ////
+                //
+                // Create the the output coverage by preserving its gridgeometry and its bands
+                //
+                ////
+		return getCoverageFactory().create(
+		        "color_mapped_"+sourceCoverage.getName().toString(), 
+		        classified,
+		        sourceCoverage.getGridGeometry(),
+		        sd,
+		        new GridCoverage[]{sourceCoverage},
+		        sourceCoverage.getProperties()
+		        );
+	    }
+	    return sourceCoverage;	
 
 
 	}
