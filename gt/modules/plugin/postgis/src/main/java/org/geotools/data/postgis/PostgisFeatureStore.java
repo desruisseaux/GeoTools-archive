@@ -150,7 +150,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                        return false; 
                     }
                 }
-                return false;
+                return true;
             }
         };
     }

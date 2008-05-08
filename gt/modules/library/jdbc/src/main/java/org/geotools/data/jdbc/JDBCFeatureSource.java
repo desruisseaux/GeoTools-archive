@@ -129,7 +129,7 @@ public class JDBCFeatureSource implements FeatureSource<SimpleFeatureType, Simpl
                        return false; 
                     }
                 }
-                return false;
+                return true;
             }  
         };
     }

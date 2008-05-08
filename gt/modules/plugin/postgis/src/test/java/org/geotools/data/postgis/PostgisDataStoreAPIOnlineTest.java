@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
@@ -40,6 +42,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.OIDFidMapper;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -63,6 +66,8 @@ import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -1512,6 +1517,102 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureCollection<SimpleFeatureType, SimpleFeature> expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);
         assertEquals(riverBounds, all.getBounds());
+    }
+
+    public void testGetFeaturesSortBy() throws NoSuchElementException, IOException,
+    IllegalAttributeException {
+        FeatureSource<SimpleFeatureType, SimpleFeature> river = data.getFeatureSource("river");
+        
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        
+        DefaultQuery query = new DefaultQuery(riverType.getTypeName());
+        query.setSortBy(new SortBy[]{ff.sort("nonExistentProperty", SortOrder.ASCENDING)});
+        try{
+            river.getFeatures(query);
+            fail("Expected a datasource exception while asking to sort by a non existent attribute");
+        }catch(DataSourceException e){
+            assertTrue(true);
+        }
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+        SimpleFeature f1, f2;
+        
+        query.setSortBy(new SortBy[]{ff.sort("river", SortOrder.ASCENDING)});
+        features = river.getFeatures(query);
+        Iterator<SimpleFeature> iterator = features.iterator();
+        try{
+            f1 = iterator.next();
+            f2 = iterator.next();
+            assertEquals("rv1", f1.getAttribute("river"));
+            assertEquals("rv2", f2.getAttribute("river"));
+        }finally{
+           features.close(iterator);
+        }
+
+        query.setSortBy(new SortBy[]{ff.sort("river", SortOrder.DESCENDING)});
+        features = river.getFeatures(query);
+        iterator = features.iterator();
+        try{
+            f1 = iterator.next();
+            f2 = iterator.next();
+            assertEquals("rv2", f1.getAttribute("river"));
+            assertEquals("rv1", f2.getAttribute("river"));
+        }finally{
+           features.close(iterator);
+        }
+    }
+
+    public void testGetFeaturesPaging() throws NoSuchElementException, IOException,
+    IllegalAttributeException {
+        FeatureSource<SimpleFeatureType, SimpleFeature> river = data.getFeatureSource("river");
+        
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        
+        DefaultQuery query = new DefaultQuery(riverType.getTypeName());
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
+        SimpleFeature f1, f2;
+        
+        query.setStartIndex(0);
+        query.setMaxFeatures(1);
+        
+        features = river.getFeatures(query);
+        Iterator<SimpleFeature> iterator = features.iterator();
+        try{
+            f1 = iterator.next();
+            assertEquals(1, ((Integer)f1.getAttribute("id")).intValue());
+            assertFalse(iterator.hasNext());
+        }finally{
+           features.close(iterator);
+        }
+
+        query.setStartIndex(1);
+        query.setMaxFeatures(1);
+        
+        features = river.getFeatures(query);
+        iterator = features.iterator();
+        try{
+            f1 = iterator.next();
+            assertEquals(2, ((Integer)f1.getAttribute("id")).intValue());
+            assertFalse(iterator.hasNext());
+        }finally{
+           features.close(iterator);
+        }
+
+        //now with order by
+        query.setStartIndex(1);
+        query.setMaxFeatures(1);
+        query.setSortBy(new SortBy[]{ff.sort("id", SortOrder.DESCENDING)});
+        
+        features = river.getFeatures(query);
+        iterator = features.iterator();
+        try{
+            f1 = iterator.next();
+            assertEquals(1, ((Integer)f1.getAttribute("id")).intValue());
+            assertFalse(iterator.hasNext());
+        }finally{
+           features.close(iterator);
+        }
     }
 
     //
