@@ -48,6 +48,7 @@ import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -499,16 +500,22 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                     + "same length as type array");
         }
 
+        final PostgisDataStore dataStore = getPostgisDataStore();
         for (int i = 0; i < arrLength; i++) {
             Object newValue = values[i];
 
             AttributeDescriptor curType = types[i];
             if (curType instanceof GeometryDescriptor) {
                 newValue = geometryWriter.write((Geometry) newValue);
+                // prepStatement indexing starts at 1...
+                statement.setObject(1 + i, newValue);
+            }else{
+                //Get the jdbc column type
+                final Class target = curType.getType().getBinding();
+                final int jdbcType = dataStore.getJdbcType(target).intValue();
+                // prepStatement indexing starts at 1...
+                statement.setObject(1 + i, newValue, jdbcType);
             }
-
-            // prepStatement indexing starts at 1...
-            statement.setObject(1 + i, newValue);
         }
     }
 

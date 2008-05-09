@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1958,6 +1959,28 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         return dbInfo;
     }
     
+    /**
+     * Returns the JDBC type constant (as in {@link Types}) that maps to the given
+     * Java class binding when constructing attribute types, or null if no such mapping exist.
+     * 
+     * @param attributeTypeBinding
+     * @return
+     */
+    public Integer getJdbcType(Class attributeTypeBinding){
+        Map.Entry entry;
+        Integer jdbcType = null;
+        Class binding;
+        for(Iterator it = TYPE_MAPPINGS.entrySet().iterator(); it.hasNext();){
+            entry = (Map.Entry) it.next();
+            binding = (Class) entry.getValue();
+            if(binding.equals(attributeTypeBinding)){
+                jdbcType = (Integer)entry.getKey();
+                break;
+            }
+        }
+        return jdbcType;
+    }
+
     /**
      * The hints supported by this datastore depending on the configuration
      */
