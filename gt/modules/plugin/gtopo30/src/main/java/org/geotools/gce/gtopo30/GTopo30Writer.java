@@ -237,7 +237,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	/**
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
-	public Format getFormat() {
+	@SuppressWarnings("deprecation")
+    public Format getFormat() {
 		return new GTopo30Format();
 	}
 
@@ -269,10 +270,10 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		if (params != null) {
 
 			if (params != null) {
-				Parameter param;
+				Parameter<?> param;
 				final int length = params.length;
 				for (int i = 0; i < length; i++) {
-					param = (Parameter) params[i];
+					param = (Parameter<?>) params[i];
 					if (param.getDescriptor().getName().getCode().equals(
 							AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName()
 									.toString())) {

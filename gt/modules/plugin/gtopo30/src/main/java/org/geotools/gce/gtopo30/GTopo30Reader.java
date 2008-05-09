@@ -68,6 +68,8 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
@@ -305,7 +307,8 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	/**
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
-	public Format getFormat() {
+	@SuppressWarnings("deprecation")
+        public Format getFormat() {
 		return  new GTopo30Format();
 	}
 
@@ -331,11 +334,9 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
 				for (int i = 0; i < params.length; i++) {
-					final ParameterValue param = (ParameterValue) params[i];
+					final ParameterValue<?> param = (ParameterValue<?>) params[i];
 					final String name = param.getDescriptor().getName().getCode();
-					if (name.equals(
-							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-									.toString())) {
+					if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())) {
 						final GridGeometry2D gg = (GridGeometry2D) param
 								.getValue();
 						requestedEnvelope = new GeneralEnvelope((Envelope) gg
@@ -504,7 +505,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		final GridSampleDimension band = getSampleDimension(max, min);
 
 		// setting metadata
-		final Map metadata = new HashMap();
+		final Map<String,Double> metadata = new HashMap<String,Double>();
 		metadata.put("maximum", Double.valueOf(stats.getMax()));
 		metadata.put("minimum", Double.valueOf(stats.getMin()));
 		metadata.put("mean", Double.valueOf(stats.getAverage()));
@@ -588,7 +589,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					parameters.parameter("false_northing").setValue(0.0);
 					final ReferencingFactoryContainer factories =
 					    ReferencingFactoryContainer.instance(null);
-					final Map properties = Collections.singletonMap("name",
+					final Map<String,String> properties = Collections.singletonMap("name",
 							"WGS 84 / Antartic Polar Stereographic");
 
 					return factories.createProjectedCRS(properties, geoCRS,
@@ -617,6 +618,8 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					// freeing
 					reader.close();
 				} catch (Exception e1) {
+				    if(LOGGER.isLoggable(Level.FINE))
+				        LOGGER.log(Level.FINE,e1.getLocalizedMessage(),e1);
 				}
 		}
 		final CoordinateReferenceSystem crs = AbstractGridFormat
@@ -643,29 +646,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 * @return the reformatted image.
 	 */
 
-	// final private RenderedOp reFormat2Float(RenderedOp image, int min, int
-	// max) {
-	//
-	// //number of elements in the lookup table
-	// final int numElem=max+9999+1;
-	// //offset is -9999
-	// final double lookup[]=new double[numElem];
-	// //changing NaN
-	// lookup[0]=Double.NaN;
-	// for(int i=min+9999;i<=max+9999;i++){
-	// lookup[i]=i-9999;
-	// }
-	//		
-	// //building the lookup table jai
-	// final LookupTableJAI lt= new LookupTableJAI(lookup,-9999);
-	// final ParameterBlockJAI pbj= new ParameterBlockJAI("lookup");
-	// pbj.addSource(image);
-	// pbj.setParameter("table",lt);
-	// return JAI.create("lookup",pbj,new
-	// RenderingHints(JAI.KEY_IMAGE_LAYOUT,new ImageLayout(image)));
-	//		
-	//
-	// }
+
 	/**
 	 * The purpose of this method is to build the sample dimensions for this
 	 * coverage.
@@ -677,7 +658,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @return The newly created sample dimensions.
 	 */
-	final private GridSampleDimension getSampleDimension(final int max,
+	private static GridSampleDimension getSampleDimension(final int max,
 			final int min) {
 		// Create the SampleDimension, with colors and byte transformation
 		// needed for visualization
@@ -692,16 +673,16 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		}
 
 		final Category values = new Category("values", demColors,
-				new NumberRange(1, 255), new NumberRange((short) min,
+				 NumberRange.create(1, 255), NumberRange.create((short) min,
 						(short) max));
 		final Category nan =
 		// new Category("No data",
 		// new Color(0, 0, 0, 0),0);
-		new Category("No data", new Color[] { new Color(0, 0, 0, 0) },
-				new NumberRange(0, 0), new NumberRange((short) -9999,
+		new Category(Vocabulary.format(VocabularyKeys.NODATA), new Color[] { new Color(0, 0, 0, 0) },
+				NumberRange.create(0, 0), NumberRange.create((short) -9999,
 						(short) -9999));
 		final GridSampleDimension band = new GridSampleDimension(
-				"digital elevation", new Category[] { values, nan }, uom);
+				"digital-elevation", new Category[] { values, nan }, uom);
 
 		return band.geophysics(true);
 	}

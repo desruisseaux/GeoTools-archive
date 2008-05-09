@@ -44,7 +44,8 @@ public class GTopo30FormatFactory implements GridFormatFactorySpi {
 	 * 
 	 * @return an instance of GTopo30Format
 	 */
-	public Format createFormat() {
+	@SuppressWarnings("deprecation")
+        public Format createFormat() {
 		return new GTopo30Format();
 	}
 
@@ -77,6 +78,6 @@ public class GTopo30FormatFactory implements GridFormatFactorySpi {
 	 * @return the implementation hints (an empty map, actually)
 	 */
 	public Map getImplementationHints() {
-		return Collections.EMPTY_MAP;
+		return Collections.emptyMap();
 	}
 }

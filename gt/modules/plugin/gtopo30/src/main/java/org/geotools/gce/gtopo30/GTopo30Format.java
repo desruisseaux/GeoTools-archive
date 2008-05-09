@@ -58,7 +58,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 * Creates an instance and sets the metadata.
 	 */
 	public GTopo30Format() {
-		mInfo = new HashMap();
+		mInfo = new HashMap<String,String>();
 		mInfo.put("name", "Gtopo30");
 		mInfo.put("description", "Gtopo30 Coverage Format");
 		mInfo.put("vendor", "Geotools");

@@ -10,7 +10,7 @@ import javax.imageio.ImageWriteParam;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 
 /**
- * @author Simone Giannecchini.
+ * @author Simone Giannecchini, GeoSolutions.
  * @since 2.3.x
  * 
  */

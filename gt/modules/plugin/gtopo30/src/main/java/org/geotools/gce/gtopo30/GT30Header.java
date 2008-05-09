@@ -83,11 +83,11 @@ final class GT30Header {
 	private static final double STD_CELL_SIZE = 0.00833333333333;
 
 	/**
-	 * A map for fast and convenient retrivial of the properties contained in
+	 * A map for fast and convenient retrieval of the properties contained in
 	 * the header file
 	 * 
 	 */
-	private Map propertyMap;
+	private Map<String, Object> propertyMap = new HashMap<String, Object>();
 
 	/**
 	 * Creates a new instance of GTOPO30Header
@@ -107,12 +107,10 @@ final class GT30Header {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(header));
-			propertyMap = initMap();
-
-			parseHeaderFile(this.propertyMap, reader);
-
+			initMap();
+			parseHeaderFile(reader);
 			if (!fullPropertySet(this.propertyMap)) {
-				throw new IOException(
+				throw new DataSourceException(
 						"Needed properties missing in GTOPO30 header file");
 			}
 		} finally {
@@ -121,6 +119,7 @@ final class GT30Header {
 					// freeing
 					reader.close();
 				} catch (Exception e1) {
+				    //TODO log me
 				}
 		}
 	}
@@ -162,7 +161,7 @@ final class GT30Header {
 	 * @return the number of rows in the file
 	 */
 	public int getNRows() {
-		return ((Integer) this.propertyMap.get(NROWS)).intValue();
+		return (Integer) this.propertyMap.get(NROWS);
 	}
 
 	/**
@@ -171,7 +170,7 @@ final class GT30Header {
 	 * @return the number of columns in the file
 	 */
 	public int getNCols() {
-		return ((Integer) this.propertyMap.get(NCOLS)).intValue();
+		return (Integer) this.propertyMap.get(NCOLS);
 	}
 
 	/**
@@ -190,7 +189,7 @@ final class GT30Header {
 	 * @return the number of bits per cell
 	 */
 	public int getNBits() {
-		return ((Integer) this.propertyMap.get(NBITS)).intValue();
+		return (Integer) this.propertyMap.get(NBITS);
 	}
 
 	/**
@@ -199,7 +198,7 @@ final class GT30Header {
 	 * @return the number of bytes per row in a band
 	 */
 	public int getBandRowBytes() {
-		return ((Integer) this.propertyMap.get(BANDROWBYTES)).intValue();
+		return (Integer) this.propertyMap.get(BANDROWBYTES);
 	}
 
 	/**
@@ -208,7 +207,7 @@ final class GT30Header {
 	 * @return the number of bytes per row
 	 */
 	public int getRowBytes() {
-		return ((Integer) this.propertyMap.get(TOTALROWBYTES)).intValue();
+		return (Integer) this.propertyMap.get(TOTALROWBYTES);
 	}
 
 	/**
@@ -217,7 +216,7 @@ final class GT30Header {
 	 * @return the number of gap bytes used to separate bands
 	 */
 	public int getBandGapBytes() {
-		return ((Integer) this.propertyMap.get(BANDGAPBYTES)).intValue();
+		return (Integer) this.propertyMap.get(BANDGAPBYTES);
 	}
 
 	/**
@@ -226,7 +225,7 @@ final class GT30Header {
 	 * @return the value used to represent lack of data
 	 */
 	public int getNoData() {
-		return ((Integer) this.propertyMap.get(NODATA)).intValue();
+		return (Integer) this.propertyMap.get(NODATA);
 	}
 
 	/**
@@ -235,7 +234,7 @@ final class GT30Header {
 	 * @return the x coordinate of the tile center
 	 */
 	public double getULXMap() {
-		return ((Double) this.propertyMap.get(ULXMAP)).doubleValue();
+		return (Double) this.propertyMap.get(ULXMAP);
 	}
 
 	/**
@@ -244,7 +243,7 @@ final class GT30Header {
 	 * @return the y coordinate of the tile center
 	 */
 	public double getULYMap() {
-		return ((Double) this.propertyMap.get(ULYMAP)).doubleValue();
+		return (Double) this.propertyMap.get(ULYMAP);
 	}
 
 	/**
@@ -253,7 +252,7 @@ final class GT30Header {
 	 * @return the width of the tile in degrees
 	 */
 	public double getXDim() {
-		return ((Double) this.propertyMap.get(XDIM)).doubleValue();
+		return (Double) this.propertyMap.get(XDIM);
 	}
 
 	/**
@@ -262,7 +261,7 @@ final class GT30Header {
 	 * @return the height of the tile in degrees
 	 */
 	public double getYDim() {
-		return ((Double) this.propertyMap.get(YDIM)).doubleValue();
+		return (Double) this.propertyMap.get(YDIM);
 	}
 
 	/**
@@ -271,24 +270,22 @@ final class GT30Header {
 	 * 
 	 * @return the initialized map
 	 */
-	private Map initMap() {
-		Map map = new HashMap();
-		map.put(BYTEORDER, "M");
-		map.put(LAYOUT, "BIL");
-		map.put(NROWS, null);
-		map.put(NCOLS, null);
-		map.put(NBANDS, null);
-		map.put(NBITS, null);
-		map.put(BANDROWBYTES, null);
-		map.put(TOTALROWBYTES, null);
-		map.put(BANDGAPBYTES, new Integer(0));
-		map.put(NODATA, new Integer(0));
-		map.put(ULXMAP, null);
-		map.put(ULYMAP, null);
-		map.put(XDIM, new Double(STD_CELL_SIZE));
-		map.put(YDIM, new Double(STD_CELL_SIZE));
+	private void initMap() {
+	        propertyMap.put(BYTEORDER, "M");
+	        propertyMap.put(LAYOUT, "BIL");
+	        propertyMap.put(NROWS, null);
+	        propertyMap.put(NCOLS, null);
+	        propertyMap.put(NBANDS, null);
+	        propertyMap.put(NBITS, null);
+	        propertyMap.put(BANDROWBYTES, null);
+	        propertyMap.put(TOTALROWBYTES, null);
+	        propertyMap.put(BANDGAPBYTES, new Integer(0));
+	        propertyMap.put(NODATA, new Integer(0));
+	        propertyMap.put(ULXMAP, null);
+	        propertyMap.put(ULYMAP, null);
+	        propertyMap.put(XDIM, new Double(STD_CELL_SIZE));
+	        propertyMap.put(YDIM, new Double(STD_CELL_SIZE));
 
-		return map;
 	}
 
 	/**
@@ -304,13 +301,9 @@ final class GT30Header {
 	 * @throws DataSourceException
 	 *             for unrecoverable data format violations
 	 */
-	private void parseHeaderFile(final Map properties,
-			final BufferedReader reader) throws IOException {
+	@SuppressWarnings("unchecked")
+        private void parseHeaderFile(final BufferedReader reader) throws IOException {
 		String currLine = reader.readLine();
-		String key = null;
-		String value = null;
-		Class propClass = null;
-
 		while (currLine != null) {
 			// remove uneeded spaces
 			currLine = currLine.trim();
@@ -322,21 +315,21 @@ final class GT30Header {
 				throw new IOException("Illegal line in GTOPO30 header file");
 			}
 
-			key = currLine.substring(0, firstSpaceIndex).toUpperCase();
-			value = currLine.substring(firstSpaceIndex).trim();
+			final String key = currLine.substring(0, firstSpaceIndex).toUpperCase();
+			final String value = currLine.substring(firstSpaceIndex).trim();
 
 			// be tolerant about unknown keys, all we need is a subset of the
 			// knows keys, the others will be discarded
-			if (properties.containsKey(key)) {
-				propClass = getPropertyClass(key);
+			if (propertyMap.containsKey(key)) {
+				final Class propClass = getPropertyClass(key);
 
 				try {
 					if (propClass == String.class) {
-						properties.put(key, value);
+					    propertyMap.put(key, value);
 					} else if (propClass == Integer.class) {
-						properties.put(key, Integer.valueOf(value));
+					    propertyMap.put(key, Integer.valueOf(value));
 					} else if (propClass == Double.class) {
-						properties.put(key, Double.valueOf(value));
+					    propertyMap.put(key, Double.valueOf(value));
 					}
 				} catch (NumberFormatException nfe) {
 					final IOException ex = new IOException();
@@ -362,11 +355,10 @@ final class GT30Header {
 	 * @return true if the map is filled in with values, false if at least one
 	 *         value is null
 	 */
-	private boolean fullPropertySet(final Map properties) {
+	private static boolean fullPropertySet(final Map<String,Object> properties) {
 		boolean full = true;
-		final Collection values = properties.values();
-
-		for (final Iterator it = values.iterator(); it.hasNext();) {
+		final Collection<Object> values = properties.values();
+		for (final Iterator<Object>  it = values.iterator(); it.hasNext();) {
 			if (it.next() == null) {
 				full = false;
 
@@ -385,8 +377,8 @@ final class GT30Header {
 	 * 
 	 * @return the class of the value associated to the passed key
 	 */
-	private Class getPropertyClass(final String key) {
-		Class propClass = null;
+	private static Class<?> getPropertyClass(final String key) {
+		Class<?> propClass = null;
 
 		if (key.equals(BYTEORDER) || key.equals(LAYOUT)) {
 			propClass = String.class;
