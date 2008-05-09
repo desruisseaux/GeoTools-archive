@@ -31,6 +31,8 @@ import org.geotools.referencing.piecewise.PiecewiseTransform1DElement;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
 import org.geotools.resources.image.ColorUtilities;
+import org.geotools.util.EqualsUtil;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.geometry.DirectPosition;
@@ -44,7 +46,7 @@ import org.opengis.util.InternationalString;
 /**
  * @author        Simone Giannecchini, GeoSolutions.
  */
-public class LinearColorMap extends AbstractList<LinearColorMapElement>
+public final class LinearColorMap extends AbstractList<LinearColorMapElement>
 		implements ColorMapTransform<LinearColorMapElement> {
 
 	public final static class LinearColorMapType {
@@ -111,6 +113,8 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
      * @uml.property  name="name"
      */
 	private InternationalString name;
+
+        private int hashCode=-1;
 
 	/**
 	 * Constructor which creates a {@link LinearColorMap} without a
@@ -784,4 +788,41 @@ public class LinearColorMap extends AbstractList<LinearColorMapElement>
 		throw new UnsupportedOperationException(Errors.format(ErrorKeys.UNSUPPORTED_OPERATION_$1, "transform"));
 		
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if(this==o)
+            return true;
+        if(!(o instanceof LinearColorMap))
+            return false;
+        final LinearColorMap that=(LinearColorMap) o;
+        if(!EqualsUtil.equals(name, that.name))
+            return false;
+        if(!EqualsUtil.equals(defaultColor, that.defaultColor))
+            return false;
+        if(preFilteringColor!=that.preFilteringColor)
+            return false;
+        if(!EqualsUtil.equals(preFilteringElements, that.preFilteringElements))
+            return false;
+        if(!EqualsUtil.equals(standardElements, that.standardElements))
+            return false;
+        return piecewise.equals(that.piecewise);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        if(hashCode>=0)
+            return hashCode;
+        hashCode=HashCodeUtil.SEED;
+        hashCode=HashCodeUtil.hash(hashCode, name);
+        hashCode=HashCodeUtil.hash(hashCode, defaultColor);
+        hashCode=HashCodeUtil.hash(hashCode, preFilteringColor);
+        hashCode=HashCodeUtil.hash(hashCode, preFilteringElements);
+        hashCode=HashCodeUtil.hash(hashCode, standardElements);
+        hashCode=HashCodeUtil.hash(hashCode, piecewise);
+        return hashCode;
+        
+        
+    }
 }

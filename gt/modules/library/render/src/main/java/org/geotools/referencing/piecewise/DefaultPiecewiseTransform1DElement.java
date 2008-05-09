@@ -15,11 +15,16 @@
  */
 package org.geotools.referencing.piecewise;
 
+import javax.naming.ldap.HasControls;
+
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
+import org.geotools.resources.Utilities;
+import org.geotools.util.EqualsUtil;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -48,6 +53,8 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 * Inverse {@link MathTransform1D}
 	 */
 	private MathTransform1D inverse;
+        
+	private int hashCode=-1;
 
 	
 	/**
@@ -182,7 +189,7 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 	 *            for this {@link DomainElement1D}.
 	 * @throws IllegalArgumentException
 	 */
-	public DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<? extends Number> valueRange,
+	protected DefaultPiecewiseTransform1DElement(CharSequence name, NumberRange<? extends Number> valueRange,
 			final MathTransform1D transform) throws IllegalArgumentException {
 		super(name, valueRange);
 		// /////////////////////////////////////////////////////////////////////
@@ -376,12 +383,19 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 
 
 	public boolean equals(Object obj) {
-		PiecewiseUtilities.ensureNonNull("Object", obj);
-		if(obj==this)
+	    if(obj==this)
 			return true;
-		boolean retVal= super.equals(obj);
-		final DefaultPiecewiseTransform1DElement that= (DefaultPiecewiseTransform1DElement) obj;
-		return retVal&&this.transform.equals(that.transform);
+            if(!(obj instanceof DefaultPiecewiseTransform1DElement))
+                return false;
+            final DefaultPiecewiseTransform1DElement that=(DefaultPiecewiseTransform1DElement) obj;
+            if(getEquivalenceClass()!=(that.getEquivalenceClass()))
+                return false;
+            if (!EqualsUtil.equals(transform, that.transform))
+                return false;
+            if (!EqualsUtil.equals(inverse, that.inverse))
+                return false;
+            return super.equals(obj);
+		
 	}
 
 	/*
@@ -393,5 +407,26 @@ public class DefaultPiecewiseTransform1DElement extends DefaultDomainElement1D i
 		buffer.append("\n").append("wkt transform=").append(this.transform.toWKT());
 		return buffer.toString();
 	}
+
+    protected Class<?> getEquivalenceClass(){
+        return DefaultPiecewiseTransform1DElement.class;
+    }
+
+    @Override
+    public int hashCode() {
+        if(hashCode>=0)
+            return hashCode;
+        hashCode=HashCodeUtil.SEED;
+        hashCode=HashCodeUtil.hash(hashCode, transform);
+        hashCode=HashCodeUtil.hash(hashCode, inverse);
+        hashCode=HashCodeUtil.hash(hashCode, super.hashCode());
+        return hashCode;
+    }
+
+    public static DefaultPiecewiseTransform1DElement create(String string,
+            NumberRange<? extends Number> range,
+            MathTransform1D mathTransform1D) {
+        return new DefaultPiecewiseTransform1DElement(string, range, mathTransform1D);
+    }
 
 }

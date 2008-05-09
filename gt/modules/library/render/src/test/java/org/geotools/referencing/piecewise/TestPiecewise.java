@@ -204,8 +204,11 @@ public class TestPiecewise extends TestCase {
 		// byte
 		//
 		// /////////////////////////////////////////////////////////////////////
-		DefaultPiecewiseTransform1DElement e0 = DefaultPiecewiseTransform1DElement
-				.create("zero", NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),((byte) 0));
+		DefaultPiecewiseTransform1DElement e0 = 
+		    DefaultPiecewiseTransform1DElement.create(
+		            "zero", 
+		            NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
+		            ((byte) 0));
 		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
 		assertEquals(0.0, e0.transform(0),0.0);
@@ -220,7 +223,6 @@ public class TestPiecewise extends TestCase {
 		
 		DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform = 
 		    new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
-
 		// checks
 		assertEquals(0.0, transform.transform(0),0);
 		assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
@@ -236,8 +238,10 @@ public class TestPiecewise extends TestCase {
 		// int
 		//
 		// /////////////////////////////////////////////////////////////////////
-		e0 = DefaultPiecewiseTransform1DElement
-				.create("zero", NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY), 0);
+		e0 = DefaultPiecewiseTransform1DElement.create(
+		        "zero", 
+		        NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
+		        0);
 		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
 		assertEquals(0.0, e0.transform(0),0.0);
@@ -250,25 +254,34 @@ public class TestPiecewise extends TestCase {
 		}
 		
 		
-		transform = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
+		DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement> transform1 = new DefaultPiecewiseTransform1D<DefaultPiecewiseTransform1DElement>(new DefaultPiecewiseTransform1DElement[] {e0});
 
 		// checks
-		assertEquals(0.0, transform.transform(0),0);
-		assertEquals( transform.transform(Double.POSITIVE_INFINITY),0.0,0.0);
+		assertEquals(0.0, transform1.transform(0),0);
+		assertEquals( transform1.transform(Double.POSITIVE_INFINITY),0.0,0.0);
 		try{
-			transform.inverse();
+			transform1.inverse();
 			assertTrue(false);
 		}catch (Exception e) {
 			// TODO: handle exception
 		}
+		
+		//hashcode and equals
+		assertFalse(transform.equals(transform1));
+		assertFalse(transform1.equals(transform));
+		assertFalse(transform.equals(transform));
+		assertFalse(transform1.equals(transform1));
+		assertEquals(transform1.hashCode(), transform.hashCode());
 		
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// double
 		//
 		// /////////////////////////////////////////////////////////////////////
-		e0 = DefaultPiecewiseTransform1DElement
-				.create("zero", NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY), 0.0);
+		e0 = DefaultPiecewiseTransform1DElement.create(
+		        "zero", 
+		        NumberRange.create(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY), 
+		        0.0);
 		assertTrue(e0 instanceof DefaultConstantPiecewiseTransformElement);
 		// checks
 		assertEquals(0.0, e0.transform(0),0.0);

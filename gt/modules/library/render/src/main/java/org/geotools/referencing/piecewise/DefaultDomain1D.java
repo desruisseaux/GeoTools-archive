@@ -22,6 +22,7 @@ import java.util.MissingResourceException;
 
 import org.geotools.renderer.i18n.Vocabulary;
 import org.geotools.renderer.i18n.VocabularyKeys;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
@@ -30,7 +31,7 @@ import org.opengis.util.InternationalString;
  * Convenience implementation of the    {@link Domain1D}    interface.
  * @author    Simone Giannecchini
  */
-public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends AbstractList<T> implements Domain1D<T>{
+public class DefaultDomain1D<E extends DefaultDomainElement1D>  extends AbstractList<E> implements Domain1D<E>{
 
 
 
@@ -66,7 +67,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 			// @todo TODO should I include the NaN value?
 			if (range == null) {
 				NumberRange<?> range = null;
-				for (T element:elements) {
+				for (E element:elements) {
 					final NumberRange<? extends Number> extent =  element.getRange();
 					if (!Double.isNaN(extent.getMinimum())&& !Double.isNaN(extent.getMaximum())) {
 						if (range != null) {
@@ -86,7 +87,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
          * The list of elements. This list most be sorted in increasing order of
          * left range element.
          */
-	private T[] elements;
+	private E[] elements;
 
 	/**
 	 * {@code  true} if there is gaps between elements, or {@code  false}
@@ -100,7 +101,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	 * domain element is the quantitative domain element with the widest range of sample
 	 * values.
 	 */
-	private T main;
+	private E main;
 
 	/**
          * List of {@link #inputMinimum} values for each domain element in
@@ -126,12 +127,17 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	private NumberRange<?> range;
 
 	/**
+	 * Lazily initialized hashcode for this class
+	 */
+        private int hashCode=-1;
+
+	/**
 	 * Constructor for {@link DefaultDomain1D}.
 	 * 
 	 * @param inDomainElements
 	 *            {@link DomainElement1D} objects that make up this list.
 	 */
-	public DefaultDomain1D(T[] inDomainElements) {
+	public DefaultDomain1D(E[] inDomainElements) {
 		init(inDomainElements);
 	}
 
@@ -141,7 +147,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	 * @throws MissingResourceException
 	 */
 	@SuppressWarnings("unchecked")
-    private void init(T[] inDomainElements)
+    private void init(E[] inDomainElements)
 			throws IllegalArgumentException, MissingResourceException {
 	    
 	    // /////////////////////////////////////////////////////////////////////
@@ -153,7 +159,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
             
 		// @todo TODOCHECK ME
 		if (inDomainElements == null)
-		    this.elements = (T[])  new DefaultDomainElement1D[]{ new DefaultPassthroughPiecewiseTransform1DElement("p0")};
+		    this.elements = (E[])  new DefaultDomainElement1D[]{ new DefaultPassthroughPiecewiseTransform1DElement("p0")};
 		else
 		    this.elements =  inDomainElements.clone();
 
@@ -199,9 +205,9 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 		 * sample values.
 		 */
 		double range = 0;
-		T main = null;
+		E main = null;
 		for (int i = elements.length; --i >= 0;) {
-			final T candidate = elements[i];
+			final E candidate = elements[i];
 			if (Double.isInfinite(candidate.getInputMinimum())
 					&& Double.isInfinite(candidate.getInputMaximum())) {
 				range = Double.POSITIVE_INFINITY;
@@ -230,7 +236,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	 *            The value.
 	 * @return The domain element of the supplied value, or {@code null}.
 	 */
-	public T findDomainElement(final double value) {
+	public E findDomainElement(final double value) {
 
 		int i = getDomainElementIndex(value);
 
@@ -241,7 +247,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 		// //
 		if (i < 0)
 			return null;
-		T domainElement1D;
+		E domainElement1D;
 		if (i > elements.length)
 			return null;
 
@@ -321,6 +327,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	/**
 	 * Returns the number of elements in this list.
 	 */
+	@Override
 	public int size() {
 		return elements.length;
 	}
@@ -328,13 +335,15 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	/**
 	 * Returns the element at the specified position in this list.
 	 */
-	public T get(final int i) {
+	@Override
+	public E get(final int i) {
 		return elements[i];
 	}
 
 	/**
 	 * Returns all elements in this {@code }.
 	 */
+	@Override
 	public Object[] toArray() {
 		return (DomainElement1D[]) elements.clone();
 	}
@@ -344,17 +353,32 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	 * the two objects are instances of the {@link DefaultDomain1D} class, then
 	 * the test check for the equality of the single elements.
 	 */
+        @SuppressWarnings("unchecked")
+        @Override
 	public boolean equals(final Object object) {
-		if (object.getClass().equals(this.getClass())) {
-			final DefaultDomain1D<?> that = (DefaultDomain1D<?>) object;
-			if (Arrays.equals(this.elements, that.elements)) {
-				assert Arrays.equals(this.minimums, that.minimums);
-				return true;
-			}
-			return false;
-		}
-		return super.equals(object);
+            if(this== object)
+                return true;
+            if(!(object instanceof DefaultDomain1D))
+                    return false; 
+            final DefaultDomain1D that =  (DefaultDomain1D) object;
+            if(getEquivalenceClass()!=that.getEquivalenceClass())
+                return false;
+            if(!this.getName().equals(that.getName()))
+                return false;
+            if(!this.getApproximateDomainRange().equals(that.getApproximateDomainRange()))
+                return false;
+            if (Arrays.equals(this.elements, that.elements)) {
+                assert Arrays.equals(this.minimums, that.minimums);
+                return true;
+            }
+            return false;
 	}
+
+	protected Class<?> getEquivalenceClass(){
+	    return DefaultDomain1D.class;
+	}
+	
+	
 
 	/*
 	 * (non-Javadoc)
@@ -372,7 +396,7 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
          * @return what seems to be the main {@link DomainElement1D} for this
          *         list.
          */
-	public T getMain() {
+	public E getMain() {
 		return main;
 	}
 
@@ -382,6 +406,20 @@ public class DefaultDomain1D<T extends DefaultDomainElement1D>  extends Abstract
 	public double[] getMinimums() {
 		return (double[]) minimums.clone();
 	}
+
+        @Override
+        public int hashCode() {
+            if(hashCode<0)
+            {
+                int result = HashCodeUtil.SEED;
+                hashCode=HashCodeUtil.hash( result,elements );
+                hashCode=HashCodeUtil.hash( result,minimums );
+                hashCode=HashCodeUtil.hash( result,getName() );
+                hashCode=HashCodeUtil.hash( result,getApproximateDomainRange() );
+
+            }
+            return hashCode;
+        }
 
 //	public boolean contains(Object o) {
 //		if (o instanceof Double) {

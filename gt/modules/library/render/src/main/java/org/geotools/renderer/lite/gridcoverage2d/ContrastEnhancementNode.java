@@ -610,7 +610,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// STEP 2 do the gamma correction by using generic piecewise
 				//
 				////
-				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
+				final DefaultPiecewiseTransform1DElement mainElement = DefaultPiecewiseTransform1DElement.create(
 						"exponential-contrast-enhancement-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 
@@ -697,7 +697,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// STEP 2 do the gamma correction by using generic piecewise
 				//
 				////
-				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
+				final DefaultPiecewiseTransform1DElement mainElement = DefaultPiecewiseTransform1DElement.create(
 						"logarithmic-contrast-enhancement-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 
@@ -846,7 +846,7 @@ class ContrastEnhancementNode extends StyleVisitorCoverageProcessingNodeAdapter
 				// STEP 2 do the gamma correction by using generic piecewise
 				//
 				////
-				final DefaultPiecewiseTransform1DElement mainElement = new DefaultPiecewiseTransform1DElement(
+				final DefaultPiecewiseTransform1DElement mainElement = DefaultPiecewiseTransform1DElement.create(
 						"gamma-correction-transform", NumberRange.create(minimum[0],maximum[0]), 
 						new MathTransform1DAdapter() {
 

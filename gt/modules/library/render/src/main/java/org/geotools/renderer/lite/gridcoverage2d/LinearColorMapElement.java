@@ -26,6 +26,7 @@ import org.geotools.referencing.piecewise.PiecewiseTransform1DElement;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
 import org.geotools.renderer.lite.gridcoverage2d.LinearColorMap.LinearColorMapType;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.operation.MathTransform1D;
 
@@ -49,6 +50,9 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
      * @uml.property  name="colors"
      */
 	private Color[] colors;
+
+
+    private int hashCode=-1;
 
 	public static LinearColorMapElement create(final CharSequence name,
 			final Color[] colors, final NumberRange<? extends Number> valueRange,
@@ -182,12 +186,16 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
 	 * @see org.geotools.renderer.lite.gridcoverage2d.Category#equals(java.lang.Object)
 	 */
 	public boolean equals(final Object object) {
-		boolean retVal = super.equals(object);
-		if (retVal) {
-			final LinearColorMapElement that = (LinearColorMapElement) object;
-			retVal &= Arrays.equals(this.getColors(), that.getColors());
-		}
-		return retVal;
+	    if(this==object)
+	        return true;
+	    if(!(object instanceof LinearColorMapElement))
+	        return false;
+            final LinearColorMapElement that = (LinearColorMapElement) object;
+            if(getEquivalenceClass()!=that.getEquivalenceClass())
+                return false;
+            if(Arrays.equals(this.getColors(), that.getColors()))
+                return false;
+            return super.equals(that);
 	}
 
 	/**
@@ -224,5 +232,17 @@ public class LinearColorMapElement extends DefaultLinearPiecewiseTransform1DElem
 
 		return buffer.toString();
 	}
+    protected Class<?> getEquivalenceClass(){
+        return LinearColorMapElement.class;
+    }
+    @Override
+    public int hashCode() {
+        if(hashCode>=0)
+            return hashCode;
+        hashCode=HashCodeUtil.SEED;
+        hashCode=HashCodeUtil.hash(hashCode, colors);
+        hashCode=HashCodeUtil.hash(hashCode, super.hashCode());
+        return hashCode;
+    }
 
 }

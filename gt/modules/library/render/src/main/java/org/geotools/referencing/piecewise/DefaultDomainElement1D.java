@@ -18,6 +18,8 @@ package org.geotools.referencing.piecewise;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
 import org.geotools.resources.Utilities;
+import org.geotools.util.EqualsUtil;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.InternationalString;
@@ -74,40 +76,40 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 */
 	public boolean equals(final Object obj) {
 		if (obj == this) {
-			// Slight optimization
 			return true;
 		}
-		if (obj != null && obj.getClass().equals(getClass())) {
-			final DefaultDomainElement1D that = (DefaultDomainElement1D) obj;
-			if (Double.doubleToRawLongBits(inputMinimum) == Double
-					.doubleToRawLongBits(that.inputMinimum)
-					&& Double.doubleToRawLongBits(inputMaximum) == Double
-							.doubleToRawLongBits(that.inputMaximum)
-					&& Utilities.equals(this.name, that.name)) {
-				// paranoiac check
-				if (this.inputRange != null && that.inputRange != null) {
-					if (!Utilities.equals(this.inputRange, that.inputRange))
-						return false;
-					return true;
-				}
-				return true;
-			}
-		}
-		return false;
+		if(obj instanceof DefaultDomainElement1D)
+		    return false;
+		final DefaultDomainElement1D that=(DefaultDomainElement1D) obj;
+	        if(getEquivalenceClass()!=that.getEquivalenceClass())
+	            return false;
+		if (!EqualsUtil.equals(inputMinimum, that.inputMinimum))
+		    return false;
+                if (!EqualsUtil.equals(inputMaximum, that.inputMaximum))
+                    return false;
+                if (!EqualsUtil.equals(this.name, that.name))
+                    return false; 
+		if (!Utilities.equals(this.range, that.range))
+		    return false;
+		return true;
 	}
-
+	
+        protected Class<?> getEquivalenceClass(){
+            return DefaultDomainElement1D.class;
+        }
+        
 	/**
 	 * @see DomainElement1D#contains(Number)
 	 */
 	public boolean contains(Number value) {
-		return inputRange.contains(value);
+		return range.contains(value);
 	}
 
 	/**
 	 * @see DomainElement1D#contains(NumberRange)
 	 */
 	public boolean contains(NumberRange<?> range) {
-		return inputRange.contains(range);
+		return range.contains(range);
 	}
 
 	/**
@@ -144,9 +146,9 @@ public class DefaultDomainElement1D implements DomainElement1D {
 
 	/**
      * The range of values   {@code     [inputMinimum..maximum]}   . May be computed only when first requested, or may be user-supplied .
-     * @uml.property  name="inputRange"
+     * @uml.property  name="range"
      */
-	private NumberRange<? extends Number> inputRange;
+	private NumberRange<? extends Number> range;
 
 	/**
 	 * Is lower input bound infinite?
@@ -170,6 +172,8 @@ public class DefaultDomainElement1D implements DomainElement1D {
      */
 	private boolean inputMinimumNaN;
 
+    private int hashCode=-1;
+
 	/**
 	 * Abstract domain element constructor.
 	 * 
@@ -179,7 +183,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 * 
 	 * @param name
 	 *            for this {@link DefaultDomainElement1D}.
-	 * @param inputRange
+	 * @param range
 	 *            for this {@link DefaultDomainElement1D}.
 	 * @throws IllegalArgumentException
 	 *             in case one of the input arguments is invalid.
@@ -192,7 +196,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		PiecewiseUtilities.ensureNonNull("name", name);
-		PiecewiseUtilities.ensureNonNull("inputRange", inputRange);
+		PiecewiseUtilities.ensureNonNull("range", inputRange);
 		
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -200,7 +204,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		this.name = SimpleInternationalString.wrap(name);
-		this.inputRange = inputRange;
+		this.range = inputRange;
 		Class<? extends Number> type = inputRange.getElementClass();
 		boolean minInc = inputRange.isMinIncluded();
 		boolean maxInc = inputRange.isMaxIncluded();
@@ -245,7 +249,15 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	 * 
 	 */
 	public int hashCode() {
-		return name.hashCode();
+	    if(hashCode>=0)
+	        return hashCode;
+	    hashCode=HashCodeUtil.SEED;
+	    hashCode=HashCodeUtil.hash(hashCode, name);
+	    hashCode=HashCodeUtil.hash(hashCode, range);
+	    hashCode=HashCodeUtil.hash(hashCode, inputMaximum);
+	    hashCode=HashCodeUtil.hash(hashCode, inputMinimum);
+	    return hashCode;
+		
 	}
 
 	/**
@@ -317,11 +329,11 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	/**
      * This method retrieves the input range.
      * @return  the input range.
-     * @uml.property  name="inputRange"
+     * @uml.property  name="range"
      */
 	public NumberRange<? extends Number> getRange() {
-	    return inputRange;
-		//return NumberRange.wrap(inputRange);
+	    return range;
+		//return NumberRange.wrap(range);
 	}
 
 	/**
@@ -336,7 +348,7 @@ public class DefaultDomainElement1D implements DomainElement1D {
 	public String toString() {
 		final StringBuffer buffer= new StringBuffer("Domain description:");
 		buffer.append("\n").append("name=").append(name);
-		buffer.append("\n").append("input range=").append(inputRange);
+		buffer.append("\n").append("input range=").append(range);
 		return buffer.toString();
 	}
 

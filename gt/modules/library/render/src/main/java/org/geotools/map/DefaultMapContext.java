@@ -63,7 +63,7 @@ public class DefaultMapContext implements MapContext {
 	/** The logger for the map module. */
 	static public final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.map");
 
-	List layerList = new ArrayList();
+	List<MapLayer> layerList = new ArrayList<MapLayer>();
 
 	CoordinateReferenceSystem crs = null;
 

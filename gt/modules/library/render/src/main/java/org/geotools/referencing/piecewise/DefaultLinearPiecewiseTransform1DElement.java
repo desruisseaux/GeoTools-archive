@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.renderer.i18n.ErrorKeys;
 import org.geotools.renderer.i18n.Errors;
+import org.geotools.util.EqualsUtil;
+import org.geotools.util.HashCodeUtil;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -295,4 +297,36 @@ public class DefaultLinearPiecewiseTransform1DElement extends DefaultPiecewiseTr
 		buffer.append("\n").append("output range=").append(this.outputRange);
 		return buffer.toString();
 	}
+
+    protected Class<?> getEquivalenceClass(){
+        return DefaultLinearPiecewiseTransform1DElement.class;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this==obj)
+            return true;
+        if(!(obj instanceof DefaultLinearPiecewiseTransform1DElement))
+            return false;
+        final DefaultLinearPiecewiseTransform1DElement that= (DefaultLinearPiecewiseTransform1DElement) obj;
+        if(that.getEquivalenceClass()!=this.getEquivalenceClass())
+            return false;
+        if(!EqualsUtil.equals(outputRange, that.outputRange))
+            return false;
+        if(!EqualsUtil.equals(outputMaximum, that.outputMaximum))
+            return false;
+        if(!EqualsUtil.equals(outputMinimum, that.outputMinimum))
+            return false;
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode=HashCodeUtil.SEED;
+        hashCode=HashCodeUtil.hash(hashCode, outputRange);
+        hashCode=HashCodeUtil.hash(hashCode, outputMaximum);
+        hashCode=HashCodeUtil.hash(hashCode, outputMinimum);
+        hashCode=HashCodeUtil.hash(hashCode, super.hashCode());
+        return hashCode;
+    }
 }
