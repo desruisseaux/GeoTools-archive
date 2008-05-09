@@ -578,18 +578,18 @@ public class TestData {
         Object[] values = new Object[type.getAttributeCount()];
 
         for (int i = 0; i < numFeatures; i++) {
-            values[1] = Integer.valueOf(i);
+            values[0] = Integer.valueOf(i);
 
             // put some nulls
-            values[2] = ((i % 2) == 0) ? null : Integer.valueOf(2 * i);
-            values[3] = new Float(0.1 * i);
-            values[4] = new Double(1000 * i);
-            values[5] = "String value #" + i;
+            values[1] = ((i % 2) == 0) ? null : Integer.valueOf(2 * i);
+            values[2] = new Float(0.1 * i);
+            values[3] = new Double(1000 * i);
+            values[4] = "String value #" + i;
 
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, i);
-            values[6] = cal.getTime();
-            values[7] = createTestGeometry(jtsGeomType, i);
+            values[5] = cal.getTime();
+            values[6] = createTestGeometry(jtsGeomType, i);
 
             SimpleFeature f = SimpleFeatureBuilder.build(type, values, null);
             col.add(f);
