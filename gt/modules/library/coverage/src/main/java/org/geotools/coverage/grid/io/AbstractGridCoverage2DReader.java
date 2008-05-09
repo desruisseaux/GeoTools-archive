@@ -670,7 +670,7 @@ public abstract class AbstractGridCoverage2DReader implements
 				final CoordinateReferenceSystem crs2D = CRS.getHorizontalCRS(
 						envelope.getCoordinateReferenceSystem());
 				if (crs2D != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
-					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
+					final MathTransform tr = CRS.findMathTransform(crs2D, crs,true);
 					if (!tr.isIdentity())
 					{
 						envelope = CRS.transform(tr, envelope);

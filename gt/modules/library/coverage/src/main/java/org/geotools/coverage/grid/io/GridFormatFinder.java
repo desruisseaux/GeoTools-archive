@@ -138,6 +138,7 @@ public final class GridFormatFinder {
 	 * @return an array with all available {@link GridFormatFactorySpi}
 	 *         implementations.
 	 */
+	@SuppressWarnings("deprecation")
 	public static Format[] getFormatArray() {
 		final Set<GridFormatFactorySpi> formats = GridFormatFinder.getAvailableFormats();
 		final List<Format> formatSet = new ArrayList<Format>(formats.size());
@@ -157,7 +158,8 @@ public final class GridFormatFinder {
 	 * @return an unmodifiable {@link Set} comprising all the {@link Format}
 	 *         that can read the {@link Object} o.
 	 */
-	public static synchronized Set<Format> findFormats(Object o) {
+	@SuppressWarnings("deprecation")
+        public static synchronized Set<Format> findFormats(Object o) {
 		final Set<GridFormatFactorySpi> availaibleFormats = getAvailableFormats();
 		final Set<Format> formats=new HashSet<Format>();
 		final Iterator<GridFormatFactorySpi> it = availaibleFormats.iterator();
@@ -195,7 +197,8 @@ public final class GridFormatFinder {
 	 *         {@link Object} o or <code>null</code> in no plugins was able to
 	 *         accept it.
 	 */
-	public static synchronized Format findFormat(Object o) {
+	@SuppressWarnings("deprecation")
+        public static synchronized Format findFormat(Object o) {
 		final Set<Format> formats = findFormats(o);
 		final Iterator<Format> it = formats.iterator();
 		if (it.hasNext())

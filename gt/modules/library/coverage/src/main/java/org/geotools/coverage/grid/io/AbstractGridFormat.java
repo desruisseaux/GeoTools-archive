@@ -54,7 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * }</code>
  * 
  * @author jeichar
- * @author Simone Giannecchini
+ * @author Simone Giannecchini, GeoSolutions
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.3.x/module/main/src/org/geotools/data/coverage/grid/AbstractGridFormat.java $
  */
@@ -108,7 +108,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * to pick up the best matching resolution level and (soon) the best
 	 * matching area.
 	 */
-	public static final DefaultParameterDescriptor READ_GRIDGEOMETRY2D = new DefaultParameterDescriptor(
+	public static final DefaultParameterDescriptor<GridGeometry2D> READ_GRIDGEOMETRY2D = new DefaultParameterDescriptor<GridGeometry2D>(
 			"ReadGridGeometry2D", GridGeometry2D.class, null, null);
 
 	/**
@@ -116,9 +116,9 @@ public abstract class AbstractGridFormat implements Format {
 	 * {@link GridCoverageWriter}s through the
 	 * {@link GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage, GeneralParameterValue[])}
 	 * method in order to control the writing process in terms of compression,
-	 * tiling, etc.
+	 * tiling, etc.GridGeometry2D
 	 */
-	public static final DefaultParameterDescriptor GEOTOOLS_WRITE_PARAMS = new DefaultParameterDescriptor(
+	public static final DefaultParameterDescriptor<GeoToolsWriteParams> GEOTOOLS_WRITE_PARAMS = new DefaultParameterDescriptor<GeoToolsWriteParams>(
 			"WriteParameters", GeoToolsWriteParams.class, null, null);
 
 
@@ -130,7 +130,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * ImageRead operation (leveraging on Deferred Execution Model, 
      * Tile Caching,...), or the direct {@code ImageReader}'s read methods.
 	 */
-	public static final DefaultParameterDescriptor USE_JAI_IMAGEREAD = new DefaultParameterDescriptor(
+	public static final DefaultParameterDescriptor<Boolean> USE_JAI_IMAGEREAD = new DefaultParameterDescriptor<Boolean>(
 			Hints.USE_JAI_IMAGEREAD.toString(), Boolean.class, new Boolean[] {
 					Boolean.TRUE, Boolean.FALSE }, Boolean.TRUE);
 	
@@ -196,7 +196,8 @@ public abstract class AbstractGridFormat implements Format {
 	 *            The source object to parse.
 	 * @return A reader for this {@link Format} or null.
 	 */
-	abstract public GridCoverageReader getReader(Object source);
+	@SuppressWarnings("deprecation")
+        abstract public GridCoverageReader getReader(Object source);
 
 	/**
 	 * 
@@ -215,7 +216,8 @@ public abstract class AbstractGridFormat implements Format {
 	 *            reader.
 	 * @return A reader for this {@link Format} or null.
 	 */
-	abstract public GridCoverageReader getReader(Object source, Hints hints);
+	@SuppressWarnings("deprecation")
+        abstract public GridCoverageReader getReader(Object source, Hints hints);
 
 	/**
 	 * Retrieves a {@link GridCoverageWriter} suitable for writing to the
@@ -229,7 +231,8 @@ public abstract class AbstractGridFormat implements Format {
 	 * @return A {@link GridCoverageWriter} suitable for writing to the provided
 	 *         <code>destination</code> with this format.
 	 */
-	abstract public GridCoverageWriter getWriter(Object destination);
+	@SuppressWarnings("deprecation")
+        abstract public GridCoverageWriter getWriter(Object destination);
 
 	/**
 	 * Tells me if this {@link Format} can read the provided <code>input</code>.
@@ -244,7 +247,8 @@ public abstract class AbstractGridFormat implements Format {
 	/**
 	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
 	 */
-	public boolean equals(Format f) {
+	@SuppressWarnings("deprecation")
+        public boolean equals(Format f) {
 		if (f.getClass() == getClass()) {
 			return true;
 		}

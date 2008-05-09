@@ -64,6 +64,7 @@ public interface GridFormatFactorySpi extends Factory, OptionalFactory {
      *                     if there were any problems creating or connecting
      *                     the datasource.
      */
+    @SuppressWarnings("deprecation")
     Format createFormat();
 
 

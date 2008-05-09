@@ -38,12 +38,13 @@ import org.opengis.parameter.ParameterValueGroup;
  *         http://svn.geotools.org/geotools/branches/2.3.x/module/main/src/org/geotools/data/coverage/grid/UnknownFormat.java $
  * @version $Revision: 1.9 $
  */
+@SuppressWarnings("deprecation")
 public class UnknownFormat extends AbstractGridFormat implements Format {
 	/**
 	 * Creates a new UnknownFormat object.
 	 */
 	public UnknownFormat() {
-		mInfo = new HashMap();
+		mInfo = new HashMap<String,String>();
 		mInfo.put("name", "Unkown Format");
 		mInfo.put("description", "This format describes all unknown formats");
 		mInfo.put("vendor", null);
